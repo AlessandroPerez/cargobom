@@ -1,0 +1,1737 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:41076026-5843-4b09-a530-9c05c7c41d4b",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "rcbom-phase0-spike"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "age",
+      "bom-ref": "crate:age",
+      "purl": "pkg:cargo/age"
+    },
+    {
+      "type": "library",
+      "name": "age_core",
+      "bom-ref": "crate:age_core",
+      "purl": "pkg:cargo/age_core"
+    },
+    {
+      "type": "library",
+      "name": "jsonwebtoken",
+      "bom-ref": "crate:jsonwebtoken",
+      "purl": "pkg:cargo/jsonwebtoken"
+    },
+    {
+      "type": "library",
+      "name": "rustls",
+      "bom-ref": "crate:rustls",
+      "purl": "pkg:cargo/rustls"
+    },
+    {
+      "type": "library",
+      "name": "realapp",
+      "bom-ref": "crate:realapp",
+      "purl": "pkg:cargo/realapp"
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-128",
+      "bom-ref": "crypto:AES-128",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "block-cipher",
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "parameterSetIdentifier": "128"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> AES_128"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "QUIC header protection"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-128-GCM",
+      "bom-ref": "crypto:AES-128-GCM",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "ae",
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "128"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES_128_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES_128_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> AES_128_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] static AES128_GCM -> AES_128_GCM"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-256",
+      "bom-ref": "crypto:AES-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "block-cipher",
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "parameterSetIdentifier": "256"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> AES_256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "QUIC header protection"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-256-GCM",
+      "bom-ref": "crypto:AES-256-GCM",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "ae",
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> AES_256_GCM"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] static AES256_GCM -> AES_256_GCM"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ChaCha20-Poly1305",
+      "bom-ref": "crypto:ChaCha20-Poly1305",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "ae",
+          "algorithmFamily": "ChaCha20",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::decrypt_in_place"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::encrypt_in_place"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::KeyInit>::new"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::aead::Aead>::decrypt::<'_, '_,"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::aead::Aead>::encrypt::<'_, '_,"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as std::ops::Drop>::drop"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] std::ptr::drop_glue::<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>>> - shim(Some(chacha20poly1305:"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::ticketer::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/ticketer.rs:61:1: 61:18>::new -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::decrypter -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::encrypter -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] static TICKETER_AEAD -> CHACHA20_POLY1305"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:nonce_bytes",
+          "value": "12"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "13"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDH-P-256",
+      "bom-ref": "crypto:ECDH-P-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "key-agree",
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keygen"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP256R1"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SECP256R1::promoted[0] -> ECDH_P256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDH_P256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-256"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDH-P-384",
+      "bom-ref": "crypto:ECDH-P-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "key-agree",
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keygen"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP384R1"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SECP384R1::promoted[0] -> ECDH_P384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDH_P384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-384"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDSA-P-256-SHA-256",
+      "bom-ref": "crypto:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P256_SHA256_FIXED"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P256_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P256_SHA256_ASN1"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-256"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDSA-P-256-SHA-384",
+      "bom-ref": "crypto:ECDSA-P-256-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P256_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P256_SHA384_ASN1"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-256"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDSA-P-384-SHA-256",
+      "bom-ref": "crypto:ECDSA-P-384-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P384_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P384_SHA256_ASN1"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-384"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "ECDSA-P-384-SHA-384",
+      "bom-ref": "crypto:ECDSA-P-384-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P384_SHA384_FIXED_SIGNING"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P384_SHA384_FIXED"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P384_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P384_SHA384_ASN1"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "P-384"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "Ed25519",
+      "bom-ref": "crypto:Ed25519",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn eddsa::alg_to_ec_verification -> ED25519"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::ED25519"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::ED25519"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::ED25519"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "Ed25519"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HKDF-SHA-256",
+      "bom-ref": "crypto:HKDF-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "kdf",
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] std::result::Result::<hkdf::Hkdf<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>, "
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> HKDF_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> HKDF_SHA256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HKDF-SHA-384",
+      "bom-ref": "crypto:HKDF-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "kdf",
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> HKDF_SHA384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HMAC-SHA-256",
+      "bom-ref": "crypto:HMAC-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "mac",
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age",
+            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, s"
+          },
+          {
+            "location": "age",
+            "additionalContext": "[mono] hmac::digest::CtOutput::<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sh"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as chacha20p"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::dig"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as std::clon"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore,"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <std::result::Result<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSh"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <std::result::Result<sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] sha2::digest::block_buffer::BlockBuffer::<64, sha2::digest::block_buffer::Eager>::digest_blocks::<{closure@<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWra"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] sha2::digest::block_buffer::BlockBuffer::<64, sha2::digest::block_buffer::Eager>::digest_blocks::<{closure@<sha2::digest::core_api::CoreWrapper<hkdf::hmac::Hmac"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "27"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HMAC-SHA-384",
+      "bom-ref": "crypto:HMAC-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "mac",
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> crypto::ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::hmac::HMAC_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HMAC-SHA-512",
+      "bom-ref": "crypto:HMAC-SHA-512",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "mac",
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA512"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PKCS1-1.5-SHA-256",
+      "bom-ref": "crypto:RSA-PKCS1-1.5-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA256_ABSENT_PARAMS"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PKCS1-1.5-SHA-384",
+      "bom-ref": "crypto:RSA-PKCS1-1.5-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA384_ABSENT_PARAMS"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PKCS1-1.5-SHA-512",
+      "bom-ref": "crypto:RSA-PKCS1-1.5-SHA-512",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA512"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PSS-SHA-256",
+      "bom-ref": "crypto:RSA-PSS-SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA256_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA256_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PSS-SHA-384",
+      "bom-ref": "crypto:RSA-PSS-SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA384_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA384_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-PSS-SHA-512",
+      "bom-ref": "crypto:RSA-PSS-SHA-512",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA512"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-256",
+      "bom-ref": "crypto:SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "hash",
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::UpdateCore>::update_blocks"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::finalize_variable_core"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::finalize_variable_core::{closure#0}"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::new"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::Sha256VarCore as std::clone::Clone>::clone"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::digest::<&[u8]>"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::finalize"
+          },
+          {
+            "location": "age_core",
+            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::digest::FixedOutput>::fin"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> SHA256"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> crypto::ring::hash::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> ring::digest::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> crypto::ring::hash::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> ring::digest::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hash::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::digest::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> crypto::ring::hash::SHA256"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> ring::digest::SHA256"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "50"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-384",
+      "bom-ref": "crypto:SHA-384",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "hash",
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> SHA384"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ring::digest::SHA384"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::digest::SHA384"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "16"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-512",
+      "bom-ref": "crypto:SHA-512",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "hash",
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA512"
+          },
+          {
+            "location": "jsonwebtoken",
+            "additionalContext": "[mir-static] fn crypto::sign -> SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> SHA512"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> SHA512"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "scrypt",
+      "bom-ref": "crypto:scrypt",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "kdf",
+          "algorithmFamily": "scrypt",
+          "cryptoFunctions": [
+            "keyderive"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age",
+            "additionalContext": "[mir-call] fn primitives::scrypt: scrypt::scrypt("
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:params",
+          "value": "unresolved (runtime work factor)"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "x25519",
+      "bom-ref": "crypto:x25519",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "key-agree",
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keygen"
+          ]
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "age",
+            "additionalContext": "[mir-call] fn x25519::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:201:1: 201:36>::wrap_file_key: EphemeralSecret::diffie_hellman("
+          },
+          {
+            "location": "age",
+            "additionalContext": "[mir-call] fn x25519::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:93:1: 93:34>::unwrap_stanza: StaticSecret::diffie_hellman("
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> kx::X25519"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] const kx -> ring::agreement::X25519"
+          },
+          {
+            "location": "rustls",
+            "additionalContext": "[mir-static] fn default_provider -> ring::agreement::X25519"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:curve",
+          "value": "Curve25519"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "crate:age",
+      "provides": [
+        "crypto:HMAC-SHA-256",
+        "crypto:scrypt",
+        "crypto:x25519"
+      ]
+    },
+    {
+      "ref": "crate:age_core",
+      "provides": [
+        "crypto:ChaCha20-Poly1305",
+        "crypto:HKDF-SHA-256",
+        "crypto:HMAC-SHA-256",
+        "crypto:SHA-256"
+      ]
+    },
+    {
+      "ref": "crate:jsonwebtoken",
+      "provides": [
+        "crypto:ECDSA-P-256-SHA-256",
+        "crypto:ECDSA-P-384-SHA-384",
+        "crypto:Ed25519",
+        "crypto:HMAC-SHA-256",
+        "crypto:HMAC-SHA-384",
+        "crypto:HMAC-SHA-512",
+        "crypto:RSA-PKCS1-1.5-SHA-256",
+        "crypto:RSA-PKCS1-1.5-SHA-384",
+        "crypto:RSA-PKCS1-1.5-SHA-512",
+        "crypto:RSA-PSS-SHA-256",
+        "crypto:RSA-PSS-SHA-384",
+        "crypto:RSA-PSS-SHA-512",
+        "crypto:SHA-256",
+        "crypto:SHA-384",
+        "crypto:SHA-512"
+      ]
+    },
+    {
+      "ref": "crate:rustls",
+      "provides": [
+        "crypto:AES-128",
+        "crypto:AES-128-GCM",
+        "crypto:AES-256",
+        "crypto:AES-256-GCM",
+        "crypto:ChaCha20-Poly1305",
+        "crypto:ECDH-P-256",
+        "crypto:ECDH-P-384",
+        "crypto:ECDSA-P-256-SHA-256",
+        "crypto:ECDSA-P-256-SHA-384",
+        "crypto:ECDSA-P-384-SHA-256",
+        "crypto:ECDSA-P-384-SHA-384",
+        "crypto:Ed25519",
+        "crypto:HKDF-SHA-256",
+        "crypto:HKDF-SHA-384",
+        "crypto:HMAC-SHA-256",
+        "crypto:HMAC-SHA-384",
+        "crypto:HMAC-SHA-512",
+        "crypto:RSA-PKCS1-1.5-SHA-256",
+        "crypto:RSA-PKCS1-1.5-SHA-384",
+        "crypto:RSA-PKCS1-1.5-SHA-512",
+        "crypto:RSA-PSS-SHA-256",
+        "crypto:RSA-PSS-SHA-384",
+        "crypto:RSA-PSS-SHA-512",
+        "crypto:SHA-256",
+        "crypto:SHA-384",
+        "crypto:SHA-512",
+        "crypto:x25519"
+      ]
+    }
+  ]
+}
