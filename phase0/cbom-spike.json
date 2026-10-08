@@ -1,7 +1,7 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.7",
-  "serialNumber": "urn:uuid:5169c84d-e4d1-4407-8b9c-5c8d09d300c1",
+  "serialNumber": "urn:uuid:01d1d5c6-5e86-4592-8552-3c9bda4a906d",
   "version": 1,
   "metadata": {
     "tools": {
@@ -17,8 +17,9 @@
     {
       "type": "library",
       "name": "spike",
-      "bom-ref": "crate:spike",
-      "purl": "pkg:cargo/spike"
+      "version": "0.1.0",
+      "bom-ref": "crate:spike@0.1.0",
+      "purl": "pkg:cargo/spike@0.1.0"
     },
     {
       "type": "cryptographic-asset",
@@ -40,36 +41,48 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "spike",
+            "location": "src/main.rs",
+            "line": 23,
+            "offset": 8,
+            "symbol": "seal::<AesGcm<Aes256, 12>>",
+            "additionalContext": "[mir-type] fn <impl at src/main.rs:21:1: 21:26>::seal"
+          },
+          {
+            "location": "src/main.rs",
+            "line": 38,
+            "offset": 46,
+            "symbol": "AES_256_GCM",
             "additionalContext": "[mir-static] fn ring_seal -> AES_256_GCM"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadCore>::generate_nonce::<&mut aes_gcm::aead::OsRng>"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadCore>::generate_nonce::<&mut aes_gcm::aead::OsRng>",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadInPlace>::encrypt_in_place"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadInPlace>::encrypt_in_place",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadInPlace>::encrypt_in_place_detached"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::AeadInPlace>::encrypt_in_place_detached",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::KeyInit>::new"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::KeyInit>::new",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::KeyInit>::new_from_slice"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::aead::Aead>::encrypt::<'_, '_, &[u8]>"
-          },
-          {
-            "location": "spike",
-            "additionalContext": "[mono] <aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as std::convert::From<aes_gcm::aes::Aes256>>::from"
+            "location": "spike-0.1.0",
+            "symbol": "<aes_gcm::AesGcm<aes_gcm::aes::Aes256, 12> as aes_gcm::aead::Aead>::encrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mono] monomorphized instance"
           }
         ]
       },
@@ -84,7 +97,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "12"
+          "value": "15"
         }
       ]
     },
@@ -106,36 +119,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadCore>::generate_nonce::<&mut aes_gcm:"
+            "location": "src/main.rs",
+            "line": 28,
+            "offset": 8,
+            "symbol": "seal::<ChaChaPoly1305<StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>>>",
+            "additionalContext": "[mir-type] fn <impl at src/main.rs:26:1: 26:29>::seal"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadInPlace>::encrypt_in_place"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadCore>::generate_nonce::<&mut aes_gcm::aead::OsRng>",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadInPlace>::encrypt_in_place_detached"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadInPlace>::encrypt_in_place",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::KeyInit>::new"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::AeadInPlace>::encrypt_in_place_detached",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::KeyInit>::new_from_slice"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::KeyInit>::new",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::aead::Aead>::encrypt::<'_, '_, &[u8]>"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as std::ops::Drop>::drop"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as aes_gcm::aead::Aead>::encrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] seal::<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>>>"
+            "location": "spike-0.1.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<aes_gcm::aes::cipher::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as std::ops::Drop>::drop",
+            "additionalContext": "[mono] monomorphized instance"
           }
         ]
       },
@@ -150,7 +173,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "10"
+          "value": "11"
         }
       ]
     },
@@ -171,36 +194,50 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as aes_gcm::KeyIni"
+            "location": "src/main.rs",
+            "line": 45,
+            "offset": 16,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::new_from_slice",
+            "additionalContext": "[mir-type] fn mac"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::c"
+            "location": "src/main.rs",
+            "line": 46,
+            "offset": 6,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::update",
+            "additionalContext": "[mir-type] fn mac"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, s"
+            "location": "src/main.rs",
+            "line": 47,
+            "offset": 6,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::finalize",
+            "additionalContext": "[mir-type] fn mac"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <std::result::Result<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as aes_gcm::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <std::result::Result<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::FixedOutputCore>::finalize_fixe",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] hmac::digest::CtOutput::<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sh"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::FixedOutputCore>::finalize_fixe",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] hmac::digest::block_buffer::BlockBuffer::<64, hmac::digest::block_buffer::Eager>::digest_blocks::<{closure@<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<h"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::UpdateCore>::update_blocks",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] hmac::digest::block_buffer::BlockBuffer::<64, hmac::digest::block_buffer::Eager>::digest_blocks::<{closure@<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<h"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as aes_gcm::KeyInit>:",
+            "additionalContext": "[mono] monomorphized instance"
           }
         ]
       },
@@ -211,7 +248,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "22"
         }
       ]
     },
@@ -232,36 +269,50 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as hmac::digest::FixedOutput>::fin"
+            "location": "src/main.rs",
+            "line": 45,
+            "offset": 16,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::new_from_slice",
+            "additionalContext": "[mir-type] fn mac (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as hmac::digest::Update>::update"
+            "location": "src/main.rs",
+            "line": 46,
+            "offset": 6,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::update",
+            "additionalContext": "[mir-type] fn mac (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as hmac::digest::Update>::update::"
+            "location": "src/main.rs",
+            "line": 47,
+            "offset": 6,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::finalize",
+            "additionalContext": "[mir-type] fn mac (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::digest::<&[u8]>"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as aes_gcm::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::finalize"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::FixedOutputCore>::finalize_fixe",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as std::default::Default>::default"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::FixedOutputCore>::finalize_fixe",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256> as hmac::digest::core_api::FixedOutputCore>::finalize_fixed_core"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as hmac::digest::core_api::UpdateCore>::update_blocks",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "spike",
-            "additionalContext": "[mono] <hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256> as hmac::digest::core_api::UpdateCore>::update_blocks"
+            "location": "spike-0.1.0",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as aes_gcm::KeyInit>:",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           }
         ]
       },
@@ -272,14 +323,14 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "18"
+          "value": "41"
         }
       ]
     }
   ],
   "dependencies": [
     {
-      "ref": "crate:spike",
+      "ref": "crate:spike@0.1.0",
       "provides": [
         "crypto:AES-256-GCM",
         "crypto:ChaCha20-Poly1305",

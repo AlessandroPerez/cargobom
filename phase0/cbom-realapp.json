@@ -1,7 +1,7 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.7",
-  "serialNumber": "urn:uuid:41076026-5843-4b09-a530-9c05c7c41d4b",
+  "serialNumber": "urn:uuid:3ed57b58-4f48-4239-b86b-635bbb145335",
   "version": 1,
   "metadata": {
     "tools": {
@@ -17,32 +17,37 @@
     {
       "type": "library",
       "name": "age",
-      "bom-ref": "crate:age",
-      "purl": "pkg:cargo/age"
+      "version": "0.11.5",
+      "bom-ref": "crate:age@0.11.5",
+      "purl": "pkg:cargo/age@0.11.5"
     },
     {
       "type": "library",
-      "name": "age_core",
-      "bom-ref": "crate:age_core",
-      "purl": "pkg:cargo/age_core"
+      "name": "age-core",
+      "version": "0.11.0",
+      "bom-ref": "crate:age-core@0.11.0",
+      "purl": "pkg:cargo/age-core@0.11.0"
     },
     {
       "type": "library",
       "name": "jsonwebtoken",
-      "bom-ref": "crate:jsonwebtoken",
-      "purl": "pkg:cargo/jsonwebtoken"
+      "version": "9.3.1",
+      "bom-ref": "crate:jsonwebtoken@9.3.1",
+      "purl": "pkg:cargo/jsonwebtoken@9.3.1"
     },
     {
       "type": "library",
       "name": "rustls",
-      "bom-ref": "crate:rustls",
-      "purl": "pkg:cargo/rustls"
+      "version": "0.23.45",
+      "bom-ref": "crate:rustls@0.23.45",
+      "purl": "pkg:cargo/rustls@0.23.45"
     },
     {
       "type": "library",
       "name": "realapp",
-      "bom-ref": "crate:realapp",
-      "purl": "pkg:cargo/realapp"
+      "version": "0.1.0",
+      "bom-ref": "crate:realapp@0.1.0",
+      "purl": "pkg:cargo/realapp@0.1.0"
     },
     {
       "type": "cryptographic-asset",
@@ -62,12 +67,18 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> AES_128 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> AES_128"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 76,
+            "offset": 21,
+            "symbol": "AES_128",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128"
           }
         ]
       },
@@ -106,24 +117,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> AES_128_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 57,
+            "offset": 19,
+            "symbol": "AES128_GCM",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES128_GCM -> AES_128_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 85,
+            "offset": 19,
+            "symbol": "AES128_GCM",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES128_GCM -> AES_128_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 119,
+            "offset": 59,
+            "symbol": "AES_128_GCM",
+            "additionalContext": "[mir-static] static AES128_GCM -> AES_128_GCM"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 73,
+            "offset": 44,
+            "symbol": "AES_128_GCM",
             "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128_GCM"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES_128_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> AES_128_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> AES_128_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] static AES128_GCM -> AES_128_GCM"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 75,
+            "offset": 21,
+            "symbol": "AES_128_GCM",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> AES_128_GCM"
           }
         ]
       },
@@ -134,7 +167,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ]
     },
@@ -156,12 +189,18 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> AES_256 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> AES_256"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 54,
+            "offset": 25,
+            "symbol": "AES_256",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256"
           }
         ]
       },
@@ -200,24 +239,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> AES_256_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 71,
+            "offset": 19,
+            "symbol": "AES256_GCM",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES256_GCM -> AES_256_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 99,
+            "offset": 19,
+            "symbol": "AES256_GCM",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES256_GCM -> AES_256_GCM (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 120,
+            "offset": 59,
+            "symbol": "AES_256_GCM",
+            "additionalContext": "[mir-static] static AES256_GCM -> AES_256_GCM"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 51,
+            "offset": 48,
+            "symbol": "AES_256_GCM",
             "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> AES_256_GCM"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] static AES256_GCM -> AES_256_GCM"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 53,
+            "offset": 25,
+            "symbol": "AES_256_GCM",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> AES_256_GCM"
           }
         ]
       },
@@ -228,7 +289,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ]
     },
@@ -250,56 +311,129 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::decrypt_in_place"
+            "location": "age-0.11.5/src/primitives/stream.rs",
+            "line": 99,
+            "offset": 18,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as KeyInit>::new",
+            "additionalContext": "[mir-type] fn stream::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives/stream.rs:96:1: 96:12>::new"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::encrypt_in_place"
+            "location": "age-0.11.5/src/primitives/stream.rs",
+            "line": 190,
+            "offset": 13,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as Aead>::encrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mir-type] fn stream::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives/stream.rs:96:1: 96:12>::encrypt_chunk"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::KeyInit>::new"
+            "location": "age-0.11.5/src/primitives/stream.rs",
+            "line": 206,
+            "offset": 13,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as Aead>::decrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mir-type] fn stream::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives/stream.rs:96:1: 96:12>::decrypt_chunk"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::aead::Aead>::decrypt::<'_, '_,"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 16,
+            "offset": 12,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as KeyInit>::new",
+            "additionalContext": "[mir-type] fn aead_encrypt"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::aead::Aead>::encrypt::<'_, '_,"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 17,
+            "offset": 6,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as Aead>::encrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mir-type] fn aead_encrypt"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as std::ops::Drop>::drop"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 39,
+            "offset": 12,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as KeyInit>::new",
+            "additionalContext": "[mir-type] fn aead_decrypt"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] std::ptr::drop_glue::<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>>> - shim(Some(chacha20poly1305:"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 40,
+            "offset": 6,
+            "symbol": "<ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as Aead>::decrypt::<'_, '_, &[u8]>",
+            "additionalContext": "[mir-type] fn aead_decrypt"
           },
           {
-            "location": "rustls",
+            "location": "age-core-0.11.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::decrypt_in_place",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::decrypt_in_place_detached",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::encrypt_in_place",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<chacha20poly1305::ChaChaPoly1305<cipher::stream_wrapper::StreamCipherCoreWrapper<chacha20::ChaChaCore<10>>> as chacha20poly1305::AeadInPlace>::encrypt_in_place_detached",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> CHACHA20_POLY1305 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "line": 68,
+            "offset": 40,
+            "symbol": "TICKETER_AEAD",
+            "additionalContext": "[mir-static] fn crypto::ring::ticketer::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/ticketer.rs:61:1: 61:18>::new -> TICKETER_AEAD -> CHACHA2"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "line": 76,
+            "offset": 17,
+            "symbol": "TICKETER_AEAD",
+            "additionalContext": "[mir-static] fn crypto::ring::ticketer::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/ticketer.rs:61:1: 61:18>::new -> TICKETER_AEAD -> CHACHA2"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "line": 193,
+            "offset": 42,
+            "symbol": "CHACHA20_POLY1305",
+            "additionalContext": "[mir-static] static TICKETER_AEAD -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 183,
+            "offset": 35,
+            "symbol": "CHACHA20_POLY1305",
+            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::decrypter -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 193,
+            "offset": 35,
+            "symbol": "CHACHA20_POLY1305",
+            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::encrypter -> CHACHA20_POLY1305"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 31,
+            "offset": 51,
+            "symbol": "CHACHA20_POLY1305",
             "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> CHACHA20_POLY1305"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::ticketer::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/ticketer.rs:61:1: 61:18>::new -> CHACHA20_POLY1305"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::decrypter -> CHACHA20_POLY1305"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::tls12::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/tls12.rs:180:1: 180:45>::encrypter -> CHACHA20_POLY1305"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> CHACHA20_POLY1305"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] static TICKETER_AEAD -> CHACHA20_POLY1305"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 33,
+            "offset": 21,
+            "symbol": "CHACHA20_POLY1305",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> CHACHA20_POLY1305"
           }
         ]
       },
@@ -314,7 +448,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
+          "value": "24"
         }
       ]
     },
@@ -335,16 +469,25 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP256R1"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/kx.rs",
+            "line": 98,
+            "offset": 26,
+            "symbol": "ECDH_P256",
             "additionalContext": "[mir-static] const SECP256R1::promoted[0] -> ECDH_P256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDH_P256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 35,
+            "offset": 19,
+            "symbol": "DEFAULT_KX_GROUPS",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_KX_GROUPS -> ECDH_P256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 181,
+            "offset": 24,
+            "symbol": "SECP256R1",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP256R1"
           }
         ]
       },
@@ -380,16 +523,25 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP384R1"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/kx.rs",
+            "line": 106,
+            "offset": 26,
+            "symbol": "ECDH_P384",
             "additionalContext": "[mir-static] const SECP384R1::promoted[0] -> ECDH_P384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDH_P384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 35,
+            "offset": 19,
+            "symbol": "DEFAULT_KX_GROUPS",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_KX_GROUPS -> ECDH_P384 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 181,
+            "offset": 45,
+            "symbol": "SECP384R1",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> SECP384R1"
           }
         ]
       },
@@ -426,28 +578,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P256_SHA256_FIXED_SIGNING"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 12,
+            "offset": 29,
+            "symbol": "ECDSA_P256_SHA256_FIXED",
             "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P256_SHA256_FIXED"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA256"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 21,
+            "offset": 29,
+            "symbol": "ECDSA_P256_SHA256_FIXED_SIGNING",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ECDSA_P256_SHA256_ASN1 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 109,
+            "offset": 8,
+            "symbol": "ECDSA_P256_SHA256",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P256_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P256_SHA256_ASN1_SIGNING"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 136,
+            "offset": 16,
+            "symbol": "ECDSA_P256_SHA256",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P256_SHA256_ASN1"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 49,
+            "offset": 9,
+            "symbol": "ECDSA_P256_SHA256_ASN1_SIGNING",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P256_SHA256_ASN1_SIGNING"
           }
         ]
       },
@@ -483,16 +653,25 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ECDSA_P256_SHA384_ASN1 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 110,
+            "offset": 8,
+            "symbol": "ECDSA_P256_SHA384",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P256_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P256_SHA384_ASN1"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 130,
+            "offset": 16,
+            "symbol": "ECDSA_P256_SHA384",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P256_SHA384"
           }
         ]
       },
@@ -528,16 +707,25 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ECDSA_P384_SHA256_ASN1 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 111,
+            "offset": 8,
+            "symbol": "ECDSA_P384_SHA256",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P384_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P384_SHA256_ASN1"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 137,
+            "offset": 16,
+            "symbol": "ECDSA_P384_SHA256",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA256"
           }
         ]
       },
@@ -574,28 +762,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P384_SHA384_FIXED_SIGNING"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 13,
+            "offset": 29,
+            "symbol": "ECDSA_P384_SHA384_FIXED",
             "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P384_SHA384_FIXED"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 22,
+            "offset": 29,
+            "symbol": "ECDSA_P384_SHA384_FIXED_SIGNING",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P384_SHA384_FIXED_SIGNING"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ECDSA_P384_SHA384_ASN1 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 112,
+            "offset": 8,
+            "symbol": "ECDSA_P384_SHA384",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> ECDSA_P384_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P384_SHA384_ASN1_SIGNING"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 129,
+            "offset": 16,
+            "symbol": "ECDSA_P384_SHA384",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> ECDSA_P384_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ECDSA_P384_SHA384_ASN1"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 57,
+            "offset": 9,
+            "symbol": "ECDSA_P384_SHA384_ASN1_SIGNING",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P384_SHA384_ASN1_SIGNING"
           }
         ]
       },
@@ -632,20 +838,32 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
+            "line": 12,
+            "offset": 29,
+            "symbol": "ED25519",
             "additionalContext": "[mir-static] fn eddsa::alg_to_ec_verification -> ED25519"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::ED25519"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::signature::ED25519 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 113,
+            "offset": 8,
+            "symbol": "webpki::ring::ED25519",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::ED25519"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::ED25519"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 140,
+            "offset": 37,
+            "symbol": "webpki::ring::ED25519",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::ED25519"
           }
         ]
       },
@@ -681,16 +899,62 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age_core",
-            "additionalContext": "[mono] std::result::Result::<hkdf::Hkdf<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>, "
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 50,
+            "offset": 4,
+            "symbol": "Hkdf::<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>::new",
+            "additionalContext": "[mir-type] fn hkdf"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> HKDF_SHA256"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 51,
+            "offset": 9,
+            "symbol": "Hkdf::<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>::expand",
+            "additionalContext": "[mir-type] fn hkdf"
           },
           {
-            "location": "rustls",
+            "location": "age-core-0.11.0",
+            "symbol": "hkdf::Hkdf::<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>::expand",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "hkdf::Hkdf::<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>::expand_multi_info",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "hkdf::Hkdf::<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>::extract",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "hkdf::Hkdf::<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>::from_prk",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "hkdf::Hkdf::<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>::new",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "std::result::Result::<hkdf::Hkdf<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>, hkdf::InvalidPrkLength>::expect",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 30,
+            "offset": 29,
+            "symbol": "HKDF_SHA256",
             "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> HKDF_SHA256"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 72,
+            "offset": 29,
+            "symbol": "HKDF_SHA256",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> HKDF_SHA256"
           }
         ]
       },
@@ -701,7 +965,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "10"
         }
       ]
     },
@@ -722,7 +986,10 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 50,
+            "offset": 33,
+            "symbol": "HKDF_SHA384",
             "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> HKDF_SHA384"
           }
         ]
@@ -755,80 +1022,157 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age",
-            "additionalContext": "[mono] <hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, s"
+            "location": "age-0.11.5/src/format.rs",
+            "line": 58,
+            "offset": 44,
+            "symbol": "CtOutput::<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>>>::into_bytes",
+            "additionalContext": "[mir-type] fn format::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/format.rs:36:1: 36:14>::new"
           },
           {
-            "location": "age",
-            "additionalContext": "[mono] hmac::digest::CtOutput::<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sh"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 33,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::new_from_slice",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::new"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as chacha20p"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 39,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::finalize",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::finalize"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::dig"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 44,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::verify_slice",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::verify"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as std::clon"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 50,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::update",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:48:1: 48:26>::write"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore,"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::finali",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <std::result::Result<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSh"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::new_fr",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <std::result::Result<sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::update",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] sha2::digest::block_buffer::BlockBuffer::<64, sha2::digest::block_buffer::Eager>::digest_blocks::<{closure@<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWra"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as chacha20poly1305::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] sha2::digest::block_buffer::BlockBuffer::<64, sha2::digest::block_buffer::Eager>::digest_blocks::<{closure@<sha2::digest::core_api::CoreWrapper<hkdf::hmac::Hmac"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::FixedOutputCore>::finaliz",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "jsonwebtoken",
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::FixedOutputCore>::finaliz",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::UpdateCore>::update_block",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as std::clone::Clone>::clone",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as chacha20poly",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hkdf::sealed",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "age-core-0.11.0",
+            "symbol": "<sha2::digest::core_api::CoreWrapper<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hkdf::sealed",
+            "additionalContext": "[mono] monomorphized instance"
+          },
+          {
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 27,
+            "offset": 41,
+            "symbol": "HMAC_SHA256",
             "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
+            "line": 8,
+            "offset": 44,
+            "symbol": "ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> crypto::ring::hmac::HMAC_SHA256 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 30,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA256",
             "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 44,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 58,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA256",
             "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::hmac::HMAC_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 86,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 30,
+            "offset": 48,
+            "symbol": "ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 72,
+            "offset": 48,
+            "symbol": "ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> ring::hmac::HMAC_SHA256"
           }
         ]
       },
@@ -839,7 +1183,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "27"
+          "value": "42"
         }
       ]
     },
@@ -860,40 +1204,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 28,
+            "offset": 41,
+            "symbol": "HMAC_SHA384",
             "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
+            "line": 9,
+            "offset": 44,
+            "symbol": "ring::hmac::HMAC_SHA384",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hmac::HMAC_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> crypto::ring::hmac::HMAC_SHA384 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 72,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA384",
             "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hmac::HMAC_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 100,
+            "offset": 37,
+            "symbol": "crypto::ring::hmac::HMAC_SHA384",
+            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hmac::HMAC_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> crypto::ring::hmac::HMAC_SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::hmac::HMAC_SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/tls13.rs",
+            "line": 50,
+            "offset": 52,
+            "symbol": "ring::hmac::HMAC_SHA384",
+            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> ring::hmac::HMAC_SHA384"
           }
         ]
       },
@@ -904,7 +1254,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "6"
         }
       ]
     },
@@ -925,11 +1275,17 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 29,
+            "offset": 41,
+            "symbol": "HMAC_SHA512",
             "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA512"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
+            "line": 11,
+            "offset": 44,
+            "symbol": "ring::hmac::HMAC_SHA512",
             "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA512"
           }
         ]
@@ -963,40 +1319,53 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 10,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA256",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA256"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA256"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 23,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA256",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::signature::RSA_PKCS1_2048_8192_SHA256 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA256_ABSENT_PARAMS"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 117,
+            "offset": 8,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA256",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 120,
+            "offset": 8,
+            "symbol": "RSA_PKCS1_2048_8192_SHA256_ABSENT_PARAMS",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA256_ABSENT_PARAMS"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 163,
+            "offset": 14,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA256",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 159,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
           }
         ]
       },
@@ -1007,7 +1376,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "7"
         }
       ]
     },
@@ -1029,40 +1398,53 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 11,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA384",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA384"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA384"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 24,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA384",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::signature::RSA_PKCS1_2048_8192_SHA384 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA384_ABSENT_PARAMS"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 118,
+            "offset": 8,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA384",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 121,
+            "offset": 8,
+            "symbol": "RSA_PKCS1_2048_8192_SHA384_ABSENT_PARAMS",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA384_ABSENT_PARAMS"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 159,
+            "offset": 14,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA384",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 160,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
           }
         ]
       },
@@ -1073,7 +1455,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "7"
         }
       ]
     },
@@ -1095,40 +1477,53 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 12,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA512",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA512"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_SHA512"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 25,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA512",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA512"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::signature::RSA_PKCS1_2048_8192_SHA512 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 119,
+            "offset": 8,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA512",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> webpki::ring::RSA_PKCS1_2048_8192_SHA512"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 122,
+            "offset": 8,
+            "symbol": "RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_2048_8192_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 155,
+            "offset": 14,
+            "symbol": "webpki::ring::RSA_PKCS1_2048_8192_SHA512",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> webpki::ring::RSA_PKCS1_2048_8192_SHA512"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PKCS1_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 161,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
           }
         ]
       },
@@ -1139,7 +1534,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "7"
         }
       ]
     },
@@ -1161,36 +1556,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 13,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA256",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA256"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA256"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 26,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA256",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA256"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA256_LEGACY_KEY"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> RSA_PSS_2048_8192_SHA256 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 114,
+            "offset": 8,
+            "symbol": "RSA_PSS_2048_8192_SHA256_LEGACY_KEY",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA256_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 151,
+            "offset": 14,
+            "symbol": "RSA_PSS_2048_8192_SHA256_LEGACY_KEY",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA256_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA256"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA256"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 162,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA256",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA25"
           }
         ]
       },
@@ -1201,7 +1606,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "6"
         }
       ]
     },
@@ -1223,36 +1628,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 14,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA384",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA384"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA384"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 27,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA384",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA384_LEGACY_KEY"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> RSA_PSS_2048_8192_SHA384 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 115,
+            "offset": 8,
+            "symbol": "RSA_PSS_2048_8192_SHA384_LEGACY_KEY",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA384_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 147,
+            "offset": 14,
+            "symbol": "RSA_PSS_2048_8192_SHA384_LEGACY_KEY",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA384_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 163,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA384",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA38"
           }
         ]
       },
@@ -1263,7 +1678,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "6"
         }
       ]
     },
@@ -1285,36 +1700,46 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 15,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA512",
             "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA512"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_SHA512"
-          },
-          {
-            "location": "jsonwebtoken",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 28,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA512",
             "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA512"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> RSA_PSS_2048_8192_SHA512 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 116,
+            "offset": 8,
+            "symbol": "RSA_PSS_2048_8192_SHA512_LEGACY_KEY",
             "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[1] -> RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 143,
+            "offset": 14,
+            "symbol": "RSA_PSS_2048_8192_SHA512_LEGACY_KEY",
+            "additionalContext": "[mir-static] const SUPPORTED_SIG_ALGS::promoted[0] -> RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> RSA_PSS_2048_8192_SHA512"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::signature::RSA_PSS_SHA512"
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 164,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA512",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA51"
           }
         ]
       },
@@ -1325,7 +1750,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "6"
         }
       ]
     },
@@ -1346,88 +1771,203 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::UpdateCore>::update_blocks"
+            "location": "age-0.11.5/src/format.rs",
+            "line": 58,
+            "offset": 44,
+            "symbol": "CtOutput::<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>>>::into_bytes",
+            "additionalContext": "[mir-type] fn format::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/format.rs:36:1: 36:14>::new (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::finalize_variable_core"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 33,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::new_from_slice",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::new (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::finalize_variable_core::{closure#0}"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 39,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::finalize",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::finalize (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::Sha256VarCore as sha2::digest::core_api::VariableOutputCore>::new"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 44,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::verify_slice",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:29:1: 29:16>::verify (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::Sha256VarCore as std::clone::Clone>::clone"
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 50,
+            "offset": 19,
+            "symbol": "<CoreWrapper<HmacCore<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>> as Mac>::update",
+            "additionalContext": "[mir-type] fn primitives::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/primitives.rs:48:1: 48:26>::write (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::digest::<&[u8]>"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::finali",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::Digest>::finalize"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::new_fr",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "age_core",
-            "additionalContext": "[mono] <sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>> as sha2::digest::FixedOutput>::fin"
+            "location": "age-0.11.5",
+            "symbol": "<hmac::digest::core_api::CoreWrapper<hmac::HmacCore<hmac::digest::core_api::CoreWrapper<hmac::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>>> as hmac::Mac>::update",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_ec_signing -> SHA256"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 50,
+            "offset": 4,
+            "symbol": "Hkdf::<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>::new",
+            "additionalContext": "[mir-type] fn hkdf (component of HKDF-SHA-256)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA256"
+            "location": "age-core-0.11.0/src/primitives.rs",
+            "line": 51,
+            "offset": 9,
+            "symbol": "Hkdf::<CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, 32, sha2::OidSha256>>>::expand",
+            "additionalContext": "[mir-type] fn hkdf (component of HKDF-SHA-256)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as chacha20poly1305::KeyInit>::new_from_slice",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn crypto::sign -> SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::FixedOutputCore>::finaliz",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::FixedOutputCore>::finaliz",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> crypto::ring::hash::SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as sha2::digest::core_api::UpdateCore>::update_block",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_128_GCM_SHA256_INTERNAL::promoted[0] -> ring::digest::SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<hkdf::hmac::HmacCore<sha2::digest::core_api::CoreWrapper<sha2::digest::core_api::CtVariableCoreWrapper<sha2::Sha256VarCore, 32, sha2::OidSha256>>> as std::clone::Clone>::clone",
+            "additionalContext": "[mono] monomorphized instance (component of HMAC-SHA-256)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> crypto::ring::hash::SHA256"
+            "location": "age-core-0.11.0",
+            "symbol": "<sha2::Sha256VarCore as sha2::digest::core_api::UpdateCore>::update_blocks",
+            "additionalContext": "[mono] monomorphized instance"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_CHACHA20_POLY1305_SHA256_INTERNAL::promoted[0] -> ring::digest::SHA256"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 12,
+            "offset": 29,
+            "symbol": "ECDSA_P256_SHA256_FIXED",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P256_SHA256_FIXED -> SHA256 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> crypto::ring::hash::SHA256"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 21,
+            "offset": 29,
+            "symbol": "ECDSA_P256_SHA256_FIXED_SIGNING",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P256_SHA256_FIXED_SIGNING -> SHA256 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256::promoted[0] -> ring::digest::SHA256"
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 27,
+            "offset": 41,
+            "symbol": "HMAC_SHA256",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA256 -> SHA256 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 10,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA256",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA256 -> SHA256 (nested)"
+          },
+          {
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 13,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA256",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA256 -> SHA256 (nested)"
+          },
+          {
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 23,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA256",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA256 -> SHA256 (nested)"
+          },
+          {
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 26,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA256",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA256 -> SHA256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "line": 9,
+            "offset": 39,
+            "symbol": "ring::digest::SHA256",
+            "additionalContext": "[mir-static] static crypto -> ring::digest::SHA256"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
+            "line": 8,
+            "offset": 44,
+            "symbol": "ring::hmac::HMAC_SHA256",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA256 -> ring::digest::SHA256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> crypto::ring::hash::SHA256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::digest::SHA256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 49,
+            "offset": 9,
+            "symbol": "ECDSA_P256_SHA256_ASN1_SIGNING",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 159,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 162,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA256",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA25"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 24,
+            "offset": 28,
+            "symbol": "crypto::ring::hash::SHA256",
             "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> crypto::ring::hash::SHA256"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256::promoted[0] -> ring::digest::SHA256"
           }
         ]
       },
@@ -1438,7 +1978,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "50"
+          "value": "91"
         }
       ]
     },
@@ -1459,56 +1999,109 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_ec_signing -> SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 13,
+            "offset": 29,
+            "symbol": "ECDSA_P384_SHA384_FIXED",
+            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> ECDSA_P384_SHA384_FIXED -> SHA384 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
+            "line": 22,
+            "offset": 29,
+            "symbol": "ECDSA_P384_SHA384_FIXED_SIGNING",
+            "additionalContext": "[mir-static] fn alg_to_ec_signing -> ECDSA_P384_SHA384_FIXED_SIGNING -> SHA384 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 28,
+            "offset": 41,
+            "symbol": "HMAC_SHA384",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA384 -> SHA384 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn crypto::sign -> SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 11,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA384",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA384 -> SHA384 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn ecdsa::alg_to_ec_verification -> SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 14,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA384",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA384 -> SHA384 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 24,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA384",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA384 -> SHA384 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS13_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 27,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA384",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA384 -> SHA384 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "line": 10,
+            "offset": 39,
+            "symbol": "ring::digest::SHA384",
+            "additionalContext": "[mir-static] static crypto -> ring::digest::SHA384"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
+            "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
+            "line": 9,
+            "offset": 44,
+            "symbol": "ring::hmac::HMAC_SHA384",
+            "additionalContext": "[mir-static] static crypto -> ring::hmac::HMAC_SHA384 -> ring::digest::SHA384 (nested)"
           },
           {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 34,
+            "offset": 23,
+            "symbol": "DEFAULT_CIPHER_SUITES",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_CIPHER_SUITES -> crypto::ring::hash::SHA384 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> ring::digest::SHA384 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 57,
+            "offset": 9,
+            "symbol": "ECDSA_P384_SHA384_ASN1_SIGNING",
+            "additionalContext": "[mir-static] fn any_ecdsa_type -> ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 160,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 163,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA384",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA38"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/tls12.rs",
+            "line": 66,
+            "offset": 28,
+            "symbol": "crypto::ring::hash::SHA384",
             "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> crypto::ring::hash::SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384::promoted[0] -> ring::digest::SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn any_ecdsa_type -> ring::digest::SHA384"
-          },
-          {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::digest::SHA384"
           }
         ]
       },
@@ -1519,7 +2112,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "16"
+          "value": "20"
         }
       ]
     },
@@ -1540,24 +2133,60 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> SHA512"
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "line": 29,
+            "offset": 41,
+            "symbol": "HMAC_SHA512",
+            "additionalContext": "[mir-static] fn crypto::sign -> HMAC_SHA512 -> SHA512 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> SHA512"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 12,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_2048_8192_SHA512",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PKCS1_2048_8192_SHA512 -> SHA512 (nested)"
           },
           {
-            "location": "jsonwebtoken",
-            "additionalContext": "[mir-static] fn crypto::sign -> SHA512"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 15,
+            "offset": 29,
+            "symbol": "RSA_PSS_2048_8192_SHA512",
+            "additionalContext": "[mir-static] fn alg_to_rsa_parameters -> RSA_PSS_2048_8192_SHA512 -> SHA512 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> SHA512"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 25,
+            "offset": 29,
+            "symbol": "RSA_PKCS1_SHA512",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PKCS1_SHA512 -> SHA512 (nested)"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> SHA512"
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "line": 28,
+            "offset": 29,
+            "symbol": "RSA_PSS_SHA512",
+            "additionalContext": "[mir-static] fn alg_to_rsa_signing -> RSA_PSS_SHA512 -> SHA512 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 36,
+            "offset": 43,
+            "symbol": "SUPPORTED_SIG_ALGS",
+            "additionalContext": "[mir-static] fn default_provider -> SUPPORTED_SIG_ALGS -> SHA512 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 161,
+            "offset": 50,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PKCS1_SHA"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/sign.rs",
+            "line": 164,
+            "offset": 48,
+            "symbol": "ring::signature::RSA_PSS_SHA512",
+            "additionalContext": "[mir-static] fn crypto::ring::sign::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.45/src/crypto/ring/sign.rs:156:1: 156:15>::new -> ring::signature::RSA_PSS_SHA51"
           }
         ]
       },
@@ -1568,7 +2197,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "8"
         }
       ]
     },
@@ -1589,8 +2218,11 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age",
-            "additionalContext": "[mir-call] fn primitives::scrypt: scrypt::scrypt("
+            "location": "age-0.11.5/src/primitives.rs",
+            "line": 68,
+            "offset": 4,
+            "symbol": "scrypt::scrypt",
+            "additionalContext": "[mir-call] fn primitives::scrypt"
           }
         ]
       },
@@ -1626,24 +2258,39 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "age",
-            "additionalContext": "[mir-call] fn x25519::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:201:1: 201:36>::wrap_file_key: EphemeralSecret::diffie_hellman("
+            "location": "age-0.11.5/src/x25519.rs",
+            "line": 118,
+            "offset": 35,
+            "symbol": "StaticSecret::diffie_hellman",
+            "additionalContext": "[mir-call] fn x25519::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:93:1: 93:34>::unwrap_stanza"
           },
           {
-            "location": "age",
-            "additionalContext": "[mir-call] fn x25519::<impl at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:93:1: 93:34>::unwrap_stanza: StaticSecret::diffie_hellman("
+            "location": "age-0.11.5/src/x25519.rs",
+            "line": 209,
+            "offset": 32,
+            "symbol": "EphemeralSecret::diffie_hellman",
+            "additionalContext": "[mir-call] fn x25519::<impl at /home/ale/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/age-0.11.5/src/x25519.rs:201:1: 201:36>::wrap_file_key"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> kx::X25519"
-          },
-          {
-            "location": "rustls",
+            "location": "rustls-0.23.45/src/crypto/ring/kx.rs",
+            "line": 83,
+            "offset": 26,
+            "symbol": "ring::agreement::X25519",
             "additionalContext": "[mir-static] const kx -> ring::agreement::X25519"
           },
           {
-            "location": "rustls",
-            "additionalContext": "[mir-static] fn default_provider -> ring::agreement::X25519"
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 35,
+            "offset": 19,
+            "symbol": "DEFAULT_KX_GROUPS",
+            "additionalContext": "[mir-static] fn default_provider -> DEFAULT_KX_GROUPS -> ring::agreement::X25519 (nested)"
+          },
+          {
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "line": 181,
+            "offset": 6,
+            "symbol": "kx::X25519",
+            "additionalContext": "[mir-static] const ALL_KX_GROUPS::promoted[0] -> kx::X25519"
           }
         ]
       },
@@ -1665,15 +2312,17 @@
   ],
   "dependencies": [
     {
-      "ref": "crate:age",
+      "ref": "crate:age@0.11.5",
       "provides": [
+        "crypto:ChaCha20-Poly1305",
         "crypto:HMAC-SHA-256",
+        "crypto:SHA-256",
         "crypto:scrypt",
         "crypto:x25519"
       ]
     },
     {
-      "ref": "crate:age_core",
+      "ref": "crate:age-core@0.11.0",
       "provides": [
         "crypto:ChaCha20-Poly1305",
         "crypto:HKDF-SHA-256",
@@ -1682,7 +2331,7 @@
       ]
     },
     {
-      "ref": "crate:jsonwebtoken",
+      "ref": "crate:jsonwebtoken@9.3.1",
       "provides": [
         "crypto:ECDSA-P-256-SHA-256",
         "crypto:ECDSA-P-384-SHA-384",
@@ -1702,7 +2351,7 @@
       ]
     },
     {
-      "ref": "crate:rustls",
+      "ref": "crate:rustls@0.23.45",
       "provides": [
         "crypto:AES-128",
         "crypto:AES-128-GCM",
