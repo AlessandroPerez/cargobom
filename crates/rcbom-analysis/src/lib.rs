@@ -110,8 +110,25 @@ pub struct Protocol {
     pub versions: Vec<String>,
     pub suites: Vec<String>,
     pub groups: Vec<String>,
+    /// Backend packages, comma-separated: the providers the code names, else those of the
+    /// reachable cipher suites, else what Layer 1's features select.
     pub backend: Option<String>,
     pub occurrences: Vec<Occurrence>,
+    named_backends: BTreeSet<String>,
+    suite_backends: BTreeSet<String>,
+    feature_backends: Vec<String>,
+}
+
+/// The backend package a rustls path names (`crypto::ring::default_provider`,
+/// `crypto::aws_lc_rs::tls13::TLS13_AES_128_GCM_SHA256`).
+fn backend_in_path(path: &str) -> Option<&'static str> {
+    if path.contains("::ring::") {
+        Some("ring")
+    } else if path.contains("::aws_lc_rs::") {
+        Some("aws-lc-rs")
+    } else {
+        None
+    }
 }
 
 pub struct Analysis {
@@ -287,7 +304,8 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let pkg = (owner_pkg.name.clone(), owner_pkg.version.to_string());
             // Composition between descriptor statics (ECDSA_P256_SHA256_FIXED -> SHA256) holds
             // wherever it is written, including inside the implementing crate.
-            if let (OwnerKind::Static, Target::Static { def }) = (&site.owner.kind, &site.target)
+            if let (OwnerKind::Static, Target::Static { def } | Target::Const { def }) =
+                (&site.owner.kind, &site.target)
                 && let Some(outer) = static_defs
                     .get(&site.owner.id)
                     .and_then(|d| match_static(kb, d, &supported))
@@ -322,15 +340,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .collect(),
                     suites: Vec::new(),
                     groups: Vec::new(),
-                    backend: proto_pkg.and_then(|pp| pp.backend.clone()),
+                    backend: None,
                     occurrences: Vec::new(),
+                    named_backends: BTreeSet::new(),
+                    suite_backends: BTreeSet::new(),
+                    feature_backends: proto_pkg.map(|pp| pp.backends.clone()).unwrap_or_default(),
                 });
                 // a provider named in the call (`crypto::ring::default_provider`) is the backend,
-                // whatever the crate's default features select
-                if callee.path.contains("::ring::") {
-                    entry.backend = Some("ring".into());
-                } else if callee.path.contains("::aws_lc_rs::") {
-                    entry.backend = Some("aws-lc-rs".into());
+                // whatever the crate's features enable
+                if let Some(b) = backend_in_path(&callee.path) {
+                    entry.named_backends.insert(b.to_string());
                 }
                 let (suites, groups) = (p.suites.clone(), p.groups.clone());
                 let last = |d: &rcbom_facts::DefRef| {
@@ -343,11 +362,13 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         continue;
                     }
                     let n = last(d);
-                    if suites.is_match(&n)
-                        && !n.ends_with("_INTERNAL")
-                        && !entry.suites.contains(&n)
-                    {
-                        entry.suites.push(n);
+                    if suites.is_match(&n) && !n.ends_with("_INTERNAL") {
+                        if let Some(b) = backend_in_path(&d.path) {
+                            entry.suite_backends.insert(b.to_string());
+                        }
+                        if !entry.suites.contains(&n) {
+                            entry.suites.push(n);
+                        }
                     } else if groups.is_match(&n) && !entry.groups.contains(&n) {
                         // a group offered as such is listed by reachable data that is not itself
                         // a group (DEFAULT_KX_GROUPS); MLKEM768 reached only as the half of
@@ -497,6 +518,14 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     merge_less_specific(&mut assets);
     protocols.retain(|_, p| !p.occurrences.is_empty());
     for p in protocols.values_mut() {
+        let backends: Vec<String> = if !p.named_backends.is_empty() {
+            p.named_backends.iter().cloned().collect()
+        } else if !p.suite_backends.is_empty() {
+            p.suite_backends.iter().cloned().collect()
+        } else {
+            p.feature_backends.clone()
+        };
+        p.backend = (!backends.is_empty()).then(|| backends.join(","));
         p.suites.sort();
         p.groups.sort();
         p.occurrences
@@ -522,14 +551,15 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         });
     }
     // A crate used by a used crypto crate is used too (aes, ctr, ghash under aes-gcm), at the
-    // same tier: propagate down the Layer 1 graph until nothing changes.
+    // same tier: propagate down the Layer 1 graph until nothing changes. Only edges whose code
+    // ships with the user's: a build dependency runs on the build machine.
     loop {
         let mut changed = false;
         for p in &man.packages {
             let Some(&u) = usage.get(&(p.name.clone(), p.version.to_string())) else {
                 continue;
             };
-            for d in &p.deps {
+            for d in &p.runtime_deps {
                 let Some(dp) = man.by_id(d) else { continue };
                 if dp.role.is_none() {
                     continue;
@@ -729,10 +759,13 @@ fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
     let names: Vec<String> = assets.keys().cloned().collect();
     for general in &names {
         for specific in &names {
-            // `Argon2` -> `Argon2id-19456-2-1`, `PBKDF2` -> `PBKDF2-SHA-256-1000`
+            // `Argon2` -> `Argon2id-19456-2-1`, `PBKDF2` -> `PBKDF2-SHA-256-1000`; same family and
+            // primitive, so the QUIC header-protection `AES-128` (a block cipher) never merges
+            // into `AES-128-GCM` (an AEAD)
             if general == specific
                 || !specific.starts_with(general.as_str())
                 || assets[general].algo.family != assets[specific].algo.family
+                || assets[general].algo.primitive != assets[specific].algo.primitive
             {
                 continue;
             }

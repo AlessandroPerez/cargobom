@@ -71,7 +71,8 @@ def main():
         cbom = out / f"{name}.cbom.json"
         c1, t_cbom, rss_cbom, err1 = run([str(CBOM), "cbom", "-o", str(cbom)], proj)
         row = {"project": name, "packages": packages, "plain_check_s": round(t_plain, 1), "cbom_s": round(t_cbom, 1),
-               "overhead": round(t_cbom / t_plain, 2) if t_plain else None, "peak_rss_mib": round(rss_cbom),
+               "overhead": round(t_cbom / t_plain, 2) if t_plain else None, "plain_peak_rss_mib": round(rss_plain),
+               "peak_rss_mib": round(rss_cbom),
                "plain_ok": c0 == 0, "cbom_ok": c1 == 0}
         if c1 != 0:
             row["error"] = err1.strip().splitlines()[-1] if err1.strip() else "failed"

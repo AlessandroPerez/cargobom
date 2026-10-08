@@ -91,17 +91,25 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             (0, 1, "column +1"),
             (0, -1, "column -1"),
         ] {
-            let caught = occs
+            // a shift that would leave the line or column below its minimum is not a
+            // shifted position: it is skipped, not counted as rejected
+            let shifted: Vec<_> = occs
                 .iter()
-                .filter(|o| {
-                    let l = (o.line as i64 + dl).max(0) as usize;
-                    let c = (o.offset as i64 + dc).max(0) as usize;
-                    (l, c) == (o.line, o.offset) || files.check(o, l, c).is_err()
+                .filter_map(|o| {
+                    let l = usize::try_from(o.line as i64 + dl)
+                        .ok()
+                        .filter(|&l| l >= 1)?;
+                    let c = usize::try_from(o.offset as i64 + dc).ok()?;
+                    Some((o, l, c))
                 })
+                .collect();
+            let caught = shifted
+                .iter()
+                .filter(|(o, l, c)| files.check(o, *l, *c).is_err())
                 .count();
             println!(
                 "self-test {what}: {caught}/{} shifted positions rejected",
-                occs.len()
+                shifted.len()
             );
         }
     }
@@ -193,7 +201,7 @@ impl Files<'_> {
         }
         // attribute macro: the position is the attribute
         if o.context.contains("[attribute ") {
-            return if at.starts_with('#') {
+            return if at.starts_with('#') && starts_token {
                 Ok(())
             } else {
                 Err(format!("expected an attribute in {text:?}"))
@@ -209,10 +217,15 @@ impl Files<'_> {
         if ident.is_empty() {
             return Err("no identifier in symbol".into());
         }
+        // import aliases (`use scrypt::scrypt as scrypt_inner;`, `extern crate x as y;`): only
+        // inside `use` and `extern crate` items, where `as` renames, not in casts
         let whole = lines.join("\n");
         let mut names = vec![ident.clone()];
+        let items = Regex::new(r"(?s)\b(?:use|extern\s+crate)\s[^;]*;").unwrap();
         let alias = Regex::new(&format!(r"\b{}\s+as\s+(\w+)", regex::escape(&ident))).unwrap();
-        names.extend(alias.captures_iter(&whole).map(|c| c[1].to_string()));
+        for item in items.find_iter(&whole) {
+            names.extend(alias.captures_iter(item.as_str()).map(|c| c[1].to_string()));
+        }
         let ok = names.iter().any(|n| {
             Regex::new(&format!(
                 r"^(?:<.*?>::)?(?:\w+(?:::<.*?>)?::)*{}\b",

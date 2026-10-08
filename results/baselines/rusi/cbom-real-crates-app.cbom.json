@@ -1,0 +1,234 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "rusi",
+          "version": "4.1.1"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-GCM",
+      "bom-ref": "rusi:AES-GCM",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 26,
+            "offset": 12,
+            "symbol": "aes_gcm::aead::KeyInit::new_from_slice",
+            "additionalContext": "[aead] key-init"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "Argon2",
+      "bom-ref": "rusi:Argon2",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 36,
+            "offset": 12,
+            "symbol": "argon2::Argon2::hash_password",
+            "additionalContext": "[kdf] hash-password"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "BLAKE3",
+      "bom-ref": "rusi:BLAKE3",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 25,
+            "offset": 12,
+            "symbol": "blake3::hash",
+            "additionalContext": "[hash] digest"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "HMAC",
+      "bom-ref": "rusi:HMAC",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 27,
+            "offset": 12,
+            "symbol": "hmac::Mac::new_from_slice",
+            "additionalContext": "[mac] key-init"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "JWT",
+      "bom-ref": "rusi:JWT",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 29,
+            "offset": 18,
+            "symbol": "jsonwebtoken::EncodingKey::from_secret",
+            "additionalContext": "[token] encode-key"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "MD5",
+      "bom-ref": "rusi:MD5",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 24,
+            "offset": 12,
+            "symbol": "md5::compute",
+            "additionalContext": "[hash] digest"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "PBKDF2",
+      "bom-ref": "rusi:PBKDF2",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 33,
+            "offset": 4,
+            "symbol": "pbkdf2::pbkdf2_hmac",
+            "additionalContext": "[kdf] derive"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-256",
+      "bom-ref": "rusi:SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 23,
+            "offset": 12,
+            "symbol": "sha2::Sha256::digest",
+            "additionalContext": "[hash] digest"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "TLS",
+      "bom-ref": "rusi:TLS",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 38,
+            "offset": 12,
+            "symbol": "rustls::ClientConfig::builder",
+            "additionalContext": "[protocol] config-builder"
+          }
+        ]
+      }
+    },
+    {
+      "type": "library",
+      "name": "rustls",
+      "bom-ref": "lib:rustls"
+    },
+    {
+      "type": "library",
+      "name": "pbkdf2",
+      "bom-ref": "lib:pbkdf2"
+    },
+    {
+      "type": "library",
+      "name": "aes-gcm",
+      "bom-ref": "lib:aes_gcm"
+    },
+    {
+      "type": "library",
+      "name": "hmac",
+      "bom-ref": "lib:hmac"
+    },
+    {
+      "type": "library",
+      "name": "blake3",
+      "bom-ref": "lib:blake3"
+    },
+    {
+      "type": "library",
+      "name": "sha2",
+      "bom-ref": "lib:sha2"
+    },
+    {
+      "type": "library",
+      "name": "argon2",
+      "bom-ref": "lib:argon2"
+    },
+    {
+      "type": "library",
+      "name": "md5",
+      "bom-ref": "lib:md5"
+    },
+    {
+      "type": "library",
+      "name": "jsonwebtoken",
+      "bom-ref": "lib:jsonwebtoken"
+    }
+  ]
+}

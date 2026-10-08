@@ -7,6 +7,9 @@ This is the evaluation of the first, deliberately narrow paper: Layers 1 and 2 o
 labelled benchmark, a held-out test set and broader knowledge-base coverage are the subject of
 the follow-up paper (section 9).
 
+All outputs behind the tables (CBOMs, scores, baseline reports, corpus and ablation data) are in
+`results/`, with the command that regenerates each part in `results/README.md`.
+
 ## 1. Questions
 
 - **RQ1 Evidence.** Are the reported positions (file, line, column) correct?
@@ -60,21 +63,21 @@ Every occurrence carries `location` (workspace-relative, or `<package>-<version>
 - macro call sites (`hash_all!`)
 - derive and attribute positions
 
-With `--self-test` it shifts every position by ±1 line and ±1 column and requires the check to fail.
+With `--self-test` it shifts every position by ±1 line and ±1 column and counts how often the check then fails. A shift that would leave the first line or column is skipped, so the column −1 direction has fewer shifted positions than the others (many manifest and item positions start at column 0).
 
 | set | positions | verified | shifted positions rejected |
 |---|---|---|---|
-| micro | 51 | 51 | 204/204 |
-| libonly | 20 | 20 | 80/80 |
-| threads | 15 | 15 | 60/60 |
-| rusi fixtures (3) | 573 | 573 | 2289/2292 |
-| realapp | 358 | 358 | 1432/1432 |
-| corpus (5 projects) | 724 | 724 | 2882/2896 |
-| **total** | **1741** | **1741** | **6947/6964** |
+| micro | 51 | 51 | 178/178 |
+| libonly | 20 | 20 | 72/72 |
+| threads | 15 | 15 | 54/54 |
+| rusi fixtures (3) | 580 | 580 | 2260/2263 |
+| realapp | 365 | 365 | 1437/1437 |
+| corpus (5 projects) | 731 | 731 | 2863/2877 |
+| **total** | **1762** | **1762** | **6864/6881** |
 
 Positions come from rustc's spans, which are offsets into the original files, so comments and formatting cannot shift them. Code from a function-like macro is attributed to the outermost call site in the user's source, with the definition site kept in the context.
 
-The self-test is a property of the verifier, not of the positions. When the same identifier sits at the same column on adjacent lines, as rustls's suite tables do, a shifted position can still look valid. That happened for 17 of 6,964 shifts (0.24%), in rustls and age sources.
+The self-test is a property of the verifier, not of the positions. When the same identifier sits at the same column on adjacent lines, a shifted position can still look valid. That happened for 17 of 6,881 shifts (0.25%): adjacent `new_from_slice` calls in the crates-app fixture, rcgen's `sign_algo.rs`, and the hpke crate's `kdf.rs` in rage's dependencies.
 
 ## 4. RQ2: detection on labelled programs
 
@@ -136,8 +139,10 @@ On realapp this finds two real patterns:
 | micro | 25 / 19 | 6 | 24 | 24 / 18 |
 | libonly | 12 / 4 | 8 | 11 | 10 / 4 |
 | threads | 9 / 9 | 0 | 9 | 7 / 7 |
-| rusi crates-app | 508 / 508 | 0 | 249 | 11 / 11 |
-| realapp | 335 / 335 | 0 | 255 | 2 / 2 |
+| rusi crates-app | 515 / 515 | 0 | 254 | 11 / 11 |
+| rusi asymmetric-app | 6 / 6 | 0 | 6 | 4 / 4 |
+| rusi modern-app | 2 / 2 | 0 | 2 | 2 / 2 |
+| realapp | 342 / 342 | 0 | 262 | 2 / 2 |
 | rcgen (library) | 86 / 86 | 0 | 78 | 85 / 85 |
 | rage | 84 / 66 | 35 | 77 | 0 / 0 |
 
@@ -158,14 +163,14 @@ Five crates.io applications and libraries (`scripts/corpus.py`). Each was built 
 
 | project | packages | plain check | cargo cbom | overhead | peak RSS | instances walked | algorithms (reachable) | other assets | occurrences (reachable) | findings |
 |---|---|---|---|---|---|---|---|---|---|---|
-| rage 0.12.1 | 277 | 16.5 s | 31.2 s | ×1.90 | 449 MiB | 47,413 | 10 (8) | – | 84 (77) | hard-coded nonce |
-| jwt-cli 6.2.0 | 125 | 9.1 s | 16.7 s | ×1.84 | 382 MiB | 17,134 | 15 (15) | HMAC key | 43 (43) | hard-coded key |
-| rcgen 0.14.10 (library) | 68 | 4.5 s | 6.7 s | ×1.48 | 261 MiB | 2,051 | 9 (9) | – | 86 (78) | – |
-| minisign 0.10.0 | 37 | 2.2 s | 8.5 s | ×3.92 | 250 MiB | 1,311 | 1 (1) | – | 1 (1) | – |
-| xh 0.26.2 | 312 | 36.4 s | 65.1 s | ×1.79 | 815 MiB | 57,351 | 34 (32) | TLS (aws-lc-rs) | 462 (242) | – |
+| rage 0.12.1 | 277 | 17.2 s | 31.6 s | ×1.84 | 450 MiB | 47,413 | 10 (8) | – | 84 (77) | hard-coded nonce |
+| jwt-cli 6.2.0 | 125 | 9.3 s | 16.9 s | ×1.82 | 383 MiB | 17,134 | 15 (15) | HMAC key | 43 (43) | hard-coded key |
+| rcgen 0.14.10 (library) | 68 | 4.5 s | 6.7 s | ×1.48 | 258 MiB | 2,051 | 9 (9) | – | 86 (78) | – |
+| minisign 0.10.0 | 37 | 2.2 s | 8.7 s | ×3.99 | 250 MiB | 1,311 | 1 (1) | – | 1 (1) | – |
+| xh 0.26.2 | 312 | 37.7 s | 66.0 s | ×1.75 | 814 MiB | 57,351 | 34 (32) | TLS (aws-lc-rs) | 469 (247) | – |
 
-- **Cost.** On the four projects larger than minisign the overhead is ×1.5 to ×1.9. minisign's ×3.9 is fixed per-crate cost on a two-second build. Memory peaks at 815 MiB, for xh.
-- **Evidence.** All 724 positions verify.
+- **Cost.** On the four projects larger than minisign the overhead is ×1.5 to ×1.8. minisign's ×4.0 is fixed per-crate cost on a two-second build. Memory peaks at 814 MiB, for xh.
+- **Evidence.** All 731 positions verify.
 - **rusi.** rusi (stable backend) reports 2 crypto components across the five projects (`JWT` in jwt-cli, `SHA-256` in xh). These programs reach their crypto through dependencies (age, jsonwebtoken, reqwest/rustls), which a source-level scan of the workspace does not enter.
 - **Findings.** Both are real and intentional, and both show why purpose (Layer 3) matters:
   - age-core's `[0; 12]` nonce: age uses each file key once.
@@ -174,7 +179,7 @@ Five crates.io applications and libraries (`scripts/corpus.py`). Each was built 
 
 The first corpus runs exposed problems the fixtures could not. All are fixed (each with a fixture or a regression check), and the table is from the fixed tool:
 
-1. **Optimisation profile.** minisign sets `[profile.dev] opt-level = 3`. At that level rustc's MIR inliner folds crypto calls into their callers, and the call sites disappear. The driver now pins `-Zmir-opt-level=1`, the debug-build MIR, whatever the profile; section 6.1 of the proposal anticipated this.
+1. **Optimisation profile.** minisign sets `[profile.dev] opt-level = 3`, which raises every crate to MIR opt-level 2. At that level the GVN pass rebuilds constant operands without a source span, the callee of every call included, so no call has a position and the driver drops it. In crates not compiled incrementally (all registry dependencies), the MIR inliner also folds calls into their callers. Disabling passes one at a time shows GVN is the cause: without GVN all of minisign's calls come back, and without the inliner none do. The driver now pins `-Zmir-opt-level=1`, the debug-build MIR, whatever the profile. Section 6.1 of the proposal anticipated a dependence on the MIR level, but for inlining only.
 2. **Extern statics.** Evaluating an FFI static's initializer (xh links oniguruma) panics in rustc; the panic was caught but rustc's ICE hook failed the build. Foreign statics are skipped, and the driver silences the hook during its own analysis, so a panic stays a counted analysis error.
 3. **Derives.** A `#[derive(Clone)]` produced a `Clone::clone` "use" of SHA-512, located at the derive. `Clone` of a crypto type is not a use: std trait calls are kept only for `Default::default`, which selects parameters (Argon2). Positions inside derives and attribute macros are now tagged, and `verify` checks them.
 4. **Out-parameters.** `let mut nonce = [0u8; 12]; rng.fill_bytes(&mut nonce);` would have read as a hard-coded nonce. A local passed by `&mut` to a call is now also defined by that call, and its constant initialization is ignored.

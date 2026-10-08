@@ -1,0 +1,185 @@
+{
+ "note": "rusi report trimmed to its tool and crypto sections",
+ "tool": {
+  "name": "rusi",
+  "version": "4.1.1",
+  "description": "Rust source analysis inspector"
+ },
+ "options": {
+  "directory": "jwt-cli-6.2.0",
+  "backend": "stable",
+  "analysis_scope": "cryptos",
+  "call_graph_mode": "static",
+  "data_flow_mode": "security",
+  "include_tests": false,
+  "max_call_candidates": 8
+ },
+ "crypto": {
+  "libraries": [
+   {
+    "id": "crypto-library-016b09e83cdedd6e",
+    "path": "jsonwebtoken",
+    "family": "token",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/decode.rs",
+    "position": {
+     "filename": "src/translators/decode.rs",
+     "line": 7,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-30c25fe1e4d00ae1",
+    "path": "jsonwebtoken",
+    "family": "token",
+    "package_path": "jwt_cli",
+    "file_path": "src/cli_config.rs",
+    "position": {
+     "filename": "src/cli_config.rs",
+     "line": 5,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-ddc30291ad2a2c15",
+    "path": "jsonwebtoken",
+    "family": "token",
+    "package_path": "jwt_cli",
+    "file_path": "src/utils.rs",
+    "position": {
+     "filename": "src/utils.rs",
+     "line": 6,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-fdd8278aa8d7a92d",
+    "path": "jsonwebtoken",
+    "family": "token",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/encode.rs",
+    "position": {
+     "filename": "src/translators/encode.rs",
+     "line": 6,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "components": [
+   {
+    "id": "crypto-component-caf92dbe62ef0b28",
+    "kind": "token",
+    "algorithm": "JWT",
+    "provider": "jsonwebtoken",
+    "operation": "encode-key",
+    "symbol": "jsonwebtoken::EncodingKey::from_secret",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/encode.rs",
+    "position": {
+     "filename": "src/translators/encode.rs",
+     "line": 28,
+     "column": 37
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "materials": [
+   {
+    "id": "crypto-material-271ef9c7d02d890f",
+    "kind": "key",
+    "name": "token_data",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/decode.rs",
+    "function": "jwt::translators::decode::decode_token",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/translators/decode.rs",
+     "line": 152,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-2dad5bb91226b573",
+    "kind": "key",
+    "name": "secret_validator",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/decode.rs",
+    "function": "jwt::translators::decode::decode_token",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/translators/decode.rs",
+     "line": 133,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-653ed0f2c757aec9",
+    "kind": "key",
+    "name": "secret",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/decode.rs",
+    "function": "jwt::translators::decode::decode_token",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/translators/decode.rs",
+     "line": 124,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-a64d07ebe7b3596d",
+    "kind": "key",
+    "name": "insecure_decoding_key",
+    "package_path": "jwt_cli",
+    "file_path": "src/translators/decode.rs",
+    "function": "jwt::translators::decode::decode_token",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/translators/decode.rs",
+     "line": 146,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-b1add7eea97f5b59",
+    "kind": "key",
+    "name": "token",
+    "package_path": "jwt_cli",
+    "file_path": "src/main.rs",
+    "function": "jwt::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 47,
+     "column": 17
+    },
+    "properties": {}
+   }
+  ],
+  "findings": [],
+  "properties": {}
+ }
+}

@@ -75,7 +75,7 @@ def main(labels_path, cbom_path, as_json=False):
 
     # provenance: per labelled (asset, line, role), the set of origin kinds the CBOM states
     # (cargo-cbom writes "role: kind (..) or kind (..)" in additionalContext)
-    kinds_re = r"\b(hard-coded|environment|file|rng|parameter|derived|computed)\b"
+    kinds_re = r"\b(hard-coded|environment|file|rng|parameter|derived|computed|unknown)\b"
     prov_total, prov_exact, prov_wrong = 0, 0, []
     for a in assets:
         for role, truth in a.get("provenance", {}).items():

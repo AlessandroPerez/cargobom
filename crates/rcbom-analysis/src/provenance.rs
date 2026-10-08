@@ -83,7 +83,9 @@ fn classify(kb: &Kb, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
             }
             out.insert(class("hard-coded", d.join(", ")));
         }
-        // a static or const that is not an algorithm descriptor: data compiled in
+        // an algorithm descriptor (`&AES_256_GCM`, `HKDF_SHA256`) says which algorithm, not
+        // what the key material is; any other static or const is data compiled in
+        Origin::Data { def } if is_descriptor(kb, def) => {}
         Origin::Data { def } => {
             out.insert(class("hard-coded", format!("static {}", short(&def.path))));
         }
@@ -134,6 +136,15 @@ fn classify(kb: &Kb, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
         Origin::Any(alts) => alts.iter().for_each(|a| classify(kb, a, depth + 1, out)),
         Origin::Unknown => {}
     }
+}
+
+/// A static or const the knowledge base names as an algorithm (`[[static]]`), in any version
+/// of its crate.
+fn is_descriptor(kb: &Kb, def: &rcbom_facts::DefRef) -> bool {
+    let name = last(&def.path);
+    kb.statics
+        .iter()
+        .any(|e| e.krates.contains(&def.krate.name) && e.pattern.is_match(name))
 }
 
 /// Algorithm descriptor statics reachable in a call's argument origins: the

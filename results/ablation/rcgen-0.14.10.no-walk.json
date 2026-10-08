@@ -1,0 +1,1187 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/rcgen@0.14.10",
+      "name": "rcgen",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/rcgen@0.14.10",
+      "type": "application",
+      "version": "0.14.10"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by rcgen (dependencies)",
+            "line": 125,
+            "location": "Cargo.toml",
+            "offset": 14,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via rcgen -> ring",
+            "line": 551,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::generate; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 86,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 241,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo",
+            "line": 243,
+            "location": "src/key_pair.rs",
+            "offset": 5,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from",
+            "line": 541,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 543,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 52,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 99,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_ECDSA_P256_SHA256",
+            "line": 162,
+            "location": "src/sign_algo.rs",
+            "offset": 29,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-384-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-384",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING",
+            "line": 247,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo",
+            "line": 249,
+            "location": "src/key_pair.rs",
+            "offset": 5,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from",
+            "line": 545,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING",
+            "line": 547,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING",
+            "line": 54,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING",
+            "line": 100,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_ECDSA_P384_SHA384",
+            "line": 172,
+            "location": "src/sign_algo.rs",
+            "offset": 29,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          }
+        ]
+      },
+      "name": "ECDSA-P-384-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_ED25519 -> ring::signature::ED25519",
+            "line": 239,
+            "location": "src/key_pair.rs",
+            "offset": 24,
+            "symbol": "sign_algo::algo::PKCS_ED25519"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_ED25519 -> ring::signature::ED25519",
+            "line": 539,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "sign_algo::algo::PKCS_ED25519"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_ED25519 -> ring::signature::ED25519",
+            "line": 56,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_ED25519"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_ED25519 -> ring::signature::ED25519",
+            "line": 107,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_ED25519"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::signature::ED25519",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_ED25519",
+            "line": 226,
+            "location": "src/sign_algo.rs",
+            "offset": 29,
+            "symbol": "ring::signature::ED25519"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA256 -> rsa::padding::pkcs1::RSA_PKCS1_SHA256",
+            "line": 253,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo",
+            "line": 255,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[present] [static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from",
+            "line": 550,
+            "location": "src/key_pair.rs",
+            "offset": 30,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_RSA_SHA256 -> rsa::padding::pkcs1::RSA_PKCS1_SHA256",
+            "line": 551,
+            "location": "src/key_pair.rs",
+            "offset": 6,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA256 -> rsa::padding::pkcs1::RSA_PKCS1_SHA256",
+            "line": 46,
+            "location": "src/sign_algo.rs",
+            "offset": 14,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA256 -> rsa::padding::pkcs1::RSA_PKCS1_SHA256",
+            "line": 96,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> rsa::padding::pkcs1::RSA_PKCS1_SHA256",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_RSA_SHA256",
+            "line": 132,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA384 -> rsa::padding::pkcs1::RSA_PKCS1_SHA384",
+            "line": 256,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo",
+            "line": 258,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA384 -> rsa::padding::pkcs1::RSA_PKCS1_SHA384",
+            "line": 48,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA384 -> rsa::padding::pkcs1::RSA_PKCS1_SHA384",
+            "line": 97,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> rsa::padding::pkcs1::RSA_PKCS1_SHA384",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_RSA_SHA384",
+            "line": 142,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA512 -> rsa::padding::pkcs1::RSA_PKCS1_SHA512",
+            "line": 259,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo",
+            "line": 261,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA512 -> rsa::padding::pkcs1::RSA_PKCS1_SHA512",
+            "line": 50,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA512 -> rsa::padding::pkcs1::RSA_PKCS1_SHA512",
+            "line": 98,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> rsa::padding::pkcs1::RSA_PKCS1_SHA512",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [static] in sign_algo::algo::PKCS_RSA_SHA512",
+            "line": 152,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; use: digest; algorithm from ring::digest::SHA256 in the arguments",
+            "line": 463,
+            "location": "src/certificate.rs",
+            "offset": 16,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}",
+            "line": 463,
+            "location": "src/certificate.rs",
+            "offset": 32,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::generate; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> digest::SHA256",
+            "line": 86,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> digest::SHA256",
+            "line": 241,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-256-SHA-256 (ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING -> digest::SHA256)",
+            "line": 243,
+            "location": "src/key_pair.rs",
+            "offset": 5,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA256 -> digest::SHA256",
+            "line": 253,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-256 (ring::signature::RSA_PKCS1_SHA256 -> digest::SHA256)",
+            "line": 255,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-256-SHA-256 (ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING -> digest::SHA256)",
+            "line": 541,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> digest::SHA256",
+            "line": 543,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of RSA-PKCS1-1.5-SHA-256 (ring::signature::RSA_PKCS1_SHA256 -> digest::SHA256)",
+            "line": 550,
+            "location": "src/key_pair.rs",
+            "offset": 30,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_RSA_SHA256 -> digest::SHA256",
+            "line": 551,
+            "location": "src/key_pair.rs",
+            "offset": 6,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::KeyIdMethod::derive",
+            "line": 725,
+            "location": "src/lib.rs",
+            "offset": 20,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[present] [call] in rcgen::KeyIdMethod::derive; use: digest; algorithm from ring::digest::SHA256 in the arguments",
+            "line": 736,
+            "location": "src/lib.rs",
+            "offset": 16,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA256 -> digest::SHA256",
+            "line": 46,
+            "location": "src/sign_algo.rs",
+            "offset": 14,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> digest::SHA256",
+            "line": 52,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA256 -> digest::SHA256",
+            "line": 96,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> digest::SHA256",
+            "line": 99,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P256_SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> digest::SHA256",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [component] in sign_algo::algo::PKCS_RSA_SHA256; part of RSA-PKCS1-1.5-SHA-256 (ring::signature::RSA_PKCS1_SHA256 -> digest::SHA256)",
+            "line": 132,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in sign_algo::algo::PKCS_ECDSA_P256_SHA256; part of ECDSA-P-256-SHA-256 (ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING -> digest::SHA256)",
+            "line": 162,
+            "location": "src/sign_algo.rs",
+            "offset": 29,
+            "symbol": "ring::signature::ECDSA_P256_SHA256_ASN1_SIGNING"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "20"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> digest::SHA384",
+            "line": 247,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-384-SHA-384 (ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING -> digest::SHA384)",
+            "line": 249,
+            "location": "src/key_pair.rs",
+            "offset": 5,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA384 -> digest::SHA384",
+            "line": 256,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-384 (ring::signature::RSA_PKCS1_SHA384 -> digest::SHA384)",
+            "line": 258,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384"
+          },
+          {
+            "additionalContext": "[present] [component] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-384-SHA-384 (ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING -> digest::SHA384)",
+            "line": 545,
+            "location": "src/key_pair.rs",
+            "offset": 22,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::key_pair::KeyPair as std::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> digest::SHA384",
+            "line": 547,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::KeyIdMethod::derive",
+            "line": 727,
+            "location": "src/lib.rs",
+            "offset": 20,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[present] [call] in rcgen::KeyIdMethod::derive; use: digest; algorithm from ring::digest::SHA384 in the arguments",
+            "line": 736,
+            "location": "src/lib.rs",
+            "offset": 16,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA384 -> digest::SHA384",
+            "line": 48,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> digest::SHA384",
+            "line": 54,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA384 -> digest::SHA384",
+            "line": 97,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> digest::SHA384",
+            "line": 100,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_ECDSA_P384_SHA384"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> digest::SHA384",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [component] in sign_algo::algo::PKCS_RSA_SHA384; part of RSA-PKCS1-1.5-SHA-384 (ring::signature::RSA_PKCS1_SHA384 -> digest::SHA384)",
+            "line": 142,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA384"
+          },
+          {
+            "additionalContext": "[present] [component] in sign_algo::algo::PKCS_ECDSA_P384_SHA384; part of ECDSA-P-384-SHA-384 (ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING -> digest::SHA384)",
+            "line": 172,
+            "location": "src/sign_algo.rs",
+            "offset": 29,
+            "symbol": "ring::signature::ECDSA_P384_SHA384_ASN1_SIGNING"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "15"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; sign_algo::algo::PKCS_RSA_SHA512 -> digest::SHA512",
+            "line": 259,
+            "location": "src/key_pair.rs",
+            "offset": 20,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::signature::RSA_PKCS1_SHA512 -> digest::SHA512)",
+            "line": 261,
+            "location": "src/key_pair.rs",
+            "offset": 28,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512"
+          },
+          {
+            "additionalContext": "[present] [static] in rcgen::KeyIdMethod::derive",
+            "line": 729,
+            "location": "src/lib.rs",
+            "offset": 20,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[present] [call] in rcgen::KeyIdMethod::derive; use: digest; algorithm from ring::digest::SHA512 in the arguments",
+            "line": 736,
+            "location": "src/lib.rs",
+            "offset": 16,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[present] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as std::fmt::Debug>::fmt; sign_algo::algo::PKCS_RSA_SHA512 -> digest::SHA512",
+            "line": 50,
+            "location": "src/sign_algo.rs",
+            "offset": 21,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [via-static] in sign_algo::SignatureAlgorithm::iter::ALGORITHMS; sign_algo::algo::PKCS_RSA_SHA512 -> digest::SHA512",
+            "line": 98,
+            "location": "src/sign_algo.rs",
+            "offset": 4,
+            "symbol": "sign_algo::algo::PKCS_RSA_SHA512"
+          },
+          {
+            "additionalContext": "[present] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> digest::SHA512",
+            "line": 109,
+            "location": "src/sign_algo.rs",
+            "offset": 2,
+            "symbol": "sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
+          },
+          {
+            "additionalContext": "[present] [component] in sign_algo::algo::PKCS_RSA_SHA512; part of RSA-PKCS1-1.5-SHA-512 (ring::signature::RSA_PKCS1_SHA512 -> digest::SHA512)",
+            "line": 152,
+            "location": "src/sign_algo.rs",
+            "offset": 27,
+            "symbol": "ring::signature::RSA_PKCS1_SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/rcgen@0.14.10"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:ECDSA-P-384-SHA-384",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/rcgen@0.14.10#root",
+      "name": "rcgen",
+      "type": "application",
+      "version": "0.14.10"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.1.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "0"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:94494969-832c-8bb3-ba67-bd730db8e6cb",
+  "specVersion": "1.7",
+  "version": 1
+}

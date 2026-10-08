@@ -2,30 +2,34 @@
 # End-to-end check of Layers 1 and 2: build the driver (pinned nightly) and the CLI (stable),
 # generate CBOMs, validate them, verify every cited position against the source (with the
 # shifted-position self-test), and compare the fixture with its golden file.
-#   scripts/e2e.sh            fixtures/micro
+#   scripts/e2e.sh            the fixtures
 #   scripts/e2e.sh --realapp  also phase0/realapp, compared with the Phase 0 asset list
+# Outputs (<name>.cbom.json, scores, logs) go to $RCBOM_RESULTS if set (results/fixtures is the
+# committed copy), else to a temporary directory.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 "$root/scripts/check.sh"
 (cd "$root/crates/rcbom-driver" && cargo build -q)
 (cd "$root" && cargo build -q)
 cbom="$root/target/debug/cargo-cbom"
-out=$(mktemp -d)
+out=${RCBOM_RESULTS:-$(mktemp -d)}
+mkdir -p "$out"
 
 for g in micro libonly threads; do
     echo "== fixtures/$g"
-    (cd "$root/fixtures/$g" && "$cbom" cbom -o "$out/$g.json" 2> "$out/$g.log") || { cat "$out/$g.log"; exit 1; }
-    (cd "$root/fixtures/$g" && "$cbom" cbom verify "$out/$g.json" --self-test)
-    python3 "$root/scripts/summary.py" "$out/$g.json" > "$out/$g.txt"
-    diff -u "$root/fixtures/$g/expected.txt" "$out/$g.txt" && echo "golden file: identical"
+    (cd "$root/fixtures/$g" && "$cbom" cbom -o "$out/$g.cbom.json" 2> "$out/$g.log") || { cat "$out/$g.log"; exit 1; }
+    (cd "$root/fixtures/$g" && "$cbom" cbom verify "$out/$g.cbom.json" --self-test)
+    python3 "$root/scripts/summary.py" "$out/$g.cbom.json" > "$out/$g.txt"
+    diff -u "$root/fixtures/$g/expected.txt" "$out/$g.txt" || { echo "golden file differs: fixtures/$g/expected.txt"; exit 1; }
+    echo "golden file: identical"
 done
 
 for d in "$root"/fixtures/rusi/*/; do
     f=$(basename "$d")
     echo "== fixtures/rusi/$f"
-    (cd "$d" && "$cbom" cbom -o "$out/$f.json" 2> "$out/$f.log") || { cat "$out/$f.log"; exit 1; }
-    (cd "$d" && "$cbom" cbom verify "$out/$f.json" | tail -1)
-    python3 "$root/scripts/score.py" "$d/labels.toml" "$out/$f.json" --json > "$out/$f.score.json"
+    (cd "$d" && "$cbom" cbom -o "$out/$f.cbom.json" 2> "$out/$f.log") || { cat "$out/$f.log"; exit 1; }
+    (cd "$d" && "$cbom" cbom verify "$out/$f.cbom.json" | tail -1)
+    python3 "$root/scripts/score.py" "$d/labels.toml" "$out/$f.cbom.json" --json > "$out/$f.score.json"
     python3 - "$out/$f.score.json" <<'PY'
 import json, sys
 r = json.load(open(sys.argv[1]))
@@ -37,9 +41,9 @@ done
 
 if [ "${1:-}" = "--realapp" ]; then
     echo "== phase0/realapp"
-    (cd "$root/phase0/realapp" && "$cbom" cbom -o "$out/realapp.json" 2> "$out/realapp.log") || { cat "$out/realapp.log"; exit 1; }
-    (cd "$root/phase0/realapp" && "$cbom" cbom verify "$out/realapp.json" --self-test)
-    python3 - "$out/realapp.json" "$root/phase0/cbom-realapp.json" <<'PY'
+    (cd "$root/phase0/realapp" && "$cbom" cbom -o "$out/realapp.cbom.json" 2> "$out/realapp.log") || { cat "$out/realapp.log"; exit 1; }
+    (cd "$root/phase0/realapp" && "$cbom" cbom verify "$out/realapp.cbom.json" --self-test)
+    python3 - "$out/realapp.cbom.json" "$root/phase0/cbom-realapp.json" <<'PY'
 import json, sys
 # Phase 0 produced algorithm assets only; key material and protocol assets came later
 def names(p, algorithms_only):

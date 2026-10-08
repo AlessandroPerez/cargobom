@@ -1,0 +1,166 @@
+{
+ "note": "rusi report trimmed to its tool and crypto sections",
+ "tool": {
+  "name": "rusi",
+  "version": "4.1.1",
+  "description": "Rust source analysis inspector"
+ },
+ "options": {
+  "directory": "cbom-real-asymmetric-app",
+  "backend": "stable",
+  "analysis_scope": "cryptos",
+  "call_graph_mode": "static",
+  "data_flow_mode": "security",
+  "include_tests": false,
+  "max_call_candidates": 8
+ },
+ "crypto": {
+  "libraries": [
+   {
+    "id": "crypto-library-6214bcab12eae746",
+    "path": "ed25519_dalek",
+    "family": "asymmetric",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 1,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-97acb5955c4a8681",
+    "path": "rsa",
+    "family": "asymmetric",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 5,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-c616829898ad0b41",
+    "path": "ring",
+    "family": "aead",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 3,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "components": [
+   {
+    "id": "crypto-component-8982551c6c3bea49",
+    "kind": "aead",
+    "algorithm": "Ring-AEAD",
+    "provider": "ring",
+    "operation": "key-init",
+    "symbol": "ring::aead::UnboundKey::new",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 12,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-8ce6bf5555402835",
+    "kind": "asymmetric",
+    "algorithm": "Ed25519",
+    "provider": "ed25519_dalek",
+    "operation": "key-init",
+    "symbol": "ed25519_dalek::SigningKey::from_bytes",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 16,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-ba6ced1d039d2bf8",
+    "kind": "hash",
+    "algorithm": "SHA-256",
+    "provider": "ring",
+    "operation": "digest",
+    "symbol": "ring::digest::digest",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 11,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-e95800d9e84f2710",
+    "kind": "asymmetric",
+    "algorithm": "RSA",
+    "provider": "rsa",
+    "operation": "keygen",
+    "symbol": "rsa::RsaPrivateKey::new",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 15,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "materials": [
+   {
+    "id": "crypto-material-84a3900bcd5a0c93",
+    "kind": "key",
+    "name": "signing_secret",
+    "package_path": "cbom_real_asymmetric_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_asymmetric_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 8,
+     "column": 9
+    },
+    "properties": {}
+   }
+  ],
+  "findings": [],
+  "properties": {}
+ }
+}

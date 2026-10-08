@@ -82,9 +82,10 @@ fn main() {
     }
     // Dependency MIR must be in the metadata for the reachability walk to enter dependencies.
     args.push("-Zalways-encode-mir".into());
-    // The MIR a debug build has, whatever the project's profile: at opt-level 3 the MIR inliner
-    // folds crypto calls into their callers and the call sites disappear (minisign sets
-    // `[profile.dev] opt-level = 3`).
+    // The MIR a debug build has, whatever the project's profile. At MIR opt-level 2, the default
+    // for opt-level >= 1, GVN rebuilds constant operands without a span, callees included, so no
+    // call has a position; in non-incremental crates the MIR inliner also folds calls into their
+    // callers (minisign sets `[profile.dev] opt-level = 3`).
     args.push("-Zmir-opt-level=1".into());
     let result = run_with_tcx!(&args, |tcx| {
         // A panic inside the analysis is caught per item and counted; rustc's ICE hook would
@@ -960,7 +961,9 @@ fn alloc_callees(
                 if let rustc_middle::mir::interpret::GlobalAlloc::VTable(ty, preds) =
                     tcx.global_alloc(id)
                 {
+                    // as for an unsizing coercion: the methods and the type's drop glue
                     found.extend(vtable_methods_internal(tcx, ty, preds));
+                    found.push(Instance::resolve_drop_in_place(rustc_internal::stable(ty)));
                 }
             }
             GlobalAlloc::TypeId { .. } => {}

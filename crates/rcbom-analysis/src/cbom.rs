@@ -253,8 +253,8 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>) -> Value {
     if p.role.is_some() && !p.kb_supported {
         props.push(prop("rcbom:kb-coverage", "unsupported-version"));
     }
-    if let Some(b) = &p.backend {
-        props.push(prop("rcbom:backend", b));
+    if !p.backends.is_empty() {
+        props.push(prop("rcbom:backend", p.backends.join(",")));
     }
     if let Some(l) = &p.links {
         props.push(prop("rcbom:native-links", l));
@@ -417,7 +417,11 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         }
     }
 
-    let root = included.iter().find(|p| p.member);
+    // the package `--manifest-path` names; in a virtual workspace, the first member by name
+    let root = included
+        .iter()
+        .find(|p| p.member && man.root.as_ref() == Some(&p.id))
+        .or_else(|| included.iter().find(|p| p.member));
     let mut run_props = vec![
         prop("rcbom:run:toolchain", &run.toolchain),
         prop("rcbom:run:target", &run.target),

@@ -1,0 +1,433 @@
+{
+ "note": "rusi report trimmed to its tool and crypto sections",
+ "tool": {
+  "name": "rusi",
+  "version": "4.1.1",
+  "description": "Rust source analysis inspector"
+ },
+ "options": {
+  "directory": "cbom-real-crates-app",
+  "backend": "stable",
+  "analysis_scope": "cryptos",
+  "call_graph_mode": "static",
+  "data_flow_mode": "security",
+  "include_tests": false,
+  "max_call_candidates": 8
+ },
+ "crypto": {
+  "libraries": [
+   {
+    "id": "crypto-library-0962f423c55c096f",
+    "path": "rustls",
+    "family": "protocol",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 6,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-1f818860f882a9ba",
+    "path": "pbkdf2",
+    "family": "kdf",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 5,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-564887d838befafd",
+    "path": "aes_gcm",
+    "family": "aead",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 1,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-604cd04a5138c0c7",
+    "path": "hmac",
+    "family": "mac",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 3,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-6e545974af2c07ee",
+    "path": "blake3",
+    "family": "hash",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 25,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-99ed247b928c691d",
+    "path": "sha2",
+    "family": "hash",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 8,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-b52cdf067e4d6faf",
+    "path": "argon2",
+    "family": "kdf",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 2,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-c7ac2c4bb9e4b23b",
+    "path": "md5",
+    "family": "hash",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 24,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-d78b7f5ff8689bc6",
+    "path": "jsonwebtoken",
+    "family": "token",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 4,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "components": [
+   {
+    "id": "crypto-component-0277a5a4b9114ffc",
+    "kind": "mac",
+    "algorithm": "HMAC",
+    "provider": "hmac",
+    "operation": "key-init",
+    "symbol": "hmac::Mac::new_from_slice",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 27,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-3628b7febe1a2048",
+    "kind": "aead",
+    "algorithm": "AES-GCM",
+    "provider": "aes_gcm",
+    "operation": "key-init",
+    "symbol": "aes_gcm::aead::KeyInit::new_from_slice",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 26,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-6970326a1666e4b4",
+    "kind": "protocol",
+    "algorithm": "TLS",
+    "provider": "rustls",
+    "operation": "config-builder",
+    "symbol": "rustls::ClientConfig::builder",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 38,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-985abb871ed29221",
+    "kind": "hash",
+    "algorithm": "MD5",
+    "provider": "md5",
+    "operation": "digest",
+    "symbol": "md5::compute",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 24,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-a3c3ae0f5000ff3f",
+    "kind": "hash",
+    "algorithm": "SHA-256",
+    "provider": "sha2",
+    "operation": "digest",
+    "symbol": "sha2::Sha256::digest",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 23,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-bd063639c332c212",
+    "kind": "token",
+    "algorithm": "JWT",
+    "provider": "jsonwebtoken",
+    "operation": "encode-key",
+    "symbol": "jsonwebtoken::EncodingKey::from_secret",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 29,
+     "column": 19
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-be42a0cb7fe6ffc4",
+    "kind": "kdf",
+    "algorithm": "PBKDF2",
+    "provider": "pbkdf2",
+    "operation": "derive",
+    "symbol": "pbkdf2::pbkdf2_hmac",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 33,
+     "column": 5
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-c6ebc0a556df9cea",
+    "kind": "hash",
+    "algorithm": "BLAKE3",
+    "provider": "blake3",
+    "operation": "digest",
+    "symbol": "blake3::hash",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 25,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-d01a4d9e59d8aefb",
+    "kind": "kdf",
+    "algorithm": "Argon2",
+    "provider": "argon2",
+    "operation": "hash-password",
+    "symbol": "argon2::Argon2::hash_password",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 36,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "materials": [
+   {
+    "id": "crypto-material-2b6dd2e667fb554e",
+    "kind": "key",
+    "name": "app_secret",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_crates_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 16,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-38b49f3ca045f5ea",
+    "kind": "key",
+    "name": "app_key",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_crates_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 29,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-4a7e8787f64f0a07",
+    "kind": "key",
+    "name": "api_token",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_crates_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 18,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-dd2a5144a58decad",
+    "kind": "nonce",
+    "name": "app_salt",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_crates_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 35,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-fa073e1b22603cdd",
+    "kind": "nonce",
+    "name": "nonce_seed",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_crates_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 32,
+     "column": 13
+    },
+    "properties": {}
+   }
+  ],
+  "findings": [
+   {
+    "id": "crypto-finding-69c0405eaa357f98",
+    "category": "weak-crypto",
+    "severity": "high",
+    "confidence": "medium",
+    "summary": "MD5 usage detected",
+    "package_path": "cbom_real_crates_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 24,
+     "column": 13
+    },
+    "properties": {}
+   }
+  ],
+  "properties": {}
+ }
+}

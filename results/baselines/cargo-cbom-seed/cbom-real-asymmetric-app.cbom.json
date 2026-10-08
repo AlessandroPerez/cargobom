@@ -1,0 +1,444 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
+      "name": "cbom-real-asymmetric-app",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via cbom-real-asymmetric-app -> rsa -> digest -> crypto-common",
+            "line": 68,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via cbom-real-asymmetric-app -> rsa -> digest",
+            "line": 116,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by cbom-real-asymmetric-app (dependencies)",
+            "line": 11,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via cbom-real-asymmetric-app -> ring",
+            "line": 338,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via cbom-real-asymmetric-app -> ed25519-dalek -> sha2",
+            "line": 416,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::aead::AES_256_GCM"
+          }
+        ]
+      },
+      "name": "AES-256-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in ed25519_dalek::signing::SigningKey::to_scalar_bytes; use: digest",
+            "line": 516,
+            "location": "ed25519-dalek-2.2.0/src/signing.rs",
+            "offset": 55,
+            "symbol": "sha2::Digest::chain_update"
+          },
+          {
+            "additionalContext": "[present] [call] in ed25519_dalek::signing::SigningKey::to_scalar_bytes; use: digest",
+            "line": 516,
+            "location": "ed25519-dalek-2.2.0/src/signing.rs",
+            "offset": 85,
+            "symbol": "sha2::Digest::finalize"
+          },
+          {
+            "additionalContext": "[present] [instantiation] in <ed25519_dalek::signing::SigningKey as ed25519::signature::Signer<ed25519::Signature>>::try_sign; chosen as generic argument of signing::<impl hazmat::ExpandedSecretKey>::raw_sign",
+            "line": 568,
+            "location": "ed25519-dalek-2.2.0/src/signing.rs",
+            "offset": 20,
+            "symbol": "signing::<impl hazmat::ExpandedSecretKey>::raw_sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ed25519_dalek::signing::<..>; use: digest",
+            "line": 812,
+            "location": "ed25519-dalek-2.2.0/src/signing.rs",
+            "offset": 37,
+            "symbol": "sha2::Digest::chain_update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ed25519_dalek::signing::<..>; use: digest",
+            "line": 812,
+            "location": "ed25519-dalek-2.2.0/src/signing.rs",
+            "offset": 62,
+            "symbol": "sha2::Digest::finalize"
+          },
+          {
+            "additionalContext": "[present] [instantiation] in ed25519_dalek::verifying::VerifyingKey::verify_strict; chosen as generic argument of verifying::RCompute::<CtxDigest>::compute",
+            "line": 374,
+            "location": "ed25519-dalek-2.2.0/src/verifying.rs",
+            "offset": 25,
+            "symbol": "verifying::RCompute::<CtxDigest>::compute"
+          },
+          {
+            "additionalContext": "[present] [instantiation] in <ed25519_dalek::verifying::VerifyingKey as ed25519::signature::Verifier<ed25519::Signature>>::verify; chosen as generic argument of verifying::VerifyingKey::raw_verify",
+            "line": 564,
+            "location": "ed25519-dalek-2.2.0/src/verifying.rs",
+            "offset": 13,
+            "symbol": "verifying::VerifyingKey::raw_verify"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7",
+        "pkg:cargo/ring@0.17.14",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0#root",
+      "name": "cbom-real-asymmetric-app",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.1.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "1842"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:84f4d71a-c62a-8679-9200-6f3bc7409214",
+  "specVersion": "1.7",
+  "version": 1
+}

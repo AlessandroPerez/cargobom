@@ -48,16 +48,22 @@ pub struct Pkg {
     /// still a crypto crate, but its APIs are not matched (`unsupported-version`).
     pub kb_supported: bool,
     pub candidates: Vec<String>,
-    /// For protocol crates: the backend package the enabled features select.
-    pub backend: Option<String>,
+    /// For protocol crates: the backend packages the enabled features select, sorted. More than
+    /// one means the features alone do not decide; the code does (`crypto::ring::default_provider`).
+    pub backends: Vec<String>,
     pub evidence: Vec<Evidence>,
     /// Shortest dependency chain from a workspace member, member first.
     pub chain: Vec<String>,
     /// Packages this one depends on (normal and build edges in the resolved graph).
     pub deps: Vec<PackageId>,
+    /// The subset whose code ships with this package's: normal edges, unless this package is a
+    /// procedural macro.
+    pub runtime_deps: Vec<PackageId>,
 }
 
 pub struct Manifest {
+    /// The package of the manifest given (`--manifest-path`), unless it is a virtual workspace.
+    pub root: Option<PackageId>,
     pub workspace_root: PathBuf,
     pub target_directory: PathBuf,
     pub packages: Vec<Pkg>,
@@ -224,12 +230,27 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
         }
         chain.reverse();
         let features: Vec<String> = node.features.iter().map(|f| f.to_string()).collect();
-        let backend = entry.and_then(|e| {
-            e.backends
-                .iter()
-                .find(|(feat, _)| features.contains(feat))
-                .map(|(_, b)| b.clone())
-        });
+        // the table describes the supported versions' features only
+        let mut backends: Vec<String> = exact
+            .map(|e| {
+                e.backends
+                    .iter()
+                    .filter(|(feat, _)| features.contains(feat))
+                    .map(|(_, b)| b.clone())
+                    .collect()
+            })
+            .unwrap_or_default();
+        backends.sort();
+        backends.dedup();
+        let proc_macro = p.targets.iter().any(|t| t.is_proc_macro());
+        let edge = |d: &&cargo_metadata::NodeDep, normal_only: bool| {
+            scope.contains_key(&d.pkg)
+                && d.dep_kinds.iter().any(|k| match k.kind {
+                    DependencyKind::Normal => !(normal_only && proc_macro),
+                    DependencyKind::Build => !normal_only,
+                    _ => false,
+                })
+        };
 
         let mut evidence = Vec::new();
         if entry.is_some() {
@@ -319,19 +340,26 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
             role: entry.map(|e| e.role),
             kb_supported: exact.is_some(),
             candidates: exact.map(|e| e.candidates.clone()).unwrap_or_default(),
-            backend,
+            backends,
             evidence,
             chain,
             deps: node
                 .deps
                 .iter()
-                .filter(|d| scope.contains_key(&d.pkg))
+                .filter(|d| edge(d, false))
+                .map(|d| d.pkg.clone())
+                .collect(),
+            runtime_deps: node
+                .deps
+                .iter()
+                .filter(|d| edge(d, true))
                 .map(|d| d.pkg.clone())
                 .collect(),
         });
     }
     out.sort_by(|a, b| (&a.name, &a.version).cmp(&(&b.name, &b.version)));
     Ok(Manifest {
+        root: resolve.root.clone(),
         workspace_root: md.workspace_root.as_std_path().to_path_buf(),
         target_directory: md.target_directory.as_std_path().to_path_buf(),
         packages: out,

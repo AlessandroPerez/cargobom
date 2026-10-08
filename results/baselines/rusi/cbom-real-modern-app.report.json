@@ -1,0 +1,144 @@
+{
+ "note": "rusi report trimmed to its tool and crypto sections",
+ "tool": {
+  "name": "rusi",
+  "version": "4.1.1",
+  "description": "Rust source analysis inspector"
+ },
+ "options": {
+  "directory": "cbom-real-modern-app",
+  "backend": "stable",
+  "analysis_scope": "cryptos",
+  "call_graph_mode": "static",
+  "data_flow_mode": "security",
+  "include_tests": false,
+  "max_call_candidates": 8
+ },
+ "crypto": {
+  "libraries": [
+   {
+    "id": "crypto-library-77ba5699cfb40b80",
+    "path": "sha1",
+    "family": "hash",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 3,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-89579165948a0ae7",
+    "path": "chacha20poly1305",
+    "family": "aead",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 1,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-c616829898ad0b41",
+    "path": "ring",
+    "family": "hash",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 2,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "components": [
+   {
+    "id": "crypto-component-93d3ba20070950dd",
+    "kind": "hash",
+    "algorithm": "SHA-1",
+    "provider": "sha1",
+    "operation": "digest",
+    "symbol": "sha1::Sha1::digest",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 8,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-component-c89eeeb19474d4f3",
+    "kind": "aead",
+    "algorithm": "ChaCha20-Poly1305",
+    "provider": "chacha20poly1305",
+    "operation": "key-init",
+    "symbol": "chacha20poly1305::aead::KeyInit::new_from_slice",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 9,
+     "column": 13
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "materials": [
+   {
+    "id": "crypto-material-0a2a0fb996196c6e",
+    "kind": "key",
+    "name": "shared_secret",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "function": "cbom_real_modern_app::main",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 6,
+     "column": 9
+    },
+    "properties": {}
+   }
+  ],
+  "findings": [
+   {
+    "id": "crypto-finding-32cbed54c50ffed7",
+    "category": "weak-crypto",
+    "severity": "high",
+    "confidence": "medium",
+    "summary": "SHA-1 usage detected",
+    "package_path": "cbom_real_modern_app",
+    "file_path": "src/main.rs",
+    "position": {
+     "filename": "src/main.rs",
+     "line": 8,
+     "column": 13
+    },
+    "properties": {}
+   }
+  ],
+  "properties": {}
+ }
+}

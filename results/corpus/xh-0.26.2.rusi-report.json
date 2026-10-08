@@ -1,0 +1,378 @@
+{
+ "note": "rusi report trimmed to its tool and crypto sections",
+ "tool": {
+  "name": "rusi",
+  "version": "4.1.1",
+  "description": "Rust source analysis inspector"
+ },
+ "options": {
+  "directory": "xh-0.26.2",
+  "backend": "stable",
+  "analysis_scope": "cryptos",
+  "call_graph_mode": "static",
+  "data_flow_mode": "security",
+  "include_tests": false,
+  "max_call_candidates": 8
+ },
+ "crypto": {
+  "libraries": [
+   {
+    "id": "crypto-library-1922d1f9296a1601",
+    "path": "sha2",
+    "family": "hash",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 12,
+     "column": 1
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   },
+   {
+    "id": "crypto-library-97dc8adc9adbbebc",
+    "path": "rustls",
+    "family": "protocol",
+    "package_path": "xh",
+    "file_path": "src/error_reporting.rs",
+    "position": {
+     "filename": "src/error_reporting.rs",
+     "line": 25,
+     "column": 5
+    },
+    "properties": {
+     "evidence": "import",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "components": [
+   {
+    "id": "crypto-component-50b330b4d39fab4d",
+    "kind": "hash",
+    "algorithm": "SHA-256",
+    "provider": "sha2",
+    "operation": "digest",
+    "symbol": "sha2::Sha256::digest",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 134,
+     "column": 22
+    },
+    "properties": {
+     "evidence": "syntax-call",
+     "confidence": "medium"
+    }
+   }
+  ],
+  "materials": [
+   {
+    "id": "crypto-material-175fc403c6d41407",
+    "kind": "key",
+    "name": "secret",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "function": "xh::message_signature::build_signing_key_with_algorithm",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 306,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-1e0e62e0d3d15bba",
+    "kind": "key",
+    "name": "password",
+    "package_path": "xh",
+    "file_path": "src/netrc.rs",
+    "function": "xh::netrc::Parser<'a,R>::finish_entry",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/netrc.rs",
+     "line": 218,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-22879b86dd34848a",
+    "kind": "key",
+    "name": "tokens_iter",
+    "package_path": "xh",
+    "file_path": "src/nested_json.rs",
+    "function": "xh::nested_json::parse_path",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/nested_json.rs",
+     "line": 105,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-28b5e0a55ff592df",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/nested_json.rs",
+    "function": "xh::nested_json::insert",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/nested_json.rs",
+     "line": 169,
+     "column": 17
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-3a712f961b41c194",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::RequestItems::headers",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 279,
+     "column": 25
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-3bcb3055f23e1c61",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "function": "xh::message_signature::sign_request",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 21,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-3dcac76686e848e2",
+    "kind": "key",
+    "name": "password",
+    "package_path": "xh",
+    "file_path": "src/auth.rs",
+    "function": "xh::auth::parse_auth",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/auth.rs",
+     "line": 58,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-43624e7fb9771448",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "function": "xh::message_signature::parse_key_input",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 231,
+     "column": 9
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-5edb0f827e95dbca",
+    "kind": "key",
+    "name": "password",
+    "package_path": "xh",
+    "file_path": "src/session.rs",
+    "function": "xh::session::Session::save_auth",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/session.rs",
+     "line": 258,
+     "column": 21
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-65b48326ddcd70a1",
+    "kind": "key",
+    "name": "uniqueness_key",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "function": "xh::message_signature::build_signature_params",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 155,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-6d54a051e631bedb",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/formatting/headers.rs",
+    "function": "xh::formatting::headers::HeaderFormatter<'a,W>::print_headers",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/formatting/headers.rs",
+     "line": 157,
+     "column": 17
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-84aace421480585c",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::RequestItems::headers",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 266,
+     "column": 25
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-8bf8fd7cd800b22a",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::split",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 68,
+     "column": 29
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-99086eb54a68c73d",
+    "kind": "key",
+    "name": "raw_key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::RequestItem::from_str",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 77,
+     "column": 17
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-a0f568d4d4d257ec",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::RequestItem::from_str",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 78,
+     "column": 17
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-af4e35de00e3b36e",
+    "kind": "key",
+    "name": "password",
+    "package_path": "xh",
+    "file_path": "src/auth.rs",
+    "function": "xh::auth::parse_auth",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/auth.rs",
+     "line": 53,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-c69b4dd2a9f4fdc7",
+    "kind": "key",
+    "name": "tokens",
+    "package_path": "xh",
+    "file_path": "src/nested_json.rs",
+    "function": "xh::nested_json::tokenize",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/nested_json.rs",
+     "line": 67,
+     "column": 13
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-c8f4df42bc9e9122",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/request_items.rs",
+    "function": "xh::request_items::RequestItems::headers",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/request_items.rs",
+     "line": 272,
+     "column": 25
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-cc4c8be96dee1e68",
+    "kind": "key",
+    "name": "key",
+    "package_path": "xh",
+    "file_path": "src/session.rs",
+    "function": "xh::session::Session::save_headers",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/session.rs",
+     "line": 215,
+     "column": 17
+    },
+    "properties": {}
+   },
+   {
+    "id": "crypto-material-d4d93c4946838a70",
+    "kind": "key",
+    "name": "shared_key",
+    "package_path": "xh",
+    "file_path": "src/message_signature.rs",
+    "function": "xh::message_signature::build_hmac_signing_key",
+    "confidence": "medium",
+    "position": {
+     "filename": "src/message_signature.rs",
+     "line": 289,
+     "column": 9
+    },
+    "properties": {}
+   }
+  ],
+  "findings": [],
+  "properties": {}
+ }
+}

@@ -1,0 +1,109 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "rusi",
+          "version": "4.1.1"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "name": "Ed25519",
+      "bom-ref": "rusi:Ed25519",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 16,
+            "offset": 12,
+            "symbol": "ed25519_dalek::SigningKey::from_bytes",
+            "additionalContext": "[asymmetric] key-init"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA",
+      "bom-ref": "rusi:RSA",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 15,
+            "offset": 12,
+            "symbol": "rsa::RsaPrivateKey::new",
+            "additionalContext": "[asymmetric] keygen"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "Ring-AEAD",
+      "bom-ref": "rusi:Ring-AEAD",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 12,
+            "offset": 12,
+            "symbol": "ring::aead::UnboundKey::new",
+            "additionalContext": "[aead] key-init"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-256",
+      "bom-ref": "rusi:SHA-256",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 11,
+            "offset": 12,
+            "symbol": "ring::digest::digest",
+            "additionalContext": "[hash] digest"
+          }
+        ]
+      }
+    },
+    {
+      "type": "library",
+      "name": "ed25519-dalek",
+      "bom-ref": "lib:ed25519_dalek"
+    },
+    {
+      "type": "library",
+      "name": "rsa",
+      "bom-ref": "lib:rsa"
+    },
+    {
+      "type": "library",
+      "name": "ring",
+      "bom-ref": "lib:ring"
+    }
+  ]
+}

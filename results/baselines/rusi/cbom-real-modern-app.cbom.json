@@ -1,0 +1,71 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "rusi",
+          "version": "4.1.1"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "name": "ChaCha20-Poly1305",
+      "bom-ref": "rusi:ChaCha20-Poly1305",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 9,
+            "offset": 12,
+            "symbol": "chacha20poly1305::aead::KeyInit::new_from_slice",
+            "additionalContext": "[aead] key-init"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-1",
+      "bom-ref": "rusi:SHA-1",
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "src/main.rs",
+            "line": 8,
+            "offset": 12,
+            "symbol": "sha1::Sha1::digest",
+            "additionalContext": "[hash] digest"
+          }
+        ]
+      }
+    },
+    {
+      "type": "library",
+      "name": "sha1",
+      "bom-ref": "lib:sha1"
+    },
+    {
+      "type": "library",
+      "name": "chacha20poly1305",
+      "bom-ref": "lib:chacha20poly1305"
+    },
+    {
+      "type": "library",
+      "name": "ring",
+      "bom-ref": "lib:ring"
+    }
+  ]
+}

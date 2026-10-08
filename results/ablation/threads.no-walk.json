@@ -1,0 +1,398 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via threads -> hmac -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via threads -> hmac -> digest",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/hmac@0.12.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by threads (dependencies)",
+            "line": 11,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "hmac"
+          },
+          {
+            "additionalContext": "[manifest] locked hmac 0.12.1; reached via threads -> hmac",
+            "line": 61,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "hmac"
+          }
+        ]
+      },
+      "name": "hmac",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/hmac@0.12.1",
+      "type": "library",
+      "version": "0.12.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by threads (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via threads -> sha2",
+            "line": 76,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/threads@0.1.0",
+      "name": "threads",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/threads@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in threads::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function)",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "hmac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[present] [call] in threads::mac; use: tag",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "hmac::Mac::update"
+          },
+          {
+            "additionalContext": "[present] [call] in threads::mac; use: tag",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "hmac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[present] [call] in threads::mac; into_bytes: setup, not a use",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in threads::hash; use: digest",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "sha2::Digest::digest"
+          },
+          {
+            "additionalContext": "[present] [component] in threads::mac; part of HMAC-SHA-256",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "hmac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[present] [component] in threads::mac; part of HMAC-SHA-256",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "hmac::Mac::update"
+          },
+          {
+            "additionalContext": "[present] [component] in threads::mac; part of HMAC-SHA-256",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "hmac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[present] [component] in threads::mac; part of HMAC-SHA-256",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:HMAC-SHA-256"
+      ],
+      "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/hmac@0.12.1",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/threads@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/threads@0.1.0#root",
+      "name": "threads",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.1.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "0"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:ccd9562d-140c-8275-bc41-78e5d6b67229",
+  "specVersion": "1.7",
+  "version": 1
+}

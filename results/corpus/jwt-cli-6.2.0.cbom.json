@@ -1,0 +1,1311 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/jsonwebtoken@9.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by jwt-cli (dependencies)",
+            "line": 63,
+            "location": "Cargo.toml",
+            "offset": 14,
+            "symbol": "jsonwebtoken"
+          },
+          {
+            "additionalContext": "[manifest] locked jsonwebtoken 9.2.0; reached via jwt-cli -> jsonwebtoken",
+            "line": 418,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "jsonwebtoken"
+          }
+        ]
+      },
+      "name": "jsonwebtoken",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "protocol"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/jsonwebtoken@9.2.0",
+      "type": "library",
+      "version": "9.2.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/jwt-cli@6.2.0",
+      "name": "jwt-cli",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/jwt-cli@6.2.0",
+      "type": "application",
+      "version": "6.2.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked ring 0.17.7; reached via jwt-cli -> jsonwebtoken -> ring",
+            "line": 699,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_7`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "ring-0.17.7/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_7"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.7",
+      "type": "library",
+      "version": "0.17.7"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification",
+            "line": 12,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing",
+            "line": 21,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-384-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-384",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification",
+            "line": 13,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing",
+            "line": 22,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING"
+          }
+        ]
+      },
+      "name": "ECDSA-P-384-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification",
+            "line": 12,
+            "location": "jsonwebtoken-9.2.0/src/crypto/eddsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "secret-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; key: parameter (argument 2 of the enclosing function)",
+            "line": 77,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 40,
+            "symbol": "jsonwebtoken::EncodingKey::from_secret"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::translators::decode::decoding_key_from_secret; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function)",
+            "line": 45,
+            "location": "src/translators/decode.rs",
+            "offset": 36,
+            "symbol": "jsonwebtoken::DecodingKey::from_secret"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::translators::decode::decode_token; key: hard-coded (literal at line 146)",
+            "line": 146,
+            "location": "src/translators/decode.rs",
+            "offset": 32,
+            "symbol": "jsonwebtoken::DecodingKey::from_secret"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::translators::encode::encoding_key_from_secret; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function)",
+            "line": 28,
+            "location": "src/translators/encode.rs",
+            "offset": 36,
+            "symbol": "jsonwebtoken::EncodingKey::from_secret"
+          }
+        ]
+      },
+      "name": "HMAC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "JWT HMAC key; HS256, HS384 or HS512 is chosen by the token header, not here"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "HMAC"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign",
+            "line": 27,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign",
+            "line": 28,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA384"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign",
+            "line": 29,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA512"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 10,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 23,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 11,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 24,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 12,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 25,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PSS-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 13,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 26,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
+          }
+        ]
+      },
+      "name": "RSA-PSS-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PSS-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 14,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 27,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA384"
+          }
+        ]
+      },
+      "name": "RSA-PSS-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PSS-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters",
+            "line": 15,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing",
+            "line": 28,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA512"
+          }
+        ]
+      },
+      "name": "RSA-PSS-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> digest::SHA256)",
+            "line": 12,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> digest::SHA256)",
+            "line": 21,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> digest::SHA256)",
+            "line": 27,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> digest::SHA256)",
+            "line": 10,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> digest::SHA256)",
+            "line": 13,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> digest::SHA256)",
+            "line": 23,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> digest::SHA256)",
+            "line": 26,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> digest::SHA384)",
+            "line": 13,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> digest::SHA384)",
+            "line": 22,
+            "location": "jsonwebtoken-9.2.0/src/crypto/ecdsa.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> digest::SHA384)",
+            "line": 28,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> digest::SHA384)",
+            "line": 11,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> digest::SHA384)",
+            "line": 14,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> digest::SHA384)",
+            "line": 24,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> digest::SHA384)",
+            "line": 27,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> digest::SHA512)",
+            "line": 29,
+            "location": "jsonwebtoken-9.2.0/src/crypto/mod.rs",
+            "offset": 41,
+            "symbol": "ring::hmac::HMAC_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> digest::SHA512)",
+            "line": 12,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> digest::SHA512)",
+            "line": 15,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> digest::SHA512)",
+            "line": 25,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> digest::SHA512)",
+            "line": 28,
+            "location": "jsonwebtoken-9.2.0/src/crypto/rsa.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.1.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.7"
+      ],
+      "provides": [
+        "crypto:algorithm:HMAC"
+      ],
+      "ref": "pkg:cargo/jsonwebtoken@9.2.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/jsonwebtoken@9.2.0"
+      ],
+      "ref": "pkg:cargo/jwt-cli@6.2.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:ECDSA-P-384-SHA-384",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-384",
+        "crypto:algorithm:HMAC-SHA-512",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
+        "crypto:algorithm:RSA-PSS-SHA-256",
+        "crypto:algorithm:RSA-PSS-SHA-384",
+        "crypto:algorithm:RSA-PSS-SHA-512",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.7"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-512"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-512"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PSS-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:RSA-PSS-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:RSA-PSS-SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/jwt-cli@6.2.0#root",
+      "name": "jwt-cli",
+      "type": "application",
+      "version": "6.2.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.1.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "17134"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:48bfdba6-b542-87ce-9da1-0030c027c6de",
+  "specVersion": "1.7",
+  "version": 1
+}

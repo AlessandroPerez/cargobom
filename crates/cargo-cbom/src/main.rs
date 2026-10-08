@@ -40,7 +40,7 @@ struct GenArgs {
     /// Output file (default: stdout).
     #[arg(short, long)]
     output: Option<PathBuf>,
-    /// The rcbom-driver binary (default: next to this executable, then $RCBOM_DRIVER).
+    /// The rcbom-driver binary (default: $RCBOM_DRIVER, then next to this executable).
     #[arg(long)]
     driver: Option<PathBuf>,
     /// Layer 1 only: no compilation, nothing from the project is executed by rcbom.
@@ -189,19 +189,27 @@ fn run_driver(a: &GenArgs, kb: &Kb, dir: &Path, facts_dir: &Path) -> Result<()> 
         );
     }
     let sysroot = String::from_utf8(out.stdout)?.trim().to_string();
+    let compiler = Command::new("rustc")
+        .arg(format!("+{TOOLCHAIN}"))
+        .arg("-vV")
+        .output()?;
+    let compiler = String::from_utf8_lossy(&compiler.stdout).to_string();
     let kb_crates = kb.crate_names().join(",");
     let stop_crates = kb.stop_crate_names().join(",");
 
-    // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. A new
-    // driver or knowledge base invalidates both.
+    // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any
+    // input of the driver other than the sources (the driver itself, the compiler, the crate
+    // lists, features, walk) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\n{:?}\nno-walk={}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\n{:?}\nno-walk={}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
             .map(|t| format!("{t:?}"))
             .unwrap_or_default(),
+        compiler.trim(),
         kb_crates,
+        stop_crates,
         a.features,
         a.no_walk
     );
@@ -228,15 +236,13 @@ fn run_driver(a: &GenArgs, kb: &Kb, dir: &Path, facts_dir: &Path) -> Result<()> 
         .env("RCBOM_KB_CRATES", &kb_crates)
         .env("RCBOM_STOP_CRATES", &stop_crates)
         .env("RCBOM_SYSROOT", &sysroot)
-        .env(
-            if a.no_walk {
-                "RCBOM_NO_WALK"
-            } else {
-                "RCBOM_WALK"
-            },
-            "1",
-        )
         .env("LD_LIBRARY_PATH", ld);
+    // the walk is on unless asked off, whatever the caller's environment says
+    if a.no_walk {
+        cmd.env("RCBOM_NO_WALK", "1");
+    } else {
+        cmd.env_remove("RCBOM_NO_WALK");
+    }
     if !a.features.is_empty() {
         cmd.arg("--features").arg(a.features.join(","));
     }

@@ -8,7 +8,8 @@ algorithms the program uses, with their parameters, where (file, line, column, s
 - where the key material handed to the API comes from (hard-coded, environment, RNG, parameter, ...)
 
 The design and its motivation are in `docs/rust-cbom-proposal2.md` (Layers 1 and 2 are built
-here). Results are in `docs/poc-evaluation.md`.
+here). The evaluation is in `docs/poc-evaluation.md`; the CBOMs and tables behind it are in
+`results/` (see `results/README.md`).
 
 ## How it works
 
