@@ -152,9 +152,33 @@ pub fn host_triple() -> Result<String> {
 
 /// Runs `cargo metadata` and builds the Layer 1 view. `features` are passed as with cargo.
 pub fn load(manifest_path: &Path, target: &str, features: &[String], kb: &Kb) -> Result<Manifest> {
+    load_with(manifest_path, target, features, kb, false)
+}
+
+/// As `load`, but `cargo metadata --locked`: fails rather than update `Cargo.lock`, for
+/// checking positions inside it.
+pub fn load_locked(
+    manifest_path: &Path,
+    target: &str,
+    features: &[String],
+    kb: &Kb,
+) -> Result<Manifest> {
+    load_with(manifest_path, target, features, kb, true)
+}
+
+fn load_with(
+    manifest_path: &Path,
+    target: &str,
+    features: &[String],
+    kb: &Kb,
+    locked: bool,
+) -> Result<Manifest> {
     let mut cmd = MetadataCommand::new();
     cmd.manifest_path(manifest_path);
     let mut opts = vec!["--filter-platform".to_string(), target.to_string()];
+    if locked {
+        opts.push("--locked".into());
+    }
     if !features.is_empty() {
         opts.push("--features".into());
         opts.push(features.join(","));
@@ -395,17 +419,22 @@ fn find_dep_key(
     let root = doc.as_table();
     let table_name = kind_name(kind);
     let mut tables: Vec<&dyn toml_edit::TableLike> = Vec::new();
+    // `[target.'cfg(target_os="linux")'.dependencies]`: cargo prints the platform as
+    // `cfg(target_os = "linux")`, so compare without whitespace
+    let squash = |s: &str| s.chars().filter(|c| !c.is_whitespace()).collect::<String>();
     if let Some(target) = &target
-        && let Some(t) = root
-            .get("target")
-            .and_then(|t| t.as_table_like())
-            .and_then(|t| t.get(target))
-        && let Some(d) = t
-            .as_table_like()
-            .and_then(|t| t.get(table_name))
-            .and_then(|d| d.as_table_like())
+        && let Some(targets) = root.get("target").and_then(|t| t.as_table_like())
     {
-        tables.push(d);
+        for (name, t) in targets.iter() {
+            if squash(name) == squash(target)
+                && let Some(d) = t
+                    .as_table_like()
+                    .and_then(|t| t.get(table_name))
+                    .and_then(|d| d.as_table_like())
+            {
+                tables.push(d);
+            }
+        }
     }
     if let Some(d) = root.get(table_name).and_then(|d| d.as_table_like()) {
         tables.push(d);

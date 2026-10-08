@@ -46,6 +46,8 @@ cd <cargo project>
 <repo>/target/debug/cargo-cbom cbom --manifest-only -o ...  # Layer 1 only, nothing compiled
 <repo>/target/debug/cargo-cbom cbom --no-walk -o ...        # ablation: no monomorphized walk
 <repo>/target/debug/cargo-cbom cbom verify cbom.json --self-test
+RCBOM_DEBUG=1 <repo>/target/debug/cargo-cbom cbom -o ...    # also print the driver's caught panics,
+                                                            # sites without a position, phase times
 ```
 
 Layer 2 compiles the project, so build scripts and procedural macros run. Run it on code you
@@ -55,7 +57,8 @@ trust, or inside a container.
 
 ```
 scripts/check.sh                 # rustfmt, clippy -D warnings, unit tests (enforced)
-scripts/e2e.sh --realapp         # fixtures: golden files, labelled scores, position checks
+scripts/e2e.sh --realapp --regress   # all fixtures: whole-CBOM golden files, labelled scores,
+                                     # every position verified, every shifted position rejected
 scripts/score.py fixtures/rusi/<fixture>/labels.toml <cbom.json>   # any tool's CBOM
 scripts/corpus.py <out> <project>... [--rusi <rusi binary>]        # real projects
 scripts/ablation.py <out> <project>...                              # with and without the walk
@@ -71,7 +74,7 @@ scripts/ablation.py <out> <project>...                              # with and w
 | `crates/rcbom-manifest` | Layer 1 |
 | `crates/rcbom-analysis` | matching, provenance, CycloneDX assembly |
 | `crates/cargo-cbom` | CLI, schema validation, `verify` |
-| `fixtures/` | micro, libonly, threads (designed cases, golden files); rusi fixtures (labelled) |
+| `fixtures/` | micro, libonly, threads (designed cases, golden files); rusi fixtures (labelled); `regress/` (21 probes from the audits and the corpus runs, golden files) |
 | `phase0/` | the Phase 0 spike and its corpus |
-| `schema/` | CycloneDX 1.7 schemas (Apache-2.0) |
+| `schema/` | CycloneDX 1.7 schemas and the Cryptography Registry (Apache-2.0) |
 | `scripts/` | checks, scoring, corpus runner, rusi converter, review sheet |

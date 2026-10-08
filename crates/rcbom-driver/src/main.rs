@@ -14,9 +14,12 @@
 //!                      implementations: the call into them is the fact, not their internals)
 //!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
 //!   RCBOM_SYSROOT      sysroot of the pinned toolchain (else asked from the wrapped rustc)
+//!   RCBOM_DEBUG        if set, print each panic the analysis catches (message and location),
+//!                      and each site dropped for having no source position
 
 #![feature(rustc_private)]
 
+extern crate rustc_abi;
 extern crate rustc_driver;
 extern crate rustc_hir;
 extern crate rustc_interface;
@@ -30,14 +33,14 @@ mod statics;
 
 use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 use std::panic::{AssertUnwindSafe, catch_unwind};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, exit};
 
 use rcbom_facts::{
-    CrateFacts, CrateInfo, CrateRef, DefRef, Expansion, FACTS_VERSION, Loc, Owner, OwnerKind,
-    Reach, Site, Target, Tier, TyTree, ViaStep,
+    CrateFacts, CrateInfo, CrateRef, DefRef, Expansion, FACTS_VERSION, Loc, MacroKind, Origin,
+    Owner, OwnerKind, Reach, Site, Target, Tier, TyTree, ViaStep,
 };
-use rustc_middle::ty::TyCtxt;
+use rustc_middle::ty::{TyCtxt, TypeVisitableExt};
 use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::mono::{Instance, InstanceKind};
 use rustc_public::mir::visit::{Location, MirVisitor};
@@ -46,7 +49,7 @@ use rustc_public::mir::{
 };
 use rustc_public::rustc_internal;
 use rustc_public::ty::{
-    Allocation, ClosureKind, ConstantKind, GenericArgKind, RigidTy, Span, Ty, TyKind,
+    Allocation, ClosureKind, ConstantKind, GenericArgKind, GenericArgs, RigidTy, Span, Ty, TyKind,
 };
 use rustc_public::{CrateDef, ItemKind};
 
@@ -63,7 +66,9 @@ fn main() {
     let skip = match &crate_name {
         None => true, // `-vV`, `--print`, ...
         Some(n) => n.starts_with("build_script_") || is_proc_macro,
-    };
+    } || args
+        .iter()
+        .any(|a| a == "--print" || a.starts_with("--print="));
     if skip || std::env::var_os("RCBOM_OUT").is_none() {
         // Build scripts and proc macros run on the host; compile them untouched.
         let rustc = rustc.unwrap_or_else(|| "rustc".into());
@@ -82,18 +87,44 @@ fn main() {
     }
     // Dependency MIR must be in the metadata for the reachability walk to enter dependencies.
     args.push("-Zalways-encode-mir".into());
-    // The MIR a debug build has, whatever the project's profile. At MIR opt-level 2, the default
-    // for opt-level >= 1, GVN rebuilds constant operands without a span, callees included, so no
-    // call has a position; in non-incremental crates the MIR inliner also folds calls into their
-    // callers (minisign sets `[profile.dev] opt-level = 3`).
-    args.push("-Zmir-opt-level=1".into());
+    // The least transformed MIR rustc produces, whatever the project's profile. At MIR
+    // opt-level 2 (the default when opt-level >= 1) GVN rebuilds constant operands without a
+    // span, callees included, and the inliner folds calls into their callers; at level 1
+    // RemoveZsts replaces every value of a zero-sized type (a callee held in a local, `OsRng`)
+    // by a constant without a span, and CopyProp and SingleUseConsts merge the definitions the
+    // argument origins follow.
+    args.push("-Zmir-opt-level=0".into());
     let result = run_with_tcx!(&args, |tcx| {
         // A panic inside the analysis is caught per item and counted; rustc's ICE hook would
-        // otherwise turn it into a compilation error of the user's crate.
-        let ice_hook = std::panic::take_hook();
-        std::panic::set_hook(Box::new(|_| {}));
+        // otherwise turn it into a compilation error of the user's crate. The guard puts the
+        // hook back however `analyze` ends.
+        type Hook = Box<dyn Fn(&std::panic::PanicHookInfo<'_>) + Sync + Send>;
+        struct Restore(Option<Hook>);
+        impl Drop for Restore {
+            fn drop(&mut self) {
+                if let Some(h) = self.0.take() {
+                    std::panic::set_hook(h);
+                }
+            }
+        }
+        let _restore = Restore(Some(std::panic::take_hook()));
+        if std::env::var_os("RCBOM_DEBUG").is_some() {
+            std::panic::set_hook(Box::new(|info| {
+                let bt = std::backtrace::Backtrace::force_capture().to_string();
+                let ours: Vec<&str> = bt
+                    .lines()
+                    .filter(|l| l.contains("rcbom_driver::"))
+                    .map(str::trim)
+                    .collect();
+                eprintln!(
+                    "rcbom-driver: caught panic: {info}\n  in {}",
+                    ours.join("\n  in ")
+                );
+            }));
+        } else {
+            std::panic::set_hook(Box::new(|_| {}));
+        }
         analyze(tcx);
-        std::panic::set_hook(ice_hook);
         ControlFlow::<(), ()>::Continue(())
     });
     exit(if result.is_ok() { 0 } else { 1 });
@@ -111,6 +142,19 @@ fn arg_values<'a>(args: &'a [String], flag: &'a str) -> impl Iterator<Item = Str
     args.windows(2)
         .filter(move |w| w[0] == flag)
         .map(|w| w[1].clone())
+}
+
+/// A codegen option (`-C extra-filename=-abc`, `-Cextra-filename=-abc`).
+fn codegen_opt(args: &[String], name: &str) -> Option<String> {
+    let key = format!("{name}=");
+    args.iter().enumerate().find_map(|(i, a)| {
+        let v = if a == "-C" {
+            args.get(i + 1)?.as_str()
+        } else {
+            a.strip_prefix("-C")?
+        };
+        v.strip_prefix(&key).map(str::to_string)
+    })
 }
 
 fn sysroot(rustc: Option<&str>) -> String {
@@ -166,37 +210,58 @@ fn analyze(tcx: TyCtxt<'_>) {
         cwd: std::env::current_dir().unwrap().display().to_string(),
         primary: std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some(),
         crate_types: tcx.crate_types().iter().map(|t| t.to_string()).collect(),
+        unit: codegen_opt(&std::env::args().collect::<Vec<_>>(), "extra-filename")
+            .unwrap_or_default(),
     };
 
     let mut sites = Vec::new();
+    // RCBOM_DEBUG: how long each phase, and any slow item, takes
+    let debug = std::env::var_os("RCBOM_DEBUG").is_some();
+    let timer = std::time::Instant::now();
+    let phase = |name: &str, since: std::time::Instant| {
+        if debug {
+            eprintln!(
+                "rcbom-driver: {}: {name}: {:.2} s",
+                local.name,
+                since.elapsed().as_secs_f64()
+            );
+        }
+    };
     // Static initializers first: a local static that leads to a KB static makes references to
     // it interesting.
-    for s in statics::local_data_sites(&mut cx) {
+    let (data_sites, data_edges) = statics::local_data_sites(&mut cx);
+    phase("static and const sites", timer);
+    let timer = std::time::Instant::now();
+    for s in data_sites {
         cx.interesting_statics.insert(owner_id_of(&s), true);
         sites.push(s);
+    }
+    for e in &data_edges {
+        cx.interesting_statics.insert(e.owner.id.clone(), true);
     }
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn) || !item.has_body() {
             continue;
         }
+        let item_timer = std::time::Instant::now();
         let r = catch_unwind(AssertUnwindSafe(|| {
-            let (body, owner) = if item.requires_monomorphization() {
-                (item.body(), fn_owner_item(&cx, &item))
+            let owner = if item.requires_monomorphization() {
+                fn_owner_item(&cx, &item)
             } else {
-                // the item body, not the instance body: same types for a monomorphic fn, but
-                // named consts are not evaluated away (aws-lc-rs algorithms are consts)
-                let inst = Instance::try_from(item).ok();
-                (
-                    item.body(),
-                    inst.map(|i| fn_owner(&cx, &i))
-                        .unwrap_or_else(|| fn_owner_item(&cx, &item)),
-                )
+                Instance::try_from(item)
+                    .ok()
+                    .map(|i| fn_owner(&cx, &i))
+                    .unwrap_or_else(|| fn_owner_item(&cx, &item))
             };
+            let did = rustc_internal::internal(cx.tcx, item.def_id());
             let mut out = Vec::new();
-            if let Some(body) = body {
+            // the item body, not an instance body: for a monomorphic fn the types are the
+            // same, and named consts are not evaluated away (aws-lc-rs algorithms are consts)
+            if let Some(body) = item.body() {
                 let mut sc = Scanner::new(
                     &mut cx,
                     &body,
+                    Some(did),
                     owner.clone(),
                     Tier::Present,
                     vec![],
@@ -204,38 +269,44 @@ fn analyze(tcx: TyCtxt<'_>) {
                 );
                 sc.visit_body(&body);
             }
-            let did = rustc_internal::internal(cx.tcx, item.def_id());
-            out.extend(statics::fn_data_sites(&mut cx, did, &owner));
+            out.extend(statics::fn_data_sites(
+                &mut cx,
+                did,
+                None,
+                &owner,
+                Tier::Present,
+                &[],
+            ));
             out
         }));
         match r {
             Ok(out) => sites.extend(out),
             Err(_) => cx.errors += 1,
         }
+        if debug && item_timer.elapsed().as_secs_f64() > 1.0 {
+            phase(&format!("item {}", item.name()), item_timer);
+        }
     }
+    phase("per-item scan", timer);
+    let timer = std::time::Instant::now();
 
     // Roots: `main` of a binary; for a library the user asked to analyse (a workspace member),
-    // its public monomorphic API. RCBOM_NO_WALK turns the walk off (ablation).
+    // its public monomorphic API and public statics; in both, what the linker keeps whatever
+    // calls it (`#[no_mangle]`, `#[export_name]`, `#[used]` statics such as constructors in
+    // `.init_array`). RCBOM_NO_WALK turns the walk off (ablation).
     let primary = std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some();
-    let roots: Vec<(Instance, String)> = if std::env::var_os("RCBOM_NO_WALK").is_some() {
-        Vec::new()
-    } else if let Some(entry) = rustc_public::entry_fn() {
-        Instance::try_from(entry)
-            .ok()
-            .map(|i| (i, i.name()))
-            .into_iter()
-            .collect()
-    } else if primary {
-        public_api_roots(&cx)
+    let (roots, static_roots) = if std::env::var_os("RCBOM_NO_WALK").is_some() || !primary {
+        (Vec::new(), Vec::new())
     } else {
-        Vec::new()
+        roots(&cx)
     };
-    let reach = (!roots.is_empty()).then(|| {
+    let reach = (!roots.is_empty() || !static_roots.is_empty()).then(|| {
         let mut w = Walker::new(&mut cx);
-        let r = w.run(roots);
+        let r = w.run(roots, static_roots);
         sites.extend(w.sites);
         r
     });
+    phase("walk", timer);
 
     // Identical facts from the per-item scan and the walk collapse to one.
     let mut seen = HashSet::new();
@@ -245,14 +316,17 @@ fn analyze(tcx: TyCtxt<'_>) {
         facts_version: FACTS_VERSION,
         krate,
         sites,
+        data_edges,
         reach,
     };
     let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
     std::fs::create_dir_all(&out).unwrap();
-    let path = out.join(format!(
-        "{}-{}.json",
-        facts.krate.name, facts.krate.stable_id
-    ));
+    // named after cargo's unit, so `cargo cbom` can keep only this build's units
+    let path = out.join(if facts.krate.unit.is_empty() {
+        format!("{}-{}.json", facts.krate.name, facts.krate.stable_id)
+    } else {
+        format!("{}{}.json", facts.krate.name, facts.krate.unit)
+    });
     std::fs::write(&path, serde_json::to_vec(&facts).unwrap()).unwrap();
     if cx.errors > 0 {
         eprintln!(
@@ -272,14 +346,55 @@ pub(crate) fn crate_ref(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> Crat
 pub(crate) fn def_ref_internal(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> DefRef {
     DefRef {
         krate: crate_ref(tcx, did),
-        path: rustc_middle::ty::print::with_no_trimmed_paths!(tcx.def_path_str(did)),
-        id: tcx.def_path_hash(did).0.to_hex(),
+        path: path_of(tcx, did),
+        id: def_hash(tcx, did),
     }
 }
 
-fn def_ref(cx: &Cx<'_>, def: rustc_public::DefId) -> DefRef {
-    let did = rustc_internal::internal(cx.tcx, def);
-    def_ref_internal(cx.tcx, did)
+/// The defining path of an item, crate first: the same whichever crate prints it, and not
+/// through re-exports (`crypto_common::KeyInit::new_from_slice`, not
+/// `aes_gcm::KeyInit::new_from_slice` in one crate and `chacha20poly1305::KeyInit::..` in
+/// another).
+pub(crate) fn path_of(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> String {
+    use rustc_middle::ty::print::{
+        with_crate_prefix, with_no_trimmed_paths, with_no_visible_paths,
+    };
+    let p = with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(
+        tcx.def_path_str(did)
+    )));
+    local_crate_name(tcx, p)
+}
+
+/// An instance's path with its generic arguments, printed the same way as `path_of`.
+pub(crate) fn instance_name(tcx: TyCtxt<'_>, inst: &Instance) -> String {
+    use rustc_middle::ty::print::{
+        with_crate_prefix, with_no_trimmed_paths, with_no_visible_paths,
+    };
+    let i = rustc_internal::internal(tcx, inst);
+    let p = with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(
+        tcx.def_path_str_with_args(i.def_id(), i.args)
+    )));
+    local_crate_name(tcx, p)
+}
+
+/// `crate::` (how rustc prints the local crate under `with_crate_prefix!`) as the crate's name:
+/// `<crate::AesSealer as crate::Sealer>::seal` is `<micro::AesSealer as micro::Sealer>::seal`.
+fn local_crate_name(tcx: TyCtxt<'_>, p: String) -> String {
+    let name = tcx.crate_name(rustc_span::def_id::LOCAL_CRATE);
+    let mut out = String::with_capacity(p.len());
+    let mut rest = p.as_str();
+    while let Some(i) = rest.find("crate::") {
+        let boundary = rest[..i]
+            .chars()
+            .next_back()
+            .is_none_or(|c| !(c.is_alphanumeric() || c == '_'));
+        out.push_str(&rest[..i]);
+        out.push_str(if boundary { name.as_str() } else { "crate" });
+        out.push_str("::");
+        rest = &rest[i + "crate::".len()..];
+    }
+    out.push_str(rest);
+    out
 }
 
 fn owner_id_of(s: &Site) -> String {
@@ -290,7 +405,7 @@ fn fn_owner(cx: &Cx<'_>, inst: &Instance) -> Owner {
     let did = rustc_internal::internal(cx.tcx, inst.def.def_id());
     Owner {
         kind: OwnerKind::Fn,
-        name: inst.name(),
+        name: instance_name(cx.tcx, inst),
         id: inst.mangled_name(),
         krate: crate_ref(cx.tcx, did),
     }
@@ -300,10 +415,41 @@ fn fn_owner_item(cx: &Cx<'_>, item: &rustc_public::CrateItem) -> Owner {
     let did = rustc_internal::internal(cx.tcx, item.def_id());
     Owner {
         kind: OwnerKind::Fn,
-        name: item.name(),
-        id: cx.tcx.def_path_hash(did).0.to_hex(),
+        name: path_of(cx.tcx, did),
+        id: def_hash(cx.tcx, did),
         krate: crate_ref(cx.tcx, did),
     }
+}
+
+/// The def-path hash as 32 hex digits; the first 16 are the crate's `StableCrateId`.
+pub(crate) fn def_hash(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> String {
+    let (a, b) = tcx.def_path_hash(did).0.split();
+    format!("{:016x}{:016x}", a.as_u64(), b.as_u64())
+}
+
+/// The source text of a span on one line outside macros: what an occurrence names.
+pub(crate) fn span_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    if span.from_expansion() {
+        return None;
+    }
+    let t = tcx.sess.source_map().span_to_snippet(span).ok()?;
+    (!t.is_empty() && !t.contains('\n') && t.chars().count() <= 120).then_some(t)
+}
+
+/// The source line of a span's position (`locate`: the outermost macro call site for code
+/// from a macro), trimmed.
+pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let at = if span.from_expansion() {
+        span.source_callsite()
+    } else {
+        span
+    };
+    let sm = tcx.sess.source_map();
+    let line = sm
+        .span_to_snippet(sm.span_extend_to_line(at.shrink_to_lo()))
+        .ok()?;
+    let line = line.trim();
+    (!line.is_empty()).then(|| line.to_string())
 }
 
 /// Source position of a span; code from a macro is attributed to the outermost call site in
@@ -317,21 +463,17 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
         while expn.call_site.from_expansion() {
             expn = expn.call_site.ctxt().outer_expn_data();
         }
-        let macro_name = match expn.kind {
-            rustc_span::hygiene::ExpnKind::Macro(rustc_span::hygiene::MacroKind::Bang, name) => {
-                format!("{name}!")
-            }
+        use rustc_span::hygiene::{ExpnKind, MacroKind as K};
+        let (kind, macro_name) = match expn.kind {
+            ExpnKind::Macro(K::Bang, name) => (MacroKind::Bang, name.to_string()),
             // code a derive or an attribute generates is attributed to that attribute
-            rustc_span::hygiene::ExpnKind::Macro(rustc_span::hygiene::MacroKind::Derive, name) => {
-                format!("derive:{name}")
-            }
-            rustc_span::hygiene::ExpnKind::Macro(rustc_span::hygiene::MacroKind::Attr, name) => {
-                format!("attr:{name}")
-            }
+            ExpnKind::Macro(K::Derive, name) => (MacroKind::Derive, name.to_string()),
+            ExpnKind::Macro(K::Attr, name) => (MacroKind::Attr, name.to_string()),
             // desugarings (`?`, `for`, `async`): the call site is ordinary code
-            _ => String::new(),
+            _ => (MacroKind::Desugaring, String::new()),
         };
         let exp = Expansion {
+            kind,
             macro_name,
             def_site: raw_loc(tcx, span),
         };
@@ -344,10 +486,21 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
 fn raw_loc(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Loc {
     let sm = tcx.sess.source_map();
     let (_, line, col, end_line, end_col) = sm.span_to_location_info(span);
-    let file = sm
+    let mut file = sm
         .span_to_filename(span)
         .prefer_local_unconditionally()
         .to_string();
+    // The standard library's sources by rustc's own name for them (`/rustc/<commit>/library/..`,
+    // as in its panic messages), not by where rust-src is installed on this machine, so that
+    // the CBOM is the same on every machine and names no local directory. rustc itself maps
+    // that name to the installed rust-src when it reads a crate's metadata, and keeps only the
+    // local path.
+    let rust_src = tcx.sess.opts.sysroot.path().join("lib/rustlib/src/rust");
+    if let Ok(rest) = Path::new(&file).strip_prefix(&rust_src)
+        && let Some(base) = virtual_rust_src(tcx)
+    {
+        file = format!("{base}/{}", rest.display());
+    }
     Loc {
         file,
         line,
@@ -357,7 +510,24 @@ fn raw_loc(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Loc {
     }
 }
 
-fn locate_stable(tcx: TyCtxt<'_>, span: Span) -> (Loc, Option<Expansion>) {
+/// `/rustc/<commit>`, the directory rustc names the standard library's sources by, from the
+/// toolchain's own `rustc -vV`; asked once, when first needed.
+fn virtual_rust_src(tcx: TyCtxt<'_>) -> Option<&'static str> {
+    static BASE: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    BASE.get_or_init(|| {
+        let rustc = tcx.sess.opts.sysroot.path().join("bin").join("rustc");
+        let out = std::process::Command::new(rustc).arg("-vV").output().ok()?;
+        let text = String::from_utf8(out.stdout).ok()?;
+        let hash = text
+            .lines()
+            .find_map(|l| l.strip_prefix("commit-hash: "))?
+            .trim();
+        (hash != "unknown").then(|| format!("/rustc/{hash}"))
+    })
+    .as_deref()
+}
+
+pub(crate) fn locate_stable(tcx: TyCtxt<'_>, span: Span) -> (Loc, Option<Expansion>) {
     locate(tcx, rustc_internal::internal(tcx, span))
 }
 
@@ -367,11 +537,14 @@ pub(crate) fn ty_tree(tcx: TyCtxt<'_>, ty: &Ty, depth: usize) -> TyTree {
     }
     match ty.kind() {
         TyKind::RigidTy(r) => match r {
-            RigidTy::Adt(def, args) => TyTree::Adt {
-                krate: crate_ref(tcx, rustc_internal::internal(tcx, def.def_id())),
-                path: def.name(),
-                args: arg_trees(tcx, &args.0, depth + 1),
-            },
+            RigidTy::Adt(def, args) => {
+                let did = rustc_internal::internal(tcx, def.def_id());
+                TyTree::Adt {
+                    krate: crate_ref(tcx, did),
+                    path: path_of(tcx, did),
+                    args: arg_trees(tcx, &args.0, depth + 1),
+                }
+            }
             RigidTy::Ref(_, t, _) | RigidTy::RawPtr(t, _) => {
                 TyTree::Ref(Box::new(ty_tree(tcx, &t, depth + 1)))
             }
@@ -395,6 +568,8 @@ pub(crate) fn ty_tree(tcx: TyCtxt<'_>, ty: &Ty, depth: usize) -> TyTree {
             _ => TyTree::Other(format!("{ty}")),
         },
         TyKind::Param(p) => TyTree::Param(p.name),
+        // `<Kdf as kdf::Kdf>::HashImpl`: a projection is not monomorphic either
+        TyKind::Alias(..) => TyTree::Param(format!("{ty}")),
         _ => TyTree::Other(format!("{ty}")),
     }
 }
@@ -463,39 +638,44 @@ fn tree_mentions(t: &TyTree, crates: &HashSet<String>) -> bool {
     }
 }
 
-pub(crate) fn tree_is_generic(t: &TyTree) -> bool {
-    match t {
-        TyTree::Param(_) => true,
-        TyTree::Adt { args, .. } | TyTree::Tuple(args) => args.iter().any(tree_is_generic),
-        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => tree_is_generic(t),
-        _ => false,
-    }
-}
-
 impl Cx<'_> {
     /// A static is worth recording if it belongs to a KB crate, or its value points (through
     /// any depth of allocations) at a static that is.
-    fn static_interesting(&mut self, def: rustc_public::mir::mono::StaticDef) -> bool {
-        let did = rustc_internal::internal(self.tcx, def.def_id());
-        let key = self.tcx.def_path_hash(did).0.to_hex();
+    pub(crate) fn static_interesting(&mut self, did: rustc_span::def_id::DefId) -> bool {
+        let key = def_hash(self.tcx, did);
         if let Some(v) = self.interesting_statics.get(&key) {
             return *v;
         }
         self.interesting_statics.insert(key.clone(), false); // breaks cycles
         let krate = self.tcx.crate_name(did.krate).to_string();
+        let tcx = self.tcx;
         // an extern static (FFI) has no initializer to evaluate
         let v = self.kb_crates.contains(&krate)
-            || !self.tcx.is_foreign_item(did)
-                && catch_unwind(AssertUnwindSafe(|| def.eval_initializer().ok()))
-                    .ok()
-                    .flatten()
-                    .is_some_and(|a| {
+            || !tcx.is_foreign_item(did)
+                && catch_unwind(AssertUnwindSafe(|| {
+                    tcx.eval_static_initializer(did).ok().map(|a| {
                         let mut found = Vec::new();
-                        alloc_statics(&a, &mut found, &mut HashSet::new(), 0);
-                        found.into_iter().any(|s| self.static_interesting(s))
-                    });
+                        for (_, prov) in a.inner().provenance().ptrs().iter() {
+                            statics::statics_in(
+                                tcx,
+                                prov.alloc_id(),
+                                &mut found,
+                                &mut HashSet::new(),
+                                0,
+                            );
+                        }
+                        found
+                    })
+                }))
+                .ok()
+                .flatten()
+                .is_some_and(|found| found.into_iter().any(|s| self.static_interesting(s)));
         self.interesting_statics.insert(key, v);
         v
+    }
+
+    fn is_std(&self, krate: &str) -> bool {
+        matches!(krate, "core" | "std" | "alloc")
     }
 }
 
@@ -521,7 +701,9 @@ fn alloc_statics(
     }
 }
 
-/// Records sites in one body: calls naming KB items and references to interesting statics.
+/// Records the calls in one body that name KB items, and collects the statics it references
+/// (for the walk). Static and const sites come from `statics::fn_data_sites`, which reads the
+/// MIR before evaluation and so has the spans that name them.
 struct Scanner<'a, 'tcx> {
     cx: &'a mut Cx<'tcx>,
     body: &'a Body,
@@ -539,12 +721,13 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     fn new(
         cx: &'a mut Cx<'tcx>,
         body: &'a Body,
+        def: Option<rustc_span::def_id::DefId>,
         owner: Owner,
         tier: Tier,
         via: Vec<ViaStep>,
         out: &'a mut Vec<Site>,
     ) -> Self {
-        let origins = origins::Origins::new(cx.tcx, body);
+        let origins = origins::Origins::new(cx.tcx, body, def);
         Scanner {
             cx,
             body,
@@ -558,19 +741,203 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     }
 
     fn push(&mut self, span: Span, target: Target) {
+        let internal = rustc_internal::internal(self.cx.tcx, span);
+        let text = span_text(self.cx.tcx, internal);
+        let line_text = line_text(self.cx.tcx, internal);
         let (span, expansion) = locate_stable(self.cx.tcx, span);
         if span.line == 0 {
-            return; // compiler-generated code (shims) has no source position
+            // compiler-generated code (shims), and operands an optimization rebuilt, have no
+            // source position
+            if std::env::var_os("RCBOM_DEBUG").is_some() {
+                eprintln!(
+                    "rcbom-driver: site without a position dropped in {}: {:?}",
+                    self.owner.name, target
+                );
+            }
+            return;
         }
         self.out.push(Site {
             tier: self.tier,
             owner: self.owner.clone(),
             span,
+            text,
+            line_text,
             expansion,
             target,
             via: self.via.clone(),
         });
     }
+
+    /// Is a call (or a function used as a value) of `def::<args>` a crypto fact?
+    fn interesting(&self, def: &rustc_public::ty::FnDef, args: &GenericArgs) -> bool {
+        let tcx = self.cx.tcx;
+        let did = rustc_internal::internal(tcx, def.def_id());
+        let iargs = rustc_internal::internal(tcx, args);
+        // not monomorphic (`<A as KeyInit>::new_from_slice`, `Hkdf::<<Kdf as Kdf>::Hash>`):
+        // the walk sees the instances
+        if iargs.has_non_region_param() || iargs.has_aliases() {
+            return false;
+        }
+        let krate = tcx.crate_name(did.krate).to_string();
+        if self.cx.kb_crates.contains(&krate) {
+            return true;
+        }
+        let trees = arg_trees(tcx, &args.0, 0);
+        if !trees.iter().any(|t| tree_mentions(t, &self.cx.kb_crates)) {
+            return false;
+        }
+        if self.cx.is_std(&krate) {
+            // `Result::unwrap`, `Vec::push`, `Clone::clone`, drop glue: the standard library
+            // handling a crypto value is not a use of it. Constructors and conversions the
+            // crypto type implements are: `<Argon2 as Default>::default()`,
+            // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`.
+            let Some(tr) = tcx.trait_of_assoc(did) else {
+                return false;
+            };
+            let name = tcx.get_diagnostic_name(tr).map(|s| s.to_string());
+            let constructed = match name.as_deref() {
+                Some("Default" | "From" | "TryFrom" | "FromStr") => trees.first(),
+                // `Into<T>`: `Self` is the source, `T` the crypto type
+                Some("Into" | "TryInto") => trees.get(1),
+                _ => None,
+            };
+            return matches!(
+                constructed,
+                Some(TyTree::Adt { krate, .. }) if self.cx.kb_crates.contains(&krate.name)
+            );
+        }
+        // another crate's generic function with a crypto type as argument: a crypto fact only
+        // if that parameter is bounded by a trait of a KB crate (`fn seal<A: Aead>`), not a
+        // container (`Mutex::new(cipher)`)
+        kb_bounded(tcx, did, iargs, &self.cx.kb_crates)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn record_call(
+        &mut self,
+        def: &rustc_public::ty::FnDef,
+        args: &GenericArgs,
+        span: Span,
+        call: Option<(&[Operand], &Terminator)>,
+    ) {
+        let tcx = self.cx.tcx;
+        let did = rustc_internal::internal(tcx, def.def_id());
+        let callee = def_ref_internal(tcx, did);
+        let method = strip_generics(&callee.path)
+            .rsplit("::")
+            .next()
+            .unwrap_or_default()
+            .to_string();
+        let (mut self_ty, mut own) = split_self(tcx, def.def_id(), args);
+        // `bytes.into()` constructs its target: the crypto type is the one the call is about
+        if let Some(tr) = tcx.trait_of_assoc(did)
+            && matches!(
+                tcx.get_diagnostic_name(tr)
+                    .map(|s| s.to_string())
+                    .as_deref(),
+                Some("Into" | "TryInto")
+            )
+            && !own.is_empty()
+        {
+            self_ty = Some(own.remove(0));
+        }
+        let (const_args, arg_origins, arg_lens) = match call {
+            Some((call_args, term)) => {
+                let origins: Vec<Origin> = call_args
+                    .iter()
+                    .map(|a| self.origins.of_arg(a, term))
+                    .collect();
+                let consts = call_args
+                    .iter()
+                    .zip(&origins)
+                    .map(|(a, o)| {
+                        const_int(a).or(match o {
+                            Origin::Const { value, .. } => *value,
+                            _ => None,
+                        })
+                    })
+                    .collect();
+                let lens = call_args
+                    .iter()
+                    .map(|a| self.origins.array_len(a))
+                    .collect();
+                (consts, origins, lens)
+            }
+            None => (Vec::new(), Vec::new(), Vec::new()),
+        };
+        self.push(
+            span,
+            Target::Call {
+                callee,
+                method,
+                self_ty,
+                args: own,
+                const_args,
+                arg_origins,
+                arg_lens,
+            },
+        );
+    }
+
+    /// A KB function used as a value (`iter.map(Sha256::digest)`, `let h: fn(..) = digest`):
+    /// recorded where it is named, like a call.
+    fn function_value(&mut self, op: &Operand) {
+        if let Operand::Constant(c) = op
+            && let Some(RigidTy::FnDef(def, args)) = c.const_.ty().kind().rigid()
+            && self.interesting(def, args)
+        {
+            self.record_call(def, args, c.span, None);
+        }
+    }
+}
+
+fn strip_generics(path: &str) -> String {
+    let mut out = String::new();
+    let mut depth = 0usize;
+    for ch in path.chars() {
+        match ch {
+            '<' => depth += 1,
+            '>' => depth = depth.saturating_sub(1),
+            _ if depth == 0 => out.push(ch),
+            _ => {}
+        }
+    }
+    out.replace("::::", "::")
+}
+
+/// Does a generic argument that names a KB type stand for a parameter bounded by a trait of
+/// a KB crate?
+fn kb_bounded<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: rustc_span::def_id::DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+    kb: &HashSet<String>,
+) -> bool {
+    let clauses = tcx.clauses_of(did).instantiate_identity(tcx);
+    clauses.clauses.into_iter().any(|c| {
+        let Some(tc) = c.skip_norm_wip().as_trait_clause() else {
+            return false;
+        };
+        let tc = tc.skip_binder();
+        if !kb.contains(tcx.crate_name(tc.def_id().krate).as_str()) {
+            return false;
+        }
+        let rustc_middle::ty::Param(p) = tc.self_ty().kind() else {
+            return false;
+        };
+        args.get(p.index as usize)
+            .and_then(|a| a.as_type())
+            .is_some_and(|t| {
+                t.walk().any(|g| {
+                    g.as_type().is_some_and(|t| match t.kind() {
+                        rustc_middle::ty::Adt(adt, _) => {
+                            kb.contains(tcx.crate_name(adt.did().krate).as_str())
+                        }
+                        _ => false,
+                    })
+                })
+            })
+    })
 }
 
 impl MirVisitor for Scanner<'_, '_> {
@@ -580,103 +947,98 @@ impl MirVisitor for Scanner<'_, '_> {
             args: call_args,
             ..
         } = &term.kind
-            && let Ok(ty) = func.ty(self.body.locals())
-            && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
         {
-            let trees = arg_trees(self.cx.tcx, &args.0, 0);
-            let callee_crate = def.krate().name;
-            let mentions = trees.iter().any(|t| tree_mentions(t, &self.cx.kb_crates));
-            // `Result::unwrap`, `Vec::len`, drop glue: the standard library handling a crypto
-            // value is not a use of it. A std trait implemented by the crypto type itself is:
-            // `<Argon2 as Default>::default()` picks the algorithm and its parameters.
-            let std = matches!(callee_crate.as_str(), "core" | "std" | "alloc");
-            let interesting = if std {
-                // only `Default::default`: `Clone`, `Drop`, `Debug` of a crypto type are not uses
-                // printed through std's re-export (`std::default::Default::default`)
-                def.name().ends_with("::default::Default::default")
-                    && mentions
-                    && !trees.iter().any(tree_is_generic)
-                    && matches!(
-                        split_self(self.cx.tcx, def.def_id(), args).0,
-                        Some(TyTree::Adt { ref krate, .. }) if self.cx.kb_crates.contains(&krate.name)
-                    )
-            } else {
-                self.cx.kb_crates.contains(&callee_crate) || mentions
-            };
-            if interesting && !trees.iter().any(tree_is_generic) {
-                // the callee path's own span (`UnboundKey::new`, `.encrypt`), not the
-                // whole call expression
+            if let Ok(ty) = func.ty(self.body.locals())
+                && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
+                && self.interesting(def, args)
+            {
+                // the callee path's own span (`UnboundKey::new`, `.encrypt`), not the whole
+                // call expression; for a callee held in a local, where it was named
                 let span = match func {
-                    Operand::Constant(c) => c.span,
-                    _ => term.source_info.span,
+                    Operand::Constant(c) => Some(c.span),
+                    _ => self.origins.callee_name_span(func),
                 };
-                let path = def.name();
-                let method = path.rsplit("::").next().unwrap_or(&path).to_string();
-                let callee = def_ref(self.cx, def.def_id());
-                let (self_ty, own) = split_self(self.cx.tcx, def.def_id(), args);
-                let const_args = call_args.iter().map(const_int).collect();
-                let arg_origins = call_args
-                    .iter()
-                    .map(|a| self.origins.of_arg(a, func, call_args))
-                    .collect();
-                let arg_lens = call_args
-                    .iter()
-                    .map(|a| self.origins.array_len(a))
-                    .collect();
-                self.push(
-                    span,
-                    Target::Call {
-                        callee,
-                        method,
-                        self_ty,
-                        args: own,
-                        const_args,
-                        arg_origins,
-                        arg_lens,
-                    },
-                );
+                if let Some(span) = span {
+                    self.record_call(def, args, span, Some((call_args, term)));
+                }
+            } else if let Some((def, args, span)) = self.origins.callee_through_pointer(func)
+                && self.interesting(&def, &args)
+            {
+                // a call through a pointer to a KB function reified here
+                self.record_call(&def, &args, span, Some((call_args, term)));
+            }
+            for a in call_args {
+                self.function_value(a);
             }
         }
         self.super_terminator(term, loc);
     }
 
+    fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        if let Rvalue::Cast(CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)), op, _) =
+            rv
+        {
+            self.function_value(op);
+        }
+        self.super_rvalue(rv, loc);
+    }
+
     fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
         if let ConstantKind::Allocated(a) = c.const_.kind() {
-            let mut found = Vec::new();
-            alloc_statics(a, &mut found, &mut HashSet::new(), 0);
-            for s in found {
-                self.statics.push(s);
-                if self.cx.static_interesting(s) {
-                    let def = def_ref(self.cx, s.def_id());
-                    self.push(c.span, Target::Static { def });
-                }
-            }
+            alloc_statics(a, &mut self.statics, &mut HashSet::new(), 0);
         }
         self.super_const_operand(c, loc);
     }
 }
 
-/// Public, monomorphic functions of the local crate (methods of public types included): the
-/// entry points of a library. Generic public functions need a caller to be instantiated.
-fn public_api_roots(cx: &Cx<'_>) -> Vec<(Instance, String)> {
-    let vis = cx.tcx.effective_visibilities(());
-    rustc_public::all_local_items()
-        .into_iter()
-        .filter(|item| {
-            matches!(item.kind(), ItemKind::Fn)
-                && item.has_body()
-                && !item.requires_monomorphization()
-        })
-        .filter(|item| {
-            let did = rustc_internal::internal(cx.tcx, item.def_id());
-            did.as_local().is_some_and(|l| vis.is_exported(l))
-        })
-        .filter_map(|item| Instance::try_from(item).ok())
-        .map(|i| {
-            let n = format!("pub {}", i.name());
-            (i, n)
-        })
-        .collect()
+/// Roots of the walk in a workspace member: `main`; for a library, its exported monomorphic
+/// functions and exported statics; in any crate, what the linker keeps whatever calls it
+/// (`#[no_mangle]`, `#[export_name]` functions, `#[used]` statics).
+fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId>) {
+    use rustc_middle::middle::codegen_fn_attrs::CodegenFnAttrFlags as F;
+    let tcx = cx.tcx;
+    let vis = tcx.effective_visibilities(());
+    let is_bin = rustc_public::entry_fn().is_some();
+    let mut fns = Vec::new();
+    if let Some(entry) = rustc_public::entry_fn()
+        && let Ok(i) = Instance::try_from(entry)
+    {
+        fns.push((i, instance_name(tcx, &i)));
+    }
+    for item in rustc_public::all_local_items() {
+        if !matches!(item.kind(), ItemKind::Fn)
+            || !item.has_body()
+            || item.requires_monomorphization()
+        {
+            continue;
+        }
+        let did = rustc_internal::internal(tcx, item.def_id());
+        let exported = !is_bin && did.as_local().is_some_and(|l| vis.is_exported(l));
+        if (exported || tcx.codegen_fn_attrs(did).contains_extern_indicator())
+            && let Ok(i) = Instance::try_from(item)
+            && !fns.iter().any(|(r, _)| *r == i)
+        {
+            let n = format!("pub {}", instance_name(tcx, &i));
+            fns.push((i, n));
+        }
+    }
+    let mut statics = Vec::new();
+    for did in tcx.hir_body_owners().map(|d| d.to_def_id()) {
+        if !matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. })
+            || tcx.is_foreign_item(did)
+        {
+            continue;
+        }
+        let attrs = tcx.codegen_fn_attrs(did);
+        let exported = !is_bin && did.as_local().is_some_and(|l| vis.is_exported(l));
+        if exported
+            || attrs.contains_extern_indicator()
+            || attrs.flags.intersects(F::USED_COMPILER | F::USED_LINKER)
+        {
+            statics.push(did);
+        }
+    }
+    (fns, statics)
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
@@ -716,12 +1078,19 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
     }
 
-    fn run(&mut self, roots: Vec<(Instance, String)>) -> Reach {
-        let names = roots.iter().map(|(_, n)| n.clone()).collect();
+    fn run(
+        &mut self,
+        roots: Vec<(Instance, String)>,
+        static_roots: Vec<rustc_span::def_id::DefId>,
+    ) -> Reach {
+        let mut names: Vec<String> = roots.iter().map(|(_, n)| n.clone()).collect();
         for (root, _) in roots {
             self.enqueue(root, None);
         }
-        let roots = names;
+        for s in static_roots {
+            names.push(format!("static {}", path_of(self.cx.tcx, s)));
+            self.reach_static(s);
+        }
         let mut truncated = false;
         while let Some(inst) = self.queue.pop_front() {
             if self.seen.len() > self.limit {
@@ -735,12 +1104,15 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut statics: Vec<DefRef> = std::mem::take(&mut self.static_refs);
         statics.sort_by(|a, b| a.id.cmp(&b.id));
         statics.dedup_by(|a, b| a.id == b.id);
+        let mut fns = std::mem::take(&mut self.fns);
+        fns.sort();
+        fns.dedup();
         Reach {
-            roots,
+            roots: names,
             instances: self.seen.len(),
             truncated,
             statics,
-            fns: std::mem::take(&mut self.fns),
+            fns,
         }
     }
 
@@ -768,7 +1140,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 break;
             }
             out.push(ViaStep {
-                caller: p.name(),
+                caller: instance_name(self.cx.tcx, p),
                 span: loc.clone(),
             });
             cur = *p;
@@ -776,27 +1148,41 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         out
     }
 
+    /// Code outside the stop crates and the standard library, or standard-library code
+    /// instantiated with such code (`Iterator::map` over the user's closure): what a stop crate
+    /// calls back.
+    fn calls_back(&self, callee: &Instance) -> bool {
+        let tcx = self.cx.tcx;
+        let foreign = |did: rustc_span::def_id::DefId| {
+            let k = tcx.crate_name(did.krate).to_string();
+            !self.cx.stop_crates.contains(&k) && !self.cx.is_std(&k)
+        };
+        let i = rustc_internal::internal(tcx, callee);
+        if foreign(i.def_id()) {
+            return true;
+        }
+        // a stop-crate or std function instantiated with user code (ring's `agree_ephemeral`
+        // hands the user's closure to its internal `agree_ephemeral_`)
+        i.args.iter().any(|a| {
+            a.walk().any(|g| {
+                g.as_type().is_some_and(|t| match t.kind() {
+                    rustc_middle::ty::Adt(adt, _) => foreign(adt.did()),
+                    rustc_middle::ty::Closure(d, _)
+                    | rustc_middle::ty::Coroutine(d, _)
+                    | rustc_middle::ty::FnDef(d, _) => foreign(*d),
+                    _ => false,
+                })
+            })
+        })
+    }
+
     fn visit(&mut self, inst: Instance) {
         let did = rustc_internal::internal(self.cx.tcx, inst.def.def_id());
         let krate = self.cx.tcx.crate_name(did.krate).to_string();
-        if self.cx.stop_crates.contains(&krate) {
-            return;
-        }
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
         let Some(body) = inst.body() else { return };
-        let owner = fn_owner(self.cx, &inst);
-        self.fns.push(owner.id.clone());
-        let via = self.via(inst);
-        let mut sites = Vec::new();
-        let mut sc = Scanner::new(self.cx, &body, owner, Tier::Reachable, via, &mut sites);
-        sc.visit_body(&body);
-        let statics = std::mem::take(&mut sc.statics);
-        self.sites.extend(sites);
-        for s in statics {
-            self.reach_static(s);
-        }
         let mut edges = Edges {
             tcx: self.cx.tcx,
             body: &body,
@@ -811,7 +1197,64 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         if debug.is_some() {
             eprintln!("rcbom-walk: {} ({:?})", inst.name(), inst.kind);
         }
+        let stop = self.cx.stop_crates.contains(&krate);
+        if !stop {
+            let owner = fn_owner(self.cx, &inst);
+            self.fns.push(owner.id.clone());
+            let item = matches!(inst.kind, InstanceKind::Item);
+            if item {
+                // a generic fn's per-item sites are owned by its def-path hash
+                self.fns.push(def_hash(self.cx.tcx, did));
+            }
+            let via = self.via(inst);
+            // A monomorphic function is scanned in its item body, as the per-item scan does:
+            // the types are the same, and the instance body has its named consts evaluated away
+            // (`SSH_ED25519_RECIPIENT_KEY_LABEL` would read as a literal). The statics it
+            // reaches are still taken from the instance body, where a const pointing at a static
+            // has become that pointer.
+            let item_body = (item
+                && !rustc_public::CrateItem(inst.def.def_id()).requires_monomorphization())
+            .then(|| rustc_public::CrateItem(inst.def.def_id()).body())
+            .flatten();
+            let mut sites = Vec::new();
+            let scanned = item_body.as_ref().unwrap_or(&body);
+            let mut sc = Scanner::new(
+                self.cx,
+                scanned,
+                Some(did),
+                owner.clone(),
+                Tier::Reachable,
+                via.clone(),
+                &mut sites,
+            );
+            sc.visit_body(scanned);
+            let mut statics = std::mem::take(&mut sc.statics);
+            if item_body.is_some() {
+                let mut v = AllocStatics(Vec::new());
+                v.visit_body(&body);
+                statics = v.0;
+            }
+            if item {
+                let args = rustc_internal::internal(self.cx.tcx, inst).args;
+                sites.extend(statics::fn_data_sites(
+                    self.cx,
+                    did,
+                    Some(args),
+                    &owner,
+                    Tier::Reachable,
+                    &via,
+                ));
+            }
+            self.sites.extend(sites);
+            for s in statics {
+                self.reach_static(rustc_internal::internal(self.cx.tcx, s.def_id()));
+            }
+        }
         for (callee, span) in edges.found {
+            // inside an algorithm implementation, only what it calls back into
+            if stop && !self.calls_back(&callee) {
+                continue;
+            }
             if debug.is_some() {
                 eprintln!("rcbom-walk:   -> {} ({:?})", callee.name(), callee.kind);
             }
@@ -822,19 +1265,25 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
 
     /// A static is reached: remember it, and walk the function pointers and vtables in its
     /// value (rustls keeps its providers as `&dyn` objects inside statics).
-    fn reach_static(&mut self, s: rustc_public::mir::mono::StaticDef) {
-        let r = def_ref(self.cx, s.def_id());
+    fn reach_static(&mut self, did: rustc_span::def_id::DefId) {
+        let tcx = self.cx.tcx;
+        let r = def_ref_internal(tcx, did);
         if !self.static_seen.insert(r.id.clone()) {
             return;
         }
         self.statics.insert(r.id.clone());
-        if self.cx.static_interesting(s) {
+        if self.cx.static_interesting(did) {
             self.static_refs.push(r);
         }
-        let did = rustc_internal::internal(self.cx.tcx, s.def_id());
-        if self.cx.tcx.is_foreign_item(did) {
+        if tcx.is_foreign_item(did) {
             return;
         }
+        let s = match rustc_public::mir::mono::StaticDef::try_from(rustc_public::CrateItem(
+            rustc_internal::stable(did),
+        )) {
+            Ok(s) => s,
+            Err(_) => return,
+        };
         let Some(a) = catch_unwind(AssertUnwindSafe(|| s.eval_initializer().ok()))
             .ok()
             .flatten()
@@ -843,13 +1292,25 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         };
         let mut found = Vec::new();
         let mut nested = Vec::new();
-        alloc_callees(self.cx.tcx, &a, &mut found, &mut nested, 0);
+        alloc_callees(tcx, &a, &mut found, &mut nested, 0);
         for i in found {
             self.enqueue(i, None);
         }
         for n in nested {
-            self.reach_static(n);
+            self.reach_static(rustc_internal::internal(tcx, n.def_id()));
         }
+    }
+}
+
+/// The statics the constants of a body point at.
+struct AllocStatics(Vec<rustc_public::mir::mono::StaticDef>);
+
+impl MirVisitor for AllocStatics {
+    fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+        if let ConstantKind::Allocated(a) = c.const_.kind() {
+            alloc_statics(a, &mut self.0, &mut HashSet::new(), 0);
+        }
+        self.super_const_operand(c, loc);
     }
 }
 

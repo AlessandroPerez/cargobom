@@ -17,6 +17,20 @@ use rcbom_kb::Kb;
 /// The nightly the driver is built with; it must compile the analysed project too.
 const TOOLCHAIN: &str = "nightly-2026-09-25";
 
+/// The pinned toolchain's sysroot.
+pub(crate) fn sysroot() -> Result<String> {
+    let out = Command::new("rustc")
+        .arg(format!("+{TOOLCHAIN}"))
+        .args(["--print", "sysroot"])
+        .output()?;
+    if !out.status.success() {
+        bail!(
+            "toolchain {TOOLCHAIN} missing: rustup toolchain install {TOOLCHAIN} --component rustc-dev,llvm-tools,rust-src"
+        );
+    }
+    Ok(String::from_utf8(out.stdout)?.trim().to_string())
+}
+
 #[derive(Parser)]
 #[command(
     bin_name = "cargo cbom",
@@ -59,7 +73,8 @@ enum Cmd {
         cbom: PathBuf,
         #[arg(long, default_value = "Cargo.toml")]
         manifest_path: PathBuf,
-        /// Also shift every position by one line or column and require the check to fail.
+        /// Also shift every verified position by one line or column and count how many shifted
+        /// positions the check rejects (each accepted one is printed).
         #[arg(long)]
         self_test: bool,
     },
@@ -93,11 +108,12 @@ fn generate(a: &GenArgs) -> Result<()> {
     } else {
         let dir = man.target_directory.join("rcbom");
         let facts_dir = dir.join("facts");
-        run_driver(a, &kb, &dir, &facts_dir)?;
-        load_facts(&facts_dir)?
+        let units = run_driver(a, &kb, &dir, &facts_dir)?;
+        load_facts(&facts_dir, Some(&units))?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
-    let an = analyze(&kb, &man, &facts);
+    let mut an = analyze(&kb, &man, &facts);
+    an.layer2 = !a.manifest_only;
     let run = RunInfo {
         tool_version: env!("CARGO_PKG_VERSION").into(),
         toolchain: if a.manifest_only {
@@ -177,18 +193,16 @@ fn find_driver(explicit: Option<&Path>) -> Result<PathBuf> {
     )
 }
 
-fn run_driver(a: &GenArgs, kb: &Kb, dir: &Path, facts_dir: &Path) -> Result<()> {
+/// Runs the build with the driver; returns the units (`<crate><extra-filename>`) the build
+/// consists of, fresh or rebuilt, as cargo reports them.
+fn run_driver(
+    a: &GenArgs,
+    kb: &Kb,
+    dir: &Path,
+    facts_dir: &Path,
+) -> Result<std::collections::BTreeSet<String>> {
     let driver = find_driver(a.driver.as_deref())?;
-    let out = Command::new("rustc")
-        .arg(format!("+{TOOLCHAIN}"))
-        .args(["--print", "sysroot"])
-        .output()?;
-    if !out.status.success() {
-        bail!(
-            "toolchain {TOOLCHAIN} missing: rustup toolchain install {TOOLCHAIN} --component rustc-dev,llvm-tools,rust-src"
-        );
-    }
-    let sysroot = String::from_utf8(out.stdout)?.trim().to_string();
+    let sysroot = sysroot()?;
     let compiler = Command::new("rustc")
         .arg(format!("+{TOOLCHAIN}"))
         .arg("-vV")
@@ -227,7 +241,12 @@ fn run_driver(a: &GenArgs, kb: &Kb, dir: &Path, facts_dir: &Path) -> Result<()> 
     };
     let mut cmd = Command::new("cargo");
     cmd.arg(format!("+{TOOLCHAIN}"))
-        .args(["check", "--workspace", "--manifest-path"])
+        .args([
+            "check",
+            "--workspace",
+            "--message-format=json-render-diagnostics",
+            "--manifest-path",
+        ])
         .arg(&a.manifest_path)
         .arg("--target-dir")
         .arg(dir.join("target"))
@@ -246,9 +265,31 @@ fn run_driver(a: &GenArgs, kb: &Kb, dir: &Path, facts_dir: &Path) -> Result<()> 
     if !a.features.is_empty() {
         cmd.arg("--features").arg(a.features.join(","));
     }
-    let status = cmd.status().context("running cargo")?;
-    if !status.success() {
+    // cargo's JSON messages on stdout, its diagnostics rendered on stderr as usual
+    let out = cmd
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::inherit())
+        .output()
+        .context("running cargo")?;
+    if !out.status.success() {
         bail!("the project did not build with {TOOLCHAIN} and rcbom-driver");
     }
-    Ok(())
+    // `compiler-artifact` messages name every unit of the build, including those cargo did not
+    // need to rebuild: `.../deps/libaes_gcm-1a2b3c.rmeta` is unit `aes_gcm-1a2b3c`
+    let mut units = std::collections::BTreeSet::new();
+    for line in String::from_utf8_lossy(&out.stdout).lines() {
+        let Ok(msg) = serde_json::from_str::<serde_json::Value>(line) else {
+            continue;
+        };
+        if msg["reason"] != "compiler-artifact" {
+            continue;
+        }
+        for f in msg["filenames"].as_array().into_iter().flatten() {
+            if let Some(stem) = f.as_str().and_then(|f| Path::new(f).file_stem()) {
+                let stem = stem.to_string_lossy();
+                units.insert(stem.strip_prefix("lib").unwrap_or(&stem).to_string());
+            }
+        }
+    }
+    Ok(units)
 }

@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 5;
+pub const FACTS_VERSION: u32 = 7;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -17,9 +17,21 @@ pub struct CrateFacts {
     /// For fn items without generics, the body is monomorphic; for generic ones, only calls
     /// whose generic arguments are already concrete are kept.
     pub sites: Vec<Site>,
+    /// Edges of the data graph that have no source position of their own: statics an
+    /// initializer reaches only through evaluation (`static T: Table = make_table();` with
+    /// `const fn make_table()` naming `&SHA256`).
+    #[serde(default)]
+    pub data_edges: Vec<DataEdge>,
     /// Present when this crate has an entry point (a binary): the instance graph walked from
     /// `main` across all crates whose MIR is available. Sites found there are `Reachable`.
     pub reach: Option<Reach>,
+}
+
+/// `owner` (a static) holds a pointer to `target` in its evaluated value.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct DataEdge {
+    pub owner: Owner,
+    pub target: DefRef,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -37,6 +49,11 @@ pub struct CrateInfo {
     /// `CARGO_PRIMARY_PACKAGE`: a workspace member the user asked to build.
     pub primary: bool,
     pub crate_types: Vec<String>,
+    /// Cargo's unit id for this compilation (`-C extra-filename`, e.g. `-1a2b3c4d5e6f7a8b`):
+    /// the facts file is `<name><unit>.json`, and `cargo cbom` keeps only the units of the
+    /// current build.
+    #[serde(default)]
+    pub unit: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -83,7 +100,8 @@ pub struct Owner {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct DefRef {
     pub krate: CrateRef,
-    /// Full def path, crate-qualified and untrimmed (`ring::aead::aes_gcm::AES_256_GCM`).
+    /// Defining path, crate-qualified, independent of re-exports and of the crate that
+    /// observed it (`ring::aead::algorithm::AES_256_GCM`).
     pub path: String,
     /// Def-path hash, stable across compilation sessions of the same crate.
     pub id: String,
@@ -162,14 +180,31 @@ pub enum Origin {
     Param {
         index: usize,
     },
-    /// The result of a call; `args` are the origins of its value arguments.
+    /// The result of a call; `args` are the origins of its value arguments. `callee` is the
+    /// defining path; `self_ty` the path of the type a method belongs to, when it is an ADT
+    /// (`argon2::Argon2` for `<Argon2 as Default>::default`).
     Call {
         callee: String,
         krate: String,
+        #[serde(default)]
+        self_ty: Option<String>,
         args: Vec<Origin>,
+        /// Where the callee is named, as for a site: the analysis finds the site of this very
+        /// call (`Oaep::new_with_label::<Sha256, _>(..)` passed to `encrypt`) and what it
+        /// matched.
+        #[serde(default)]
+        span: Option<Loc>,
+    },
+    /// A value of a type without fields (`rand::rngs::OsRng`, `Option::None`): no data, but the
+    /// type itself may say where values come from.
+    Unit {
+        path: String,
+        krate: String,
     },
     /// Several definitions reach the value.
     Any(Vec<Origin>),
+    /// A bound of the search was hit here (depth, width or size): the origin is incomplete.
+    Truncated,
     Unknown,
 }
 
@@ -180,6 +215,16 @@ pub struct Site {
     /// Where the name appears. For code produced by a macro, this is the outermost macro call
     /// site in the user's source, and `expansion` keeps the position inside the macro.
     pub span: Loc,
+    /// The source text of `span` when it is on one line and not inside a macro expansion
+    /// (`Sha512_256::digest`, `seal_in_place_append_tag`, `aead::AES_256_GCM`).
+    #[serde(default)]
+    pub text: Option<String>,
+    /// The source line holding the position (for code from a macro, the line of the outermost
+    /// call), without its leading and trailing whitespace. Two sites on neighbouring lines can
+    /// have the same `text` at the same column (`Ec(kp) => kp.public_key()` above
+    /// `Ed(kp) => kp.public_key()`); their lines tell them apart.
+    #[serde(default)]
+    pub line_text: Option<String>,
     pub expansion: Option<Expansion>,
     pub target: Target,
     /// For sites inside a monomorphized generic instance: the calls that created the
@@ -187,11 +232,23 @@ pub struct Site {
     pub via: Vec<ViaStep>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum MacroKind {
+    /// `name!(..)`: the position is the macro's name at the call.
+    Bang,
+    /// `#[derive(Name)]`: the position is `Name` inside the derive list.
+    Derive,
+    /// `#[name]`: the position is the attribute.
+    Attr,
+    /// A compiler rewrite (`?`, `for`, `async`): the position is ordinary code.
+    Desugaring,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Expansion {
-    /// `name!` for a function-like macro, `derive:Name` for a derive, `attr:name` for an
-    /// attribute macro (the position is then the attribute); empty for desugarings (`?`,
-    /// `for`), whose call site is ordinary code.
+    pub kind: MacroKind,
+    /// The macro's name as rustc records it (`hash_all`, `ml::sha512_of`, `Clone`); empty for
+    /// desugarings.
     pub macro_name: String,
     pub def_site: Loc,
 }
@@ -211,7 +268,8 @@ pub struct Reach {
     /// Statics referenced from reachable code. Statics they refer to in turn are closed over
     /// by the analysis, using the static-owned sites of every crate.
     pub statics: Vec<DefRef>,
-    /// Owner ids (mangled names) of the reached function instances: sites found by the
-    /// per-item scan inside one of them are reachable too.
+    /// Owner ids of the reached function instances (mangled names), and the def-path hashes
+    /// of their definitions: sites found by the per-item scan inside one of them, generic or
+    /// not, are reachable too.
     pub fns: Vec<String>,
 }

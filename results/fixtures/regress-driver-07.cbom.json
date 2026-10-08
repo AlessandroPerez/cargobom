@@ -1,0 +1,350 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via t7 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t7 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via t7 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/t7@0.1.0",
+      "name": "t7",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t7@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in t7::t2; line: `let alg = const { &SHA256 };`; code: `SHA256`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t7::t2; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `digest(alg, d).as_ref().len()`; code: `digest`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t7::TL::__rust_std_internal_init_fn; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `static TL: usize = digest(&SHA384, b\"tl\").as_ref().len();`; code: `digest`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t7::TL::__rust_std_internal_init_fn; line: `static TL: usize = digest(&SHA384, b\"tl\").as_ref().len();`; code: `SHA384`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "ring::digest::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t7::LAZY::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by <{closure@src/main.rs:16:46: 16:48} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 48,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t7::LAZY::{closure#0}; instantiated by <{closure@src/main.rs:16:46: 16:48} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `SHA512`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 56,
+            "symbol": "ring::digest::SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/t7@0.1.0"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t7@0.1.0#root",
+      "name": "t7",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "77"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:5ad01dd0-d0fe-88c7-8e4b-88cadf572356",
+  "specVersion": "1.7",
+  "version": 1
+}

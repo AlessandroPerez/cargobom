@@ -198,6 +198,38 @@
       "version": "0.10.7"
     },
     {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via cbom-real-modern-app -> ring -> getrandom",
+            "line": 131,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -228,6 +260,34 @@
       "purl": "pkg:cargo/poly1305@0.8.0",
       "type": "library",
       "version": "0.8.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand_core@0.6.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_core 0.6.4; reached via cbom-real-modern-app -> chacha20poly1305 -> aead -> crypto-common -> rand_core",
+            "line": 174,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_core"
+          }
+        ]
+      },
+      "name": "rand_core",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/rand_core@0.6.4",
+      "type": "library",
+      "version": "0.6.4"
     },
     {
       "bom-ref": "pkg:cargo/ring@0.17.14",
@@ -366,11 +426,11 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_modern_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 7)",
+            "additionalContext": "[present] [call] in cbom_real_modern_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 7); line: `let _ = ChaCha20Poly1305::new_from_slice(&shared_secret.as_bytes()[..32]);`; code: `ChaCha20Poly1305::new_from_slice`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 12,
-            "symbol": "chacha20poly1305::KeyInit::new_from_slice"
+            "symbol": "crypto_common::KeyInit::new_from_slice"
           }
         ]
       },
@@ -394,7 +454,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:param:nonce_bytes",
@@ -430,11 +490,11 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_modern_app::main; use: digest",
+            "additionalContext": "[present] [call] in cbom_real_modern_app::main; use: digest; line: `let _ = Sha1::digest(shared_secret.as_bytes());`; code: `Sha1::digest`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 12,
-            "symbol": "sha1::Digest::digest"
+            "symbol": "digest::digest::Digest::digest"
           }
         ]
       },
@@ -458,7 +518,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -508,7 +568,9 @@
       "ref": "pkg:cargo/cipher@0.4.4"
     },
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.6.4"
+      ],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
@@ -518,13 +580,25 @@
       "ref": "pkg:cargo/digest@0.10.7"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
     },
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "ref": "pkg:cargo/rand_core@0.6.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
     {
@@ -569,7 +643,7 @@
       },
       {
         "name": "rcbom:kb:version",
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       {
         "name": "rcbom:run:reachable-instances",
@@ -586,7 +660,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:a01e0f09-7fa1-8f76-978e-e40217a26786",
+  "serialNumber": "urn:uuid:4e2e5a71-5040-8763-94ff-fc57df6482af",
   "specVersion": "1.7",
   "version": 1
 }

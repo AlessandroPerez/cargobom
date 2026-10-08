@@ -1,0 +1,304 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via t11 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t11 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via t11 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/t11@0.1.0",
+      "name": "t11",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t11@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [static] in t11::sha256_table; line: `Table { alg: &SHA256 }`; code: `SHA256`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 33,
+            "symbol": "t11::TABLE"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in t11::TABLE2; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 51,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE2`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 58,
+            "symbol": "t11::TABLE2"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/t11@0.1.0"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t11@0.1.0#root",
+      "name": "t11",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "8"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:eefd616f-99e7-87e6-9f14-31869e27258d",
+  "specVersion": "1.7",
+  "version": 1
+}

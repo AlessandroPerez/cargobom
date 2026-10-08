@@ -1,24 +1,28 @@
 {
   "fixture": "cbom-real-crates-app",
   "core_pairs": 8,
-  "core_pairs_found": 8,
-  "recall": 1.0,
+  "core_pairs_found": 7,
+  "recall": 0.875,
   "reported_pairs": 9,
-  "true_positive_pairs": 8,
-  "precision": 0.889,
+  "true_positive_pairs": 7,
+  "precision": 0.778,
   "fully_named": 3,
   "core_assets": 8,
-  "core_assets_found": 8,
+  "core_assets_found": 7,
   "named_less_specifically": [
     "BLAKE3-256 @ 25 as BLAKE3",
     "AES-256-GCM @ 26 as AES-GCM",
     "HMAC-SHA-256 @ 27 as HMAC",
-    "PBKDF2-SHA-256-1000-32 @ 33 as PBKDF2",
-    "Argon2id-19456-2-1 @ 36 as Argon2"
+    "PBKDF2-SHA-256-1000-32 @ 33 as PBKDF2"
   ],
-  "missed": [],
-  "family_only": [],
+  "missed": [
+    "Argon2id-19456-2-1 @ 36"
+  ],
+  "family_only": [
+    "Argon2id-19456-2-1 @ 36"
+  ],
   "false_positives": [
+    "Argon2 @ 36",
     "JWT @ 29"
   ],
   "extended_found": [],
@@ -26,7 +30,7 @@
   "capability_credited": [],
   "unexpected_in_dependencies": [],
   "crates_found": "9/10",
-  "provenance_total": 7,
+  "provenance_total": 6,
   "provenance_exact": 0,
   "provenance_wrong": [
     "AES-256-GCM @ 26 key: said nothing, truth ['environment', 'hard-coded']",
@@ -34,7 +38,6 @@
     "PBKDF2-SHA-256-1000-32 @ 33 password: said nothing, truth ['environment', 'hard-coded']",
     "PBKDF2-SHA-256-1000-32 @ 33 salt: said nothing, truth ['hard-coded']",
     "Argon2id-19456-2-1 @ 36 password: said nothing, truth ['environment', 'hard-coded']",
-    "Argon2id-19456-2-1 @ 36 salt: said nothing, truth ['hard-coded']",
-    "HMAC secret key (jsonwebtoken) @ 29 key: said nothing, truth ['environment', 'hard-coded']"
+    "Argon2id-19456-2-1 @ 36 salt: said nothing, truth ['hard-coded']"
   ]
 }

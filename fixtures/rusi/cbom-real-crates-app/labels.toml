@@ -7,8 +7,11 @@
 #        "extended"   real, but reasonable tools may omit it; credited if found, not a miss
 # lines            src/main.rs lines whose code uses the asset (the line the call starts on)
 # component_lines  lines where the asset is used only as part of another (SHA-256 inside HMAC)
-# functions        what the code at those lines does with it ([] = set up, never used)
-# accept           asset names counted as a match (registry name first)
+# functions        what the code at those lines does with it ([] = set up, never used; a tool
+#                  then reports no observed use: cargo-cbom writes the knowledge base's defaults
+#                  with rcbom:functions:source = knowledge-base)
+# accept           asset names counted as a match, exactly (registry name first, then the valid
+#                  less specific registry names)
 # provenance       role -> where the value handed to the API comes from: hard-coded, environment,
 #                  file, rng, parameter, derived (all that apply)
 
@@ -49,7 +52,7 @@ why = "blake3::hash (blake3 1.8.5), default 32-byte output"
 
 [[asset]]
 name = "AES-256-GCM"
-accept = ["AES-256-GCM", "AES-GCM", "AES-256"]  # registry: key size and mode are optional segments
+accept = ["AES-256-GCM", "AES-GCM", "AES-256", "AES"]  # registry: key size and mode are optional segments
 family = "AES"
 primitive = "ae"
 tier = "core"
@@ -61,7 +64,7 @@ provenance = { key = ["environment", "hard-coded"] }  # app_secret: env::var("AP
 
 [[asset]]
 name = "HMAC-SHA-256"
-accept = ["HMAC-SHA-256"]
+accept = ["HMAC-SHA-256", "HMAC"]  # registry: HMAC[-{hashAlgorithm}]
 family = "HMAC"
 primitive = "mac"
 tier = "core"
@@ -72,7 +75,7 @@ provenance = { key = ["environment", "hard-coded"] }  # app_secret, as above
 
 [[asset]]
 name = "PBKDF2-SHA-256-1000-32"
-accept = ["PBKDF2-SHA-256-1000-32", "PBKDF2-SHA-256", "PBKDF2-HMAC-SHA-256", "PBKDF2"]
+accept = ["PBKDF2-SHA-256-1000-32", "PBKDF2-SHA-256-1000", "PBKDF2-SHA-256", "PBKDF2-HMAC-SHA-256", "PBKDF2"]
 family = "PBKDF2"
 primitive = "kdf"
 tier = "core"
@@ -84,7 +87,7 @@ provenance = { password = ["environment", "hard-coded"], salt = ["hard-coded"] }
 
 [[asset]]
 name = "Argon2id-19456-2-1"
-accept = ["Argon2id-19456-2-1", "Argon2id", "Argon2"]
+accept = ["Argon2id-19456-2-1", "Argon2id-19456-2", "Argon2id-19456", "Argon2id"]  # registry: Argon2(id|i|d)[..]; "Argon2" alone is not a registry name
 family = "Argon2"
 primitive = "kdf"
 tier = "core"

@@ -1,20 +1,79 @@
-HMAC-SHA-256           src/lib.rs:13:16  [reachable] [call]  new_from_slice
-HMAC-SHA-256           src/lib.rs:14:6  [reachable] [call]  update
-HMAC-SHA-256           src/lib.rs:15:17  [reachable] [call]  into_bytes
-HMAC-SHA-256           src/lib.rs:15:6  [reachable] [call]  finalize
-HMAC-SHA-256           src/lib.rs:20:4  [reachable] [instantiation]  tag
-MD5                    src/lib.rs:26:4  [present] [call]  compute
-SHA-256                src/lib.rs:13:16  [reachable] [component]  new_from_slice
-SHA-256                src/lib.rs:14:6  [reachable] [component]  update
-SHA-256                src/lib.rs:15:17  [reachable] [component]  into_bytes
-SHA-256                src/lib.rs:15:6  [reachable] [component]  finalize
-SHA-256                src/lib.rs:20:4  [reachable] [component]  tag
-SHA-256                src/lib.rs:8:4  [reachable] [call]  digest
-crypto-common          Cargo.lock:30:0  [manifest]  crypto-common
-digest                 Cargo.lock:40:0  [manifest]  digest
-hmac                   Cargo.lock:61:0  [manifest]  hmac
-hmac                   Cargo.toml:12:0  [manifest]  hmac
-md5                    Cargo.lock:85:0  [manifest]  md5
-md5                    Cargo.toml:11:0  [manifest]  md5
-sha2                   Cargo.lock:91:0  [manifest]  sha2
-sha2                   Cargo.toml:10:0  [manifest]  sha2
+  occ HMAC-SHA-256 | src/lib.rs:13:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in libonly::tag::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | src/lib.rs:14:6 | digest::mac::Mac::update | [reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.update(data);`; code: `update`
+  occ HMAC-SHA-256 | src/lib.rs:15:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in libonly::tag::<..>; into_bytes: setup, not a use; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-256 | src/lib.rs:15:6 | digest::mac::Mac::finalize | [reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ HMAC-SHA-256 | src/lib.rs:20:4 | libonly::tag | [reachable] [instantiation] in libonly::tag_sha256; chosen as generic argument of libonly::tag; line: `tag::<Hmac<Sha256>>(key, data)`; code: `tag::<Hmac<Sha256>>`
+  occ MD5 | src/lib.rs:26:4 | md5::compute | [present] [call] in libonly::legacy; use: digest; line: `md5::compute(data).0`; code: `md5::compute`
+  occ SHA-256 | src/lib.rs:13:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`
+  occ SHA-256 | src/lib.rs:14:6 | digest::mac::Mac::update | [reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.update(data);`; code: `update`
+  occ SHA-256 | src/lib.rs:15:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-256 | src/lib.rs:15:6 | digest::mac::Mac::finalize | [reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | src/lib.rs:20:4 | libonly::tag | [reachable] [component] in libonly::tag_sha256; part of HMAC-SHA-256; line: `tag::<Hmac<Sha256>>(key, data)`; code: `tag::<Hmac<Sha256>>`
+  occ SHA-256 | src/lib.rs:8:4 | digest::digest::Digest::digest | [reachable] [call] in libonly::fingerprint; use: digest; line: `Sha256::digest(data).into()`; code: `Sha256::digest`
+  occ crypto-common | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via libonly -> hmac -> digest -> crypto-common
+  occ digest | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via libonly -> hmac -> digest
+  occ hmac | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via libonly -> hmac
+  occ hmac | Cargo.toml:12:0 | hmac | [manifest] declared by libonly (dependencies)
+  occ md5 | Cargo.lock:85:0 | md5 | [manifest] locked md5 0.7.0; reached via libonly -> md5
+  occ md5 | Cargo.toml:11:0 | md5 | [manifest] declared by libonly (dependencies)
+  occ sha2 | Cargo.lock:91:0 | sha2 | [manifest] locked sha2 0.10.9; reached via libonly -> sha2
+  occ sha2 | Cargo.toml:10:0 | sha2 | [manifest] declared by libonly (dependencies)
+  prop HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | rcbom:occurrences=5
+  prop HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | rcbom:reachability=reachable
+  prop MD5 | rcbom:confidence=high
+  prop MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | rcbom:functions:source=observed
+  prop MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | rcbom:occurrences=1
+  prop MD5 | rcbom:reachability=present
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | rcbom:reachability=reachable
+  prop crypto-common | rcbom:crypto-role=trait
+  prop crypto-common | rcbom:scope=required
+  prop digest | rcbom:crypto-role=trait
+  prop digest | rcbom:scope=required
+  prop hmac | rcbom:crypto-role=algorithm
+  prop hmac | rcbom:scope=required
+  prop hmac | rcbom:usage=reachable
+  prop libonly | rcbom:scope=required
+  prop md5 | rcbom:crypto-role=algorithm
+  prop md5 | rcbom:scope=required
+  prop md5 | rcbom:usage=present
+  prop sha2 | rcbom:crypto-role=algorithm
+  prop sha2 | rcbom:scope=required
+  prop sha2 | rcbom:usage=reachable
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application libonly 0.1.0 | pkg:cargo/libonly@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
+component library md5 0.7.0 | pkg:cargo/md5@0.7.0
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/libonly@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/libonly@0.1.0 -> pkg:cargo/md5@0.7.0
+dep pkg:cargo/libonly@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:MD5
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/libonly@0.1.0#root", "name": "libonly", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=151
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

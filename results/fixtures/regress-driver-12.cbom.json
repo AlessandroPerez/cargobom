@@ -1,0 +1,230 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via t12 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t12 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via t12 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/t12@0.1.0",
+      "name": "t12",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t12@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t12::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let d = digest(&SHA256, &[LESS as u8, GREATER as u8, std_generics() as u8]);`; code: `digest`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t12::main; line: `let d = digest(&SHA256, &[LESS as u8, GREATER as u8, std_generics() as u8]);`; code: `SHA256`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/t12@0.1.0"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t12@0.1.0#root",
+      "name": "t12",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "87"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:4e286114-252a-8ecc-b092-f58bc0a97715",
+  "specVersion": "1.7",
+  "version": 1
+}

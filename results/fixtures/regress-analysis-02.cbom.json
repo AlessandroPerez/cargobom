@@ -1,0 +1,924 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via t2 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t2 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via t2 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/t2@0.1.0",
+      "name": "t2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t2@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in t2::hkdf_to_aead; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `AES_256_GCM`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_pbkdf2_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (ring::pbkdf2::derive); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[present] [static] in t2::ring_pbkdf2_key; line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `AES_256_GCM`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Okm::fill); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[present] [static] in t2::ring_hkdf_key; line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `AES_256_GCM`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          }
+        ]
+      },
+      "name": "AES-256-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "derived"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "keygen",
+            "sign"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::ed_sign; use: sign; line: `kp.sign(b\"msg\").as_ref().to_vec()`; code: `sign`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::ed_gen; use: keygen; line: `signature::Ed25519KeyPair::generate_pkcs8(&rng).unwrap().as_ref().to_vec()`; code: `signature::Ed25519KeyPair::generate_pkcs8`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HKDF-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 7); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::Salt::new`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "ring::hkdf::Salt::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t2::hkdf_to_aead; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 58,
+            "symbol": "ring::hkdf::Salt::extract"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `expand`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::hkdf::Prk::expand"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::Salt::new`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::hkdf::Salt::new"
+          },
+          {
+            "additionalContext": "[present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `extract`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::hkdf::Salt::extract"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `expand`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 58,
+            "symbol": "ring::hkdf::Prk::expand"
+          },
+          {
+            "additionalContext": "[present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 76,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `fill`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 104,
+            "symbol": "ring::hkdf::Okm::<'_, L>::fill"
+          }
+        ]
+      },
+      "name": "HKDF-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:ikm",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-salt"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "10"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t2::hkdf_to_aead; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t2::ring_pbkdf2; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_pbkdf2_key; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 76,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:PBKDF2-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "PBKDF2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t2::ring_pbkdf2; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 21); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::pbkdf2::derive"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t2::ring_pbkdf2; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[present] [call] in t2::ring_pbkdf2_key; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::derive`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::pbkdf2::derive"
+          },
+          {
+            "additionalContext": "[present] [static] in t2::ring_pbkdf2_key; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "PBKDF2-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-salt"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in t2::rsa3072; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::rsa3072; use: verify; algorithm from ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 in the arguments; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `verify`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 82,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t2::hkdf_to_aead; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::seal_digest; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t2::seal_digest; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `SHA256`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t2::ring_pbkdf2; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_pbkdf2_key; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 76,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t2::rsa3072; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 -> ring::digest::SHA384); line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512/256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t2::sha512_256; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; line: `digest(&SHA512_256, d).as_ref().len()`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t2::sha512_256; line: `digest(&SHA512_256, d).as_ref().len()`; code: `SHA512_256`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::SHA512_256"
+          }
+        ]
+      },
+      "name": "SHA-512/256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:HKDF-SHA-256",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:PBKDF2-SHA-256",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512/256"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/t2@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HKDF-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:PBKDF2-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t2@0.1.0#root",
+      "name": "t2",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "118"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:69d3f0a5-e1cc-8c93-9ad9-4ef6cfc7cacb",
+  "specVersion": "1.7",
+  "version": 1
+}

@@ -37,19 +37,16 @@ fn tier_str(t: Tier) -> &'static str {
     }
 }
 
-/// `[tier] [kind] [macro m!] owner: use; details`. The bracketed tags come first so tools (and
-/// `cargo cbom verify`) can read them back.
+/// `[tier] [kind] [macro m!] in owner; use: f; details; line: `..`; code: `..``. The bracketed
+/// tags come first and the source text last, so tools (and `cargo cbom verify`) can read them
+/// back.
 fn context(o: &Occurrence) -> String {
     let mut s = format!("[{}] [{}]", tier_str(o.tier), o.kind.as_str());
-    match o
-        .macro_name
-        .as_deref()
-        .map(|m| m.split_once(':').unwrap_or(("", m)))
-    {
-        Some(("derive", name)) => s.push_str(&format!(" [derive {name}]")),
-        Some(("attr", name)) => s.push_str(&format!(" [attribute {name}]")),
-        Some((_, m)) => s.push_str(&format!(" [macro {m}]")),
-        None => {}
+    match &o.macro_tag {
+        Some((rcbom_facts::MacroKind::Derive, name)) => s.push_str(&format!(" [derive {name}]")),
+        Some((rcbom_facts::MacroKind::Attr, name)) => s.push_str(&format!(" [attribute {name}]")),
+        Some((rcbom_facts::MacroKind::Bang, name)) => s.push_str(&format!(" [macro {name}!]")),
+        _ => {}
     }
     s.push_str(&format!(" in {}", o.owner));
     if let Some(f) = &o.function {
@@ -59,14 +56,41 @@ fn context(o: &Occurrence) -> String {
         s.push_str("; ");
         s.push_str(d);
     }
+    // last, so they can be read back: the source line, and the exact text at the position
+    // (the line may hold backquotes, in a literal or a comment; the code text never does)
+    if let Some(l) = &o.line_text {
+        s.push_str(&format!("; line: `{l}`"));
+    }
+    if let Some(c) = o.code.as_ref().filter(|c| !c.contains('`')) {
+        s.push_str(&format!("; code: `{c}`"));
+    }
     s
 }
 
-fn asset_ref(name: &str) -> String {
-    format!("crypto:algorithm:{name}")
+/// bom-refs of the assets, by key: `crypto:algorithm:<name>`, `crypto:material:<type>:<name>`
+/// for key material, and `:<primitive>` added when two algorithms share a name (BLAKE3 the hash
+/// and BLAKE3 keyed, a MAC).
+fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
+    let mut by_name: BTreeMap<&str, usize> = BTreeMap::new();
+    for a in an.assets.values().filter(|a| a.algo.material.is_none()) {
+        *by_name.entry(&a.name).or_default() += 1;
+    }
+    an.assets
+        .values()
+        .map(|a| {
+            let r = match &a.algo.material {
+                Some(m) => format!("crypto:material:{m}:{}", a.name),
+                None if by_name[a.name.as_str()] > 1 => {
+                    format!("crypto:algorithm:{}:{}", a.name, a.algo.primitive)
+                }
+                None => format!("crypto:algorithm:{}", a.name),
+            };
+            (a.key.clone(), r)
+        })
+        .collect()
 }
 
-fn asset_component(kb: &Kb, a: &Asset) -> Value {
+fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     let observed = a.observed_functions();
     let (functions, source): (Vec<String>, &str) = if observed.is_empty() {
         (a.algo.functions.clone(), "knowledge-base")
@@ -118,8 +142,9 @@ fn asset_component(kb: &Kb, a: &Asset) -> Value {
     if !direct && !a.occurrences.is_empty() {
         props.push(prop("rcbom:only-as-component", "true"));
     }
-    for (k, v) in &a.params {
-        props.push(prop(&format!("rcbom:param:{k}"), v));
+    for (k, vs) in &a.params {
+        let v: Vec<&str> = vs.iter().map(String::as_str).collect();
+        props.push(prop(&format!("rcbom:param:{k}"), v.join(" | ")));
     }
     // where the key material handed to this asset's APIs comes from (intraprocedural)
     let mut by_role: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
@@ -140,6 +165,11 @@ fn asset_component(kb: &Kb, a: &Asset) -> Value {
     if let Some(n) = &a.algo.note {
         props.push(prop("rcbom:note", n));
     }
+    // a name the Cryptography Registry has no pattern for (a family name for a variant the
+    // code does not determine, a variant the registry does not list)
+    if a.algo.material.is_none() && !rcbom_kb::registry::valid(&a.name, &a.algo.family) {
+        props.push(prop("rcbom:registry-name", "unmatched"));
+    }
     props.push(prop("rcbom:occurrences", a.occurrences.len()));
     let crypto = match &a.algo.material {
         // a key with no scheme: material, linked to its family by a property
@@ -156,7 +186,7 @@ fn asset_component(kb: &Kb, a: &Asset) -> Value {
     };
     json!({
         "type": "cryptographic-asset",
-        "bom-ref": asset_ref(&a.name),
+        "bom-ref": bom_ref,
         "name": a.name,
         "cryptoProperties": crypto,
         "evidence": { "occurrences": occurrences },
@@ -231,7 +261,7 @@ fn manifest_occurrences(man: &Manifest, p: &Pkg) -> Vec<Value> {
         .collect()
 }
 
-fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>) -> Value {
+fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool) -> Value {
     let v = p.version.to_string();
     let mut props = vec![prop(
         "rcbom:scope",
@@ -261,7 +291,8 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>) -> Value {
         props.push(prop("rcbom:ffi-boundary", "true"));
     }
     if let (Some(u), Some(r)) = (usage, p.role) {
-        if !p.kb_supported {
+        if !p.kb_supported || !layer2 {
+            // without Layer 2 (`--manifest-only`) no use was looked for
             // its APIs are not in the knowledge base: no use could have been seen
             props.push(prop("rcbom:usage", "unknown"));
         } else if r != Role::Trait {
@@ -321,7 +352,7 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
             )
             .next();
         for name in &p.candidates {
-            if an.assets.contains_key(name) {
+            if an.assets.values().any(|a| a.name == *name) {
                 continue;
             }
             let mut ap = serde_json::Map::new();
@@ -331,6 +362,7 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
             }
             out.push(json!({
                 "type": "cryptographic-asset",
+                "rcbom-from": pkg_ref(&p.name, &p.version.to_string()),
                 "bom-ref": format!("crypto:candidate:{}@{}:{}", p.name, p.version, name),
                 "name": name,
                 "cryptoProperties": { "assetType": "algorithm", "algorithmProperties": ap },
@@ -338,7 +370,10 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                 "properties": [
                     prop("rcbom:detection:method", "manifest"),
                     prop("rcbom:confidence", "low"),
-                    prop("rcbom:usage", "declared-not-used"),
+                    prop(
+                        "rcbom:usage",
+                        if an.layer2 { "declared-not-used" } else { "unknown" },
+                    ),
                     prop("rcbom:kb:version", &kb.version),
                 ],
             }));
@@ -364,12 +399,18 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
                 an.usage
                     .get(&(p.name.clone(), p.version.to_string()))
                     .copied(),
+                an.layer2,
             )
         })
         .collect();
-    components.extend(an.assets.values().map(|a| asset_component(kb, a)));
+    let refs = asset_refs(an);
+    components.extend(
+        an.assets
+            .values()
+            .map(|a| asset_component(kb, a, &refs[&a.key])),
+    );
     components.extend(an.protocols.values().map(|p| protocol_component(kb, p)));
-    components.extend(candidate_assets(kb, man, an));
+    let mut candidates = candidate_assets(kb, man, an);
 
     // Dependencies: package graph reduced to the included packages, providers, composition.
     let by_id: HashMap<_, _> = man.packages.iter().map(|p| (p.id.clone(), p)).collect();
@@ -379,7 +420,24 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
             provides
                 .entry(pkg_ref(n, v))
                 .or_default()
-                .insert(asset_ref(&a.name));
+                .insert(refs[&a.key].clone());
+        }
+    }
+    // the protocol crate provides the protocol; a candidate comes from its crate
+    for p in an.protocols.values() {
+        if let Some((n, v)) = &p.package {
+            provides
+                .entry(pkg_ref(n, v))
+                .or_default()
+                .insert(format!("crypto:protocol:{}", p.name));
+        }
+    }
+    for c in &candidates {
+        if let (Some(r), Some(from)) = (c["bom-ref"].as_str(), c["rcbom-from"].as_str()) {
+            provides
+                .entry(from.to_string())
+                .or_default()
+                .insert(r.to_string());
         }
     }
     let mut deps = Vec::new();
@@ -409,13 +467,18 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         let on: BTreeSet<String> = a
             .components
             .iter()
-            .filter(|c| an.assets.contains_key(*c))
-            .map(|c| asset_ref(c))
+            .filter_map(|c| refs.get(c).cloned())
             .collect();
         if !on.is_empty() {
-            deps.push(json!({ "ref": asset_ref(&a.name), "dependsOn": on }));
+            deps.push(json!({ "ref": refs[&a.key], "dependsOn": on }));
         }
     }
+    for c in &mut candidates {
+        if let Some(o) = c.as_object_mut() {
+            o.remove("rcbom-from");
+        }
+    }
+    components.extend(candidates);
 
     // the package `--manifest-path` names; in a virtual workspace, the first member by name
     let root = included

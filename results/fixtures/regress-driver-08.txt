@@ -1,0 +1,49 @@
+  occ AES-256-GCM | src/main.rs:6:29 | aws_lc_rs::aead::unbound_key::UnboundKey::new | [reachable] [call] in t8::a1; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`
+  occ AES-256-GCM | src/main.rs:6:46 | aws_lc_rs::aead::aes_gcm::AES_256_GCM | [reachable] [static] in t8::a1; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`
+  occ AES-256-GCM | src/main.rs:8:6 | aws_lc_rs::aead::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in t8::a1; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 7); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`
+  occ SHA-384 | src/main.rs:13:20 | aws_lc_rs::digest::sha::SHA384 | [reachable] [static] in t8::a2; instantiated by t8::main at src/main.rs:19; line: `digest::digest(&digest::SHA384, d.as_ref()).as_ref().len()`; code: `digest::SHA384`
+  occ SHA-384 | src/main.rs:13:4 | aws_lc_rs::digest::digest | [reachable] [call] in t8::a2; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `digest::digest(&digest::SHA384, d.as_ref()).as_ref().len()`; code: `digest::digest`
+  occ aws-lc-rs | Cargo.lock:6:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.17.3; reached via t8 -> aws-lc-rs
+  occ aws-lc-rs | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by t8 (dependencies); features ["aws-lc-sys", "alloc"]; default-features = false
+  occ aws-lc-rs | aws-lc-rs-1.17.3/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_17_3_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | aws-lc-sys-0.43.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_43_0`; code behind the FFI boundary is not analysed
+  prop AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | rcbom:occurrences=3
+  prop AES-256-GCM | rcbom:provenance:key=parameter
+  prop AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | rcbom:reachability=reachable
+  prop SHA-384 | rcbom:confidence=high
+  prop SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | rcbom:reachability=reachable
+  prop aws-lc-rs | rcbom:crypto-role=algorithm
+  prop aws-lc-rs | rcbom:ffi-boundary=true
+  prop aws-lc-rs | rcbom:native-links=aws_lc_rs_1_17_3_sys
+  prop aws-lc-rs | rcbom:scope=required
+  prop aws-lc-rs | rcbom:usage=reachable
+  prop aws-lc-sys | rcbom:ffi-boundary=true
+  prop aws-lc-sys | rcbom:native-links=aws_lc_0_43_0
+  prop aws-lc-sys | rcbom:scope=required
+  prop t8 | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application t8 0.1.0 | pkg:cargo/t8@0.1.0
+component library aws-lc-rs 1.17.3 | pkg:cargo/aws-lc-rs@1.17.3
+component library aws-lc-sys 0.43.0 | pkg:cargo/aws-lc-sys@0.43.0
+dep pkg:cargo/aws-lc-rs@1.17.3 -> pkg:cargo/aws-lc-sys@0.43.0
+dep pkg:cargo/t8@0.1.0 -> pkg:cargo/aws-lc-rs@1.17.3
+provides pkg:cargo/aws-lc-rs@1.17.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aws-lc-rs@1.17.3 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/t8@0.1.0#root", "name": "t8", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=81
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

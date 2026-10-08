@@ -75,7 +75,7 @@ The first run exposed gaps beyond knowledge-base coverage:
 - **Same-line merge:** when a use is found with and without run-time parameters (`Argon2` from `hash_password`, `Argon2id-19456-2-1` from `default()`), the resolved name wins.
 - **Locations** are normalized lexically (`aws_lc_rs/../ring/kx.rs` is `ring/kx.rs`).
 
-All positions in all four fixture sets verify against the source: 966 positions. The ±1 self-test rejects every shifted position except 3 of 1,072 line shifts in crates-app, where rustls lists suites on consecutive lines with the same identifier at the same column.
+All positions in all four fixture sets verified against the source at the time of this round: 966 positions. The ±1 self-test then rejected every shifted position except 3 of 1,072 line shifts in crates-app; the verifier was later made strict enough to reject all shifted positions (see `docs/poc-evaluation.md`).
 
 ## Next
 

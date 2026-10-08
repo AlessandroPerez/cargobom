@@ -288,6 +288,38 @@
       "version": "0.10.7"
     },
     {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via micro -> ring -> getrandom",
+            "line": 157,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
       "bom-ref": "pkg:cargo/ghash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -434,6 +466,34 @@
       "purl": "pkg:cargo/polyval@0.6.2",
       "type": "library",
       "version": "0.6.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand_core@0.6.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_core 0.6.4; reached via micro -> aes-gcm -> aead -> crypto-common -> rand_core",
+            "line": 243,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_core"
+          }
+        ]
+      },
+      "name": "rand_core",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/rand_core@0.6.4",
+      "type": "library",
+      "version": "0.6.4"
     },
     {
       "bom-ref": "pkg:cargo/ring@0.17.14",
@@ -612,53 +672,53 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
-            "symbol": "aes_gcm::KeyInit::new_from_slice"
+            "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
-            "symbol": "aes_gcm::AeadCore::generate_nonce"
+            "symbol": "aead::AeadCore::generate_nonce"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aes_gcm::AeadCore::generate_nonce); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
-            "symbol": "aes_gcm::aead::Aead::encrypt"
+            "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of seal",
+            "additionalContext": "[reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<Aes256Gcm>(&self.0, msg)`; code: `seal::<Aes256Gcm>`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 8,
-            "symbol": "seal"
+            "symbol": "micro::seal"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::ring_seal; algorithm from ring::aead::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function)",
+            "additionalContext": "[reachable] [call] in micro::ring_seal; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 29,
-            "symbol": "ring::aead::UnboundKey::new"
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in micro::ring_seal",
+            "additionalContext": "[reachable] [static] in micro::ring_seal; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 46,
-            "symbol": "ring::aead::AES_256_GCM"
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 41)",
+            "additionalContext": "[reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 41); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 6,
-            "symbol": "ring::aead::LessSafeKey::seal_in_place_append_tag"
+            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           }
         ]
       },
@@ -682,7 +742,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:param:nonce_bytes",
@@ -726,32 +786,32 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
-            "symbol": "aes_gcm::KeyInit::new_from_slice"
+            "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
-            "symbol": "aes_gcm::AeadCore::generate_nonce"
+            "symbol": "aead::AeadCore::generate_nonce"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aes_gcm::AeadCore::generate_nonce); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
-            "symbol": "aes_gcm::aead::Aead::encrypt"
+            "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of seal",
+            "additionalContext": "[reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<ChaCha20Poly1305>(&self.0, msg)`; code: `seal::<ChaCha20Poly1305>`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 8,
-            "symbol": "seal"
+            "symbol": "micro::seal"
           }
         ]
       },
@@ -775,7 +835,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:param:nonce_bytes",
@@ -811,32 +871,32 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function)",
+            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 16,
-            "symbol": "hmac::Mac::new_from_slice"
+            "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; use: tag",
+            "additionalContext": "[reachable] [call] in micro::mac; use: tag; line: `m.update(msg);`; code: `update`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::update"
+            "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; use: tag",
+            "additionalContext": "[reachable] [call] in micro::mac; use: tag; line: `.finalize()`; code: `finalize`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 9,
-            "symbol": "hmac::Mac::finalize"
+            "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; into_bytes: setup, not a use",
+            "additionalContext": "[reachable] [call] in micro::mac; into_bytes: setup, not a use; line: `.into_bytes()`; code: `into_bytes`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 9,
-            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           }
         ]
       },
@@ -860,7 +920,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:provenance:key",
@@ -888,46 +948,46 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 16,
-            "symbol": "hmac::Mac::new_from_slice"
+            "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `m.update(msg);`; code: `update`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::update"
+            "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.finalize()`; code: `finalize`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 9,
-            "symbol": "hmac::Mac::finalize"
+            "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.into_bytes()`; code: `into_bytes`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 9,
-            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [static] in DIGESTS",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; DIGESTS -> ring::digest::SHA256",
+            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
-            "symbol": "DIGESTS"
+            "symbol": "micro::DIGESTS"
           }
         ]
       },
@@ -951,7 +1011,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -975,7 +1035,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63",
+            "additionalContext": "[reachable] [call] [macro hash_all!] in micro::digests; use: digest; algorithm from ring::digest::SHA384 in the arguments; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
+            "line": 72,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 12,
@@ -999,15 +1066,15 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -1027,25 +1094,25 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in DIGESTS",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 64,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; DIGESTS -> ring::digest::SHA512",
+            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
-            "symbol": "DIGESTS"
+            "symbol": "micro::DIGESTS"
           },
           {
-            "additionalContext": "[present] [call] in micro::unused_sha512; use: digest",
+            "additionalContext": "[present] [call] in micro::unused_sha512; use: digest; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 4,
-            "symbol": "sha2::Digest::digest"
+            "symbol": "digest::digest::Digest::digest"
           }
         ]
       },
@@ -1065,11 +1132,11 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -1121,7 +1188,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         }
       ],
       "type": "cryptographic-asset"
@@ -1178,7 +1245,9 @@
       "ref": "pkg:cargo/cipher@0.4.4"
     },
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.6.4"
+      ],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
@@ -1192,6 +1261,10 @@
         "pkg:cargo/crypto-common@0.1.7"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
       "dependsOn": [
@@ -1232,7 +1305,15 @@
       "ref": "pkg:cargo/polyval@0.6.2"
     },
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "ref": "pkg:cargo/rand_core@0.6.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
       "provides": [
         "crypto:algorithm:AES-256-GCM",
         "crypto:algorithm:SHA-256",
@@ -1244,6 +1325,9 @@
     {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:candidate:sha1@0.10.7:SHA-1"
       ],
       "ref": "pkg:cargo/sha1@0.10.7"
     },
@@ -1296,11 +1380,11 @@
       },
       {
         "name": "rcbom:kb:version",
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "154"
+        "value": "535"
       }
     ],
     "tools": {
@@ -1313,7 +1397,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:a058eb0d-5a35-8e42-b4b0-13ce6925076f",
+  "serialNumber": "urn:uuid:80ca431c-a913-8d24-af44-eda259911ee0",
   "specVersion": "1.7",
   "version": 1
 }

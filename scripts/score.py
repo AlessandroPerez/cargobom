@@ -38,10 +38,11 @@ def main(labels_path, cbom_path, as_json=False):
     names_reported = {n for n, _ in reported}
 
     def accepts(a, name):
-        # registry patterns make trailing parameters optional: "PBKDF2-SHA-256-1000" is a valid,
-        # less specific name for "PBKDF2-SHA-256-1000-32"
+        # exactly one of the label's names: the valid less specific registry names are listed
+        # there ("PBKDF2-SHA-256" for "PBKDF2-SHA-256-1000-32"); a prefix rule would also take
+        # "PBKDF2-SHA" or "SHA", which are no registry names
         n = norm(name)
-        return any(n == norm(x) or norm(x).startswith(n + "-") for x in a["accept"])
+        return any(n == norm(x) for x in a["accept"])
 
     # recall over core (asset, line) pairs
     core_pairs = [(a, l) for a in assets if a["tier"] == "core" for l in a["lines"]]
@@ -78,6 +79,8 @@ def main(labels_path, cbom_path, as_json=False):
     kinds_re = r"\b(hard-coded|environment|file|rng|parameter|derived|computed|unknown)\b"
     prov_total, prov_exact, prov_wrong = 0, 0, []
     for a in assets:
+        if a["tier"] != "core":
+            continue  # an extended asset may be omitted; its provenance is not owed
         for role, truth in a.get("provenance", {}).items():
             for l in a["lines"]:
                 prov_total += 1
@@ -87,7 +90,9 @@ def main(labels_path, cbom_path, as_json=False):
                         for t in texts:
                             for part in t.split("; "):
                                 if part.startswith(f"{role}: "):
-                                    said |= set(re.findall(kinds_re, part))
+                                    # the kinds, not the details in parentheses
+                                    bare = re.sub(r"\([^()]*\)", "", part)
+                                    said |= set(re.findall(kinds_re, bare))
                 if said == set(truth):
                     prov_exact += 1
                 else:

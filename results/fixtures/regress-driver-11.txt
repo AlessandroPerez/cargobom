@@ -1,0 +1,47 @@
+  occ SHA-256 | src/main.rs:16:26 | ring::digest::digest | [reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `digest`
+  occ SHA-256 | src/main.rs:16:33 | t11::TABLE | [reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `TABLE`
+  occ SHA-256 | src/main.rs:7:18 | ring::digest::SHA256 | [present] [static] in t11::sha256_table; line: `Table { alg: &SHA256 }`; code: `SHA256`
+  occ SHA-384 | src/main.rs:13:37 | ring::digest::SHA384 | [reachable] [static] in t11::TABLE2; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`
+  occ SHA-384 | src/main.rs:16:51 | ring::digest::digest | [reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `digest`
+  occ SHA-384 | src/main.rs:16:58 | t11::TABLE2 | [reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `TABLE2`
+  occ getrandom | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t11 -> ring -> getrandom
+  occ ring | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t11 -> ring
+  occ ring | Cargo.toml:9:0 | ring | [manifest] declared by t11 (dependencies)
+  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | rcbom:confidence=high
+  prop SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | rcbom:occurrences=3
+  prop SHA-384 | rcbom:reachability=reachable
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop ring | rcbom:crypto-role=algorithm
+  prop ring | rcbom:ffi-boundary=true
+  prop ring | rcbom:native-links=ring_core_0_17_14_
+  prop ring | rcbom:scope=required
+  prop ring | rcbom:usage=reachable
+  prop t11 | rcbom:scope=required
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application t11 0.1.0 | pkg:cargo/t11@0.1.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t11@0.1.0 -> pkg:cargo/ring@0.17.14
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/t11@0.1.0#root", "name": "t11", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=8
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

@@ -4,6 +4,8 @@
 
 > Update: scored against labelled third-party fixtures in `docs/rusi-fixtures-results.md`. That work added
 > const-item tracking (aws-lc-rs), constant call arguments, protocol and key-material assets.
+> The tables below are this draft's; the current numbers, after the audits and the corpus
+> re-run, are in `docs/poc-evaluation.md`.
 
 ## What exists
 
@@ -41,7 +43,7 @@ Every occurrence in the CBOM carries a position:
 
 Positions come from rustc's spans, which are offsets into the original file, so comments, blank lines and formatting cannot shift them. Code produced by a function-like macro is attributed to the outermost call site in the user's source (`hash_all!(..)`), and the position inside the macro definition is kept in the context. Layer 1 positions come from parsing `Cargo.toml` with spans (`toml_edit`) and from the `Cargo.lock` entry.
 
-`cargo cbom verify` reopens every cited file and checks that the code at `line`/`offset` names the symbol, accepting `use … as` aliases (age calls `scrypt::scrypt` as `scrypt_inner`). `--self-test` shifts every position by one line or column and requires the check to fail.
+`cargo cbom verify` reopens every cited file and checks that the code at `line`/`offset` names the symbol, accepting `use … as` aliases (age calls `scrypt::scrypt` as `scrypt_inner`). `--self-test` shifts every position by one line or column and counts how many shifted positions the check rejects (`scripts/e2e.sh` requires all of them).
 
 ## Results
 

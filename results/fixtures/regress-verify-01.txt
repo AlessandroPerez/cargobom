@@ -1,0 +1,37 @@
+  occ SHA-256 | src/main.rs:21:26 | digest::digest::Digest::update | [reachable] [call] in v01::feed; use: digest; line: `Sink::Sha(h) => h.update(data),`; code: `update`
+  occ SHA-256 | src/main.rs:27:26 | digest::digest::Digest::new | [reachable] [call] in v01::main; new: setup, not a use; line: `let mut a = Sink::Sha(Sha256::new());`; code: `Sha256::new`
+  occ SHA-256 | src/main.rs:32:12 | digest::digest::Digest::digest | [reachable] [call] in v01::main; use: digest; line: `let d = Sha256::digest(b"y"); // the `y` input, see `feed``; code: `Sha256::digest`
+  occ crypto-common | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via v01 -> sha2 -> digest -> crypto-common
+  occ digest | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via v01 -> sha2 -> digest
+  occ sha2 | Cargo.lock:66:0 | sha2 | [manifest] locked sha2 0.10.9; reached via v01 -> sha2
+  occ sha2 | Cargo.toml:9:0 | sha2 | [manifest] declared by v01 (dependencies)
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | rcbom:reachability=reachable
+  prop crypto-common | rcbom:crypto-role=trait
+  prop crypto-common | rcbom:scope=required
+  prop digest | rcbom:crypto-role=trait
+  prop digest | rcbom:scope=required
+  prop sha2 | rcbom:crypto-role=algorithm
+  prop sha2 | rcbom:scope=required
+  prop sha2 | rcbom:usage=reachable
+  prop v01 | rcbom:scope=required
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application v01 0.1.0 | pkg:cargo/v01@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/v01@0.1.0 -> pkg:cargo/sha2@0.10.9
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/v01@0.1.0#root", "name": "v01", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=154
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

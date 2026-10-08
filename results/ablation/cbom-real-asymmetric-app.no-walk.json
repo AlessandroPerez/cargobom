@@ -110,6 +110,137 @@
       "version": "2.2.0"
     },
     {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via cbom-real-asymmetric-app -> ring -> getrandom",
+            "line": 173,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand@0.8.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by cbom-real-asymmetric-app (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "rand"
+          },
+          {
+            "additionalContext": "[manifest] locked rand 0.8.6; reached via cbom-real-asymmetric-app -> rand",
+            "line": 308,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand"
+          }
+        ]
+      },
+      "name": "rand",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/rand@0.8.6",
+      "type": "library",
+      "version": "0.8.6"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand_chacha@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_chacha 0.3.1; reached via cbom-real-asymmetric-app -> rand -> rand_chacha",
+            "line": 319,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_chacha"
+          }
+        ]
+      },
+      "name": "rand_chacha",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/rand_chacha@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand_core@0.6.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_core 0.6.4; reached via cbom-real-asymmetric-app -> rand -> rand_core",
+            "line": 329,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_core"
+          }
+        ]
+      },
+      "name": "rand_core",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/rand_core@0.6.4",
+      "type": "library",
+      "version": "0.6.4"
+    },
+    {
       "bom-ref": "pkg:cargo/ring@0.17.14",
       "evidence": {
         "occurrences": [
@@ -235,6 +366,34 @@
       "version": "0.10.9"
     },
     {
+      "bom-ref": "pkg:cargo/signature@2.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked signature 2.2.0; reached via cbom-real-asymmetric-app -> rsa -> signature",
+            "line": 433,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "signature"
+          }
+        ]
+      },
+      "name": "signature",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/signature@2.2.0",
+      "type": "library",
+      "version": "2.2.0"
+    },
+    {
       "bom-ref": "crypto:algorithm:AES-256-GCM",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -252,18 +411,18 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; algorithm from ring::aead::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9)",
+            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9); line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `UnboundKey::new`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 12,
-            "symbol": "ring::aead::UnboundKey::new"
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[present] [static] in cbom_real_asymmetric_app::main",
+            "additionalContext": "[present] [static] in cbom_real_asymmetric_app::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `AES_256_GCM`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 29,
-            "symbol": "ring::aead::AES_256_GCM"
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
           }
         ]
       },
@@ -287,7 +446,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:provenance:key",
@@ -320,11 +479,11 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16)",
+            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
-            "symbol": "ed25519_dalek::SigningKey::from_bytes"
+            "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
           }
         ]
       },
@@ -348,7 +507,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:provenance:key",
@@ -366,7 +525,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:RSA-2048",
+      "bom-ref": "crypto:material:private-key:RSA-2048",
       "cryptoProperties": {
         "assetType": "related-crypto-material",
         "relatedCryptoMaterialProperties": {
@@ -377,11 +536,11 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rand::thread_rng)",
+            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
-            "symbol": "rsa::RsaPrivateKey::new"
+            "symbol": "rsa::key::RsaPrivateKey::new"
           }
         ]
       },
@@ -405,7 +564,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -437,14 +596,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments",
+            "additionalContext": "[present] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in cbom_real_asymmetric_app::main",
+            "additionalContext": "[present] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
@@ -472,7 +631,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -486,6 +645,7 @@
     {
       "dependsOn": [
         "pkg:cargo/ed25519-dalek@2.2.0",
+        "pkg:cargo/rand@0.8.6",
         "pkg:cargo/ring@0.17.14",
         "pkg:cargo/rsa@0.9.10"
       ],
@@ -504,7 +664,8 @@
     {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7",
-        "pkg:cargo/sha2@0.10.9"
+        "pkg:cargo/sha2@0.10.9",
+        "pkg:cargo/signature@2.2.0"
       ],
       "provides": [
         "crypto:algorithm:Ed25519"
@@ -513,6 +674,31 @@
     },
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/rand_chacha@0.3.1",
+        "pkg:cargo/rand_core@0.6.4"
+      ],
+      "ref": "pkg:cargo/rand@0.8.6"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.6.4"
+      ],
+      "ref": "pkg:cargo/rand_chacha@0.3.1"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "ref": "pkg:cargo/rand_core@0.6.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
       "provides": [
         "crypto:algorithm:AES-256-GCM",
         "crypto:algorithm:SHA-256"
@@ -521,10 +707,13 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/digest@0.10.7"
+        "pkg:cargo/digest@0.10.7",
+        "pkg:cargo/rand@0.8.6",
+        "pkg:cargo/rand_core@0.6.4",
+        "pkg:cargo/signature@2.2.0"
       ],
       "provides": [
-        "crypto:algorithm:RSA-2048"
+        "crypto:material:private-key:RSA-2048"
       ],
       "ref": "pkg:cargo/rsa@0.9.10"
     },
@@ -533,6 +722,13 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7",
+        "pkg:cargo/rand_core@0.6.4"
+      ],
+      "ref": "pkg:cargo/signature@2.2.0"
     }
   ],
   "metadata": {
@@ -561,7 +757,7 @@
       },
       {
         "name": "rcbom:kb:version",
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       {
         "name": "rcbom:run:reachable-instances",
@@ -578,7 +774,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:54f7aa51-8521-8987-b42e-a17f392b4979",
+  "serialNumber": "urn:uuid:06751cd9-6409-85b6-8af0-10ba51b4c4d0",
   "specVersion": "1.7",
   "version": 1
 }

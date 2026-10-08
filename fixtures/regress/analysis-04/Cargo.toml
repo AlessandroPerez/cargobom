@@ -1,0 +1,27 @@
+[package]
+name = "t4"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["inner"]
+
+[dependencies]
+hashing = { package = "sha2", version = "0.10" }
+md5.version = "0.7"
+inner = { path = "inner" }
+
+[dependencies.hmac]
+version = "0.12"
+
+[target.'cfg(target_os="linux")'.dependencies]
+sha1 = "0.10"
+
+[target.'cfg(unix)'.dependencies]
+blake3 = "1"
+
+[dev-dependencies]
+hmac = "0.12"
+
+[build-dependencies]
+md5 = "0.7"

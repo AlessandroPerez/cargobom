@@ -1,0 +1,311 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/aws-lc-rs@1.17.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t8 (dependencies); features [\"aws-lc-sys\", \"alloc\"]; default-features = false",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] locked aws-lc-rs 1.17.3; reached via t8 -> aws-lc-rs",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] native library `aws_lc_rs_1_17_3_sys`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-rs-1.17.3/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-rs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_rs_1_17_3_sys"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-rs@1.17.3",
+      "type": "library",
+      "version": "1.17.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/aws-lc-sys@0.43.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] native library `aws_lc_0_43_0`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-sys-0.43.0/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-sys",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_0_43_0"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-sys@0.43.0",
+      "type": "library",
+      "version": "0.43.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/t8@0.1.0",
+      "name": "t8",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t8@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t8::a1; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "aws_lc_rs::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t8::a1; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "aws_lc_rs::aead::aes_gcm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t8::a1; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 7); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "aws_lc_rs::aead::LessSafeKey::seal_in_place_append_tag"
+          }
+        ]
+      },
+      "name": "AES-256-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t8::a2; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `digest::digest(&digest::SHA384, d.as_ref()).as_ref().len()`; code: `digest::digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "aws_lc_rs::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t8::a2; instantiated by t8::main at src/main.rs:19; line: `digest::digest(&digest::SHA384, d.as_ref()).as_ref().len()`; code: `digest::SHA384`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "aws_lc_rs::digest::sha::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-sys@0.43.0"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/aws-lc-rs@1.17.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/aws-lc-sys@0.43.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-rs@1.17.3"
+      ],
+      "ref": "pkg:cargo/t8@0.1.0"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t8@0.1.0#root",
+      "name": "t8",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "81"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:5296c9c1-3b7c-8fb8-b4ec-203b2deb9ef0",
+  "specVersion": "1.7",
+  "version": 1
+}

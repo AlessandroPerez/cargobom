@@ -18,7 +18,7 @@ why = "ring::digest::digest(&SHA256, ..) (ring 0.17.14)"
 
 [[asset]]
 name = "AES-256-GCM"
-accept = ["AES-256-GCM", "AES-GCM", "AES-256"]  # registry: key size and mode are optional segments
+accept = ["AES-256-GCM", "AES-GCM", "AES-256", "AES"]  # registry: key size and mode are optional segments
 family = "AES"
 primitive = "ae"
 tier = "core"
@@ -41,11 +41,11 @@ why = "RsaPrivateKey::new(&mut rng, 2048) (rsa 0.9.10, e = 65537, key.rs:214-219
 provenance = { rng = ["rng"] }  # thread_rng() at line 14
 
 [[asset]]
-name = "Ed25519 private key"
+name = "Ed25519"
 accept = ["Ed25519"]
 family = "EdDSA"
 primitive = "signature"
-asset_type = "related-crypto-material"
+asset_type = "algorithm"  # the key fixes its scheme (unlike an RSA key), so the algorithm is the asset
 material = { type = "private-key", size = 256, provenance = "hard-coded [42u8; 32]" }
 tier = "core"
 lines = [16]

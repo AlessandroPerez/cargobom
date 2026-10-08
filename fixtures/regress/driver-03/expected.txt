@@ -1,0 +1,123 @@
+  occ Ed25519 | src/main.rs:19:4 | core::convert::TryFrom::try_from | [reachable] [call] in t3::e1; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::try_from(b).is_ok()`; code: `ed25519_dalek::SigningKey::try_from`
+  occ RSA-2048 | src/main.rs:25:4 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t3::k1; use: keygen; rng: rng (rand_core::os::OsRng); line: `rsa::RsaPrivateKey::new(&mut OsRng, bits).is_ok()`; code: `rsa::RsaPrivateKey::new`
+  occ crypto-common | Cargo.lock:48:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t3 -> rsa -> digest -> crypto-common
+  occ digest | Cargo.lock:96:0 | digest | [manifest] locked digest 0.10.7; reached via t3 -> rsa -> digest
+  occ ed25519-dalek | Cargo.lock:117:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via t3 -> ed25519-dalek
+  occ ed25519-dalek | Cargo.toml:10:0 | ed25519-dalek | [manifest] declared by t3 (dependencies)
+  occ getrandom | Cargo.lock:147:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t3 -> rand_core -> getrandom
+  occ rand | Cargo.lock:281:0 | rand | [manifest] locked rand 0.8.8; reached via t3 -> rsa -> num-bigint-dig -> rand
+  occ rand_chacha | Cargo.lock:291:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t3 -> rsa -> num-bigint-dig -> rand -> rand_chacha
+  occ rand_core | Cargo.lock:301:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t3 -> rand_core
+  occ rand_core | Cargo.toml:11:0 | rand_core | [manifest] declared by t3 (dependencies); features ["getrandom"]
+  occ rsa | Cargo.lock:310:0 | rsa | [manifest] locked rsa 0.9.10; reached via t3 -> rsa
+  occ rsa | Cargo.toml:12:0 | rsa | [manifest] declared by t3 (dependencies)
+  occ sha2 | Cargo.lock:375:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t3 -> ed25519-dalek -> sha2
+  occ signature | Cargo.lock:386:0 | signature | [manifest] locked signature 2.2.0; reached via t3 -> rsa -> signature
+  occ x25519 | src/main.rs:13:17 | x25519_dalek::x25519::StaticSecret::random_from_rng | [reachable] [call] in t3::x2; use: keygen; rng: rng (rand_core::os::OsRng); line: `let secret = StaticSecret::random_from_rng(OsRng);`; code: `StaticSecret::random_from_rng`
+  occ x25519 | src/main.rs:14:12 | x25519_dalek::x25519::StaticSecret::diffie_hellman | [reachable] [call] in t3::x2; use: keyderive; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `diffie_hellman`
+  occ x25519 | src/main.rs:14:28 | core::convert::From::from | [reachable] [call] in t3::x2; from: setup, not a use; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `PublicKey::from`
+  occ x25519 | src/main.rs:6:17 | core::convert::From::from | [reachable] [call] in t3::x1; from: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let secret = StaticSecret::from([7u8; 32]);`; code: `StaticSecret::from`
+  occ x25519 | src/main.rs:7:17 | core::convert::From::from | [reachable] [call] in t3::x1; from: setup, not a use; line: `let public = PublicKey::from(&secret);`; code: `PublicKey::from`
+  occ x25519 | src/main.rs:8:12 | x25519_dalek::x25519::StaticSecret::diffie_hellman | [reachable] [call] in t3::x1; use: keyderive; line: `*secret.diffie_hellman(&public).as_bytes()`; code: `diffie_hellman`
+  occ x25519-dalek | Cargo.lock:480:0 | x25519-dalek | [manifest] locked x25519-dalek 2.0.1; reached via t3 -> x25519-dalek
+  occ x25519-dalek | Cargo.toml:9:0 | x25519-dalek | [manifest] declared by t3 (dependencies); features ["static_secrets"]
+  prop Ed25519 | rcbom:confidence=high
+  prop Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | rcbom:functions:source=knowledge-base
+  prop Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | rcbom:occurrences=1
+  prop Ed25519 | rcbom:provenance:key=parameter
+  prop Ed25519 | rcbom:reachability=reachable
+  prop RSA-2048 | rcbom:algorithm-family=RSA
+  prop RSA-2048 | rcbom:confidence=high
+  prop RSA-2048 | rcbom:detection:method=type-resolved
+  prop RSA-2048 | rcbom:functions:source=observed
+  prop RSA-2048 | rcbom:kb:version=0.2.0
+  prop RSA-2048 | rcbom:occurrences=1
+  prop RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | rcbom:reachability=reachable
+  prop crypto-common | rcbom:crypto-role=trait
+  prop crypto-common | rcbom:scope=required
+  prop digest | rcbom:crypto-role=trait
+  prop digest | rcbom:scope=required
+  prop ed25519-dalek | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | rcbom:scope=required
+  prop ed25519-dalek | rcbom:usage=reachable
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop rand | rcbom:crypto-role=algorithm
+  prop rand | rcbom:scope=required
+  prop rand | rcbom:usage=present
+  prop rand_chacha | rcbom:crypto-role=algorithm
+  prop rand_chacha | rcbom:scope=required
+  prop rand_chacha | rcbom:usage=present
+  prop rand_core | rcbom:crypto-role=trait
+  prop rand_core | rcbom:scope=required
+  prop rsa | rcbom:crypto-role=algorithm
+  prop rsa | rcbom:scope=required
+  prop rsa | rcbom:usage=reachable
+  prop sha2 | rcbom:crypto-role=algorithm
+  prop sha2 | rcbom:scope=required
+  prop sha2 | rcbom:usage=reachable
+  prop signature | rcbom:crypto-role=trait
+  prop signature | rcbom:scope=required
+  prop t3 | rcbom:scope=required
+  prop x25519 | rcbom:confidence=high
+  prop x25519 | rcbom:detection:method=type-resolved
+  prop x25519 | rcbom:finding=hard-coded-key
+  prop x25519 | rcbom:functions:source=observed
+  prop x25519 | rcbom:kb:version=0.2.0
+  prop x25519 | rcbom:occurrences=6
+  prop x25519 | rcbom:provenance:key=hard-coded
+  prop x25519 | rcbom:provenance:rng=rng
+  prop x25519 | rcbom:reachability=reachable
+  prop x25519-dalek | rcbom:crypto-role=algorithm
+  prop x25519-dalek | rcbom:scope=required
+  prop x25519-dalek | rcbom:usage=reachable
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+component application t3 0.1.0 | pkg:cargo/t3@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
+component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0
+component library x25519-dalek 2.0.1 | pkg:cargo/x25519-dalek@2.0.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/t3@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
+dep pkg:cargo/t3@0.1.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/t3@0.1.0 -> pkg:cargo/rsa@0.9.10
+dep pkg:cargo/t3@0.1.0 -> pkg:cargo/x25519-dalek@2.0.1
+dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/rand_core@0.6.4
+provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
+provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
+provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:algorithm:x25519
+root {"bom-ref": "pkg:cargo/t3@0.1.0#root", "name": "t3", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=437
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

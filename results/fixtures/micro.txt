@@ -1,51 +1,233 @@
-AES-256-GCM            src/main.rs:12:17  [reachable] [call]  new_from_slice
-AES-256-GCM            src/main.rs:13:16  [reachable] [call]  generate_nonce
-AES-256-GCM            src/main.rs:14:11  [reachable] [call]  encrypt
-AES-256-GCM            src/main.rs:25:8  [reachable] [instantiation]  seal
-AES-256-GCM            src/main.rs:40:29  [reachable] [call]  new
-AES-256-GCM            src/main.rs:40:46  [reachable] [static]  AES_256_GCM
-AES-256-GCM            src/main.rs:42:6  [reachable] [call]  seal_in_place_append_tag
-ChaCha20-Poly1305      src/main.rs:12:17  [reachable] [call]  new_from_slice
-ChaCha20-Poly1305      src/main.rs:13:16  [reachable] [call]  generate_nonce
-ChaCha20-Poly1305      src/main.rs:14:11  [reachable] [call]  encrypt
-ChaCha20-Poly1305      src/main.rs:30:8  [reachable] [instantiation]  seal
-HMAC-SHA-256           src/main.rs:49:16  [reachable] [call]  new_from_slice
-HMAC-SHA-256           src/main.rs:52:6  [reachable] [call]  update
-HMAC-SHA-256           src/main.rs:55:9  [reachable] [call]  finalize
-HMAC-SHA-256           src/main.rs:56:9  [reachable] [call]  into_bytes
-SHA-1                  Cargo.lock:266:0  [manifest]  sha1
-SHA-1                  Cargo.toml:16:0  [manifest]  sha1
-SHA-256                src/main.rs:49:16  [reachable] [component]  new_from_slice
-SHA-256                src/main.rs:52:6  [reachable] [component]  update
-SHA-256                src/main.rs:55:9  [reachable] [component]  finalize
-SHA-256                src/main.rs:56:9  [reachable] [component]  into_bytes
-SHA-256                src/main.rs:68:50  [reachable] [static]  SHA256
-SHA-256                src/main.rs:71:24  [reachable] [via-static]  DIGESTS
-SHA-384                src/main.rs:72:12  [reachable] [static] [macro hash_all!]  SHA384
-SHA-512                src/main.rs:68:64  [reachable] [static]  SHA512
-SHA-512                src/main.rs:71:24  [reachable] [via-static]  DIGESTS
-SHA-512                src/main.rs:80:4  [present] [call]  digest
-aead                   Cargo.lock:6:0  [manifest]  aead
-aes                    Cargo.lock:16:0  [manifest]  aes
-aes-gcm                Cargo.lock:27:0  [manifest]  aes-gcm
-aes-gcm                Cargo.toml:10:0  [manifest]  aes-gcm
-chacha20               Cargo.lock:66:0  [manifest]  chacha20
-chacha20poly1305       Cargo.lock:77:0  [manifest]  chacha20poly1305
-chacha20poly1305       Cargo.toml:11:0  [manifest]  chacha20poly1305
-cipher                 Cargo.lock:90:0  [manifest]  cipher
-crypto-common          Cargo.lock:110:0  [manifest]  crypto-common
-ctr                    Cargo.lock:121:0  [manifest]  ctr
-digest                 Cargo.lock:130:0  [manifest]  digest
-ghash                  Cargo.lock:168:0  [manifest]  ghash
-hmac                   Cargo.lock:178:0  [manifest]  hmac
-hmac                   Cargo.toml:12:0  [manifest]  hmac
-poly1305               Cargo.lock:220:0  [manifest]  poly1305
-polyval                Cargo.lock:231:0  [manifest]  polyval
-ring                   Cargo.lock:252:0  [manifest]  ring
-ring                   Cargo.toml:13:0  [manifest]  ring
-ring                   ring-0.17.14/Cargo.toml:18:0  [manifest]  links
-sha1                   Cargo.lock:266:0  [manifest]  sha1
-sha1                   Cargo.toml:16:0  [manifest]  sha1
-sha2                   Cargo.lock:277:0  [manifest]  sha2
-sha2                   Cargo.toml:14:0  [manifest]  sha2
-universal-hash         Cargo.lock:306:0  [manifest]  universal-hash
+  occ AES-256-GCM | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
+  occ AES-256-GCM | src/main.rs:13:16 | aead::AeadCore::generate_nonce | [reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`
+  occ AES-256-GCM | src/main.rs:14:11 | aead::Aead::encrypt | [reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25; line: `cipher.encrypt(&nonce, msg).expect("encrypt")`; code: `encrypt`
+  occ AES-256-GCM | src/main.rs:25:8 | micro::seal | [reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<Aes256Gcm>(&self.0, msg)`; code: `seal::<Aes256Gcm>`
+  occ AES-256-GCM | src/main.rs:40:29 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in micro::ring_seal; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`
+  occ AES-256-GCM | src/main.rs:40:46 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in micro::ring_seal; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`
+  occ AES-256-GCM | src/main.rs:42:6 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 41); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`
+  occ ChaCha20-Poly1305 | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
+  occ ChaCha20-Poly1305 | src/main.rs:13:16 | aead::AeadCore::generate_nonce | [reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`
+  occ ChaCha20-Poly1305 | src/main.rs:14:11 | aead::Aead::encrypt | [reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30; line: `cipher.encrypt(&nonce, msg).expect("encrypt")`; code: `encrypt`
+  occ ChaCha20-Poly1305 | src/main.rs:30:8 | micro::seal | [reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<ChaCha20Poly1305>(&self.0, msg)`; code: `seal::<ChaCha20Poly1305>`
+  occ HMAC-SHA-256 | src/main.rs:49:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | src/main.rs:52:6 | digest::mac::Mac::update | [reachable] [call] in micro::mac; use: tag; line: `m.update(msg);`; code: `update`
+  occ HMAC-SHA-256 | src/main.rs:55:9 | digest::mac::Mac::finalize | [reachable] [call] in micro::mac; use: tag; line: `.finalize()`; code: `finalize`
+  occ HMAC-SHA-256 | src/main.rs:56:9 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in micro::mac; into_bytes: setup, not a use; line: `.into_bytes()`; code: `into_bytes`
+  occ SHA-1 | Cargo.lock:266:0 | sha1 | [manifest] locked sha1 0.10.7; reached via micro -> sha1
+  occ SHA-1 | Cargo.toml:16:0 | sha1 | [manifest] declared by micro (dependencies)
+  occ SHA-256 | src/main.rs:49:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ SHA-256 | src/main.rs:52:6 | digest::mac::Mac::update | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `m.update(msg);`; code: `update`
+  occ SHA-256 | src/main.rs:55:9 | digest::mac::Mac::finalize | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.finalize()`; code: `finalize`
+  occ SHA-256 | src/main.rs:56:9 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.into_bytes()`; code: `into_bytes`
+  occ SHA-256 | src/main.rs:68:50 | ring::digest::SHA256 | [reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`
+  occ SHA-256 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
+  occ SHA-384 | src/main.rs:72:12 | ring::digest::SHA384 | [reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b"x");`
+  occ SHA-384 | src/main.rs:72:12 | ring::digest::digest | [reachable] [call] [macro hash_all!] in micro::digests; use: digest; algorithm from ring::digest::SHA384 in the arguments; expanded from src/main.rs:63; line: `let b = hash_all!(data, b"x");`
+  occ SHA-512 | src/main.rs:68:64 | ring::digest::SHA512 | [reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`
+  occ SHA-512 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
+  occ SHA-512 | src/main.rs:80:4 | digest::digest::Digest::digest | [present] [call] in micro::unused_sha512; use: digest; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`
+  occ aead | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via micro -> aes-gcm -> aead
+  occ aes | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via micro -> aes-gcm -> aes
+  occ aes-gcm | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via micro -> aes-gcm
+  occ aes-gcm | Cargo.toml:10:0 | aes-gcm | [manifest] declared by micro (dependencies)
+  occ chacha20 | Cargo.lock:66:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via micro -> chacha20poly1305 -> chacha20
+  occ chacha20poly1305 | Cargo.lock:77:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via micro -> chacha20poly1305
+  occ chacha20poly1305 | Cargo.toml:11:0 | chacha20poly1305 | [manifest] declared by micro (dependencies)
+  occ cipher | Cargo.lock:90:0 | cipher | [manifest] locked cipher 0.4.4; reached via micro -> aes-gcm -> cipher
+  occ crypto-common | Cargo.lock:110:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via micro -> aes-gcm -> aead -> crypto-common
+  occ ctr | Cargo.lock:121:0 | ctr | [manifest] locked ctr 0.9.2; reached via micro -> aes-gcm -> ctr
+  occ digest | Cargo.lock:130:0 | digest | [manifest] locked digest 0.10.7; reached via micro -> hmac -> digest
+  occ getrandom | Cargo.lock:157:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via micro -> ring -> getrandom
+  occ ghash | Cargo.lock:168:0 | ghash | [manifest] locked ghash 0.5.1; reached via micro -> aes-gcm -> ghash
+  occ hmac | Cargo.lock:178:0 | hmac | [manifest] locked hmac 0.12.1; reached via micro -> hmac
+  occ hmac | Cargo.toml:12:0 | hmac | [manifest] declared by micro (dependencies)
+  occ poly1305 | Cargo.lock:220:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via micro -> chacha20poly1305 -> poly1305
+  occ polyval | Cargo.lock:231:0 | polyval | [manifest] locked polyval 0.6.2; reached via micro -> aes-gcm -> ghash -> polyval
+  occ rand_core | Cargo.lock:243:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via micro -> aes-gcm -> aead -> crypto-common -> rand_core
+  occ ring | Cargo.lock:252:0 | ring | [manifest] locked ring 0.17.14; reached via micro -> ring
+  occ ring | Cargo.toml:13:0 | ring | [manifest] declared by micro (dependencies)
+  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ sha1 | Cargo.lock:266:0 | sha1 | [manifest] locked sha1 0.10.7; reached via micro -> sha1
+  occ sha1 | Cargo.toml:16:0 | sha1 | [manifest] declared by micro (dependencies)
+  occ sha2 | Cargo.lock:277:0 | sha2 | [manifest] locked sha2 0.10.9; reached via micro -> sha2
+  occ sha2 | Cargo.toml:14:0 | sha2 | [manifest] declared by micro (dependencies)
+  occ universal-hash | Cargo.lock:306:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via micro -> chacha20poly1305 -> poly1305 -> universal-hash
+  prop AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | rcbom:occurrences=7
+  prop AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | rcbom:provenance:key=parameter
+  prop AES-256-GCM | rcbom:provenance:nonce=hard-coded,rng
+  prop AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha20-Poly1305 | rcbom:confidence=high
+  prop ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop ChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop ChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop ChaCha20-Poly1305 | rcbom:occurrences=4
+  prop ChaCha20-Poly1305 | rcbom:param:nonce_bytes=12
+  prop ChaCha20-Poly1305 | rcbom:provenance:key=parameter
+  prop ChaCha20-Poly1305 | rcbom:provenance:nonce=rng
+  prop ChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | rcbom:occurrences=4
+  prop HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-1 | rcbom:confidence=low
+  prop SHA-1 | rcbom:detection:method=manifest
+  prop SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | rcbom:usage=declared-not-used
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | rcbom:confidence=high
+  prop SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | rcbom:confidence=high
+  prop SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | rcbom:occurrences=3
+  prop SHA-512 | rcbom:reachability=reachable
+  prop aead | rcbom:crypto-role=trait
+  prop aead | rcbom:scope=required
+  prop aes | rcbom:crypto-role=algorithm
+  prop aes | rcbom:scope=required
+  prop aes | rcbom:usage=reachable
+  prop aes-gcm | rcbom:crypto-role=algorithm
+  prop aes-gcm | rcbom:scope=required
+  prop aes-gcm | rcbom:usage=reachable
+  prop chacha20 | rcbom:crypto-role=algorithm
+  prop chacha20 | rcbom:scope=required
+  prop chacha20 | rcbom:usage=reachable
+  prop chacha20poly1305 | rcbom:crypto-role=algorithm
+  prop chacha20poly1305 | rcbom:scope=required
+  prop chacha20poly1305 | rcbom:usage=reachable
+  prop cipher | rcbom:crypto-role=trait
+  prop cipher | rcbom:scope=required
+  prop crypto-common | rcbom:crypto-role=trait
+  prop crypto-common | rcbom:scope=required
+  prop ctr | rcbom:crypto-role=algorithm
+  prop ctr | rcbom:scope=required
+  prop ctr | rcbom:usage=reachable
+  prop digest | rcbom:crypto-role=trait
+  prop digest | rcbom:scope=required
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop ghash | rcbom:crypto-role=algorithm
+  prop ghash | rcbom:scope=required
+  prop ghash | rcbom:usage=reachable
+  prop hmac | rcbom:crypto-role=algorithm
+  prop hmac | rcbom:scope=required
+  prop hmac | rcbom:usage=reachable
+  prop micro | rcbom:scope=required
+  prop poly1305 | rcbom:crypto-role=algorithm
+  prop poly1305 | rcbom:scope=required
+  prop poly1305 | rcbom:usage=reachable
+  prop polyval | rcbom:crypto-role=algorithm
+  prop polyval | rcbom:scope=required
+  prop polyval | rcbom:usage=reachable
+  prop rand_core | rcbom:crypto-role=trait
+  prop rand_core | rcbom:scope=required
+  prop ring | rcbom:crypto-role=algorithm
+  prop ring | rcbom:ffi-boundary=true
+  prop ring | rcbom:native-links=ring_core_0_17_14_
+  prop ring | rcbom:scope=required
+  prop ring | rcbom:usage=reachable
+  prop sha1 | rcbom:crypto-role=algorithm
+  prop sha1 | rcbom:scope=required
+  prop sha1 | rcbom:usage=declared-not-used
+  prop sha2 | rcbom:crypto-role=algorithm
+  prop sha2 | rcbom:scope=required
+  prop sha2 | rcbom:usage=reachable
+  prop universal-hash | rcbom:crypto-role=trait
+  prop universal-hash | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application micro 0.1.0 | pkg:cargo/micro@0.1.0
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3
+component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1
+component library chacha20poly1305 0.10.1 | pkg:cargo/chacha20poly1305@0.10.1
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
+component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20@0.9.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/chacha20@0.9.1
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/poly1305@0.8.0
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/chacha20poly1305@0.10.1
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/sha1@0.10.7
+dep pkg:cargo/micro@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha1@0.10.7 -> crypto:candidate:sha1@0.10.7:SHA-1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/micro@0.1.0#root", "name": "micro", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=535
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

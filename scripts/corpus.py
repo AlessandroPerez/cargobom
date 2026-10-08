@@ -11,6 +11,8 @@ import json, os, pathlib, re, shutil, subprocess, sys, time
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CBOM = ROOT / "target" / "debug" / "cargo-cbom"
 TOOLCHAIN = "nightly-2026-09-25"
+HOST = next(l.split()[1] for l in subprocess.run(["rustc", "-vV"], capture_output=True, text=True).stdout.splitlines()
+            if l.startswith("host:"))
 
 
 def run(cmd, cwd, env=None):
@@ -18,7 +20,7 @@ def run(cmd, cwd, env=None):
     probe = ("import resource,subprocess,sys,time;t=time.time();"
              "r=subprocess.run(sys.argv[1:],stdout=subprocess.DEVNULL,stderr=subprocess.PIPE);"
              "print(r.returncode,time.time()-t,resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss);"
-             "sys.stderr.write(r.stderr.decode(errors='replace')[-3000:])")
+             "sys.stderr.write(r.stderr.decode(errors='replace'))")
     p = subprocess.run([sys.executable, "-c", probe, *cmd], cwd=cwd, env=env, capture_output=True, text=True)
     code, secs, rss = p.stdout.split()
     return int(code), float(secs), int(rss) / 1024, p.stderr
@@ -41,6 +43,10 @@ def stats(path):
         "material": kinds.get("related-crypto-material", 0),
         "protocols": kinds.get("protocol", 0),
         "reachable_assets": reach_assets,
+        "reachable_algorithms": sum(1 for c in crypto
+                                    if c["cryptoProperties"]["assetType"] == "algorithm"
+                                    and any(p["name"] == "rcbom:reachability" and p["value"] == "reachable"
+                                            for p in c.get("properties", []))),
         "occurrences": len(occ),
         "reachable_occurrences": sum(1 for o in occ if o["additionalContext"].startswith("[reachable]")),
         "findings": findings,
@@ -61,7 +67,9 @@ def main():
     rows = []
     for proj in map(pathlib.Path, args[1:]):
         name = proj.name
-        meta = subprocess.run(["cargo", "metadata", "--format-version", "1", "--locked", "--quiet"], cwd=proj, capture_output=True, text=True)
+        # the packages a host build resolves, as cargo cbom's Layer 1 counts them
+        meta = subprocess.run(["cargo", "metadata", "--format-version", "1", "--locked", "--quiet",
+                               "--filter-platform", HOST], cwd=proj, capture_output=True, text=True)
         packages = len(json.loads(meta.stdout)["packages"]) if meta.returncode == 0 else -1
         plain_dir = out / f"{name}.plain-target"
         shutil.rmtree(plain_dir, ignore_errors=True)
@@ -73,7 +81,9 @@ def main():
         row = {"project": name, "packages": packages, "plain_check_s": round(t_plain, 1), "cbom_s": round(t_cbom, 1),
                "overhead": round(t_cbom / t_plain, 2) if t_plain else None, "plain_peak_rss_mib": round(rss_plain),
                "peak_rss_mib": round(rss_cbom),
-               "plain_ok": c0 == 0, "cbom_ok": c1 == 0}
+               "plain_ok": c0 == 0, "cbom_ok": c1 == 0,
+               # panics the driver caught: each is a bug (rcbom-driver: <crate>: N items could not be analysed)
+               "items_not_analysed": sum(int(n) for n in re.findall(r"rcbom-driver: \S+: (\d+) items? could not be analysed", err1))}
         if c1 != 0:
             row["error"] = err1.strip().splitlines()[-1] if err1.strip() else "failed"
             rows.append(row)
@@ -87,7 +97,7 @@ def main():
         row["shift_rejected"] = f"{sum(a for a, _ in shifted)}/{sum(b for _, b in shifted)}"
         row.update(stats(cbom))
         if rusi:
-            r_out = out / f"{name}.rusi.json"
+            r_out = out / f"{name}.rusi-report.json"
             c2, t_rusi, _, _ = run([rusi, "cryptos", "--dir", ".", "-o", str(r_out)], proj)
             if c2 == 0:
                 rep = json.load(open(r_out))

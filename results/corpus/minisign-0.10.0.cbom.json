@@ -86,6 +86,56 @@
       "version": "0.10.7"
     },
     {
+      "bom-ref": "pkg:cargo/getrandom@0.4.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by minisign (dependencies); features [\"wasm_js\"]; default-features = false",
+            "line": 51,
+            "location": "Cargo.toml",
+            "offset": 108,
+            "symbol": "getrandom"
+          },
+          {
+            "additionalContext": "[manifest] declared by minisign (dependencies); default-features = false",
+            "line": 60,
+            "location": "Cargo.toml",
+            "offset": 113,
+            "symbol": "getrandom"
+          },
+          {
+            "additionalContext": "[manifest] locked getrandom 0.4.3; reached via minisign -> getrandom",
+            "line": 83,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unsupported-version"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "unknown"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.4.3",
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
       "bom-ref": "pkg:cargo/hmac@0.12.1",
       "evidence": {
         "occurrences": [
@@ -248,7 +298,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive",
+            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
             "line": 138,
             "location": "src/secret_key.rs",
             "offset": 8,
@@ -276,11 +326,19 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:param:unresolved",
           "value": "work factor (log_n, r, p) computed at run time"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -308,6 +366,10 @@
       "ref": "pkg:cargo/digest@0.10.7"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
       ],
@@ -315,6 +377,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/getrandom@0.4.3",
         "pkg:cargo/scrypt@0.11.0"
       ],
       "ref": "pkg:cargo/minisign@0.10.0"
@@ -370,11 +433,11 @@
       },
       {
         "name": "rcbom:kb:version",
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "1311"
+        "value": "1360"
       }
     ],
     "tools": {
@@ -387,7 +450,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6d194fea-d624-86b9-9585-6ece6f085b24",
+  "serialNumber": "urn:uuid:26979e64-29e6-8d45-9502-f53cd67d5eeb",
   "specVersion": "1.7",
   "version": 1
 }

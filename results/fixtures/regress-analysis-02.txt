@@ -1,0 +1,151 @@
+  occ AES-256-GCM | src/main.rs:56:13 | ring::aead::unbound_key::UnboundKey::new | [present] [call] in t2::ring_pbkdf2_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (ring::pbkdf2::derive); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`
+  occ AES-256-GCM | src/main.rs:56:30 | ring::aead::algorithm::AES_256_GCM | [present] [static] in t2::ring_pbkdf2_key; line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `AES_256_GCM`
+  occ AES-256-GCM | src/main.rs:63:13 | ring::aead::unbound_key::UnboundKey::new | [present] [call] in t2::ring_hkdf_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Okm::fill); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`
+  occ AES-256-GCM | src/main.rs:63:30 | ring::aead::algorithm::AES_256_GCM | [present] [static] in t2::ring_hkdf_key; line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `AES_256_GCM`
+  occ AES-256-GCM | src/main.rs:8:38 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t2::hkdf_to_aead; line: `let okm = prk.expand(&[b"info"], &AES_256_GCM).unwrap();`; code: `AES_256_GCM`
+  occ Ed25519 | src/main.rs:30:13 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8 | [reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`
+  occ Ed25519 | src/main.rs:31:7 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [reachable] [call] in t2::ed_sign; use: sign; line: `kp.sign(b"msg").as_ref().to_vec()`; code: `sign`
+  occ Ed25519 | src/main.rs:40:4 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8 | [reachable] [call] in t2::ed_gen; use: keygen; line: `signature::Ed25519KeyPair::generate_pkcs8(&rng).unwrap().as_ref().to_vec()`; code: `signature::Ed25519KeyPair::generate_pkcs8`
+  occ HKDF-SHA-256 | src/main.rs:62:104 | ring::hkdf::Okm::<'_, L>::fill | [present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `fill`
+  occ HKDF-SHA-256 | src/main.rs:62:20 | ring::hkdf::HKDF_SHA256 | [present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | src/main.rs:62:4 | ring::hkdf::Salt::new | [present] [call] in t2::ring_hkdf_key; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-256 | src/main.rs:62:45 | ring::hkdf::Salt::extract | [present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `extract`
+  occ HKDF-SHA-256 | src/main.rs:62:58 | ring::hkdf::Prk::expand | [present] [call] in t2::ring_hkdf_key; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `expand`
+  occ HKDF-SHA-256 | src/main.rs:62:76 | ring::hkdf::HKDF_SHA256 | [present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | src/main.rs:7:14 | ring::hkdf::Salt::new | [reachable] [call] in t2::hkdf_to_aead; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 7); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b"salt").extract(ikm);`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-256 | src/main.rs:7:30 | ring::hkdf::HKDF_SHA256 | [reachable] [static] in t2::hkdf_to_aead; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b"salt").extract(ikm);`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | src/main.rs:7:58 | ring::hkdf::Salt::extract | [reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b"salt").extract(ikm);`; code: `extract`
+  occ HKDF-SHA-256 | src/main.rs:8:18 | ring::hkdf::Prk::expand | [reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `let okm = prk.expand(&[b"info"], &AES_256_GCM).unwrap();`; code: `expand`
+  occ HMAC-SHA-256 | src/main.rs:21:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in t2::ring_pbkdf2; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b"salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ HMAC-SHA-256 | src/main.rs:55:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [present] [component] in t2::ring_pbkdf2_key; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ HMAC-SHA-256 | src/main.rs:62:20 | ring::hkdf::HKDF_SHA256 | [present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-256 | src/main.rs:62:76 | ring::hkdf::HKDF_SHA256 | [present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-256 | src/main.rs:7:30 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in t2::hkdf_to_aead; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b"salt").extract(ikm);`; code: `hkdf::HKDF_SHA256`
+  occ PBKDF2-SHA-256 | src/main.rs:21:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [static] in t2::ring_pbkdf2; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b"salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ PBKDF2-SHA-256 | src/main.rs:21:4 | ring::pbkdf2::derive | [reachable] [call] in t2::ring_pbkdf2; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 21); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b"salt", pw, &mut out);`; code: `pbkdf2::derive`
+  occ PBKDF2-SHA-256 | src/main.rs:55:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [present] [static] in t2::ring_pbkdf2_key; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ PBKDF2-SHA-256 | src/main.rs:55:4 | ring::pbkdf2::derive | [present] [call] in t2::ring_pbkdf2_key; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::derive`
+  occ RSA-PKCS1-1.5-SHA-384 | src/main.rs:26:39 | ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 | [reachable] [static] in t2::rsa3072; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`
+  occ RSA-PKCS1-1.5-SHA-384 | src/main.rs:26:82 | ring::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in t2::rsa3072; use: verify; algorithm from ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 in the arguments; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `verify`
+  occ SHA-256 | src/main.rs:13:18 | ring::digest::digest | [reachable] [call] in t2::seal_digest; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `digest`
+  occ SHA-256 | src/main.rs:13:26 | ring::digest::SHA256 | [reachable] [static] in t2::seal_digest; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `SHA256`
+  occ SHA-256 | src/main.rs:21:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in t2::ring_pbkdf2; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b"salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ SHA-256 | src/main.rs:55:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [present] [component] in t2::ring_pbkdf2_key; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ SHA-256 | src/main.rs:62:20 | ring::hkdf::HKDF_SHA256 | [present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ SHA-256 | src/main.rs:62:76 | ring::hkdf::HKDF_SHA256 | [present] [component] in t2::ring_hkdf_key; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b"ctx"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`
+  occ SHA-256 | src/main.rs:7:30 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in t2::hkdf_to_aead; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b"salt").extract(ikm);`; code: `hkdf::HKDF_SHA256`
+  occ SHA-384 | src/main.rs:26:39 | ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 | [reachable] [component] in t2::rsa3072; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 -> ring::digest::SHA384); line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`
+  occ SHA-512/256 | src/main.rs:35:12 | ring::digest::SHA512_256 | [reachable] [static] in t2::sha512_256; line: `digest(&SHA512_256, d).as_ref().len()`; code: `SHA512_256`
+  occ SHA-512/256 | src/main.rs:35:4 | ring::digest::digest | [reachable] [call] in t2::sha512_256; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; line: `digest(&SHA512_256, d).as_ref().len()`; code: `digest`
+  occ getrandom | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t2 -> ring -> getrandom
+  occ ring | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t2 -> ring
+  occ ring | Cargo.toml:9:0 | ring | [manifest] declared by t2 (dependencies)
+  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | rcbom:functions:source=knowledge-base
+  prop AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | rcbom:occurrences=5
+  prop AES-256-GCM | rcbom:provenance:key=derived
+  prop AES-256-GCM | rcbom:reachability=reachable
+  prop Ed25519 | rcbom:confidence=high
+  prop Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | rcbom:occurrences=3
+  prop Ed25519 | rcbom:reachability=reachable
+  prop HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | rcbom:finding=hard-coded-salt
+  prop HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | rcbom:occurrences=10
+  prop HKDF-SHA-256 | rcbom:provenance:ikm=parameter
+  prop HKDF-SHA-256 | rcbom:provenance:salt=hard-coded,parameter
+  prop HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | rcbom:occurrences=5
+  prop HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256 | rcbom:confidence=high
+  prop PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256 | rcbom:occurrences=4
+  prop PBKDF2-SHA-256 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256 | rcbom:provenance:salt=hard-coded,parameter
+  prop PBKDF2-SHA-256 | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=2
+  prop RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=reachable
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=7
+  prop SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | rcbom:confidence=high
+  prop SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | rcbom:reachability=reachable
+  prop SHA-512/256 | rcbom:confidence=high
+  prop SHA-512/256 | rcbom:detection:method=type-resolved
+  prop SHA-512/256 | rcbom:functions:source=observed
+  prop SHA-512/256 | rcbom:kb:version=0.2.0
+  prop SHA-512/256 | rcbom:occurrences=2
+  prop SHA-512/256 | rcbom:reachability=reachable
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop ring | rcbom:crypto-role=algorithm
+  prop ring | rcbom:ffi-boundary=true
+  prop ring | rcbom:native-links=ring_core_0_17_14_
+  prop ring | rcbom:scope=required
+  prop ring | rcbom:usage=reachable
+  prop t2 | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application t2 0.1.0 | pkg:cargo/t2@0.1.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-384 -> crypto:algorithm:SHA-384
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t2@0.1.0 -> pkg:cargo/ring@0.17.14
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:Ed25519
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512/256
+root {"bom-ref": "pkg:cargo/t2@0.1.0#root", "name": "t2", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=118
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

@@ -2,9 +2,11 @@
 #
 # Matching is structural. The driver reports the generic arguments of every call and the def
 # path of every static; entries here key on (crate, item name) and generic-argument positions,
-# never on printed MIR. Asset names follow the CycloneDX Cryptography Registry patterns.
+# never on printed MIR. Asset names follow the CycloneDX Cryptography Registry patterns
+# (schema/cryptography-defs.json). Paths are defining paths, crate first, not re-exports:
+# `crypto_common::KeyInit::new_from_slice`, `ring::aead::algorithm::AES_256_GCM`.
 
-version = "0.1.0"
+version = "0.2.0"
 
 # --- Layer 1: crates -----------------------------------------------------------------------
 # role: algorithm  implements primitives; its internals are not evidence, calls into it are.
@@ -71,7 +73,7 @@ package = "rustls"
 versions = ">=0.23, <0.24"
 role = "protocol"
 candidates = []
-# feature -> backend package; the enabled one is reported on the component
+# feature -> backend package
 backends = { ring = "ring", aws_lc_rs = "aws-lc-rs" }
 
 [[crate]]
@@ -154,6 +156,12 @@ package = "universal-hash"
 versions = ">=0.5, <0.6"
 role = "trait"
 
+# `Signer::sign`, `Verifier::verify` of ed25519-dalek and rsa go through this trait crate.
+[[crate]]
+package = "signature"
+versions = ">=2, <3"
+role = "trait"
+
 [[crate]]
 package = "aes"
 versions = ">=0.8, <0.9"
@@ -184,33 +192,105 @@ package = "ctr"
 versions = ">=0.9, <0.10"
 role = "algorithm"
 
+[[crate]]
+package = "cbc"
+versions = ">=0.1, <0.2"
+role = "algorithm"
+
+# Random number generation: the CSPRNG (rand's ThreadRng, ChaCha12 over rand_chacha), its
+# traits, and the OS source. Their outputs are provenance sources (see [[source]] below).
+[[crate]]
+package = "rand"
+versions = ">=0.8, <0.10"
+role = "algorithm"
+
+[[crate]]
+package = "rand_chacha"
+versions = ">=0.3, <0.10"
+role = "algorithm"
+
+[[crate]]
+package = "rand_core"
+versions = ">=0.6, <0.10"
+role = "trait"
+
+[[crate]]
+package = "getrandom"
+versions = ">=0.2, <0.4"
+role = "algorithm"
+
 # --- Layer 2: types (RustCrypto) -----------------------------------------------------------
 # An ADT that is an algorithm. Parameters come from its generic arguments:
 #   { arg = N, map = {..} }     arg N is a type whose name maps to a value
-#   { arg = N, typenum = true } arg N is a typenum (or const) integer
+#   { arg = N, typenum = true } arg N is a typenum (or const) integer (times `scale`; through
+#                               `map` if given)
 #   { arg = N, asset = true }   arg N contains another KB type; its asset name (composition)
 #   { parent_arg = N, .. }      the same, but on the type that contains the matched one
-# `functions` are the asset's defaults when no call reveals the use.
+#   { .., path = [i, j] }       the argument's own argument i, then that one's argument j
+# An argument read as a parameter (map, typenum) is part of the name, not a component.
+# `functions` are the asset's defaults when no call reveals the use. `[..]` in a name is written
+# only when its parameters differ from `defaults`.
 
+# AES-256-GCM is the standard 16-byte tag and 12-byte nonce; AES-256-GCM-128-128 the same
+# cipher with a 16-byte nonce (registry: AES[-(128|192|256)][-(GCM|CCM)][-{tagLength}]
+# [-{ivLength}], lengths in bits).
 [[type]]
 crate = "aes_gcm"
 name = "AesGcm"
-asset = "AES-{key}-GCM"
+asset = "AES-{key}-GCM[-{tag_bits}-{nonce_bits}]"
 family = "AES"
 primitive = "ae"
 mode = "gcm"
 functions = ["encrypt", "decrypt"]
 parameter_set = "{key}"
-params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } }, nonce_bytes = { arg = 1, typenum = true }, tag_bytes = { arg = 2, typenum = true } }
+defaults = { tag_bits = "128", nonce_bits = "96" }
+params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } }, nonce_bytes = { arg = 1, typenum = true }, tag_bytes = { arg = 2, typenum = true }, nonce_bits = { arg = 1, typenum = true, scale = 8 }, tag_bits = { arg = 2, typenum = true, scale = 8 } }
 
+# chacha20 0.9: ChaCha20 = StreamCipherCoreWrapper<ChaChaCore<U10>>, XChaCha20 =
+# ..<XChaChaCore<U10>>; the typenum counts double rounds (U4 = 8 rounds, U6 = 12, U10 = 20).
+# ChaCha8/12 have no registry name; they are named like the others.
 [[type]]
 crate = "chacha20poly1305"
 name = "ChaChaPoly1305"
-asset = "ChaCha20-Poly1305"
+asset = "{core}{rounds}-Poly1305"
 family = "ChaCha20"
 primitive = "ae"
 functions = ["encrypt", "decrypt"]
-params = { nonce_bytes = { arg = 1, typenum = true } }
+params = { core = { arg = 0, path = [0], map = { ChaChaCore = "ChaCha", XChaChaCore = "XChaCha" } }, rounds = { arg = 0, path = [0, 0], typenum = true, scale = 2 }, nonce_bytes = { arg = 1, typenum = true } }
+
+# A block cipher in a mode: the cipher is a parameter of the mode.
+[[type]]
+crate = "cbc"
+name = "Encryptor"
+asset = "AES-{key}-CBC"
+family = "AES"
+primitive = "block-cipher"
+mode = "cbc"
+functions = ["encrypt"]
+parameter_set = "{key}"
+params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
+
+[[type]]
+crate = "cbc"
+name = "Decryptor"
+asset = "AES-{key}-CBC"
+family = "AES"
+primitive = "block-cipher"
+mode = "cbc"
+functions = ["decrypt"]
+parameter_set = "{key}"
+params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
+
+[[type]]
+crate = "ctr"
+name = "CtrCore"
+asset = "AES-{key}-CTR"
+family = "AES"
+primitive = "block-cipher"
+mode = "ctr"
+functions = ["encrypt", "decrypt"]
+parameter_set = "{key}"
+params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
 
 [[type]]
 crate = "hmac"
@@ -239,6 +319,16 @@ primitive = "kdf"
 functions = ["keyderive"]
 params = { hash = { arg = 0, asset = true } }
 
+# hkdf's incremental extraction
+[[type]]
+crate = "hkdf"
+name = "HkdfExtract"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, asset = true } }
+
 # sha2 0.10: Sha256 = CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, U32, OidSha256>>; the
 # output size (SHA-224 vs SHA-256) is an argument of the wrapper around the core.
 [[type]]
@@ -250,6 +340,8 @@ primitive = "hash"
 functions = ["digest"]
 params = { bits = { parent_arg = 1, typenum = true, scale = 8 } }
 
+# SHA-512 truncated to 224 or 256 bits is SHA-512/224, SHA-512/256 (sha2 lib.rs: Sha512_224 =
+# ..<Sha512VarCore, U28, ..>), not SHA-224, SHA-256.
 [[type]]
 crate = "sha2"
 name = "Sha512VarCore"
@@ -257,7 +349,7 @@ asset = "SHA-{bits}"
 family = "SHA-2"
 primitive = "hash"
 functions = ["digest"]
-params = { bits = { parent_arg = 1, typenum = true, scale = 8 } }
+params = { bits = { parent_arg = 1, typenum = true, scale = 8, map = { "224" = "512/224", "256" = "512/256", "384" = "384", "512" = "512" } } }
 
 [[type]]
 crate = "sha1"
@@ -267,6 +359,7 @@ family = "SHA-1"
 primitive = "hash"
 functions = ["digest"]
 
+# blake3: the constructor of a Hasher says its mode ([[fn]] entries below)
 [[type]]
 crate = "blake3"
 name = "Hasher"
@@ -275,8 +368,9 @@ family = "BLAKE3"
 primitive = "hash"
 functions = ["digest"]
 
-# The parameters of an Argon2 value are run-time fields; `Argon2::default()` (an [[fn]] entry
-# below) names them. Elsewhere the asset is reported as plain Argon2.
+# The parameters of an Argon2 value are run-time fields. The constructor that built a receiver
+# names them (`Argon2::default()`, `Argon2::new(Algorithm::Argon2i, ..)`, [[fn]] entries below);
+# without one the asset is the family name, which the registry has no pattern for.
 [[type]]
 crate = "argon2"
 name = "Argon2"
@@ -303,17 +397,150 @@ primitive = "signature"
 functions = ["verify"]
 curve = "other/Ed25519"
 
+# x25519-dalek's keys: the algorithm is in the type
+[[type]]
+crate = "x25519_dalek"
+name = "StaticSecret"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+curve = "other/Curve25519"
+
+[[type]]
+crate = "x25519_dalek"
+name = "EphemeralSecret"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+curve = "other/Curve25519"
+
+[[type]]
+crate = "x25519_dalek"
+name = "ReusableSecret"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+curve = "other/Curve25519"
+
+[[type]]
+crate = "x25519_dalek"
+name = "PublicKey"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+curve = "other/Curve25519"
+
+[[type]]
+crate = "ring"
+name = "Ed25519KeyPair"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "other/Ed25519"
+
+[[type]]
+crate = "aws_lc_rs"
+name = "Ed25519KeyPair"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "other/Ed25519"
+
+# rsa 0.9 signature and encryption schemes, generic over the digest
+[[type]]
+crate = "rsa"
+name = "SigningKey"
+module = "^pkcs1v15::"
+asset = "RSA-PKCS1-1.5-{hash}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "VerifyingKey"
+module = "^pkcs1v15::"
+asset = "RSA-PKCS1-1.5-{hash}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["verify"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "SigningKey"
+module = "^pss::"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "BlindedSigningKey"
+module = "^pss::"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "VerifyingKey"
+module = "^pss::"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["verify"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "Pkcs1v15Encrypt"
+asset = "RSA-PKCS1-1.5"
+family = "RSAES-PKCS1"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+
+# The digest of an Oaep value is a run-time field; `Oaep::new::<D>()` ([[fn]] below) names it.
+[[type]]
+crate = "rsa"
+name = "Oaep"
+asset = "RSA-OAEP"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+
 # --- Layer 2: statics (ring and aws-lc-rs style) --------------------------------------------
-# `name` is a regex over the static's own name; {1}, {2} are its groups. aws-lc-rs keeps ring's
-# API and names, so the entries cover both crates.
+# `name` is a regex over the item's own name; {1}, {2} are its groups. `module` restricts the
+# item's path inside its crate when the name alone is ambiguous. aws-lc-rs keeps ring's API and
+# names, so most entries cover both crates.
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^AES_(128|256)_GCM$"
+name = "^AES_(128|192|256)_GCM$"
 asset = "AES-{1}-GCM"
 family = "AES"
 primitive = "ae"
 mode = "gcm"
+parameter_set = "{1}"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^AES_(128|256)_GCM_SIV$"
+asset = "AES-{1}-GCM-SIV"
+family = "AES"
+primitive = "ae"
 parameter_set = "{1}"
 functions = ["encrypt", "decrypt"]
 
@@ -325,9 +552,11 @@ family = "ChaCha20"
 primitive = "ae"
 functions = ["encrypt", "decrypt"]
 
+# QUIC header protection keys (`aead::quic`): AES in ECB on one block, or ChaCha20
 [[static]]
 crate = ["ring", "aws_lc_rs"]
 name = "^AES_(128|256)$"
+module = "^aead::quic::"
 asset = "AES-{1}"
 family = "AES"
 primitive = "block-cipher"
@@ -337,8 +566,56 @@ note = "QUIC header protection"
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^HMAC_SHA(256|384|512)$"
+name = "^CHACHA20$"
+module = "^aead::quic::"
+asset = "ChaCha20"
+family = "ChaCha20"
+primitive = "stream-cipher"
+functions = ["encrypt"]
+note = "QUIC header protection"
+
+# aws-lc-rs block-cipher keys (`cipher`): the mode is chosen by the key constructor
+[[static]]
+crate = "aws_lc_rs"
+name = "^AES_(128|192|256)$"
+module = "^cipher::"
+asset = "AES-{1}"
+family = "AES"
+primitive = "block-cipher"
+parameter_set = "{1}"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^AES_(128|192|256)$"
+module = "^cmac::"
+asset = "CMAC-AES-{1}"
+family = "CMAC"
+primitive = "mac"
+functions = ["tag"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^AES_(128|192|256)$"
+module = "^key_wrap::"
+asset = "AES-{1}-KW"
+family = "AES"
+primitive = "key-wrap"
+parameter_set = "{1}"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^HMAC_SHA(224|256|384|512)$"
 asset = "HMAC-SHA-{1}"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^HMAC_SHA1_FOR_LEGACY_USE_ONLY$"
+asset = "HMAC-SHA-1"
 family = "HMAC"
 primitive = "mac"
 functions = ["tag"]
@@ -353,8 +630,32 @@ functions = ["keyderive"]
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^SHA(256|384|512)$"
+name = "^HKDF_SHA1_FOR_LEGACY_USE_ONLY$"
+asset = "HKDF-SHA-1"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^PBKDF2_HMAC_SHA(1|256|384|512)$"
+asset = "PBKDF2-SHA-{1}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^SHA(224|256|384|512)$"
 asset = "SHA-{1}"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^SHA512_256$"
+asset = "SHA-512/256"
 family = "SHA-2"
 primitive = "hash"
 functions = ["digest"]
@@ -369,8 +670,17 @@ functions = ["digest"]
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^ECDSA_P(256|384|521)_SHA(256|384|512)"
+name = "^ECDSA_P(256|384|521)_SHA(1|224|256|384|512)_"
 asset = "ECDSA-P-{1}-SHA-{2}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+curve = "nist/P-{1}"
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P(256|384|521)_SHA3_(256|384|512)_"
+asset = "ECDSA-P-{1}-SHA3-{2}"
 family = "ECDSA"
 primitive = "signature"
 functions = ["sign", "verify"]
@@ -385,9 +695,11 @@ primitive = "signature"
 functions = ["sign", "verify"]
 curve = "other/Ed25519"
 
+# ring: RSA_PKCS1_SHA256 (signing), RSA_PKCS1_2048_8192_SHA256, RSA_PKCS1_3072_8192_SHA384,
+# RSA_PKCS1_1024_8192_SHA1_FOR_LEGACY_USE_ONLY (verification, key-size bounds)
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PKCS1_(?:2048_8192_)?SHA(256|384|512)"
+name = "^RSA_PKCS1_(?:[0-9]+_[0-9]+_)?SHA(1|256|384|512)"
 asset = "RSA-PKCS1-1.5-SHA-{1}"
 family = "RSASSA-PKCS1"
 primitive = "signature"
@@ -395,15 +707,23 @@ functions = ["sign", "verify"]
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PSS_(?:2048_8192_)?SHA(256|384|512)"
+name = "^RSA_PSS_(?:[0-9]+_[0-9]+_)?SHA(256|384|512)"
 asset = "RSA-PSS-SHA-{1}"
 family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
 
 [[static]]
+crate = "aws_lc_rs"
+name = "^OAEP_SHA(1|256|384|512)_MGF1SHA(1|256|384|512)$"
+asset = "RSA-OAEP-SHA-{1}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^ECDH_P(256|384)$"
+name = "^ECDH_P(256|384|521)$"
 asset = "ECDH-P-{1}"
 family = "ECDH"
 primitive = "key-agree"
@@ -420,6 +740,15 @@ parameter_set = "{1}"
 functions = ["encapsulate", "decapsulate"]
 
 [[static]]
+crate = "aws_lc_rs"
+name = "^ML_DSA_(44|65|87)$"
+asset = "ML-DSA-{1}"
+family = "ML-DSA"
+primitive = "signature"
+parameter_set = "{1}"
+functions = ["sign", "verify"]
+
+[[static]]
 crate = ["ring", "aws_lc_rs"]
 name = "^X25519$"
 asset = "x25519"
@@ -429,7 +758,12 @@ functions = ["keyderive"]
 curve = "other/Curve25519"
 
 # --- Layer 2: functions (non-generic APIs) ---------------------------------------------------
-# `path` is a regex over the callee's def path with the crate prefix removed.
+# `path` is a regex over the callee's defining path with the crate prefix removed; with
+# `self_type` (a std trait the crypto type implements), over the full callee path.
+# `{ const_arg = N }`: value argument N when it is an integer constant (through `map`, `scale`).
+# `{ arg_len = N }`: the length of the array behind value argument N (`&mut [0u8; 32]`).
+# `{ arg = N, .. }`: generic argument N, as for types. `use`: what the call does when its method
+# is not a listed use (`keygen` for a key generator); without it the call sets the asset up.
 
 [[fn]]
 crate = "x25519_dalek"
@@ -457,6 +791,8 @@ family = "MD5"
 primitive = "hash"
 functions = ["digest"]
 
+# `blake3::hash` always returns 256 bits; a `Hasher`'s output length is chosen when it is
+# finalized (`finalize` or `finalize_xof`), so the type alone is plain BLAKE3.
 [[fn]]
 crate = "blake3"
 path = "^hash$"
@@ -465,16 +801,62 @@ family = "BLAKE3"
 primitive = "hash"
 functions = ["digest"]
 
-# `{ const_arg = N }`: value argument N when it is an integer constant at the call site.
-# `{ arg_len = N }`: the length of the array behind value argument N (`&mut [0u8; 32]`).
+# BLAKE3's keyed mode is a MAC and its key-derivation mode a KDF; the registry names BLAKE3 as
+# a hash only, so the name stays BLAKE3 with the primitive telling the modes apart.
+[[fn]]
+crate = "blake3"
+path = "^keyed_hash$"
+asset = "BLAKE3-256"
+family = "BLAKE3"
+primitive = "mac"
+functions = ["tag"]
+note = "keyed mode"
+
+[[fn]]
+crate = "blake3"
+path = "^Hasher::new_keyed$"
+asset = "BLAKE3"
+family = "BLAKE3"
+primitive = "mac"
+functions = ["tag"]
+note = "keyed mode"
+
+[[fn]]
+crate = "blake3"
+path = "^derive_key$"
+asset = "BLAKE3-256"
+family = "BLAKE3"
+primitive = "kdf"
+functions = ["keyderive"]
+note = "key derivation mode"
+
+[[fn]]
+crate = "blake3"
+path = "^Hasher::new_derive_key$"
+asset = "BLAKE3"
+family = "BLAKE3"
+primitive = "kdf"
+functions = ["keyderive"]
+note = "key derivation mode"
+
 [[fn]]
 crate = "pbkdf2"
-path = "^pbkdf2_hmac(_array)?$"
+path = "^pbkdf2_hmac$"
 asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
 params = { hash = { arg = 0, asset = true }, iterations = { const_arg = 2 }, dk_len = { arg_len = 3 } }
+
+# pbkdf2_hmac_array::<D, N>(password, salt, rounds) -> [u8; N]
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2_hmac_array$"
+asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, asset = true }, iterations = { const_arg = 2 }, dk_len = { arg = 1, typenum = true } }
 
 # A std trait implemented by the crypto type: `self_type` names it, `path` matches the callee.
 # argon2 0.5: Algorithm::default() = Argon2id, Params::default() = m 19 MiB, t 2, p 1 (params.rs).
@@ -487,6 +869,17 @@ family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
 
+# Argon2::new(algorithm, version, params): the variant is argument 0 (Argon2d = 0, Argon2i = 1,
+# Argon2id = 2, argon2 0.5 algorithm.rs); the costs are in the Params value.
+[[fn]]
+crate = "argon2"
+path = "Argon2::new$"
+asset = "Argon2{variant}"
+family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { variant = { const_arg = 0, map = { "0" = "d", "1" = "i", "2" = "id" } } }
+
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
 crate = "rsa"
@@ -495,9 +888,20 @@ asset = "RSA-{bits}"
 family = "RSA"
 primitive = "pke"
 functions = ["keygen"]
+use = "keygen"
 material = "private-key"
 size = "{bits}"
 params = { bits = { const_arg = 1 } }
+
+# rsa 0.9: Oaep::new::<D>(), Oaep::new_with_label::<D, S>(label)
+[[fn]]
+crate = "rsa"
+path = "Oaep::new(_with_label)?$"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+params = { hash = { arg = 0, asset = true } }
 
 # A JWT HMAC key: the algorithm (HS256/384/512) is chosen by the header at encode time.
 [[fn]]
@@ -523,16 +927,22 @@ suites = "^TLS(13)?_[A-Z0-9_]+$"
 groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1|SECP384R1|SECP521R1|FFDHE[0-9]+)$"
 
 # --- Uses -------------------------------------------------------------------------------------
-# The method called says what the code does with the asset. Methods not listed (`new`,
-# `new_from_slice`, `generate_nonce`, ...) set the asset up; they are evidence, not a use.
+# The method called says what the code does with the asset, for assets of the listed
+# primitives (all if none): `expand` is a key derivation for HKDF, not for the AES-256-GCM
+# whose key length it is given. Methods not listed (`new`, `new_from_slice`,
+# `generate_nonce`, ...) set the asset up; they are evidence, not a use. A method listed under
+# two uses makes either, and the call does not say which: a stream cipher's `apply_keystream`
+# encrypts or decrypts with the same operation.
 
 [[use]]
 function = "encrypt"
-methods = ["encrypt", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place_append_tag", "seal_in_place_separate_tag"]
+primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
+methods = ["encrypt", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place_append_tag", "seal_in_place_separate_tag", "encrypt_padded_mut", "encrypt_padded_vec_mut", "apply_keystream", "wrap", "wrap_with_padding"]
 
 [[use]]
 function = "decrypt"
-methods = ["decrypt", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_within"]
+primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
+methods = ["decrypt", "decrypt_blinded", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_within", "decrypt_padded_mut", "decrypt_padded_vec_mut", "apply_keystream", "unwrap", "unwrap_with_padding"]
 
 [[use]]
 function = "digest"
@@ -542,20 +952,22 @@ methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "ne
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "chain_update", "finalize", "finalize_reset", "sign"]
+methods = ["update", "chain_update", "finalize", "finalize_reset", "sign", "keyed_hash"]
 
 [[use]]
 function = "verify"
+primitives = ["signature", "mac", "kdf"]
 methods = ["verify", "verify_slice", "verify_truncated_left", "verify_password", "verify_strict"]
 
 [[use]]
 function = "keyderive"
-methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "hash_password", "hash_password_into", "pbkdf2_hmac", "pbkdf2_hmac_array"]
+primitives = ["kdf", "key-agree"]
+methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "hash_password", "hash_password_into", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "fill"]
 
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign"]
+methods = ["sign", "try_sign", "sign_with_rng"]
 
 [[use]]
 function = "keygen"
@@ -563,10 +975,11 @@ methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8"]
 
 # --- Provenance -------------------------------------------------------------------------------
 # Roles: which value argument of an API is key material (method calls count the receiver as
-# argument 0). `path` is a regex over the callee's def path. The analysis follows each such
-# argument's origin inside the enclosing function and classifies it with the sources below:
-# hard-coded (a constant), parameter (an argument of the enclosing function), one of the source
-# kinds, derived (the output of a KDF in this knowledge base), or unknown.
+# argument 0). `path` is a regex over the callee's defining path, or over `<Self type>::<method>`
+# (`x25519_dalek::x25519::StaticSecret::from`). The analysis follows each such argument's origin
+# inside the enclosing function and classifies it with the sources below: hard-coded (a
+# constant), parameter (an argument of the enclosing function), one of the source kinds, derived
+# (the output of a KDF), computed (returned by a call that takes nothing from here), or unknown.
 
 [[role]]
 path = "KeyInit::new(_from_slice)?$"
@@ -593,7 +1006,7 @@ path = "Nonce::assume_unique_for_key$"
 args = { "0" = "nonce" }
 
 [[role]]
-path = "LessSafeKey::(seal|open)_in_place"
+path = "LessSafeKey::(seal_in_place\\w*|open_in_place|open_within)$"
 args = { "1" = "nonce" }
 
 [[role]]
@@ -604,6 +1017,11 @@ args = { "1" = "key" }
 path = "pbkdf2_hmac(_array)?$"
 args = { "0" = "password", "1" = "salt" }
 
+# ring/aws-lc-rs pbkdf2::derive(algorithm, iterations, salt, secret, out)
+[[role]]
+path = "pbkdf2::derive$"
+args = { "2" = "salt", "3" = "password" }
+
 [[role]]
 path = "SaltString::(encode_b64|from_b64|new)$"
 args = { "0" = "salt" }
@@ -613,11 +1031,36 @@ path = "PasswordHasher::hash_password$"
 args = { "1" = "password", "2" = "salt" }
 
 [[role]]
+path = "Argon2::hash_password_into$"
+args = { "1" = "password", "2" = "salt" }
+
+[[role]]
+path = "^scrypt::scrypt$"
+args = { "0" = "password", "1" = "salt" }
+
+[[role]]
 path = "Hkdf::<.*>::new$"
 args = { "0" = "salt", "1" = "ikm" }
 
 [[role]]
-path = "SigningKey::from_bytes$"
+path = "Hkdf::<.*>::extract$"
+args = { "0" = "salt", "1" = "ikm" }
+
+[[role]]
+path = "Hkdf::<.*>::from_prk$"
+args = { "0" = "key" }
+
+# ring/aws-lc-rs hkdf::Salt::new(algorithm, value), Salt::extract(&self, secret)
+[[role]]
+path = "hkdf::Salt::new$"
+args = { "1" = "salt" }
+
+[[role]]
+path = "hkdf::Salt::extract$"
+args = { "1" = "ikm" }
+
+[[role]]
+path = "SigningKey::(from_bytes|try_from|from)$"
 args = { "0" = "key" }
 
 [[role]]
@@ -628,13 +1071,27 @@ args = { "0" = "key" }
 path = "RsaPrivateKey::new$"
 args = { "0" = "rng" }
 
+# `StaticSecret::from([7u8; 32])`, `bytes.into()`
 [[role]]
-path = "StaticSecret::from$|StaticSecret::random_from_rng$"
+path = "StaticSecret::(from|into)$"
 args = { "0" = "key" }
 
-# Sources: calls whose result is external input or randomness. `path` is a regex over the
-# callee's def path. Standard-library calls that match nothing here are seen through (`as_bytes`,
-# `unwrap`, `to_vec`): the origin is that of their arguments.
+[[role]]
+path = "StaticSecret::random_from_rng$"
+args = { "0" = "rng" }
+
+[[role]]
+path = "^blake3::(keyed_hash|Hasher::new_keyed)$"
+args = { "0" = "key" }
+
+[[role]]
+path = "^blake3::derive_key$"
+args = { "1" = "ikm" }
+
+# Sources: calls whose result is external input, randomness, or a key derivation. `path` is a
+# regex over the callee's defining path (or `<Self type>::<method>`), also matched against the
+# type of a field-less value (`OsRng`). Standard-library calls that match nothing here are seen
+# through (`as_bytes`, `unwrap`, `to_vec`): the origin is that of their receiver.
 
 [[source]]
 kind = "environment"
@@ -646,4 +1103,46 @@ path = "^std::fs::(read|read_to_string)$|^std::io::(Read|BufRead)::read"
 
 [[source]]
 kind = "rng"
-path = "(^rand::(thread_rng|rng|random)$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|OsRng)"
+path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|OsRng)"
+
+# the output of a key derivation (the PRK, the OKM, a shared secret) is derived, whatever went in
+[[source]]
+kind = "derived"
+path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::agree_ephemeral$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac(_array)?)?$|^blake3::derive_key$)"
+
+# Calls whose result carries only some arguments' data (receiver = argument 0).
+[[passthrough]]
+path = "^anyhow::Context::(context|with_context)$|^eyre::WrapErr::(wrap_err|wrap_err_with)$"
+args = [0]
+
+[[passthrough]]
+path = "^base64::engine::Engine::(decode|decode_vec|decode_slice|decode_slice_unchecked)$"
+args = [1]
+
+# secrecy's wrappers hand out the secret they hold (`key.expose_secret()`, age)
+[[passthrough]]
+path = "^secrecy::(ExposeSecret::expose_secret|ExposeSecretMut::expose_secret_mut)$"
+args = [0]
+
+# generic-array, the key, nonce and block types of RustCrypto's 0.10 generation
+# (`Key::<Aes256Gcm>::from_slice(b"..")`): its constructors from slices and iterators, and its
+# slice views, are their argument's data. Before the std entry below, whose `clone_from_slice`
+# is a method copying into its receiver.
+[[passthrough]]
+path = "^generic_array::GenericArray::(from_slice|from_mut_slice|clone_from_slice|from_exact_iter|as_slice|as_mut_slice)$"
+args = [0]
+
+# std methods that copy data into their receiver: the data is the argument
+[[passthrough]]
+path = "::(copy_from_slice|clone_from_slice|extend_from_slice|push_str|push|extend|write_all|fill)$"
+args = [1]
+
+# `format!("{secret}")`: the formatted values, not the literal pieces
+[[passthrough]]
+path = "^core::fmt::Arguments::<.*>::new|^core::fmt::Arguments::new"
+args = [1, 2, 3]
+
+# Random generators built from a seed: their output is the seed's (`StdRng::seed_from_u64(42)`).
+[[seeded]]
+kind = "seed"
+path = "SeedableRng::(seed_from_u64|from_seed)$"

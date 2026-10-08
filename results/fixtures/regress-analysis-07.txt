@@ -1,0 +1,107 @@
+  occ AES-256-GCM | src/main.rs:15:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t7::seeded; new_from_slice: setup, not a use; key: hard-coded (seed of rng::Rng::gen: literal at line 13); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | src/main.rs:16:14 | aead::Aead::encrypt | [reachable] [call] in t7::seeded; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b"x"[..]);`; code: `encrypt`
+  occ AES-256-GCM | src/main.rs:9:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t7::b64_env; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _c = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`
+  occ aead | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t7 -> aes-gcm -> aead
+  occ aes | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t7 -> aes-gcm -> aes
+  occ aes-gcm | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t7 -> aes-gcm
+  occ aes-gcm | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t7 (dependencies)
+  occ cipher | Cargo.lock:53:0 | cipher | [manifest] locked cipher 0.4.4; reached via t7 -> aes-gcm -> cipher
+  occ crypto-common | Cargo.lock:72:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t7 -> aes-gcm -> aead -> crypto-common
+  occ ctr | Cargo.lock:83:0 | ctr | [manifest] locked ctr 0.9.2; reached via t7 -> aes-gcm -> ctr
+  occ getrandom | Cargo.lock:102:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t7 -> rand -> rand_core -> getrandom
+  occ ghash | Cargo.lock:113:0 | ghash | [manifest] locked ghash 0.5.1; reached via t7 -> aes-gcm -> ghash
+  occ polyval | Cargo.lock:144:0 | polyval | [manifest] locked polyval 0.6.2; reached via t7 -> aes-gcm -> ghash -> polyval
+  occ rand | Cargo.lock:183:0 | rand | [manifest] locked rand 0.8.8; reached via t7 -> rand
+  occ rand | Cargo.toml:11:0 | rand | [manifest] declared by t7 (dependencies)
+  occ rand_chacha | Cargo.lock:194:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t7 -> rand -> rand_chacha
+  occ rand_core | Cargo.lock:204:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t7 -> rand -> rand_core
+  occ universal-hash | Cargo.lock:251:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t7 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | rcbom:occurrences=3
+  prop AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | rcbom:provenance:key=environment,hard-coded
+  prop AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | rcbom:reachability=reachable
+  prop aead | rcbom:crypto-role=trait
+  prop aead | rcbom:scope=required
+  prop aes | rcbom:crypto-role=algorithm
+  prop aes | rcbom:scope=required
+  prop aes | rcbom:usage=reachable
+  prop aes-gcm | rcbom:crypto-role=algorithm
+  prop aes-gcm | rcbom:scope=required
+  prop aes-gcm | rcbom:usage=reachable
+  prop cipher | rcbom:crypto-role=trait
+  prop cipher | rcbom:scope=required
+  prop crypto-common | rcbom:crypto-role=trait
+  prop crypto-common | rcbom:scope=required
+  prop ctr | rcbom:crypto-role=algorithm
+  prop ctr | rcbom:scope=required
+  prop ctr | rcbom:usage=reachable
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop ghash | rcbom:crypto-role=algorithm
+  prop ghash | rcbom:scope=required
+  prop ghash | rcbom:usage=reachable
+  prop polyval | rcbom:crypto-role=algorithm
+  prop polyval | rcbom:scope=required
+  prop polyval | rcbom:usage=reachable
+  prop rand | rcbom:crypto-role=algorithm
+  prop rand | rcbom:scope=required
+  prop rand | rcbom:usage=reachable
+  prop rand_chacha | rcbom:crypto-role=algorithm
+  prop rand_chacha | rcbom:scope=required
+  prop rand_chacha | rcbom:usage=reachable
+  prop rand_core | rcbom:crypto-role=trait
+  prop rand_core | rcbom:scope=required
+  prop t7 | rcbom:scope=required
+  prop universal-hash | rcbom:crypto-role=trait
+  prop universal-hash | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+component application t7 0.1.0 | pkg:cargo/t7@0.1.0
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t7@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
+dep pkg:cargo/t7@0.1.0 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+root {"bom-ref": "pkg:cargo/t7@0.1.0#root", "name": "t7", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=282
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25

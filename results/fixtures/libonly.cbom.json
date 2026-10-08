@@ -202,39 +202,39 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in libonly::tag::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [call] in libonly::tag::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`",
             "line": 13,
             "location": "src/lib.rs",
             "offset": 16,
-            "symbol": "hmac::Mac::new_from_slice"
+            "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.update(data);`; code: `update`",
             "line": 14,
             "location": "src/lib.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::update"
+            "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
             "line": 15,
             "location": "src/lib.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::finalize"
+            "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in libonly::tag::<..>; into_bytes: setup, not a use; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [call] in libonly::tag::<..>; into_bytes: setup, not a use; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
             "line": 15,
             "location": "src/lib.rs",
             "offset": 17,
-            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in libonly::tag_sha256; chosen as generic argument of tag",
+            "additionalContext": "[reachable] [instantiation] in libonly::tag_sha256; chosen as generic argument of libonly::tag; line: `tag::<Hmac<Sha256>>(key, data)`; code: `tag::<Hmac<Sha256>>`",
             "line": 20,
             "location": "src/lib.rs",
             "offset": 4,
-            "symbol": "tag"
+            "symbol": "libonly::tag"
           }
         ]
       },
@@ -258,7 +258,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:provenance:key",
@@ -286,7 +286,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in libonly::legacy; use: digest",
+            "additionalContext": "[present] [call] in libonly::legacy; use: digest; line: `md5::compute(data).0`; code: `md5::compute`",
             "line": 26,
             "location": "src/lib.rs",
             "offset": 4,
@@ -314,7 +314,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -338,46 +338,46 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in libonly::fingerprint; use: digest",
+            "additionalContext": "[reachable] [call] in libonly::fingerprint; use: digest; line: `Sha256::digest(data).into()`; code: `Sha256::digest`",
             "line": 8,
             "location": "src/lib.rs",
             "offset": 4,
-            "symbol": "sha2::Digest::digest"
+            "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`",
             "line": 13,
             "location": "src/lib.rs",
             "offset": 16,
-            "symbol": "hmac::Mac::new_from_slice"
+            "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.update(data);`; code: `update`",
             "line": 14,
             "location": "src/lib.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::update"
+            "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
             "line": 15,
             "location": "src/lib.rs",
             "offset": 6,
-            "symbol": "hmac::Mac::finalize"
+            "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20",
+            "additionalContext": "[reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
             "line": 15,
             "location": "src/lib.rs",
             "offset": 17,
-            "symbol": "hmac::digest::CtOutput::<T>::into_bytes"
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in libonly::tag_sha256; part of HMAC-SHA-256",
+            "additionalContext": "[reachable] [component] in libonly::tag_sha256; part of HMAC-SHA-256; line: `tag::<Hmac<Sha256>>(key, data)`; code: `tag::<Hmac<Sha256>>`",
             "line": 20,
             "location": "src/lib.rs",
             "offset": 4,
-            "symbol": "tag"
+            "symbol": "libonly::tag"
           }
         ]
       },
@@ -401,7 +401,7 @@
         },
         {
           "name": "rcbom:kb:version",
-          "value": "0.1.0"
+          "value": "0.2.0"
         },
         {
           "name": "rcbom:occurrences",
@@ -488,11 +488,11 @@
       },
       {
         "name": "rcbom:kb:version",
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "41"
+        "value": "151"
       }
     ],
     "tools": {
@@ -505,7 +505,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7c41ff05-bd59-8b7c-a470-358c0ce1b5f6",
+  "serialNumber": "urn:uuid:23cf6588-96b7-8e08-81a6-002f8ac8b680",
   "specVersion": "1.7",
   "version": 1
 }

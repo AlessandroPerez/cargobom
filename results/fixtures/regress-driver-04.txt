@@ -1,0 +1,79 @@
+  occ SHA-1 | src/main.rs:8:12 | ring::digest::digest | [reachable] [call] in t4::init; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b"init");`; code: `digest`
+  occ SHA-1 | src/main.rs:8:20 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in t4::init; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b"init");`; code: `SHA1_FOR_LEGACY_USE_ONLY`
+  occ SHA-256 | src/main.rs:52:36 | ring::digest::digest | [reachable] [call] in t4::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `digest`
+  occ SHA-256 | src/main.rs:52:44 | ring::digest::SHA256 | [reachable] [static] in t4::w4::{closure#0}; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `SHA256`
+  occ SHA-256 | src/main.rs:59:26 | ring::digest::digest | [reachable] [call] in <t4::Fp as core::fmt::Display>::fmt; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `write!(f, "{:?}", digest(&SHA256, b"fp"))`; code: `digest`
+  occ SHA-256 | src/main.rs:59:34 | ring::digest::SHA256 | [reachable] [static] in <t4::Fp as core::fmt::Display>::fmt; line: `write!(f, "{:?}", digest(&SHA256, b"fp"))`; code: `SHA256`
+  occ SHA-384 | src/main.rs:21:16 | ring::digest::SHA384 | [reachable] [static] in <t4::X as t4::Base>::h; line: `digest(&SHA384, b"x").as_ref().len()`; code: `SHA384`
+  occ SHA-384 | src/main.rs:21:8 | ring::digest::digest | [reachable] [call] in <t4::X as t4::Base>::h; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(&SHA384, b"x").as_ref().len()`; code: `digest`
+  occ SHA-512 | src/main.rs:38:16 | ring::digest::digest | [reachable] [call] in <t4::Inner as core::ops::drop::Drop>::drop; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(&SHA512, b"drop");`; code: `digest`
+  occ SHA-512 | src/main.rs:38:24 | ring::digest::SHA512 | [reachable] [static] in <t4::Inner as core::ops::drop::Drop>::drop; line: `let _ = digest(&SHA512, b"drop");`; code: `SHA512`
+  occ getrandom | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t4 -> ring -> getrandom
+  occ ring | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t4 -> ring
+  occ ring | Cargo.toml:9:0 | ring | [manifest] declared by t4 (dependencies)
+  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ x25519 | src/main.rs:50:13 | ring::agreement::EphemeralPrivateKey::generate | [reachable] [call] in t4::w4; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`
+  occ x25519 | src/main.rs:50:44 | ring::ec::curve25519::x25519::X25519 | [reachable] [static] in t4::w4; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`
+  occ x25519 | src/main.rs:51:39 | ring::ec::curve25519::x25519::X25519 | [reachable] [static] in t4::w4; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`
+  occ x25519 | src/main.rs:52:4 | ring::agreement::agree_ephemeral | [reachable] [call] in t4::w4; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `agree_ephemeral`
+  prop SHA-1 | rcbom:confidence=high
+  prop SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | rcbom:confidence=high
+  prop SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | rcbom:confidence=high
+  prop SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | rcbom:confidence=high
+  prop SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | rcbom:reachability=reachable
+  prop getrandom | rcbom:crypto-role=algorithm
+  prop getrandom | rcbom:scope=required
+  prop getrandom | rcbom:usage=reachable
+  prop ring | rcbom:crypto-role=algorithm
+  prop ring | rcbom:ffi-boundary=true
+  prop ring | rcbom:native-links=ring_core_0_17_14_
+  prop ring | rcbom:scope=required
+  prop ring | rcbom:usage=reachable
+  prop t4 | rcbom:scope=required
+  prop x25519 | rcbom:confidence=high
+  prop x25519 | rcbom:detection:method=type-resolved
+  prop x25519 | rcbom:functions:source=observed
+  prop x25519 | rcbom:kb:version=0.2.0
+  prop x25519 | rcbom:occurrences=4
+  prop x25519 | rcbom:reachability=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+component application t4 0.1.0 | pkg:cargo/t4@0.1.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t4@0.1.0 -> pkg:cargo/ring@0.17.14
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:x25519
+root {"bom-ref": "pkg:cargo/t4@0.1.0#root", "name": "t4", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:reachable-instances=58
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
