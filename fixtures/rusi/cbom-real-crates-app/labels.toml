@@ -1,0 +1,218 @@
+# Ground truth for cbom-real-crates-app (rusi fixture, cdxgen-plugins-bin@6a64635, MIT).
+#
+# Labelled from src/main.rs and the locked crate sources, before scoring any tool.
+# Annotator 1: Claude (2026-10-08). Annotator 2: pending.
+#
+# tier = "core"       the algorithm is used by this program's code at these lines; must be found
+#        "extended"   real, but reasonable tools may omit it; credited if found, not a miss
+# lines            src/main.rs lines whose code uses the asset (the line the call starts on)
+# component_lines  lines where the asset is used only as part of another (SHA-256 inside HMAC)
+# functions        what the code at those lines does with it ([] = set up, never used)
+# accept           asset names counted as a match (registry name first)
+# provenance       role -> where the value handed to the API comes from: hard-coded, environment,
+#                  file, rng, parameter, derived (all that apply)
+
+fixture = "cbom-real-crates-app"
+source = "https://github.com/cdxgen/cdxgen-plugins-bin/tree/6a646353e4fbd9d64fa115176241d7a233e19630/thirdparty/rusi/fixtures/cbom-real-crates-app"
+status = "draft: annotator 1"
+
+[[asset]]
+name = "SHA-256"
+accept = ["SHA-256"]
+family = "SHA-2"
+primitive = "hash"
+tier = "core"
+lines = [23]
+component_lines = [27, 33]
+functions = ["digest"]
+why = "Sha256::digest (sha2 0.10.9); also the hash inside Hmac<Sha256> (27) and the PRF hash of pbkdf2_hmac::<Sha256> (33)"
+
+[[asset]]
+name = "MD5"
+accept = ["MD5"]
+family = "MD5"
+primitive = "hash"
+tier = "core"
+lines = [24]
+functions = ["digest"]
+why = "md5::compute (md5 0.7.0)"
+
+[[asset]]
+name = "BLAKE3-256"
+accept = ["BLAKE3-256", "BLAKE3"]
+family = "BLAKE3"
+primitive = "hash"
+tier = "core"
+lines = [25]
+functions = ["digest"]
+why = "blake3::hash (blake3 1.8.5), default 32-byte output"
+
+[[asset]]
+name = "AES-256-GCM"
+accept = ["AES-256-GCM", "AES-GCM", "AES-256"]  # registry: key size and mode are optional segments
+family = "AES"
+primitive = "ae"
+tier = "core"
+lines = [26]
+functions = []
+params = { nonce_bytes = "12", tag_bytes = "16" }
+why = "Aes256Gcm::new_from_slice (aes-gcm 0.10.3): a cipher is keyed, never used to encrypt"
+provenance = { key = ["environment", "hard-coded"] }  # app_secret: env::var("APP_SECRET") or the literal fallback at line 17
+
+[[asset]]
+name = "HMAC-SHA-256"
+accept = ["HMAC-SHA-256"]
+family = "HMAC"
+primitive = "mac"
+tier = "core"
+lines = [27]
+functions = []
+why = "Hmac::<Sha256>::new_from_slice (hmac 0.12.1): keyed, never updated or finalized"
+provenance = { key = ["environment", "hard-coded"] }  # app_secret, as above
+
+[[asset]]
+name = "PBKDF2-SHA-256-1000-32"
+accept = ["PBKDF2-SHA-256-1000-32", "PBKDF2-SHA-256", "PBKDF2-HMAC-SHA-256", "PBKDF2"]
+family = "PBKDF2"
+primitive = "kdf"
+tier = "core"
+lines = [33]
+functions = ["keyderive"]
+params = { iterations = "1000", dk_len = "32", salt = "hard-coded b\"saltysalt\" (9 bytes)" }
+why = "pbkdf2_hmac::<Sha256>(pw, b\"saltysalt\", 1_000, &mut [0u8; 32]) (pbkdf2 0.12.2); 1,000 iterations and a literal salt"
+provenance = { password = ["environment", "hard-coded"], salt = ["hard-coded"] }  # salt b"saltysalt" at line 33
+
+[[asset]]
+name = "Argon2id-19456-2-1"
+accept = ["Argon2id-19456-2-1", "Argon2id", "Argon2"]
+family = "Argon2"
+primitive = "kdf"
+tier = "core"
+lines = [36]
+functions = ["keyderive"]
+params = { memory_kib = "19456", passes = "2", parallelism = "1", output_bytes = "32", salt = "hard-coded b\"fixed-salt-value\" (16 bytes), line 35" }
+why = "Argon2::default().hash_password (argon2 0.5.3): Algorithm::default() is Argon2id, Params::default() m=19*1024, t=2, p=1, 32-byte output (params.rs:42-76)"
+provenance = { password = ["environment", "hard-coded"], salt = ["hard-coded"] }  # salt from SaltString::encode_b64(b"fixed-salt-value") at line 35
+
+[[asset]]
+name = "HMAC secret key (jsonwebtoken)"
+accept = ["HMAC", "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
+family = "HMAC"
+primitive = "mac"
+tier = "extended"
+lines = [29]
+functions = []
+why = "EncodingKey::from_secret (jsonwebtoken 9.3.1) wraps an HMAC secret; HS256/384/512 is chosen only by a Header at encode time, and nothing is encoded. Key material with an undetermined algorithm"
+provenance = { key = ["environment", "hard-coded"] }  # app_secret, as above
+
+[[asset]]
+name = "TLS (rustls 0.23.40, aws-lc-rs default provider)"
+accept = ["TLS", "TLSv1.2", "TLSv1.3", "TLS 1.2", "TLS 1.3"]
+family = "TLS"
+primitive = "protocol"
+tier = "core"
+lines = [38]
+functions = []
+backend = "aws-lc-rs"
+why = "ClientConfig::builder() installs CryptoProvider::get_default_or_install_from_crate_features(); rustls default features are aws_lc_rs, prefer-post-quantum, tls12. No connection is made: capability, not traffic"
+
+# What the default aws-lc-rs provider makes available (rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:
+# DEFAULT_CIPHER_SUITES at 101, DEFAULT_KX_GROUPS at 247, SUPPORTED_SIG_ALGS).
+# Reached from line 38; credited if reported, not counted as misses.
+[[capability]]
+via_line = 38
+cipher_suites = [
+    "TLS13_AES_256_GCM_SHA384", "TLS13_AES_128_GCM_SHA256", "TLS13_CHACHA20_POLY1305_SHA256",
+    "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+    "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+    "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+]
+kx_groups = ["X25519MLKEM768 (hybrid: x25519 + ML-KEM-768, preferred)", "x25519", "ECDH-P-256", "ECDH-P-384"]
+# signature schemes: SUPPORTED_SIG_ALGS (mod.rs), from rustls-webpki's aws-lc-rs algorithms
+algorithms = [
+    "AES-128-GCM", "AES-256-GCM", "ChaCha20-Poly1305", "SHA-256", "SHA-384", "HMAC-SHA-256",
+    "HMAC-SHA-384", "HKDF-SHA-256", "HKDF-SHA-384", "x25519", "ECDH-P-256", "ECDH-P-384",
+    "ML-KEM-768",
+    "ECDSA-P-256-SHA-256", "ECDSA-P-256-SHA-384", "ECDSA-P-256-SHA-512",
+    "ECDSA-P-384-SHA-256", "ECDSA-P-384-SHA-384", "ECDSA-P-384-SHA-512",
+    "ECDSA-P-521-SHA-256", "ECDSA-P-521-SHA-384", "ECDSA-P-521-SHA-512",
+    "Ed25519",
+    "RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512",
+    "RSA-PSS-SHA-256", "RSA-PSS-SHA-384", "RSA-PSS-SHA-512",
+]
+
+# Lines a name-matching tool might flag but that use no cryptography.
+[[negative]]
+lines = [1, 2, 3, 4, 5, 6, 8]
+why = "imports only"
+
+[[negative]]
+lines = [16, 17, 18]
+why = "a secret read from the environment with a literal fallback: key material provenance, not an algorithm"
+
+# Layer 1: crates and whether the program's code uses them.
+[[crate]]
+package = "aes-gcm"
+usage = "used"
+[[crate]]
+package = "argon2"
+usage = "used"
+[[crate]]
+package = "blake3"
+usage = "used"
+[[crate]]
+package = "hmac"
+usage = "used"
+[[crate]]
+package = "jsonwebtoken"
+usage = "used"
+[[crate]]
+package = "md5"
+usage = "used"
+[[crate]]
+package = "pbkdf2"
+usage = "used"
+[[crate]]
+package = "rustls"
+usage = "used"
+backend = "aws-lc-rs"
+[[crate]]
+package = "sha2"
+usage = "used"
+[[crate]]
+package = "aws-lc-sys"
+usage = "used"
+native = true
+why = "links = aws_lc_*; the C library behind rustls's default provider"
+
+# Added in adjudication after the first scoring run (2026-10-08): the scorer listed SHA-512 and
+# ring-based JWT algorithms found in jsonwebtoken. They are real: jsonwebtoken 9.3.1 links its
+# whole algorithm table (ring), present but not reachable from main (only from_secret is called).
+[[capability]]
+via_line = 29
+reachable = false
+source = "jsonwebtoken-9.3.1/src/crypto/{mod,rsa,ecdsa,eddsa}.rs"
+algorithms = [
+    "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512",
+    "RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512",
+    "RSA-PSS-SHA-256", "RSA-PSS-SHA-384", "RSA-PSS-SHA-512",
+    "ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384", "Ed25519",
+    "SHA-256", "SHA-384", "SHA-512",
+]
+
+# Added in adjudication after scoring (2026-10-08), each checked in the rustls 0.23.40 source:
+# - QUIC header protection: the TLS 1.3 suites carry a header-protection cipher
+#   (aws_lc_rs/tls13.rs, e.g. line 77 `header_alg: &aead::quic::AES_128`), reachable with them.
+[[capability]]
+via_line = 38
+reachable = true
+source = "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs (quic KeyBuilder header_alg)"
+algorithms = ["AES-128", "AES-256", "ChaCha20"]
+
+# - Compiled but not offered by the default provider: ALL_KX_GROUPS (mod.rs:258) also lists
+#   SECP256R1MLKEM768, MLKEM768 and MLKEM1024; present, not reachable from main.
+[[capability]]
+via_line = 38
+reachable = false
+source = "rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:258 (ALL_KX_GROUPS), pq/mod.rs"
+algorithms = ["ML-KEM-768", "ML-KEM-1024", "ECDH-P-256"]

@@ -1,0 +1,29 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/rcbom-facts",
+    "crates/rcbom-kb",
+    "crates/rcbom-manifest",
+    "crates/rcbom-analysis",
+    "crates/cargo-cbom",
+]
+# The driver links rustc_private and builds only on the pinned nightly (see its rust-toolchain.toml).
+# phase0/ and fixtures/ hold standalone target crates.
+exclude = ["crates/rcbom-driver", "phase0", "fixtures"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+rcbom-facts = { path = "crates/rcbom-facts" }
+rcbom-kb = { path = "crates/rcbom-kb" }
+rcbom-manifest = { path = "crates/rcbom-manifest" }
+rcbom-analysis = { path = "crates/rcbom-analysis" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+regex = "1"
+semver = "1"
+toml = "0.9"

@@ -1,0 +1,54 @@
+# Ground truth for cbom-real-modern-app (rusi fixture, cdxgen-plugins-bin@6a64635, MIT).
+# Labelled from src/main.rs and the locked crate sources, before scoring any tool.
+# Annotator 1: Claude (2026-10-08). Annotator 2: pending. Field meanings: see ../cbom-real-crates-app/labels.toml.
+
+fixture = "cbom-real-modern-app"
+source = "https://github.com/cdxgen/cdxgen-plugins-bin/tree/6a646353e4fbd9d64fa115176241d7a233e19630/thirdparty/rusi/fixtures/cbom-real-modern-app"
+status = "draft: annotator 1"
+
+[[asset]]
+name = "SHA-1"
+accept = ["SHA-1"]
+family = "SHA-1"
+primitive = "hash"
+tier = "core"
+lines = [8]
+functions = ["digest"]
+why = "Sha1::digest (sha1 0.10.6)"
+
+[[asset]]
+name = "ChaCha20-Poly1305"
+accept = ["ChaCha20-Poly1305"]
+family = "ChaCha20"
+primitive = "ae"
+tier = "core"
+lines = [9]
+functions = []
+params = { nonce_bytes = "12" }
+why = "ChaCha20Poly1305::new_from_slice (chacha20poly1305 0.10.1): keyed, never used to encrypt"
+provenance = { key = ["environment", "hard-coded"] }  # shared_secret: env::var("SHARED_SECRET") or the literal fallback at line 7
+
+# The trap in this fixture: ring is linked and named, but only for a length constant.
+[[negative]]
+lines = [10]
+names = ["SHA-256"]
+why = "ring::digest::SHA256_OUTPUT_LEN is `pub const usize = 32` (digest.rs:545); nothing is hashed. A SHA-256 finding here is a false positive"
+
+[[negative]]
+lines = [1, 2, 3]
+why = "imports only"
+
+[[negative]]
+lines = [6, 7]
+why = "a secret read from the environment with a literal fallback: key material provenance, not an algorithm"
+
+[[crate]]
+package = "chacha20poly1305"
+usage = "used"
+[[crate]]
+package = "sha1"
+usage = "used"
+[[crate]]
+package = "ring"
+usage = "no-crypto-use"
+why = "only SHA256_OUTPUT_LEN, a constant"

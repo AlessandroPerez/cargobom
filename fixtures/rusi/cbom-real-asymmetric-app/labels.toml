@@ -1,0 +1,96 @@
+# Ground truth for cbom-real-asymmetric-app (rusi fixture, cdxgen-plugins-bin@6a64635, MIT).
+# Labelled from src/main.rs and the locked crate sources, before scoring any tool.
+# Annotator 1: Claude (2026-10-08). Annotator 2: pending. Field meanings: see ../cbom-real-crates-app/labels.toml.
+
+fixture = "cbom-real-asymmetric-app"
+source = "https://github.com/cdxgen/cdxgen-plugins-bin/tree/6a646353e4fbd9d64fa115176241d7a233e19630/thirdparty/rusi/fixtures/cbom-real-asymmetric-app"
+status = "draft: annotator 1"
+
+[[asset]]
+name = "SHA-256"
+accept = ["SHA-256"]
+family = "SHA-2"
+primitive = "hash"
+tier = "core"
+lines = [11]
+functions = ["digest"]
+why = "ring::digest::digest(&SHA256, ..) (ring 0.17.14)"
+
+[[asset]]
+name = "AES-256-GCM"
+accept = ["AES-256-GCM", "AES-GCM", "AES-256"]  # registry: key size and mode are optional segments
+family = "AES"
+primitive = "ae"
+tier = "core"
+lines = [12]
+functions = []
+why = "ring UnboundKey::new(&AES_256_GCM, ..): a key is built, never used to seal or open"
+provenance = { key = ["environment", "hard-coded"] }  # signing_secret: env::var("SIGNING_SECRET") or the literal fallback at line 9
+
+[[asset]]
+name = "RSA private key (2048 bits)"
+accept = ["RSA-2048", "RSA"]
+family = "RSA"
+primitive = "pke"
+asset_type = "related-crypto-material"
+material = { type = "private-key", size = 2048, public_exponent = 65537 }
+tier = "core"
+lines = [15]
+functions = ["keygen"]
+why = "RsaPrivateKey::new(&mut rng, 2048) (rsa 0.9.10, e = 65537, key.rs:214-219). No scheme (PKCS#1, PSS, OAEP) is chosen, so the registry has no algorithm name for it: it is key material"
+provenance = { rng = ["rng"] }  # thread_rng() at line 14
+
+[[asset]]
+name = "Ed25519 private key"
+accept = ["Ed25519"]
+family = "EdDSA"
+primitive = "signature"
+asset_type = "related-crypto-material"
+material = { type = "private-key", size = 256, provenance = "hard-coded [42u8; 32]" }
+tier = "core"
+lines = [16]
+functions = []
+why = "SigningKey::from_bytes(&[42u8; 32]) (ed25519-dalek 2.2.0): a signing key from a literal, never used to sign"
+provenance = { key = ["hard-coded"] }  # [42u8; 32] at line 16
+
+[[asset]]
+name = "SHA-512"
+accept = ["SHA-512"]
+family = "SHA-2"
+primitive = "hash"
+tier = "extended"
+lines = []
+component_lines = [16]
+functions = []
+why = "Ed25519 key expansion hashes the secret with SHA-512 (by definition of Ed25519)"
+
+[[asset]]
+name = "CSPRNG (rand ThreadRng: ChaCha12, reseeded from the OS)"
+accept = ["ChaCha12", "ChaCha", "ChaCha20", "DRBG", "CSPRNG"]
+family = "ChaCha"
+primitive = "drbg"
+tier = "extended"
+lines = [14]
+functions = ["generate"]
+why = "rand 0.8.6 thread_rng(): ReseedingRng over ChaCha12Core (rngs/std.rs:13); the randomness for the RSA key generation at line 15"
+
+[[negative]]
+lines = [1, 2, 3, 4, 5]
+why = "imports only"
+
+[[negative]]
+lines = [8, 9]
+why = "a secret read from the environment with a literal fallback: key material provenance, not an algorithm"
+
+[[crate]]
+package = "ring"
+usage = "used"
+[[crate]]
+package = "rsa"
+usage = "used"
+[[crate]]
+package = "ed25519-dalek"
+usage = "used"
+[[crate]]
+package = "rand"
+usage = "used"

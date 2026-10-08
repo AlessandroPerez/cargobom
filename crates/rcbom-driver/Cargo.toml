@@ -1,0 +1,16 @@
+[package]
+name = "rcbom-driver"
+description = "RUSTC_WRAPPER that records crypto-relevant MIR facts through rustc_public"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+rcbom-facts = { path = "../rcbom-facts" }
+serde_json = "1"
+
+[package.metadata.rust-analyzer]
+rustc_private = true
+
+# Standalone: built with the pinned nightly, not part of the stable workspace.
+[workspace]
