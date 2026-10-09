@@ -88,19 +88,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t5@0.1.0",
-      "name": "t5",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t5@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -122,7 +109,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t5::unused_by_bin; use: digest; line: `digest(&SHA256, d).as_ref().len()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t5::unused_by_bin; line: `digest(&SHA256, d).as_ref().len()`; code: `SHA256`",
             "line": 19,
             "location": "src/lib.rs",
             "offset": 12,
@@ -181,7 +168,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t5::H384 as t5::Hasher>::hash; use: digest; line: `digest(&SHA384, d).as_ref().len()`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <t5::H384 as t5::Hasher>::hash; line: `digest(&SHA384, d).as_ref().len()`; code: `SHA384`",
             "line": 13,
             "location": "src/lib.rs",
             "offset": 16,
@@ -233,7 +220,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t5::ALGS; use: digest; line: `pub static ALGS: [&Algorithm; 1] = [&SHA512];`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t5::ALGS; line: `pub static ALGS: [&Algorithm; 1] = [&SHA512];`; code: `SHA512`",
             "line": 4,
             "location": "src/lib.rs",
             "offset": 37,
@@ -257,7 +244,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -296,8 +283,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t5@0.1.0#root",
+      "bom-ref": "pkg:cargo/t5@0.1.0",
       "name": "t5",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t5@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -345,7 +339,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:93cac4f6-df62-8dad-acf5-d2af391be68c",
+  "serialNumber": "urn:uuid:7ae83f67-4431-87f2-b86f-4b242e523e37",
   "specVersion": "1.7",
   "version": 1
 }

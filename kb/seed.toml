@@ -262,6 +262,111 @@ primitive = "ae"
 functions = ["encrypt", "decrypt"]
 params = { core = { arg = 0, path = [0], map = { ChaChaCore = "ChaCha", XChaChaCore = "XChaCha" } }, rounds = { arg = 0, path = [0, 0], typenum = true, scale = 2 }, nonce_bytes = { arg = 1, typenum = true } }
 
+# aes 0.8's block ciphers used directly (`Aes128::new(key).encrypt_block(&mut block)`): one block
+# at a time, no mode (registry AES[-(128|192|256)][-{mode}]..). Inside a mode or an AEAD they are
+# a parameter of its entry (`cbc::Encryptor<Aes128>` is AES-128-CBC), not an asset of their own.
+[[type]]
+crate = "aes"
+name = "Aes128"
+asset = "AES-128"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "128"
+
+[[type]]
+crate = "aes"
+name = "Aes128Enc"
+asset = "AES-128"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "128"
+
+[[type]]
+crate = "aes"
+name = "Aes128Dec"
+asset = "AES-128"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "128"
+
+[[type]]
+crate = "aes"
+name = "Aes192"
+asset = "AES-192"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "192"
+
+[[type]]
+crate = "aes"
+name = "Aes192Enc"
+asset = "AES-192"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "192"
+
+[[type]]
+crate = "aes"
+name = "Aes192Dec"
+asset = "AES-192"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "192"
+
+[[type]]
+crate = "aes"
+name = "Aes256"
+asset = "AES-256"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "256"
+
+[[type]]
+crate = "aes"
+name = "Aes256Enc"
+asset = "AES-256"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "256"
+
+[[type]]
+crate = "aes"
+name = "Aes256Dec"
+asset = "AES-256"
+family = "AES"
+primitive = "block-cipher"
+functions = ["encrypt", "decrypt"]
+parameter_set = "256"
+
+# chacha20 0.9's stream ciphers used directly (`ChaCha20::new(key, nonce).apply_keystream(..)`):
+# ChaCha20 = StreamCipherCoreWrapper<ChaChaCore<U10>>, the typenum counting double rounds. In
+# ChaCha20-Poly1305 the core is a parameter of that entry, not an asset of its own.
+[[type]]
+crate = "chacha20"
+name = "ChaChaCore"
+asset = "ChaCha{rounds}"
+family = "ChaCha20"
+primitive = "stream-cipher"
+functions = ["encrypt", "decrypt"]
+params = { rounds = { arg = 0, typenum = true, scale = 2 } }
+
+[[type]]
+crate = "chacha20"
+name = "XChaChaCore"
+asset = "XChaCha{rounds}"
+family = "ChaCha20"
+primitive = "stream-cipher"
+functions = ["encrypt", "decrypt"]
+params = { rounds = { arg = 0, typenum = true, scale = 2 } }
+
 # A block cipher in a mode: the cipher is a parameter of the mode, and these entries hold for
 # AES ciphers only (`required`): `cbc::Encryptor<blowfish::Blowfish>` and
 # `ctr::Ctr64BE<blowfish::Blowfish>` are not AES. aes 0.8's encrypt-only and decrypt-only types
@@ -386,7 +491,9 @@ functions = ["digest"]
 
 # The parameters of an Argon2 value are run-time fields. The constructor that built a receiver
 # names them (`Argon2::default()`, `Argon2::new(Algorithm::Argon2i, ..)`, [[fn]] entries below);
-# without one the asset is the family name, which the registry has no pattern for.
+# without one the asset is the family name, which the registry has no pattern for. Two methods
+# do not use the receiver's: `verify_password` hashes with the algorithm and costs of the stored
+# hash, `hash_password_customized(pw, alg, version, params, salt)` with its arguments.
 [[type]]
 crate = "argon2"
 name = "Argon2"
@@ -394,6 +501,7 @@ asset = "Argon2"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
+own_params = ["verify_password", "hash_password_customized"]
 
 # The password-hash API types. Their parameters are chosen per call: `hash_password` uses the
 # crate's defaults ([[fn]] entries below), `hash_password_customized` the caller's, and
@@ -573,20 +681,22 @@ functions = ["encrypt", "decrypt"]
 crate = "rsa"
 name = "EncryptingKey"
 module = "^oaep::"
-asset = "RSA-OAEP-{hash}"
+asset = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt"]
+defaults = { mgf_hash = "{hash}" }
 params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
 
 [[type]]
 crate = "rsa"
 name = "DecryptingKey"
 module = "^oaep::"
-asset = "RSA-OAEP-{hash}"
+asset = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["decrypt"]
+defaults = { mgf_hash = "{hash}" }
 params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
 
 [[type]]
@@ -1123,6 +1233,27 @@ family = "scrypt"
 primitive = "kdf"
 functions = ["keyderive"]
 
+# ed25519-dalek 2's `hazmat` API: `raw_sign::<Sha512>(&esk, msg, &vk)` signs (SHA-512 is part of
+# Ed25519), `raw_verify::<Sha512>(..)` verifies; `ExpandedSecretKey::from_bytes(&[u8; 64])` (or
+# `from_slice`) sets up a key
+[[fn]]
+crate = "ed25519_dalek"
+path = "^hazmat::(raw_sign|raw_sign_prehashed|raw_sign_byupdate|raw_verify|raw_verify_prehashed)$"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+curve = "other/Ed25519"
+
+[[fn]]
+crate = "ed25519_dalek"
+path = "^hazmat::ExpandedSecretKey::from_(bytes|slice)$"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "other/Ed25519"
+
 [[fn]]
 crate = "md5"
 path = "^compute$"
@@ -1237,13 +1368,15 @@ functions = ["keyderive"]
 crate = "argon2"
 self_type = "Argon2"
 path = "Default::default$"
-asset = "Argon2id-19456-2-1"
+asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
+params = { variant = { value = "id" }, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" } }
 
 # Argon2::new(algorithm, version, params): the variant is argument 0 (Argon2d = 0, Argon2i = 1,
-# Argon2id = 2, argon2 0.5 algorithm.rs); the costs are in the Params value.
+# Argon2id = 2, argon2 0.5 algorithm.rs); the costs are in the Params value, named where it is
+# built (`Params::new(m_cost, t_cost, p_cost, output_len)`, below).
 [[fn]]
 crate = "argon2"
 path = "Argon2::new$"
@@ -1252,6 +1385,27 @@ family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
 params = { variant = { const_arg = 0, map = { "0" = "d", "1" = "i", "2" = "id" } } }
+
+# argon2 0.5 `Params::new(m_cost, t_cost, p_cost, output_len)`: the costs; the variant is the
+# `Argon2` value's, or the `hash_password_customized` call's it is passed to
+[[fn]]
+crate = "argon2"
+path = "Params::new$"
+asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
+family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { variant = {}, m_cost = { const_arg = 0 }, t_cost = { const_arg = 1 }, p_cost = { const_arg = 2 } }
+
+# Argon2::new_with_secret(secret, algorithm, version, params): the variant is argument 1
+[[fn]]
+crate = "argon2"
+path = "Argon2::new_with_secret$"
+asset = "Argon2{variant}"
+family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { variant = { const_arg = 1, map = { "0" = "d", "1" = "i", "2" = "id" } } }
 
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
@@ -1266,11 +1420,40 @@ material = "private-key"
 size = "{bits}"
 params = { bits = { const_arg = 1 } }
 
+# `RsaPrivateKey::new_with_exp(rng, bits, exp)`, and the signing keys generated with their
+# scheme (`pkcs1v15::SigningKey::<D>::random(rng, bits)`, pss's `SigningKey` and
+# `BlindedSigningKey`): an RSA key of `bits`
+[[fn]]
+crate = "rsa"
+path = "RsaPrivateKey::new_with_exp$"
+asset = "RSA-{bits}"
+family = "RSA"
+primitive = "pke"
+functions = ["keygen"]
+use = "keygen"
+material = "private-key"
+size = "{bits}"
+params = { bits = { const_arg = 1 } }
+
+[[fn]]
+crate = "rsa"
+path = "(pkcs1v15|pss)::.*(SigningKey|BlindedSigningKey)::random$"
+asset = "RSA-{bits}"
+family = "RSA"
+primitive = "pke"
+functions = ["keygen"]
+use = "keygen"
+material = "private-key"
+size = "{bits}"
+params = { bits = { const_arg = 1 } }
+
 # rsa 0.9: Oaep::new::<D>(), Oaep::new_with_label::<D, S>(label): D is the OAEP hash and
 # MGF1's. Oaep::new_with_mgf_hash::<D, M>(), new_with_mgf_hash_and_label::<D, M, S>(label):
-# MGF1 hashes with M. The registry's RSA-OAEP[-{hashAlgorithm}][-{maskGenAlgorithm}] has no
-# notation for the mask generation function: the name has the OAEP hash, `mgf_hash` the MGF1
-# one, and both hashes are components.
+# MGF1 hashes with M. The registry's RSA-OAEP[-{hashAlgorithm}][-{maskGenAlgorithm}] names the
+# mask generation function after the hash; it is written when it is not MGF1 with the OAEP
+# hash (`RSA-OAEP-SHA-256-MGF1-SHA-1`, Java's OAEPWithSHA-256AndMGF1Padding), so that the two
+# schemes, whose ciphertexts do not decrypt under each other, are two assets. Both hashes are
+# components.
 [[fn]]
 crate = "rsa"
 path = "Oaep::new(_with_label)?$"
@@ -1283,10 +1466,11 @@ params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 0, asset = true 
 [[fn]]
 crate = "rsa"
 path = "Oaep::new_with_mgf_hash(_and_label)?$"
-asset = "RSA-OAEP-{hash}"
+asset = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+defaults = { mgf_hash = "{hash}" }
 params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
 
 # rsa 0.9 signature paddings: Pkcs1v15Sign::new::<D>() (RSASSA-PKCS1-v1_5 with D's DigestInfo
@@ -1345,27 +1529,27 @@ groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1
 [[use]]
 function = "encrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place_append_tag", "seal_in_place_separate_tag", "encrypt_padded_mut", "encrypt_padded_vec_mut", "apply_keystream", "wrap", "wrap_with_padding"]
+methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place", "seal_in_place_append_tag", "seal_in_place_separate_tag", "seal_in_place_scatter", "seal_out_of_place_scatter", "less_safe_encrypt", "encrypt_padded", "encrypt_padded_mut", "encrypt_padded_vec", "encrypt_padded_vec_mut", "encrypt_padded_b2b", "encrypt_padded_b2b_mut", "encrypt_padded_inout", "encrypt_padded_inout_mut", "encrypt_block", "encrypt_block_mut", "encrypt_block_b2b", "encrypt_block_b2b_mut", "encrypt_block_inout", "encrypt_block_inout_mut", "encrypt_blocks", "encrypt_blocks_mut", "encrypt_blocks_b2b", "encrypt_blocks_b2b_mut", "encrypt_blocks_inout", "encrypt_blocks_inout_mut", "encrypt_b2b", "encrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "wrap", "wrap_with_padding"]
 
 [[use]]
 function = "decrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_within", "decrypt_padded_mut", "decrypt_padded_vec_mut", "apply_keystream", "unwrap", "unwrap_with_padding"]
+methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_in_place_separate_tag", "open_separate_gather", "open_within", "decrypt_padded", "decrypt_padded_mut", "decrypt_padded_vec", "decrypt_padded_vec_mut", "decrypt_padded_b2b", "decrypt_padded_b2b_mut", "decrypt_padded_inout", "decrypt_padded_inout_mut", "decrypt_block", "decrypt_block_mut", "decrypt_block_b2b", "decrypt_block_b2b_mut", "decrypt_block_inout", "decrypt_block_inout_mut", "decrypt_blocks", "decrypt_blocks_mut", "decrypt_blocks_b2b", "decrypt_blocks_b2b_mut", "decrypt_blocks_inout", "decrypt_blocks_inout_mut", "decrypt_b2b", "decrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "unwrap", "unwrap_with_padding"]
 
 [[use]]
 function = "digest"
 primitives = ["hash"]
-methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "finalize_xof", "new_with_prefix", "compute", "consume", "hash"]
+methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "chain_update", "finalize", "finalize_reset", "finalize_xof", "sign", "keyed_hash"]
+methods = ["update", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash"]
 
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash"]
+methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "raw_verify", "raw_verify_prehashed"]
 
 [[use]]
 function = "keyderive"
@@ -1377,16 +1561,17 @@ methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt",
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng"]
+methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate"]
 
 [[use]]
 function = "keygen"
 methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8"]
 
-# x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom)
+# x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom);
+# rsa's `pkcs1v15::SigningKey::random(rng, bits)`
 [[use]]
 function = "keygen"
-primitives = ["key-agree"]
+primitives = ["key-agree", "signature"]
 methods = ["random"]
 
 # aws-lc-rs `kem`: `EncapsulationKey::encapsulate()`, `DecapsulationKey::decapsulate(ct)`
@@ -1443,6 +1628,16 @@ args = { "2" = "key" }
 path = "^(ring|aws_lc_rs)::aead::quic::HeaderProtectionKey::new$"
 args = { "1" = "key" }
 
+# keys made from HKDF output (`UnboundKey::from(prk.expand(&[info], &AES_256_GCM)?)`, ring's
+# and aws-lc-rs's `From<Okm>` impls): the output is the key (a salt for `Salt`)
+[[role]]
+path = "^(ring|aws_lc_rs)::(aead::(unbound_key::)?UnboundKey|aead::quic::HeaderProtectionKey|cipher::UnboundCipherKey|hmac::Key|hkdf::Prk)::from$"
+args = { "0" = "key" }
+
+[[role]]
+path = "^(ring|aws_lc_rs)::hkdf::Salt::from$"
+args = { "0" = "salt" }
+
 # a pseudorandom key used as is (`Prk::new_less_safe(alg, prk)`); the TLS 1.2 PRF secret
 [[role]]
 path = "^(ring|aws_lc_rs)::hkdf::Prk::new_less_safe$"
@@ -1457,8 +1652,36 @@ path = "Nonce::assume_unique_for_key$"
 args = { "0" = "nonce" }
 
 [[role]]
-path = "LessSafeKey::(seal_in_place\\w*|open_in_place|open_within)$"
+path = "LessSafeKey::(seal_\\w+|open_\\w+)$"
 args = { "1" = "nonce" }
+
+# aws-lc-rs TLS record keys: `seal_in_place_append_tag(nonce, aad, in_out)`
+[[role]]
+path = "^aws_lc_rs::aead::tls::(TlsRecordSealingKey|TlsRecordOpeningKey)::(seal|open)_\\w+$"
+args = { "1" = "nonce" }
+
+# aws-lc-rs block-cipher keys: `less_safe_encrypt(in_out, context)`, the context holding the IV
+[[role]]
+path = "^aws_lc_rs::cipher::.*::less_safe_encrypt$"
+args = { "2" = "iv" }
+
+# ring / aws-lc-rs key pairs from a seed or a serialised private key
+[[role]]
+path = "^(ring|aws_lc_rs)::.*Ed25519KeyPair::(from_seed_unchecked|from_seed_and_public_key|from_pkcs8|from_pkcs8_maybe_unchecked)$"
+args = { "0" = "key" }
+
+[[role]]
+path = "^(ring|aws_lc_rs)::.*EcdsaKeyPair::(from_pkcs8|from_private_key_and_public_key)$"
+args = { "1" = "key" }
+
+[[role]]
+path = "^(ring|aws_lc_rs)::.*RsaKeyPair::(from_pkcs8|from_der)$"
+args = { "0" = "key" }
+
+# rsa's private keys decoded from PKCS#8 or PKCS#1 (`DecodePrivateKey`, `DecodeRsaPrivateKey`)
+[[role]]
+path = "RsaPrivateKey::from_(pkcs8|pkcs1)_(pem|der)$"
+args = { "0" = "key" }
 
 [[role]]
 path = "hmac::Key::new$"
@@ -1472,10 +1695,16 @@ args = { "0" = "password", "1" = "salt" }
 path = "^pbkdf2::pbkdf2(_array)?$"
 args = { "0" = "password", "1" = "salt" }
 
-# ring/aws-lc-rs pbkdf2::derive(algorithm, iterations, salt, secret, out)
+# ring/aws-lc-rs pbkdf2::derive(algorithm, iterations, salt, secret, out), and
+# verify(algorithm, iterations, salt, secret, previously_derived)
 [[role]]
-path = "pbkdf2::derive$"
+path = "^(ring|aws_lc_rs)::pbkdf2::(derive|verify)$"
 args = { "2" = "salt", "3" = "password" }
+
+# `PasswordVerifier::verify_password(&self, password, hash)`
+[[role]]
+path = "PasswordVerifier::verify_password$"
+args = { "1" = "password" }
 
 [[role]]
 path = "SaltString::(encode_b64|from_b64|new)$"
@@ -1528,8 +1757,23 @@ path = "(EncodingKey|DecodingKey)::from_(base64_)?secret$"
 args = { "0" = "key" }
 
 [[role]]
-path = "RsaPrivateKey::new$"
+path = "RsaPrivateKey::new(_with_exp)?$"
 args = { "0" = "rng" }
+
+[[role]]
+path = "^rsa::(pkcs1v15|pss)::.*::random$"
+args = { "0" = "rng" }
+
+# rsa: `pub_key.encrypt(&mut rng, padding, msg)`, `priv_key.decrypt_blinded(&mut rng, ..)`, and
+# the signature traits' randomized signing (`sign_with_rng(&mut rng, msg)`)
+[[role]]
+path = "^rsa::key::(RsaPublicKey::encrypt|RsaPrivateKey::decrypt_blinded)$|RandomizedSigner::(try_)?sign_with_rng$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$|RandomizedPrehashSigner::sign_prehash_with_rng$"
+args = { "1" = "rng" }
+
+# ed25519-dalek's hazmat key: `ExpandedSecretKey::from_bytes(&bytes)`
+[[role]]
+path = "^ed25519_dalek::hazmat::ExpandedSecretKey::from_(bytes|slice)$"
+args = { "0" = "key" }
 
 # `StaticSecret::from([7u8; 32])`, `bytes.into()`
 [[role]]
@@ -1568,16 +1812,16 @@ path = "^std::env::(var|var_os|vars|vars_os|args|args_os)$"
 
 [[source]]
 kind = "file"
-path = "^std::fs::(read|read_to_string)$|^std::io::(Read|BufRead)::read"
+path = "^std::fs::(read|read_to_string)$|^(std|alloc)::io::(read::)?Read::read|^(std|alloc)::io::(buf_read::)?BufRead::read"
 
 [[source]]
 kind = "rng"
-path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random|new)$|OsRng)"
+path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random|new)$|OsRng|ThreadRng::default$)"
 
 # the output of a key derivation (the PRK, the OKM, a shared secret) is derived, whatever went in
 [[source]]
 kind = "derived"
-path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$)"
+path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$|^blake3::Hasher::new_derive_key$)"
 
 # Calls whose result carries only some arguments' data (receiver = argument 0).
 [[passthrough]]
@@ -1601,9 +1845,10 @@ args = [0]
 path = "^generic_array::GenericArray::(from_slice|from_mut_slice|clone_from_slice|from_exact_iter|as_slice|as_mut_slice)$"
 args = [0]
 
-# std methods that copy data into their receiver: the data is the argument
+# std methods that copy data into their receiver: the data is the argument (std's only: a
+# program's own `fill(buf)`, or blake3's `OutputReader::fill(&mut out)`, is not one)
 [[passthrough]]
-path = "::(copy_from_slice|clone_from_slice|extend_from_slice|push_str|push|extend|write_all|fill)$"
+path = "^(core|std|alloc)::.*::(copy_from_slice|clone_from_slice|extend_from_slice|push_str|push|extend|write_all|fill)$"
 args = [1]
 
 # `format!("{secret}")`: the formatted values, not the literal pieces

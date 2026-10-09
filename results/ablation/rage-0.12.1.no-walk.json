@@ -562,19 +562,6 @@
       "version": "0.6.2"
     },
     {
-      "bom-ref": "pkg:cargo/rage@0.12.1",
-      "name": "rage",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/rage@0.12.1",
-      "type": "application",
-      "version": "0.12.1"
-    },
-    {
       "bom-ref": "pkg:cargo/rand@0.8.7",
       "evidence": {
         "occurrences": [
@@ -1503,7 +1490,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in age::ssh::identity::UnencryptedKey::unwrap_stanza; use: decrypt; line: `sk.decrypt_blinded(`; code: `decrypt_blinded`",
+            "additionalContext": "[present] [call] in age::ssh::identity::UnencryptedKey::unwrap_stanza; use: decrypt; rng: rng (rand_core::os::OsRng); line: `sk.decrypt_blinded(`; code: `decrypt_blinded`",
             "line": 76,
             "location": "age-0.12.1/src/ssh/identity.rs",
             "offset": 23,
@@ -1517,7 +1504,7 @@
             "symbol": "rsa::oaep::Oaep::new_with_label"
           },
           {
-            "additionalContext": "[present] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: encrypt; line: `.encrypt(`; code: `encrypt`",
+            "additionalContext": "[present] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: encrypt; rng: rng (rand_core::os::OsRng); line: `.encrypt(`; code: `encrypt`",
             "line": 159,
             "location": "age-0.12.1/src/ssh/recipient.rs",
             "offset": 21,
@@ -1557,6 +1544,10 @@
         {
           "name": "rcbom:param:mgf_hash",
           "value": "SHA-256"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -2451,8 +2442,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/rage@0.12.1#root",
+      "bom-ref": "pkg:cargo/rage@0.12.1",
       "name": "rage",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/rage@0.12.1",
       "type": "application",
       "version": "0.12.1"
     },
@@ -2500,7 +2498,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2ac8a033-86b6-8172-9ae7-a446a9cf53e4",
+  "serialNumber": "urn:uuid:fc582180-8dfb-84c6-b596-de683b376135",
   "specVersion": "1.7",
   "version": 1
 }

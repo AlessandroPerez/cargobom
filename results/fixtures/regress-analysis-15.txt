@@ -1,0 +1,524 @@
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:154:12 | crypto_common::KeyInit::new | [reachable] [call] in a15::a12; new: setup, not a use; key: hard-coded (16 bytes, literal at line 154); line: `let c = aes::Aes128::new(GenericArray::from_slice(b"0123456789abcdef"));`; code: `aes::Aes128::new`
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:155:6 | cipher::block::BlockEncrypt::encrypt_block | [reachable] [call] in a15::a12; use: encrypt; line: `c.encrypt_block(GenericArray::from_mut_slice(block));`; code: `encrypt_block`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:81:13 | crypto_common::KeyIvInit::new | [reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let ct = cbc::Encryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:82:9 | cipher::block::BlockEncryptMut::encrypt_padded_b2b_mut | [reachable] [call] in a15::a7; use: encrypt; line: `.encrypt_padded_b2b_mut::<Pkcs7>(pt, &mut buf)`; code: `encrypt_padded_b2b_mut`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:86:14 | crypto_common::KeyIvInit::new | [reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let pt2 = cbc::Decryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:87:9 | cipher::block::BlockDecryptMut::decrypt_padded_b2b_mut | [reachable] [call] in a15::a7; use: decrypt; line: `.decrypt_padded_b2b_mut::<Pkcs7>(&ct, &mut out)`; code: `decrypt_padded_b2b_mut`
+  occ AES-128-CTR | crypto:algorithm:AES-128-CTR | src/main.rs:89:16 | crypto_common::KeyIvInit::new | [reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes128>::new(key.into(), iv.into());`; code: `ctr::Ctr128BE::<aes::Aes128>::new`
+  occ AES-128-CTR | crypto:algorithm:AES-128-CTR | src/main.rs:90:18 | cipher::stream::StreamCipher::try_apply_keystream | [reachable] [call] in a15::a7; use: encrypt or decrypt; line: `pt2.len() + c.try_apply_keystream(data).is_ok() as usize`; code: `try_apply_keystream`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:192:13 | crypto_common::KeyIvInit::new | [reachable] [call] in a15::a15; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (16 bytes, literal at line 191); line: `let ct = cbc::Encryptor::<aes::Aes256>::new(&hashed, &iv.into())`; code: `cbc::Encryptor::<aes::Aes256>::new`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:193:9 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] in a15::a15; use: encrypt; line: `.encrypt_padded_vec_mut::<Pkcs7>(b"data");`; code: `encrypt_padded_vec_mut`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:129:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a10; new_from_slice: setup, not a use; key: computed (a15::Config::default); line: `let c = Aes256Gcm::new_from_slice(&cfg.key).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:130:6 | aead::Aead::encrypt | [reachable] [call] in a15::a10; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), msg).unwrap()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:141:15 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a11; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let lazy = Aes256Gcm::new_from_slice(&LAZY_KEY).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:142:15 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a11; new_from_slice: setup, not a use; key: file (std::fs::read); line: `let once = Aes256Gcm::new_from_slice(ONCE_KEY.get().unwrap()).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:146:9 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `lazy.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:147:15 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `+ once.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:148:12 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: computed (run-time contents of static a15::COUNTER); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:235:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = Aes256Gcm::new_from_slice(&k[..32]).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:55:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a4; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:56:6 | aead::Aead::encrypt | [reachable] [call] in a15::a4; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b"m".as_ref()).unwrap()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a5; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(key.as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:65:6 | aead::Aead::encrypt | [reachable] [call] in a15::a5; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b"m".as_ref()).unwrap()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:74:12 | crypto_common::KeyInit::new | [reachable] [call] in a15::a6; new: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new(&key);`; code: `Aes256Gcm::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:75:6 | aead::Aead::encrypt | [reachable] [call] in a15::a6; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b"m".as_ref()).unwrap()`; code: `encrypt`
+  occ Argon2 | crypto:algorithm:Argon2 | src/main.rs:26:22 | password_hash::traits::PasswordVerifier::verify_password | [reachable] [call] in a15::a1; use: verify; verify_password: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); line: `Argon2::default().verify_password(pw, &parsed).is_ok()`; code: `verify_password`
+  occ Argon2 | crypto:algorithm:Argon2 | src/main.rs:26:4 | core::default::Default::default | [reachable] [call] in a15::a1; default: setup, not a use; line: `Argon2::default().verify_password(pw, &parsed).is_ok()`; code: `Argon2::default`
+  occ Argon2i | crypto:algorithm:Argon2i | src/main.rs:41:12 | argon2::Argon2::<'key>::new_with_secret | [reachable] [call] in a15::a3; new_with_secret: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Argon2::new_with_secret`
+  occ Argon2i | crypto:algorithm:Argon2i | src/main.rs:44:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a15::a3; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 2 of the enclosing function); line: `h.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:32:17 | argon2::params::Params::new | [reachable] [call] in a15::a2; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`
+  occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:33:4 | core::default::Default::default | [reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`
+  occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:34:9 | password_hash::traits::PasswordHasher::hash_password_customized | [reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:51:16 | blake3::Hasher::new_derive_key | [reachable] [call] in a15::a4; new_derive_key: setup, not a use; line: `let mut h = blake3::Hasher::new_derive_key("app 2024 aes key");`; code: `blake3::Hasher::new_derive_key`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:52:6 | blake3::Hasher::update | [reachable] [call] in a15::a4; update: setup, not a use; line: `h.update(secret);`; code: `update`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:54:6 | blake3::Hasher::finalize_xof | [reachable] [call] in a15::a4; use: keyderive; line: `h.finalize_xof().fill(&mut key);`; code: `finalize_xof`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:61:16 | blake3::Hasher::new_derive_key | [reachable] [call] in a15::a5; new_derive_key: setup, not a use; line: `let mut h = blake3::Hasher::new_derive_key("app 2024 aes key");`; code: `blake3::Hasher::new_derive_key`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:62:6 | blake3::Hasher::update | [reachable] [call] in a15::a5; update: setup, not a use; line: `h.update(secret);`; code: `update`
+  occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:63:16 | blake3::Hasher::finalize | [reachable] [call] in a15::a5; use: keyderive; line: `let key = h.finalize();`; code: `finalize`
+  occ ChaCha20 | crypto:algorithm:ChaCha20 | src/main.rs:156:16 | crypto_common::KeyIvInit::new | [reachable] [call] in a15::a12; new: setup, not a use; key: hard-coded (32 bytes, literal at line 157); iv: hard-coded (12 bytes, literal at line 158); line: `let mut s = chacha20::ChaCha20::new(`; code: `chacha20::ChaCha20::new`
+  occ ChaCha20 | crypto:algorithm:ChaCha20 | src/main.rs:160:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in a15::a12; use: encrypt or decrypt; line: `s.apply_keystream(block);`; code: `apply_keystream`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:166:14 | ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes | [reachable] [call] in a15::a13; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let esk = ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes(expanded);`; code: `ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:167:13 | core::convert::From::from | [reachable] [call] in a15::a13; from: setup, not a use; line: `let vk = ed25519_dalek::VerifyingKey::from(&esk);`; code: `ed25519_dalek::VerifyingKey::from`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:168:4 | ed25519_dalek::hazmat::raw_sign | [reachable] [call] in a15::a13; use: sign; line: `ed25519_dalek::hazmat::raw_sign::<Sha512>(&esk, msg, &vk)`; code: `ed25519_dalek::hazmat::raw_sign::<Sha512>`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:175:13 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in a15::a14; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let sk = ed25519_dalek::SigningKey::from_bytes(&seed);`; code: `ed25519_dalek::SigningKey::from_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:176:17 | signature::signer::Signer::sign | [reachable] [call] in a15::a14; use: sign; line: `let sig = sk.sign(b"msg");`; code: `sign`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:177:23 | signature::verifier::Verifier::verify | [reachable] [call] in a15::a14; use: verify; line: `sk.verifying_key().verify(b"msg", &sig).is_ok()`; code: `verify`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:177:7 | ed25519_dalek::signing::SigningKey::verifying_key | [reachable] [call] in a15::a14; verifying_key: setup, not a use; line: `sk.verifying_key().verify(b"msg", &sig).is_ok()`; code: `verifying_key`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:97:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [call] in a15::a8; use: keygen; rng: rng (default::Default::default); line: `let sk = ed25519_dalek::SigningKey::generate(&mut ThreadRng::default());`; code: `ed25519_dalek::SigningKey::generate`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:98:47 | ed25519_dalek::signing::SigningKey::verifying_key | [reachable] [call] in a15::a8; verifying_key: setup, not a use; line: `rsa::traits::PublicKeyParts::size(&k) + sk.verifying_key().as_bytes().len()`; code: `verifying_key`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:98:63 | ed25519_dalek::verifying::VerifyingKey::as_bytes | [reachable] [call] in a15::a8; as_bytes: setup, not a use; line: `rsa::traits::PublicKeyParts::size(&k) + sk.verifying_key().as_bytes().len()`; code: `as_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:184:18 | digest::mac::Mac::new_from_slice | [reachable] [call] in a15::a15; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(&hashed).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:185:8 | digest::mac::Mac::update | [reachable] [call] in a15::a15; use: tag; line: `mac.update(b"challenge");`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:186:16 | digest::mac::Mac::finalize | [reachable] [call] in a15::a15; use: tag; line: `let _ = mac.finalize();`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:71:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in a15::a6; new_from_slice: setup, not a use; key: hard-coded (5 bytes, literal at line 71); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(b"label").unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:72:6 | digest::mac::Mac::update | [reachable] [call] in a15::a6; use: tag; line: `m.update(secret);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:73:16 | digest::mac::Mac::finalize | [reachable] [call] in a15::a6; use: tag; line: `let key = m.finalize().into_bytes();`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:73:27 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in a15::a6; into_bytes: setup, not a use; line: `let key = m.finalize().into_bytes();`; code: `into_bytes`
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:105:13 | rsa::key::RsaPrivateKey::new_with_exp | [reachable] [call] in a15::a9; use: keygen; rng: rng (rand_core::os::OsRng); line: `let k1 = rsa::RsaPrivateKey::new_with_exp(&mut OsRng, 2048, &e).unwrap();`; code: `rsa::RsaPrivateKey::new_with_exp`
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:244:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in a15::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let k = rsa::RsaPrivateKey::new(&mut OsRng, 2048).unwrap();`; code: `rsa::RsaPrivateKey::new`
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:96:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in a15::a8; use: keygen; rng: rng (default::Default::default); line: `let k = rsa::RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `rsa::RsaPrivateKey::new`
+  occ RSA-3072 | crypto:material:private-key:RSA-3072 | src/main.rs:106:13 | rsa::pkcs1v15::signing_key::SigningKey::<D>::random | [reachable] [call] in a15::a9; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = rsa::pkcs1v15::SigningKey::<Sha256>::random(&mut OsRng, 3072).unwrap();`; code: `rsa::pkcs1v15::SigningKey::<Sha256>::random`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:202:29 | rsa::oaep::Oaep::new | [reachable] [call] in a15::a16; new: setup, not a use; line: `.encrypt(&mut OsRng, rsa::Oaep::new::<Sha256>(), msg)`; code: `rsa::Oaep::new::<Sha256>`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:202:9 | rsa::key::RsaPublicKey::encrypt | [reachable] [call] in a15::a16; use: encrypt; rng: rng (rand_core::os::OsRng); line: `.encrypt(&mut OsRng, rsa::Oaep::new::<Sha256>(), msg)`; code: `encrypt`
+  occ RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | src/main.rs:205:9 | rsa::key::RsaPublicKey::encrypt | [reachable] [call] in a15::a16; use: encrypt; rng: rng (rand_core::os::OsRng); line: `.encrypt(`; code: `encrypt`
+  occ RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | src/main.rs:207:12 | rsa::oaep::Oaep::new_with_mgf_hash | [reachable] [call] in a15::a16; new_with_mgf_hash: setup, not a use; line: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>(),`; code: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>`
+  occ RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | src/main.rs:109:9 | rsa::key::RsaPublicKey::encrypt | [reachable] [call] in a15::a9; use: encrypt; rng: hard-coded (literal at line 107); line: `.encrypt(&mut seeded, rsa::Pkcs1v15Encrypt, b"m")`; code: `encrypt`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:106:13 | rsa::pkcs1v15::signing_key::SigningKey::<D>::random | [reachable] [component] in a15::a9; part of RSA-3072; line: `let sk = rsa::pkcs1v15::SigningKey::<Sha256>::random(&mut OsRng, 3072).unwrap();`; code: `rsa::pkcs1v15::SigningKey::<Sha256>::random`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:207:12 | rsa::oaep::Oaep::new_with_mgf_hash | [reachable] [component] in a15::a16; part of RSA-OAEP-SHA-256-MGF1-SHA-1; line: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>(),`; code: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:106:13 | rsa::pkcs1v15::signing_key::SigningKey::<D>::random | [reachable] [component] in a15::a9; part of RSA-PKCS1-1.5-SHA-256; line: `let sk = rsa::pkcs1v15::SigningKey::<Sha256>::random(&mut OsRng, 3072).unwrap();`; code: `rsa::pkcs1v15::SigningKey::<Sha256>::random`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:183:17 | digest::digest::Digest::new | [reachable] [call] in a15::a15; new: setup, not a use; line: `let hashed = Sha256::new().chain_update(secret).finalize();`; code: `Sha256::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:183:31 | digest::digest::Digest::chain_update | [reachable] [call] in a15::a15; use: digest; line: `let hashed = Sha256::new().chain_update(secret).finalize();`; code: `chain_update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:183:52 | digest::digest::Digest::finalize | [reachable] [call] in a15::a15; use: digest; line: `let hashed = Sha256::new().chain_update(secret).finalize();`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:184:18 | digest::mac::Mac::new_from_slice | [reachable] [component] in a15::a15; part of HMAC-SHA-256; line: `let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(&hashed).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:185:8 | digest::mac::Mac::update | [reachable] [component] in a15::a15; part of HMAC-SHA-256; line: `mac.update(b"challenge");`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:186:16 | digest::mac::Mac::finalize | [reachable] [component] in a15::a15; part of HMAC-SHA-256; line: `let _ = mac.finalize();`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:202:29 | rsa::oaep::Oaep::new | [reachable] [component] in a15::a16; part of RSA-OAEP-SHA-256; line: `.encrypt(&mut OsRng, rsa::Oaep::new::<Sha256>(), msg)`; code: `rsa::Oaep::new::<Sha256>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:207:12 | rsa::oaep::Oaep::new_with_mgf_hash | [reachable] [component] in a15::a16; part of RSA-OAEP-SHA-256-MGF1-SHA-1; line: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>(),`; code: `rsa::Oaep::new_with_mgf_hash::<Sha256, sha1::Sha1>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:71:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in a15::a6; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(b"label").unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:72:6 | digest::mac::Mac::update | [reachable] [component] in a15::a6; part of HMAC-SHA-256; line: `m.update(secret);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:73:16 | digest::mac::Mac::finalize | [reachable] [component] in a15::a6; part of HMAC-SHA-256; line: `let key = m.finalize().into_bytes();`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:73:27 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in a15::a6; part of HMAC-SHA-256; line: `let key = m.finalize().into_bytes();`; code: `into_bytes`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:168:4 | ed25519_dalek::hazmat::raw_sign | [reachable] [component] in a15::a13; part of Ed25519; line: `ed25519_dalek::hazmat::raw_sign::<Sha512>(&esk, msg, &vk)`; code: `ed25519_dalek::hazmat::raw_sign::<Sha512>`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:188:4 | digest::digest::Digest::new | [reachable] [call] in a15::a15; new: setup, not a use; line: `Sha512::new()`; code: `Sha512::new`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:189:9 | digest::digest::Digest::chain_update | [reachable] [call] in a15::a15; use: digest; line: `.chain_update(secret.as_bytes())`; code: `chain_update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:190:9 | digest::digest::Digest::finalize_into | [reachable] [call] in a15::a15; use: digest; line: `.finalize_into((&mut out).into());`; code: `finalize_into`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:25:0 | aead | [manifest] locked aead 0.5.2; reached via a15 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:35:0 | aes | [manifest] locked aes 0.8.4; reached via a15 -> aes
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:9:0 | aes | [manifest] declared by a15 (dependencies)
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:46:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via a15 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:10:0 | aes-gcm | [manifest] declared by a15 (dependencies)
+  occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.lock:60:0 | argon2 | [manifest] locked argon2 0.5.3; reached via a15 -> argon2
+  occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.toml:11:0 | argon2 | [manifest] declared by a15 (dependencies)
+  occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.lock:105:0 | blake3 | [manifest] locked blake3 1.8.5; reached via a15 -> blake3
+  occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.toml:12:0 | blake3 | [manifest] declared by a15 (dependencies)
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.lock:137:0 | cbc | [manifest] locked cbc 0.1.2; reached via a15 -> cbc
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.toml:13:0 | cbc | [manifest] declared by a15 (dependencies); features ["alloc"]
+  occ chacha20 | pkg:cargo/chacha20@0.9.1 | Cargo.lock:162:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via a15 -> chacha20
+  occ chacha20 | pkg:cargo/chacha20@0.9.1 | Cargo.toml:14:0 | chacha20 | [manifest] declared by a15 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:173:0 | cipher | [manifest] locked cipher 0.4.4; reached via a15 -> aes -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:213:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a15 -> aes -> cipher -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:224:0 | ctr | [manifest] locked ctr 0.9.2; reached via a15 -> ctr
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.toml:15:0 | ctr | [manifest] declared by a15 (dependencies)
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:271:0 | digest | [manifest] locked digest 0.10.7; reached via a15 -> hmac -> digest
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:293:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via a15 -> ed25519-dalek
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:16:0 | ed25519-dalek | [manifest] declared by a15 (dependencies); features ["hazmat", "rand_core"]
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:330:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a15 -> ed25519-dalek -> rand_core -> getrandom
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:341:0 | ghash | [manifest] locked ghash 0.5.1; reached via a15 -> aes-gcm -> ghash
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:351:0 | hmac | [manifest] locked hmac 0.12.1; reached via a15 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:17:0 | hmac | [manifest] declared by a15 (dependencies)
+  occ password-hash | pkg:cargo/password-hash@0.5.0 | Cargo.lock:442:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via a15 -> argon2 -> password-hash
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:483:0 | polyval | [manifest] locked polyval 0.6.2; reached via a15 -> aes-gcm -> ghash -> polyval
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:522:0 | rand | [manifest] locked rand 0.8.8; reached via a15 -> rand
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.toml:18:0 | rand | [manifest] declared by a15 (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:533:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via a15 -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:543:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via a15 -> ed25519-dalek -> rand_core
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.lock:552:0 | rsa | [manifest] locked rsa 0.9.10; reached via a15 -> rsa
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:19:0 | rsa | [manifest] declared by a15 (dependencies)
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.lock:616:0 | sha1 | [manifest] locked sha1 0.10.7; reached via a15 -> sha1
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.toml:20:0 | sha1 | [manifest] declared by a15 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:627:0 | sha2 | [manifest] locked sha2 0.10.9; reached via a15 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:21:0 | sha2 | [manifest] declared by a15 (dependencies); features ["oid"]
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:644:0 | signature | [manifest] locked signature 2.2.0; reached via a15 -> rsa -> signature
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:716:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via a15 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:finding=hard-coded-key
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:functions:source=observed
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:kb:version=0.2.0
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:occurrences=2
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:provenance:key=hard-coded
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:reachability=reachable
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:confidence=high
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:detection:method=type-resolved
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:functions:source=observed
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:kb:version=0.2.0
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=4
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:confidence=high
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:detection:method=type-resolved
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:functions:source=observed
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:kb:version=0.2.0
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:occurrences=2
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:provenance:iv=parameter
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:provenance:key=parameter
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:reachability=reachable
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:confidence=high
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:detection:method=type-resolved
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:finding=hard-coded-iv
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:functions:source=observed
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:kb:version=0.2.0
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:occurrences=2
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=hard-coded
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:reachability=reachable
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=14
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,derived,environment,file,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:confidence=high
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:detection:method=type-resolved
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:functions:source=observed
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:kb:version=0.2.0
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:occurrences=2
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:provenance:password=parameter
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:reachability=reachable
+  prop Argon2 | crypto:algorithm:Argon2 | rcbom:registry-name=unmatched
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:confidence=high
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:detection:method=type-resolved
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:functions:source=observed
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:kb:version=0.2.0
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:occurrences=2
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:provenance:key=parameter
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:provenance:password=parameter
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:provenance:salt=parameter
+  prop Argon2i | crypto:algorithm:Argon2i | rcbom:reachability=reachable
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:confidence=high
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:detection:method=type-resolved
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:functions:source=observed
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:kb:version=0.2.0
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:occurrences=3
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:reachability=reachable
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:confidence=high
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:detection:method=type-resolved
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:functions:source=observed
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:kb:version=0.2.0
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:note=key derivation mode
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:occurrences=6
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:reachability=reachable
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:confidence=high
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:detection:method=type-resolved
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:finding=hard-coded-iv
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:finding=hard-coded-key
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:functions:source=observed
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:kb:version=0.2.0
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:occurrences=2
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:provenance:iv=hard-coded
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:provenance:key=hard-coded
+  prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=10
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:rng=rng
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=7
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=hard-coded,parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:detection:method=type-resolved
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:functions:source=observed
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=3
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:algorithm-family=RSA
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:confidence=high
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:detection:method=type-resolved
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:functions:source=observed
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:kb:version=0.2.0
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:occurrences=1
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:provenance:rng=rng
+  prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:reachability=reachable
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:confidence=high
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:functions:source=observed
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:occurrences=2
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:param:mgf_hash=SHA-256
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:provenance:rng=rng
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:reachability=reachable
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:confidence=high
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:detection:method=type-resolved
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:functions:source=observed
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:kb:version=0.2.0
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:occurrences=2
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:provenance:rng=rng
+  prop RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:finding=predictable-rng
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:occurrences=1
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:provenance:rng=hard-coded
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=knowledge-base
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=1
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:only-as-component=true
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=knowledge-base
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=1
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:only-as-component=true
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=13
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=4
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=reachable
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:crypto-role=algorithm
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:scope=required
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:usage=reachable
+  prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:crypto-role=algorithm
+  prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:scope=required
+  prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:usage=reachable
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:crypto-role=algorithm
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:scope=required
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:crypto-role=trait
+  prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:crypto-role=algorithm
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:scope=required
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CTR | crypto:algorithm:AES-128-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset Argon2 | crypto:algorithm:Argon2 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["verify"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2i | crypto:algorithm:Argon2i | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE3 | crypto:algorithm:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset ChaCha20 | crypto:algorithm:ChaCha20 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
+asset RSA-3072 | crypto:material:private-key:RSA-3072 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 3072, "type": "private-key"}}
+asset RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSAES-OAEP", "cryptoFunctions": ["encrypt"], "primitive": "pke"}, "assetType": "algorithm"}
+asset RSA-OAEP-SHA-256-MGF1-SHA-1 | crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 | {"algorithmProperties": {"algorithmFamily": "RSAES-OAEP", "cryptoFunctions": ["encrypt"], "primitive": "pke"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | {"algorithmProperties": {"algorithmFamily": "RSAES-PKCS1", "cryptoFunctions": ["encrypt"], "primitive": "pke"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library argon2 0.5.3 | pkg:cargo/argon2@0.5.3 | purl pkg:cargo/argon2@0.5.3
+component library blake3 1.8.5 | pkg:cargo/blake3@1.8.5 | purl pkg:cargo/blake3@1.8.5
+component library cbc 0.1.2 | pkg:cargo/cbc@0.1.2 | purl pkg:cargo/cbc@0.1.2
+component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1 | purl pkg:cargo/chacha20@0.9.1
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0 | purl pkg:cargo/password-hash@0.5.0
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10 | purl pkg:cargo/rsa@0.9.10
+component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-OAEP-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/argon2@0.5.3
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/blake3@1.8.5
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/cbc@0.1.2
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/chacha20@0.9.1
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/rsa@0.9.10
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/sha1@0.10.7
+dep pkg:cargo/a15@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/password-hash@0.5.0
+dep pkg:cargo/cbc@0.1.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20@0.9.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/password-hash@0.5.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency crypto:algorithm:Ed25519
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:RSA-OAEP-SHA-256
+dependency crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+dependency pkg:cargo/a15@0.1.0
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/argon2@0.5.3
+dependency pkg:cargo/blake3@1.8.5
+dependency pkg:cargo/cbc@0.1.2
+dependency pkg:cargo/chacha20@0.9.1
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/password-hash@0.5.0
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand@0.8.8
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/rsa@0.9.10
+dependency pkg:cargo/sha1@0.10.7
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128-CTR
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-65536-3-4
+provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/chacha20@0.9.1 -> crypto:algorithm:ChaCha20
+provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:AES-128-CTR
+provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-OAEP-SHA-256
+provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-OAEP-SHA-256-MGF1-SHA-1
+provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-PKCS1-1.5
+provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
+provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-3072
+provides pkg:cargo/sha1@0.10.7 -> crypto:algorithm:SHA-1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/a15@0.1.0", "name": "a15", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a15@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=73
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=542
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

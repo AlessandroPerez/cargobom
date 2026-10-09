@@ -88,19 +88,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t13@0.1.0",
-      "name": "t13",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t13@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -117,7 +104,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t13::sign_ecdsa; use: sign; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in t13::sign_ecdsa; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 15,
@@ -129,6 +116,13 @@
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; key: rng (rand::SystemRandom::new); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), &rng).unwrap();`; code: `EcdsaKeyPair::from_pkcs8`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
             "additionalContext": "[reachable] [call] in t13::sign_ecdsa; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; line: `kp.sign(&rng, msg).unwrap().as_ref().to_vec()`; code: `sign`",
@@ -162,8 +156,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:key",
+          "value": "rng"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -259,7 +257,7 @@
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_tagged; from_pkcs8: setup, not a use; line: `let kp = Ed25519KeyPair::from_pkcs8(pkcs8.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in t13::sign_tagged; from_pkcs8: setup, not a use; key: rng (rand::SystemRandom::new); line: `let kp = Ed25519KeyPair::from_pkcs8(pkcs8.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 13,
@@ -316,6 +314,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -483,8 +485,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t13@0.1.0#root",
+      "bom-ref": "pkg:cargo/t13@0.1.0",
       "name": "t13",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t13@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -519,7 +528,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "109"
+        "value": "88"
       }
     ],
     "tools": {
@@ -532,7 +541,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5f1e83dc-9b52-8171-9d79-7084e7bff854",
+  "serialNumber": "urn:uuid:326aaee3-4a92-81f1-bbbe-576230cc9721",
   "specVersion": "1.7",
   "version": 1
 }

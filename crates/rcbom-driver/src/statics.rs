@@ -54,6 +54,7 @@ pub(crate) fn local_data_sites(cx: &mut Cx<'_>) -> (Vec<Site>, Vec<DataEdge>) {
             name: path_of(tcx, did),
             id: crate::def_hash(tcx, did),
             krate: crate_ref(tcx, did),
+            path: path_of(tcx, did),
         };
         let found = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             let mut v = Refs::new(tcx, None);
@@ -104,6 +105,28 @@ pub(crate) fn local_data_sites(cx: &mut Cx<'_>) -> (Vec<Site>, Vec<DataEdge>) {
     (out, edges)
 }
 
+/// The promoted constants of item `did` that its code uses: all of a static's or a const's, and
+/// those of a function that its live code uses (see `dead_blocks`).
+pub(crate) fn used_promoted(tcx: TyCtxt<'_>, did: DefId) -> Vec<mir::Promoted> {
+    if matches!(
+        tcx.def_kind(did),
+        DefKind::Static { .. } | DefKind::Const | DefKind::AssocConst
+    ) {
+        return tcx.promoted_mir(did).indices().collect();
+    }
+    if !tcx.is_mir_available(did) {
+        return Vec::new();
+    }
+    let body = tcx.optimized_mir(did);
+    let mut v = Refs::new(tcx, None);
+    v.dead = dead_blocks(body);
+    v.owner = Some(did);
+    v.visit_body(body);
+    let mut used: Vec<mir::Promoted> = v.promoted_used.into_iter().collect();
+    used.sort();
+    used
+}
+
 /// Statics and consts a function names in its own body and promoted constants. For an
 /// instance (`args`), generic constants are resolved with its arguments.
 pub(crate) fn fn_data_sites<'tcx>(
@@ -119,10 +142,18 @@ pub(crate) fn fn_data_sites<'tcx>(
         return Vec::new();
     }
     let found = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        // only the code that runs: not a branch on a constant (`debug_assert!` in a release
+        // build), nor the promoted constants only such a branch uses
+        let body = tcx.optimized_mir(did);
         let mut v = Refs::new(tcx, args);
-        v.visit_body(tcx.optimized_mir(did));
-        for p in tcx.promoted_mir(did).iter() {
-            v.visit_body(p);
+        v.dead = dead_blocks(body);
+        v.owner = Some(did);
+        v.visit_body(body);
+        v.dead = Vec::new();
+        for (i, p) in tcx.promoted_mir(did).iter_enumerated() {
+            if v.promoted_used.contains(&i) {
+                v.visit_body(p);
+            }
         }
         v.found
     }));
@@ -198,6 +229,11 @@ struct Refs<'tcx> {
     args: Option<GenericArgsRef<'tcx>>,
     found: Vec<(Named, rustc_span::Span)>,
     depth: usize,
+    /// Blocks of the body being visited that no execution reaches (see `dead_blocks`).
+    dead: Vec<bool>,
+    /// The item whose body this is, and the promoted constants its live code uses.
+    owner: Option<DefId>,
+    promoted_used: HashSet<mir::Promoted>,
 }
 
 impl<'tcx> Refs<'tcx> {
@@ -207,12 +243,71 @@ impl<'tcx> Refs<'tcx> {
             args,
             found: Vec::new(),
             depth: 0,
+            dead: Vec::new(),
+            owner: None,
+            promoted_used: HashSet::new(),
         }
     }
 }
 
+/// The blocks of a body no execution reaches: those only a branch on a constant leads to
+/// (`if cfg!(debug_assertions)` is `if false` in a release build, which MIR level 0 keeps).
+fn dead_blocks(body: &mir::Body<'_>) -> Vec<bool> {
+    let n = body.basic_blocks.len();
+    let mut live = vec![false; n];
+    let mut work = vec![mir::START_BLOCK];
+    while let Some(b) = work.pop() {
+        if live[b.index()] {
+            continue;
+        }
+        live[b.index()] = true;
+        let block = &body.basic_blocks[b];
+        let term = block.terminator();
+        if let mir::TerminatorKind::SwitchInt { discr, targets } = &term.kind {
+            let value = match discr {
+                mir::Operand::Constant(c) => c.const_.try_to_scalar_int(),
+                mir::Operand::Copy(p) | mir::Operand::Move(p) if p.projection.is_empty() => block
+                    .statements
+                    .iter()
+                    .rev()
+                    .find_map(|s| match &s.kind {
+                        mir::StatementKind::Assign(a)
+                            if a.0.local == p.local && a.0.projection.is_empty() =>
+                        {
+                            Some(match &a.1 {
+                                mir::Rvalue::Use(mir::Operand::Constant(c), ..) => {
+                                    c.const_.try_to_scalar_int()
+                                }
+                                _ => None,
+                            })
+                        }
+                        _ => None,
+                    })
+                    .flatten(),
+                _ => None,
+            };
+            if let Some(v) = value {
+                work.push(targets.target_for_value(v.to_bits_unchecked()));
+                continue;
+            }
+        }
+        work.extend(term.successors());
+    }
+    live.into_iter().map(|l| !l).collect()
+}
+
 impl<'tcx> Visitor<'tcx> for Refs<'tcx> {
-    fn visit_const_operand(&mut self, c: &mir::ConstOperand<'tcx>, _: mir::Location) {
+    fn visit_const_operand(&mut self, c: &mir::ConstOperand<'tcx>, loc: mir::Location) {
+        if self.dead.get(loc.block.index()).copied().unwrap_or(false) {
+            return;
+        }
+        // a promoted constant of this body, used here
+        if let mir::Const::Unevaluated(uv, _) = c.const_
+            && let Some(p) = uv.promoted
+            && Some(uv.def) == self.owner
+        {
+            self.promoted_used.insert(p);
+        }
         match c.const_ {
             mir::Const::Unevaluated(uv, _) if uv.promoted.is_none() => {
                 match self.tcx.def_kind(uv.def) {

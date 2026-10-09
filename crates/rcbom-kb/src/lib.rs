@@ -147,6 +147,11 @@ pub struct Algo {
     /// (`keygen` for `RsaPrivateKey::new`). Without it such a call sets the asset up.
     #[serde(default, rename = "use")]
     pub implied_use: Option<String>,
+    /// (`[[type]]` entries) Methods whose parameters are not those of the constructor that built
+    /// the receiver: `verify_password` takes them from the stored hash,
+    /// `hash_password_customized` from its arguments.
+    #[serde(default)]
+    pub own_params: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]

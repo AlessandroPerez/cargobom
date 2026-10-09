@@ -11,7 +11,7 @@
         }
       ],
       "purl": "pkg:cargo/dep@0.1.0",
-      "type": "application",
+      "type": "library",
       "version": "0.1.0"
     },
     {
@@ -108,19 +108,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t15@0.1.0",
-      "name": "t15",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t15@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -135,21 +122,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in dep::N1; use: digest; dep::N2 -> ring::digest::SHA256; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `N2`",
+            "additionalContext": "[reachable] [via-static] in dep::N1; dep::N2 -> ring::digest::SHA256; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `N2`",
             "line": 8,
             "location": "dep/src/lib.rs",
             "offset": 36,
             "symbol": "dep::N2"
           },
           {
-            "additionalContext": "[reachable] [static] in dep::N1; use: digest; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in dep::N1; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `SHA256`",
             "line": 8,
             "location": "dep/src/lib.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in dep::N2; use: digest; dep::N1 -> ring::digest::SHA256; line: `pub static N2: Node = Node { next: &N1, alg: None };`; code: `N1`",
+            "additionalContext": "[reachable] [via-static] in dep::N2; dep::N1 -> ring::digest::SHA256; line: `pub static N2: Node = Node { next: &N1, alg: None };`; code: `N1`",
             "line": 9,
             "location": "dep/src/lib.rs",
             "offset": 36,
@@ -163,7 +150,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w1; use: digest; dep::N1 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N1`",
+            "additionalContext": "[reachable] [via-static] in t15::w1; dep::N1 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N1`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 11,
@@ -177,35 +164,35 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w1; use: digest; dep::N2 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N2`",
+            "additionalContext": "[reachable] [via-static] in t15::w1; dep::N2 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N2`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 60,
             "symbol": "dep::N2"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t15::w4::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t15::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::w4 at src/main.rs:21; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t15::w4::{closure#0}; use: digest; instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t15::w4::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t15::w4::{closure#0}; instantiated by t15::w4 at src/main.rs:21; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `SHA256`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::gen_hash::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t15::gen_hash::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::digest`",
+            "additionalContext": "[reachable] [call] in t15::gen_hash::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::digest`",
             "line": 2,
             "location": "target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t15::gen_hash::{closure#0}; use: digest; instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t15::gen_hash::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t15::gen_hash::{closure#0}; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::SHA256`",
             "line": 2,
             "location": "target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs",
             "offset": 44,
@@ -257,7 +244,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in dep::ALG_C; use: digest; line: `pub const ALG_C: &Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
+            "additionalContext": "[reachable] [static] in dep::ALG_C; line: `pub const ALG_C: &Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
             "line": 12,
             "location": "dep/src/lib.rs",
             "offset": 31,
@@ -271,7 +258,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w2; use: digest; dep::ALG_C -> ring::digest::SHA384; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_C`",
+            "additionalContext": "[reachable] [via-static] in t15::w2; dep::ALG_C -> ring::digest::SHA384; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_C`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 11,
@@ -323,7 +310,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in dep::ALG_S; use: digest; line: `pub static ALG_S: &Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
+            "additionalContext": "[reachable] [static] in dep::ALG_S; line: `pub static ALG_S: &Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
             "line": 13,
             "location": "dep/src/lib.rs",
             "offset": 32,
@@ -337,7 +324,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w2; use: digest; dep::ALG_S -> ring::digest::SHA512; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_S`",
+            "additionalContext": "[reachable] [via-static] in t15::w2; dep::ALG_S -> ring::digest::SHA512; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_S`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 50,
@@ -407,8 +394,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t15@0.1.0#root",
+      "bom-ref": "pkg:cargo/t15@0.1.0",
       "name": "t15",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t15@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -456,7 +450,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ad56970f-c1ef-8efb-8d02-5a8d7d75eebc",
+  "serialNumber": "urn:uuid:caac1a46-70b0-8739-b1b5-be5433b8ac4c",
   "specVersion": "1.7",
   "version": 1
 }

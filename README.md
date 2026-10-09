@@ -22,6 +22,8 @@ here). The evaluation is in `docs/poc-evaluation.md`; the CBOMs and tables behin
   - the calls into knowledge-base crates
   - references to algorithm statics and consts
   - the intraprocedural origin of each argument
+  - how values that can carry an algorithm or a key move between functions (struct fields,
+    parameters, return values, statics written at run time)
 
   In a binary, or a library workspace member, it also walks the monomorphized instance graph
   from the entry points (`main`, or the public API).

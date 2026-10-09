@@ -371,19 +371,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t2@0.1.0",
-      "name": "t2",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t2@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "pkg:cargo/universal-hash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -429,14 +416,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t2::o1::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by t2::o1 at src/main.rs:10; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:20; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:19; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 23,
@@ -637,8 +624,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t2@0.1.0#root",
+      "bom-ref": "pkg:cargo/t2@0.1.0",
       "name": "t2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t2@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -673,7 +667,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "224"
+        "value": "149"
       }
     ],
     "tools": {
@@ -686,7 +680,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c8733dc7-3fe8-8570-9632-e918c0bb5f77",
+  "serialNumber": "urn:uuid:3751c58d-ff3c-88ec-9d27-8cd9b49bc2f9",
   "specVersion": "1.7",
   "version": 1
 }

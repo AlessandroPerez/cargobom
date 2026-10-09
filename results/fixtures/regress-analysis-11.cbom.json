@@ -2,19 +2,6 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
-      "bom-ref": "pkg:cargo/a11@0.1.0",
-      "name": "a11",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/a11@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "pkg:cargo/aead@0.5.2",
       "evidence": {
         "occurrences": [
@@ -1002,6 +989,13 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
+            "additionalContext": "[reachable] [call] in a11::m1; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `let key = LessSafeKey::new(UnboundKey::from(okm));`; code: `UnboundKey::from`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "core::convert::From::from"
+          },
+          {
             "additionalContext": "[reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: parameter (argument 2 of the enclosing function); line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`",
             "line": 40,
             "location": "src/main.rs",
@@ -1049,7 +1043,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "environment,parameter"
+          "value": "derived,environment,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -1057,7 +1051,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -1291,7 +1285,7 @@
             "symbol": "ring::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a11::m1; use: keyderive; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in a11::m1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 30,
@@ -1568,7 +1562,7 @@
             "symbol": "rsa::oaep::Oaep::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m4; use: encrypt; line: `k.encrypt(&mut rand::thread_rng(), padding, m).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a11::m4; use: encrypt; rng: rng (rngs::thread::thread_rng); line: `k.encrypt(&mut rand::thread_rng(), padding, m).unwrap()`; code: `encrypt`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 6,
@@ -1601,6 +1595,10 @@
         {
           "name": "rcbom:param:mgf_hash",
           "value": "SHA-256"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -2068,8 +2066,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/a11@0.1.0#root",
+      "bom-ref": "pkg:cargo/a11@0.1.0",
       "name": "a11",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a11@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -2104,7 +2109,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "885"
+        "value": "347"
       }
     ],
     "tools": {
@@ -2117,7 +2122,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:00054700-0ec1-8214-95db-3f4f4e817a16",
+  "serialNumber": "urn:uuid:224886ea-b7d6-80d7-8eca-8cc2b2d3278f",
   "specVersion": "1.7",
   "version": 1
 }

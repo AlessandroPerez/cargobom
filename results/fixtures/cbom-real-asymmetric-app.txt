@@ -3,7 +3,7 @@
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:16:12 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:15:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:12 | ring::digest::digest | [reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:20 | ring::digest::SHA256 | [reachable] [static] in cbom_real_asymmetric_app::main; use: digest; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:20 | ring::digest::SHA256 | [reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:68:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via cbom-real-asymmetric-app -> rsa -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:116:0 | digest | [manifest] locked digest 0.10.7; reached via cbom-real-asymmetric-app -> rsa -> digest
   occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:137:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via cbom-real-asymmetric-app -> ed25519-dalek
@@ -50,7 +50,6 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
-  prop cbom-real-asymmetric-app | pkg:cargo/cbom-real-asymmetric-app@0.1.0 | rcbom:scope=required
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -87,7 +86,6 @@ asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"alg
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application cbom-real-asymmetric-app 0.1.0 | pkg:cargo/cbom-real-asymmetric-app@0.1.0 | purl pkg:cargo/cbom-real-asymmetric-app@0.1.0
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
@@ -138,12 +136,12 @@ provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
-root {"bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0#root", "name": "cbom-real-asymmetric-app", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0", "name": "cbom-real-asymmetric-app", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/cbom-real-asymmetric-app@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=52
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=416
+run rcbom:run:reachable-instances=130
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

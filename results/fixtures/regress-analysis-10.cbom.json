@@ -88,19 +88,6 @@
       "version": "0.45.0"
     },
     {
-      "bom-ref": "pkg:cargo/t10@0.1.0",
-      "name": "t10",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t10@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:3DES-112",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -331,7 +318,7 @@
             "symbol": "aws_lc_rs::aead::quic::HeaderProtectionKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::literal_keys; use: encrypt; line: `let hp = aead::quic::HeaderProtectionKey::new(&aead::quic::AES_128, &[2u8; 16]).unwrap();`; code: `aead::quic::AES_128`",
+            "additionalContext": "[reachable] [static] in t10::literal_keys; line: `let hp = aead::quic::HeaderProtectionKey::new(&aead::quic::AES_128, &[2u8; 16]).unwrap();`; code: `aead::quic::AES_128`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 51,
@@ -355,7 +342,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -411,7 +398,7 @@
             "symbol": "aws_lc_rs::aead::aes_gcm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in t10::literal_keys; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; line: `let _ = t.seal_in_place_append_tag(nonce, aead::Aad::empty(), &mut buf);`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in t10::literal_keys; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 17); line: `let _ = t.seal_in_place_append_tag(nonce, aead::Aad::empty(), &mut buf);`; code: `seal_in_place_append_tag`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 14,
@@ -462,6 +449,14 @@
         {
           "name": "rcbom:finding",
           "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
         },
         {
           "name": "rcbom:occurrences",
@@ -756,7 +751,7 @@
             "symbol": "aws_lc_rs::cmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; use: tag; line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::DES_EDE3_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::DES_EDE3_FOR_LEGACY_USE_ONLY`",
             "line": 92,
             "location": "src/main.rs",
             "offset": 28,
@@ -826,7 +821,7 @@
             "symbol": "aws_lc_rs::cmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::literal_keys; use: tag; line: `let ck = cmac::Key::new(cmac::AES_128, &[4u8; 16]).unwrap();`; code: `cmac::AES_128`",
+            "additionalContext": "[reachable] [static] in t10::literal_keys; line: `let ck = cmac::Key::new(cmac::AES_128, &[4u8; 16]).unwrap();`; code: `cmac::AES_128`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 28,
@@ -956,7 +951,7 @@
             "symbol": "aws_lc_rs::agreement::PrivateKey::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::agreements; use: keyderive; line: `let pk = agreement::PrivateKey::generate(&agreement::ECDH_P256).unwrap();`; code: `agreement::ECDH_P256`",
+            "additionalContext": "[reachable] [static] in t10::agreements; line: `let pk = agreement::PrivateKey::generate(&agreement::ECDH_P256).unwrap();`; code: `agreement::ECDH_P256`",
             "line": 64,
             "location": "src/main.rs",
             "offset": 46,
@@ -970,7 +965,7 @@
             "symbol": "aws_lc_rs::agreement::agree"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::agreements; use: keyderive; line: `let _ = agreement::agree(&pk, agreement::UnparsedPublicKey::new(&agreement::ECDH_P256, peer), aws_lc_rs::error::Unspecified, |km| Ok(km.to_vec()));`; code: `agreement::ECDH_P256`",
+            "additionalContext": "[reachable] [static] in t10::agreements; line: `let _ = agreement::agree(&pk, agreement::UnparsedPublicKey::new(&agreement::ECDH_P256, peer), aws_lc_rs::error::Unspecified, |km| Ok(km.to_vec()));`; code: `agreement::ECDH_P256`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 69,
@@ -1023,7 +1018,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: verify; line: `let _verify_only = &signature::ECDSA_P384_SHA256_ASN1;`; code: `signature::ECDSA_P384_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let _verify_only = &signature::ECDSA_P384_SHA256_ASN1;`; code: `signature::ECDSA_P384_SHA256_ASN1`",
             "line": 108,
             "location": "src/main.rs",
             "offset": 24,
@@ -1047,7 +1042,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -1085,14 +1080,21 @@
             "symbol": "aws_lc_rs::ec::key_pair::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: sign; line: `let doc = signature::EcdsaKeyPair::generate_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, &rng).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let doc = signature::EcdsaKeyPair::generate_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, &rng).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`",
             "line": 103,
             "location": "src/main.rs",
             "offset": 55,
             "symbol": "aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: sign; line: `let kp = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, doc.as_ref()).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [call] in t10::descriptor_functions; algorithm from aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING in the arguments; key: rng (rand::SystemRandom::new); line: `let kp = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, doc.as_ref()).unwrap();`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "line": 104,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::ec::key_pair::EcdsaKeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let kp = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, doc.as_ref()).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`",
             "line": 104,
             "location": "src/main.rs",
             "offset": 50,
@@ -1106,7 +1108,7 @@
             "symbol": "aws_lc_rs::ec::key_pair::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: verify; line: `let pk = signature::UnparsedPublicKey::new(&signature::ECDSA_P256K1_SHA256_ASN1, kp.public_key().as_ref());`; code: `signature::ECDSA_P256K1_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let pk = signature::UnparsedPublicKey::new(&signature::ECDSA_P256K1_SHA256_ASN1, kp.public_key().as_ref());`; code: `signature::ECDSA_P256K1_SHA256_ASN1`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 48,
@@ -1144,8 +1146,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:key",
+          "value": "rng"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -1166,7 +1172,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: verify; line: `let _ed_verify_only = &signature::ED25519;`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let _ed_verify_only = &signature::ED25519;`; code: `signature::ED25519`",
             "line": 110,
             "location": "src/main.rs",
             "offset": 27,
@@ -1190,7 +1196,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -1225,7 +1231,7 @@
             "symbol": "aws_lc_rs::hkdf::Prk::new_less_safe"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in t10::prk_and_prf; line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::HKDF_SHA256`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 39,
@@ -1239,7 +1245,7 @@
             "symbol": "aws_lc_rs::hkdf::Prk::expand"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in t10::prk_and_prf; line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `hkdf::HKDF_SHA256`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 33,
@@ -1438,7 +1444,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: sign; line: `let _rsa_sign_only = &signature::RSA_PKCS1_SHA384;`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let _rsa_sign_only = &signature::RSA_PKCS1_SHA384;`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 111,
             "location": "src/main.rs",
             "offset": 26,
@@ -1462,7 +1468,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -1490,7 +1496,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t10::descriptor_functions; use: verify; line: `let _rsa_verify_only = &signature::RSA_PSS_2048_8192_SHA512;`; code: `signature::RSA_PSS_2048_8192_SHA512`",
+            "additionalContext": "[reachable] [static] in t10::descriptor_functions; line: `let _rsa_verify_only = &signature::RSA_PSS_2048_8192_SHA512;`; code: `signature::RSA_PSS_2048_8192_SHA512`",
             "line": 109,
             "location": "src/main.rs",
             "offset": 28,
@@ -1514,7 +1520,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -1752,7 +1758,7 @@
             "symbol": "aws_lc_rs::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; use: digest; line: `let a = digest::digest(&digest::SHA3_256, msg);`; code: `digest::SHA3_256`",
+            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; line: `let a = digest::digest(&digest::SHA3_256, msg);`; code: `digest::SHA3_256`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 28,
@@ -1811,7 +1817,7 @@
             "symbol": "aws_lc_rs::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; use: digest; line: `let b = digest::digest(&digest::SHA3_512, msg);`; code: `digest::SHA3_512`",
+            "additionalContext": "[reachable] [static] in t10::legacy_and_sha3; line: `let b = digest::digest(&digest::SHA3_512, msg);`; code: `digest::SHA3_512`",
             "line": 84,
             "location": "src/main.rs",
             "offset": 28,
@@ -1869,7 +1875,7 @@
             "symbol": "aws_lc_rs::tls_prf::Secret::new"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let s = tls_prf::Secret::new(&tls_prf::P_SHA256, &[6u8; 48]).unwrap();`; code: `tls_prf::P_SHA256`",
+            "additionalContext": "[reachable] [static] in t10::prk_and_prf; line: `let s = tls_prf::Secret::new(&tls_prf::P_SHA256, &[6u8; 48]).unwrap();`; code: `tls_prf::P_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 34,
@@ -1943,7 +1949,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let _other = &tls_prf::P_SHA384;`; code: `tls_prf::P_SHA384`",
+            "additionalContext": "[reachable] [static] in t10::prk_and_prf; line: `let _other = &tls_prf::P_SHA384;`; code: `tls_prf::P_SHA384`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 18,
@@ -1967,7 +1973,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -2012,7 +2018,7 @@
             "symbol": "aws_lc_rs::agreement::ephemeral::EphemeralPrivateKey::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::agreements; use: keyderive; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::X25519`",
+            "additionalContext": "[reachable] [static] in t10::agreements; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::X25519`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 55,
@@ -2026,7 +2032,7 @@
             "symbol": "aws_lc_rs::agreement::ephemeral::agree_ephemeral"
           },
           {
-            "additionalContext": "[reachable] [static] in t10::agreements; use: keyderive; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::X25519`",
+            "additionalContext": "[reachable] [static] in t10::agreements; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::X25519`",
             "line": 57,
             "location": "src/main.rs",
             "offset": 93,
@@ -2152,8 +2158,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t10@0.1.0#root",
+      "bom-ref": "pkg:cargo/t10@0.1.0",
       "name": "t10",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t10@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -2188,7 +2201,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "374"
+        "value": "277"
       }
     ],
     "tools": {
@@ -2201,7 +2214,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7f6c0d60-aca7-8d60-8d40-7efd29c6014f",
+  "serialNumber": "urn:uuid:011f7fd3-0de4-81df-ab43-5e2ef25ec043",
   "specVersion": "1.7",
   "version": 1
 }

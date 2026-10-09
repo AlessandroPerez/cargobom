@@ -63,7 +63,6 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
-  prop t3 | pkg:cargo/t3@0.1.0 | rcbom:scope=required
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
   prop x25519 | crypto:algorithm:x25519 | rcbom:finding=hard-coded-key
@@ -79,7 +78,6 @@
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
-component application t3 0.1.0 | pkg:cargo/t3@0.1.0 | purl pkg:cargo/t3@0.1.0
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
@@ -130,12 +128,12 @@ doc version=1
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
 provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:algorithm:x25519
-root {"bom-ref": "pkg:cargo/t3@0.1.0#root", "name": "t3", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/t3@0.1.0", "name": "t3", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t3@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=49
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=437
+run rcbom:run:reachable-instances=111
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

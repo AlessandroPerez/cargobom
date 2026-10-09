@@ -62,7 +62,7 @@ Status: draft: annotator 1
 | 12 | `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);` | AES-256-GCM | core | set up only |  | key: environment or hard-coded | ring UnboundKey::new(&AES_256_GCM, ..): a key is built, never used to seal or open | |
 | 14 | `let mut rng = thread_rng();` | CSPRNG (rand ThreadRng: ChaCha12, reseeded from the OS) | extended | generate |  |  | rand 0.8.6 thread_rng(): ReseedingRng over ChaCha12Core (rngs/std.rs:13); the randomness for the RSA key generation at line 15 | |
 | 15 | `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();` | RSA private key (2048 bits) | core | keygen | type=private-key, size=2048, public_exponent=65537 | rng: rng | RsaPrivateKey::new(&mut rng, 2048) (rsa 0.9.10, e = 65537, key.rs:214-219). No scheme (PKCS#1, PSS, OAEP) is chosen, so the registry has no algorithm name for it: it is key material | |
-| 16 | `let _ = SigningKey::from_bytes(&[42u8; 32]);` | Ed25519 private key | core | set up only | type=private-key, size=256, provenance=hard-coded [42u8; 32] | key: hard-coded | SigningKey::from_bytes(&[42u8; 32]) (ed25519-dalek 2.2.0): a signing key from a literal, never used to sign | |
+| 16 | `let _ = SigningKey::from_bytes(&[42u8; 32]);` | Ed25519 | core | set up only | type=private-key, size=256, provenance=hard-coded [42u8; 32] | key: hard-coded | SigningKey::from_bytes(&[42u8; 32]) (ed25519-dalek 2.2.0): a signing key from a literal, never used to sign | |
 | 16 | `let _ = SigningKey::from_bytes(&[42u8; 32]);` | SHA-512 | extended (component) |  |  |  | Ed25519 key expansion hashes the secret with SHA-512 (by definition of Ed25519) | |
 
 Crates: ring (used), rsa (used), ed25519-dalek (used), rand (used)

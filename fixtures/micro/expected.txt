@@ -19,12 +19,12 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:52:6 | digest::mac::Mac::update | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `m.update(msg);`; code: `update`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:55:9 | digest::mac::Mac::finalize | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.finalize()`; code: `finalize`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:9 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.into_bytes()`; code: `into_bytes`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:50 | ring::digest::SHA256 | [reachable] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:72:12 | ring::digest::SHA384 | [reachable] [static] [macro hash_all!] in micro::digests; use: digest; expanded from src/main.rs:63; line: `let b = hash_all!(data, b"x");`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:50 | ring::digest::SHA256 | [reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:72:12 | ring::digest::SHA384 | [reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b"x");`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:72:12 | ring::digest::digest | [reachable] [call] [macro hash_all!] in micro::digests; use: digest; algorithm from ring::digest::SHA384 in the arguments; expanded from src/main.rs:63; line: `let b = hash_all!(data, b"x");`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:68:64 | ring::digest::SHA512 | [reachable] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:68:64 | ring::digest::SHA512 | [reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:71:24 | micro::DIGESTS | [reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:80:4 | digest::digest::Digest::digest | [present] [call] in micro::unused_sha512; use: digest; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`
   occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via micro -> aes-gcm -> aead
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via micro -> aes-gcm -> aes
@@ -85,7 +85,7 @@
   prop SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | rcbom:usage=declared-not-used
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
@@ -97,7 +97,7 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=3
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
@@ -133,7 +133,6 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
-  prop micro | pkg:cargo/micro@0.1.0 | rcbom:scope=required
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
@@ -163,7 +162,6 @@ asset SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | {"algorithmProperties": {"alg
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application micro 0.1.0 | pkg:cargo/micro@0.1.0 | purl pkg:cargo/micro@0.1.0
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
@@ -251,12 +249,12 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 provides pkg:cargo/sha1@0.10.7 -> crypto:candidate:sha1@0.10.7:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
-root {"bom-ref": "pkg:cargo/micro@0.1.0#root", "name": "micro", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/micro@0.1.0", "name": "micro", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/micro@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=35
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=535
+run rcbom:run:reachable-instances=155
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

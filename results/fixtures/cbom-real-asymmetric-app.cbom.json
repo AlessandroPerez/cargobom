@@ -2,19 +2,6 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
-      "bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
-      "name": "cbom-real-asymmetric-app",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -607,7 +594,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; use: digest; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
@@ -737,8 +724,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0#root",
+      "bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
       "name": "cbom-real-asymmetric-app",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/cbom-real-asymmetric-app@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -773,7 +767,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "416"
+        "value": "130"
       }
     ],
     "tools": {
@@ -786,7 +780,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4043ebd0-9fcc-82b3-911b-07e43312f5e1",
+  "serialNumber": "urn:uuid:d6a9d690-1f02-881e-bc90-a03ca0a28d0d",
   "specVersion": "1.7",
   "version": 1
 }

@@ -223,6 +223,15 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     })
 }
 
+/// The bom-ref of a protocol's asset: `crypto:protocol:TLS`.
+pub(crate) fn protocol_ref(p: &crate::Protocol) -> String {
+    format!("crypto:protocol:{}", p.name)
+}
+
+/// A protocol's asset: one for the protocol the configuration offers, with every version it
+/// enables (`rcbom:protocol:versions`) and all their cipher suites. CycloneDX gives a protocol
+/// one `version`: it is stated only when one version is enabled, so that suites of another
+/// version are never listed under it.
 fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
     let occurrences: Vec<Value> = p
         .occurrences
@@ -239,7 +248,7 @@ fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
         .collect();
     let mut pp = serde_json::Map::new();
     pp.insert("type".into(), json!(p.kind));
-    if let Some(v) = p.versions.iter().max() {
+    if let [v] = p.versions.as_slice() {
         pp.insert("version".into(), json!(v));
     }
     pp.insert(
@@ -267,7 +276,7 @@ fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
     }
     json!({
         "type": "cryptographic-asset",
-        "bom-ref": format!("crypto:protocol:{}", p.name),
+        "bom-ref": protocol_ref(p),
         "name": p.name,
         "cryptoProperties": { "assetType": "protocol", "protocolProperties": pp },
         "evidence": { "occurrences": occurrences },
@@ -320,9 +329,10 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
         props.push(prop("rcbom:ffi-boundary", "true"));
     }
     if let (Some(u), Some(r)) = (usage, p.role) {
-        if !p.kb_supported || !layer2 {
-            // without Layer 2 (`--manifest-only`) no use was looked for
-            // its APIs are not in the knowledge base: no use could have been seen
+        if !p.kb_supported || !layer2 || (p.scope == Scope::Build && u == Usage::DeclaredNotUsed) {
+            // without Layer 2 (`--manifest-only`) no use was looked for; its APIs are not in
+            // the knowledge base: no use could have been seen; only build scripts and proc
+            // macros use it, and they are not analysed
             props.push(prop("rcbom:usage", "unknown"));
         } else if r != Role::Trait {
             props.push(prop(
@@ -336,7 +346,7 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
         }
     }
     let mut c = json!({
-        "type": if p.member { "application" } else { "library" },
+        "type": if p.member && p.binary { "application" } else { "library" },
         "bom-ref": pkg_ref(&p.name, &v),
         "name": p.name,
         "version": v,
@@ -381,7 +391,13 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
             )
             .next();
         for name in &p.candidates {
-            if an.assets.values().any(|a| a.name == *name) {
+            // an algorithm of that name was found (a key of that name, the JWT HMAC secret, is
+            // not the algorithm)
+            if an
+                .assets
+                .values()
+                .any(|a| a.name == *name && a.algo.material.is_none())
+            {
                 continue;
             }
             let mut ap = serde_json::Map::new();
@@ -403,7 +419,11 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                     prop("rcbom:confidence", "low"),
                     prop(
                         "rcbom:usage",
-                        if an.layer2 { "declared-not-used" } else { "unknown" },
+                        if an.layer2 && p.scope == Scope::Required {
+                            "declared-not-used"
+                        } else {
+                            "unknown"
+                        },
                     ),
                     prop("rcbom:kb:version", &kb.version),
                 ],
@@ -460,7 +480,7 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
             provides
                 .entry(pkg_ref(n, v))
                 .or_default()
-                .insert(format!("crypto:protocol:{}", p.name));
+                .insert(protocol_ref(p));
         }
     }
     for c in &candidates {
@@ -529,6 +549,15 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
     for n in &an.notes {
         run_props.push(prop("rcbom:run:note", n));
     }
+    // the root package is the BOM's subject: `metadata.component`, the same bom-ref the
+    // dependency graph starts from, and not also among the components
+    let root_component = root.and_then(|r| {
+        let rr = pkg_ref(&r.name, &r.version.to_string());
+        let i = components
+            .iter()
+            .position(|c| c["bom-ref"] == rr.as_str())?;
+        Some(components.remove(i))
+    });
     let mut bom = json!({
         "bomFormat": "CycloneDX",
         "specVersion": "1.7",
@@ -540,9 +569,8 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         "components": components,
         "dependencies": deps,
     });
-    if let Some(r) = root {
-        let v = r.version.to_string();
-        bom["metadata"]["component"] = json!({ "type": "application", "bom-ref": format!("{}#root", pkg_ref(&r.name, &v)), "name": r.name, "version": v });
+    if let Some(c) = root_component {
+        bom["metadata"]["component"] = c;
     }
     // Same inputs, same CBOM: the serial number is derived from the content.
     let digest = fnv128(serde_json::to_string(&bom).unwrap().as_bytes());

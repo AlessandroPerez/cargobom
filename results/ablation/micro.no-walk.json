@@ -391,19 +391,6 @@
       "version": "0.12.1"
     },
     {
-      "bom-ref": "pkg:cargo/micro@0.1.0",
-      "name": "micro",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/micro@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -931,14 +918,14 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[present] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
+            "additionalContext": "[present] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[present] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[present] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
@@ -962,7 +949,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
@@ -997,7 +984,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] [macro hash_all!] in micro::digests; use: digest; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
+            "additionalContext": "[present] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 12,
@@ -1049,14 +1036,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
+            "additionalContext": "[present] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 64,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[present] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[present] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
@@ -1317,8 +1304,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/micro@0.1.0#root",
+      "bom-ref": "pkg:cargo/micro@0.1.0",
       "name": "micro",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/micro@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -1366,7 +1360,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:96fd88ed-103a-84a1-84d9-86de26643520",
+  "serialNumber": "urn:uuid:2722adca-b8c8-89d2-be51-f074b10a5bc1",
   "specVersion": "1.7",
   "version": 1
 }

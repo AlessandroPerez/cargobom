@@ -18,9 +18,7 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
-  prop v01 | pkg:cargo/v01@0.1.0 | rcbom:scope=required
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application v01 0.1.0 | pkg:cargo/v01@0.1.0 | purl pkg:cargo/v01@0.1.0
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
@@ -35,12 +33,12 @@ doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-root {"bom-ref": "pkg:cargo/v01@0.1.0#root", "name": "v01", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/v01@0.1.0", "name": "v01", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v01@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=10
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=154
+run rcbom:run:reachable-instances=102
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

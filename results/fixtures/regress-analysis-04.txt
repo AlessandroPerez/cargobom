@@ -66,18 +66,16 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=declared-not-used
-  prop t4 | pkg:cargo/t4@0.1.0 | rcbom:scope=required
 asset BLAKE3 | crypto:candidate:blake3@1.8.5:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "primitive": "hash"}, "assetType": "algorithm"}
 asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
 asset MD5 | crypto:candidate:md5@0.7.0:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-2 | crypto:candidate:sha2@0.10.9:SHA-2 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "primitive": "hash"}, "assetType": "algorithm"}
-component application inner 0.2.0 | pkg:cargo/inner@0.2.0 | purl pkg:cargo/inner@0.2.0
-component application t4 0.1.0 | pkg:cargo/t4@0.1.0 | purl pkg:cargo/t4@0.1.0
 component library blake3 1.8.5 | pkg:cargo/blake3@1.8.5 | purl pkg:cargo/blake3@1.8.5
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library inner 0.2.0 | pkg:cargo/inner@0.2.0 | purl pkg:cargo/inner@0.2.0
 component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
 component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
@@ -109,7 +107,7 @@ provides pkg:cargo/hmac@0.12.1 -> crypto:candidate:hmac@0.12.1:HMAC
 provides pkg:cargo/md5@0.7.0 -> crypto:candidate:md5@0.7.0:MD5
 provides pkg:cargo/sha1@0.10.7 -> crypto:candidate:sha1@0.10.7:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:candidate:sha2@0.10.9:SHA-2
-root {"bom-ref": "pkg:cargo/t4@0.1.0#root", "name": "t4", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/t4@0.1.0", "name": "t4", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t4@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=23

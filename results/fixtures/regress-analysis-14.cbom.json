@@ -1,0 +1,737 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a14 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a14 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a14 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "128",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a14::GCM128; line: `static GCM128: Gcm = Gcm(Alg(&aead::AES_128_GCM));`; code: `aead::AES_128_GCM`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::aead::algorithm::AES_128_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::Alg::key; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::make_key; algorithm from ring::aead::algorithm::AES_128_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `UnboundKey::new`",
+            "line": 107,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::make_key; line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `aead::AES_128_GCM`",
+            "line": 107,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::aead::algorithm::AES_128_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::seal_with; use: encrypt; algorithm from ring::aead::algorithm::AES_128_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 113); line: `key.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
+            "line": 114,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a14::main; a14::GCM128 -> ring::aead::algorithm::AES_128_GCM; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `GCM128`",
+            "line": 125,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "a14::GCM128"
+          }
+        ]
+      },
+      "name": "AES-128-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a14::GCM256; line: `static GCM256: Gcm = Gcm(Alg(&aead::AES_256_GCM));`; code: `aead::AES_256_GCM`",
+            "line": 64,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::Alg::key; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::Sealer::seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 92); line: `.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
+            "line": 94,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a14::main; a14::GCM256 -> ring::aead::algorithm::AES_256_GCM; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `GCM256`",
+            "line": 125,
+            "location": "src/main.rs",
+            "offset": 56,
+            "symbol": "a14::GCM256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::main; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args); line: `UnboundKey::new(&aead::AES_256_GCM, &input).unwrap(),`; code: `UnboundKey::new`",
+            "line": 129,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::main; line: `UnboundKey::new(&aead::AES_256_GCM, &input).unwrap(),`; code: `aead::AES_256_GCM`",
+            "line": 129,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          }
+        ]
+      },
+      "name": "AES-256-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "environment,parameter"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ChaCha20-Poly1305",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ChaCha20",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a14::CHACHA; line: `static CHACHA: ChaCha = ChaCha(Alg(&aead::CHACHA20_POLY1305));`; code: `aead::CHACHA20_POLY1305`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::ChaCha::key; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`",
+            "line": 74,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a14::main; a14::CHACHA -> ring::aead::algorithm::CHACHA20_POLY1305; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `CHACHA`",
+            "line": 125,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "a14::CHACHA"
+          }
+        ]
+      },
+      "name": "ChaCha20-Poly1305",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "sign"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a14::key_pair; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING in the arguments; key: parameter (argument 0 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `EcdsaKeyPair::from_pkcs8`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::key_pair; line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::Signer::sign; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; line: `let sig = self.inner.sign(&self.rng, msg).map_err(|_| Error)?;`; code: `sign`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a14::Mac::new; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: parameter (argument 0 of the enclosing function); line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::Key::new`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "ring::hmac::Key::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::Mac::new; line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::HMAC_SHA256`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::Mac::tag; use: tag; algorithm from ring::hmac::HMAC_SHA256, reaching the call from another function; line: `hmac::sign(&self.key, msg)`; code: `hmac::sign`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::hmac::sign"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a14::key_pair; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a14::Mac::new; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::HMAC_SHA256`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest::digest(alg, data)`; code: `digest::digest`",
+            "line": 101,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::main; line: `hash_with(&digest::SHA256, &input).as_ref().len(),`; code: `digest::SHA256`",
+            "line": 136,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; line: `digest::digest(alg, data)`; code: `digest::digest`",
+            "line": 101,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a14::main; line: `hash_with(&digest::SHA384, &input).as_ref().len()`; code: `digest::SHA384`",
+            "line": 137,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "ring::digest::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a14@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-GCM",
+        "crypto:algorithm:AES-256-GCM",
+        "crypto:algorithm:ChaCha20-Poly1305",
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a14@0.1.0",
+      "name": "a14",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a14@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "177"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:cb810cfd-be51-8ac6-901d-24fa769acb7a",
+  "specVersion": "1.7",
+  "version": 1
+}

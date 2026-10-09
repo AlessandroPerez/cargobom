@@ -1,6 +1,6 @@
 # cargo-cbom: proof-of-concept evaluation
 
-*9 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 7.*
+*9 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 8.*
 
 This is the evaluation of the first, deliberately narrow paper: Layers 1 and 2 of
 `docs/rust-cbom-proposal2.md`, intraprocedural provenance, and a small labelled test set. A
@@ -23,7 +23,7 @@ All outputs behind the tables (CBOMs, scores, baseline reports, corpus and ablat
 **Tool.** Layer 1 reads `cargo metadata` and the manifests. Layer 2 is a `RUSTC_WRAPPER` on `rustc_public` that records, in every crate:
 - calls into knowledge-base crates, with their generic arguments as type trees
 - references to algorithm statics and consts
-- the intraprocedural origin of each call argument
+- the intraprocedural origin of each call argument, and how values that can carry an algorithm or a key move between functions (struct fields, parameters, return values, statics written at run time)
 
 It then walks the monomorphized instance graph from `main`, or from the public API of a library: vtables for `dyn`, function pointers, drop glue, statics. The stable analysis matches these facts against the knowledge base structurally (crate, item, generic-argument positions, version ranges), and emits CycloneDX 1.7, validated against the official schemas on every run.
 
@@ -46,7 +46,7 @@ Crypto crates in other versions are reported as `unsupported-version` rather tha
 | micro, libonly, threads | written for this work | 3 | golden files (designed cases) |
 | rusi fixtures | cdxgen-plugins-bin@6a64635, MIT, unchanged | 3 | `labels.toml`, written from source before scoring |
 | realapp | Phase 0 corpus (age, jsonwebtoken, rustls/ring) | 1 | Phase 0 output as oracle |
-| regression probes | written by independent audits of the pipeline, and after the corpus runs (section 8) | 30 | golden files (each case commented) |
+| regression probes | written by independent audits of the pipeline, and after the corpus runs (section 8) | 39 | golden files (each case commented) |
 | corpus | crates.io releases: rage, jwt-cli, rcgen, minisign, xh | 5 | none (feasibility) |
 
 The cases micro and libonly cover:
@@ -63,12 +63,13 @@ The cases micro and libonly cover:
 
 ## 3. RQ1: evidence positions
 
-Every occurrence carries `location` (workspace-relative, or `<package>-<version>/<path>` in a dependency), `line`, `offset` (0-based column), `symbol`, and in its context the source line and the exact text at the position (`line: \`let d = Sha512_256::digest(data);\`; code: \`Sha512_256::digest\``). `cargo cbom verify` reopens each cited file and checks, from the CBOM and the sources only:
-- that the position starts a token in code, not in a comment or a literal;
-- that the line is the recorded line, and the source at the position starts with the recorded text and is a path whose last segment is the symbol's name or an import alias of it (aliases read from `use` items only);
+Every occurrence carries `location` (workspace-relative, or `<package>-<version>/<path>` in a dependency), `line`, `offset` (0-based column) and `symbol`. An occurrence in code also records, in its context, the source line, and, when the text at the position lies on one line outside a macro, that text (`line: \`let d = Sha512_256::digest(data);\`; code: \`Sha512_256::digest\``). `cargo cbom verify` reopens each cited file and checks, from the CBOM and the sources only:
+- that the position starts a token in code, not in a comment, a literal or a `use` item, and not after a keyword that defines an item;
+- that the line is the recorded line, and the source at the position starts with the recorded text and is a path whose last segment is the symbol's name or an import alias of it (aliases from `use` items of the file, its package or the crates the path goes through, renaming the symbol's item);
+- the positions the details cite (where a generic instance was instantiated, where a macro's code was written);
 - macro call sites (`hash_all!`, `ml::sha512_of!`), derive and attribute positions;
 - that a component is where the asset it is part of is, that one asset has one occurrence per position and symbol, and that a qualifier imported from a crate of the CBOM belongs to a crate providing the asset;
-- for manifests, the exact key, and in `Cargo.lock` the package's name and version lines.
+- for manifests, the exact key of the component's package (its rename and version requirement), and in `Cargo.lock` the package's name and version lines.
 
 With `--self-test` it shifts every position by ±1 line and ±1 column and counts how often the check then fails. A shift that would leave the first line or column is skipped, so the column −1 direction has fewer shifted positions than the others (many manifest and item positions start at column 0).
 
@@ -77,11 +78,11 @@ With `--self-test` it shifts every position by ±1 line and ±1 column and count
 | micro | 54 | 54 | 188/188 |
 | libonly | 20 | 20 | 72/72 |
 | threads | 15 | 15 | 54/54 |
-| rusi fixtures (3) | 635 | 635 | 2,473/2,473 |
-| realapp | 396 | 396 | 1,557/1,557 |
-| regression probes (30) | 3,104 | 3,104 | 12,036/12,036 |
-| corpus (5 projects) | 831 | 831 | 3,270/3,270 |
-| **total** | **5,055** | **5,055** | **19,650/19,650** |
+| rusi fixtures (3) | 820 | 820 | 3,213/3,213 |
+| realapp | 550 | 550 | 2,173/2,173 |
+| regression probes (39) | 4,896 | 4,896 | 19,089/19,089 |
+| corpus (5 projects) | 1,018 | 1,018 | 4,018/4,018 |
+| **total** | **7,373** | **7,373** | **28,807/28,807** |
 
 Positions come from rustc's spans, which are offsets into the original files, so comments and formatting cannot shift them. Code from a function-like macro is attributed to the outermost call site in the user's source, with the definition site kept in the context.
 
@@ -147,11 +148,11 @@ On realapp this finds two real patterns:
 | micro | 26 / 20 | 6 | 25 | 24 / 18 |
 | libonly | 12 / 4 | 8 | 11 | 10 / 4 |
 | threads | 9 / 9 | 0 | 9 | 7 / 7 |
-| rusi crates-app | 560 / 560 | 0 | 278 | 11 / 11 |
+| rusi crates-app | 745 / 745 | 0 | 384 | 11 / 11 |
 | rusi asymmetric-app | 6 / 6 | 0 | 6 | 4 / 4 |
 | rusi modern-app | 2 / 2 | 0 | 2 | 2 / 2 |
-| realapp | 369 / 369 | 0 | 275 | 2 / 2 |
-| rcgen (library) | 92 / 92 | 0 | 84 | 91 / 91 |
+| realapp | 523 / 523 | 0 | 408 | 2 / 2 |
+| rcgen (library) | 94 / 94 | 6 | 92 | 93 / 93 |
 | rage | 119 / 86 | 37 | 116 | 0 / 0 |
 
 The walk does two things.
@@ -163,7 +164,7 @@ The walk does two things.
   A syntax-level tool cannot name any of these.
 - **Tiers.** It separates capability from use. In realapp, scrypt and both age `diffie_hellman` calls are present but not reachable from `main`. In xh, ML-KEM-1024, ECDH-P-521 and HMAC-SHA-512 are present only, while the default provider's algorithms are reachable through reqwest's client builder.
 
-Programs that call crypto APIs directly from non-generic code (the rusi fixtures, realapp's own `main`, rcgen) lose nothing without the walk except the tier split.
+Programs that call crypto APIs directly from non-generic code (the rusi fixtures, realapp's own `main`, rcgen) lose nothing without the walk except the tier split. rcgen's six occurrences in a generic instance are in `KeyIdMethod::derive`, generic only over its `impl AsRef<[u8]>` argument: the digests it names do not depend on the type, so the per-item scan finds them too.
 
 ## 7. RQ5: feasibility on real projects
 
@@ -171,18 +172,19 @@ Five crates.io applications and libraries (`scripts/corpus.py`). Each was built 
 
 | project | packages | plain check | cargo cbom | overhead | peak RSS | instances walked | algorithms (reachable) | other assets | occurrences (reachable) | findings |
 |---|---|---|---|---|---|---|---|---|---|---|
-| rage 0.12.1 | 192 | 18.4 s | 33.8 s | ×1.84 | 436 MiB | 46,363 | 14 (14) | – | 119 (116) | hard-coded nonce |
-| jwt-cli 6.2.0 | 73 | 14.9 s | 22.6 s | ×1.51 | 350 MiB | 16,837 | 15 (15) | HMAC key | 47 (47) | hard-coded key |
-| rcgen 0.14.10 (library) | 21 | 10.8 s | 14.5 s | ×1.34 | 266 MiB | 2,074 | 9 (9) | – | 92 (84) | – |
-| minisign 0.10.0 | 22 | 2.3 s | 8.5 s | ×3.65 | 246 MiB | 1,351 | 1 (1) | – | 2 (2) | – |
-| xh 0.26.2 | 215 | 59.5 s | 91.4 s | ×1.53 | 879 MiB | 57,024 | 39 (36) | TLS (aws-lc-rs) | 511 (270) | – |
+| rage 0.12.1 | 192 | 18.0 s | 35.6 s | ×1.98 | 429 MiB | 45,099 | 14 (14) | – | 119 (116) | hard-coded nonce |
+| jwt-cli 6.2.0 | 73 | 14.5 s | 24.1 s | ×1.66 | 350 MiB | 16,606 | 15 (15) | HMAC key | 86 (86) | hard-coded key |
+| rcgen 0.14.10 (library) | 19 | 10.9 s | 15.1 s | ×1.38 | 257 MiB | 2,470 | 9 (9) | – | 94 (92) | – |
+| minisign 0.10.0 | 22 | 2.4 s | 8.8 s | ×3.68 | 246 MiB | 1,298 | 1 (1) | – | 2 (2) | – |
+| xh 0.26.2 | 213 | 55.9 s | 103.3 s | ×1.85 | 871 MiB | 56,319 | 39 (36) | TLS (aws-lc-rs) | 657 (380) | hard-coded IKM and salt (TLS 1.3 key schedule) |
 
-- **Cost.** On the four projects larger than minisign the overhead is ×1.3 to ×1.8. minisign's ×3.7 is fixed per-crate cost on a two-second build. Memory peaks at 879 MiB, for xh. Packages are those of the analysed build as Layer 1 counts them (`rcbom:run:packages`): the host platform's, without development-only packages and optional dependencies that only a weak feature names.
-- **Evidence.** All 831 positions verify, and the self-test rejects all 3,270 shifted ones. The driver caught no panic in any of the five builds.
+- **Cost.** On the four projects larger than minisign the overhead is ×1.4 to ×2.0. minisign's ×3.7 is fixed per-crate cost on a two-second build. Memory peaks at 871 MiB, for xh. Packages are those of the analysed build as Layer 1 counts them (`rcbom:run:packages`): the host platform's, without development-only packages and optional dependencies that only a weak feature names.
+- **Evidence.** All 1,018 positions verify, and the self-test rejects all 4,018 shifted ones. The driver caught no panic in any of the five builds.
 - **rusi.** rusi (stable backend) reports 2 crypto components across the five projects: `JWT` in jwt-cli, and `SHA-256` in xh's `src/message_signature.rs`, a module compiled only with the non-default feature `http-message-signatures` (which cargo-cbom, analysing default features, does not see). These programs reach their crypto through dependencies (age, jsonwebtoken, reqwest/rustls), which a source-level scan of the workspace does not enter.
-- **Findings.** Both are real and intentional, and both show why purpose (Layer 3) matters:
+- **Findings.** All are real and intentional, and all show why purpose (Layer 3) matters:
   - age-core's `[0; 12]` nonce: age uses each file key once.
   - jwt-cli's `DecodingKey::from_secret("")`: used only when signature validation is explicitly disabled.
+  - xh's hard-coded HKDF input key and salt: rustls's TLS 1.3 key schedule starts from a zero input key and a zero salt, as RFC 8446 (section 7.1) specifies. They are found since the third audit round, which follows an algorithm and its key from the cipher suite statics into rustls's own functions (section 8).
 - **Coverage limit.** minisign implements Ed25519 and BLAKE2b in its own source. A knowledge-base tool sees only its use of the scrypt crate.
 
 The first corpus runs exposed problems the fixtures could not. All are fixed (each with a fixture or a regression check), and the table is from the fixed tool:
@@ -197,7 +199,7 @@ The first corpus runs exposed problems the fixtures could not. All are fixed (ea
 The re-run after the audits (section 8) found seven more. All are fixed, and each is covered by a regression probe, a golden file or the corpus run:
 
 7. **Panics inside compiler queries.** rage did not build. Before the build failed, the driver had caught panics in 122 items of rage, its `rage-keygen` binary and one dependency (flate2). Two bugs caused them. An inline `const { .. }` was read with the enclosing function's generic arguments instead of its own (it surfaced in standard-library MIR that inlines such blocks). And a dependency's *trivial* constant, an enum discriminant such as `Ordering::Less`, has no MIR stored for it, and asking for it panics inside the query. A panic inside a query leaves it marked as running, and in an incremental build, which cargo uses for workspace members, rustc then aborts. `cargo cbom` also hid the reason: it captured cargo's error output and dropped it. The driver now reads inline consts with their own arguments, and trivial constants by their value. `scripts/e2e.sh` and `scripts/corpus.py` treat any caught panic as a failure, and `RCBOM_DEBUG=1` prints each one with the driver's frames.
-8. **The same text on the next line.** In rcgen, `KeyPairKind::Ec(kp) => kp.public_key()` sits above `KeyPairKind::Ed(kp) => kp.public_key()`: the same callee name at the same column, and only the second is Ed25519. The self-test moved the Ed25519 position one line up, and the verifier accepted it. Each occurrence now records its source line (`line: \`..\``), and the verifier requires it.
+8. **The same text on the next line.** In rcgen, `KeyPairKind::Ec(kp) => kp.public_key()` sits above `KeyPairKind::Ed(kp) => kp.public_key()`: the same callee name at the same column, and only the second is Ed25519. The self-test moved the Ed25519 position one line up, and the verifier accepted it. Each occurrence in code now records its source line (`line: \`..\``), and the verifier requires it.
 9. **A derived key read as hard-coded.** age derives an X25519 key with its own helper, `hkdf(ssh_key, LABEL, &[]).into()`. The classification looked through any call into the union of its arguments, so the constant label and the empty salt made the key "hard-coded". Calls outside the knowledge base are now `computed`, as an intraprocedural analysis should say. A knowledge-base call is hard-coded only when every argument carrying data is.
 10. **Two descriptions of one fact.** The walk read a monomorphic function's instance body, in which named constants are already evaluated, while the per-item scan read the item body; the same argument was "static `LABEL`" in one and "literal at line 119" in the other, and the merged occurrence listed both. The walk now scans monomorphic functions in their item bodies too.
 11. **A slow analysis.** minisign took 204 s instead of 9: the argument-origin analysis was computed for every function, and minisign's own unrolled BLAKE2b compression function took 103 s on its own, once in the per-item scan and once in the walk. That function calls no crypto API, so nothing needs its origins. The analysis now runs only when an origin is asked for, and solves each block's effect once (section 23 of `docs/poc_workflow.md`): 0.4 s.
@@ -253,9 +255,69 @@ The one finding left as a known limit is in the verifier's self-test: it does no
 `#[cfg]`, so a shift onto an identical statement the configuration removes is accepted. The
 generator never cites such code.
 
+**A third round.** Four new reviewers audited the driver; Layer 1, the knowledge base, matching
+and provenance; verification, the harness and the documents; and, held out, four crates.io
+projects never run before (password-auth 1.0.0, vodozemac 0.10.0, instant-acme 0.8.5,
+bore-cli 0.6.0), each asset and occurrence checked against the sources. They reported 57
+findings (11 high, 20 medium, 26 low), all reproduced. All high and medium ones are fixed;
+five low ones are documented as limits (`docs/poc_workflow.md` section 34):
+- **Values across functions.** A key pair or an algorithm kept in a struct field and used in
+  another method was dropped: instant-acme's ECDSA and HMAC signing, rustls's TLS 1.3 record
+  keys, its key exchange and ML-KEM decapsulation. The driver now records what the program
+  stores in struct fields (by field path, so a wrapper's field inside another wrapper is told
+  apart), what its functions return and what callers pass, and the analysis follows them
+  (section 23.1 of `docs/poc_workflow.md`). This is flow- and context-insensitive: where several
+  algorithms may reach a call, each is reported "one of N that may reach the call".
+- **Statics written at run time.** Keys in `LazyLock`, `OnceLock` and `static mut`, and a counter
+  nonce in an atomic, were hard-coded; they are now classified by what the program puts there.
+- **Generators and defaults.** `Default::default()` was a fixed value whatever the type: rand's
+  `ThreadRng::default()` was a predictable generator, and the program's own `Config::default()`
+  reading the environment a hard-coded key.
+- **The walk.** A library's generic public function did not reach its private non-generic
+  callees (password-auth), nor a `pub async fn` its body; an `async` closure made the driver
+  lose the whole function; vendored crates counted as the program's own. Shims were scanned
+  like code, and their trait-declaration positions failed verification.
+- **Argument origins.** Keys read with `read_exact` (defined in `alloc::io` on the pinned
+  nightly), filled across an `.await` or in a capturing closure, filled field by field, chunk
+  by chunk or through a lock guard, replaced by `mem::replace`, destructured from arrays,
+  partly overwritten; the reaching definition's length of an output slice; the program's own
+  `fill`. Also a stack overflow: a loop walking a linked list (once_cell's waiter queue) made
+  the origin search read an ever longer path.
+- **Knowledge base and matching.** AES and ChaCha20 used directly were not assets; BLAKE3's
+  key-derivation mode and an HMAC keyed by a label over a secret gave hard-coded keys; ring's and
+  aws-lc-rs's scatter/gather AEAD methods had no use and their nonces no role; RSA key
+  generation through `new_with_exp` and a signing key's `random` was missed; Argon2's
+  `verify_password` and `hash_password_customized` took the receiver's costs; Ed25519's hazmat
+  signing was a SHA-512 setup, and curve25519-dalek's internal SHA-512 a use; OAEP schemes with
+  different MGF1 hashes merged; keys made from HKDF output (`UnboundKey::from(okm)`) had no role.
+- **Layer 1 and usage.** Features enabled only by a development dependency counted (ring as a
+  second backend of instant-acme's rustls); rand_core and getrandom were reachable in programs
+  that draw no randomness, through interface crates.
+- **Verification and CBOM semantics.** The verifier skipped its provider check on paths without
+  a qualifier, did not tie manifest positions to their component, accepted positions inside
+  `use` items, at definitions, through unrelated aliases and outside `#[derive]`, rejected
+  attributes inside `cfg_attr`, re-exported traits, long paths and aliases split over lines,
+  skipped occurrences without a position, and used the host instead of the recorded target. The
+  TLS asset stated version 1.3 while listing TLS 1.2 suites; the root package was duplicated
+  outside `metadata.component`; library-only members were typed `application`.
+
+**Reviewing the regenerated outputs.** As after the second round, every changed golden file and
+the held-out and corpus CBOMs were compared with their previous versions. Five more defects
+surfaced and were fixed: splitting TLS into one asset per version broke the labelled full name of the
+protocol, so the asset is one again and states a version only when one is enabled; values
+found in another function lost the context they are read in, so rustls's key agreement lost
+`keyderive` (now each value is followed in its own function); following them at every level
+multiplied the work (now remembered and bounded per question); and the interface-crate fix
+also made rand_core unused in a program calling `generate_nonce(&mut OsRng)` (an algorithm
+crate's type in a call's generic arguments now uses its crate). Last, in xh, ML-KEM-1024
+became reachable: rustls's reachable ML-KEM code reads its algorithm from a field, and one of
+the values stored there is listed only by `ALL_KX_GROUPS`, which no entry point names. An
+algorithm reaching a call only from data no entry point reaches is now present at that call.
+
 The probes are kept as regression fixtures (`fixtures/regress`, run by `scripts/e2e.sh
 --regress`), each compared with its reviewed CBOM: 19 from the first audits, 2 from the corpus
-re-run (section 7), and 9 from the second round and the review of its outputs.
+re-run (section 7), 9 from the second round and the review of its outputs, and 9 from the
+third round and the review of its outputs.
 
 ## 9. Limitations and threats
 
@@ -264,7 +326,7 @@ re-run (section 7), and 9 from the second round and the review of its outputs.
 - **Baseline.** rusi was run with its default syntax backend only; its compiler backend needs a stable ≥ 1.98 with `rustc-dev`.
 - **Reachability is not value-sensitive.** jsonwebtoken's `encode` matches on a run-time algorithm, so all its signing algorithms are reachable.
 - **Reachability is not proven sound.** It over-approximates within what it walks, like rustc's mono-item collector: vtables of every unsized type, function pointers, drop glue, code that crypto crates call back. It can still miss edges through non-generic std code, or through function pointers it cannot see created. A crypto use the walk misses is reported `present`, not dropped. The xh case (section 7) shows how a single missing edge kind changes the tier picture, and why the threads fixture now guards it.
-- **Provenance is intraprocedural.** Values crossing a function boundary are reported as `parameter` or `computed`; only what a closure or `async` body captured is traced into its parent.
+- **Provenance is mostly intraprocedural.** Across functions, only struct fields, parameters, the program's own return values and statics written at run time are followed, for values that can carry an algorithm or a key, and flow- and context-insensitively: several algorithms that may reach a call are each reported as "one of N". Otherwise values crossing a function boundary are `parameter` or `computed`.
 - **Run-time parameters.** A name says what the code determines: `Argon2::new` with costs in a `Params` value is `Argon2i`, an aws-lc-rs block-cipher key whose mode a separate constructor picks is `AES-128`, and a key-encryption key is AES for key wrapping until a `wrap` or `wrap_with_padding` call names KW or KWP. A bare family name has no registry pattern and is flagged.
 - **Standard library.** Non-generic std code has no MIR without a std sysroot, so the walk does not enter it. Generic std code (threads, iterators, closures, `dyn` calls) is walked.
 - **Knowledge-base tool.** Self-implemented cryptography is invisible (minisign's own Ed25519 and BLAKE2b), and so are crates outside the seed. Trait-based inference (any `Digest` or `Aead` implementation) is future work.

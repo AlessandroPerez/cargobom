@@ -44,7 +44,6 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
-  prop libonly | pkg:cargo/libonly@0.1.0 | rcbom:scope=required
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:crypto-role=algorithm
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:scope=required
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:usage=present
@@ -54,7 +53,6 @@
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application libonly 0.1.0 | pkg:cargo/libonly@0.1.0 | purl pkg:cargo/libonly@0.1.0
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
@@ -80,12 +78,12 @@ doc version=1
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:MD5
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-root {"bom-ref": "pkg:cargo/libonly@0.1.0#root", "name": "libonly", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/libonly@0.1.0", "name": "libonly", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/libonly@0.1.0", "type": "library", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=13
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=151
+run rcbom:run:reachable-instances=41
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

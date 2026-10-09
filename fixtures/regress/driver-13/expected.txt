@@ -166,7 +166,6 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
-  prop t13 | pkg:cargo/t13@0.1.0 | rcbom:scope=required
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
@@ -177,7 +176,6 @@ asset PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | {"a
 asset PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset RSA-3072 | crypto:material:private-key:RSA-3072 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 3072, "type": "private-key"}}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application t13 0.1.0 | pkg:cargo/t13@0.1.0 | purl pkg:cargo/t13@0.1.0
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
@@ -276,12 +274,12 @@ provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-210000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-600000-32
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-3072
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-root {"bom-ref": "pkg:cargo/t13@0.1.0#root", "name": "t13", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/t13@0.1.0", "name": "t13", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t13@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=52
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=497
+run rcbom:run:reachable-instances=168
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

@@ -37,20 +37,36 @@ const MAX_DEPTH: usize = 10;
 const MAX_WIDTH: usize = 8;
 /// Nodes per origin tree.
 const MAX_NODES: usize = 400;
+/// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
+/// path at each turn, and moves and borrows are free of the other limits.
+const MAX_PATH: usize = 16;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-enum Step {
+pub(crate) enum Step {
     Deref,
     Field(usize),
     Variant(usize),
     /// Some element or elements of an array or slice (`a[i]`, `a[2..]`, slice patterns): a
     /// part of it, not the whole.
     Elem,
+    /// Element `n` of an array, counted from the start (`let [a, b] = arr;`): a part of it.
+    Index(usize),
+}
+
+impl Step {
+    /// The same part of a place: an element at a known index is one of the elements an
+    /// unknown index (`Elem`) may be.
+    fn same(&self, other: &Step) -> bool {
+        match (self, other) {
+            (Step::Elem, Step::Elem | Step::Index(_)) | (Step::Index(_), Step::Elem) => true,
+            _ => self == other,
+        }
+    }
 }
 
 type Path = Vec<Step>;
 
-fn variant_index(v: &rustc_public::ty::VariantIdx) -> usize {
+pub(crate) fn variant_index(v: &rustc_public::ty::VariantIdx) -> usize {
     // `VariantIdx` prints as `VariantIdx(n, ..)`; its index accessor is not public
     format!("{v:?}")
         .trim_start_matches("VariantIdx(")
@@ -68,6 +84,15 @@ fn path_of_place(p: &Place) -> Path {
             ProjectionElem::Field(f, _) => out.push(Step::Field(*f)),
             ProjectionElem::Downcast(v) => out.push(Step::Variant(variant_index(v))),
             ProjectionElem::OpaqueCast(_) => {}
+            // `let [a, b] = arr;`: element `offset` from the start
+            ProjectionElem::ConstantIndex {
+                offset,
+                from_end: false,
+                ..
+            } => {
+                out.push(Step::Index(*offset as usize));
+                break;
+            }
             // `a[i]`, `a[2..]`, slice patterns: some part of the array, whichever it is
             _ => {
                 out.push(Step::Elem);
@@ -98,6 +123,11 @@ enum DefKind {
     OutParam {
         func: Operand,
         args: Vec<Operand>,
+    },
+    /// The place was mutably borrowed by this call, which returned a value holding the borrow
+    /// (`key.chunks_mut(16)`, `split_at_mut`): later writes go through that value.
+    Through {
+        func: Operand,
     },
 }
 
@@ -311,6 +341,7 @@ impl Flow {
             body,
             direct: &direct,
         };
+        // (place, path, at, kind, single target, written by the call as its receiver)
         let mut extra = Vec::new();
         for (place, at, kind) in &pending {
             let path = path_of_place(place);
@@ -321,34 +352,119 @@ impl Flow {
                 // update); otherwise it may (weak)
                 let targets = ptr.targets(place.local, &path[..i], 0);
                 let single = sole_target(&targets);
-                for (t, tp) in targets {
+                for Target {
+                    local: t, path: tp, ..
+                } in targets
+                {
                     let mut p = tp;
                     p.extend_from_slice(&path[i + 1..]);
-                    extra.push((t, p, *at, clone_kind(kind), single));
+                    extra.push((t, p, *at, clone_kind(kind), single, false));
                 }
             }
-            if let DefKind::Call { func, args } = kind {
-                // out-parameters, unless the call only hands out a borrow into its argument
-                // (`index_mut`, `as_mut`, `deref_mut`): the caller writes through the result
-                if !returns_mut_ref(body, place) {
-                    for a in args {
-                        if let Operand::Copy(p) | Operand::Move(p) = a
-                            && is_mut_ptr(body, p)
+            let DefKind::Call { func, args } = kind else {
+                continue;
+            };
+            let name = callee_name(body, func).unwrap_or_default();
+            // `mem::replace(&mut key, v)`, `mem::swap(&mut a, &mut b)`: what the pointers point
+            // to becomes the other value
+            let deref = |o: &Operand| match o {
+                Operand::Copy(p) | Operand::Move(p) => {
+                    let mut q = p.clone();
+                    q.projection.push(ProjectionElem::Deref);
+                    Some(q)
+                }
+                _ => None,
+            };
+            let span = body.blocks[at.bb].terminator.source_info.span;
+            let moved: Vec<(usize, Rvalue)> = match name.as_str() {
+                "core::mem::replace" | "std::mem::replace" if args.len() == 2 => {
+                    vec![(
+                        0,
+                        Rvalue::Use(args[1].clone(), rustc_public::mir::WithRetag::No),
+                    )]
+                }
+                "core::mem::swap" | "std::mem::swap" if args.len() == 2 => {
+                    match (deref(&args[0]), deref(&args[1])) {
+                        (Some(a), Some(b)) => vec![
+                            (
+                                0,
+                                Rvalue::Use(Operand::Copy(b), rustc_public::mir::WithRetag::No),
+                            ),
+                            (
+                                1,
+                                Rvalue::Use(Operand::Copy(a), rustc_public::mir::WithRetag::No),
+                            ),
+                        ],
+                        _ => Vec::new(),
+                    }
+                }
+                _ => Vec::new(),
+            };
+            if !moved.is_empty() {
+                for (k, rv) in moved {
+                    if let Some(Operand::Copy(p) | Operand::Move(p)) = args.get(k) {
+                        let targets = ptr.targets(p.local, &path_of_place(p), 0);
+                        let single = sole_target(&targets);
+                        for Target {
+                            local: t, path: tp, ..
+                        } in targets
                         {
-                            let targets = ptr.targets(p.local, &path_of_place(p), 0);
-                            let single = sole_target(&targets);
-                            for (t, tp) in targets {
-                                extra.push((
-                                    t,
-                                    tp,
-                                    *at,
-                                    DefKind::OutParam {
-                                        func: func.clone(),
-                                        args: args.clone(),
-                                    },
-                                    single,
-                                ));
-                            }
+                            extra.push((
+                                t,
+                                tp,
+                                *at,
+                                DefKind::Assign(rv.clone(), span),
+                                single,
+                                false,
+                            ));
+                        }
+                    }
+                }
+                continue;
+            }
+            // out-parameters, unless the call only hands out a borrow into its argument
+            // (`index_mut`, `as_mut`, `deref_mut`): the caller writes through the result. A
+            // method returning its receiver (`hasher.update(d)` is `&mut Self`) wrote it.
+            let hands_out = returns_mut_ref(body, place) && !returns_receiver(body, place, args);
+            if hands_out {
+                continue;
+            }
+            // a call returning a value that holds the borrow (`chunks_mut`, `split_at_mut`):
+            // the writes come later, through that value
+            let through = !returns_mut_ref(body, place) && holds_borrow(body, place);
+            for (k, a) in args.iter().enumerate() {
+                if let Operand::Copy(p) | Operand::Move(p) = a
+                    && is_mut_ptr(body, p)
+                {
+                    let targets = ptr.targets(p.local, &path_of_place(p), 0);
+                    let single = sole_target(&targets);
+                    for Target {
+                        local: t, path: tp, ..
+                    } in targets
+                    {
+                        if through {
+                            let mut part = tp;
+                            part.push(Step::Elem);
+                            extra.push((
+                                t,
+                                part,
+                                *at,
+                                DefKind::Through { func: func.clone() },
+                                false,
+                                false,
+                            ));
+                        } else {
+                            extra.push((
+                                t,
+                                tp,
+                                *at,
+                                DefKind::OutParam {
+                                    func: func.clone(),
+                                    args: args.clone(),
+                                },
+                                single,
+                                k == 0,
+                            ));
                         }
                     }
                 }
@@ -357,7 +473,6 @@ impl Flow {
         // a write to an element (`key[31] = 1`, through `&mut key[3]`, or a fill of
         // `&mut key[..16]`) changes part of the array: it neither overwrites the whole nor
         // replaces its initialization
-        let partial = |path: &[Step]| path.contains(&Step::Elem);
         for (place, at, kind) in pending {
             let path = path_of_place(&place);
             let strong = !path.contains(&Step::Deref) && !partial(&path);
@@ -372,12 +487,14 @@ impl Flow {
                 sole: true,
             });
         }
-        for (local, path, at, kind, single) in extra {
-            let out_param = matches!(kind, DefKind::OutParam { .. });
+        for (local, path, at, kind, single, receiver) in extra {
+            let out_param = matches!(kind, DefKind::OutParam { .. } | DefKind::Through { .. });
             let init = is_init(body, &kind) && !partial(&path);
             // through a reference: certain only with a single target; an out-parameter call
-            // may or may not write, so it never overwrites
-            let strong = single && !out_param && !partial(&path);
+            // may or may not write, so it never overwrites, unless it is the call's receiver:
+            // its new value is the call's, which takes the old one as an argument
+            // (`mac.update(secret)`)
+            let strong = single && (!out_param || receiver) && !partial(&path);
             let sole = single && !partial(&path);
             defs.push(Def {
                 local,
@@ -403,6 +520,140 @@ impl Flow {
 }
 
 impl<'a, 'tcx> Origins<'a, 'tcx> {
+    /// Origin of `op` read at statement `idx` of block `bb` (the terminator if `idx` is the
+    /// number of statements).
+    pub(crate) fn operand_at(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
+        self.nodes.set(0);
+        self.operand(op, At { bb, idx }, 0, &mut HashSet::new())
+    }
+
+    pub(crate) fn body(&self) -> &'a Body {
+        self.body
+    }
+
+    /// Origin of the part `rest` of `op` (`op.aead.alg`) read at statement `idx` of block `bb`;
+    /// a constant is taken whole.
+    pub(crate) fn operand_part_at(
+        &self,
+        op: &Operand,
+        rest: &[Step],
+        bb: usize,
+        idx: usize,
+    ) -> Origin {
+        self.nodes.set(0);
+        let at = At { bb, idx };
+        match op {
+            Operand::Copy(p) | Operand::Move(p) => {
+                let mut path = path_of_place(p);
+                path.extend_from_slice(rest);
+                self.place(p.local, path, at, 0, &mut HashSet::new())
+            }
+            _ => self.operand(op, at, 0, &mut HashSet::new()),
+        }
+    }
+
+    /// Origin of the part `rest` of what `rv` computes at statement `idx` of block `bb`.
+    pub(crate) fn rvalue_part_at(
+        &self,
+        rv: &Rvalue,
+        span: Span,
+        rest: &[Step],
+        bb: usize,
+        idx: usize,
+    ) -> Origin {
+        self.nodes.set(0);
+        self.rvalue(rv, span, rest, At { bb, idx }, 0, &mut HashSet::new())
+    }
+
+    /// What the function returns, or the part `rest` of it: the return place at each `return`.
+    pub(crate) fn returned_part(&self, rest: &[Step]) -> Origin {
+        let mut alts = Vec::new();
+        for (bb, block) in self.body.blocks.iter().enumerate() {
+            if matches!(block.terminator.kind, TerminatorKind::Return) {
+                self.nodes.set(0);
+                let at = At {
+                    bb,
+                    idx: block.statements.len(),
+                };
+                let o = self.place(
+                    rustc_public::mir::RETURN_LOCAL,
+                    rest.to_vec(),
+                    at,
+                    0,
+                    &mut HashSet::new(),
+                );
+                if !alts.contains(&o) {
+                    alts.push(o);
+                }
+            }
+        }
+        match alts.len() {
+            0 => Origin::Unknown,
+            1 => alts.pop().unwrap(),
+            _ => Origin::Any(alts),
+        }
+    }
+
+    /// The origin of a closure passed as a value (`LazyLock::new(|| ..)`): what it returns.
+    pub(crate) fn closure_value(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
+        self.operand_at(op, bb, idx)
+    }
+
+    /// `o`, the origin of a value of type `ty`, read further along `rest`: a field of a struct
+    /// whose origin the search ends at (a parameter, a call's result, a static) is a read of
+    /// that field (`Origin::Field`), which the analysis looks up in what the crate stores there.
+    fn read_fields(&self, ty: rustc_middle::ty::Ty<'tcx>, rest: &[Step], o: Origin) -> Origin {
+        let tcx = self.tcx;
+        let mut ty = ty;
+        let mut o = o;
+        let mut variant = None;
+        for step in rest {
+            match step {
+                Step::Deref => match ty.builtin_deref(true) {
+                    Some(t) => ty = t,
+                    None => break,
+                },
+                Step::Variant(v) => variant = Some(*v),
+                Step::Field(f) => match ty.kind() {
+                    rustc_middle::ty::Adt(adt, args) => {
+                        let v = match (adt.is_enum(), variant) {
+                            (true, Some(v)) => adt.variant(rustc_abi::VariantIdx::from_usize(v)),
+                            (true, None) => break,
+                            _ => adt.non_enum_variant(),
+                        };
+                        let Some(field) = v.fields.get(rustc_abi::FieldIdx::from_usize(*f)) else {
+                            break;
+                        };
+                        if !adt.is_enum() {
+                            o = Origin::Field {
+                                adt: crate::path_of(tcx, adt.did()),
+                                field: *f,
+                                base: Box::new(o),
+                            };
+                        }
+                        ty = field.ty(tcx, args).skip_norm_wip();
+                        variant = None;
+                    }
+                    rustc_middle::ty::Tuple(ts) => match ts.get(*f) {
+                        Some(t) => ty = *t,
+                        None => break,
+                    },
+                    _ => break,
+                },
+                Step::Elem | Step::Index(_) => match ty.builtin_index() {
+                    Some(t) => ty = t,
+                    None => break,
+                },
+            }
+        }
+        o
+    }
+
+    /// The type of `local`, as `rustc_middle` has it, followed along `path`.
+    fn local_ty(&self, local: Local) -> rustc_middle::ty::Ty<'tcx> {
+        rustc_internal::internal(self.tcx, self.body.locals()[local].ty)
+    }
+
     /// Origin of argument `op` of the call terminating a block.
     pub(crate) fn of_arg(&self, op: &Operand, term: &Terminator) -> Origin {
         let Some(&bb) = self.flow().term_bb.get(&(term as *const Terminator)) else {
@@ -583,13 +834,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         None
     }
 
-    /// Length of the array behind an argument (`&mut [0u8; 32]` passed as `&mut [u8]`), found
-    /// in the types along the def chain.
-    pub(crate) fn array_len(&self, op: &Operand) -> Option<u64> {
-        self.len_of_operand(op, 0)
+    /// Length of the array behind an argument of the call terminating `term` (`&mut [0u8; 32]`
+    /// passed as `&mut [u8]`), found in the types along the definitions that reach the call.
+    pub(crate) fn array_len(&self, op: &Operand, term: &Terminator) -> Option<u64> {
+        let bb = *self.flow().term_bb.get(&(term as *const Terminator))?;
+        let at = At {
+            bb,
+            idx: self.body.blocks[bb].statements.len(),
+        };
+        self.len_of_operand(op, at, 0)
     }
 
-    fn len_of_operand(&self, op: &Operand, depth: usize) -> Option<u64> {
+    fn len_of_operand(&self, op: &Operand, at: At, depth: usize) -> Option<u64> {
         if depth > MAX_DEPTH {
             return None;
         }
@@ -599,36 +855,42 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
         match op {
             Operand::Copy(p) | Operand::Move(p) if p.projection.is_empty() => {
-                self.len_of_local(p.local, depth + 1)
+                self.len_of_local(p.local, at, depth + 1)
             }
             _ => None,
         }
     }
 
-    fn len_of_local(&self, l: Local, depth: usize) -> Option<u64> {
+    /// The length of the array `l` holds or points to at `at`: the same for every definition
+    /// that reaches there (`let out = &mut big; .. out = &mut small;` is `small`'s).
+    fn len_of_local(&self, l: Local, at: At, depth: usize) -> Option<u64> {
         if depth > MAX_DEPTH {
             return None;
         }
         if let Some(n) = array_len_of_ty(&self.body.locals()[l].ty) {
             return Some(n);
         }
-        self.flow().by_local.get(&l)?.iter().find_map(|&i| {
+        let mut lens = self.reaching_at(l, at).into_iter().map(|i| {
             let d = &self.flow().defs[i];
             if !d.path.is_empty() {
                 return None;
             }
             match &d.kind {
                 DefKind::Assign(Rvalue::Use(op, _), _)
-                | DefKind::Assign(Rvalue::Cast(_, op, _), _) => self.len_of_operand(op, depth + 1),
+                | DefKind::Assign(Rvalue::Cast(_, op, _), _) => {
+                    self.len_of_operand(op, d.at, depth + 1)
+                }
                 DefKind::Assign(Rvalue::Ref(_, _, p), _)
                 | DefKind::Assign(Rvalue::AddressOf(_, p), _)
                 | DefKind::Assign(Rvalue::Reborrow(_, _, p), _)
                 | DefKind::Assign(Rvalue::CopyForDeref(p), _) => {
-                    self.len_of_local(p.local, depth + 1)
+                    self.len_of_local(p.local, d.at, depth + 1)
                 }
                 _ => None,
             }
-        })
+        });
+        let first = lens.next()??;
+        lens.all(|n| n == Some(first)).then_some(first)
     }
 
     /// Definitions of `local` that reach the point `at`.
@@ -685,6 +947,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         depth: usize,
         seen: &mut HashSet<Key>,
     ) -> Origin {
+        if path.len() > MAX_PATH {
+            return Origin::Truncated;
+        }
         let key = (local, path.clone(), at);
         if !seen.insert(key.clone()) {
             return Origin::Unknown; // a loop: the other definitions say where it starts
@@ -706,7 +971,20 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             } else {
                 continue;
             };
-            let o = self.def_origin(d, &rest, depth, seen);
+            let mut o = self.def_origin(d, &rest, depth, seen);
+            // a field of a parameter or of a call's result: what the crate stores there
+            if matches!(
+                d.kind,
+                DefKind::Entry | DefKind::Call { .. } | DefKind::OutParam { .. }
+            ) && rest.iter().any(|s| matches!(s, Step::Field(_)))
+                && !matches!(o, Origin::Unknown | Origin::Truncated)
+                && !(self.kind != BodyKind::Fn && matches!(d.kind, DefKind::Entry) && local == 1)
+            {
+                let mut ty = self.local_ty(local);
+                // the definition's own path first (the place it defines)
+                ty = walk_ty(self.tcx, ty, &d.path);
+                o = self.read_fields(ty, &rest, o);
+            }
             if !list.contains(&o) {
                 if list.len() >= MAX_WIDTH {
                     list.push(Origin::Truncated);
@@ -740,13 +1018,53 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let d = &self.flow().defs[i];
         defs.iter().any(|&j| {
             let e = &self.flow().defs[j];
-            j != i
-                && e.strong
-                && e.path.len() > d.path.len()
+            if j == i || e.path.len() <= d.path.len() {
+                return false;
+            }
+            // a call filling the part (`rng.fill_bytes(&mut cfg.key)`) replaces what an
+            // initialization (`Cfg { key: [0; 32], .. }`) or the entry value had there
+            let fills = || {
+                matches!(e.kind, DefKind::OutParam { .. })
+                    && e.sole
+                    && (d.init
+                        || matches!(d.kind, DefKind::Entry)
+                        || self.part_init(d, &e.path[d.path.len()..]))
+            };
+            (e.strong || fills())
                 && is_prefix(&d.path, &e.path)
                 && is_prefix(&e.path, path)
                 && self.always_through(d, e.at, at)
         })
+    }
+
+    /// Is the part `rest` of what definition `d` builds an initialization: the field of a
+    /// struct literal given as a constant (`Cfg { key: [0u8; 32], .. }`, its `[0u8; 32]` in a
+    /// temporary)?
+    fn part_init(&self, d: &Def, rest: &[Step]) -> bool {
+        let DefKind::Assign(Rvalue::Aggregate(kind, ops), _) = &d.kind else {
+            return false;
+        };
+        let f = match (kind, rest) {
+            (AggregateKind::Adt(_, v, ..), [Step::Variant(w), Step::Field(f), ..])
+                if variant_index(v) == *w =>
+            {
+                *f
+            }
+            (_, [Step::Field(f), ..]) | (AggregateKind::Array(_), [Step::Index(f), ..]) => *f,
+            _ => return false,
+        };
+        match ops.get(f) {
+            Some(Operand::Constant(_)) => true,
+            Some(Operand::Copy(q) | Operand::Move(q)) if q.projection.is_empty() => {
+                let defs = self.reaching_at(q.local, d.at);
+                !defs.is_empty()
+                    && defs.iter().all(|&i| {
+                        let e = &self.flow().defs[i];
+                        e.path.is_empty() && e.init
+                    })
+            }
+            _ => false,
+        }
     }
 
     /// Does every way from definition `d` to the point `to` pass through the point `via`?
@@ -794,6 +1112,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             DefKind::Call { func, args } | DefKind::OutParam { func, args } => {
                 self.call(func, args, d.at, depth, seen)
             }
+            DefKind::Through { func } => Origin::Through {
+                callee: callee_name(self.body, func).unwrap_or_default(),
+            },
         }
     }
 
@@ -870,6 +1191,28 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 p.extend_from_slice(rest);
                 self.place(q.local, p, at, depth, seen)
             }
+            Rvalue::Use(op @ Operand::Constant(c), _)
+                if rest.iter().any(|s| matches!(s, Step::Field(_))) =>
+            {
+                let o = self.operand(op, at, depth, seen);
+                if matches!(o, Origin::Data { .. }) {
+                    let ty = rustc_internal::internal(self.tcx, c.const_.ty());
+                    self.read_fields(ty, rest, o)
+                } else {
+                    o
+                }
+            }
+            // `*b` for a box `b`, as MIR lowers it: `b.0 as *const T`, a pointer to what the box
+            // holds; reading through it continues there, as through `&raw const *b`
+            Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _)
+                if let Some(k) = self.box_pointer(q) =>
+            {
+                let mut p = path_of_place(q);
+                p.truncate(p.len() - k);
+                p.push(Step::Deref);
+                p.extend_from_slice(rest.strip_prefix(&[Step::Deref]).unwrap_or(&[]));
+                self.place(q.local, p, at, depth, seen)
+            }
             Rvalue::Use(op, _) | Rvalue::Cast(_, op, _) => self.operand(op, at, depth, seen),
             // a reference stands for what it points to; reading through it continues there
             Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) | Rvalue::Reborrow(_, _, q) => {
@@ -898,6 +1241,23 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
     }
 
+    /// Is `q` a box's pointer (`b.0`, its `Unique`, or a field further in): how many fields
+    /// from the box `b`.
+    fn box_pointer(&self, q: &Place) -> Option<usize> {
+        let n = q.projection.len();
+        (1..=n.min(3)).find(|&k| {
+            q.projection[n - k..]
+                .iter()
+                .all(|e| matches!(e, ProjectionElem::Field(0, _)))
+                && Place {
+                    local: q.local,
+                    projection: q.projection[..n - k].to_vec(),
+                }
+                .ty(self.body.locals())
+                .is_ok_and(|t| rustc_internal::internal(self.tcx, t).is_box())
+        })
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn aggregate(
         &self,
@@ -918,6 +1278,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 Some((*f, &rest[2..]))
             }
             (_, [Step::Field(f), ..]) => Some((*f, &rest[1..])),
+            // one element of an array literal at a known index (`let [a, _b] = [x, lit];`)
+            (AggregateKind::Array(_), [Step::Index(i), ..]) => Some((*i, &rest[1..])),
             _ => None,
         };
         if let Some((f, tail)) = field
@@ -990,7 +1352,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     0 => Origin::Unknown,
                     1 => parts.pop().unwrap(),
                     // one element of an array literal (`[a, b][i]`): one of them
-                    _ if matches!(rest.first(), Some(Step::Elem)) => Origin::Any(parts),
+                    _ if matches!(rest.first(), Some(Step::Elem | Step::Index(_))) => {
+                        Origin::Any(parts)
+                    }
                     // the value itself: made of all of them (`[user, b"pepper"].concat()`)
                     _ => Origin::All(parts),
                 }
@@ -1159,6 +1523,22 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             _ => {}
         }
         if let Some(unit) = self.unit_value(&ty) {
+            // a named const of a field-less struct names its item: aws-lc-rs's Ed25519
+            // descriptor is one (`signature::ED25519: EdDSAParameters`)
+            if let ConstantKind::Unevaluated(u) = c.const_.kind()
+                && let Some(o) = self.unevaluated(
+                    (
+                        rustc_internal::internal(self.tcx, u.def.def_id()),
+                        rustc_internal::internal(self.tcx, &u.args),
+                        u.promoted.map(rustc_middle::mir::Promoted::from_u32),
+                    ),
+                    &ty,
+                    None,
+                    false,
+                )
+            {
+                return o;
+            }
             return unit;
         }
         let span = Some(self.loc(c.span));
@@ -1368,11 +1748,63 @@ fn clone_kind(k: &DefKind) -> DefKind {
             func: func.clone(),
             args: args.clone(),
         },
+        DefKind::Through { func } => DefKind::Through { func: func.clone() },
     }
 }
 
+/// `ty` followed along `path` (fields, derefs, elements), as far as it goes.
+fn walk_ty<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    ty: rustc_middle::ty::Ty<'tcx>,
+    path: &[Step],
+) -> rustc_middle::ty::Ty<'tcx> {
+    let mut ty = ty;
+    let mut variant = None;
+    for step in path {
+        ty = match step {
+            Step::Deref => match ty.builtin_deref(true) {
+                Some(t) => t,
+                None => return ty,
+            },
+            Step::Variant(v) => {
+                variant = Some(*v);
+                continue;
+            }
+            Step::Field(f) => match ty.kind() {
+                rustc_middle::ty::Adt(adt, args) => {
+                    let v = match (adt.is_enum(), variant.take()) {
+                        (true, Some(v)) => adt.variant(rustc_abi::VariantIdx::from_usize(v)),
+                        (true, None) => return ty,
+                        _ => adt.non_enum_variant(),
+                    };
+                    match v.fields.get(rustc_abi::FieldIdx::from_usize(*f)) {
+                        Some(field) => field.ty(tcx, args).skip_norm_wip(),
+                        None => return ty,
+                    }
+                }
+                rustc_middle::ty::Tuple(ts) => match ts.get(*f) {
+                    Some(t) => *t,
+                    None => return ty,
+                },
+                _ => return ty,
+            },
+            Step::Elem | Step::Index(_) => match ty.builtin_index() {
+                Some(t) => t,
+                None => return ty,
+            },
+        };
+    }
+    ty
+}
+
 fn is_prefix(a: &[Step], b: &[Step]) -> bool {
-    b.len() >= a.len() && b[..a.len()] == *a
+    b.len() >= a.len() && a.iter().zip(b).all(|(x, y)| x.same(y))
+}
+
+/// A part of the place, not all of it: an element.
+fn partial(path: &[Step]) -> bool {
+    path.iter()
+        .any(|s| matches!(s, Step::Elem | Step::Index(_)))
 }
 
 /// Does `d` end `e`? An assignment overwrites the place and its parts; a call that fills the
@@ -1419,9 +1851,18 @@ struct Pointees<'a> {
     direct: &'a HashMap<Local, Vec<&'a DefKind>>,
 }
 
+/// A place a pointer may point to. `alias` marks the place through the pointer itself
+/// (`(*_7)` behind `_6 = &mut (*_7)`), listed next to what `_7` was found to point at: it stands
+/// for that place, not for another one.
+struct Target {
+    local: Local,
+    path: Path,
+    alias: bool,
+}
+
 impl Pointees<'_> {
     /// Places that `local.path` (a reference or raw pointer) points to.
-    fn targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<(Local, Path)> {
+    fn targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<Target> {
         if depth > 6 || !path.is_empty() {
             return Vec::new();
         }
@@ -1433,25 +1874,56 @@ impl Pointees<'_> {
                 | DefKind::Assign(Rvalue::Reborrow(_, _, q), _) => {
                     let qp = path_of_place(q);
                     // `&mut *r` reborrows what `r` points to
+                    let mut found = false;
                     if let Some(i) = qp.iter().position(|s| *s == Step::Deref) {
-                        for (t, mut tp) in self.targets(q.local, &qp[..i], depth + 1) {
-                            tp.extend_from_slice(&qp[i + 1..]);
-                            out.push((t, tp));
+                        for mut t in self.targets(q.local, &qp[..i], depth + 1) {
+                            t.path.extend_from_slice(&qp[i + 1..]);
+                            found |= !t.alias;
+                            out.push(t);
                         }
                     }
-                    out.push((q.local, qp));
+                    out.push(Target {
+                        local: q.local,
+                        alias: found,
+                        path: qp,
+                    });
                 }
                 DefKind::Assign(Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _), _)
-                | DefKind::Assign(Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _), _) => {
-                    out.extend(self.targets(q.local, &path_of_place(q), depth + 1))
+                | DefKind::Assign(Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _), _)
+                    if q.projection.is_empty() =>
+                {
+                    out.extend(self.targets(q.local, &[], depth + 1))
                 }
-                // `index_mut(&mut buf, ..)`, `as_mut()`: a borrow into the argument
-                DefKind::Call { args, .. } => {
+                // `_9 = copy ((*_1).0)`, `_49 = deref_copy (_1.0)`: a copy of the pointer held in
+                // a place (a closure's capture by reference, an `async` body's saved locals
+                // behind its pinned self); it points where that one does, `*((*_1).0)`
+                DefKind::Assign(Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _), _)
+                | DefKind::Assign(Rvalue::CopyForDeref(q), _) => {
+                    let mut qp = path_of_place(q);
+                    if !partial(&qp) {
+                        qp.push(Step::Deref);
+                        out.push(Target {
+                            local: q.local,
+                            path: qp,
+                            alias: false,
+                        });
+                    }
+                }
+                // `index_mut(&mut buf, ..)`, `as_mut()`: a borrow into the argument, all of it
+                // (`as_mut`, `deref_mut`, `&mut buf[..]`) or a part (`&mut buf[..16]`,
+                // `get_mut(i)`)
+                DefKind::Call { func, args } => {
+                    let part = borrows_part(self.body, func, args);
                     for a in args {
                         if let Operand::Copy(q) | Operand::Move(q) = a
                             && is_mut_ptr(self.body, q)
                         {
-                            out.extend(self.targets(q.local, &path_of_place(q), depth + 1));
+                            for mut t in self.targets(q.local, &path_of_place(q), depth + 1) {
+                                if part && !partial(&t.path) {
+                                    t.path.push(Step::Elem);
+                                }
+                                out.push(t);
+                            }
                         }
                     }
                 }
@@ -1462,15 +1934,55 @@ impl Pointees<'_> {
     }
 }
 
-/// Does a pointer with these targets point at one place? The targets also list the references
-/// a reborrow went through (`_7` behind `_6 = &mut (*_7)`, with a `Deref` path), which stand for
-/// the place they point at, not for another place.
-fn sole_target(targets: &[(Local, Path)]) -> bool {
-    targets
-        .iter()
-        .filter(|(_, p)| !p.contains(&Step::Deref))
-        .count()
-        == 1
+/// Does a pointer with these targets point at one place? The aliases stand for the place they
+/// point at, not for another one.
+fn sole_target(targets: &[Target]) -> bool {
+    targets.iter().filter(|t| !t.alias).count() == 1
+}
+
+/// The defining path of the function a call operand names.
+fn callee_name(body: &Body, func: &Operand) -> Option<String> {
+    match func.ty(body.locals()).ok()?.kind() {
+        TyKind::RigidTy(RigidTy::FnDef(def, _)) => Some(def.name()),
+        _ => None,
+    }
+}
+
+/// Does a call that returns `&mut` into its argument borrow a part of it (an element, a
+/// range other than `..`), rather than all of it (`as_mut`, `deref_mut`, `&mut buf[..]`)?
+fn borrows_part(body: &Body, func: &Operand, args: &[Operand]) -> bool {
+    let name = callee_name(body, func).unwrap_or_default();
+    let method = name.rsplit("::").next().unwrap_or("");
+    let elementwise = matches!(
+        method,
+        "index_mut"
+            | "get_mut"
+            | "get_unchecked_mut"
+            | "first_mut"
+            | "last_mut"
+            | "split_first_mut"
+            | "split_last_mut"
+    );
+    // the receiver is an array, a slice or a `Vec` (`Mutex::get_mut` is all of the value)
+    let of_sequence = args
+        .first()
+        .and_then(|a| a.ty(body.locals()).ok())
+        .is_some_and(|t| {
+            let inner = match t.kind().rigid() {
+                Some(RigidTy::Ref(_, i, _)) => i.kind(),
+                _ => return false,
+            };
+            match inner.rigid() {
+                Some(RigidTy::Array(..) | RigidTy::Slice(_)) => true,
+                Some(RigidTy::Adt(d, _)) => d.name().ends_with("::Vec"),
+                _ => false,
+            }
+        });
+    // `&mut buf[..]` indexes with `RangeFull`: all of it
+    let full = args.get(1).and_then(|a| a.ty(body.locals()).ok()).is_some_and(|t| {
+        matches!(t.kind().rigid(), Some(RigidTy::Adt(d, _)) if d.name().ends_with("RangeFull"))
+    });
+    elementwise && of_sequence && !full
 }
 
 fn is_mut_ptr(body: &Body, p: &Place) -> bool {
@@ -1484,6 +1996,37 @@ fn is_mut_ptr(body: &Body, p: &Place) -> bool {
 
 fn returns_mut_ref(body: &Body, dest: &Place) -> bool {
     is_mut_ptr(body, dest)
+}
+
+/// A method returning its own receiver (`&mut self -> &mut Self`, `hasher.update(d)`).
+fn returns_receiver(body: &Body, dest: &Place, args: &[Operand]) -> bool {
+    let (Ok(d), Some(Ok(a))) = (
+        dest.ty(body.locals()),
+        args.first().map(|a| a.ty(body.locals())),
+    ) else {
+        return false;
+    };
+    is_mut_ptr(body, dest) && d == a
+}
+
+/// Does the call's result hold a borrow (`ChunksMut<'_, u8>`, `(&mut [u8], &mut [u8])`)?
+fn holds_borrow(body: &Body, dest: &Place) -> bool {
+    fn borrows(t: &Ty, depth: usize) -> bool {
+        if depth > 3 {
+            return false;
+        }
+        match t.kind().rigid() {
+            Some(RigidTy::Ref(..)) => true,
+            Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| borrows(t, depth + 1)),
+            Some(RigidTy::Adt(_, args)) => args.0.iter().any(|a| match a {
+                rustc_public::ty::GenericArgKind::Lifetime(_) => true,
+                rustc_public::ty::GenericArgKind::Type(t) => borrows(t, depth + 1),
+                _ => false,
+            }),
+            _ => false,
+        }
+    }
+    dest.ty(body.locals()).is_ok_and(|t| borrows(&t, 0))
 }
 
 /// Reaching definitions at block entries (forward may-analysis with kills).

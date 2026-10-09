@@ -97,11 +97,19 @@ impl Graph {
 /// their extern names: `sha2_11 = { package = "sha2" }` is `sha2_11`).
 type Externs = HashMap<String, HashMap<String, Vec<String>>>;
 
+/// Library crate name -> bom-refs of the packages whose library it is (`aws_lc_rs` is
+/// aws-lc-rs's), from `cargo metadata`.
+type Libs = HashMap<String, Vec<String>>;
+
 fn pkg_ref(name: &str, version: &str) -> String {
     format!("pkg:cargo/{name}@{version}")
 }
 
-fn load_externs(manifest_path: &Path, target: &str, features: &[String]) -> Option<Externs> {
+fn load_externs(
+    manifest_path: &Path,
+    target: &str,
+    features: &[String],
+) -> Option<(Externs, Libs)> {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut cmd = Command::new(cargo);
     cmd.args([
@@ -124,6 +132,7 @@ fn load_externs(manifest_path: &Path, target: &str, features: &[String]) -> Opti
     let md: Value = serde_json::from_slice(&out.stdout).ok()?;
     let mut refs: HashMap<&str, String> = HashMap::new();
     let mut ext: Externs = HashMap::new();
+    let mut libs: Libs = HashMap::new();
     for p in md["packages"].as_array()? {
         let (Some(id), Some(n), Some(v)) =
             (p["id"].as_str(), p["name"].as_str(), p["version"].as_str())
@@ -143,6 +152,9 @@ fn load_externs(manifest_path: &Path, target: &str, features: &[String]) -> Opti
             });
             if lib && let Some(tn) = t["name"].as_str() {
                 own.entry(tn.replace('-', "_")).or_default().push(r.clone());
+                libs.entry(tn.replace('-', "_"))
+                    .or_default()
+                    .push(r.clone());
             }
         }
     }
@@ -161,7 +173,7 @@ fn load_externs(manifest_path: &Path, target: &str, features: &[String]) -> Opti
             }
         }
     }
-    Some(ext)
+    Some((ext, libs))
 }
 
 /// The pinned toolchain's sysroot and commit (`rustc -vV`).
@@ -197,19 +209,39 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         })
         .unwrap_or_default();
     let kb = Kb::seed()?;
-    let target = rcbom_manifest::host_triple()?;
+    // the platform the CBOM was made for (its dependency tables and features)
+    let target = match doc["metadata"]["properties"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .find(|p| p["name"] == "rcbom:run:target")
+        .and_then(|p| p["value"].as_str())
+    {
+        Some(t) => t.to_string(),
+        None => rcbom_manifest::host_triple()?,
+    };
     let man = rcbom_manifest::load_locked(manifest_path, &target, &features, &kb)?;
-    let externs = load_externs(manifest_path, &target, &features);
-    if externs.is_none() {
-        eprintln!("verify: cargo metadata failed; crate names are resolved by package name");
-    }
+    let (externs, libs) = match load_externs(manifest_path, &target, &features) {
+        Some((e, l)) => (Some(e), Some(l)),
+        None => {
+            eprintln!("verify: cargo metadata failed; crate names are resolved by package name");
+            (None, None)
+        }
+    };
     let mut graph = Graph {
         packages: HashSet::new(),
         depends_on: HashMap::new(),
         providers: HashMap::new(),
         family: HashMap::new(),
     };
-    for c in doc["components"].as_array().into_iter().flatten() {
+    // the components, and the root package (`metadata.component`)
+    let root = doc["metadata"]["component"].clone();
+    for c in doc["components"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .chain(std::iter::once(&root).filter(|r| r.is_object()))
+    {
         let Some(r) = c["bom-ref"].as_str() else {
             continue;
         };
@@ -259,14 +291,25 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     }
     let mut occs = Vec::new();
     let mut without_line = 0;
-    for c in doc["components"].as_array().into_iter().flatten() {
+    for c in doc["components"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .chain(std::iter::once(&root).filter(|r| r.is_object()))
+    {
         for o in c["evidence"]["occurrences"]
             .as_array()
             .into_iter()
             .flatten()
         {
             let (Some(line), Some(offset)) = (o["line"].as_u64(), o["offset"].as_u64()) else {
+                // the generator gives every occurrence a position: one without is not evidence
                 without_line += 1;
+                println!(
+                    "MISMATCH {} {}: an occurrence without a line and offset",
+                    c["name"].as_str().unwrap_or(""),
+                    o["location"].as_str().unwrap_or("")
+                );
                 continue;
             };
             occs.push(Occ {
@@ -294,7 +337,9 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     }
     let mut files = Files {
         man: &man,
+        kb: &kb,
         externs,
+        libs,
         toolchain: None,
         cache: HashMap::new(),
         pkg_binds: HashMap::new(),
@@ -324,6 +369,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         bad,
         without_line
     );
+    let bad = bad + without_line;
     if self_test {
         for (dl, dc, what) in [
             (1i64, 0i64, "line +1"),
@@ -396,6 +442,9 @@ struct Source {
     locals: HashSet<String>,
     /// `Cargo.toml`: its keys
     toml: Vec<TomlKey>,
+    /// Rust: where each `use` or `extern crate` item is, from (line, col) to (line, col)
+    /// (1-based lines, 0-based char columns, end exclusive): a path there is an import, not a use
+    use_spans: Vec<((usize, usize), (usize, usize))>,
 }
 
 impl Source {
@@ -415,25 +464,45 @@ impl Source {
                 binds: Vec::new(),
                 locals: HashSet::new(),
                 toml: if toml { toml_keys(text) } else { Vec::new() },
+                use_spans: Vec::new(),
             };
         }
         let (mut class, code_text) = lex(text);
         for (c, l) in class.iter_mut().zip(&lines) {
             c.truncate(l.chars().count());
         }
+        // char index -> (line, col)
+        let mut starts = vec![0usize];
+        for (i, c) in code_text.chars().enumerate() {
+            if c == '\n' {
+                starts.push(i + 1);
+            }
+        }
+        let at = |i: usize| {
+            let l = starts.partition_point(|&s| s <= i) - 1;
+            (l + 1, i - starts[l])
+        };
+        let char_of = |b: usize| code_text[..b].chars().count();
+        let use_spans = USE_ITEM
+            .find_iter(&code_text)
+            .map(|m| (at(char_of(m.start())), at(char_of(m.end()))))
+            .collect();
         Source {
             lines,
             class,
             binds: bindings(&code_text),
             locals: locals(&code_text),
             toml: Vec::new(),
+            use_spans,
         }
     }
 }
 
 struct Files<'a> {
     man: &'a rcbom_manifest::Manifest,
+    kb: &'a Kb,
     externs: Option<Externs>,
+    libs: Option<Libs>,
     /// The pinned toolchain's sysroot and commit, for `/rustc/<commit>/library/..` locations;
     /// read when first needed
     toolchain: Option<Option<(PathBuf, String)>>,
@@ -810,20 +879,39 @@ fn extends(name: &str, parent: &str, family: Option<&str>) -> bool {
         && (name[parent.len()..].starts_with('-') || family == Some(parent))
 }
 
+/// The (name, version) of the package a component's manifest evidence is of: a package
+/// (`pkg:cargo/<name>@<version>`), or the package a candidate algorithm is declared through
+/// (`crypto:candidate:<name>@<version>:<asset>`).
+fn package_of(component: &str) -> Option<(&str, &str)> {
+    if let Some(c) = component.strip_prefix("crypto:candidate:") {
+        let (nv, _) = c.split_once(':')?;
+        return nv.split_once('@');
+    }
+    component.strip_prefix("pkg:cargo/")?.split_once('@')
+}
+
 /// A `Cargo.lock` position: the `name = "<symbol>"` line, at column 0, whose next line is the
-/// version the context names (`locked sha2 0.10.9; ..`): two locked versions are told apart.
+/// version the context names (`locked sha2 0.10.9; ..`), which is the package the occurrence
+/// is evidence of: two locked versions are told apart.
 fn check_lock(
     lines: &[String],
     line: usize,
     offset: usize,
     symbol: &str,
     context: &str,
+    component: &str,
 ) -> Result<(), String> {
     let m = re!(r"^\[manifest\] locked (\S+) (\S+);")
         .captures(context)
         .ok_or("a Cargo.lock occurrence whose context names no locked package")?;
     if &m[1] != symbol {
         return Err(format!("the context names {}, the symbol {symbol}", &m[1]));
+    }
+    if package_of(component) != Some((&m[1], &m[2])) {
+        return Err(format!(
+            "the context names {} {}, but this is evidence of {component}",
+            &m[1], &m[2]
+        ));
     }
     let text = lines.get(line.wrapping_sub(1)).ok_or("line out of range")?;
     let want = format!("name = \"{symbol}\"");
@@ -1156,8 +1244,11 @@ impl Toml {
 /// A `Cargo.toml` position: the start of a key (a quoted key at its opening quote, as the
 /// generator writes it) whose last segment is the symbol, and:
 /// - `declared by P (K)`: a dependency key in `[K]` (`[K] sym = ..`, `[K.sym]`, `K.sym = ..`,
-///   `sym.version = ..`) or `[target.<platform>.K]`, in the manifest of package P;
-/// - `native library `L``: the `links` key of `[package]`, with value L.
+///   `sym.version = ..`) or `[target.<platform>.K]`, in the manifest of package P, that names
+///   the package the occurrence is evidence of: its name (`package = ..` if renamed), and a
+///   version requirement its version meets;
+/// - `native library `L``: the `links` key of `[package]`, with value L, in the manifest of the
+///   package the occurrence is evidence of.
 fn check_toml(
     keys: &[TomlKey],
     text: &str,
@@ -1165,7 +1256,10 @@ fn check_toml(
     offset: usize,
     symbol: &str,
     context: &str,
+    component: &str,
 ) -> Result<(), String> {
+    let (cname, cversion) = package_of(component)
+        .ok_or_else(|| format!("a manifest occurrence of {component}, not a package"))?;
     let k = keys
         .iter()
         .find(|k| k.line == line && k.col == offset)
@@ -1196,6 +1290,37 @@ fn check_toml(
                 name.unwrap_or("no package")
             ));
         }
+        // the dependency this key declares: its package and version requirement
+        let field = |f: &str| {
+            keys.iter().find(|x| {
+                x.path.len() == k.path.len() + 1
+                    && x.path.starts_with(&k.path)
+                    && x.path.last().is_some_and(|l| l == f)
+            })
+        };
+        let package = field("package")
+            .and_then(|x| x.value.as_deref())
+            .unwrap_or(symbol);
+        if package != cname {
+            return Err(format!(
+                "the key here declares {package}, but this is evidence of {component}"
+            ));
+        }
+        let req = k
+            .value
+            .as_deref()
+            .or_else(|| field("version").and_then(|x| x.value.as_deref()));
+        if let Some(req) = req
+            && let (Ok(req), Ok(v)) = (
+                semver::VersionReq::parse(req),
+                semver::Version::parse(cversion),
+            )
+            && !req.matches(&v)
+        {
+            return Err(format!(
+                "the key here requires {package} {req}, but this is evidence of {component}"
+            ));
+        }
         Ok(())
     } else if let Some(m) = re!(r"^\[manifest\] native library `([^`]*)`").captures(context) {
         if path != ["package", "links"] || k.value.as_deref() != Some(&m[1]) {
@@ -1204,16 +1329,30 @@ fn check_toml(
                 &m[1]
             ));
         }
+        let name = keys
+            .iter()
+            .find(|k| k.path == ["package", "name"])
+            .and_then(|k| k.value.as_deref());
+        if name != Some(cname) {
+            return Err(format!(
+                "this is the manifest of {}, but this is evidence of {component}",
+                name.unwrap_or("no package")
+            ));
+        }
         Ok(())
     } else {
         Err(format!("unrecognized manifest context {context:?}"))
     }
 }
 
+/// A `use` or `extern crate` item, in a source with comments and literals blanked.
+static USE_ITEM: std::sync::LazyLock<Regex> =
+    std::sync::LazyLock::new(|| Regex::new(r"(?s)\b(?:use|extern\s+crate)\s[^;]*;").unwrap());
+
 /// Every name the `use` and `extern crate` items of a source bind (comments and literals
 /// blanked: `as` renames there, not in casts).
 fn bindings(code_text: &str) -> Vec<Binding> {
-    re!(r"(?s)\b(?:use|extern\s+crate)\s[^;]*;")
+    USE_ITEM
         .find_iter(code_text)
         .flat_map(|m| use_bindings(m.as_str()))
         .collect()
@@ -1394,14 +1533,6 @@ fn import_roots(binds: &[Binding], name: &str) -> Option<BTreeSet<String>> {
     Some(roots)
 }
 
-/// The import aliases of `ident` (`use scrypt::scrypt as scrypt_inner;`).
-fn aliases<'b>(binds: &'b [Binding], ident: &'b str) -> impl Iterator<Item = &'b String> + 'b {
-    binds
-        .iter()
-        .filter(move |b| b.path.last().is_some_and(|l| l == ident) && b.name != ident)
-        .map(|b| &b.name)
-}
-
 /// Every Rust file under a package's directory, not in `target/`, a hidden directory or
 /// another package's directory.
 fn package_files(dir: &Path) -> Vec<PathBuf> {
@@ -1456,7 +1587,7 @@ impl Files<'_> {
         let mut out = Vec::new();
         for f in package_files(dir) {
             if let Ok(t) = std::fs::read_to_string(&f)
-                && t.contains(" as ")
+                && re!(r"\sas\s").is_match(&t)
             {
                 out.extend(bindings(&lex(&t).1));
             }
@@ -1570,22 +1701,45 @@ impl Files<'_> {
         if o.context.starts_with("[manifest]") {
             let file = o.location.rsplit('/').next().unwrap_or("");
             return match file {
-                "Cargo.lock" => check_lock(&src.lines, line, offset, &o.symbol, &o.context),
-                "Cargo.toml" => check_toml(&src.toml, &text, line, offset, &o.symbol, &o.context),
+                "Cargo.lock" => check_lock(
+                    &src.lines,
+                    line,
+                    offset,
+                    &o.symbol,
+                    &o.context,
+                    &o.component_ref,
+                ),
+                "Cargo.toml" => check_toml(
+                    &src.toml,
+                    &text,
+                    line,
+                    offset,
+                    &o.symbol,
+                    &o.context,
+                    &o.component_ref,
+                ),
                 _ => Err("a manifest occurrence outside Cargo.toml and Cargo.lock".into()),
             };
         }
+        // evidence in code is one of the kinds the generator writes, after its tier
+        let ctx = split_context(&o.context);
+        let kind =
+            re!(r"^\[(?:reachable|present)\] \[(call|static|via-static|instantiation|component)\]")
+                .captures(ctx.tags)
+                .map(|m| m[1].to_string())
+                .ok_or("no tier and evidence kind among the tags")?;
         let starts_token = token_start(&src, line, offset);
         // code positions are in code, not in a comment or a literal
         if src.class[line - 1].get(offset) != Some(&Class::Code) {
             return Err(format!("position inside a comment or literal in {text:?}"));
         }
-        // the generator recorded the source line and the exact text it found at the position,
-        // last in the context, in that order; the line may hold backquotes, the text does not
-        let ctx = split_context(&o.context);
-        if let Some(l) = ctx.line
-            && text.trim() != l
-        {
+        // the generator records the source line and, when it is on one line outside a macro,
+        // the exact text at the position, last in the context, in that order; the line may hold
+        // backquotes, the text does not
+        let Some(l) = ctx.line else {
+            return Err("no source line recorded".into());
+        };
+        if text.trim() != l {
             return Err(format!("expected the line `{l}`, found {text:?}"));
         }
         if let Some(code) = ctx.code
@@ -1593,6 +1747,17 @@ impl Files<'_> {
         {
             return Err(format!("expected `{code}` in {text:?}"));
         }
+        // an import names an item, it does not use it
+        if src
+            .use_spans
+            .iter()
+            .any(|&(a, b)| a <= (line, offset) && (line, offset) < b)
+        {
+            return Err(format!("position inside a `use` item in {text:?}"));
+        }
+        // the positions the details name: where a generic instance was instantiated, where a
+        // macro's code was written
+        self.check_details(ctx.details)?;
         // the macro tags are among the leading tags, never in the recorded source text
         if let Some(m) = re!(r"\[macro ([\w:]+!)\]").captures(ctx.tags) {
             let name = &m[1];
@@ -1605,32 +1770,64 @@ impl Files<'_> {
                 Err(format!("expected `{name}` in {text:?}"))
             };
         }
-        // derive: the position is the derive's name inside `#[derive(..)]`
+        // derive: the position is the derive's name inside `#[derive(..)]` (or a `cfg_attr`'s
+        // `derive(..)`)
         if let Some(m) = re!(r"\[derive ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
             let ok = Regex::new(&format!(r"^(?:\w+::)*{}\b", regex::escape(&name)))
                 .unwrap()
                 .is_match(&at);
-            return if ok && starts_token {
+            let in_derive = attribute_before(&src, line, offset).is_some_and(|a| {
+                re!(r"^(?:derive|cfg_attr)\s*\(").is_match(&a) && open_in(&a, "derive")
+            });
+            return if ok && starts_token && in_derive {
                 Ok(())
             } else {
-                Err(format!("expected derive `{name}` in {text:?}"))
+                Err(format!(
+                    "expected derive `{name}` inside `#[derive(..)]` in {text:?}"
+                ))
             };
         }
-        // attribute macro: the position is the attribute
+        // attribute macro: the position is the attribute, or its name inside a `cfg_attr`
         if let Some(m) = re!(r"\[attribute ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
-            let ok = Regex::new(&format!(r"^#!?\[\s*(?:\w+::)*{}\b", regex::escape(&name)))
+            let direct = Regex::new(&format!(r"^#!?\[\s*(?:\w+::)*{}\b", regex::escape(&name)))
                 .unwrap()
-                .is_match(&at);
-            return if at.starts_with('#') && ok && starts_token {
+                .is_match(&at)
+                && at.starts_with('#');
+            let in_cfg_attr = Regex::new(&format!(r"^(?:\w+::)*{}\b", regex::escape(&name)))
+                .unwrap()
+                .is_match(&at)
+                && attribute_before(&src, line, offset)
+                    .is_some_and(|a| re!(r"^cfg_attr\s*\(").is_match(&a));
+            return if (direct || in_cfg_attr) && starts_token {
                 Ok(())
             } else {
                 Err(format!("expected an attribute in {text:?}"))
             };
         }
+        // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
+        if let Some(w) = word_before(&src, line, offset)
+            && matches!(
+                w.as_str(),
+                "fn" | "struct"
+                    | "enum"
+                    | "union"
+                    | "trait"
+                    | "type"
+                    | "mod"
+                    | "static"
+                    | "const"
+                    | "let"
+                    | "macro_rules"
+            )
+        {
+            return Err(format!("position after `{w}`: a definition, in {text:?}"));
+        }
         // code: the callee or static, by name or by an import alias of it
-        let ident = strip_generics(&o.symbol)
+        let sym = strip_generics(&o.symbol);
+        let sym_crate = sym.split("::").next().unwrap_or("").to_string();
+        let ident = sym
             .trim_end_matches(':')
             .rsplit("::")
             .next()
@@ -1646,7 +1843,11 @@ impl Files<'_> {
         let owner = man.owner_of(&path);
         let owner_id = owner.map(|p| p.id.repr.clone());
         let mut ok = parsed.as_ref().is_some_and(|(_, last, _)| {
-            *last == ident || aliases(&src.binds, &ident).any(|a| a == last)
+            *last == ident
+                || src.binds.iter().any(|b| {
+                    b.name == *last
+                        && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &src.binds)
+                })
         });
         // an alias another file defines: of this package, or of the crate the path goes
         // through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in mylib)
@@ -1673,7 +1874,11 @@ impl Files<'_> {
                 }
             }
             for d in dirs {
-                if aliases(&self.package_binds(&d), &ident).any(|a| a == last) {
+                let binds = self.package_binds(&d);
+                if binds.iter().any(|b| {
+                    b.name == *last
+                        && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
+                }) {
                     ok = true;
                     break;
                 }
@@ -1682,10 +1887,6 @@ impl Files<'_> {
         if !(ok && starts_token) {
             return Err(format!("expected `{ident}` in {text:?}"));
         }
-        let kind = re!(r"^\[\w+\] \[([\w-]+)\]")
-            .captures(ctx.tags)
-            .map(|m| m[1].to_string())
-            .unwrap_or_default();
         // a component is used where the asset it is part of is used
         if kind == "component"
             && let Some(m) = re!(r"; part of ([^\s;(]+)").captures(ctx.details)
@@ -1719,18 +1920,44 @@ impl Files<'_> {
                 return Err(format!("`{parent}`, which this is part of, is not here"));
             }
         }
-        // a qualifier written in the source that is not part of the symbol names the self type
-        // (`Hmac::<Sha256>::new_from_slice` for `crypto_common::KeyInit::new_from_slice`). If it,
-        // and every type named in the path's generic arguments, is imported from a crate of the
-        // CBOM, one of those crates (or a dependency of one) must provide the asset.
+        // a descriptor is evidence of the asset the knowledge base names it (`ring::digest::
+        // SHA512` is SHA-512, not SHA-384): the static itself, or the one a table leads to
+        let descriptor = match kind.as_str() {
+            "static" => Some(sym.clone()),
+            "via-static" => re!(r" -> ([\w:]+)(?:;|$)")
+                .captures(ctx.details)
+                .map(|m| m[1].to_string()),
+            _ => None,
+        };
+        if let Some(d) = descriptor {
+            let k = d.split("::").next().unwrap_or("");
+            let names = rcbom_analysis::static_names(self.kb, k, &d);
+            let family = self.graph.family.get(&o.component_ref).map(String::as_str);
+            if !names.is_empty()
+                && !names
+                    .iter()
+                    .any(|n| *n == o.component || extends(&o.component, n, family))
+            {
+                return Err(format!(
+                    "`{d}` is {}, not {}",
+                    names.join(" or "),
+                    o.component
+                ));
+            }
+        }
+        // what the path names must provide the asset: the callee's crate, a self type written
+        // as a qualifier (`Hmac::<Sha256>::new_from_slice` for `crypto_common::KeyInit::
+        // new_from_slice`), or a type in the generic arguments (`<Hmac<Sha256> as Mac>::m`,
+        // `seal::<Aes256Gcm>`). Each is a package of the CBOM the file can name it from; the
+        // standard library, an interface crate and the program's own code provide nothing and
+        // decide nothing. A type parameter or a local type could carry any asset: no check.
         if matches!(
             kind.as_str(),
             "call" | "static" | "via-static" | "instantiation"
         ) && let Some((quals, _, generics)) = &parsed
-            && let Some(q0) = quals.first()
-            && !matches!(q0.as_str(), "crate" | "self" | "super" | "Self")
+            && let Some(provs) = self.graph.providers.get(&o.component_ref)
         {
-            let sym_segs: Vec<String> = strip_generics(&o.symbol)
+            let sym_segs: Vec<String> = sym
                 .split("::")
                 .map(|s| s.trim_start_matches('<').to_string())
                 .collect();
@@ -1740,42 +1967,238 @@ impl Files<'_> {
                 "Result", "as", "dyn", "impl", "mut", "const", "fn", "static", "_",
             ];
             let owner_id = owner_id.as_deref();
-            if !sym_segs.iter().any(|s| s == q0)
-                && let Some(mut roots) = self.origins(&src, owner_id, q0)
-                && let Some(provs) = self.graph.providers.get(&o.component_ref)
+            let mut roots: Vec<String> = Vec::new();
+            let mut unknown = false;
+            // the callee's crate
+            roots.extend(
+                self.lib_refs(&sym_crate)
+                    .into_iter()
+                    .filter(|r| !self.neutral(r)),
+            );
+            // a written qualifier: a self type, unless the path is the trait's own path
+            // (`aes_gcm::aead::KeyInit::new_from_slice`: the qualifiers lead to the trait)
+            let trait_path = quals.last().is_some_and(|q| sym_segs.contains(q));
+            if let Some(q0) = quals.first()
+                && !matches!(q0.as_str(), "crate" | "self" | "super" | "Self")
+                && !sym_segs.contains(q0)
+                && !trait_path
             {
-                let mut unknown = false;
-                for g in generics.iter().filter(|g| !NEUTRAL.contains(&g.as_str())) {
-                    match self.origins(&src, owner_id, g) {
-                        Some(r) => roots.extend(r),
-                        // a type parameter or a local type: it could carry the asset
-                        None => unknown = true,
-                    }
+                match self.origins(&src, owner_id, q0) {
+                    Some(r) => roots.extend(r.into_iter().filter(|r| !self.neutral(r))),
+                    None => unknown = true,
                 }
-                let provided = roots.iter().any(|r| {
-                    let cl = self.graph.closure(r);
-                    provs.iter().any(|p| cl.contains(p))
+            }
+            for g in generics.iter().filter(|g| !NEUTRAL.contains(&g.as_str())) {
+                match self.origins(&src, owner_id, g) {
+                    Some(r) => roots.extend(r.into_iter().filter(|r| !self.neutral(r))),
+                    None => unknown = true,
+                }
+            }
+            let provided = roots.iter().any(|r| {
+                let cl = self.graph.closure(r);
+                provs.iter().any(|p| cl.contains(p))
+            });
+            if !unknown && !roots.is_empty() && !provided {
+                roots.sort();
+                roots.dedup();
+                return Err(format!(
+                    "the path names {}, which does not provide {}",
+                    roots.join(", "),
+                    o.component
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// The packages of the CBOM whose library is the crate `name` (the crate a symbol's path
+    /// starts with).
+    fn lib_refs(&self, name: &str) -> Vec<String> {
+        let refs = match &self.libs {
+            Some(l) => l.get(name).cloned().unwrap_or_default(),
+            None => self.crate_refs(None, name),
+        };
+        refs.into_iter()
+            .filter(|r| self.graph.packages.contains(r))
+            .collect()
+    }
+
+    /// A package that provides no asset by being named: the program's own, or an interface
+    /// crate (`digest`, `aead`, `signature`: their traits are implemented by others).
+    fn neutral(&self, r: &str) -> bool {
+        r.strip_prefix("pkg:cargo/")
+            .and_then(|nv| nv.split_once('@'))
+            .and_then(|(n, v)| self.man.by_name_version(n, v))
+            .is_some_and(|p| p.local || matches!(p.role, Some(rcbom_kb::Role::Trait)))
+    }
+
+    /// Whether binding `b` (`use x::y::ident as name;`) is an alias of the item `ident` of crate
+    /// `krate`: imported from that crate, from one that depends on it (a re-export), or from the
+    /// program's own module when the package imports `ident` from such a crate (a local
+    /// re-export); not an unrelated item that happens to share the last segment.
+    fn alias_of(
+        &self,
+        b: &Binding,
+        ident: &str,
+        krate: &str,
+        owner: Option<&str>,
+        binds: &[Binding],
+    ) -> bool {
+        if b.path.last().map(String::as_str) != Some(ident) || b.name == ident {
+            return false;
+        }
+        let target = self.lib_refs(krate);
+        // the symbol's crate is not a package of the CBOM (the standard library): no check
+        if target.is_empty() {
+            return true;
+        }
+        let from = |root: &str| {
+            self.crate_refs(owner, root)
+                .iter()
+                .any(|r| target.iter().any(|t| self.graph.closure(r).contains(t)))
+        };
+        match b.path.first().map(String::as_str) {
+            Some("crate" | "self" | "super") => binds.iter().any(|o| {
+                o.name == ident
+                    && o.path.last().map(String::as_str) == Some(ident)
+                    && o.path.first().is_some_and(|r| {
+                        !matches!(r.as_str(), "crate" | "self" | "super") && from(r)
+                    })
+            }),
+            Some(root) => root == krate || from(root),
+            None => false,
+        }
+    }
+
+    /// The positions a context's details name: `instantiated by .. at <file>:<line>` (where a
+    /// generic instance was instantiated) and `expanded from <file>:<line>` (where a macro's
+    /// code is written) must be lines of code of files that exist; a standard-library file is
+    /// read from the pinned toolchain, whose commit it must name.
+    fn check_details(&mut self, details: &str) -> Result<(), String> {
+        for part in details.split("; ") {
+            let Some(m) =
+                re!(r"^(?:instantiated by .* at|expanded from) ([^\s;]+):(\d+)$").captures(part)
+            else {
+                continue;
+            };
+            let (file, line) = (m[1].to_string(), m[2].parse::<usize>().unwrap_or(0));
+            let path = self.resolve(&file)?;
+            let src = self
+                .source(&path)
+                .ok_or_else(|| format!("cannot read {file}, named in `{part}`"))?;
+            let code = src
+                .class
+                .get(line.wrapping_sub(1))
+                .zip(src.lines.get(line.wrapping_sub(1)))
+                .is_some_and(|(cls, l)| {
+                    l.chars()
+                        .zip(cls)
+                        .any(|(c, k)| *k == Class::Code && !c.is_whitespace())
                 });
-                if !unknown && !provided {
-                    roots.sort();
-                    roots.dedup();
-                    return Err(format!(
-                        "`{q0}` comes from {}, which does not provide {}",
-                        roots.join(", "),
-                        o.component
-                    ));
-                }
+            if !code {
+                return Err(format!("`{part}`: no code at line {line} of {file}"));
             }
         }
         Ok(())
     }
 }
 
-/// The source from a position on, over the next 8 lines: chars and their classes.
+/// The text of the attribute a position is in, from after its `#[` (or `#![`) to the position:
+/// the code before the position, over a few lines, back to the last `#[` with its brackets still
+/// open. None when the position is in no attribute.
+fn attribute_before(src: &Source, line: usize, offset: usize) -> Option<String> {
+    let mut code = String::new();
+    for l in (line.saturating_sub(12).max(1)..=line).rev() {
+        let chars: Vec<char> = src.lines[l - 1].chars().collect();
+        let end = if l == line {
+            offset.min(chars.len())
+        } else {
+            chars.len()
+        };
+        let part: String = chars[..end]
+            .iter()
+            .zip(&src.class[l - 1])
+            .map(|(&c, k)| if *k == Class::Code { c } else { ' ' })
+            .collect();
+        code = format!("{part}\n{code}");
+        if let Some(i) = code.rfind("#[").or_else(|| code.rfind("#![")) {
+            let open = code[i..].find('[').unwrap() + i + 1;
+            let inner = &code[open..];
+            let depth: i32 = inner
+                .chars()
+                .map(|c| match c {
+                    '[' | '(' => 1,
+                    ']' | ')' => -1,
+                    _ => 0,
+                })
+                .sum();
+            return (depth >= 0 && !inner.contains(']')).then(|| inner.trim_start().to_string());
+        }
+    }
+    None
+}
+
+/// Whether, in an attribute's text up to a position, a `name(` is still open there.
+fn open_in(attr: &str, name: &str) -> bool {
+    let Some(i) = attr.rfind(&format!("{name}(")).or_else(|| {
+        Regex::new(&format!(r"{}\s+\(", regex::escape(name)))
+            .unwrap()
+            .find_iter(attr)
+            .last()
+            .map(|m| m.start())
+    }) else {
+        return false;
+    };
+    let mut depth = 0i32;
+    for c in attr[i..].chars() {
+        match c {
+            '(' => depth += 1,
+            ')' => depth -= 1,
+            _ => {}
+        }
+    }
+    depth >= 1
+}
+
+/// The identifier just before a position (whitespace and comments skipped, over a few lines),
+/// when the token before it is one: `fn` in `fn seal<..>`, `macro_rules` in `macro_rules! m`.
+fn word_before(src: &Source, line: usize, offset: usize) -> Option<String> {
+    let mut code = String::new();
+    for l in line.saturating_sub(4).max(1)..=line {
+        let chars: Vec<char> = src.lines[l - 1].chars().collect();
+        let end = if l == line {
+            offset.min(chars.len())
+        } else {
+            chars.len()
+        };
+        code.extend(
+            chars[..end]
+                .iter()
+                .zip(&src.class[l - 1])
+                .map(|(&c, k)| if *k == Class::Comment { ' ' } else { c }),
+        );
+        code.push(' ');
+    }
+    let code = code.trim_end();
+    let code = code.strip_suffix('!').unwrap_or(code);
+    let word: String = code
+        .chars()
+        .rev()
+        .take_while(|&c| is_ident(c))
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .collect();
+    (!word.is_empty()).then_some(word)
+}
+
+/// The source from a position on, over the next 63 lines: chars and their classes. A path is
+/// read from it with its generic arguments balanced, so the extent only bounds a path rustfmt
+/// spread over many lines.
 fn rest(src: &Source, line: usize, offset: usize) -> (Vec<char>, Vec<Class>) {
     let mut s = Vec::new();
     let mut k = Vec::new();
-    for (n, l) in src.lines.iter().enumerate().skip(line - 1).take(9) {
+    for (n, l) in src.lines.iter().enumerate().skip(line - 1).take(64) {
         if n + 1 != line {
             s.push('\n');
             k.push(Class::Code);
@@ -1964,11 +2387,25 @@ mod tests {
         let src = Source::new(lock, false, false);
         assert_eq!(src.lines[1], "name = \"sha2\"");
         let ctx = "[manifest] locked sha2 0.10.9; reached via p -> sha2";
-        assert_eq!(check_lock(&src.lines, 2, 0, "sha2", ctx), Ok(()));
-        assert!(check_lock(&src.lines, 2, 1, "sha2", ctx).is_err());
-        assert!(check_lock(&src.lines, 3, 0, "sha2", ctx).is_err());
-        assert!(check_lock(&src.lines, 2, 0, "sha2", "[manifest] locked sha2 0.11.0; x").is_err());
-        assert!(check_lock(&src.lines, 2, 0, "sha2", "[manifest] something").is_err());
+        let c = "pkg:cargo/sha2@0.10.9";
+        assert_eq!(check_lock(&src.lines, 2, 0, "sha2", ctx, c), Ok(()));
+        assert!(check_lock(&src.lines, 2, 1, "sha2", ctx, c).is_err());
+        assert!(check_lock(&src.lines, 3, 0, "sha2", ctx, c).is_err());
+        assert!(
+            check_lock(
+                &src.lines,
+                2,
+                0,
+                "sha2",
+                "[manifest] locked sha2 0.11.0; x",
+                c
+            )
+            .is_err()
+        );
+        assert!(check_lock(&src.lines, 2, 0, "sha2", "[manifest] something", c).is_err());
+        // the evidence of another version of the package, or of another package
+        assert!(check_lock(&src.lines, 2, 0, "sha2", ctx, "pkg:cargo/sha2@0.11.0").is_err());
+        assert!(check_lock(&src.lines, 2, 0, "sha2", ctx, "pkg:cargo/sha1@0.10.6").is_err());
         let rs = Source::new(
             "use sha2::Sha256;\r\nfn f() { Sha256::digest(b) }\r\n",
             true,
@@ -1988,7 +2425,8 @@ mod tests {
                 4,
                 0,
                 "sha2",
-                "[manifest] declared by p (dependencies)"
+                "[manifest] declared by p (dependencies)",
+                "pkg:cargo/sha2@0.10.9"
             ),
             Ok(())
         );
@@ -2025,9 +2463,41 @@ md5 = "0.7"
 ring = "0.17"
 "#;
 
+    /// The package each key of MANIFEST declares, as the CBOM names it.
+    fn component(symbol: &str) -> &'static str {
+        match symbol {
+            "hashing" => "pkg:cargo/sha2@0.10.9",
+            "md5" => "pkg:cargo/md5@0.7.0",
+            "sha1" => "pkg:cargo/sha1@0.10.6",
+            "hmac" => "pkg:cargo/hmac@0.12.1",
+            "blake3" => "pkg:cargo/blake3@1.8.5",
+            "ring" => "pkg:cargo/ring@0.17.14",
+            "links" => "pkg:cargo/t4@0.1.0",
+            _ => "pkg:cargo/other@1.0.0",
+        }
+    }
+
     fn toml_check(line: usize, col: usize, symbol: &str, ctx: &str) -> Result<(), String> {
+        toml_check_of(line, col, symbol, ctx, component(symbol))
+    }
+
+    fn toml_check_of(
+        line: usize,
+        col: usize,
+        symbol: &str,
+        ctx: &str,
+        component: &str,
+    ) -> Result<(), String> {
         let src = Source::new(MANIFEST, false, true);
-        check_toml(&src.toml, &src.lines[line - 1], line, col, symbol, ctx)
+        check_toml(
+            &src.toml,
+            &src.lines[line - 1],
+            line,
+            col,
+            symbol,
+            ctx,
+            component,
+        )
     }
 
     #[test]
@@ -2067,6 +2537,12 @@ ring = "0.17"
         assert_eq!(toml_check(4, 0, "links", links), Ok(()));
         assert!(toml_check(4, 0, "links", "[manifest] native library `other`; x").is_err());
         assert!(toml_check(4, 0, "links", "[manifest] unheard of").is_err());
+        assert!(toml_check_of(4, 0, "links", links, "pkg:cargo/ring@0.17.14").is_err());
+        // a key declaring another package, or a version the requirement excludes
+        assert!(toml_check_of(10, 0, "sha1", dep, "pkg:cargo/ring@0.17.14").is_err());
+        assert!(toml_check_of(8, 0, "hashing", dep, "pkg:cargo/sha2@0.11.0").is_err());
+        assert!(toml_check_of(16, 14, "hmac", dep, "pkg:cargo/hmac@0.13.0").is_err());
+        assert!(toml_check_of(9, 0, "md5", dep, "pkg:cargo/md5@0.8.0").is_err());
         // a root dotted key into the table
         let root = Source::new(
             "dependencies.zeta = \"1\"\n[package]\nname = \"t4\"\n",
@@ -2074,7 +2550,15 @@ ring = "0.17"
             true,
         );
         assert_eq!(
-            check_toml(&root.toml, &root.lines[0], 1, 13, "zeta", dep),
+            check_toml(
+                &root.toml,
+                &root.lines[0],
+                1,
+                13,
+                "zeta",
+                dep,
+                "pkg:cargo/zeta@1.2.0"
+            ),
             Ok(())
         );
     }
@@ -2111,11 +2595,15 @@ ring = "0.17"
         assert_eq!(roots("Thing"), None);
         // not imported: the crate of that name, if any
         assert_eq!(roots("sha2"), Some(vec!["sha2".into()]));
-        assert_eq!(
-            aliases(&src.binds, "Sha256").collect::<Vec<_>>(),
-            vec!["Hasher"]
-        );
-        assert_eq!(aliases(&src.binds, "Aead").collect::<Vec<_>>(), vec!["A"]);
+        let renamed = |ident: &str| {
+            src.binds
+                .iter()
+                .filter(|b| b.path.last().is_some_and(|l| l == ident) && b.name != ident)
+                .map(|b| b.name.clone())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(renamed("Sha256"), vec!["Hasher"]);
+        assert_eq!(renamed("Aead"), vec!["A"]);
         for local in ["D", "N", "Wrapper"] {
             assert!(src.locals.contains(local), "{local}");
         }

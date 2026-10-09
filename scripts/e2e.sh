@@ -28,6 +28,8 @@ driver="$root/crates/rcbom-driver/target/debug/rcbom-driver"
 unset RCBOM_DRIVER
 out=${RCBOM_RESULTS:-$(mktemp -d)}
 mkdir -p "$out"
+# absolute: the generator and the verifier run in each fixture's directory
+out=$(cd "$out" && pwd)
 realapp=0
 regress=0
 for a in "$@"; do
@@ -46,8 +48,10 @@ run() {
     if grep 'could not be analysed' "$out/$name.log"; then
         echo "the driver caught panics: each is a bug (RCBOM_DEBUG=1 prints them)"; exit 1
     fi
-    (cd "$dir" && "$cbom" cbom verify "$out/$name.cbom.json" --self-test) > "$out/$name.verify" || {
-        cat "$out/$name.verify"; exit 1; }
+    # the CBOM named by its file name, as it sits next to the report in the results
+    if ! (cd "$dir" && "$cbom" cbom verify "$out/$name.cbom.json" --self-test) | sed "s#^$out/##" > "$out/$name.verify"; then
+        cat "$out/$name.verify"; exit 1
+    fi
     python3 - "$out/$name.verify" <<'PY'
 import re, sys
 text = open(sys.argv[1]).read()

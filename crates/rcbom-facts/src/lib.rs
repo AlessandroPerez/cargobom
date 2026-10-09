@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 7;
+pub const FACTS_VERSION: u32 = 8;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -25,6 +25,105 @@ pub struct CrateFacts {
     /// Present when this crate has an entry point (a binary): the instance graph walked from
     /// `main` across all crates whose MIR is available. Sites found there are `Reachable`.
     pub reach: Option<Reach>,
+    /// How values reach a call from other functions, for the values that can carry an
+    /// algorithm or a key (types of knowledge-base crates): what this crate stores in struct
+    /// fields, what its functions return, what it passes to functions, and what its statics
+    /// hold at run time.
+    #[serde(default)]
+    pub links: Links,
+}
+
+/// Value flow across the functions of a crate (see `CrateFacts::links`). Flow-insensitive: a
+/// field holds any value stored in it anywhere, a parameter any argument passed for it.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Links {
+    /// `S { f: v }`, `x.f = v`, in function bodies and static initializers.
+    pub fields: Vec<FieldStore>,
+    /// What a function returns.
+    pub returns: Vec<Returned>,
+    /// A call of a function outside the knowledge-base crates and the standard library, with
+    /// its arguments' origins (`Unknown` for arguments that cannot carry one).
+    pub calls: Vec<LocalCall>,
+    /// Values a static holds at run time: a `LazyLock`'s or `OnceLock`'s initializer, what
+    /// `OnceLock::set` or a write to a `static mut` puts there.
+    pub statics: Vec<StaticValue>,
+}
+
+impl Links {
+    /// Adds `other`'s records, without duplicates.
+    pub fn merge(&mut self, other: Links) {
+        for f in other.fields {
+            if !self.fields.contains(&f) {
+                self.fields.push(f);
+            }
+        }
+        for r in other.returns {
+            if !self.returns.contains(&r) {
+                self.returns.push(r);
+            }
+        }
+        for c in other.calls {
+            if !self.calls.contains(&c) {
+                self.calls.push(c);
+            }
+        }
+        for s in other.statics {
+            match self.statics.iter_mut().find(|x| x.def.id == s.def.id) {
+                Some(x) => {
+                    x.mutable |= s.mutable;
+                    for v in s.values {
+                        if !x.values.contains(&v) {
+                            x.values.push(v);
+                        }
+                    }
+                }
+                None => self.statics.push(s),
+            }
+        }
+    }
+}
+
+/// A value stored in a struct field, or in a field of a struct inside it.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct FieldStore {
+    /// Defining path of the struct.
+    pub adt: String,
+    /// The field, then the fields inside it (`c.aead.alg`: `aead`'s index, then `alg`'s).
+    pub path: Vec<usize>,
+    pub value: Origin,
+    /// Defining path of the function storing it, whose parameters `value` names; empty in a
+    /// static's initializer.
+    pub func: String,
+    /// Stored through a reference (`self.alg = v` in a `&mut self` method): the struct written
+    /// may be a part of another one.
+    pub via_ref: bool,
+}
+
+/// What a function returns, or a field of it (`path`, as in `FieldStore`).
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Returned {
+    /// Defining path of the function.
+    pub func: String,
+    pub path: Vec<usize>,
+    pub value: Origin,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct LocalCall {
+    /// Defining path of the function called.
+    pub callee: String,
+    /// Defining path of the function calling it, whose parameters `args` name.
+    pub caller: String,
+    pub args: Vec<Origin>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct StaticValue {
+    pub def: DefRef,
+    /// Its contents change at run time (`static mut`, `LazyLock`, `OnceLock`, a lock, an
+    /// atomic): it is not data compiled in.
+    pub mutable: bool,
+    pub values: Vec<Origin>,
 }
 
 /// `owner` (a static) holds a pointer to `target` in its evaluated value.
@@ -95,6 +194,10 @@ pub struct Owner {
     /// For statics, the def-path hash (matches `DefRef::id`); for fns, the mangled name.
     pub id: String,
     pub krate: CrateRef,
+    /// The defining path of the function or static, without an instance's generic arguments:
+    /// what `LocalCall::callee` and `Returned::func` name.
+    #[serde(default)]
+    pub path: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -206,6 +309,18 @@ pub enum Origin {
         /// For an enum variant, its discriminant (`argon2::Algorithm::Argon2i` is 1).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         value: Option<i128>,
+    },
+    /// A buffer written through a borrow that `callee` returned (`for c in key.chunks_mut(16) {
+    /// rng.fill_bytes(c) }`, a lock guard): what was written is not followed.
+    Through {
+        callee: String,
+    },
+    /// Field `field` of a struct `adt` read from a value whose origin is `base` (a parameter,
+    /// a call's result, a static): any value the crate stores in that field (`Links::fields`).
+    Field {
+        adt: String,
+        field: usize,
+        base: Box<Origin>,
     },
     /// Several definitions reach the value: it is one of these.
     Any(Vec<Origin>),

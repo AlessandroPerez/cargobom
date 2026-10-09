@@ -230,12 +230,40 @@ fn run_driver(
     let compiler = String::from_utf8_lossy(&compiler.stdout).to_string();
     let kb_crates = kb.crate_names().join(",");
     let stop_crates = kb.stop_crate_names().join(",");
+    // what the stop crates depend on (curve25519-dalek under ed25519-dalek): their
+    // implementation, which the walk does not enter from them
+    let impl_crates = {
+        let stop: std::collections::BTreeSet<String> = kb.stop_crate_names().into_iter().collect();
+        let mut seen: std::collections::BTreeSet<&rcbom_manifest::PackageId> = Default::default();
+        let mut stack: Vec<&rcbom_manifest::PackageId> = man
+            .packages
+            .iter()
+            .filter(|p| !p.local && stop.contains(&p.name.replace('-', "_")))
+            .flat_map(|p| p.runtime_deps.iter())
+            .collect();
+        while let Some(id) = stack.pop() {
+            if seen.insert(id)
+                && let Some(p) = man.by_id(id)
+            {
+                stack.extend(p.runtime_deps.iter());
+            }
+        }
+        let mut names: Vec<String> = seen
+            .into_iter()
+            .filter_map(|id| man.by_id(id))
+            .filter(|p| !p.local)
+            .map(|p| p.name.replace('-', "_"))
+            .collect();
+        names.sort();
+        names.dedup();
+        names.join(",")
+    };
 
     // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any
     // input of the driver other than the sources (the driver itself, the compiler, the crate
     // lists, features, walk) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\nkb={}\nstop={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -244,6 +272,7 @@ fn run_driver(
         compiler.trim(),
         kb_crates,
         stop_crates,
+        impl_crates,
         a.features,
         a.no_walk,
         a.profile,
@@ -278,6 +307,7 @@ fn run_driver(
         .env("RCBOM_OUT", facts_dir)
         .env("RCBOM_KB_CRATES", &kb_crates)
         .env("RCBOM_STOP_CRATES", &stop_crates)
+        .env("RCBOM_IMPL_CRATES", &impl_crates)
         .env("RCBOM_LOCAL_DIRS", local_dirs.join("\n"))
         .env("RCBOM_SYSROOT", &sysroot)
         .env("LD_LIBRARY_PATH", ld);

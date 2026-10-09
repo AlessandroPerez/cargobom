@@ -13,6 +13,8 @@
 //!                      naming items of these crates are recorded
 //!   RCBOM_LOCAL_DIRS   directories of the program's own packages (workspace members, path
 //!                      dependencies), one per line: their crates are never KB or stop crates
+//!   RCBOM_IMPL_CRATES  the stop crates' dependencies: from a stop crate, the walk does not
+//!                      follow calls into them (their implementation, not callbacks)
 //!   RCBOM_STOP_CRATES  crates whose bodies the reachability walk does not enter (algorithm
 //!                      implementations: the call into them is the fact, not their internals)
 //!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
@@ -31,6 +33,7 @@ extern crate rustc_middle;
 extern crate rustc_public;
 extern crate rustc_span;
 
+mod links;
 mod origins;
 mod statics;
 
@@ -188,6 +191,8 @@ pub(crate) struct Cx<'tcx> {
     pub tcx: TyCtxt<'tcx>,
     kb_crates: HashSet<String>,
     stop_crates: HashSet<String>,
+    /// The stop crates' dependencies (`RCBOM_IMPL_CRATES`).
+    impl_crates: HashSet<String>,
     /// The program's own crates (workspace members, path dependencies), by crate number and
     /// stable id: never the crates the knowledge base describes, whatever their names (a member
     /// called `signature`).
@@ -195,6 +200,11 @@ pub(crate) struct Cx<'tcx> {
     local_ids: HashSet<String>,
     /// Memo: does this static (by def-path hash) lead to a knowledge-base static?
     interesting_statics: HashMap<String, bool>,
+    /// Value flow across this crate's functions (`links`).
+    links: rcbom_facts::Links,
+    /// This crate's statics whose contents change at run time and can hold key material
+    /// (`links::mutable_static_defs`), computed once.
+    pub(crate) mutable_statics: std::cell::OnceCell<HashSet<rustc_span::def_id::DefId>>,
     pub errors: usize,
 }
 
@@ -204,9 +214,12 @@ fn analyze(tcx: TyCtxt<'_>) {
         tcx,
         kb_crates: env_set("RCBOM_KB_CRATES"),
         stop_crates: env_set("RCBOM_STOP_CRATES"),
+        impl_crates: env_set("RCBOM_IMPL_CRATES"),
         local,
         local_ids,
         interesting_statics: HashMap::new(),
+        links: Default::default(),
+        mutable_statics: std::cell::OnceCell::new(),
         errors: 0,
     };
     let local = rustc_public::local_crate();
@@ -253,6 +266,57 @@ fn analyze(tcx: TyCtxt<'_>) {
     for e in &data_edges {
         cx.interesting_statics.insert(e.owner.id.clone(), true);
     }
+    // a function named in a static's or const's initializer (`static HASH: fn(&[u8]) -> Hash =
+    // blake3::hash;`): named there, whatever calls it later
+    for did in tcx.hir_body_owners().map(|d| d.to_def_id()) {
+        if !matches!(
+            tcx.def_kind(did),
+            rustc_hir::def::DefKind::Static { .. }
+                | rustc_hir::def::DefKind::Const
+                | rustc_hir::def::DefKind::AssocConst
+        ) || tcx.is_foreign_item(did)
+        {
+            continue;
+        }
+        let r = catch_unwind(AssertUnwindSafe(|| {
+            let item = rustc_public::CrateItem(rustc_internal::stable(did));
+            let owner = Owner {
+                kind: OwnerKind::Static,
+                name: path_of(tcx, did),
+                id: def_hash(tcx, did),
+                krate: crate_ref(tcx, did),
+                path: path_of(tcx, did),
+            };
+            let mut out = Vec::new();
+            if !item.requires_monomorphization()
+                && let Some(body) = item.body()
+            {
+                let mut sc = Scanner::new(
+                    &mut cx,
+                    &body,
+                    Some(did),
+                    owner,
+                    Tier::Present,
+                    vec![],
+                    &mut out,
+                    None,
+                );
+                sc.visit_body(&body);
+                let mut l = rcbom_facts::Links::default();
+                links::body_links(&cx, &body, did, false, &mut l);
+                links::promoted_links(&cx, did, &mut l);
+                cx.links.merge(l);
+            }
+            out
+        }));
+        match r {
+            Ok(out) => sites.extend(
+                out.into_iter()
+                    .filter(|s| matches!(s.target, rcbom_facts::Target::Call { .. })),
+            ),
+            Err(_) => cx.errors += 1,
+        }
+    }
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn) || !item.has_body() {
             continue;
@@ -271,7 +335,7 @@ fn analyze(tcx: TyCtxt<'_>) {
             let mut out = Vec::new();
             // the item body, not an instance body: for a monomorphic fn the types are the
             // same, and named consts are not evaluated away (aws-lc-rs algorithms are consts)
-            if let Some(body) = item.body() {
+            if let Some(body) = item.body().map(|b| live_body(&b)) {
                 let mut sc = Scanner::new(
                     &mut cx,
                     &body,
@@ -283,6 +347,10 @@ fn analyze(tcx: TyCtxt<'_>) {
                     None,
                 );
                 sc.visit_body(&body);
+                let mut l = rcbom_facts::Links::default();
+                links::body_links(&cx, &body, did, true, &mut l);
+                links::promoted_links(&cx, did, &mut l);
+                cx.links.merge(l);
             }
             out.extend(statics::fn_data_sites(
                 &mut cx,
@@ -327,12 +395,21 @@ fn analyze(tcx: TyCtxt<'_>) {
     let mut seen = HashSet::new();
     sites.retain(|s| seen.insert(s.clone()));
 
+    let mut crate_links = std::mem::take(&mut cx.links);
+    if catch_unwind(AssertUnwindSafe(|| {
+        links::mutable_statics(&cx, &mut crate_links)
+    }))
+    .is_err()
+    {
+        cx.errors += 1;
+    }
     let facts = CrateFacts {
         facts_version: FACTS_VERSION,
         krate,
         sites,
         data_edges,
         reach,
+        links: crate_links,
     };
     let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
     std::fs::create_dir_all(&out).unwrap();
@@ -423,6 +500,7 @@ fn fn_owner(cx: &Cx<'_>, inst: &Instance) -> Owner {
         name: instance_name(cx.tcx, inst),
         id: inst.mangled_name(),
         krate: crate_ref(cx.tcx, did),
+        path: path_of(cx.tcx, did),
     }
 }
 
@@ -433,6 +511,7 @@ fn fn_owner_item(cx: &Cx<'_>, item: &rustc_public::CrateItem) -> Owner {
         name: path_of(cx.tcx, did),
         id: def_hash(cx.tcx, did),
         krate: crate_ref(cx.tcx, did),
+        path: path_of(cx.tcx, did),
     }
 }
 
@@ -664,8 +743,8 @@ fn tree_mentions(t: &TyTree, cx: &Cx<'_>) -> bool {
     }
 }
 
-/// The crates of the program's own packages: those whose root file is in the directory of a
-/// workspace member or path dependency (`RCBOM_LOCAL_DIRS`, one per line).
+/// The crates of the program's own packages: those whose root file belongs to a workspace
+/// member or path dependency (`RCBOM_LOCAL_DIRS`, their directories, one per line).
 fn local_crates(tcx: TyCtxt<'_>) -> (HashSet<rustc_span::def_id::CrateNum>, HashSet<String>) {
     let dirs: Vec<PathBuf> = std::env::var("RCBOM_LOCAL_DIRS")
         .unwrap_or_default()
@@ -688,7 +767,14 @@ fn local_crates(tcx: TyCtxt<'_>) -> (HashSet<rustc_span::def_id::CrateNum>, Hash
             .prefer_local_unconditionally()
             .to_string();
         let root = cwd.join(root);
-        if dirs.iter().any(|d| root.starts_with(d)) {
+        // the package the root file belongs to: the nearest directory above it with a
+        // `Cargo.toml` (a crate vendored under the project, or a `CARGO_HOME` inside it, has its
+        // own)
+        let pkg = root
+            .ancestors()
+            .skip(1)
+            .find(|d| d.join("Cargo.toml").is_file());
+        if pkg.is_some_and(|p| dirs.iter().any(|d| d == p)) {
             nums.insert(c);
             ids.insert(format!("{:016x}", tcx.stable_crate_id(c).as_u64()));
         }
@@ -708,8 +794,14 @@ impl Cx<'_> {
     }
 
     /// Is this crate one whose code the walk does not enter (an algorithm implementation)?
-    fn stop_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
+    pub(crate) fn stop_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
         !self.local.contains(&c) && self.stop_crates.contains(self.tcx.crate_name(c).as_str())
+    }
+
+    /// Is this crate a dependency of a stop crate (`RCBOM_IMPL_CRATES`): part of how an
+    /// algorithm is implemented, when a stop crate calls into it?
+    fn impl_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
+        !self.local.contains(&c) && self.impl_crates.contains(self.tcx.crate_name(c).as_str())
     }
 
     /// A static is worth recording if it belongs to a KB crate, or its value points (through
@@ -812,6 +904,20 @@ struct Scanner<'a, 'tcx> {
     statics: Vec<rustc_public::mir::mono::StaticDef>,
     /// Def-use index of the body, for argument origins.
     origins: origins::Origins<'a, 'tcx>,
+    /// The body holds a value `rustc_public` cannot convert the type of (`unconvertible`).
+    unconvertible: bool,
+}
+
+/// Does a local of `body` have a type `rustc_public` cannot convert yet? An `async` closure's
+/// (`CoroutineClosure`): converting it panics ("FIXME(async_closures): Lower these to SMIR").
+/// Reading a statement or call that involves one is a known limit of the interface, not a bug.
+fn has_unconvertible(tcx: TyCtxt<'_>, body: &Body) -> bool {
+    body.locals().iter().any(|l| {
+        rustc_internal::internal(tcx, l.ty).walk().any(|g| {
+            g.as_type()
+                .is_some_and(|t| matches!(t.kind(), rustc_middle::ty::CoroutineClosure(..)))
+        })
+    })
 }
 
 impl<'a, 'tcx> Scanner<'a, 'tcx> {
@@ -833,6 +939,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         if let Some((item, args)) = item {
             origins = origins.with_item(item, args);
         }
+        let unconvertible = has_unconvertible(cx.tcx, body);
         Scanner {
             cx,
             body,
@@ -842,6 +949,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             out,
             statics: Vec::new(),
             origins,
+            unconvertible,
         }
     }
 
@@ -966,7 +1074,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                     .collect();
                 let lens = call_args
                     .iter()
-                    .map(|a| self.origins.array_len(a))
+                    .map(|a| self.origins.array_len(a, term))
                     .collect();
                 (consts, origins, lens)
             }
@@ -995,6 +1103,70 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         {
             self.record_call(def, args, c.span, None);
         }
+    }
+}
+
+/// The body without the blocks no execution reaches: those behind a branch on a constant
+/// (`if cfg!(debug_assertions)` is `if false` in a release build, which MIR level 0 keeps).
+/// Their statements are dropped and their terminators made `unreachable`.
+fn live_body(body: &rustc_public::mir::Body) -> rustc_public::mir::Body {
+    let n = body.blocks.len();
+    let mut live = vec![false; n];
+    let mut work = vec![0usize];
+    while let Some(b) = work.pop() {
+        if b >= n || live[b] {
+            continue;
+        }
+        live[b] = true;
+        let block = &body.blocks[b];
+        match &block.terminator.kind {
+            TerminatorKind::SwitchInt { discr, targets } => match switch_value(block, discr) {
+                Some(v) => work.push(
+                    targets
+                        .branches()
+                        .find(|(x, _)| *x == v)
+                        .map(|(_, t)| t)
+                        .unwrap_or(targets.otherwise()),
+                ),
+                None => work.extend(block.terminator.successors()),
+            },
+            _ => work.extend(block.terminator.successors()),
+        }
+    }
+    let mut out = body.clone();
+    for (b, l) in live.iter().enumerate() {
+        if !l {
+            out.blocks[b].statements.clear();
+            out.blocks[b].terminator.kind = TerminatorKind::Unreachable;
+        }
+    }
+    out
+}
+
+/// The value a block switches on, when it is a constant: given directly, or assigned to the
+/// switched local earlier in the block (`_3 = const false; switchInt(move _3)`).
+fn switch_value(block: &rustc_public::mir::BasicBlock, discr: &Operand) -> Option<u128> {
+    let c = match discr {
+        Operand::Constant(c) => c.clone(),
+        Operand::Copy(p) | Operand::Move(p) if p.projection.is_empty() => {
+            let rv = block.statements.iter().rev().find_map(|s| match &s.kind {
+                rustc_public::mir::StatementKind::Assign(q, rv)
+                    if q.local == p.local && q.projection.is_empty() =>
+                {
+                    Some(rv)
+                }
+                _ => None,
+            })?;
+            match rv {
+                Rvalue::Use(Operand::Constant(c), _) => c.clone(),
+                _ => return None,
+            }
+        }
+        _ => return None,
+    };
+    match c.const_.kind() {
+        ConstantKind::Allocated(a) => a.read_uint().ok(),
+        _ => None,
     }
 }
 
@@ -1046,7 +1218,49 @@ fn kb_bounded<'tcx>(
 }
 
 impl MirVisitor for Scanner<'_, '_> {
+    // a panic loses the call, rvalue or constant it was raised in, not the function: an
+    // `async` closure's type is lost this way (`has_unconvertible`); any other panic is a bug,
+    // counted as one
     fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.scan_terminator(term, loc)));
+        self.caught(r.is_err(), "a call");
+    }
+
+    fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.scan_rvalue(rv, loc)));
+        self.caught(r.is_err(), "a value");
+    }
+
+    fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.scan_const(c, loc)));
+        self.caught(r.is_err(), "a constant");
+    }
+}
+
+impl Scanner<'_, '_> {
+    fn caught(&mut self, panicked: bool, what: &str) {
+        if !panicked {
+            return;
+        }
+        if !self.unconvertible {
+            self.cx.errors += 1;
+        }
+        if std::env::var_os("RCBOM_DEBUG").is_some() {
+            eprintln!(
+                "rcbom-driver: {what} in {} could not be read{}",
+                self.owner.name,
+                if self.unconvertible {
+                    " (an async closure's type, which rustc_public cannot convert)"
+                } else {
+                    ""
+                }
+            );
+        }
+    }
+}
+
+impl Scanner<'_, '_> {
+    fn scan_terminator(&mut self, term: &Terminator, loc: Location) {
         if let TerminatorKind::Call {
             func,
             args: call_args,
@@ -1086,16 +1300,24 @@ impl MirVisitor for Scanner<'_, '_> {
         self.super_terminator(term, loc);
     }
 
-    fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
-        if let Rvalue::Cast(CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)), op, _) =
-            rv
-        {
-            self.function_value(op);
+    fn scan_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        match rv {
+            // a function made a pointer, or kept as a value in a struct, a tuple, an array or a
+            // local (`Some(blake3::hash)`, `Holder { f: Aes256Gcm::new_from_slice }`): it is
+            // named here, whatever calls it later
+            Rvalue::Cast(CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)), op, _)
+            | Rvalue::Use(op, _) => self.function_value(op),
+            Rvalue::Aggregate(_, ops) => {
+                for op in ops {
+                    self.function_value(op);
+                }
+            }
+            _ => {}
         }
         self.super_rvalue(rv, loc);
     }
 
-    fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+    fn scan_const(&mut self, c: &ConstOperand, loc: Location) {
         if let ConstantKind::Allocated(a) = c.const_.kind() {
             alloc_statics(a, &mut self.statics, &mut HashSet::new(), 0);
         }
@@ -1132,6 +1354,35 @@ fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId
         {
             let n = format!("pub {}", instance_name(tcx, &i));
             fns.push((i, n));
+        }
+    }
+    // a library: the non-generic functions its exported generic or inline functions call
+    // (`pub fn hash(d: impl AsRef<[u8]>)` calling a private `fn inner(d: &[u8])`), which
+    // every user of the library runs and rustc exports for them (`reachable_set`)
+    if !is_bin {
+        let reachable = tcx.reachable_set(());
+        let mut extra: Vec<rustc_span::def_id::DefId> = tcx
+            .hir_body_owners()
+            .filter(|l| reachable.contains(l))
+            .map(|l| l.to_def_id())
+            .filter(|d| {
+                matches!(
+                    tcx.def_kind(*d),
+                    rustc_hir::def::DefKind::Fn | rustc_hir::def::DefKind::AssocFn
+                )
+            })
+            .collect();
+        extra.sort_by_key(|d| def_hash(tcx, *d));
+        for did in extra {
+            let item = rustc_public::CrateItem(rustc_internal::stable(did));
+            if item.has_body()
+                && !item.requires_monomorphization()
+                && let Ok(i) = Instance::try_from(item)
+                && !fns.iter().any(|(r, _)| *r == i)
+            {
+                let n = format!("pub {}", instance_name(tcx, &i));
+                fns.push((i, n));
+            }
         }
     }
     let mut statics = Vec::new();
@@ -1265,9 +1516,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     /// calls back.
     fn calls_back(&self, callee: &Instance) -> bool {
         let tcx = self.cx.tcx;
+        // a stop crate's own dependencies are its implementation (curve25519-dalek under
+        // ed25519-dalek), not code it calls back
         let foreign = |did: rustc_span::def_id::DefId| {
             let k = tcx.crate_name(did.krate).to_string();
-            !self.cx.stop_crate(did.krate) && !self.cx.is_std(&k)
+            !self.cx.stop_crate(did.krate) && !self.cx.is_std(&k) && !self.cx.impl_crate(did.krate)
         };
         let i = rustc_internal::internal(tcx, callee);
         if foreign(i.def_id()) {
@@ -1293,14 +1546,19 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
-        let Some(body) = inst.body() else { return };
+        let Some(body) = inst.body().map(|b| live_body(&b)) else {
+            return;
+        };
         let mut edges = Edges {
             tcx: self.cx.tcx,
             body: &body,
             found: Vec::new(),
             cur: None,
+            unconvertible: has_unconvertible(self.cx.tcx, &body),
+            errors: 0,
         };
         edges.visit_body(&body);
+        self.cx.errors += edges.errors;
         // RCBOM_DEBUG_WALK=<substring>: print the edges out of matching instances
         let debug = std::env::var("RCBOM_DEBUG_WALK")
             .ok()
@@ -1309,7 +1567,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             eprintln!("rcbom-walk: {} ({:?})", inst.name(), inst.kind);
         }
         let stop = self.cx.stop_crate(did.krate);
-        if !stop {
+        // a shim's body is the compiler's (a `dyn` method behind a function pointer, drop glue,
+        // `<closure as FnOnce>::call_once`): what it calls is walked, but none of it is code
+        // written at the span it carries (the trait method's declaration)
+        let shim = matches!(inst.kind, InstanceKind::Shim);
+        if !stop && !shim {
             let owner = fn_owner(self.cx, &inst);
             self.fns.push(owner.id.clone());
             let item = matches!(inst.kind, InstanceKind::Item);
@@ -1327,7 +1589,8 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 item && rustc_public::CrateItem(inst.def.def_id()).requires_monomorphization();
             let item_body = (item && !generic)
                 .then(|| rustc_public::CrateItem(inst.def.def_id()).body())
-                .flatten();
+                .flatten()
+                .map(|b| live_body(&b));
             let mut sites = Vec::new();
             let scanned = item_body.as_ref().unwrap_or(&body);
             // A generic instance (or a closure) must be scanned in its instance body, where the
@@ -1438,6 +1701,9 @@ struct Edges<'a, 'tcx> {
     found: Vec<(Instance, Span)>,
     /// Span of the statement being visited, for casts.
     cur: Option<Span>,
+    /// As in `Scanner`: the body holds an `async` closure; panics that are bugs.
+    unconvertible: bool,
+    errors: usize,
 }
 
 impl MirVisitor for Edges<'_, '_> {
@@ -1446,7 +1712,26 @@ impl MirVisitor for Edges<'_, '_> {
         self.super_statement(stmt, loc);
     }
 
+    // a type `rustc_public` cannot convert (an `async` closure's) loses one edge, not the
+    // instance's others; any other panic is a bug, counted
     fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_terminator(term, loc)));
+        self.errors += usize::from(r.is_err() && !self.unconvertible);
+    }
+
+    fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_rvalue(rv, loc)));
+        self.errors += usize::from(r.is_err() && !self.unconvertible);
+    }
+
+    fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+        let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_const(c, loc)));
+        self.errors += usize::from(r.is_err() && !self.unconvertible);
+    }
+}
+
+impl Edges<'_, '_> {
+    fn edges_of_terminator(&mut self, term: &Terminator, loc: Location) {
         self.cur = Some(term.source_info.span);
         match &term.kind {
             TerminatorKind::Call { func, .. } => {
@@ -1474,7 +1759,31 @@ impl MirVisitor for Edges<'_, '_> {
         self.super_terminator(term, loc);
     }
 
-    fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+    fn edges_of_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        // a closure or coroutine built here: its body runs when it is called or polled, by
+        // the code it is handed to or returned to (a library's `pub async fn`, a returned
+        // `impl Fn`); built here, it is reachable from here
+        if let Rvalue::Aggregate(kind, _) = rv {
+            let built = match kind {
+                rustc_public::mir::AggregateKind::Closure(def, args) => Some((def.def_id(), args)),
+                rustc_public::mir::AggregateKind::Coroutine(def, args) => {
+                    Some((def.def_id(), args))
+                }
+                rustc_public::mir::AggregateKind::CoroutineClosure(def, args) => {
+                    Some((def.def_id(), args))
+                }
+                _ => None,
+            };
+            if let Some((def, args)) = built {
+                let did = rustc_internal::internal(self.tcx, def);
+                let iargs = rustc_internal::internal(self.tcx, args);
+                if !iargs.has_non_region_param() {
+                    let i = rustc_middle::ty::Instance::new_raw(did, iargs);
+                    let span = self.cur.unwrap_or(self.body.span);
+                    self.found.push((rustc_internal::stable(i), span));
+                }
+            }
+        }
         if let Rvalue::Cast(kind, op, target) = rv {
             let span = self.cur.unwrap_or(self.body.span);
             if let Ok(src) = op.ty(self.body.locals()) {
@@ -1508,7 +1817,7 @@ impl MirVisitor for Edges<'_, '_> {
         self.super_rvalue(rv, loc);
     }
 
-    fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+    fn edges_of_const(&mut self, c: &ConstOperand, loc: Location) {
         if let ConstantKind::Allocated(a) = c.const_.kind() {
             let mut found = Vec::new();
             alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), 0);

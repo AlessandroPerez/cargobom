@@ -1,0 +1,128 @@
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:107:18 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in a14::make_key; algorithm from ring::aead::algorithm::AES_128_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `UnboundKey::new`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:107:35 | ring::aead::algorithm::AES_128_GCM | [reachable] [static] in a14::make_key; line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `aead::AES_128_GCM`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:114:8 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in a14::seal_with; use: encrypt; algorithm from ring::aead::algorithm::AES_128_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 113); line: `key.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:125:36 | a14::GCM128 | [reachable] [via-static] in a14::main; a14::GCM128 -> ring::aead::algorithm::AES_128_GCM; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `GCM128`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:63:30 | ring::aead::algorithm::AES_128_GCM | [reachable] [static] in a14::GCM128; line: `static GCM128: Gcm = Gcm(Alg(&aead::AES_128_GCM));`; code: `aead::AES_128_GCM`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:68:8 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in a14::Alg::key; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:125:56 | a14::GCM256 | [reachable] [via-static] in a14::main; a14::GCM256 -> ring::aead::algorithm::AES_256_GCM; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `GCM256`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:129:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in a14::main; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args); line: `UnboundKey::new(&aead::AES_256_GCM, &input).unwrap(),`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:129:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in a14::main; line: `UnboundKey::new(&aead::AES_256_GCM, &input).unwrap(),`; code: `aead::AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:30 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in a14::GCM256; line: `static GCM256: Gcm = Gcm(Alg(&aead::AES_256_GCM));`; code: `aead::AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:68:8 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in a14::Alg::key; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:94:13 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in a14::Sealer::seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 92); line: `.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:125:16 | a14::CHACHA | [reachable] [via-static] in a14::main; a14::CHACHA -> ring::aead::algorithm::CHACHA20_POLY1305; line: `let keys = [CHACHA.key(&input), GCM128.key(&input), GCM256.key(&input)];`; code: `CHACHA`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:62:36 | ring::aead::algorithm::CHACHA20_POLY1305 | [reachable] [static] in a14::CHACHA; line: `static CHACHA: ChaCha = ChaCha(Alg(&aead::CHACHA20_POLY1305));`; code: `aead::CHACHA20_POLY1305`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:74:8 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in a14::ChaCha::key; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:15:30 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [reachable] [static] in a14::key_pair; line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:15:4 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8 | [reachable] [call] in a14::key_pair; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING in the arguments; key: parameter (argument 0 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `EcdsaKeyPair::from_pkcs8`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:32:29 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign | [reachable] [call] in a14::Signer::sign; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; line: `let sig = self.inner.sign(&self.rng, msg).map_err(|_| Error)?;`; code: `sign`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:45:17 | ring::hmac::Key::new | [reachable] [call] in a14::Mac::new; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: parameter (argument 0 of the enclosing function); line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::Key::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:45:32 | ring::hmac::HMAC_SHA256 | [reachable] [static] in a14::Mac::new; line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::HMAC_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:50:8 | ring::hmac::sign | [reachable] [call] in a14::Mac::tag; use: tag; algorithm from ring::hmac::HMAC_SHA256, reaching the call from another function; line: `hmac::sign(&self.key, msg)`; code: `hmac::sign`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:101:4 | ring::digest::digest | [reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest::digest(alg, data)`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:136:19 | ring::digest::SHA256 | [reachable] [static] in a14::main; line: `hash_with(&digest::SHA256, &input).as_ref().len(),`; code: `digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:30 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [reachable] [component] in a14::key_pair; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:45:32 | ring::hmac::HMAC_SHA256 | [reachable] [component] in a14::Mac::new; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `key: hmac::Key::new(hmac::HMAC_SHA256, secret),`; code: `hmac::HMAC_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:101:4 | ring::digest::digest | [reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; line: `digest::digest(alg, data)`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:137:19 | ring::digest::SHA384 | [reachable] [static] in a14::main; line: `hash_with(&digest::SHA384, &input).as_ref().len()`; code: `digest::SHA384`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a14 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a14 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a14 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:confidence=high
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:detection:method=type-resolved
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:functions:source=observed
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:kb:version=0.2.0
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:occurrences=6
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:key=parameter
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:reachability=reachable
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=6
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:functions:source=knowledge-base
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:occurrences=3
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:provenance:key=parameter
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=3
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:key=parameter
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=3
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt", "decrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/a14@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:HMAC-SHA-256
+dependency pkg:cargo/a14@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-128-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/a14@0.1.0", "name": "a14", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a14@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=177
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

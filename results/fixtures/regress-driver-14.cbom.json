@@ -174,19 +174,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t14@0.1.0",
-      "name": "t14",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t14@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -202,7 +189,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t14::k3; use: verify; instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in t14::k3; instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 9,
@@ -216,7 +203,7 @@
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::k3m; use: verify; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in t14::k3m; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 9,
@@ -275,7 +262,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in t14::suite; use: digest; line: `Suite { alg: &SHA256 }`; code: `SHA256`",
+            "additionalContext": "[present] [static] in t14::suite; line: `Suite { alg: &SHA256 }`; code: `SHA256`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 18,
@@ -289,7 +276,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t14::k2; use: digest; t14::SUITE -> ring::digest::SHA256; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `SUITE`",
+            "additionalContext": "[reachable] [via-static] in t14::k2; t14::SUITE -> ring::digest::SHA256; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `SUITE`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 17,
@@ -310,14 +297,14 @@
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:61; line: `let f = digest;`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:60; line: `let f = digest;`; code: `digest`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f1::{closure#0}; use: digest; instantiated by t14::f1 at src/main.rs:61; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t14::f1::{closure#0}; instantiated by t14::f1 at src/main.rs:60; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 26,
@@ -331,7 +318,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f3; use: digest; line: `let x = h(&SHA256, d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t14::f3; line: `let x = h(&SHA256, d);`; code: `SHA256`",
             "line": 78,
             "location": "src/main.rs",
             "offset": 15,
@@ -383,7 +370,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <t14::S384 as t14::Scheme>::ALG; use: digest; line: `const ALG: &'static Algorithm = &SHA384;`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <t14::S384 as t14::Scheme>::ALG; line: `const ALG: &'static Algorithm = &SHA384;`; code: `SHA384`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 37,
@@ -397,7 +384,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <t14::S384 as t14::Scheme>::hash; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `digest(Self::ALG, d).as_ref().len()`; code: `Self::ALG`",
+            "additionalContext": "[reachable] [via-static] in <t14::S384 as t14::Scheme>::hash; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `digest(Self::ALG, d).as_ref().len()`; code: `Self::ALG`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 15,
@@ -411,7 +398,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t14::k1; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `S384::ALG`",
+            "additionalContext": "[reachable] [via-static] in t14::k1; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `S384::ALG`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 27,
@@ -425,7 +412,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in t14::f2; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA384`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 11,
@@ -439,7 +426,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f3; use: digest; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in t14::f3; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `SHA384`",
             "line": 79,
             "location": "src/main.rs",
             "offset": 12,
@@ -491,7 +478,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in t14::pick; use: digest; line: `&SHA512`; code: `SHA512`",
+            "additionalContext": "[present] [static] in t14::pick; line: `&SHA512`; code: `SHA512`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 5,
@@ -505,7 +492,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t14::k2; use: digest; t14::PICKED -> ring::digest::SHA512; line: `digest(PICKED, d).as_ref().len()`; code: `PICKED`",
+            "additionalContext": "[reachable] [via-static] in t14::k2; t14::PICKED -> ring::digest::SHA512; line: `digest(PICKED, d).as_ref().len()`; code: `PICKED`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 11,
@@ -526,7 +513,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t14::f2; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA512`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 46,
@@ -610,8 +597,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t14@0.1.0#root",
+      "bom-ref": "pkg:cargo/t14@0.1.0",
       "name": "t14",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t14@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -646,7 +640,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "40"
+        "value": "34"
       }
     ],
     "tools": {
@@ -659,7 +653,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f277615a-5c87-8c85-bf43-5a6376c4341a",
+  "serialNumber": "urn:uuid:35b1e296-c3ab-85d2-ae9b-3c160e2e0f7e",
   "specVersion": "1.7",
   "version": 1
 }

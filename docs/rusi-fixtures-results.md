@@ -31,19 +31,19 @@ rusi's report is converted by `scripts/rusi_to_cbom.py`, keeping every crypto co
 
 ## Results
 
-Totals over the three fixtures (14 core findings, 11 labelled provenance roles):
+Totals over the three fixtures (14 core findings, 10 labelled provenance roles of core assets):
 
 | | recall | precision | fully named | provenance |
 |---|---|---|---|---|
 | cargo-cbom, seed knowledge base (held out) | 7/14 | 9/9 | 7/14 | (not implemented) |
-| cargo-cbom, current | 14/14 | 17/17 | 14/14 | 11/11 |
-| rusi 4.1.1, stable backend | 13/14 | 13/15 | 7/14 | 0/11 (not reported) |
+| cargo-cbom, current | 14/14 | 17/17 | 14/14 | 10/10 |
+| rusi 4.1.1, stable backend | 12/14 | 12/15 | 7/14 | 0/10 (not reported) |
 
 Per fixture (recall, precision, fully named, provenance):
 
 | fixture | cargo-cbom (seed) | cargo-cbom (current) | rusi |
 |---|---|---|---|
-| crates-app | 3/8, 5/5, 3/8, – | 8/8, 11/11, 8/8, 7/7 | 8/8, 8/9, 3/8, 0/7 |
+| crates-app | 3/8, 5/5, 3/8, – | 8/8, 11/11, 8/8, 6/6 | 7/8, 7/9, 3/8, 0/6 |
 | asymmetric-app | 2/4, 2/2, 2/4, – | 4/4, 4/4, 4/4, 3/3 | 3/4, 3/4, 2/4, 0/3 |
 | modern-app | 2/2, 2/2, 2/2, – | 2/2, 2/2, 2/2, 1/1 | 2/2, 2/2, 2/2, 0/1 |
 

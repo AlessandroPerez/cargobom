@@ -1,0 +1,56 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:18:8 | ring::digest::digest | [reachable] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:43 | ring::digest::SHA256 | [reachable] [static] in a20::SHA256_SUITE; line: `static SHA256_SUITE: Suite = Suite { alg: &digest::SHA256 };`; code: `digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:40 | a20::SHA256_SUITE | [reachable] [via-static] in a20::DEFAULT; a20::SHA256_SUITE -> ring::digest::SHA256; line: `pub static DEFAULT: &[&dyn Hasher] = &[&SHA256_SUITE];`; code: `SHA256_SUITE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:36 | a20::SHA256_SUITE | [present] [via-static] in a20::ALL; a20::SHA256_SUITE -> ring::digest::SHA256; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA256_SUITE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:13 | a20::DEFAULT | [reachable] [via-static] in a20::main; a20::DEFAULT -> ring::digest::SHA256; line: `for h in DEFAULT {`; code: `DEFAULT`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:8 | ring::digest::digest | [present] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:43 | ring::digest::SHA512 | [present] [static] in a20::SHA512_SUITE; line: `static SHA512_SUITE: Suite = Suite { alg: &digest::SHA512 };`; code: `digest::SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:51 | a20::SHA512_SUITE | [present] [via-static] in a20::ALL; a20::SHA512_SUITE -> ring::digest::SHA512; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA512_SUITE`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a20 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a20 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a20 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=3
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a20@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/a20@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/a20@0.1.0", "name": "a20", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a20@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=45
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -24,7 +24,6 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t1::pbkdf; part of PBKDF2-SHA-256; line: `pbkdf2::pbkdf2_hmac::<Sha256>(b"pw", b"salt", iters, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ SHA-512 | crypto:algorithm:SHA-512 | curve25519-dalek-4.1.3/src/scalar.rs:676:36 | digest::digest::Digest::finalize | [reachable] [call] in curve25519_dalek::scalar::Scalar::from_hash::<..>; use: digest; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:548; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:515; instantiated by ed25519_dalek::verifying::VerifyingKey::raw_verify::<..> at ed25519-dalek-2.2.0/src/verifying.rs:211; instantiated by <ed25519_dalek::verifying::VerifyingKey as signature::verifier::Verifier<ed25519::Signature>>::verify at ed25519-dalek-2.2.0/src/verifying.rs:564; line: `output.copy_from_slice(hash.finalize().as_slice());`; code: `finalize`
   occ SHA-512/224 | crypto:algorithm:SHA-512/224 | src/main.rs:39:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let b = Sha512_224::digest(d);`; code: `Sha512_224::digest`
   occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:38:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let a = Sha512_256::digest(d);`; code: `Sha512_256::digest`
   occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:40:12 | digest::mac::Mac::new_from_slice | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`
@@ -160,12 +159,6 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:confidence=high
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:detection:method=type-resolved
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:functions:source=observed
@@ -271,7 +264,6 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
-  prop t1 | pkg:cargo/t1@0.1.0 | rcbom:scope=required
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
@@ -284,12 +276,10 @@ asset HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | {"algorithmProperti
 asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512/224 | crypto:algorithm:SHA-512/224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 asset scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
-component application t1 0.1.0 | pkg:cargo/t1@0.1.0 | purl pkg:cargo/t1@0.1.0
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
@@ -428,15 +418,14 @@ provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
 provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt-131072-8-1-32
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/224
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/256
-root {"bom-ref": "pkg:cargo/t1@0.1.0#root", "name": "t1", "type": "application", "version": "0.1.0"}
+root {"bom-ref": "pkg:cargo/t1@0.1.0", "name": "t1", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t1@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=69
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=1806
+run rcbom:run:reachable-instances=660
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

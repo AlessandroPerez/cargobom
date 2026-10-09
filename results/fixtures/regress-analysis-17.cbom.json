@@ -1,0 +1,997 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/aws-lc-rs@1.18.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a17 (dependencies); features [\"legacy-des\"]",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] locked aws-lc-rs 1.18.1; reached via a17 -> aws-lc-rs",
+            "line": 13,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-rs-1.18.1/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-rs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_rs_1_18_1_sys"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-rs@1.18.1",
+      "type": "library",
+      "version": "1.18.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/aws-lc-sys@0.45.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-sys-0.45.0/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-sys",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_0_45_0"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-sys@0.45.0",
+      "type": "library",
+      "version": "0.45.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "128",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::scatter; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "aws_lc_rs::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::scatter; line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `aead::AES_128_GCM`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "aws_lc_rs::aead::aes_gcm::AES_128_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 16); line: `let _ = k.seal_out_of_place_scatter(Nonce::assume_unique_for_key([1u8; 12]), Aad::empty(), data, &mut ct, &[], &mut tag[..16]);`; code: `seal_out_of_place_scatter`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "aws_lc_rs::aead::LessSafeKey::seal_out_of_place_scatter"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::scatter; use: decrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 18); line: `let r = k.open_separate_gather(Nonce::assume_unique_for_key([2u8; 12]), Aad::empty(), &ct, &tag[..16], &mut pt);`; code: `open_separate_gather`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "aws_lc_rs::aead::LessSafeKey::open_separate_gather"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 19); line: `let _ = k.seal_in_place_scatter(Nonce::assume_unique_for_key([3u8; 12]), Aad::empty(), data, &[], &mut tag[..16]);`; code: `seal_in_place_scatter`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "aws_lc_rs::aead::LessSafeKey::seal_in_place_scatter"
+          }
+        ]
+      },
+      "name": "AES-128-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "parameterSetIdentifier": "128",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::ctr_iv; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::UnboundCipherKey::new`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::cipher::UnboundCipherKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::ctr_iv; line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::AES_128`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "aws_lc_rs::cipher::AES_128"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::ctr_iv; use: encrypt; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; iv: hard-coded (16 bytes, literal at line 27); line: `ek.less_safe_encrypt(data, ctx).is_ok()`; code: `less_safe_encrypt`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "aws_lc_rs::cipher::EncryptingKey::less_safe_encrypt"
+          }
+        ]
+      },
+      "name": "AES-128",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-iv"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a17::P256; line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; line: `.verify(msg, sig)`; code: `verify`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a17::main; a17::P256 -> aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
+            "line": 85,
+            "location": "src/main.rs",
+            "offset": 42,
+            "symbol": "a17::P256"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::ed_seed; from_seed_unchecked: setup, not a use; key: hard-coded (32 bytes, literal at line 50); line: `let kp = signature::Ed25519KeyPair::from_seed_unchecked(&[4u8; 32]).unwrap();`; code: `signature::Ed25519KeyPair::from_seed_unchecked`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::ed25519::Ed25519KeyPair::from_seed_unchecked"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::ed_seed; use: sign; line: `kp.sign(msg).as_ref().len()`; code: `sign`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "aws_lc_rs::ed25519::Ed25519KeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::ED; line: `alg: &signature::ED25519,`; code: `signature::ED25519`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "aws_lc_rs::signature::ED25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; line: `.verify(msg, sig)`; code: `verify`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a17::main; a17::ED -> aws_lc_rs::signature::ED25519; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `ED`",
+            "line": 85,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a17::ED"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::Key::new`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "aws_lc_rs::hmac::Key::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::mac_kdf; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "aws_lc_rs::hmac::HMAC_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: tag; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; line: `let t = hmac::sign(&k, b\"data\");`; code: `hmac::sign`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "aws_lc_rs::hmac::sign"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ML-KEM-1024",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ML-KEM",
+          "cryptoFunctions": [
+            "decapsulate",
+            "encapsulate",
+            "keygen"
+          ],
+          "parameterSetIdentifier": "1024",
+          "primitive": "kem"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: keygen; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::DecapsulationKey::generate`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::kem::DecapsulationKey::<Id>::generate"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::kem1024; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::ML_KEM_1024`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "aws_lc_rs::kem::ML_KEM_1024"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: encapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `let (ct, _ss) = ek.encapsulate().unwrap();`; code: `encapsulate`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "aws_lc_rs::kem::EncapsulationKey::<Id>::encapsulate"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: decapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `dk.decapsulate(ct).is_ok()`; code: `decapsulate`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "aws_lc_rs::kem::DecapsulationKey::<Id>::decapsulate"
+          }
+        ]
+      },
+      "name": "ML-KEM-1024",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:PBKDF2-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "PBKDF2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: keyderive; algorithm from aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 36); password: parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "aws_lc_rs::pbkdf2::derive"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::mac_kdf; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "PBKDF2-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-salt"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a17::P256; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a17::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
+            "line": 85,
+            "location": "src/main.rs",
+            "offset": 42,
+            "symbol": "a17::P256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512/256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: digest; algorithm from aws_lc_rs::digest::sha::SHA512_256 in the arguments; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "aws_lc_rs::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a17::mac_kdf; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::SHA512_256`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "aws_lc_rs::digest::sha::SHA512_256"
+          }
+        ]
+      },
+      "name": "SHA-512/256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of HMAC-SHA-512 (aws_lc_rs::hmac::HMAC_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "aws_lc_rs::hmac::HMAC_SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-rs@1.18.1"
+      ],
+      "ref": "pkg:cargo/a17@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-sys@0.45.0"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128",
+        "crypto:algorithm:AES-128-GCM",
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-512",
+        "crypto:algorithm:ML-KEM-1024",
+        "crypto:algorithm:PBKDF2-SHA-256",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:SHA-512/256"
+      ],
+      "ref": "pkg:cargo/aws-lc-rs@1.18.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/aws-lc-sys@0.45.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-512"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:PBKDF2-SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a17@0.1.0",
+      "name": "a17",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a17@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "14"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "216"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:4c28fd68-f7d2-8282-a6c1-bc3ec17f66f5",
+  "specVersion": "1.7",
+  "version": 1
+}

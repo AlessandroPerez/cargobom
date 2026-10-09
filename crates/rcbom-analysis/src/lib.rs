@@ -4,6 +4,7 @@
 //! assemble a CycloneDX 1.7 CBOM together with Layer 1.
 
 mod cbom;
+mod links;
 mod matcher;
 mod provenance;
 
@@ -16,6 +17,7 @@ use rcbom_kb::{Algo, Kb, Role};
 use rcbom_manifest::Manifest;
 
 pub use cbom::{RunInfo, to_cyclonedx};
+pub use matcher::static_names;
 use matcher::{
     Match, match_constructor, match_fn, match_fn_with, match_protocol, match_static, match_types,
 };
@@ -218,7 +220,12 @@ struct Ctx<'a> {
     /// What the calls a constructor's value is passed to matched, by the constructor's call
     /// site: `Params::new(15, 8, 1, 32)` set up for `scrypt(.., &p, out)` with a 64-byte `out`
     /// is scrypt-32768-8-1-64, as the call is.
-    consumers: HashMap<CallKey<'a>, Vec<Match>>,
+    consumers: std::cell::RefCell<HashMap<CallKey<'a>, Vec<Match>>>,
+    /// Filled while sites are matched: each constructor call linked to the call its value is
+    /// passed to, with what that call matched (first pass), to become `consumers` (second).
+    links: std::cell::RefCell<HashMap<CallKey<'a>, Vec<Match>>>,
+    /// Values across functions (`links`): fields, results, parameters, mutable statics.
+    flow: links::LinkIndex,
 }
 
 type CallKey<'a> = (&'a str, &'a str, usize, usize);
@@ -232,7 +239,16 @@ fn call_key(s: &Site) -> CallKey<'_> {
     )
 }
 
-impl Ctx<'_> {
+impl<'a> Ctx<'a> {
+    /// Records that the value constructor call `at` makes is passed to a call that matched `m`.
+    fn link(&self, at: &'a Site, m: &Match) {
+        self.links
+            .borrow_mut()
+            .entry(call_key(at))
+            .or_default()
+            .push(m.clone());
+    }
+
     fn package_of_crate(&self, name: &str, stable_id: &str) -> Option<(String, String)> {
         self.crates
             .get(&(name.to_string(), stable_id.to_string()))
@@ -249,7 +265,7 @@ impl Ctx<'_> {
 }
 
 pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
-    let mut ctx = Ctx {
+    let ctx = Ctx {
         kb,
         crates: facts
             .iter()
@@ -272,17 +288,17 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .filter(|s| matches!(s.target, Target::Call { .. }))
             .map(|s| (call_key(s), s))
             .collect(),
-        consumers: HashMap::new(),
+        consumers: Default::default(),
+        links: Default::default(),
+        flow: {
+            let t = std::time::Instant::now();
+            let ix = links::LinkIndex::new(facts);
+            if std::env::var_os("RCBOM_DEBUG").is_some() {
+                eprintln!("analysis: link index in {:.1?}", t.elapsed());
+            }
+            ix
+        },
     };
-    let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
-    keys.sort();
-    let mut consumers: HashMap<CallKey<'_>, Vec<Match>> = HashMap::new();
-    for k in keys {
-        if let Some((m, Some(c))) = fn_site_match(&ctx, ctx.calls[&k]) {
-            consumers.entry(call_key(c)).or_default().push(m);
-        }
-    }
-    ctx.consumers = consumers;
     let mut notes = Vec::new();
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
 
@@ -374,50 +390,30 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             reachable_statics.extend(closure(&d.id).into_iter().map(|d| d.id));
         }
     }
+    let reached_data = |id: &str| reachable_statics.contains(id);
     if truncated {
         notes.push(
             "reachability walk hit its instance limit; the reachable tier is incomplete".into(),
         );
     }
 
-    // The methods called on knowledge-base packages, and whether from reachable code: a
-    // descriptor that permits one operation stands for it only where a call performs it (rcgen
-    // keeps ring's verification `ED25519` as a tag of its signing algorithm, and never verifies)
-    let mut called: HashMap<((String, String), &str), Tier> = HashMap::new();
-    for f in facts {
-        let cwd = PathBuf::from(&f.krate.cwd);
-        for s in &f.sites {
-            // calls inside an algorithm or trait crate are its implementation (section 24.3)
-            let file = PathBuf::from(&s.span.file);
-            let implementation = man
-                .owner_of(&if file.is_absolute() {
-                    file
-                } else {
-                    cwd.join(file)
-                })
-                .is_some_and(|o| matches!(o.role, Some(Role::Algorithm | Role::Trait)));
-            if let Target::Call { callee, method, .. } = &s.target
-                && !implementation
-                && kb.crate_by_name(&callee.krate.name).is_some()
-                && let Some(p) = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
-            {
-                let t = if reached_fns.contains(s.owner.id.as_str()) {
-                    Tier::Reachable
-                } else {
-                    s.tier
-                };
-                let e = called.entry((p, method.as_str())).or_insert(t);
-                *e = (*e).max(t);
-            }
+    // A first pass over the calls links each constructor to the calls its value is passed to
+    // (`Params::new` to the `scrypt` it configures); the second names the constructor's own
+    // occurrence after them.
+    {
+        let t = std::time::Instant::now();
+        let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
+        keys.sort();
+        for k in keys {
+            let _ = site_matches(&ctx, ctx.calls[&k], &closure, &reached_data);
+        }
+        let links = ctx.links.take();
+        *ctx.consumers.borrow_mut() = links;
+        if std::env::var_os("RCBOM_DEBUG").is_some() {
+            eprintln!("analysis: first pass in {:.1?}", t.elapsed());
         }
     }
-    let performed = |m: &Match, f: &str, tier: Tier| {
-        called.iter().any(|((p, method), t)| {
-            *t >= tier
-                && m.providers.contains(p)
-                && kb.use_of(method, &m.algo.primitive).as_deref() == Some(f)
-        })
-    };
+    let main_pass = std::time::Instant::now();
 
     // --- sites -> occurrences ---------------------------------------------------------------
     let mut assets: BTreeMap<String, Asset> = BTreeMap::new();
@@ -557,23 +553,48 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     note: None,
                 });
             }
-            // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age)
-            if let Target::Call { callee, .. } = &site.target
-                && kb.crate_by_name(&callee.krate.name).is_some()
-                && let Some(cp) = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
+            // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age); so
+            // does a call on a value of one of its types through an interface crate's trait
+            // (`Aes128::new(key)` is `crypto_common::KeyInit::new`), and a call an algorithm
+            // crate's type instantiates, whose code runs it (`generate_nonce(&mut OsRng)` draws
+            // from rand_core's `OsRng`)
+            if let Target::Call {
+                callee,
+                self_ty,
+                args,
+                ..
+            } = &site.target
             {
-                let u = usage.entry(cp).or_insert(Usage::Present);
-                if tier == Tier::Reachable {
-                    *u = Usage::Reachable;
+                let self_krate = match self_ty {
+                    Some(rcbom_facts::TyTree::Adt { krate, .. }) => Some(krate),
+                    _ => None,
+                };
+                let mut in_args = Vec::new();
+                for a in args {
+                    adt_crates(a, &mut in_args);
+                }
+                let in_args = in_args.into_iter().filter(|k| {
+                    kb.crate_by_name(&k.name)
+                        .is_some_and(|c| c.role == Role::Algorithm)
+                });
+                for k in std::iter::once(&callee.krate)
+                    .chain(self_krate)
+                    .chain(in_args)
+                {
+                    if kb.crate_by_name(&k.name).is_some()
+                        && let Some(cp) = ctx.package_of_crate(&k.name, &k.stable_id)
+                    {
+                        let u = usage.entry(cp).or_insert(Usage::Present);
+                        if tier == Tier::Reachable {
+                            *u = Usage::Reachable;
+                        }
+                    }
                 }
             }
-            let matches = site_matches(&ctx, site, &closure);
-            let prov = provenance::of_call(kb, &site.target);
-            for (m, kind, function, symbol, detail) in matches {
-                let function = match (kind, function) {
-                    (Kind::Static | Kind::ViaStatic, Some(f)) if !performed(&m, &f, tier) => None,
-                    (_, f) => f,
-                };
+            let matches = site_matches(&ctx, site, &closure, &reached_data);
+            let prov = provenance::of_call(kb, &ctx.flow, &site.target);
+            for (m, kind, function, symbol, detail, unreached) in matches {
+                let tier = if unreached { Tier::Present } else { tier };
                 for prov in &m.providers {
                     let u = usage.entry(prov.clone()).or_insert(Usage::Present);
                     if tier == Tier::Reachable {
@@ -804,20 +825,17 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
         }
     }
-    // An interface crate passes its usage on only when the program calls into it: aes-gcm
-    // using `aead` does not run `aead`'s `getrandom` (through crypto-common and rand_core),
-    // while `OsRng` called directly does.
-    let direct: BTreeSet<(String, String)> = usage.keys().cloned().collect();
+    // An interface crate passes no usage on: its traits are implemented by the algorithm
+    // crates, so aes-gcm using `aead`, or the program calling `KeyInit::new_from_slice`, does not
+    // run `aead`'s `getrandom` (through crypto-common and rand_core); `OsRng` called directly
+    // does (rand_core is an algorithm crate).
     loop {
         let mut changed = false;
         for p in &man.packages {
-            if p.role == Some(Role::Protocol) {
+            if matches!(p.role, Some(Role::Protocol | Role::Trait)) {
                 continue;
             }
             let key = (p.name.clone(), p.version.to_string());
-            if p.role == Some(Role::Trait) && !direct.contains(&key) {
-                continue;
-            }
             let Some(&u) = usage.get(&key) else {
                 continue;
             };
@@ -846,6 +864,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 .or_insert(Usage::DeclaredNotUsed);
         }
     }
+    if std::env::var_os("RCBOM_DEBUG").is_some() {
+        eprintln!("analysis: sites in {:.1?}", main_pass.elapsed());
+    }
     Analysis {
         assets,
         protocols,
@@ -857,16 +878,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     }
 }
 
-type SiteMatch = (Match, Kind, Option<String>, String, Vec<String>);
+/// (match, kind, use, symbol, details, reached only from data no entry point reaches)
+type SiteMatch = (Match, Kind, Option<String>, String, Vec<String>, bool);
 
-/// The use a descriptor named in code stands for, when it permits only one
-/// (`ECDSA_P256_SHA384_ASN1` verifies; `AES_256_GCM` encrypts and decrypts, which one the
-/// calls say), and a call into its package performs that operation (see `performed`).
-fn sole_function(m: &Match) -> Option<String> {
-    match m.algo.functions.as_slice() {
-        [f] => Some(f.clone()),
-        _ => None,
-    }
+/// The detail of a call whose parameters are not its receiver's (`verify_password`): it is
+/// not merged into the receiver's constructor on the same line.
+const OWN_PARAMS: &str = ": its own parameters, not its receiver's";
+
+/// `None` (`Option::None` passed for an optional argument).
+fn is_none_origin(o: &rcbom_facts::Origin) -> bool {
+    matches!(o, rcbom_facts::Origin::Unit { path, .. } if path.ends_with("Option::None"))
 }
 
 /// What the call an argument of `site` comes from matched, when it is a [[fn]] entry of
@@ -880,6 +901,7 @@ fn argument_constructor<'a>(
     family: &str,
     own: Option<&str>,
     overrides: &BTreeMap<String, String>,
+    skip_receiver: bool,
 ) -> Option<(Match, &'a Site)> {
     let Target::Call {
         arg_origins,
@@ -911,7 +933,7 @@ fn argument_constructor<'a>(
         .chain(site_args.iter())
         .for_each(|t| collect(t, &mut adts));
     let mut found: Vec<(Match, &Site)> = Vec::new();
-    for o in arg_origins {
+    for o in arg_origins.iter().skip(usize::from(skip_receiver)) {
         // the constructor itself, or through plumbing (`Params::new(..).ok()?`, `.unwrap()`)
         let mut o = o;
         for _ in 0..8 {
@@ -1018,7 +1040,7 @@ fn fn_site_match<'a>(ctx: &Ctx<'a>, site: &Site) -> Option<(Match, Option<&'a Si
     )?;
     let own = Some(callee.krate.name.as_str());
     Some(
-        match argument_constructor(ctx, site, &m.algo.family, own, &m.params) {
+        match argument_constructor(ctx, site, &m.algo.family, own, &m.values, false) {
             Some((c, at)) => (adopt(c, m), Some(at)),
             None => (m, None),
         },
@@ -1044,6 +1066,7 @@ fn site_matches(
     ctx: &Ctx<'_>,
     site: &Site,
     closure: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
+    reachable: &dyn Fn(&str) -> bool,
 ) -> Vec<SiteMatch> {
     let kb = ctx.kb;
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
@@ -1070,11 +1093,11 @@ fn site_matches(
                             short(&def.path),
                             short(&inner.path)
                         )];
-                        out.push((c, Kind::Component, None, symbol.clone(), d));
+                        out.push((c, Kind::Component, None, symbol.clone(), d, false));
                     }
                 }
-                let f = sole_function(&m);
-                out.insert(0, (m, Kind::Static, f, symbol, vec![]));
+                // a descriptor named is not used here: the calls it reaches say how
+                out.insert(0, (m, Kind::Static, None, symbol, vec![], false));
             } else {
                 // descriptors this item leads to; one reached only inside another descriptor
                 // (the SHA-256 in rcgen's PKCS_ECDSA_P256_SHA256 -> ECDSA_P256_SHA256_ASN1) is
@@ -1102,13 +1125,12 @@ fn site_matches(
                                 short(&o.path),
                                 short(&inner.path)
                             )];
-                            out.push((m, Kind::Component, None, symbol.clone(), d));
+                            out.push((m, Kind::Component, None, symbol.clone(), d, false));
                         }
                         None => {
                             let detail =
                                 vec![format!("{} -> {}", short(&def.path), short(&inner.path))];
-                            let f = sole_function(&m);
-                            out.push((m, Kind::ViaStatic, f, symbol.clone(), detail));
+                            out.push((m, Kind::ViaStatic, None, symbol.clone(), detail, false));
                         }
                     }
                 }
@@ -1144,9 +1166,17 @@ fn site_matches(
             ..
         } => {
             let symbol = callee.path.clone();
-            let fn_match = fn_site_match(ctx, site).map(|(m, _)| {
+            let fn_match = fn_site_match(ctx, site).map(|(m, at)| {
+                if let Some(c) = at {
+                    ctx.link(c, &m);
+                }
                 // a constructor set up for calls that all compute one asset is part of it
-                match ctx.consumers.get(&call_key(site)).map(Vec::as_slice) {
+                match ctx
+                    .consumers
+                    .borrow()
+                    .get(&call_key(site))
+                    .map(Vec::as_slice)
+                {
                     Some([u, rest @ ..]) if rest.iter().all(|r| r.key() == u.key()) => {
                         adopt(u.clone(), m)
                     }
@@ -1176,7 +1206,7 @@ fn site_matches(
                 } else {
                     vec![]
                 };
-                out.push((m, Kind::Call, f, symbol.clone(), d));
+                out.push((m, Kind::Call, f, symbol.clone(), d, false));
             }
             // a call into a crypto crate, or a std constructor or conversion of a crypto type
             // (`StaticSecret::from(bytes)`, `SigningKey::try_from(b)`, `<Argon2 as Default>`)
@@ -1205,24 +1235,68 @@ fn site_matches(
                 let providers = std::mem::take(&mut m.provider_crates);
                 // the receiver's constructor may say more than its type: `Argon2::default()`
                 // is Argon2id-19456-2-1, `Hasher::new_keyed(k)` a keyed BLAKE3
+                // ..unless the method takes its parameters from elsewhere: `verify_password`
+                // from the stored hash, `hash_password_customized` from its arguments (a
+                // `Params` built there, with the receiver's variant when the call passes `None`)
+                let own_params = m.algo.own_params.iter().any(|x| x == method);
+                let family = m.algo.family.clone();
+                let from_receiver = |r| match_constructor(kb, &family, r);
+                let overrides = match receiver {
+                    Some(r)
+                        if own_params
+                            && matches!(&site.target, Target::Call { arg_origins, .. }
+                                if arg_origins.get(2).is_some_and(is_none_origin)) =>
+                    {
+                        from_receiver(r).map(|(c, _)| c.values).unwrap_or_default()
+                    }
+                    _ => BTreeMap::new(),
+                };
+                let own_crate = providers.first().map(|k| k.name.clone());
                 if outer.is_none()
+                    && !own_params
                     && let Some(r) = receiver
-                    && let Some(c) = match_constructor(kb, &m.algo.family, r)
+                    && let Some((c, at)) = from_receiver(r)
                 {
                     let comps = std::mem::take(&mut m.components);
                     m = c;
                     m.components = comps;
+                    if let Some(at) = at
+                        && let Some(c) = ctx.calls.get(&(
+                            site.owner.id.as_str(),
+                            at.file.as_str(),
+                            at.line,
+                            at.col,
+                        ))
+                    {
+                        ctx.link(c, &m);
+                    }
                 } else if outer.is_none()
-                    && let Some(c) =
-                        argument_constructor(ctx, site, &m.algo.family, None, &BTreeMap::new())
-                            .map(|(c, _)| c)
+                    && let Some((c, at)) = argument_constructor(
+                        ctx,
+                        site,
+                        &m.algo.family,
+                        own_crate.as_deref().filter(|_| own_params),
+                        &overrides,
+                        own_params,
+                    )
                 {
+                    ctx.link(at, &c);
                     // or a value built in an argument: `encrypt(&mut rng,
                     // Oaep::new_with_label::<Sha256, _>(label), msg)` is RSA-OAEP-SHA-256, the
                     // `Oaep` type alone RSA-OAEP
                     let comps = std::mem::take(&mut m.components);
                     m = c;
                     m.components = comps;
+                }
+                // the receiver of such a method is set up for what the method computes
+                if outer.is_none()
+                    && own_params
+                    && let Some((_, Some(at))) = receiver.and_then(from_receiver)
+                    && let Some(c) =
+                        ctx.calls
+                            .get(&(site.owner.id.as_str(), at.file.as_str(), at.line, at.col))
+                {
+                    ctx.link(c, &m);
                 }
                 for k in providers {
                     m.providers
@@ -1233,33 +1307,60 @@ fn site_matches(
                 match outer {
                     None if into_kb => {
                         let f = kb.use_of(method, &m.algo.primitive);
-                        let setup = if f.is_none() {
+                        let mut setup = if f.is_none() {
                             vec![format!("{method}: setup, not a use")]
                         } else {
                             vec![]
                         };
-                        out.push((m, Kind::Call, f, symbol.clone(), setup));
+                        if own_params {
+                            setup.push(format!("{method}{OWN_PARAMS}"));
+                        }
+                        out.push((m, Kind::Call, f, symbol.clone(), setup, false));
                     }
                     None => {
                         let d = vec![format!(
                             "chosen as generic argument of {}",
                             short(&callee.path)
                         )];
-                        out.push((m, Kind::Instantiation, None, symbol.clone(), d));
+                        out.push((m, Kind::Instantiation, None, symbol.clone(), d, false));
                     }
                     Some(parent) => {
                         let d = vec![format!("part of {parent}")];
-                        out.push((m, Kind::Component, None, symbol.clone(), d));
+                        out.push((m, Kind::Component, None, symbol.clone(), d, false));
                     }
                 }
             }
             // ring / aws-lc-rs: keys are untyped, the algorithm is a static passed when the key
             // was built. `k.seal_in_place_append_tag(..)` gets AES-256-GCM from the
             // `UnboundKey::new(&AES_256_GCM, ..)` in the origin of `k`.
-            if out.is_empty() && into_kb {
-                let has_roles = !provenance::of_call(kb, &site.target).is_empty();
-                // the call's own arguments; if what they name is not used here, its receiver's
-                for (mut descriptors, others) in provenance::data_in_args(kb, &site.target) {
+            let has_roles = || !provenance::of_call(kb, &ctx.flow, &site.target).is_empty();
+            // a call that can give an occurrence: the method is a use, or it has key-material
+            // roles (most calls into a protocol crate's own code are neither)
+            let can_occur = || {
+                kb.uses
+                    .iter()
+                    .any(|u| u.methods.iter().any(|m| m == method))
+            };
+            if out.is_empty() && into_kb && (can_occur() || has_roles()) {
+                let has_roles = has_roles();
+                // the call's own arguments; if what they name is not used here, its receiver's;
+                // if nothing in this function names the algorithm, what reaches the key or
+                // algorithm from other functions (a field, a parameter, a function's result),
+                // looked up only then
+                let local = provenance::data_in_args(kb, None, &site.target);
+                let linked = std::iter::once_with(|| {
+                    provenance::data_in_args(
+                        kb,
+                        Some((&ctx.flow, site.owner.path.as_str())),
+                        &site.target,
+                    )
+                })
+                .flatten();
+                let places = local
+                    .into_iter()
+                    .map(|p| (p, false))
+                    .chain(linked.map(|p| (p, true)));
+                for ((mut descriptors, others), from_elsewhere) in places {
                     // the user's own data naming exactly one descriptor (`digest(TABLE.alg, ..)`
                     // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`)
                     // is chosen at run time
@@ -1274,6 +1375,7 @@ fn site_matches(
                             descriptors.push(one.clone());
                         }
                     }
+                    let n = descriptors.len();
                     for def in descriptors {
                         if let Some(mut m) =
                             matcher::match_static_called(kb, &def, Some(method), &supported)
@@ -1285,11 +1387,25 @@ fn site_matches(
                             m.providers.extend(
                                 ctx.package_of_crate(&def.krate.name, &def.krate.stable_id),
                             );
-                            let d = vec![format!(
-                                "algorithm from {} in the arguments",
-                                short(&def.path)
-                            )];
-                            out.push((m, Kind::Call, f, symbol.clone(), d));
+                            // several algorithms reach it (rustls's record keys, one per cipher
+                            // suite): which one is chosen at run time
+                            let d = vec![match (from_elsewhere, n) {
+                                (false, _) => {
+                                    format!("algorithm from {} in the arguments", short(&def.path))
+                                }
+                                (true, 1) => format!(
+                                    "algorithm from {}, reaching the call from another function",
+                                    short(&def.path)
+                                ),
+                                (true, n) => format!(
+                                    "algorithm one of {n} that may reach the call from other functions: {}",
+                                    short(&def.path)
+                                ),
+                            }];
+                            // a value stored only by code or data no entry point reaches
+                            // (ALL_KX_GROUPS's MLKEM1024) does not reach this call at run time
+                            let unreached = from_elsewhere && !reachable(&def.id);
+                            out.push((m, Kind::Call, f, symbol.clone(), d, unreached));
                         }
                     }
                     if !out.is_empty() {
@@ -1339,6 +1455,9 @@ fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
             {
                 let s = assets.get_mut(specific).unwrap();
                 for g in from_general {
+                    if g.detail.iter().any(|d| d.ends_with(OWN_PARAMS)) {
+                        continue;
+                    }
                     if let Some(o) = s
                         .occurrences
                         .iter_mut()
@@ -1375,5 +1494,19 @@ fn short(name: &str) -> String {
     match name.find("::<") {
         Some(i) if name.len() > 60 => format!("{}::<..>", &name[..i]),
         _ => name.to_string(),
+    }
+}
+
+/// The crates of the ADTs a type tree names (`OsRng` in `generate_nonce::<OsRng>`).
+fn adt_crates<'a>(t: &'a rcbom_facts::TyTree, out: &mut Vec<&'a rcbom_facts::CrateRef>) {
+    use rcbom_facts::TyTree;
+    match t {
+        TyTree::Adt { krate, args, .. } => {
+            out.push(krate);
+            args.iter().for_each(|a| adt_crates(a, out));
+        }
+        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => adt_crates(t, out),
+        TyTree::Tuple(ts) => ts.iter().for_each(|a| adt_crates(a, out)),
+        _ => {}
     }
 }

@@ -88,19 +88,6 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t4@0.1.0",
-      "name": "t4",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t4@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:SHA-1",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -122,7 +109,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::init; use: digest; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b\"init\");`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t4::init; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b\"init\");`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 20,
@@ -174,14 +161,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t4::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t4::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `digest`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4::{closure#0}; use: digest; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t4::w4::{closure#0}; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `SHA256`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 44,
@@ -195,7 +182,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::Fp as core::fmt::Display>::fmt; use: digest; line: `write!(f, \"{:?}\", digest(&SHA256, b\"fp\"))`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <t4::Fp as core::fmt::Display>::fmt; line: `write!(f, \"{:?}\", digest(&SHA256, b\"fp\"))`; code: `SHA256`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 34,
@@ -254,7 +241,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::X as t4::Base>::h; use: digest; line: `digest(&SHA384, b\"x\").as_ref().len()`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <t4::X as t4::Base>::h; line: `digest(&SHA384, b\"x\").as_ref().len()`; code: `SHA384`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 16,
@@ -313,7 +300,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::Inner as core::ops::drop::Drop>::drop; use: digest; line: `let _ = digest(&SHA512, b\"drop\");`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <t4::Inner as core::ops::drop::Drop>::drop; line: `let _ = digest(&SHA512, b\"drop\");`; code: `SHA512`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 24,
@@ -374,14 +361,14 @@
             "symbol": "ring::agreement::EphemeralPrivateKey::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4; use: keyderive; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in t4::w4; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::ec::curve25519::x25519::X25519"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4; use: keyderive; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in t4::w4; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 39,
@@ -453,8 +440,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t4@0.1.0#root",
+      "bom-ref": "pkg:cargo/t4@0.1.0",
       "name": "t4",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t4@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -489,7 +483,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "58"
+        "value": "54"
       }
     ],
     "tools": {
@@ -502,7 +496,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1be8520a-28a1-8c56-86cc-2a8799e3cf59",
+  "serialNumber": "urn:uuid:04a5d03e-4d20-8aa3-a6a2-fa1c233cc87e",
   "specVersion": "1.7",
   "version": 1
 }

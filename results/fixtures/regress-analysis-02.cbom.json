@@ -88,26 +88,12 @@
       "version": "0.17.14"
     },
     {
-      "bom-ref": "pkg:cargo/t2@0.1.0",
-      "name": "t2",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/t2@0.1.0",
-      "type": "application",
-      "version": "0.1.0"
-    },
-    {
       "bom-ref": "crypto:algorithm:AES-256-GCM",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "AES",
           "cryptoFunctions": [
-            "encrypt",
-            "decrypt"
+            "encrypt"
           ],
           "mode": "gcm",
           "parameterSetIdentifier": "256",
@@ -123,6 +109,20 @@
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `LessSafeKey::new(UnboundKey::from(okm))`; code: `UnboundKey::from`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "core::convert::From::from"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t2::seal_digest; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 14); line: `key.seal_in_place_append_tag(nonce, Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
             "additionalContext": "[present] [call] in t2::ring_pbkdf2_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (ring::pbkdf2::derive); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
@@ -170,7 +170,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -181,8 +181,16 @@
           "value": "derived"
         },
         {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -204,7 +212,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 13,
@@ -249,6 +257,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "3"
         }
@@ -277,7 +289,7 @@
             "symbol": "ring::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [static] in t2::hkdf_to_aead; use: keyderive; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in t2::hkdf_to_aead; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 30,
@@ -305,7 +317,7 @@
             "symbol": "ring::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[present] [static] in t2::ring_hkdf_key; use: keyderive; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 20,
@@ -326,7 +338,7 @@
             "symbol": "ring::hkdf::Prk::expand"
           },
           {
-            "additionalContext": "[present] [static] in t2::ring_hkdf_key; use: keyderive; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[present] [static] in t2::ring_hkdf_key; line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::HKDF_SHA256`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 76,
@@ -488,7 +500,7 @@
             "symbol": "ring::pbkdf2::derive"
           },
           {
-            "additionalContext": "[reachable] [static] in t2::ring_pbkdf2; use: keyderive; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in t2::ring_pbkdf2; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 19,
@@ -502,7 +514,7 @@
             "symbol": "ring::pbkdf2::derive"
           },
           {
-            "additionalContext": "[present] [static] in t2::ring_pbkdf2_key; use: keyderive; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[present] [static] in t2::ring_pbkdf2_key; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), salt, pw, &mut key);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 19,
@@ -566,7 +578,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t2::rsa3072; use: verify; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`",
+            "additionalContext": "[reachable] [static] in t2::rsa3072; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 39,
@@ -639,7 +651,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t2::seal_digest; use: digest; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t2::seal_digest; line: `let mut buf = digest(&SHA256, msg).as_ref().to_vec();`; code: `SHA256`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 26,
@@ -782,7 +794,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t2::sha512_256; use: digest; line: `digest(&SHA512_256, d).as_ref().len()`; code: `SHA512_256`",
+            "additionalContext": "[reachable] [static] in t2::sha512_256; line: `digest(&SHA512_256, d).as_ref().len()`; code: `SHA512_256`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 12,
@@ -877,8 +889,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/t2@0.1.0#root",
+      "bom-ref": "pkg:cargo/t2@0.1.0",
       "name": "t2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t2@0.1.0",
       "type": "application",
       "version": "0.1.0"
     },
@@ -913,7 +932,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "118"
+        "value": "90"
       }
     ],
     "tools": {
@@ -926,7 +945,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:81179092-40d9-84b4-8b7d-c29625934354",
+  "serialNumber": "urn:uuid:e75bf18e-18bd-8a61-800e-ec86c89f375f",
   "specVersion": "1.7",
   "version": 1
 }

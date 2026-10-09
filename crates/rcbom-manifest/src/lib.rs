@@ -6,11 +6,12 @@
 //! dependency, or the `Cargo.lock` entry of a transitive one, with the dependency chain from a
 //! workspace member. Code locations are Layer 2's job.
 
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use cargo_metadata::{Dependency, DependencyKind, Metadata, MetadataCommand, Package, PackageId};
+pub use cargo_metadata::PackageId;
+use cargo_metadata::{Dependency, DependencyKind, Metadata, MetadataCommand, Package};
 use rcbom_kb::{Kb, Role};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -39,6 +40,8 @@ pub struct Pkg {
     pub version: semver::Version,
     pub manifest_dir: PathBuf,
     pub member: bool,
+    /// It has a binary target: an application, not only a library.
+    pub binary: bool,
     /// The program's own code: a workspace member or a path dependency (no registry or git
     /// source).
     pub local: bool,
@@ -188,7 +191,72 @@ fn load_with(
     }
     cmd.other_options(opts);
     let md = cmd.exec().context("cargo metadata")?;
-    build(&md, kb, target, &target_cfg(target)?)
+    let built = build_features(manifest_path, target, features, locked);
+    build(&md, kb, target, &target_cfg(target)?, built.as_ref())
+}
+
+/// The features each package is built with, by (name, version), as `cargo check` of the
+/// workspace resolves them: `cargo metadata` unifies them with the dev-dependencies' (a
+/// `ring` feature a test enables), which the build does not. None if `cargo tree` fails.
+fn build_features(
+    manifest_path: &Path,
+    target: &str,
+    features: &[String],
+    locked: bool,
+) -> Option<HashMap<(String, String), BTreeSet<String>>> {
+    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    let mut cmd = std::process::Command::new(cargo);
+    cmd.args([
+        "tree",
+        "--workspace",
+        "-e",
+        "normal,build",
+        "--prefix",
+        "none",
+        "--format",
+        "{p}|{f}",
+        "--target",
+        target,
+        "--manifest-path",
+    ])
+    .arg(manifest_path);
+    if locked {
+        cmd.arg("--locked");
+    }
+    if !features.is_empty() {
+        cmd.arg("--features").arg(features.join(","));
+    }
+    let out = cmd.stderr(std::process::Stdio::null()).output().ok()?;
+    if !out.status.success() {
+        return None;
+    }
+    let mut map: HashMap<(String, String), BTreeSet<String>> = HashMap::new();
+    for line in String::from_utf8_lossy(&out.stdout).lines() {
+        // `rustls v0.23.36 (..)|aws_lc_rs,std` (a package seen before ends in `(*)`)
+        let Some((pkg, feats)) = line.split_once('|') else {
+            continue;
+        };
+        let mut it = pkg.split_whitespace();
+        let (Some(name), Some(v)) = (it.next(), it.next()) else {
+            continue;
+        };
+        let Some(version) = v.strip_prefix('v') else {
+            continue;
+        };
+        let e = map
+            .entry((name.to_string(), version.to_string()))
+            .or_default();
+        e.extend(
+            feats
+                .trim()
+                .trim_end_matches("(*)")
+                .split(',')
+                .map(str::trim)
+                .filter(|f| !f.is_empty())
+                .map(str::to_string),
+        );
+    }
+    Some(map)
 }
 
 /// The `cfg` values of the target, for platform-specific dependency tables.
@@ -208,6 +276,7 @@ fn build(
     kb: &Kb,
     target: &str,
     cfg: &[cargo_metadata::cargo_platform::Cfg],
+    built: Option<&HashMap<(String, String), BTreeSet<String>>>,
 ) -> Result<Manifest> {
     let resolve = md
         .resolve
@@ -216,6 +285,15 @@ fn build(
     let nodes: HashMap<&PackageId, &cargo_metadata::Node> =
         resolve.nodes.iter().map(|n| (&n.id, n)).collect();
     let pkgs: HashMap<&PackageId, &Package> = md.packages.iter().map(|p| (&p.id, p)).collect();
+    // the features a package is built with: as the build resolves them, when known
+    let features_of = |id: &PackageId| -> Vec<String> {
+        let p = pkgs[id];
+        match built.and_then(|b| b.get(&(p.name.to_string(), p.version.to_string()))) {
+            Some(f) => f.iter().cloned().collect(),
+            None if built.is_some() => Vec::new(),
+            None => nodes[id].features.iter().map(|f| f.to_string()).collect(),
+        }
+    };
 
     // The declarations of `parent` that this resolve edge comes from: same package, a
     // matching version requirement, and a kind and target cargo applied on this platform.
@@ -247,7 +325,7 @@ fn build(
             .iter()
             .map(|x| x.rename.clone().unwrap_or_else(|| x.name.clone()))
             .collect();
-        node.features.iter().any(|f| {
+        features_of(&node.id).iter().any(|f| {
             keys.iter().any(|k| f.as_str() == k)
                 || parent.features.get(f.as_str()).is_some_and(|vals| {
                     vals.iter().any(|v| {
@@ -325,7 +403,7 @@ fn build(
             cur = par;
         }
         chain.reverse();
-        let features: Vec<String> = node.features.iter().map(|f| f.to_string()).collect();
+        let features: Vec<String> = features_of(id);
         // the table describes the supported versions' features only
         let mut backends: Vec<String> = exact
             .map(|e| {
@@ -431,6 +509,10 @@ fn build(
                 .as_std_path()
                 .to_path_buf(),
             member,
+            binary: p
+                .targets
+                .iter()
+                .any(|t| t.kind.iter().any(|k| k.to_string() == "bin")),
             local: !foreign,
             scope: *s,
             features,

@@ -10,6 +10,9 @@ pub struct Match {
     pub name: String,
     pub algo: Algo,
     pub params: BTreeMap<String, String>,
+    /// Every parameter value resolved, those the name shows included: what a constructor hands
+    /// on to the calls its value is passed to (the variant of `Argon2::new(..)` to `Params`).
+    pub values: BTreeMap<String, String>,
     /// Keys of the assets found inside this one's generic arguments.
     pub components: BTreeSet<String>,
     pub providers: BTreeSet<(String, String)>,
@@ -30,7 +33,8 @@ fn last(path: &str) -> &str {
 /// - `[..]` is an optional part, written only when all its placeholders are resolved and one of
 ///   them differs from its default (`AES-{key}-GCM[-{tag_bits}-{nonce_bits}]` is `AES-256-GCM`
 ///   with the standard 16-byte tag and 12-byte nonce, `AES-256-GCM-128-128` with a 16-byte
-///   nonce).
+///   nonce). A default can be another parameter (`RSA-OAEP-{hash}[-MGF1-{mgf_hash}]` with
+///   `mgf_hash = "{hash}"` is `RSA-OAEP-SHA-256` when MGF1 hashes with SHA-256 too).
 pub(crate) fn fill(
     template: &str,
     vals: &BTreeMap<String, String>,
@@ -49,7 +53,7 @@ pub(crate) fn fill(
         let resolved = keys.iter().all(|k| vals.contains_key(k));
         let differs = keys
             .iter()
-            .any(|k| defaults.get(k).is_none_or(|d| vals.get(k) != Some(d)));
+            .any(|k| default_of(defaults, vals, k).is_none_or(|d| vals.get(k) != Some(d)));
         if resolved && differs {
             t.push_str(part);
         }
@@ -81,6 +85,20 @@ pub(crate) fn fill(
     }
     out.push_str(rest);
     out
+}
+
+/// A parameter's default value; a default can be another parameter's value (`mgf_hash =
+/// "{hash}"`: MGF1 with the OAEP hash).
+fn default_of<'a>(
+    defaults: &'a BTreeMap<String, String>,
+    vals: &'a BTreeMap<String, String>,
+    key: &str,
+) -> Option<&'a String> {
+    let d = defaults.get(key)?;
+    match d.strip_prefix('{').and_then(|x| x.strip_suffix('}')) {
+        Some(other) => vals.get(other),
+        None => Some(d),
+    }
 }
 
 fn placeholders(s: &str) -> Vec<String> {
@@ -172,6 +190,7 @@ pub fn match_static_called(
             return Some(Match {
                 name: algo.asset.clone(),
                 params: BTreeMap::new(),
+                values: BTreeMap::new(),
                 algo,
                 components: BTreeSet::new(),
                 providers: BTreeSet::new(),
@@ -180,6 +199,34 @@ pub fn match_static_called(
         }
     }
     None
+}
+
+/// Every name a descriptor static or const can be an asset of: its entry's, and those the
+/// methods called with it select (`asset_by_method`). Empty when no `[[static]]` entry matches.
+/// For `cargo cbom verify`, which checks that a descriptor cited as evidence is of its asset.
+pub fn static_names(kb: &Kb, krate: &str, path: &str) -> Vec<String> {
+    let def = DefRef {
+        krate: CrateRef {
+            name: krate.to_string(),
+            stable_id: String::new(),
+        },
+        path: path.to_string(),
+        id: String::new(),
+    };
+    let all = |_: &CrateRef| true;
+    let methods: BTreeSet<&str> = kb
+        .statics
+        .iter()
+        .filter(|e| e.krates.iter().any(|k| k == krate))
+        .flat_map(|e| e.asset_by_method.keys().map(String::as_str))
+        .collect();
+    let mut out: Vec<String> = std::iter::once(None)
+        .chain(methods.into_iter().map(Some))
+        .filter_map(|m| match_static_called(kb, &def, m, &all).map(|m| m.name))
+        .collect();
+    out.sort();
+    out.dedup();
+    out
 }
 
 /// A call matched by a `[[fn]]` entry: a free function or method of a KB crate
@@ -249,6 +296,15 @@ pub fn match_fn_with(
     ))
 }
 
+/// A parameter declared without a source: the call the value is passed to gives it.
+fn sourceless(p: &Param) -> bool {
+    p.arg.is_none()
+        && p.parent_arg.is_none()
+        && p.const_arg.is_none()
+        && p.arg_len.is_none()
+        && p.value.is_none()
+}
+
 /// The asset of a `[[fn]]` entry, with its parameters from the call and `overrides`.
 #[allow(clippy::too_many_arguments)]
 fn fn_entry_match(
@@ -280,22 +336,20 @@ fn fn_entry_match(
             params.insert(k.clone(), v);
         }
     }
-    for (k, v) in overrides.iter().filter(|(k, _)| *k != "unresolved") {
-        params.insert(k.clone(), v.clone());
+    // what the entry leaves to the call its value is passed to (declared without a source:
+    // the output length of `scrypt(.., &params, out)`, the Argon2 variant of the `Argon2` value
+    // `Params` are used with)
+    for (k, v) in overrides {
+        if e.params.get(k).is_some_and(sourceless) && !params.contains_key(k) {
+            params.insert(k.clone(), v.clone());
+        }
     }
     let algo = filled_algo(&e.algo, &params);
+    let values = params.clone();
     // placeholders of the name left without a value (`{missing}` in `unresolved`); a parameter
     // declared without a source is the call's to give (`dk_len` of `scrypt::Params::new`, which
     // `scrypt(.., &params, out)` derives as `out.len()`), not one this call failed to resolve
-    let from_call = |k: &String| {
-        e.params.get(k).is_some_and(|p| {
-            p.arg.is_none()
-                && p.parent_arg.is_none()
-                && p.const_arg.is_none()
-                && p.arg_len.is_none()
-                && p.value.is_none()
-        })
-    };
+    let from_call = |k: &String| e.params.get(k).is_some_and(sourceless);
     let missing: Vec<String> = placeholders(&e.algo.asset)
         .into_iter()
         .filter(|k| !params.contains_key(k) && !from_call(k))
@@ -317,18 +371,40 @@ fn fn_entry_match(
         name: algo.asset.clone(),
         algo,
         params,
+        values,
         components: BTreeSet::new(),
         providers: BTreeSet::new(),
         provider_crates: provider.into_iter().collect(),
     }
 }
 
-/// The constructor a receiver was built by, when a `[[fn]]` entry of the same family names
-/// it: `argon2.hash_password(..)` with `argon2` from `Argon2::default()` is Argon2id-19456-2-1,
-/// a `blake3::Hasher` from `Hasher::new_keyed(key)` a keyed hash. Follows the receiver chain
-/// (`&mut x`, `x.unwrap()`).
-pub fn match_constructor(kb: &Kb, family: &str, receiver: &Origin) -> Option<Match> {
-    let mut cur = receiver;
+/// The asset a constructor call in an origin tree makes, its parameters from its constant
+/// arguments.
+fn constructed_by(
+    kb: &Kb,
+    e: &rcbom_kb::PatternEntry,
+    args: &[Origin],
+    overrides: &BTreeMap<String, String>,
+) -> Match {
+    let consts: Vec<Option<i128>> = args
+        .iter()
+        .map(|a| match a {
+            Origin::Const { value, .. }
+            | Origin::Data { value, .. }
+            | Origin::Unit { value, .. } => *value,
+            _ => None,
+        })
+        .collect();
+    fn_entry_match(kb, e, &[], &consts, &[], None, &|_| true, overrides)
+}
+
+/// The `[[fn]]` entry of `family` an argument's origin is a call of, through standard-library
+/// plumbing (`Params::new(..).unwrap()`, `?`), with that call's arguments.
+fn argument_entry<'k, 'o>(
+    kb: &'k Kb,
+    family: &str,
+    mut o: &'o Origin,
+) -> Option<(&'k rcbom_kb::PatternEntry, &'o [Origin])> {
     for _ in 0..8 {
         let Origin::Call {
             callee,
@@ -336,6 +412,52 @@ pub fn match_constructor(kb: &Kb, family: &str, receiver: &Origin) -> Option<Mat
             self_ty,
             args,
             ..
+        } = o
+        else {
+            return None;
+        };
+        let path = strip_generics(callee);
+        let within = path.strip_prefix(&format!("{krate}::")).unwrap_or(&path);
+        // a constructor of a parameter value of that crate (`argon2::Params`), not data computed
+        // with the family (`blake3::derive_key(..)` as the key of `Hasher::new_keyed`)
+        let builds = self_ty
+            .as_deref()
+            .is_some_and(|t| t.starts_with(&format!("{krate}::")));
+        if builds
+            && let Some(e) = kb.fns.iter().find(|e| {
+                e.algo.family == family
+                    && e.self_type.is_none()
+                    && e.krates.contains(krate)
+                    && e.pattern.is_match(within)
+            })
+        {
+            return Some((e, args));
+        }
+        if !matches!(krate.as_str(), "core" | "std" | "alloc") {
+            return None;
+        }
+        o = args.first()?;
+    }
+    None
+}
+
+/// The constructor a receiver was built by, when a `[[fn]]` entry of the same family names
+/// it: `argon2.hash_password(..)` with `argon2` from `Argon2::default()` is Argon2id-19456-2-1,
+/// a `blake3::Hasher` from `Hasher::new_keyed(key)` a keyed hash. Follows the receiver chain
+/// (`&mut x`, `x.unwrap()`).
+pub fn match_constructor<'o>(
+    kb: &Kb,
+    family: &str,
+    receiver: &'o Origin,
+) -> Option<(Match, Option<&'o rcbom_facts::Loc>)> {
+    let mut cur = receiver;
+    for _ in 0..8 {
+        let Origin::Call {
+            callee,
+            krate,
+            self_ty,
+            args,
+            span,
         } = cur
         else {
             return None;
@@ -357,26 +479,17 @@ pub fn match_constructor(kb: &Kb, family: &str, receiver: &Origin) -> Option<Mat
                 }
         });
         if let Some(e) = entry {
-            let consts: Vec<Option<i128>> = args
-                .iter()
-                .map(|a| match a {
-                    Origin::Const { value, .. }
-                    | Origin::Data { value, .. }
-                    | Origin::Unit { value, .. } => *value,
-                    _ => None,
-                })
-                .collect();
             let none = BTreeMap::new();
-            return Some(fn_entry_match(
-                kb,
-                e,
-                &[],
-                &consts,
-                &[],
-                None,
-                &|_| true,
-                &none,
-            ));
+            let m = constructed_by(kb, e, args, &none);
+            // a value of the family built in its arguments says more (`Argon2::new(alg, ver,
+            // Params::new(m, t, p, None)?)`): that one, with what this constructor fixes
+            for a in args {
+                if let Some(inner) = argument_entry(kb, family, a) {
+                    let (f, inner_args) = inner;
+                    return Some((constructed_by(kb, f, inner_args, &m.values), span.as_ref()));
+                }
+            }
+            return Some((m, span.as_ref()));
         }
         // only plumbing hands its receiver on (`unwrap`, `as_ref`, a crypto crate's
         // conversion); what the program's own function returns is not its argument
@@ -550,6 +663,7 @@ fn type_match(
     Some(Match {
         name: algo.asset.clone(),
         algo,
+        values: params.clone(),
         params,
         components: BTreeSet::new(),
         providers: BTreeSet::new(),
@@ -858,6 +972,25 @@ mod tests {
         assert_eq!(fill(t, &v, &d), "AES-256-GCM");
         v.insert("nonce_bits".into(), "128".into());
         assert_eq!(fill(t, &v, &d), "AES-256-GCM-128-128");
+    }
+
+    #[test]
+    fn a_default_can_be_another_parameter() {
+        let map = |kv: &[(&str, &str)]| -> BTreeMap<String, String> {
+            kv.iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect()
+        };
+        let d = map(&[("mgf_hash", "{hash}")]);
+        let t = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]";
+        let same = map(&[("hash", "SHA-256"), ("mgf_hash", "SHA-256")]);
+        assert_eq!(fill(t, &same, &d), "RSA-OAEP-SHA-256");
+        let other = map(&[("hash", "SHA-256"), ("mgf_hash", "SHA-1")]);
+        assert_eq!(fill(t, &other, &d), "RSA-OAEP-SHA-256-MGF1-SHA-1");
+        assert!(rcbom_kb::registry::valid(
+            "RSA-OAEP-SHA-256-MGF1-SHA-1",
+            "RSAES-OAEP"
+        ));
     }
 }
 

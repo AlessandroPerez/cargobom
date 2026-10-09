@@ -562,19 +562,6 @@
       "version": "0.6.2"
     },
     {
-      "bom-ref": "pkg:cargo/rage@0.12.1",
-      "name": "rage",
-      "properties": [
-        {
-          "name": "rcbom:scope",
-          "value": "required"
-        }
-      ],
-      "purl": "pkg:cargo/rage@0.12.1",
-      "type": "application",
-      "version": "0.12.1"
-    },
-    {
       "bom-ref": "pkg:cargo/rand@0.8.7",
       "evidence": {
         "occurrences": [
@@ -1724,7 +1711,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in age::ssh::identity::UnencryptedKey::unwrap_stanza; use: decrypt; line: `sk.decrypt_blinded(`; code: `decrypt_blinded`",
+            "additionalContext": "[reachable] [call] in age::ssh::identity::UnencryptedKey::unwrap_stanza; use: decrypt; rng: rng (rand_core::os::OsRng); line: `sk.decrypt_blinded(`; code: `decrypt_blinded`",
             "line": 76,
             "location": "age-0.12.1/src/ssh/identity.rs",
             "offset": 23,
@@ -1738,7 +1725,7 @@
             "symbol": "rsa::oaep::Oaep::new_with_label"
           },
           {
-            "additionalContext": "[reachable] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: encrypt; line: `.encrypt(`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: encrypt; rng: rng (rand_core::os::OsRng); line: `.encrypt(`; code: `encrypt`",
             "line": 159,
             "location": "age-0.12.1/src/ssh/recipient.rs",
             "offset": 21,
@@ -1778,6 +1765,10 @@
         {
           "name": "rcbom:param:mgf_hash",
           "value": "SHA-256"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -2165,7 +2156,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <age::native::x25519::Identity as core::str::traits::FromStr>::from_str::{closure#2}; from: setup, not a use; instantiated by age_core::primitives::bech32_decode::<..> at age-core-0.12.0/src/primitives.rs:119; instantiated by core::result::Result::<..>; line: `.map(StaticSecret::from)`; code: `StaticSecret::from`",
+            "additionalContext": "[reachable] [call] in <age::native::x25519::Identity as core::str::traits::FromStr>::from_str::{closure#2}; from: setup, not a use; instantiated by <age::native::x25519::Identity as core::str::traits::FromStr>::from_str at age-0.12.1/src/native/x25519.rs:51; line: `.map(StaticSecret::from)`; code: `StaticSecret::from`",
             "line": 55,
             "location": "age-0.12.1/src/native/x25519.rs",
             "offset": 25,
@@ -2228,7 +2219,7 @@
             "symbol": "x25519_dalek::x25519::PublicKey::as_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in <age::native::x25519::Recipient as core::str::traits::FromStr>::from_str::{closure#2}; from: setup, not a use; instantiated by age_core::primitives::bech32_decode::<..> at age-core-0.12.0/src/primitives.rs:119; instantiated by core::result::Result::<..>; line: `.map(PublicKey::from)`; code: `PublicKey::from`",
+            "additionalContext": "[reachable] [call] in <age::native::x25519::Recipient as core::str::traits::FromStr>::from_str::{closure#2}; from: setup, not a use; instantiated by <age::native::x25519::Recipient as core::str::traits::FromStr>::from_str at age-0.12.1/src/native/x25519.rs:175; line: `.map(PublicKey::from)`; code: `PublicKey::from`",
             "line": 178,
             "location": "age-0.12.1/src/native/x25519.rs",
             "offset": 25,
@@ -2721,8 +2712,15 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:cargo/rage@0.12.1#root",
+      "bom-ref": "pkg:cargo/rage@0.12.1",
       "name": "rage",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/rage@0.12.1",
       "type": "application",
       "version": "0.12.1"
     },
@@ -2757,7 +2755,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "46363"
+        "value": "45099"
       }
     ],
     "tools": {
@@ -2770,7 +2768,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c2348e88-8ee3-8f10-92d5-e829126e6ea3",
+  "serialNumber": "urn:uuid:af17083f-1dd8-8f76-af07-cd9e90676465",
   "specVersion": "1.7",
   "version": 1
 }
