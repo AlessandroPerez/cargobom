@@ -335,7 +335,7 @@ fn analyze(tcx: TyCtxt<'_>) {
             let mut out = Vec::new();
             // the item body, not an instance body: for a monomorphic fn the types are the
             // same, and named consts are not evaluated away (aws-lc-rs algorithms are consts)
-            if let Some(body) = item.body().map(|b| live_body(&b)) {
+            if let Some(body) = item.body().map(|b| live_body(tcx, &b)) {
                 let mut sc = Scanner::new(
                     &mut cx,
                     &body,
@@ -378,15 +378,27 @@ fn analyze(tcx: TyCtxt<'_>) {
     // calls it (`#[no_mangle]`, `#[export_name]`, `#[used]` statics such as constructors in
     // `.init_array`). RCBOM_NO_WALK turns the walk off (ablation).
     let primary = std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some();
-    let (roots, static_roots) = if std::env::var_os("RCBOM_NO_WALK").is_some() || !primary {
-        (Vec::new(), Vec::new())
+    let (roots, static_roots, generic) = if std::env::var_os("RCBOM_NO_WALK").is_some() || !primary
+    {
+        (Vec::new(), Vec::new(), Vec::new())
     } else {
         roots(&cx)
     };
-    let reach = (!roots.is_empty() || !static_roots.is_empty()).then(|| {
+    // a library's generic functions its users can call: their per-item sites (those whose
+    // crypto does not depend on the type arguments: `PrivateJar<J>::add` sealing with
+    // AES-256-GCM) are reachable, as when an instance of them is walked
+    let generic_paths: Vec<String> = generic.iter().map(|d| path_of(cx.tcx, *d)).collect();
+    let generic: Vec<String> = generic.iter().map(|d| def_hash(cx.tcx, *d)).collect();
+    let reach = (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
         let mut w = Walker::new(&mut cx);
-        let r = w.run(roots, static_roots);
+        let mut r = w.run(roots, static_roots);
         sites.extend(w.sites);
+        r.fns.extend(generic);
+        r.fns.sort();
+        r.fns.dedup();
+        r.paths.extend(generic_paths);
+        r.paths.sort();
+        r.paths.dedup();
         r
     });
     phase("walk", timer);
@@ -548,6 +560,24 @@ pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
 
 /// Source position of a span; code from a macro is attributed to the outermost call site in
 /// the user's source, with the position inside the macro kept as `Expansion`.
+/// For a function a derive generated (its definition is in the derive's expansion), a span of
+/// that expansion to cite its code at: the derive's (`locate` then tags it `[derive ..]`).
+pub(crate) fn derive_site(
+    tcx: TyCtxt<'_>,
+    did: rustc_span::def_id::DefId,
+) -> Option<rustc_span::Span> {
+    use rustc_span::hygiene::{ExpnKind, MacroKind as K};
+    let ds = tcx.def_span(did);
+    if !ds.from_expansion() {
+        return None;
+    }
+    let mut expn = ds.ctxt().outer_expn_data();
+    while expn.call_site.from_expansion() {
+        expn = expn.call_site.ctxt().outer_expn_data();
+    }
+    matches!(expn.kind, ExpnKind::Macro(K::Derive, _)).then_some(ds)
+}
+
 pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Expansion>) {
     if span.from_expansion() {
         let call = span.source_callsite();
@@ -906,18 +936,40 @@ struct Scanner<'a, 'tcx> {
     origins: origins::Origins<'a, 'tcx>,
     /// The body holds a value `rustc_public` cannot convert the type of (`unconvertible`).
     unconvertible: bool,
+    /// The item the body is of.
+    def: Option<rustc_span::def_id::DefId>,
+}
+
+/// Is a caught panic `rustc_public`'s for an `async` closure's type, which it cannot convert
+/// yet ("FIXME(async_closures)"), wherever the type sits (a capture's field, a callee's
+/// generic argument)?
+fn async_closure(e: &Box<dyn std::any::Any + Send>) -> bool {
+    let msg = e
+        .downcast_ref::<String>()
+        .map(String::as_str)
+        .or_else(|| e.downcast_ref::<&str>().copied())
+        .unwrap_or("");
+    msg.contains("FIXME(async_closures)")
 }
 
 /// Does a local of `body` have a type `rustc_public` cannot convert yet? An `async` closure's
 /// (`CoroutineClosure`): converting it panics ("FIXME(async_closures): Lower these to SMIR").
 /// Reading a statement or call that involves one is a known limit of the interface, not a bug.
 fn has_unconvertible(tcx: TyCtxt<'_>, body: &Body) -> bool {
-    body.locals().iter().any(|l| {
-        rustc_internal::internal(tcx, l.ty).walk().any(|g| {
+    let unconvertible = |ty: rustc_public::ty::Ty| {
+        rustc_internal::internal(tcx, ty).walk().any(|g| {
             g.as_type()
                 .is_some_and(|t| matches!(t.kind(), rustc_middle::ty::CoroutineClosure(..)))
         })
-    })
+    };
+    // in a local's type, or in a callee's generic arguments (`apply::<{async closure}>`)
+    body.locals().iter().any(|l| unconvertible(l.ty))
+        || body.blocks.iter().any(|b| match &b.terminator.kind {
+            rustc_public::mir::TerminatorKind::Call { func, .. } => {
+                func.ty(body.locals()).is_ok_and(unconvertible)
+            }
+            _ => false,
+        })
 }
 
 impl<'a, 'tcx> Scanner<'a, 'tcx> {
@@ -950,14 +1002,23 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             statics: Vec::new(),
             origins,
             unconvertible,
+            def,
         }
     }
 
     fn push(&mut self, span: Span, target: Target) {
-        let internal = rustc_internal::internal(self.cx.tcx, span);
+        let mut internal = rustc_internal::internal(self.cx.tcx, span);
+        // code a derive generates with an input token's span (`quote_spanned!` at a field's
+        // name): the derive's, not the field's
+        if !internal.from_expansion()
+            && let Some(did) = self.def
+            && let Some(call) = derive_site(self.cx.tcx, did)
+        {
+            internal = call;
+        }
         let text = span_text(self.cx.tcx, internal);
         let line_text = line_text(self.cx.tcx, internal);
-        let (span, expansion) = locate_stable(self.cx.tcx, span);
+        let (span, expansion) = locate(self.cx.tcx, internal);
         if span.line == 0 {
             // compiler-generated code (shims), and operands an optimization rebuilt, have no
             // source position
@@ -1109,7 +1170,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
 /// The body without the blocks no execution reaches: those behind a branch on a constant
 /// (`if cfg!(debug_assertions)` is `if false` in a release build, which MIR level 0 keeps).
 /// Their statements are dropped and their terminators made `unreachable`.
-fn live_body(body: &rustc_public::mir::Body) -> rustc_public::mir::Body {
+fn live_body(tcx: TyCtxt<'_>, body: &rustc_public::mir::Body) -> rustc_public::mir::Body {
     let n = body.blocks.len();
     let mut live = vec![false; n];
     let mut work = vec![0usize];
@@ -1120,7 +1181,7 @@ fn live_body(body: &rustc_public::mir::Body) -> rustc_public::mir::Body {
         live[b] = true;
         let block = &body.blocks[b];
         match &block.terminator.kind {
-            TerminatorKind::SwitchInt { discr, targets } => match switch_value(block, discr) {
+            TerminatorKind::SwitchInt { discr, targets } => match switch_value(tcx, block, discr) {
                 Some(v) => work.push(
                     targets
                         .branches()
@@ -1145,7 +1206,11 @@ fn live_body(body: &rustc_public::mir::Body) -> rustc_public::mir::Body {
 
 /// The value a block switches on, when it is a constant: given directly, or assigned to the
 /// switched local earlier in the block (`_3 = const false; switchInt(move _3)`).
-fn switch_value(block: &rustc_public::mir::BasicBlock, discr: &Operand) -> Option<u128> {
+fn switch_value(
+    tcx: TyCtxt<'_>,
+    block: &rustc_public::mir::BasicBlock,
+    discr: &Operand,
+) -> Option<u128> {
     let c = match discr {
         Operand::Constant(c) => c.clone(),
         Operand::Copy(p) | Operand::Move(p) if p.projection.is_empty() => {
@@ -1166,6 +1231,15 @@ fn switch_value(block: &rustc_public::mir::BasicBlock, discr: &Operand) -> Optio
     };
     match c.const_.kind() {
         ConstantKind::Allocated(a) => a.read_uint().ok(),
+        // a named constant (`if FLAG`), evaluated when it does not depend on generics
+        ConstantKind::Unevaluated(_) => {
+            use rustc_middle::ty::TypeVisitableExt;
+            let k = rustc_internal::internal(tcx, &c.const_);
+            if k.ty().has_non_region_param() {
+                return None;
+            }
+            k.try_eval_bits(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized())
+        }
         _ => None,
     }
 }
@@ -1223,33 +1297,34 @@ impl MirVisitor for Scanner<'_, '_> {
     // counted as one
     fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_terminator(term, loc)));
-        self.caught(r.is_err(), "a call");
+        self.caught(r.err(), "a call");
     }
 
     fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_rvalue(rv, loc)));
-        self.caught(r.is_err(), "a value");
+        self.caught(r.err(), "a value");
     }
 
     fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_const(c, loc)));
-        self.caught(r.is_err(), "a constant");
+        self.caught(r.err(), "a constant");
     }
 }
 
 impl Scanner<'_, '_> {
-    fn caught(&mut self, panicked: bool, what: &str) {
-        if !panicked {
+    fn caught(&mut self, panic: Option<Box<dyn std::any::Any + Send>>, what: &str) {
+        let Some(e) = panic else {
             return;
-        }
-        if !self.unconvertible {
+        };
+        let unconvertible = self.unconvertible || async_closure(&e);
+        if !unconvertible {
             self.cx.errors += 1;
         }
         if std::env::var_os("RCBOM_DEBUG").is_some() {
             eprintln!(
                 "rcbom-driver: {what} in {} could not be read{}",
                 self.owner.name,
-                if self.unconvertible {
+                if unconvertible {
                     " (an async closure's type, which rustc_public cannot convert)"
                 } else {
                     ""
@@ -1327,8 +1402,16 @@ impl Scanner<'_, '_> {
 
 /// Roots of the walk in a workspace member: `main`; for a library, its exported monomorphic
 /// functions and exported statics; in any crate, what the linker keeps whatever calls it
-/// (`#[no_mangle]`, `#[export_name]` functions, `#[used]` statics).
-fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId>) {
+/// (`#[no_mangle]`, `#[export_name]` functions, `#[used]` statics). Last, a library's generic
+/// functions its users can call (not walked: only a caller has their type arguments).
+#[allow(clippy::type_complexity)]
+fn roots(
+    cx: &Cx<'_>,
+) -> (
+    Vec<(Instance, String)>,
+    Vec<rustc_span::def_id::DefId>,
+    Vec<rustc_span::def_id::DefId>,
+) {
     use rustc_middle::middle::codegen_fn_attrs::CodegenFnAttrFlags as F;
     let tcx = cx.tcx;
     let vis = tcx.effective_visibilities(());
@@ -1358,7 +1441,9 @@ fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId
     }
     // a library: the non-generic functions its exported generic or inline functions call
     // (`pub fn hash(d: impl AsRef<[u8]>)` calling a private `fn inner(d: &[u8])`), which
-    // every user of the library runs and rustc exports for them (`reachable_set`)
+    // every user of the library runs and rustc exports for them (`reachable_set`), and those
+    // generic functions themselves
+    let mut generic = Vec::new();
     if !is_bin {
         let reachable = tcx.reachable_set(());
         let mut extra: Vec<rustc_span::def_id::DefId> = tcx
@@ -1375,9 +1460,12 @@ fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId
         extra.sort_by_key(|d| def_hash(tcx, *d));
         for did in extra {
             let item = rustc_public::CrateItem(rustc_internal::stable(did));
-            if item.has_body()
-                && !item.requires_monomorphization()
-                && let Ok(i) = Instance::try_from(item)
+            if !item.has_body() {
+                continue;
+            }
+            if item.requires_monomorphization() {
+                generic.push(did);
+            } else if let Ok(i) = Instance::try_from(item)
                 && !fns.iter().any(|(r, _)| *r == i)
             {
                 let n = format!("pub {}", instance_name(tcx, &i));
@@ -1401,7 +1489,7 @@ fn roots(cx: &Cx<'_>) -> (Vec<(Instance, String)>, Vec<rustc_span::def_id::DefId
             statics.push(did);
         }
     }
-    (fns, statics)
+    (fns, statics, generic)
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
@@ -1418,6 +1506,8 @@ struct Walker<'a, 'tcx> {
     sites: Vec<Site>,
     /// Owner ids of the instances whose bodies were walked.
     fns: Vec<String>,
+    /// Defining paths of the walked functions.
+    paths: Vec<String>,
     limit: usize,
 }
 
@@ -1437,6 +1527,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             static_seen: HashSet::new(),
             sites: Vec::new(),
             fns: Vec::new(),
+            paths: Vec::new(),
             limit,
         }
     }
@@ -1470,12 +1561,16 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut fns = std::mem::take(&mut self.fns);
         fns.sort();
         fns.dedup();
+        let mut paths = std::mem::take(&mut self.paths);
+        paths.sort();
+        paths.dedup();
         Reach {
             roots: names,
             instances: self.seen.len(),
             truncated,
             statics,
             fns,
+            paths,
         }
     }
 
@@ -1546,7 +1641,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
-        let Some(body) = inst.body().map(|b| live_body(&b)) else {
+        let Some(body) = inst.body().map(|b| live_body(self.cx.tcx, &b)) else {
             return;
         };
         let mut edges = Edges {
@@ -1574,6 +1669,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         if !stop && !shim {
             let owner = fn_owner(self.cx, &inst);
             self.fns.push(owner.id.clone());
+            self.paths.push(path_of(self.cx.tcx, did));
             let item = matches!(inst.kind, InstanceKind::Item);
             if item {
                 // a generic fn's per-item sites are owned by its def-path hash
@@ -1590,7 +1686,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             let item_body = (item && !generic)
                 .then(|| rustc_public::CrateItem(inst.def.def_id()).body())
                 .flatten()
-                .map(|b| live_body(&b));
+                .map(|b| live_body(self.cx.tcx, &b));
             let mut sites = Vec::new();
             let scanned = item_body.as_ref().unwrap_or(&body);
             // A generic instance (or a closure) must be scanned in its instance body, where the
@@ -1716,17 +1812,17 @@ impl MirVisitor for Edges<'_, '_> {
     // instance's others; any other panic is a bug, counted
     fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_terminator(term, loc)));
-        self.errors += usize::from(r.is_err() && !self.unconvertible);
+        self.errors += usize::from(r.is_err_and(|e| !self.unconvertible && !async_closure(&e)));
     }
 
     fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_rvalue(rv, loc)));
-        self.errors += usize::from(r.is_err() && !self.unconvertible);
+        self.errors += usize::from(r.is_err_and(|e| !self.unconvertible && !async_closure(&e)));
     }
 
     fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
         let r = catch_unwind(AssertUnwindSafe(|| self.edges_of_const(c, loc)));
-        self.errors += usize::from(r.is_err() && !self.unconvertible);
+        self.errors += usize::from(r.is_err_and(|e| !self.unconvertible && !async_closure(&e)));
     }
 }
 

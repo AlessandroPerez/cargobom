@@ -1,0 +1,575 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/aws-lc-rs@1.18.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a22 (dependencies); features [\"legacy-des\", \"unstable\"]",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] locked aws-lc-rs 1.18.1; reached via a22 -> aws-lc-rs",
+            "line": 13,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-rs-1.18.1/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-rs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_rs_1_18_1_sys"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-rs@1.18.1",
+      "type": "library",
+      "version": "1.18.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/aws-lc-sys@0.45.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-sys-0.45.0/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-sys",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_0_45_0"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-sys@0.45.0",
+      "type": "library",
+      "version": "0.45.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a22::main; line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; line: `let _ = p.verify_sig(b\"msg\", &a);`; code: `verify_sig`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "aws_lc_rs::signature::ParsedPublicKey::verify_sig"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a22::main; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `signature::ED25519`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "aws_lc_rs::signature::ED25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ED25519 in the arguments; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "aws_lc_rs::signature::VerificationAlgorithm::verify_sig"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ML-DSA-44",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ML-DSA",
+          "cryptoFunctions": [
+            "keygen",
+            "sign"
+          ],
+          "parameterSetIdentifier": "44",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: keygen; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `signature::PqdsaKeyPair::generate`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::generate"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a22::main; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44_SIGNING; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `aws_lc_rs::unstable::signature::MLDSA_44_SIGNING`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 48,
+            "symbol": "aws_lc_rs::unstable::signature::MLDSA_44_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: sign; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let _ = kp.sign(b\"msg\", &mut sig);`; code: `sign`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::sign"
+          }
+        ]
+      },
+      "name": "ML-DSA-44",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PSS-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a22::main; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; line: `let _ = u.verify(b\"msg\", &a);`; code: `verify`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "RSA-PSS-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a22::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a22::main; part of RSA-PSS-SHA-256 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a22::main; line: `let ctx = digest::Context::new(&digest::SHA384);`; code: `digest::SHA384`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "aws_lc_rs::digest::sha::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a22::main; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `let d = ctx.finish();`; code: `finish`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "aws_lc_rs::digest::Context::finish"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-rs@1.18.1"
+      ],
+      "ref": "pkg:cargo/a22@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-sys@0.45.0"
+      ],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:ML-DSA-44",
+        "crypto:algorithm:RSA-PSS-SHA-256",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/aws-lc-rs@1.18.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/aws-lc-sys@0.45.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PSS-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ML-DSA-44"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a22@0.1.0",
+      "name": "a22",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a22@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "14"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "119"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:5363b021-b73c-8bd5-be66-9acf519e4f89",
+  "specVersion": "1.7",
+  "version": 1
+}

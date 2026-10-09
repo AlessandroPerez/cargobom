@@ -274,12 +274,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     }
 
     fn flow(&self) -> &Flow {
-        self.flow.get_or_init(|| Flow::new(self.body))
+        self.flow
+            .get_or_init(|| Flow::new(self.body, self.kind == BodyKind::Coroutine))
     }
 }
 
 impl Flow {
-    fn new(body: &Body) -> Self {
+    fn new(body: &Body, coroutine: bool) -> Self {
         let nargs = body.arg_locals().len();
         let mut defs = Vec::new();
         for l in 1..=nargs {
@@ -432,7 +433,46 @@ impl Flow {
             // a call returning a value that holds the borrow (`chunks_mut`, `split_at_mut`):
             // the writes come later, through that value
             let through = !returns_mut_ref(body, place) && holds_borrow(body, place);
+            // a call that writes the whole buffer it is given (`rng.fill_bytes(nonce)`,
+            // `read_exact(buf)`): what was there before is gone
+            let whole = fills_whole(body, func);
             for (k, a) in args.iter().enumerate() {
+                // a closure or a struct handed over (by value or `&mut`) that holds a `&mut` to
+                // a place (`|| rng.fill_bytes(&mut k1)` called, `fill_out(Out { buf: &mut k2 })`):
+                // the call may write that place through it
+                if !through && let Operand::Copy(p) | Operand::Move(p) = a {
+                    let holders: Vec<Local> = if is_mut_ptr(body, p) {
+                        ptr.targets(p.local, &path_of_place(p), 0)
+                            .into_iter()
+                            .filter(|t| t.path.is_empty())
+                            .map(|t| t.local)
+                            .collect()
+                    } else if p.projection.is_empty() {
+                        vec![p.local]
+                    } else {
+                        Vec::new()
+                    };
+                    for h in holders {
+                        for (targets, single) in ptr.held(h) {
+                            for Target {
+                                local: t, path: tp, ..
+                            } in targets
+                            {
+                                extra.push((
+                                    t,
+                                    tp,
+                                    *at,
+                                    DefKind::OutParam {
+                                        func: func.clone(),
+                                        args: args.clone(),
+                                    },
+                                    single,
+                                    false,
+                                ));
+                            }
+                        }
+                    }
+                }
                 if let Operand::Copy(p) | Operand::Move(p) = a
                     && is_mut_ptr(body, p)
                 {
@@ -453,6 +493,14 @@ impl Flow {
                                 false,
                                 false,
                             ));
+                        } else if tp.is_empty()
+                            && is_rng(body, t)
+                            && !callee_name(body, func).is_some_and(|c| c.contains("Rng"))
+                        {
+                            // a generator lent to a call that draws from it (`pk.encrypt(&mut
+                            // rng, ..)`, `RsaPrivateKey::new(&mut rng, ..)`), not one of its own
+                            // methods (`RngCore::fill_bytes`): still the same generator, the
+                            // call's data is not put in it
                         } else {
                             extra.push((
                                 t,
@@ -463,7 +511,7 @@ impl Flow {
                                     args: args.clone(),
                                 },
                                 single,
-                                k == 0,
+                                k == 0 || whole,
                             ));
                         }
                     }
@@ -473,9 +521,42 @@ impl Flow {
         // a write to an element (`key[31] = 1`, through `&mut key[3]`, or a fill of
         // `&mut key[..16]`) changes part of the array: it neither overwrites the whole nor
         // replaces its initialization
+        // in a coroutine, the locals holding its pinned self (`_44 = copy (_1.0)`)
+        let self_ptrs: HashSet<Local> = if coroutine {
+            body.blocks
+                .iter()
+                .flat_map(|b| &b.statements)
+                .filter_map(|st| match &st.kind {
+                    StatementKind::Assign(
+                        lhs,
+                        Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _),
+                    )
+                    | StatementKind::Assign(lhs, Rvalue::CopyForDeref(q))
+                        if lhs.projection.is_empty()
+                            && q.local == 1
+                            && matches!(q.projection.as_slice(), [ProjectionElem::Field(0, _)]) =>
+                    {
+                        Some(lhs.local)
+                    }
+                    _ => None,
+                })
+                .collect()
+        } else {
+            HashSet::new()
+        };
         for (place, at, kind) in pending {
             let path = path_of_place(&place);
-            let strong = !path.contains(&Step::Deref) && !partial(&path);
+            // a coroutine's saved local (`((*_44) as variant#3).0`, a local of an `async` body
+            // kept across an `.await`) is reached through its pinned self, which points at the
+            // coroutine alone: written, it is overwritten
+            let saved = coroutine
+                && ((place.local == 1
+                    && matches!(path.as_slice(), [Step::Field(0), Step::Deref, rest @ ..]
+                        if !rest.contains(&Step::Deref)))
+                    || (self_ptrs.contains(&place.local)
+                        && matches!(path.as_slice(), [Step::Deref, rest @ ..]
+                            if !rest.contains(&Step::Deref))));
+            let strong = (saved || !path.contains(&Step::Deref)) && !partial(&path);
             let init = is_init(body, &kind) && !partial(&path);
             defs.push(Def {
                 local: place.local,
@@ -491,9 +572,9 @@ impl Flow {
             let out_param = matches!(kind, DefKind::OutParam { .. } | DefKind::Through { .. });
             let init = is_init(body, &kind) && !partial(&path);
             // through a reference: certain only with a single target; an out-parameter call
-            // may or may not write, so it never overwrites, unless it is the call's receiver:
-            // its new value is the call's, which takes the old one as an argument
-            // (`mac.update(secret)`)
+            // may or may not write, so it never overwrites, unless it is the call's receiver
+            // (its new value is the call's, which takes the old one as an argument:
+            // `mac.update(secret)`) or the call fills the whole buffer (`fills_whole`)
             let strong = single && (!out_param || receiver) && !partial(&path);
             let sole = single && !partial(&path);
             defs.push(Def {
@@ -624,9 +705,17 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                         let Some(field) = v.fields.get(rustc_abi::FieldIdx::from_usize(*f)) else {
                             break;
                         };
-                        if !adt.is_enum() {
+                        // a field of a struct, or of a variant of an enum outside the standard
+                        // library, named by the variant (`KeyPairKind::Ec`, as
+                        // `links::body_links` stores it); `Some(k)` stands for the whole value
+                        let std = matches!(
+                            tcx.crate_name(adt.did().krate).as_str(),
+                            "core" | "std" | "alloc"
+                        );
+                        if !adt.is_enum() || !std {
+                            let named = if adt.is_enum() { v.def_id } else { adt.did() };
                             o = Origin::Field {
-                                adt: crate::path_of(tcx, adt.did()),
+                                adt: crate::path_of(tcx, named),
                                 field: *f,
                                 base: Box::new(o),
                             };
@@ -761,7 +850,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let did = self.def?;
         let parent = self.tcx.parent(did);
         let body = rustc_public::CrateItem(rustc_internal::stable(parent)).body()?;
-        let outer = Origins::new(self.tcx, &body, Some(parent));
+        let mut outer = Origins::new(self.tcx, &body, Some(parent));
+        // a closure of a generic function's instance: the parent's constants with that
+        // instance's arguments (`let alg = T::ALG;` captured in `each::<P512>`)
+        if let Some(a) = self.inst_args() {
+            let n = self.tcx.generics_of(parent).count().min(a.len());
+            outer = outer.with_item(parent, self.tcx.mk_args(&a[..n]));
+        }
         for (bb, block) in body.blocks.iter().enumerate() {
             for (idx, s) in block.statements.iter().enumerate() {
                 let StatementKind::Assign(_, Rvalue::Aggregate(AggregateKind::Closure(d, _), ops)) =
@@ -952,7 +1047,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
         let key = (local, path.clone(), at);
         if !seen.insert(key.clone()) {
-            return Origin::Unknown; // a loop: the other definitions say where it starts
+            // the place is being computed (`seen` holds the places under way): its value depends
+            // on its own earlier value (a loop, `ctr += 1`); the other definitions say where it
+            // starts
+            return Origin::Loop;
         }
         let defs = self.reaching_at(local, at);
         // definitions of the place, or of a whole it is part of: it is one of these
@@ -963,6 +1061,11 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             let d = &self.flow().defs[i];
             let (list, rest) = if is_prefix(&d.path, &path) {
                 if self.shadowed(i, &defs, &path, at) {
+                    continue;
+                }
+                // `Pick::B(y)` read from a `Pick::A(x)` built here: never this definition's
+                // value (the read happens only when the value is the other variant)
+                if other_variant(&d.kind, &path[d.path.len()..]) {
                     continue;
                 }
                 (&mut alts, path[d.path.len()..].to_vec())
@@ -1128,6 +1231,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     ) -> Origin {
         if depth >= MAX_DEPTH {
             return Origin::Truncated;
+        }
+        // `Algorithm::default()` of a field-less enum: the variant its `Default` returns
+        // (`Argon2::new(Algorithm::default(), ..)` is Argon2id)
+        if args.is_empty()
+            && let Some(TyKind::RigidTy(RigidTy::FnDef(def, gargs))) =
+                func.ty(self.body.locals()).ok().map(|t| t.kind())
+            && let Some(o) = self.default_variant(def.def_id(), &gargs)
+        {
+            return o;
         }
         let (callee, krate, self_ty) = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
             Some(TyKind::RigidTy(RigidTy::FnDef(def, gargs))) => {
@@ -1463,7 +1575,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
         let parent = self.tcx.parent(did);
         let body = rustc_public::CrateItem(rustc_internal::stable(parent)).body()?;
-        let outer = Origins::new(self.tcx, &body, Some(parent));
+        let mut outer = Origins::new(self.tcx, &body, Some(parent));
+        // a closure of a generic function's instance: the parent's constants with that
+        // instance's arguments (`let alg = T::ALG;` captured in `each::<P512>`)
+        if let Some(a) = self.inst_args() {
+            let n = self.tcx.generics_of(parent).count().min(a.len());
+            outer = outer.with_item(parent, self.tcx.mk_args(&a[..n]));
+        }
         let mut caps: Option<Vec<Vec<Origin>>> = None;
         for (bb, block) in body.blocks.iter().enumerate() {
             for (idx, s) in block.statements.iter().enumerate() {
@@ -1643,12 +1761,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
             }
             // a named const (aws-lc-rs algorithms) not yet evaluated
-            None => vec![crate::statics::resolve_const(
-                tcx,
-                did,
-                uargs,
-                self.inst_args(),
-            )],
+            None => crate::statics::resolve_const(tcx, did, uargs, self.inst_args())
+                .into_iter()
+                .collect(),
         };
         let evaluate = || {
             if args.has_non_region_param() {
@@ -1801,6 +1916,41 @@ fn is_prefix(a: &[Step], b: &[Step]) -> bool {
     b.len() >= a.len() && a.iter().zip(b).all(|(x, y)| x.same(y))
 }
 
+/// Is the local a random generator (`ThreadRng`, `OsRng`, `StdRng`, `ChaCha20Rng`)?
+fn is_rng(body: &Body, local: Local) -> bool {
+    match body.locals()[local].ty.kind() {
+        TyKind::RigidTy(RigidTy::Adt(def, _)) => def.name().ends_with("Rng"),
+        _ => false,
+    }
+}
+
+/// Calls that write every byte of the buffers they are given by `&mut`, or fail: random
+/// fills (`RngCore::fill_bytes`, `try_fill_bytes`, `Rng::fill`, ring's `SecureRandom::fill`,
+/// `getrandom`) and `Read::read_exact`.
+fn fills_whole(body: &Body, func: &Operand) -> bool {
+    let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
+        func.ty(body.locals()).ok().map(|t| t.kind())
+    else {
+        return false;
+    };
+    let name = def.name();
+    let last = name.rsplit("::").next().unwrap_or(&name);
+    matches!(
+        last,
+        "fill_bytes" | "try_fill_bytes" | "fill" | "try_fill" | "getrandom" | "read_exact"
+    )
+}
+
+/// A definition building one variant of an enum (`Pick::A(x)`), read as another
+/// (`[Variant(B), Field(0)]`).
+fn other_variant(d: &DefKind, rest: &[Step]) -> bool {
+    matches!(
+        (d, rest.first()),
+        (DefKind::Assign(Rvalue::Aggregate(AggregateKind::Adt(_, v, ..), _), _), Some(Step::Variant(w)))
+            if variant_index(v) != *w
+    )
+}
+
 /// A part of the place, not all of it: an element.
 fn partial(path: &[Step]) -> bool {
     path.iter()
@@ -1928,6 +2078,28 @@ impl Pointees<'_> {
                     }
                 }
                 _ => {}
+            }
+        }
+        out
+    }
+}
+
+impl Pointees<'_> {
+    /// What the `&mut` borrows a closure or a struct built in `local` holds point to (its
+    /// captures, its fields), each with whether it points at one place.
+    fn held(&self, local: Local) -> Vec<(Vec<Target>, bool)> {
+        let mut out = Vec::new();
+        for k in self.direct.get(&local).into_iter().flatten() {
+            if let DefKind::Assign(Rvalue::Aggregate(_, ops), _) = k {
+                for op in ops {
+                    if let Operand::Copy(q) | Operand::Move(q) = op
+                        && is_mut_ptr(self.body, q)
+                    {
+                        let t = self.targets(q.local, &path_of_place(q), 0);
+                        let single = sole_target(&t);
+                        out.push((t, single));
+                    }
+                }
             }
         }
         out
@@ -2135,6 +2307,62 @@ impl BitSet {
 }
 
 /// The discriminant of an enum's variant, as the integer it is.
+impl Origins<'_, '_> {
+    /// The variant a field-less enum's `Default::default()` returns, read from the impl's MIR
+    /// (a derived `#[default]`, or `fn default() -> Self { Self::Argon2id }`).
+    fn default_variant(
+        &self,
+        def: rustc_public::DefId,
+        gargs: &rustc_public::ty::GenericArgs,
+    ) -> Option<Origin> {
+        use rustc_middle::mir::{
+            AggregateKind as A, RETURN_PLACE, Rvalue as R, StatementKind as S,
+        };
+        let tcx = self.tcx;
+        let did = rustc_internal::internal(tcx, def);
+        if path_of(tcx, did) != "core::default::Default::default" {
+            return None;
+        }
+        let gargs = rustc_internal::internal(tcx, gargs);
+        let self_ty = gargs.first()?.as_type()?;
+        let rustc_middle::ty::Adt(adt, _) = self_ty.kind() else {
+            return None;
+        };
+        if !adt.is_enum() || adt.variants().iter().any(|v| !v.fields.is_empty()) {
+            return None;
+        }
+        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+        let inst = rustc_middle::ty::Instance::try_resolve(tcx, env, did, gargs).ok()??;
+        let id = inst.def_id();
+        if !tcx.is_mir_available(id) {
+            return None;
+        }
+        let body = tcx.optimized_mir(id);
+        let mut found = None;
+        for bb in body.basic_blocks.iter() {
+            for st in &bb.statements {
+                if let S::Assign(b) = &st.kind
+                    && b.0.local == RETURN_PLACE
+                    && let R::Aggregate(k, ops) = &b.1
+                    && let A::Adt(_, v, ..) = **k
+                    && ops.is_empty()
+                {
+                    if found.is_some_and(|f| f != v) {
+                        return None;
+                    }
+                    found = Some(v);
+                }
+            }
+        }
+        let v = found?;
+        Some(Origin::Unit {
+            path: path_of(tcx, adt.variant(v).def_id),
+            krate: tcx.crate_name(adt.did().krate).to_string(),
+            value: discriminant(tcx, *adt, v),
+        })
+    }
+}
+
 fn discriminant<'tcx>(
     tcx: TyCtxt<'tcx>,
     adt: rustc_middle::ty::AdtDef<'tcx>,

@@ -1,7 +1,8 @@
 # Regression fixtures
 
-Small programs written by three independent audits of the pipeline (driver, analysis,
-verification) and after the corpus runs, each with commented cases that once produced a wrong
+Small programs written by four rounds of independent audits of the pipeline (driver,
+analysis, verification, a held-out review of crates.io projects) and after the corpus runs,
+each with commented cases that once produced a wrong
 CBOM or none: a lost call site, a wrong position, a wrong argument origin, a misnamed algorithm,
 a false finding, a driver panic, a shifted position the verifier accepted. Each directory's
 `expected.txt` is the reviewed CBOM (as `scripts/summary.py` prints it); `scripts/e2e.sh --regress`
@@ -27,6 +28,10 @@ any difference.
 | driver-15 | statics pointing at each other, a dependency's const naming a ring static, code a build script generates into `OUT_DIR` (closure names without paths), a closure reached through standard-library iterators (calls without a position) |
 | driver-16 | argument origins (third audit round): a key read with `read_exact` (`alloc::io` on the pinned nightly), filled across an `.await` and inside a capturing closure, one field of a struct literal filled, a fill through `chunks_mut` and through a lock guard, `mem::replace` with a constant, array destructuring, a half overwrite, the output slice that reaches PBKDF2, the program's own `fill`; an `async` closure in a function; a knowledge-base function in an `Option` and in a static function pointer; a `LazyLock` key; a loop walking a linked list (the search used to overflow the stack) |
 | driver-17 | a library's roots: a generic public function's private, non-generic callee, a public `async fn`'s body, a returned closure |
+| driver-18 | values followed (fourth audit round): an enum's variant read only from that variant; statics written at run time (a lock's guard, a `static mut`, `OnceLock::set`, `LazyLock`) with their initial values; a trait's associated const in generic code and in a closure capturing it (never the trait's default); an enum-typed parameter; a local closure's parameter; a branch on a named `const`; an algorithm only an unreachable caller passes; a program static naming a composite descriptor (`&hmac::HMAC_SHA256`) |
+| driver-19 | argument origins and roles (fourth audit round): secrets appended to (`extend_from_slice`, `push_str`); a loop counter and an atomic counter nonce; a key in a `Cell`, filled by a closure holding `&mut`, or through a struct's `&mut`; an `async` local overwritten after an `.await`; a nonce filled in a `split_at_mut` buffer; zeros of `vec![0; n]`; part of a literal; a generator lent to calls (`RsaPrivateKey::new(&mut rng, ..)` twice); rsa's `SigningKey::random`; Ed25519ph; Argon2's `From<Params>`, `Algorithm::default()` and `Params::default()`; scrypt's `hash_password_customized`; `hash_password_into_with_memory`'s salt; BLAKE3's `update_reader`; `from_keypair_bytes`; the program's own `RngCore` |
+| driver-20 | a library's API (fourth audit round): the methods of a public type generic over a parameter the crypto does not depend on; a trait's default method a public type takes; a long name keeping its method |
+| driver-21 | a procedural derive spanning its generated code at an input token (`quote_spanned!`): cited at the derive; an `async` closure passed to a generic function (an interface limit, not counted as an error) |
 | analysis-01 | RustCrypto: HKDF output, `anyhow` context, `copy_from_slice`, XChaCha, SHA-512/t, PBKDF2 with run-time iterations, Argon2 constructors, scrypt and argon2 roles, Ed25519 sign/verify, AES-GCM with a 16-byte nonce |
 | analysis-02 | ring: HKDF and PBKDF2 key derivation, descriptor linking through receivers only, RSA 3072, Ed25519 key pairs, SHA-512/256 |
 | analysis-03 | rustls with both backends, the provider the program installs, groups set in code, a `#[path]`-shared file |
@@ -47,5 +52,8 @@ any difference.
 | analysis-18 | a program that draws no random number (rand_core and getrandom unused); a digest in `debug_assert!` and one under `cfg(debug_assertions)`, absent from the release build |
 | analysis-19 | Layer 1: rustls's `ring` feature enabled by a dev-dependency only (no ring package, aws-lc-rs the only backend) |
 | analysis-20 | an algorithm that reaches a reachable call from other functions only through data no entry point reaches (a suite listed by `ALL` but not by `DEFAULT`, as rustls's ML-KEM-1024): present at that call, not reachable |
+| analysis-21 | a key pair and a digest algorithm kept in enum variants and read by matching (rcgen's `KeyPairKind`), the key built through the program's generic extension trait (`.ext()?`, rcgen's `_err`), and an algorithm passed in `Some(..)`; ring's RSA key pair from PKCS#8, private key material with a hard-coded key |
+| analysis-22 | aws-lc-rs (fourth audit round): `verify_sig`, the current verification API, on a descriptor and a parsed key; a digest context's `finish`; aws-lc-rs's own alias of a composite descriptor (`unstable::signature::MLDSA_44_SIGNING`) |
+| analysis-23 | jsonwebtoken 9 (fourth audit round): a signing key decoded from PEM, private key material of its family with a hard-coded key; HMAC secrets hard-coded and from the environment |
 | verify-01 | the same call text at the same column on neighbouring lines, on receivers of different types; a line holding backquotes |
 | verify-02 | the verifier: two versions of one crate (one renamed), one alias imported from two crates (two modules; cfg), an alias defined in another file, a raw identifier, a path after a single `:`, tag-like text in a comment, a path broken by a comment, a path from the root, a quoted key and a dev-dependency of the same crate, a CRLF `Cargo.lock` |

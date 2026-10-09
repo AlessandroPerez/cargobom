@@ -39,10 +39,12 @@
   occ PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | src/main.rs:39:4 | ring::pbkdf2::derive | [reachable] [call] in a16::ring_pbkdf2; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA512 in the arguments; salt: hard-coded (9 bytes, literal at line 39); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA512, n, b"salt-salt", pw, &mut out);`; code: `pbkdf2::derive`
   occ PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | src/main.rs:40:19 | ring::pbkdf2::PBKDF2_HMAC_SHA512 | [reachable] [static] in a16::ring_pbkdf2; line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA512, n, b"other-salt", b"hunter2", &out).is_ok()`; code: `pbkdf2::PBKDF2_HMAC_SHA512`
   occ PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | src/main.rs:40:4 | ring::pbkdf2::verify | [reachable] [call] in a16::ring_pbkdf2; use: verify; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA512 in the arguments; salt: hard-coded (10 bytes, literal at line 40); password: hard-coded (7 bytes, literal at line 40); line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA512, n, b"other-salt", b"hunter2", &out).is_ok()`; code: `pbkdf2::verify`
+  occ RSA | crypto:material:private-key:RSA | src/main.rs:80:13 | ring::rsa::keypair::KeyPair::from_der | [reachable] [call] in a16::ring_sign; from_der: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let rk = signature::RsaKeyPair::from_der(der).unwrap();`; code: `signature::RsaKeyPair::from_der`
   occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | src/main.rs:82:13 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [reachable] [static] in a16::ring_sign; line: `rk.sign(&signature::RSA_PSS_SHA512, &rng, msg, &mut sig).unwrap();`; code: `signature::RSA_PSS_SHA512`
   occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | src/main.rs:82:7 | ring::rsa::keypair::KeyPair::sign | [reachable] [call] in a16::ring_sign; use: sign; algorithm from ring::rsa::padding::pss::RSA_PSS_SHA512 in the arguments; line: `rk.sign(&signature::RSA_PSS_SHA512, &rng, msg, &mut sig).unwrap();`; code: `sign`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:45:38 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a16::ring_digest; line: `let mut c = digest::Context::new(&digest::SHA1_FOR_LEGACY_USE_ONLY);`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:46:6 | ring::digest::Context::update | [reachable] [call] in a16::ring_digest; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `c.update(d);`; code: `update`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:47:6 | ring::digest::Context::finish | [reachable] [call] in a16::ring_digest; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `c.finish().as_ref().len() + digest::digest(&digest::SHA384, d).as_ref().len()`; code: `finish`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:47 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in a16::named_only; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1 -> ring::digest::SHA256); line: `let v = signature::UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, pk.to_vec());`; code: `signature::ECDSA_P256_SHA256_ASN1`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:52:31 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in a16::ring_hkdf; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, b"fixed salt");`; code: `hkdf::HKDF_SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:28 | ring::hmac::HMAC_SHA256 | [reachable] [component] in a16::ring_hkdf; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `let k2 = hmac::Key::new(hmac::HMAC_SHA256, b"literal hmac key");`; code: `hmac::HMAC_SHA256`
@@ -151,6 +153,14 @@
   prop PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | rcbom:provenance:password=hard-coded,parameter
   prop PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | rcbom:provenance:salt=hard-coded
   prop PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | rcbom:reachability=reachable
+  prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
+  prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
+  prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
+  prop RSA | crypto:material:private-key:RSA | rcbom:functions:source=knowledge-base
+  prop RSA | crypto:material:private-key:RSA | rcbom:kb:version=0.2.0
+  prop RSA | crypto:material:private-key:RSA | rcbom:occurrences=1
+  prop RSA | crypto:material:private-key:RSA | rcbom:provenance:key=parameter
+  prop RSA | crypto:material:private-key:RSA | rcbom:reachability=reachable
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:confidence=high
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:detection:method=type-resolved
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=observed
@@ -161,7 +171,7 @@
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
-  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=3
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
@@ -208,6 +218,7 @@ asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"a
 asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["verify"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-512 | crypto:algorithm:PBKDF2-SHA-512 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive", "verify"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
 asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign"], "primitive": "signature"}, "assetType": "algorithm"}
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
@@ -228,14 +239,24 @@ dep crypto:algorithm:PBKDF2-SHA-512 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
 dep pkg:cargo/a16@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ChaCha20-Poly1305
+dependency crypto:algorithm:ECDH-P-256
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
+dependency crypto:algorithm:Ed25519
 dependency crypto:algorithm:HKDF-SHA-256
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:HMAC-SHA-384
 dependency crypto:algorithm:HMAC-SHA-512
 dependency crypto:algorithm:PBKDF2-SHA-512
 dependency crypto:algorithm:RSA-PSS-SHA-512
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:x25519
+dependency crypto:material:private-key:RSA
 dependency pkg:cargo/a16@0.1.0
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
@@ -259,6 +280,7 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:x25519
+provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
 root {"bom-ref": "pkg:cargo/a16@0.1.0", "name": "a16", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a16@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=

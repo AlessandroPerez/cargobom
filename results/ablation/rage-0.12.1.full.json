@@ -1297,14 +1297,14 @@
             "symbol": "aead::Aead::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in hpke::aead::AeadCtx::<..>; new: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by hpke::setup::derive_enc_ctx::<..> at hpke-0.12.0/src/setup.rs:131; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:164; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144; line: `encryptor: <A::AeadImpl as aead::KeyInit>::new(&key.0),`; code: `<A::AeadImpl as aead::KeyInit>::new`",
+            "additionalContext": "[reachable] [call] in hpke::aead::AeadCtx::<..>::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by hpke::setup::derive_enc_ctx::<..> at hpke-0.12.0/src/setup.rs:131; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:164; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144; line: `encryptor: <A::AeadImpl as aead::KeyInit>::new(&key.0),`; code: `<A::AeadImpl as aead::KeyInit>::new`",
             "line": 205,
             "location": "hpke-0.12.0/src/aead.rs",
             "offset": 23,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in hpke::aead::AeadCtxS::<..>; use: encrypt; nonce: computed (hpke::aead::mix_nonce); instantiated by hpke::aead::AeadCtxS::<..> at hpke-0.12.0/src/aead.rs:437; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:79; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144; instantiated by <age::native::tag::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tag.rs:95; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95; line: `.encrypt_in_place_detached(&nonce.0, aad, plaintext)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in hpke::aead::AeadCtxS::<..>::seal_in_place_detached; use: encrypt; nonce: computed (hpke::aead::mix_nonce); instantiated by hpke::aead::AeadCtxS::<..>::seal at hpke-0.12.0/src/aead.rs:437; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:79; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144; instantiated by <age::native::tag::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tag.rs:95; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95; line: `.encrypt_in_place_detached(&nonce.0, aad, plaintext)`; code: `encrypt_in_place_detached`",
             "line": 405,
             "location": "hpke-0.12.0/src/aead.rs",
             "offset": 17,
@@ -2708,6 +2708,50 @@
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:RSA-OAEP-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-192-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha20-Poly1305"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:PBKDF2"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:scrypt"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:x25519"
     }
   ],
   "metadata": {
@@ -2768,7 +2812,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:af17083f-1dd8-8f76-af07-cd9e90676465",
+  "serialNumber": "urn:uuid:6e2bed12-3a66-8a1f-8c97-ef7e99573cef",
   "specVersion": "1.7",
   "version": 1
 }

@@ -433,6 +433,17 @@ fn argument_entry<'k, 'o>(
         {
             return Some((e, args));
         }
+        // a std constructor of such a value (`Params::default()`): an entry with that self type
+        if let Some(t) = self_ty.as_deref()
+            && let Some(e) = kb.fns.iter().find(|e| {
+                e.algo.family == family
+                    && e.self_type.as_deref() == Some(last(t))
+                    && e.krates.iter().any(|k| t.starts_with(&format!("{k}::")))
+                    && e.pattern.is_match(&path)
+            })
+        {
+            return Some((e, args));
+        }
         if !matches!(krate.as_str(), "core" | "std" | "alloc") {
             return None;
         }

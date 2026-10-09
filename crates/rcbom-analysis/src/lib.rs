@@ -391,6 +391,23 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
     }
     let reached_data = |id: &str| reachable_statics.contains(id);
+    // the functions reachable from an entry point, by defining path (as links name them)
+    let reached_paths: HashSet<String> = facts
+        .iter()
+        .filter_map(|f| f.reach.as_ref())
+        .flat_map(|r| r.paths.iter().cloned())
+        .chain(
+            facts
+                .iter()
+                .flat_map(|f| &f.sites)
+                .filter(|s| {
+                    s.owner.kind == OwnerKind::Fn
+                        && (s.tier == Tier::Reachable || reached_fns.contains(s.owner.id.as_str()))
+                })
+                .map(|s| s.owner.path.clone()),
+        )
+        .collect();
+    let reached_path = |p: &str| reached_paths.contains(p);
     if truncated {
         notes.push(
             "reachability walk hit its instance limit; the reachable tier is incomplete".into(),
@@ -405,7 +422,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
         keys.sort();
         for k in keys {
-            let _ = site_matches(&ctx, ctx.calls[&k], &closure, &reached_data);
+            let _ = site_matches(&ctx, ctx.calls[&k], &closure, &reached_data, &reached_path);
         }
         let links = ctx.links.take();
         *ctx.consumers.borrow_mut() = links;
@@ -511,6 +528,12 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         if let Some(b) = backend_in_path(&d.path) {
                             entry.suite_backends.insert(b.to_string());
                         }
+                        // the registry's (IANA's) name: rustls's `TLS13_AES_128_GCM_SHA256` is
+                        // `TLS_AES_128_GCM_SHA256` (RFC 8446 B.4); TLS 1.2 names already are
+                        let n = match n.strip_prefix("TLS13_") {
+                            Some(rest) => format!("TLS_{rest}"),
+                            None => n,
+                        };
                         if !entry.suites.contains(&n) {
                             entry.suites.push(n);
                         }
@@ -591,7 +614,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                 }
             }
-            let matches = site_matches(&ctx, site, &closure, &reached_data);
+            let matches = site_matches(&ctx, site, &closure, &reached_data, &reached_path);
             let prov = provenance::of_call(kb, &ctx.flow, &site.target);
             for (m, kind, function, symbol, detail, unreached) in matches {
                 let tier = if unreached { Tier::Present } else { tier };
@@ -1067,6 +1090,7 @@ fn site_matches(
     site: &Site,
     closure: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
     reachable: &dyn Fn(&str) -> bool,
+    reached_path: &dyn Fn(&str) -> bool,
 ) -> Vec<SiteMatch> {
     let kb = ctx.kb;
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
@@ -1190,6 +1214,9 @@ fn site_matches(
                     .iter()
                     .any(|e| e.self_type.is_some() && e.pattern.is_match(&callee.path));
             let fn_name = fn_match.as_ref().map(|m| m.name.clone());
+            // the entry makes key material (`SigningKey::<Sha256>::random(rng, 2048)` an RSA-2048
+            // key): the scheme its type names is what the key is made for, not a part of it
+            let fn_material = fn_match.as_ref().is_some_and(|m| m.algo.material.is_some());
             let fn_family = fn_match.as_ref().map(|m| m.algo.family.clone());
             if let Some(mut m) = fn_match {
                 for k in std::mem::take(&mut m.provider_crates) {
@@ -1303,7 +1330,11 @@ fn site_matches(
                         .extend(ctx.package_of_crate(&k.name, &k.stable_id));
                 }
                 // the hash of `pbkdf2_hmac::<Sha256>` is part of the PBKDF2 asset
-                let outer = outer.or_else(|| fn_name.clone());
+                let outer = outer.or_else(|| {
+                    fn_name
+                        .clone()
+                        .filter(|_| !(fn_material && m.algo.material.is_none()))
+                });
                 match outer {
                     None if into_kb => {
                         let f = kb.use_of(method, &m.algo.primitive);
@@ -1341,19 +1372,29 @@ fn site_matches(
                     .iter()
                     .any(|u| u.methods.iter().any(|m| m == method))
             };
-            if out.is_empty() && into_kb && (can_occur() || has_roles()) {
+            // a protocol crate's own function (rustls's `KeySchedule::derive`, jsonwebtoken's
+            // `crypto::ecdsa::sign`) is not a crypto API: its crypto is at the algorithm crate's
+            // calls inside it, which are looked up there
+            let protocol_callee = kb
+                .crate_by_name(&callee.krate.name)
+                .is_some_and(|c| c.role == Role::Protocol);
+            if out.is_empty() && into_kb && !protocol_callee && (can_occur() || has_roles()) {
                 let has_roles = has_roles();
                 // the call's own arguments; if what they name is not used here, its receiver's;
                 // if nothing in this function names the algorithm, what reaches the key or
                 // algorithm from other functions (a field, a parameter, a function's result),
                 // looked up only then
                 let local = provenance::data_in_args(kb, None, &site.target);
+                let named = std::cell::RefCell::new(HashMap::new());
                 let linked = std::iter::once_with(|| {
-                    provenance::data_in_args(
+                    ctx.flow.take_named();
+                    let r = provenance::data_in_args(
                         kb,
                         Some((&ctx.flow, site.owner.path.as_str())),
                         &site.target,
-                    )
+                    );
+                    *named.borrow_mut() = ctx.flow.take_named();
+                    r
                 })
                 .flatten();
                 let places = local
@@ -1365,10 +1406,27 @@ fn site_matches(
                     // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`)
                     // is chosen at run time
                     for d in others {
-                        let found: Vec<rcbom_facts::DefRef> = closure(&d.id)
+                        // a static that changes at run time holds what the program puts there
+                        // (looked up with the values from elsewhere), not its initializer's
+                        if ctx.flow.mutable_static(&d.id).is_some() {
+                            continue;
+                        }
+                        let mut found: Vec<rcbom_facts::DefRef> = closure(&d.id)
                             .into_iter()
                             .filter(|x| match_static(kb, x, &supported).is_some())
                             .collect();
+                        // a descriptor another one is made of (`HMAC_SHA256`'s `SHA256`) is part
+                        // of it, not a second one
+                        let parts: Vec<String> = found
+                            .iter()
+                            .flat_map(|y| {
+                                closure(&y.id)
+                                    .into_iter()
+                                    .filter(|x| x.id != y.id)
+                                    .map(|x| x.id)
+                            })
+                            .collect();
+                        found.retain(|x| !parts.contains(&x.id));
                         if let [one] = found.as_slice()
                             && !descriptors.contains(one)
                         {
@@ -1402,9 +1460,20 @@ fn site_matches(
                                     short(&def.path)
                                 ),
                             }];
-                            // a value stored only by code or data no entry point reaches
-                            // (ALL_KX_GROUPS's MLKEM1024) does not reach this call at run time
-                            let unreached = from_elsewhere && !reachable(&def.id);
+                            // a value named only by code or data no entry point reaches (a
+                            // caller never called, ALL_KX_GROUPS's MLKEM1024) does not reach
+                            // this call at run time
+                            let unreached = from_elsewhere && {
+                                let owners =
+                                    named.borrow().get(&def.id).cloned().unwrap_or_default();
+                                !owners.iter().any(|w| {
+                                    if w.is_empty() {
+                                        reachable(&def.id)
+                                    } else {
+                                        reached_path(w)
+                                    }
+                                }) && !(owners.is_empty() && reachable(&def.id))
+                            };
                             out.push((m, Kind::Call, f, symbol.clone(), d, unreached));
                         }
                     }
@@ -1489,12 +1558,41 @@ fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
 }
 
 /// `micro::seal::<aes_gcm::AesGcm<aes_gcm::aes::Aes256, ..>>` -> `micro::seal::<..>`, for
-/// human-readable context; the full instance stays in the facts.
+/// human-readable context; the full instance stays in the facts. Only a path's generic
+/// arguments are elided, the item's name is kept (`ConnectorBuilder::<WantsTlsConfig>::
+/// with_native_roots` -> `ConnectorBuilder::<..>::with_native_roots`), and so are the types of
+/// a qualified segment (`<impl Paseto<'_, V4, Public>>::try_sign`).
 fn short(name: &str) -> String {
-    match name.find("::<") {
-        Some(i) if name.len() > 60 => format!("{}::<..>", &name[..i]),
-        _ => name.to_string(),
+    if name.len() <= 60 {
+        return name.to_string();
     }
+    let mut out = String::new();
+    // nesting inside elided arguments
+    let mut skip = 0usize;
+    let mut prev = None;
+    for (i, c) in name.char_indices() {
+        if skip > 0 {
+            match c {
+                '<' => skip += 1,
+                // not the arrow of a function type (`fn(&[u8]) -> Vec<u8>`)
+                '>' if prev != Some('-') => skip -= 1,
+                _ => {}
+            }
+            if skip == 0 {
+                out.push_str("..>");
+            }
+        } else {
+            out.push(c);
+            // the generic arguments of a path (`seal::<..>`, `ConnectorBuilder::<..>`); a type's
+            // in a qualified segment (`<KeyPair as TryFrom<&PrivateKeyDer<'_>>>`, `<impl
+            // Paseto<'_, V4, Public>>`) tell impls apart, and stay
+            if c == '<' && prev == Some(':') && !name[i + 1..].starts_with("impl ") {
+                skip = 1;
+            }
+        }
+        prev = Some(c);
+    }
+    out
 }
 
 /// The crates of the ADTs a type tree names (`OsRng` in `generate_nonce::<OsRng>`).
@@ -1508,5 +1606,47 @@ fn adt_crates<'a>(t: &'a rcbom_facts::TyTree, out: &mut Vec<&'a rcbom_facts::Cra
         TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => adt_crates(t, out),
         TyTree::Tuple(ts) => ts.iter().for_each(|a| adt_crates(a, out)),
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::short;
+
+    #[test]
+    fn short_names_keep_the_item() {
+        assert_eq!(
+            short("micro::seal::<aes_gcm::AesGcm<aes_gcm::aes::Aes256, typenum::U12>>"),
+            "micro::seal::<..>"
+        );
+        assert_eq!(
+            short(
+                "rusty_paseto::core::paseto_impl::v4_public::<impl rusty_paseto::core::Paseto<'_, V4, Public>>::try_sign"
+            ),
+            "rusty_paseto::core::paseto_impl::v4_public::<impl rusty_paseto::core::Paseto<'_, V4, Public>>::try_sign"
+        );
+        assert_eq!(
+            short(
+                "<rcgen::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from"
+            ),
+            "<rcgen::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from"
+        );
+        assert_eq!(
+            short(
+                "<rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign_with_a_long_name"
+            ),
+            "<rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign_with_a_long_name"
+        );
+        assert_eq!(
+            short(
+                "hyper_rustls::connector::builder::ConnectorBuilder::<WantsTlsConfig>::with_native_roots"
+            ),
+            "hyper_rustls::connector::builder::ConnectorBuilder::<..>::with_native_roots"
+        );
+        assert_eq!(
+            short("a_crate::module::apply::<fn(&[u8]) -> std::vec::Vec<u8>, u8>::run_it"),
+            "a_crate::module::apply::<..>::run_it"
+        );
+        assert_eq!(short("a::b::<c>"), "a::b::<c>");
     }
 }

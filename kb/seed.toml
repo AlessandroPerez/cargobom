@@ -513,6 +513,7 @@ asset = "scrypt"
 family = "scrypt"
 primitive = "kdf"
 functions = ["keyderive"]
+own_params = ["hash_password_customized"]
 
 [[type]]
 crate = "pbkdf2"
@@ -1238,11 +1239,44 @@ functions = ["keyderive"]
 # `from_slice`) sets up a key
 [[fn]]
 crate = "ed25519_dalek"
-path = "^hazmat::(raw_sign|raw_sign_prehashed|raw_sign_byupdate|raw_verify|raw_verify_prehashed)$"
+path = "^hazmat::(raw_sign|raw_sign_byupdate|raw_verify)$"
 asset = "Ed25519"
 family = "EdDSA"
 primitive = "signature"
 functions = ["sign", "verify"]
+curve = "other/Ed25519"
+
+# ed25519-dalek 2's prehashed signatures (feature `digest`): Ed25519ph (RFC 8032 section 5.1:
+# the message's SHA-512, signed with its own domain separator and an optional context), not
+# Ed25519. `sign_prehashed`, `verify_prehashed(_strict)`, the hazmat `raw_*_prehashed`, and the
+# `DigestSigner`/`DigestVerifier` impls of the keys, which call them (signing.rs, verifying.rs)
+[[fn]]
+crate = "ed25519_dalek"
+path = "(^|::)(SigningKey::sign_prehashed|VerifyingKey::verify_prehashed|VerifyingKey::verify_prehashed_strict)$|^hazmat::raw_(sign|verify)_prehashed$"
+asset = "Ed25519ph"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+curve = "other/Ed25519"
+
+[[fn]]
+crate = "ed25519_dalek"
+self_type = "SigningKey"
+path = "DigestSigner::(try_)?sign_digest$"
+asset = "Ed25519ph"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "other/Ed25519"
+
+[[fn]]
+crate = "ed25519_dalek"
+self_type = "VerifyingKey"
+path = "DigestVerifier::verify_digest$"
+asset = "Ed25519ph"
+family = "EdDSA"
+primitive = "signature"
+functions = ["verify"]
 curve = "other/Ed25519"
 
 [[fn]]
@@ -1397,6 +1431,30 @@ primitive = "kdf"
 functions = ["keyderive"]
 params = { variant = {}, m_cost = { const_arg = 0 }, t_cost = { const_arg = 1 }, p_cost = { const_arg = 2 } }
 
+# argon2 0.5 `Params::default()` (`Params::DEFAULT`, params.rs): m 19456 KiB, t 2, p 1; the
+# variant is the `Argon2` value's it is used with
+[[fn]]
+crate = "argon2"
+self_type = "Params"
+path = "Default::default$"
+asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
+family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { variant = {}, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" } }
+
+# `Argon2::from(params)` (lib.rs: `Self::new(Algorithm::default(), Version::default(), params)`):
+# Argon2id with those costs
+[[fn]]
+crate = "argon2"
+self_type = "Argon2"
+path = "From::from$"
+asset = "Argon2{variant}"
+family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { variant = { value = "id" } }
+
 # Argon2::new_with_secret(secret, algorithm, version, params): the variant is argument 1
 [[fn]]
 crate = "argon2"
@@ -1446,6 +1504,18 @@ use = "keygen"
 material = "private-key"
 size = "{bits}"
 params = { bits = { const_arg = 1 } }
+
+# ring / aws-lc-rs: an RSA private key decoded from PKCS#8 or DER (`RsaKeyPair::from_pkcs8`):
+# key material whose size is in the encoding and whose padding is chosen at each `sign`
+# (`RSA-PKCS1-1.5-SHA-256` there)
+[[fn]]
+crate = ["ring", "aws_lc_rs"]
+path = "^rsa::(keypair|key)::KeyPair::(from_pkcs8|from_der)$"
+asset = "RSA"
+family = "RSA"
+primitive = "signature"
+functions = ["sign"]
+material = "private-key"
 
 # rsa 0.9: Oaep::new::<D>(), Oaep::new_with_label::<D, S>(label): D is the OAEP hash and
 # MGF1's. Oaep::new_with_mgf_hash::<D, M>(), new_with_mgf_hash_and_label::<D, M, S>(label):
@@ -1505,6 +1575,36 @@ primitive = "mac"
 material = "secret-key"
 note = "JWT HMAC key; HS256, HS384 or HS512 is chosen by the token header, not here"
 
+# jsonwebtoken 9 signing keys decoded from PEM or DER (`EncodingKey::from_rsa_pem(pem)`): private
+# key material of the family; the scheme (RS256, PS384, ES256, EdDSA..) is chosen by the token
+# header
+[[fn]]
+crate = "jsonwebtoken"
+path = "EncodingKey::from_rsa_(pem|der)$"
+asset = "RSA"
+family = "RSA"
+primitive = "signature"
+material = "private-key"
+note = "JWT RSA signing key; RS256/384/512 or PS256/384/512 is chosen by the token header"
+
+[[fn]]
+crate = "jsonwebtoken"
+path = "EncodingKey::from_ec_(pem|der)$"
+asset = "ECDSA"
+family = "ECDSA"
+primitive = "signature"
+material = "private-key"
+note = "JWT EC signing key; ES256 or ES384 is chosen by the token header"
+
+[[fn]]
+crate = "jsonwebtoken"
+path = "EncodingKey::from_ed_(pem|der)$"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+material = "private-key"
+curve = "other/Ed25519"
+
 # --- Protocols ---------------------------------------------------------------------------------
 # A call that configures a protocol stack. Suites and groups are the protocol crate's statics
 # reachable from it; versions come from the crate's enabled features.
@@ -1539,29 +1639,29 @@ methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place",
 [[use]]
 function = "digest"
 primitives = ["hash"]
-methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash"]
+methods = ["digest", "update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash", "finish"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash"]
+methods = ["update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash"]
 
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "raw_verify", "raw_verify_prehashed"]
+methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed"]
 
 [[use]]
 function = "keyderive"
 primitives = ["kdf", "key-agree"]
-methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_into", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
+methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_into", "hash_password_into_with_memory", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
 
 # the `signature` crate's traits: Signer, RandomizedSigner, DigestSigner,
 # RandomizedDigestSigner, hazmat::PrehashSigner, RandomizedPrehashSigner
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate"]
+methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "sign_prehashed", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate"]
 
 [[use]]
 function = "keygen"
@@ -1674,8 +1774,10 @@ args = { "0" = "key" }
 path = "^(ring|aws_lc_rs)::.*EcdsaKeyPair::(from_pkcs8|from_private_key_and_public_key)$"
 args = { "1" = "key" }
 
+# `RsaKeyPair` is an alias: the calls name `ring::rsa::keypair::KeyPair`,
+# `aws_lc_rs::rsa::key::KeyPair`
 [[role]]
-path = "^(ring|aws_lc_rs)::.*RsaKeyPair::(from_pkcs8|from_der)$"
+path = "^(ring::rsa::keypair|aws_lc_rs::rsa::key)::KeyPair::(from_pkcs8|from_der)$"
 args = { "0" = "key" }
 
 # rsa's private keys decoded from PKCS#8 or PKCS#1 (`DecodePrivateKey`, `DecodeRsaPrivateKey`)
@@ -1715,8 +1817,13 @@ path = "PasswordHasher::hash_password$"
 args = { "1" = "password", "2" = "salt" }
 
 [[role]]
-path = "Argon2::hash_password_into$"
+path = "Argon2::hash_password_into(_with_memory)?$"
 args = { "1" = "password", "2" = "salt" }
+
+# `hash_password_customized(&self, password, algorithm, version, params, salt)`
+[[role]]
+path = "PasswordHasher::hash_password_customized$"
+args = { "1" = "password", "5" = "salt" }
 
 # the secret (pepper) of `Argon2::new_with_secret(secret, algorithm, version, params)`
 [[role]]
@@ -1749,11 +1856,15 @@ path = "hkdf::Salt::extract$"
 args = { "1" = "ikm" }
 
 [[role]]
-path = "SigningKey::(from_bytes|try_from|from)$"
+path = "SigningKey::(from_bytes|from_keypair_bytes|try_from|from)$"
 args = { "0" = "key" }
 
 [[role]]
 path = "(EncodingKey|DecodingKey)::from_(base64_)?secret$"
+args = { "0" = "key" }
+
+[[role]]
+path = "EncodingKey::from_(rsa|ec|ed)_(pem|der)$"
 args = { "0" = "key" }
 
 [[role]]
@@ -1821,7 +1932,7 @@ path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill
 # the output of a key derivation (the PRK, the OKM, a shared secret) is derived, whatever went in
 [[source]]
 kind = "derived"
-path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$|^blake3::Hasher::new_derive_key$)"
+path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password(_customized)?$|::hash_password_into(_with_memory)?$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$|^blake3::Hasher::new_derive_key$)"
 
 # Calls whose result carries only some arguments' data (receiver = argument 0).
 [[passthrough]]
@@ -1845,11 +1956,17 @@ args = [0]
 path = "^generic_array::GenericArray::(from_slice|from_mut_slice|clone_from_slice|from_exact_iter|as_slice|as_mut_slice)$"
 args = [0]
 
-# std methods that copy data into their receiver: the data is the argument (std's only: a
+# std methods that copy data over their receiver: the data is the argument (std's only: a
 # program's own `fill(buf)`, or blake3's `OutputReader::fill(&mut out)`, is not one)
 [[passthrough]]
-path = "^(core|std|alloc)::.*::(copy_from_slice|clone_from_slice|extend_from_slice|push_str|push|extend|write_all|fill)$"
+path = "^(core|std|alloc)::.*::(copy_from_slice|clone_from_slice|fill)$"
 args = [1]
+
+# std methods that append to their receiver: the data is what was there and what is added
+# (`key.extend_from_slice(b"pepper")` on a key read from the environment is the environment's)
+[[passthrough]]
+path = "^(core|std|alloc)::.*::(extend_from_slice|push_str|push|extend|write_all|append)$"
+args = [0, 1]
 
 # `format!("{secret}")`: the formatted values, not the literal pieces
 [[passthrough]]

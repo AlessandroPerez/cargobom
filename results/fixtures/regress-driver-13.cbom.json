@@ -815,7 +815,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:Argon2d",
+      "bom-ref": "crypto:algorithm:Argon2d-19456-2-1",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "Argon2",
@@ -836,6 +836,13 @@
             "symbol": "argon2::Argon2::<'key>::new"
           },
           {
+            "additionalContext": "[reachable] [call] in t13::n3; default: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Params::default`",
+            "line": 111,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "core::default::Default::default"
+          },
+          {
             "additionalContext": "[reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 112); line: `b.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
             "line": 112,
             "location": "src/main.rs",
@@ -844,7 +851,7 @@
           }
         ]
       },
-      "name": "Argon2d",
+      "name": "Argon2d-19456-2-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -880,13 +887,13 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:Argon2i",
+      "bom-ref": "crypto:algorithm:Argon2i-19456-2-1",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "Argon2",
@@ -907,6 +914,13 @@
             "symbol": "argon2::Argon2::<'key>::new"
           },
           {
+            "additionalContext": "[reachable] [call] in t13::n3; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`",
+            "line": 109,
+            "location": "src/main.rs",
+            "offset": 60,
+            "symbol": "core::default::Default::default"
+          },
+          {
             "additionalContext": "[reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
             "line": 110,
             "location": "src/main.rs",
@@ -915,7 +929,7 @@
           }
         ]
       },
-      "name": "Argon2i",
+      "name": "Argon2i-19456-2-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -951,7 +965,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -1299,8 +1313,8 @@
         "pkg:cargo/password-hash@0.5.0"
       ],
       "provides": [
-        "crypto:algorithm:Argon2d",
-        "crypto:algorithm:Argon2i"
+        "crypto:algorithm:Argon2d-19456-2-1",
+        "crypto:algorithm:Argon2i-19456-2-1"
       ],
       "ref": "pkg:cargo/argon2@0.5.3"
     },
@@ -1449,6 +1463,26 @@
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:PBKDF2-SHA-256-600000-32"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2d-19456-2-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2i-19456-2-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA-3072"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
     }
   ],
   "metadata": {
@@ -1509,7 +1543,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4027b13f-bd55-8ddd-b037-94786f3d9600",
+  "serialNumber": "urn:uuid:d4046656-75bf-8651-bcd0-7021c4989de2",
   "specVersion": "1.7",
   "version": 1
 }

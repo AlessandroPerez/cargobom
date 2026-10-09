@@ -1,0 +1,96 @@
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:32:18 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8 | [reachable] [call] in a21::Holder::ec; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; line: `let doc = EcdsaKeyPair::generate_pkcs8(alg, &rng).ext()?;`; code: `EcdsaKeyPair::generate_pkcs8`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:33:17 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8 | [reachable] [call] in a21::Holder::ec; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; key: computed (a21::Ext::ext); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, doc.as_ref(), &rng).ext()?;`; code: `EcdsaKeyPair::from_pkcs8`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:46:31 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign | [reachable] [call] in a21::Holder::run; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; line: `Kind::Ec(kp) => kp.sign(&SystemRandom::new(), msg).unwrap().as_ref().to_vec(),`; code: `sign`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:75:24 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING | [reachable] [static] in a21::main; line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`
+  occ RSA | crypto:material:private-key:RSA | src/main.rs:66:13 | ring::rsa::keypair::KeyPair::from_pkcs8 | [reachable] [call] in a21::sign_rsa; from_pkcs8: setup, not a use; key: hard-coded (static a21::RSA_PKCS8); line: `let kp = signature::RsaKeyPair::from_pkcs8(RSA_PKCS8).unwrap();`; code: `signature::RsaKeyPair::from_pkcs8`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:68:13 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [reachable] [static] in a21::sign_rsa; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:68:7 | ring::rsa::keypair::KeyPair::sign | [reachable] [call] in a21::sign_rsa; use: sign; algorithm from ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 in the arguments; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `sign`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:19 | ring::digest::digest | [reachable] [call] in a21::pick; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; line: `Some(a) => digest::digest(a, m).as_ref().to_vec(),`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:13 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [reachable] [component] in a21::sign_rsa; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:75:24 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING | [reachable] [component] in a21::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:78:30 | ring::digest::SHA256 | [reachable] [static] in a21::main; line: `println!("{}", pick(Some(&digest::SHA256), b"m").len());`; code: `digest::SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:39:30 | ring::digest::SHA384 | [reachable] [static] in a21::Holder::hash; line: `kind: Kind::Hash(&digest::SHA384, 0),`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:48:34 | ring::digest::digest | [reachable] [call] in a21::Holder::run; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; line: `Kind::Hash(alg, _) => digest::digest(alg, msg).as_ref().to_vec(),`; code: `digest::digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a21 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a21 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a21 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=4
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:key=computed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
+  prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
+  prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
+  prop RSA | crypto:material:private-key:RSA | rcbom:finding=hard-coded-key
+  prop RSA | crypto:material:private-key:RSA | rcbom:functions:source=knowledge-base
+  prop RSA | crypto:material:private-key:RSA | rcbom:kb:version=0.2.0
+  prop RSA | crypto:material:private-key:RSA | rcbom:occurrences=1
+  prop RSA | crypto:material:private-key:RSA | rcbom:provenance:key=hard-coded
+  prop RSA | crypto:material:private-key:RSA | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=2
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
+asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/a21@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:material:private-key:RSA
+dependency pkg:cargo/a21@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
+root {"bom-ref": "pkg:cargo/a21@0.1.0", "name": "a21", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a21@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=143
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

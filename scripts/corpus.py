@@ -109,6 +109,12 @@ def main():
         rows.append(row)
         print(json.dumps(row), flush=True)
     json.dump(rows, open(out / "corpus.json", "w"), indent=2)
+    # a caught panic, a failed run or a position that does not verify is a failure of the run
+    bad = [r["project"] for r in rows
+           if not r.get("cbom_ok") or r.get("items_not_analysed") or r.get("positions_mismatched")]
+    if bad:
+        print(f"corpus: FAILED for {', '.join(bad)}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -1010,6 +1010,62 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:material:private-key:RSA",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "private-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a16::ring_sign; from_der: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let rk = signature::RsaKeyPair::from_der(der).unwrap();`; code: `signature::RsaKeyPair::from_der`",
+            "line": 80,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::rsa::keypair::KeyPair::from_der"
+          }
+        ]
+      },
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "RSA"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:SHA-1",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1036,6 +1092,13 @@
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "ring::digest::Context::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a16::ring_digest; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `c.finish().as_ref().len() + digest::digest(&digest::SHA384, d).as_ref().len()`; code: `finish`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "ring::digest::Context::finish"
           }
         ]
       },
@@ -1063,7 +1126,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -1431,7 +1494,8 @@
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
         "crypto:algorithm:SHA-512",
-        "crypto:algorithm:x25519"
+        "crypto:algorithm:x25519",
+        "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1484,6 +1548,46 @@
         "crypto:algorithm:SHA-512"
       ],
       "ref": "crypto:algorithm:RSA-PSS-SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha20-Poly1305"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ECDH-P-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:x25519"
     }
   ],
   "metadata": {
@@ -1544,7 +1648,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:606a58ba-4d9f-86d8-8ee4-fa538967d44d",
+  "serialNumber": "urn:uuid:80f286fd-96f2-86d7-ac27-dec6c535ea63",
   "specVersion": "1.7",
   "version": 1
 }

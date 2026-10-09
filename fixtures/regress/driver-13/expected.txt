@@ -7,10 +7,12 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:73:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t13::o7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 69) or rng (rand_core::RngCore::fill_bytes); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:73:45 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t13::o7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 70) or rng (rand_core::RngCore::fill_bytes); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t13::o8; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `Aes256Gcm::new_from_slice(&k).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ Argon2d | crypto:algorithm:Argon2d | src/main.rs:111:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Argon2::new`
-  occ Argon2d | crypto:algorithm:Argon2d | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 112); line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
-  occ Argon2i | crypto:algorithm:Argon2i | src/main.rs:109:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
-  occ Argon2i | crypto:algorithm:Argon2i | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:111:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Argon2::new`
+  occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:111:49 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Params::default`
+  occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 112); line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
+  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:60 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
+  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | src/main.rs:95:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, 100_000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | src/main.rs:94:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, n, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:92:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, ITERATIONS, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
@@ -55,24 +57,24 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,hard-coded,rng
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:confidence=high
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:detection:method=type-resolved
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:finding=hard-coded-salt
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:functions:source=observed
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:kb:version=0.2.0
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:occurrences=2
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:provenance:password=parameter
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:provenance:salt=hard-coded
-  prop Argon2d | crypto:algorithm:Argon2d | rcbom:reachability=reachable
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:confidence=high
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:detection:method=type-resolved
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:finding=hard-coded-salt
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:functions:source=observed
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:kb:version=0.2.0
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:occurrences=2
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:provenance:password=parameter
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:provenance:salt=hard-coded
-  prop Argon2i | crypto:algorithm:Argon2i | rcbom:reachability=reachable
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:confidence=high
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:finding=hard-coded-salt
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:functions:source=observed
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:kb:version=0.2.0
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:occurrences=3
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:password=parameter
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:salt=hard-coded
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:reachability=reachable
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:confidence=high
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:finding=hard-coded-salt
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:functions:source=observed
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:kb:version=0.2.0
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:occurrences=3
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=parameter
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=hard-coded
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:detection:method=type-resolved
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:functions:source=observed
@@ -169,8 +171,8 @@
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
-asset Argon2d | crypto:algorithm:Argon2d | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
-asset Argon2i | crypto:algorithm:Argon2i | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
@@ -237,9 +239,14 @@ dep pkg:cargo/t13@0.1.0 -> pkg:cargo/rand@0.8.8
 dep pkg:cargo/t13@0.1.0 -> pkg:cargo/rsa@0.9.10
 dep pkg:cargo/t13@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:Argon2d-19456-2-1
+dependency crypto:algorithm:Argon2i-19456-2-1
 dependency crypto:algorithm:PBKDF2-SHA-256-100000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-210000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-600000-32
+dependency crypto:algorithm:SHA-256
+dependency crypto:material:private-key:RSA-3072
 dependency pkg:cargo/aead@0.5.2
 dependency pkg:cargo/aes-gcm@0.10.3
 dependency pkg:cargo/aes@0.8.4
@@ -267,8 +274,8 @@ doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
-provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2d
-provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2d-19456-2-1
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i-19456-2-1
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-100000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-210000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-600000-32

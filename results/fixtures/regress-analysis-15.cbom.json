@@ -1260,7 +1260,7 @@
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: computed (run-time contents of static a15::COUNTER); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`",
             "line": 148,
             "location": "src/main.rs",
             "offset": 12,
@@ -1321,73 +1321,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:Argon2id-65536-3-4",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "Argon2",
-          "cryptoFunctions": [
-            "keyderive"
-          ],
-          "primitive": "kdf"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a15::a2; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`",
-            "line": 32,
-            "location": "src/main.rs",
-            "offset": 17,
-            "symbol": "argon2::params::Params::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`",
-            "line": 33,
-            "location": "src/main.rs",
-            "offset": 4,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`",
-            "line": 34,
-            "location": "src/main.rs",
-            "offset": 9,
-            "symbol": "password_hash::traits::PasswordHasher::hash_password_customized"
-          }
-        ]
-      },
-      "name": "Argon2id-65536-3-4",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:Argon2i",
+      "bom-ref": "crypto:algorithm:Argon2i-19456-2-1",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "Argon2",
@@ -1408,6 +1342,13 @@
             "symbol": "argon2::Argon2::<'key>::new_with_secret"
           },
           {
+            "additionalContext": "[reachable] [call] in a15::a3; default: setup, not a use; line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Params::default`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 80,
+            "symbol": "core::default::Default::default"
+          },
+          {
             "additionalContext": "[reachable] [call] in a15::a3; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 2 of the enclosing function); line: `h.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`",
             "line": 44,
             "location": "src/main.rs",
@@ -1416,7 +1357,7 @@
           }
         ]
       },
-      "name": "Argon2i",
+      "name": "Argon2i-19456-2-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -1452,7 +1393,81 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Argon2id-65536-3-4",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "Argon2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a15::a2; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "argon2::params::Params::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "password_hash::traits::PasswordHasher::hash_password_customized"
+          }
+        ]
+      },
+      "name": "Argon2id-65536-3-4",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "rng"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -2183,7 +2198,7 @@
         "algorithmProperties": {
           "algorithmFamily": "RSASSA-PKCS1",
           "cryptoFunctions": [
-            "sign"
+            "keygen"
           ],
           "primitive": "signature"
         },
@@ -2192,7 +2207,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a15::a9; part of RSA-3072; line: `let sk = rsa::pkcs1v15::SigningKey::<Sha256>::random(&mut OsRng, 3072).unwrap();`; code: `rsa::pkcs1v15::SigningKey::<Sha256>::random`",
+            "additionalContext": "[reachable] [call] in a15::a9; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = rsa::pkcs1v15::SigningKey::<Sha256>::random(&mut OsRng, 3072).unwrap();`; code: `rsa::pkcs1v15::SigningKey::<Sha256>::random`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 13,
@@ -2216,15 +2231,15 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:only-as-component",
-          "value": "true"
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -2617,7 +2632,7 @@
       ],
       "provides": [
         "crypto:algorithm:Argon2",
-        "crypto:algorithm:Argon2i",
+        "crypto:algorithm:Argon2i-19456-2-1",
         "crypto:algorithm:Argon2id-65536-3-4"
       ],
       "ref": "pkg:cargo/argon2@0.5.3"
@@ -2816,6 +2831,70 @@
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2i-19456-2-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2id-65536-3-4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha20"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA-2048"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA-3072"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -2876,7 +2955,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3dcdb307-3275-84bb-9ad6-cba500e4b2c6",
+  "serialNumber": "urn:uuid:7a194354-5753-8b32-9c63-24881a5e3564",
   "specVersion": "1.7",
   "version": 1
 }

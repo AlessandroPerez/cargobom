@@ -30,6 +30,9 @@ pub struct LinkIndex {
     budget: Cell<usize>,
     /// Answers already given: the same field is read at many calls.
     memo: RefCell<HashMap<(Origin, String), Values>>,
+    /// For the current question: the functions each descriptor found was named in (`""`: a
+    /// static's initializer, or what a static holds at run time).
+    named_in: RefCell<HashMap<String, std::collections::BTreeSet<String>>>,
 }
 
 type Values = Option<Vec<(Origin, String)>>;
@@ -96,6 +99,20 @@ impl LinkIndex {
             }
         }
         ix
+    }
+
+    /// Notes that descriptor `id` was found named in function `owner`.
+    pub fn note(&self, id: &str, owner: &str) {
+        self.named_in
+            .borrow_mut()
+            .entry(id.to_string())
+            .or_default()
+            .insert(owner.to_string());
+    }
+
+    /// The functions noted since the last call, by descriptor.
+    pub fn take_named(&self) -> HashMap<String, std::collections::BTreeSet<String>> {
+        std::mem::take(&mut *self.named_in.borrow_mut())
     }
 
     /// A static whose contents change at run time, with the values recorded for it.
@@ -187,14 +204,23 @@ impl LinkIndex {
                     }
                 }
             }
-            // a call of the program's own function: what it returns, the part read first
-            Origin::Call { callee, args, .. } => {
-                if let Some(k) = (0..=path.len()).rev().find(|k| {
-                    self.returns
-                        .contains_key(&(callee.clone(), fields(&path[..*k])))
-                }) {
+            // a call of the program's own function: what it returns, the part read first; a
+            // trait method's call (`r._err()` on a `Result`), what the implementation for the
+            // `Self` type it names returns
+            Origin::Call {
+                callee,
+                args,
+                self_ty,
+                ..
+            } => {
+                let names = std::iter::once(callee.clone())
+                    .chain(self_ty.iter().map(|t| rcbom_facts::impl_key(callee, t)));
+                if let Some((name, k)) = names
+                    .flat_map(|n| (0..=path.len()).rev().map(move |k| (n.clone(), k)))
+                    .find(|(n, k)| self.returns.contains_key(&(n.clone(), fields(&path[..*k]))))
+                {
                     let mut found = Vec::new();
-                    for r in &self.returns[&(callee.clone(), fields(&path[..k]))] {
+                    for r in &self.returns[&(name, fields(&path[..k]))] {
                         let v = substitute(r, args);
                         self.resolve(&v, &path[k..], owner, depth + 1, &mut found);
                     }
@@ -255,6 +281,15 @@ const WRAPPERS: &[&str] = &[
     "Box::<T>::new",
     "Arc::<T>::new",
     "Rc::<T>::new",
+    // what a lock or a once-cell holds, and what is put in one
+    "Mutex::<T>::new",
+    "Mutex::<T>::lock",
+    "RwLock::<T>::new",
+    "RwLock::<T>::read",
+    "RwLock::<T>::write",
+    "OnceLock::<T>::get",
+    "OnceCell::<T>::get",
+    "LazyLock::<T, F>::force",
 ];
 
 /// `o` without the standard-library calls that only unwrap, wrap or borrow a value

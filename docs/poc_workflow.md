@@ -1,7 +1,7 @@
 # cargo-cbom proof of concept: the complete workflow
 
 *Written 9 October 2026 for cargo-cbom 0.1.0 (driver built on `nightly-2026-09-25`, rustc
-1.100.0-nightly f7575a9da), knowledge base 0.2.0, facts version 8. Everything below describes the code in this
+1.100.0-nightly f7575a9da), knowledge base 0.2.0, facts version 9. Everything below describes the code in this
 repository as it is; where a statement depends on the compiler version, the version is named.*
 
 This document explains, from first principles, how the tool turns a Rust project into a
@@ -304,7 +304,8 @@ the compiler keeps **expansion data**:
 Expansions nest: `vec![...]` used inside `hash_all!` has a call site that is itself inside an
 expansion. `span.from_expansion()` says whether a span was produced by expansion.
 `span.source_callsite()` follows call sites outwards until it reaches the user's source: the
-outermost invocation. Section 22 shows how the tool uses this.
+invocation written there (for `outer!(inner!(x))`, whose argument holds `inner!`'s call as the
+user wrote it, `inner!`). Section 22 shows how the tool uses this.
 
 ## 7. Generics, traits and monomorphization
 
@@ -488,10 +489,11 @@ fixed MIR level, and counted the call sites recorded in the crates `minisign`, `
 | none (level 2, from the profile) | 0 | 0 | 0 |
 | `-Zinline-mir=no` (level 2, no inliner) | 0 | 0 | 0 |
 | `-Zmir-enable-passes=-GVN` (level 2, no GVN) | 4 | 9 | 2 |
-| `-Zmir-opt-level=1` (what the driver passes) | 4 | 10 | 2 |
+| `-Zmir-opt-level=1` | 4 | 10 | 2 |
 
 The calls are still in the MIR at level 2, but without positions, and the driver drops every
-site that has no position (section 22). GVN alone accounts for all the missing calls; the
+site that has no position (section 22). The driver passes `-Zmir-opt-level=0`: level 1 transforms
+too (below). GVN alone accounts for all the missing calls; the
 inliner additionally removes one call inside `scrypt`, which is not compiled incrementally.
 
 **Level 1 transforms too.** The passes that run at level 1 but not at level 0 are
@@ -571,7 +573,7 @@ match crates to Cargo packages. rustc offers several identifiers:
 | def path string | `ring::aead::algorithm::AES_256_GCM` | yes, when printed as the *defining* path, crate first (below) | human-readable `path` and `symbol` |
 | def-path hash | `f6ce076f005a77e65957e17b002ad5d4` (ring's `AES_256_GCM`) | **yes**: 128 bits; the first 64 are the crate's `StableCrateId`, the last 64 a hash of the item's path inside the crate | `id` of statics, consts, generic owners |
 | `StableCrateId` | `f6ce076f005a77e6` (ring 0.17.14 in this build) | **yes**: a 64-bit hash of the crate name, the `-C metadata` values Cargo passes (which encode the package's identity and version), whether the crate is an executable, and the compiler version (`rustc_span/src/def_id.rs`, `StableCrateId::new`) | tells two versions of one crate apart |
-| mangled symbol name | `_RNvCscTT69CrhWaT_5micro9ring_seal` (`micro::ring_seal`) | **yes**: the linker symbol of an instance (Rust v0 mangling), unique per instance | `id` of monomorphic function owners |
+| mangled symbol name | `_RNvCshUiPcX6YYPZ_5micro9ring_seal` (`micro::ring_seal`) | **yes**: the linker symbol of an instance (Rust v0 mangling), unique per instance | `id` of monomorphic function owners |
 | crate name | `aes_gcm` | yes, but two versions share it | KB matching, together with the `StableCrateId` |
 
 A **visible path** is the path a user would write, which may go through a re-export, and
@@ -707,6 +709,7 @@ argument, then parses:
 | `--driver PATH` | the driver binary. Without it, the first path that exists among: `$RCBOM_DRIVER`; `rcbom-driver` next to the `cargo-cbom` executable; `crates/rcbom-driver/target/release/rcbom-driver` and then `.../debug/rcbom-driver` in this repository. If none exists, the run stops with an error |
 | `--manifest-only` | Layer 1 only: no compilation |
 | `--no-walk` | no reachability walk (the ablation, section 21) |
+| `--profile NAME` | the cargo profile whose build is analysed (default `release`, the profile a program ships with): its features, `cfg(debug_assertions)` and dependencies decide what is compiled |
 | `verify CBOM [--self-test] [--manifest-path P]` | the position checker (section 27); it re-reads the workspace at `P` (default `./Cargo.toml`), so it must be run against the workspace the CBOM describes |
 
 The run then:
@@ -1026,7 +1029,7 @@ runs. It follows the same principles as rustc's mono item collector, and Kani's 
 
 **Roots**, in a workspace member (`CARGO_PRIMARY_PACKAGE`):
 - a binary's entry function, `main`, as an instance;
-- a library's exported functions that need no monomorphization (public at the crate boundary, by rustc's effective visibilities), and its exported statics. A public *generic* function cannot be a root, because it has no instance until something instantiates it; so the non-generic functions of the crate that rustc's `reachable_set` lists are roots too: what other crates' instances can end up calling, such as a private helper a public generic function calls (password-auth's generic `generate_hash` runs the non-generic `generate_phc_hash`);
+- a library's exported functions that need no monomorphization (public at the crate boundary, by rustc's effective visibilities), and its exported statics. A public *generic* function cannot be a root, because it has no instance until something instantiates it; so the non-generic functions of the crate that rustc's `reachable_set` lists are roots too: what other crates' instances can end up calling, such as a private helper a public generic function calls (password-auth's generic `generate_hash` runs the non-generic `generate_phc_hash`). The generic functions in that set, the public ones and those they call, are not walked, but their per-item sites count as reached, as when one of their instances is walked (step 3): the sites whose crypto does not depend on the type arguments are reachable (cookie's `PrivateJar<J>::add` seals with AES-256-GCM whatever the parent jar `J` is), and so is a trait's default method that a public type takes (its `Self` is a parameter); those that do depend on them name no asset there;
 - in either, what the linker keeps whatever calls it: functions with `#[no_mangle]` or `#[export_name]` (rustc's `contains_extern_indicator`), and statics with `#[used]`, such as a constructor placed in `.init_array` that runs before `main`.
 
 Dependencies have no roots; their code is reached from the members' walks, through their MIR
@@ -1102,7 +1105,7 @@ Code: `locate` and `raw_loc` in the driver.
 
 **`locate(span)`:**
 - If the span is **not** from a macro expansion, the position is `raw_loc(span)`.
-- If it **is**, the position is that of `span.source_callsite()`: the outermost invocation, in the user's source. The macro is described by the outermost expansion data, found by following call sites outwards while they are themselves inside expansions. Its kind decides the recorded name:
+- If it **is**, the position is that of `span.source_callsite()`: the invocation in the user's source (of a macro called in another's arguments, as `inner!` in `outer!(inner!(x))`, the inner one, whose call the user wrote; of a macro a macro's body calls, as `vec!` in `hash_all!`, the outer one). The macro is described by the outermost expansion data, found by following call sites outwards while they are themselves inside expansions. Its kind decides the recorded name:
   - a function-like macro (kind `Bang`), with its name as rustc records it (`hash_all`, `ml::sha512_of`), even when the code came from an inner `vec![..]`;
   - a derive (kind `Derive`), positioned at `Name` inside `#[derive(..)]`;
   - an attribute macro (kind `Attr`), positioned at the attribute;
@@ -1123,7 +1126,7 @@ records the text it covers (`span_to_snippet`, at most 120 characters): `Sha512_
 whole line holding the position, without leading and trailing whitespace (`line_text`): the
 span is reduced to its first character (`shrink_to_lo`), widened to the line around it
 (`span_extend_to_line`), and read with `span_to_snippet`. For code from a macro, the span is
-first replaced by the outermost call site, as for the position. The CBOM carries it (`line:`),
+first replaced by the call site in the user's source, as for the position. The CBOM carries it (`line:`),
 and `verify` requires the line at the position to be exactly that. The column and the text at
 it do not always pin a position down: in rcgen,
 
@@ -1169,7 +1172,11 @@ statement) where it happens:
   `rng.fill_bytes(&mut nonce)` defines `nonce`, `pbkdf2_hmac(.., &mut out)` defines `out`. A
   method that takes `&mut self` and returns it (a builder: blake3's `Hasher::update`) writes its
   receiver too. `std::mem::replace(&mut key, v)` defines `key` as `v`, and `mem::swap(&mut a, &mut
-  b)` each as the other;
+  b)` each as the other. A closure or a struct handed to a call (by value or `&mut`) that holds a
+  `&mut` to a place (`|| rng.fill_bytes(&mut k1)` called, `fill_out(Out { buf: &mut k2 })`) makes
+  that call an out-parameter of the place too. A generator lent to a call that draws from it
+  (`pk.encrypt(&mut rng, ..)`, `RsaPrivateKey::new(&mut rng, 2048)`) is not one: the call's data is
+  not put in it (a local of a type named `..Rng`, unless the callee is a generator's own method);
 - a **write through a borrow a call returned**: a call that returns a mutable reference or a
   value holding one (`index_mut`, `as_mut`, `key.chunks_mut(16)`, `split_at_mut`, a
   `Mutex::lock` or `RefCell::borrow_mut` guard) hands out a borrow rather than writing its
@@ -1190,6 +1197,12 @@ graph decides which definitions can reach each point, with kills:
   targets it may or may not land on each (*weak*: nothing is killed);
 - a write to an element (`key[31] = 1`, through `&mut key[3]`, a fill of `&mut key[..16]`)
   changes part of the array: it is weak, and is no initialization;
+- a call that writes the whole buffer it is given (a random fill: `fill_bytes`,
+  `try_fill_bytes`, `fill`, `getrandom`; `read_exact`) overwrites it, through a reference with a
+  single target too: a nonce part of a buffer split with `split_at_mut` and filled by the
+  generator is the generator's only;
+- a write to a local an `async` body keeps across an `.await` (a field of the coroutine,
+  reached through its pinned self `_1.0`, which points at the coroutine alone) is strong;
 - an out-parameter call through a reference with a single target replaces the place's earlier
   *initializations*: a constant (`let mut nonce = [0u8; 12]`) or a standard-library constructor
   taking only constants (`String::new()`, `Vec::with_capacity(32)`, `Default::default()`).
@@ -1236,7 +1249,7 @@ A definition gives:
 | `Ref`, `AddressOf`, `Reborrow` of a place | the origin of the place (a reference stands for what it points to) |
 | `Cast(operand)`, `Use(constant)` | the origin of the operand |
 | `Repeat(constant, n)` (`[0u8; 12]`) | `Const { len }` with the statement's span; `len` is a byte count, given only when the elements are bytes |
-| `Aggregate` read through one of its fields (`cfg.key` of `Cfg { key: .., rounds: 100_000 }`) | the origin of that field's operand only |
+| `Aggregate` read through one of its fields (`cfg.key` of `Cfg { key: .., rounds: 100_000 }`) | the origin of that field's operand only; an enum variant read as another (`Pick::B(y)` of a `Pick::A(x)` built here) is not this definition's value |
 | `Aggregate` of constants only, read whole | `Const { len }` (an array of bytes) or `Const` without length |
 | `Aggregate` of a struct or variant without fields (`OsRng`, `Option::None`) | `Unit { path }`, naming the type or variant |
 | a closure aggregate passed on (`unwrap_or_else(|_| "x".into())`) | the closure followed: the origin of its return value, at every `return`, with its captures' origins; wrapped as `Call { callee: "<closure>", args: [that] }` |
@@ -1245,10 +1258,11 @@ A definition gives:
 | an enum variant without fields (`Algorithm::Argon2i`) | `Unit { path, value }`, naming the variant, with its discriminant as `value` |
 | arithmetic (`key[0] & 248`, `seq ^ IV`), checked or not | `All` of the operands' origins; a unary operation, its operand's |
 | a definition through a borrow a call returned | `Through { callee }` |
-| a field read of a value whose origin the search ends at (a parameter, a call's result, an out-parameter) | `Field { adt, field, base }`, the struct's defining path, the field's index and the origin of the value read; a field of a field nests (`self.0.0`). The analysis looks it up in what the program stores there (section 23.1) |
+| a field read of a value whose origin the search ends at (a parameter, a call's result, an out-parameter) | `Field { adt, field, base }`, the struct's defining path (an enum outside the standard library: the variant's, `KeyPairKind::Ec`), the field's index and the origin of the value read; a field of a field nests (`self.0.0`). The analysis looks it up in what the program stores there (section 23.1) |
+| `Default::default()` of a field-less enum (`Algorithm::default()`) | the variant its `Default` returns, as `Unit` (read from the impl's MIR: `Argon2id`) |
 | a call result (or out-parameter) | `Call { callee, krate, self_ty, args, span }`: the callee's defining path, its crate, the ADT it belongs to (`argon2::Argon2` for `<Argon2 as Default>::default`), the origins of its arguments, and where the callee is named (the position the call's own site has, if any). A call through a pointer to a function reified in the body names that function; through any other pointer, `<indirect>` |
 | a constant pointer to a static | `Data { def }` (the static) |
-| a named const (`aws_lc_rs::aead::AES_256_GCM`) | `Data { def, value }`; an associated const is resolved to the impl's item when the arguments are known (`S384::ALG`, `Self::ALG` in `impl Scheme for S384`); an integer or field-less enum const carries the value the compiler evaluates (`const ITERATIONS: u32 = 600_000`) |
+| a named const (`aws_lc_rs::aead::AES_256_GCM`) | `Data { def, value }`; an associated const is resolved to the impl's item when the arguments are known (`S384::ALG`, `Self::ALG` in `impl Scheme for S384`), and a trait's const whose type is not known yet (`T::ALG` read in the generic body) is nothing: its default is only one of the values the instances may have; an integer or field-less enum const carries the value the compiler evaluates (`const ITERATIONS: u32 = 600_000`) |
 | a promoted constant or inline const block | `Data` of what its own MIR names (`&AES_256_GCM` promoted, `const { &SHA512 }`); if it names nothing (`const { pick() }`, a `const fn` result), the statics its evaluated value points at; else `Const { len }` (literal data such as `&[42u8; 32]`) |
 | in a generic instance or closure, a constant the instance body has evaluated | what the item's MIR has at the same span, as in the three rows above (section 21) |
 | an integer constant | `Const { value }` |
@@ -1264,7 +1278,8 @@ per node, at most 400 nodes per tree, and places of at most 16 path steps: a loo
 list (`q = (*q).next`, once_cell's waiter queue) reads a longer path at each turn, which no
 other bound stops (it overflowed the compiler's stack). A bound that cuts the tree leaves an
 explicit `Truncated` node, which the analysis reports as `unknown`; a loop back to a place being
-computed (`x = f(x)`) is `Unknown`, since the other definitions say where the value starts.
+computed (`ctr += 1`, `x = f(x)`) is `Loop`: the value depends on its own earlier value, and the
+other definitions say where it starts (the analysis reads it as a counter, section 25).
 
 The tree is knowledge-base agnostic: it says "the result of `std::env::var`", not
 "environment". The analysis classifies it (section 25).
@@ -1292,12 +1307,23 @@ aead::Algorithm`, `hmac::Key`, `&dyn Hash`), or the fields of program structs th
   and the path of fields (`Chacha20Poly1305Aead(AeadAlgorithm(&CHACHA20_POLY1305))` stores
   `CHACHA20_POLY1305` in `Chacha20Poly1305Aead.0.0` as well as in `AeadAlgorithm.0`). Each store
   records the function it is in, whose parameters its value names, and whether the struct was
-  reached through a reference (and so may be part of another one);
-- **returns**: what each function returns, and each field of it that can carry one;
+  reached through a reference (and so may be part of another one). An enum variant built by
+  the program is a struct of its own, named by the variant: rcgen's `KeyPairKind::Ec(kp)`
+  stores `kp` in `KeyPairKind::Ec.0`, which `match &self.kind { KeyPairKind::Ec(kp) => .. }`
+  reads (a standard-library enum's field, `Some(k)`, is read as the whole value);
+- **returns**: what each function returns, and each field of it that can carry one; a generic
+  function's whole result, whatever its type (`fn _err(self) -> Result<T, Error>`). A method
+  implementing a trait's records it also under the trait's method and its `Self` type, the
+  names its calls have (`r._err()` on a `Result` calls `ExternalError::_err` with `Self` a
+  `Result`);
 - **calls**: every call of a function whose code is analysed (not the standard library's, nor a
-  stop crate's), with its caller and the origins of the arguments that can carry one;
+  stop crate's), with its caller and the origins of the arguments that can carry one; a call of a
+  closure of the crate (`f(&SHA512, d)`, which is `Fn::call(&f, (&SHA512, d))`) as a call of the
+  closure, its parameters receiving the tuple's elements;
 - **statics written at run time**: what a `LazyLock`'s initializer, `OnceLock::set` or
-  `get_or_init`, or a write through `&mut` to a `static mut` puts in a static, and which
+  `get_or_init`, a fill through `&mut`, an assignment to a `static mut` (`ALG2 = &SHA1`) or a write
+  through a lock's guard (`*ALG.write().unwrap() = &SHA1`) puts in a static; its initial value,
+  unless it starts empty (`OnceLock`, `OnceCell`) or is computed on first use (`LazyLock`); and which
   statics change at run time (a `static mut`, or a type with interior mutability).
 
 Stop crates' bodies record none: their functions are what the knowledge base names
@@ -1307,13 +1333,19 @@ The analysis indexes these over all the build's crates (`LinkIndex`), and looks 
 flow- and context-insensitively, from the function that reads it:
 - a field read `base.f.g` is resolved from its base: a parameter becomes what each caller
   passes, read in that caller (and so on up the calls); a call of the program's own function
-  becomes what it returns, the longest recorded part of it first, its parameters replaced by the
-  call's arguments; standard-library wrappers are looked through (`?`, `unwrap`, `map_err`,
+  becomes what it returns (a trait method's call, what the implementation for its `Self` type
+  returns), the longest recorded part of it first, its parameters replaced by the call's
+  arguments; standard-library wrappers are looked through (`?`, `unwrap`, `map_err`,
   `clone`, `Arc::new`, `Box::new`, `deref`);
 - where that gives nothing, the stores of the field path stand for it: those of the longest
   part of the path that has any (`Chacha20Poly1305Aead.0.0` before `AeadAlgorithm.0`), with the
   stores of its shorter parts made through a reference. A caller that passes an unknown value
   leaves the stores standing for it too.
+
+A static that changes at run time holds what the program puts there, not only its initializer:
+an algorithm read from one (`digest(*ALG.read().unwrap(), ..)`, `ONCE.get().unwrap()`, `*LAZY`) is
+each of its recorded values ("one of 2": its initial SHA-256 or the SHA-1 written later), looked
+up as the values from elsewhere are, through the standard library's wrappers of locks and cells.
 
 Each value found comes with the function it is read in, whose parameters and fields it names
 (a value stored in a field, those of the function that stored it), and the search for a
@@ -1418,6 +1450,8 @@ Several matchers run on the same call site, in order:
    - parameters already spelled out in the name or the parameter set are not repeated as properties. A parameter the name leaves out stays one: with the iteration count unknown, `PBKDF2-{hash}-{iterations}-{dk_len}` stops after the hash, and the output length is `rcbom:param:dk_len`. An optional part left out at its default value is implied by the name;
    - ADTs found *inside* a matched ADT's arguments are its **components** (SHA-256 inside HMAC-SHA-256), except in arguments read as parameters (the `Aes256` of `AesGcm<Aes256, ..>` is part of the name, not a component).
 
+   A value argument's constructor is followed through a `self_type` entry too: `Argon2::new(Algorithm::default(), Version::default(), Params::default())` is Argon2id-19456-2-1, from the entry for `<Params as Default>::default` (the driver reads `Algorithm::default()` as the variant it returns, section 23).
+
    A type match on the receiver can be made more precise by the receiver's constructor: if the call's receiver was built (through references, `unwrap` and the like: calls into the standard library or a knowledge-base crate, never the program's own functions, whose result is not their argument) by a call that a `[[fn]]` entry of the same family matches, that entry's asset is used instead (`match_constructor`). `argon2.hash_password(..)` with `argon2` from `Argon2::default()` is Argon2id-19456-2-1, not plain Argon2; a `blake3::Hasher` from `Hasher::new_keyed(k)` is keyed BLAKE3, a MAC. Not for the methods a `[[type]]` entry lists in `own_params`, whose parameters are not those of the receiver: `verify_password` checks against the algorithm and costs of the stored hash string, and `hash_password_customized` takes them from its arguments. Such a call takes its arguments' constructor, if one names its asset (the `Params::new(65536, 3, 4, None)` passed to `hash_password_customized` gives Argon2id-65536-3-4, the variant still the receiver's), and otherwise keeps the type's family name (`Argon2`), with the detail `<method>: its own parameters, not its receiver's`. The receiver's constructor, a setup for that call, is then named like it.
 
    Otherwise, a value argument can do the same (`argument_constructor`). rsa's `RsaPublicKey::encrypt(&mut rng, Oaep::new_with_label::<Sha256, _>(label), msg)` names only `Oaep` in its type, and an `Oaep` holds its digest as a run-time value: the type alone gives RSA-OAEP. The argument's origin is the call `Oaep::new_with_label`, whose callee position the driver records with the origin (`Origin::Call.span`). The analysis looks up the site of that very call (same function instance, same file, line and column), matches it, and uses its asset, RSA-OAEP-SHA-256, when it is a `[[fn]]` entry of the same family and the call builds a value of an ADT the matched call names in its types (`Oaep::new_with_label` builds an `Oaep`, which `encrypt::<R, Oaep>` names; `blake3::derive_key`, a free function, builds no `Hasher`, so `hasher.update(&blake3::derive_key(..))` stays a plain BLAKE3 hash). If two arguments lead to constructors of the family with different names, the call does not say which, and the type's asset stays.
@@ -1425,7 +1459,7 @@ Several matchers run on the same call site, in order:
    A type match of the family a `[[fn]]` entry of step 1 already matched is skipped: the constructor `Oaep::new_with_label::<Sha256, _>` is RSA-OAEP-SHA-256, and its `Oaep` self type is not also an RSA-OAEP that is part of it.
 
    Each type match becomes an occurrence of one of three kinds:
-   - if it is a component of an enclosing match, or of a function entry matched in step 1 (the hash inside `pbkdf2_hmac::<Sha256>`): **`component`**, with the detail `part of <outer>`;
+   - if it is a component of an enclosing match, or of a function entry matched in step 1 (the hash inside `pbkdf2_hmac::<Sha256>`): **`component`**, with the detail `part of <outer>`; not when the function entry makes key material and the type is the algorithm it is made for (rsa's `SigningKey::<Sha256>::random(rng, 2048)` is an RSA-2048 key and a `keygen` call of RSA-PKCS1-1.5-SHA-256);
    - else, if the callee belongs to a knowledge-base crate, or is a standard-library constructor or conversion of a knowledge-base type (`StaticSecret::from(..)`, `SigningKey::try_from(..)`): **`call`**, with the use of the method, or the detail `<method>: setup, not a use` when the method is not a use (`new_from_slice`, `generate_nonce`);
    - else (the user's own generic function called with a crypto type, `seal::<Aes256Gcm>`): **`instantiation`**, with the detail `chosen as generic argument of seal`.
 3. **ring / aws-lc-rs linking.** If nothing matched, and the callee belongs to a knowledge-base crate (or is a standard-library constructor of one of its types), the descriptors the call names are looked for in its argument origins (`provenance::data_in_args`), in two places tried in turn:
@@ -1434,9 +1468,9 @@ Several matchers run on the same call site, in order:
 
    A field of a static (`digest(TABLE.alg, ..)`) stands for the static, whose data says which descriptor (the rule above), not for every value of its type's field.
 
-   If neither place names a descriptor, both are tried again with the values that reach the call from other functions (section 23.1): the key pair or the algorithm a field holds (`self.inner.sign(&self.rng, msg)`, `hmac::sign(&self.key, msg)`), what callers pass for a parameter, what the program's own function returned. When one descriptor reaches the call, the detail is `algorithm from <descriptor>, reaching the call from another function`. When several do (rustls's `AeadAlgorithm::encrypter`, called for the AES-128-GCM and the AES-256-GCM suite), which one is chosen at run time: the call is an occurrence of each, with the detail `algorithm one of N that may reach the call from other functions: <descriptor>`. The lookup is flow- and context-insensitive, so "may": a value stored in a field anywhere in the program may be the one read. The tiers still hold: a descriptor no reachable code or data names (rustls's `MLKEM1024`, listed only by `ALL_KX_GROUPS`) does not reach the call at run time, so at a reachable call its occurrence is `present` (probe analysis-20). It is made only for a call that could give an occurrence (its method is a use, or it has key-material roles) and whose own arguments and receiver name no descriptor: most calls into a protocol crate's own code are neither, and looking them all up made xh's analysis eight times slower (84 s instead of 10 s with its facts already built).
+   If neither place names a descriptor, both are tried again with the values that reach the call from other functions (section 23.1): the key pair or the algorithm a field holds (`self.inner.sign(&self.rng, msg)`, `hmac::sign(&self.key, msg)`), what callers pass for a parameter, what the program's own function returned. When one descriptor reaches the call, the detail is `algorithm from <descriptor>, reaching the call from another function`. When several do (rustls's `AeadAlgorithm::encrypter`, called for the AES-128-GCM and the AES-256-GCM suite), which one is chosen at run time: the call is an occurrence of each, with the detail `algorithm one of N that may reach the call from other functions: <descriptor>`. The lookup is flow- and context-insensitive, so "may": a value stored in a field anywhere in the program may be the one read. The tiers still hold: a descriptor reaches a reachable call at run time only if a function that names it is reachable, or, for a descriptor in a static's data, if reachable code or data names that data. One named only by a caller never called, or listed only by rustls's `ALL_KX_GROUPS` (`MLKEM1024`), is `present` at that call (probes analysis-20, driver-18). It is made only for a call that could give an occurrence (its method is a use, or it has key-material roles) and whose own arguments and receiver name no descriptor: most calls into a protocol crate's own code are neither, and looking them all up made xh's analysis eight times slower (84 s instead of 10 s with its facts already built). A protocol crate's own function is never looked up this way: rustls's `KeySchedule::derive` and jsonwebtoken's `crypto::ecdsa::sign` are not crypto APIs, and their crypto is at the algorithm crate's calls inside them.
 
-   Other arguments are data, not the algorithm: a buffer that `digest(&SHA256, ..)` filled does not make a seal SHA-256, and a key derived with `HKDF_SHA256` does not make `UnboundKey::new` an HKDF call. The program's own static or const naming exactly one descriptor (`digest(TABLE.alg, ..)` with `TABLE.alg = &SHA256`) names that descriptor; a table of several (`DIGESTS[i]`) is chosen at run time and names none. For each descriptor found, the call becomes a **`call`** occurrence of that asset, when either the method is a use *for that asset's primitive* (`seal_in_place_append_tag` is `encrypt`, which applies to AEADs; `expand` is `keyderive`, which does not apply to the AES-256-GCM whose key length it is given) or the call has key-material roles (`UnboundKey::new(alg, key)`). The detail is `algorithm from <descriptor> in the arguments`.
+   Other arguments are data, not the algorithm: a buffer that `digest(&SHA256, ..)` filled does not make a seal SHA-256, and a key derived with `HKDF_SHA256` does not make `UnboundKey::new` an HKDF call. The program's own static or const naming exactly one descriptor (`digest(TABLE.alg, ..)` with `TABLE.alg = &SHA256`) names that descriptor, a descriptor another is made of not counting (`static MAC_ALG: &hmac::Algorithm = &hmac::HMAC_SHA256` names HMAC-SHA-256, whose `SHA256` is part of it); a table of several (`DIGESTS[i]`) is chosen at run time and names none. A static whose contents change at run time names what the program puts there (section 23.1), not its initializer. For each descriptor found, the call becomes a **`call`** occurrence of that asset, when either the method is a use *for that asset's primitive* (`seal_in_place_append_tag` is `encrypt`, which applies to AEADs; `expand` is `keyderive`, which does not apply to the AES-256-GCM whose key length it is given) or the call has key-material roles (`UnboundKey::new(alg, key)`). The detail is `algorithm from <descriptor> in the arguments`.
 
 ### 24.6 Protocols
 
@@ -1478,28 +1512,30 @@ Code: `crates/rcbom-analysis/src/provenance.rs`.
    | `Const` | **hard-coded**: "N bytes", "literal at line L" |
    | `Call` of `<closure>` (a closure of this function, which the driver followed; section 23) | the classes of what the closure returns |
    | `Data` naming an algorithm descriptor (an item a `[[static]]` entry matches, in any version of its crate) | nothing: it says which algorithm, not what the key material is (`UnboundKey::new(&AES_256_GCM, key)`) |
-   | `Data` naming a static whose contents change at run time (a `static mut`, a type with interior mutability: `LazyLock`, `OnceLock`, a lock, an atomic) | the classes of the values the program puts there (section 23.1: a `LazyLock`'s initializer, `OnceLock::set`, a fill through `&mut`), or, when none is recorded, **computed**: "run-time contents of static P" |
+   | `Data` naming a static whose contents change at run time (a `static mut`, a type with interior mutability: `LazyLock`, `OnceLock`, a lock, an atomic) | the classes of the values the program puts there and of its initial value (section 23.1: a `LazyLock`'s initializer, `OnceLock::set`, a fill through `&mut`, an assignment; a `static mut KEY = [7u8; 32]` never written is hard-coded), or, when none is recorded, **computed**: "run-time contents of static P" |
    | `Data` naming any other static or const | **hard-coded**: "static P" |
    | `Field` (a field of a value from another function) | the classes of that value: a parameter's field is the parameter's |
    | `Param` | **parameter**: "argument i of the enclosing function" |
    | `Unit` (a value of a field-less type, an enum variant, a function item) | the kind of a `[[source]]` entry matching its path (`rand_core::os::OsRng` is **rng**), else nothing: it carries no data |
+   | `Call` of a generator's method on the program's own type (its own `RngCore` impl: `NotRandom.fill_bytes(..)`) | **computed**: "NotRandom::fill_bytes": that type's code, not a known source |
    | `Call` matching a `[[source]]` entry | that source's kind: **environment** (`std::env::var`, args), **file** (`std::fs::read`, a `Read` or `BufRead` method such as `read_exact`: those traits are defined in `alloc::io` on the pinned nightly), **rng** (`thread_rng`, `ThreadRng::default`, `RngCore::fill_bytes`, `getrandom`, `AeadCore::generate_nonce`, ring/aws-lc-rs `rand`, `OsRng`, ...), **derived** (the output of a key derivation: HKDF `expand`/`extract`, ring's `Okm::fill` and `pbkdf2::derive`, `hash_password`, `diffie_hellman`, `agree_ephemeral`, scrypt, PBKDF2, BLAKE3's key-derivation mode). Its arguments are not looked into: what goes into a KDF is not what comes out |
    | an **rng** source whose receiver was built by a `[[seeded]]` constructor (`StdRng::seed_from_u64(42)`) | the classes of the seed: as predictable as it |
    | `Call` to a knowledge-base function whose primitive is `kdf` (matched as `[[fn]]` entries are, by its path inside its crate: `Hasher::new_derive_key`) | **derived** |
-   | `Call` matching a `[[passthrough]]` entry | the classes of the listed arguments only: the result of `anyhow::Context::context` (argument 0, not the message), `base64::Engine::decode` (argument 1, not the engine), `GenericArray::from_slice` and secrecy's `expose_secret` (argument 0), the standard library's `copy_from_slice`, `push_str`, `extend`, `fill` (argument 1, the data copied in; a `fill` of the program's own or blake3's `OutputReader::fill` is not one), `fmt::Arguments::new` (the formatted values, not the literal pieces) |
+   | `Call` matching a `[[passthrough]]` entry | the classes of the listed arguments only: the result of `anyhow::Context::context` (argument 0, not the message), `base64::Engine::decode` (argument 1, not the engine), `GenericArray::from_slice` and secrecy's `expose_secret` (argument 0), the standard library's `copy_from_slice`, `clone_from_slice`, `fill` (argument 1, the data copied over the receiver; a `fill` of the program's own or blake3's `OutputReader::fill` is not one), `fmt::Arguments::new` (the formatted values, not the literal pieces); for several listed arguments, a function of them: the standard library's appends, `extend_from_slice`, `push_str`, `push`, `extend`, `write_all`, `append` (the receiver and what is added: a key read from the environment with `b"pepper"` appended is the environment's) |
    | `Call` to `Default::default` with no arguments, of a standard-library, generic-array or knowledge-base type | **hard-coded**: "default value" (`GenericArray::default()`, `[u8; 32]::default()`: a fixed value) |
    | `Call` to `Default::default` of any other type (the program's own `Config::default()`, which may read the environment) | **computed**: "Config::default" |
    | `Call` to a knowledge-base crate's `new` with no arguments (`Sha256::new()`, `blake3::Hasher::new()`) | **hard-coded**: "initial state, Sha256": a fresh state is fixed, and what is fed into it decides (`Sha256::new().chain_update(secret)` is the secret's) |
    | `Call` with no arguments | **computed**: by code outside this function |
-   | `Call` into the standard library that reads what a lock or a cell holds (`Mutex::lock`, `RwLock::read`, `RefCell::borrow_mut`) | **computed**: "contents of Mutex::lock": what was written through its guards is not followed |
+   | `Call` into the standard library that reads what a lock, a cell or an atomic holds (`Mutex::lock`, `RwLock::read`, `RefCell::borrow_mut`, `Cell::get`, `AtomicU64::fetch_add`) | **computed**: "contents of Mutex::lock": what was written through its guards or a shared reference is not followed, and an atomic's `fetch_add` is a counter |
    | `Through` (a buffer written through a borrow a call returned, section 23) | **computed**: "written through chunks_mut" |
-   | `Call` into `core`, `std` or `alloc` to indexing or slicing (`Index::index`, `get`, `split_at`, ...), or to a method whose other arguments are what an error carries (`ok_or`, `ok_or_else`, `map_err`, `expect`, `expect_err`, `inspect`, `inspect_err`) | the classes of its **receiver** only (argument 0): in `&key[..32]` the range is not key material, in `.expect("message")` the message is not the data |
+   | `Call` into `core`, `std` or `alloc` to indexing or slicing (`Index::index`, `get`, `split_at`, `split_at_mut`, `chunks_exact`, ...), or to a method whose other arguments are what an error carries (`ok_or`, `ok_or_else`, `map_err`, `expect`, `expect_err`, `inspect`, `inspect_err`), or that repeats its first argument (`vec![0u8; n]`, `repeat`) | the classes of its **receiver** only (argument 0): in `&key[..32]` the range is not key material, in `.expect("message")` the message is not the data, `vec![0u8; 12 + n]` is zeros whatever `n` is. A part of a value has a length of its own: its hard-coded class has no byte count (`&zeroes[..32]` of a 64-byte literal) |
    | `Call` into `core`, `std` or `alloc` to `unwrap_or`, `unwrap_or_else`, `or`, `or_else`, `map_or`, `map_or_else`, `get_or_insert`, `get_or_insert_with` | the classes of all its arguments: either one supplies the value |
    | other `Call` into `core`, `std` or `alloc` (`b"..".iter().chain(secret.iter())`, `1_000u64.wrapping_add(seq)`, `u64::from_str_radix(s, 16)`) | a function of its arguments, as for a knowledge-base crate (next row) |
    | `Call` into a knowledge-base crate to indexing or slicing | the receiver only |
    | other `Call` into a knowledge-base crate (constructors and computations such as `Nonce::assume_unique_for_key`, `UnboundKey::new(&AES_256_GCM, key)`, `SaltString::encode_b64`) | a function of its arguments: **hard-coded** only when *every* argument carrying data can be (descriptors and field-less values carry none; an argument of unknown origin can never be), otherwise the classes of the arguments that are not hard-coded. Crypto crates read no hidden input: generators are sources, matched above |
    | `Call` into any other crate, with arguments (the program's own `hkdf(ssh_key, LABEL, &[])`, a dependency outside the knowledge base) | **computed**: what it returns is decided outside this function |
-   | `Any` | the union of its alternatives |
+   | `Any` | the union of its alternatives; if one depends on the value's own earlier value (`Loop`, section 23: `ctr += 1`), a counter, **computed**: "changes with each iteration of a loop", its constant alternatives being only where it starts |
+   | `Loop` | **computed**: "changes with each iteration of a loop" |
    | `All` (a value built from parts: an array or struct literal, arithmetic, a value with elements written afterwards) | a function of its parts, as for a computation: hard-coded only when every part can be (`[user, b"pepper"].concat()` varies with `user`; a random key with its first byte clamped stays random) |
    | `Truncated` | **unknown**: "origin search bound reached" |
    | `Unknown` | nothing |
@@ -1597,28 +1633,33 @@ the driver computed it, from the CBOM and the source files only. An occurrence w
 `line` and `offset` is a mismatch: the generator writes a position for every one.
 
 1. **Load the CBOM**, and re-run Layer 1 with the features and the target recorded in the CBOM (`rcbom:run:features`, `rcbom:run:target`), to map locations back to files (section 16, step 6). `cargo metadata` runs with `--locked`, so it cannot rewrite the `Cargo.lock` whose lines are being checked. A second `cargo metadata` call gives, for each package, the crate names its dependencies have in its code (`sha2`, and `sha2_11` for a renamed `sha2` 0.11).
-2. **Read each cited file.** A byte-order mark at the start of a Rust file is dropped, as rustc does before counting columns, and the `\r` of a CRLF line is dropped from every line. A small lexer marks which characters of a Rust file are code: not inside a comment (`//`, nested `/* */`), a string literal (also byte, C and raw strings) or a character literal. A small TOML lexer does the same for manifests: comments, single- and multi-line strings, arrays, inline tables, table headers and dotted keys.
+2. **Read each cited file.** A location is a normalised relative path (a workspace file, `<package>-<version>/<path>`), or a standard-library one (`/rustc/<commit>/library/..`): an absolute path or one with `.`, `..` or empty segments is rejected. A byte-order mark at the start of a Rust file is dropped, as rustc does before counting columns, and the `\r` of a CRLF line is dropped from every line. A small lexer marks which characters of a Rust file are code: not inside a comment (`//`, nested `/* */`), a string literal (also byte, C and raw strings) or a character literal. A small TOML lexer does the same for manifests: comments, single- and multi-line strings, arrays, inline tables, table headers and dotted keys. In a Rust file, a small parser over the code lists the items with a body, with their extent: functions, statics and consts, `impl` blocks (with their type, and the trait with its arguments, `TryFrom<&PrivateKeyDer>`), traits, modules, `macro_rules!` bodies and macro invocations.
 3. **For each occurrence:** take line `line`; the text from character `offset` on is *at*. One asset may have only one occurrence per position and symbol (the generator merges by that key). Then:
    - `[manifest]` in `Cargo.toml`: the position must be exactly the start of a key whose last segment is the symbol (a quoted key at its opening quote; not in a comment or a string), in the table the context names: `declared by P (dependencies)` requires the key path `dependencies.<symbol>` or `target.<cfg>.dependencies.<symbol>` (also as `[dependencies.<symbol>]` or `<symbol>.version = ..`), in the manifest whose `package.name` is P; `native library L` requires `[package] links = "L"`. The declaration must be of the package the occurrence's component is (its bom-ref, `pkg:cargo/<name>@<version>`, or a candidate's `crypto:candidate:<name>@<version>:..`): the dependency's `package` rename if it has one, else its key, names it, and its version requirement accepts the version. A manifest context in any other kind of file is rejected.
    - `[manifest]` in `Cargo.lock`: the line must be `name = "<symbol>"` and the next one `version = "<v>"`, with the name and version from the context (`locked sha2 0.10.9`), which must be the component's: two locked versions of one package are told apart.
    - any other occurrence must carry the tags the generator writes for code, its tier then its kind of evidence (`[reachable] [call]`, `[present] [static]`, `[via-static]`, `[instantiation]`, `[component]`), and a recorded source line (`line: \`...\``). It must start a token (not inside an identifier, not after `r#` or `::`; a single `:`, as in `W { n:Sha256::digest(d) }`, is fine) and be in code (not in a comment or a literal), and not inside a `use` item: an import names an item, it does not use it. The line, without leading and trailing whitespace, must be exactly the recorded one. If the context records the source text (`code: \`...\``), *at* must start with exactly that text. The code text is read first, as the backquoted text at the very end; the line is then what remains between `line: \`` and the last backquote, since a line may itself contain backquotes.
-   - The positions the details name must be code lines of their files: where a generic instance was instantiated (`instantiated by .. at <file>:<line>`) and where a macro's code was written (`expanded from <file>:<line>`).
+   - The positions the details name must be code lines of their files: where a generic instance was instantiated (`instantiated by <caller> at <file>:<line>`) and where a macro's code was written (`expanded from <file>:<line>`). Outside the standard library, an instantiation's line must be in the caller the detail names and name what it instantiates (the occurrence's item, then each caller in turn; a closure, instantiated where it is written, is not named there); a `[macro m!]` code's line must be inside the body of `macro_rules! m`, and name the symbol unless the call's line does (`hash_with!(SHA384)` for a body calling `digest(&$alg, ..)`).
+   - The symbol's crate (a qualified path's, `<t14::S384 as t14::Scheme>::ALG`, is its type's) must be a crate of the build: a made-up one would switch the descriptor and provider checks off.
    - The tags (`[macro m!]`, `[derive D]`, `[attribute a]`, `[component]`) are read from the leading `[..]` of the context only, never from the recorded line, which can contain such text in a comment.
-   - `[macro m!]`: *at* must start with `m!`, optionally path-qualified.
+   - `[macro m!]`: *at* must start with `m!`, optionally path-qualified. A tagged position is the macro's, derive's or attribute's name, so the symbol and provider checks below do not apply to it; the descriptor and component checks do.
    - `[derive D]`: *at* must start with `D`, optionally path-qualified (`serde::Serialize`), inside `#[derive(..)]` or a `cfg_attr`'s `derive(..)`; only `D`'s last path segment is compared.
    - `[attribute a]`: *at* must start with an attribute naming `a` (`#[a]`, `#[path::a(..)]`), or be that name inside a `cfg_attr(..)`.
+   - an untagged code position must lie in the item its context names (`in <item>`): the innermost function, static or const around it has the item's last name (generic arguments and compiler-made segments such as `{closure#0}` left out), and, for a method whose path names its type (`<A as T>::f`, `A::<..>::f`, `<impl A<..>>::f`), the impl block around it is of that type and of that trait (or, for a default method, it is in the trait; a blanket impl `impl<T> Tr for T` is told by its trait). An identical statement in another function, or in another type's method of the same name (rustls's `encrypt` of the GCM and of the ChaCha record encrypter), is another occurrence. Code a macro invocation wraps (`thread_local! { static TL: .. }`) is in the items the macro makes, so a name that does not match is accepted there. And it must not lie inside a `macro_rules!` body: a macro's code is cited where it is called;
    - code positions after a keyword that defines an item or binding (`fn`, `struct`, `enum`, `union`, `trait`, `type`, `mod`, `static`, `const`, `let`, `macro_rules`) are rejected: a definition names a new item, it does not use one.
    - otherwise (code): *at*, continued over the next lines (rustfmt breaks long paths), must be a path whose **last** segment is the symbol's name (its last segment without generic arguments) or an import alias of it. Generic arguments in the path are balanced (`Hmac::<Sha256>::new_from_slice`, `<sha2::Sha512 as Digest>::digest`), so the path cannot run on into the next expression; comments between segments are skipped (`sha2::Sha256 // ..` then `::digest(d)`), raw identifiers are read without `r#`, and a path may start with `::`. Aliases are read from the `use` and `extern crate` items of the file, where `IDENT as NAME` renames (`as _` does not); if the name is not found there, from those of every file of the file's package and of the crate the path goes through (`pub use ring::digest::digest as hash_it;` in `src/algs.rs`). An alias counts only when it renames an item of the symbol's name imported from the symbol's crate, or from a crate of the CBOM that depends on it (a re-export): `use other::digest as d;` is not an alias of `ring::digest::digest` unless `other` depends on ring. A standard-library symbol's aliases are not checked this way.
    - a `[static]` occurrence must name a descriptor the knowledge base gives the occurrence's asset (`ring::digest::SHA512` is SHA-512, never SHA-384), and a `[via-static]` one must end its chain (`A -> B`) in such a descriptor.
-   - a `[component] .. part of X` occurrence must be where an occurrence of X is, or, after a same-line merge, on the same line as an asset whose name is strictly longer and extends X at a `-` boundary (or extends it as its family, `Argon2` into `Argon2id-19456-2-1`).
+   - a `[component]` occurrence must name what it is part of (`part of X`), and be where an occurrence of X is, or, after a same-line merge, on the same line as an asset whose name is strictly longer and extends X at a `-` boundary (or extends it as its family, `Argon2` into `Argon2id-19456-2-1`).
    - a path qualified by a type the source imports from a crate of the CBOM (`Hmac::<Sha256>::new_from_slice` for the symbol `digest::mac::Mac::new_from_slice`): if that qualifier and every type in the path's generic arguments resolve, through the file's `use` items and the dependencies of the package owning the file, to library components of the CBOM, one of those packages, or a package it depends on, must provide the asset (`dependencies[].provides`). The symbol's own crate counts as one of those packages (`ring::digest::digest` names ring). This tells `Aes256Gcm::new_from_slice` from `Hmac::<Sha256>::new_from_slice` on the next line. When a name is bound to several crates in the file (`use sha1::Sha1 as H;` in one module, `use sha2::Sha256 as H;` in another, or two `#[cfg]` alternatives), any of them may provide the asset. When something may be the program's own (a type parameter or definition of the file, a `crate::`, `self::` or `super::` import, a glob import, a local alias) the rule makes no check; nor does a qualifier that resolves to the standard library, an interface crate (role `trait`) or the program's own crates, which implement no asset themselves.
    - a standard-library location (`/rustc/<commit>/library/..`) must name the pinned toolchain's commit (`commit-hash` of `rustc +nightly-2026-09-25 -vV`); the file is read from the toolchain's rust-src.
 4. **Report** mismatches and fail if there are any.
 
 Known limits: `#[cfg(..)]` is not evaluated, so a shifted position that lands on an identical
 statement the configuration removes (`#[cfg(any())] let d = Sha256::digest(data);` right above
-the same statement) is accepted by the self-test; the generator never cites such code, since
-rustc does not compile it. Imports are read per file, not per scope. Of a dependency key, the
+the same statement), or a position moved to such an alternative in the same function (rcgen's
+`try_from` has a ring and an aws-lc-rs branch), is accepted; the generator never cites such
+code, since rustc does not compile it. What a procedural macro generates is not visible in the
+source: of a derive or attribute occurrence, the attribute and the symbol's crate are checked,
+not which call or descriptor the generated code holds. Imports are read per file, not per scope. Of a dependency key, the
 kind of table is checked, not which `[target.'cfg(..)'.*]` table it is in, nor the features the
 context lists (the context records neither).
 5. **`--self-test`:** shift every verified position by +1 line, −1 line, +1 column and −1 column, and count how many shifted positions the check rejects (each accepted one is printed). A shift that would leave the first line or column is skipped. A correct checker rejects every shifted position: a shifted position names something else, the same name with other text (`Sha512_224::digest` on the line after `Sha512_256::digest`), or the same text on another line (`KeyPairKind::Ec(kp) => kp.public_key()` above `KeyPairKind::Ed(kp) => kp.public_key()`, section 22). The command reports the counts; `scripts/e2e.sh` fails unless every shift of every fixture is rejected.
@@ -1636,8 +1677,8 @@ at load time:
 - every regular expression must compile;
 - `required` is allowed on `[[type]]` parameters only.
 
-The seed (version 0.2.0) has 36 crates, 38 types, 42 statics, 27 functions, 1 protocol, 11 uses,
-35 roles, 4 sources, 6 passthroughs and 1 seeded-generator entry. Paths in its regular
+The seed (version 0.2.0) has 36 crates, 49 types, 42 statics, 42 functions, 1 protocol, 11 uses,
+49 roles, 4 sources, 7 passthroughs and 1 seeded-generator entry. Paths in its regular
 expressions are *defining* paths, crate first (section 11).
 
 **`version`.** Recorded in every CBOM (`rcbom:kb:version`).
@@ -1879,27 +1920,30 @@ path = "SeedableRng::(seed_from_u64|from_seed)$"
 
 One JSON file per analysed crate, `<crate name><unit>.json` (the unit is cargo's
 `-C extra-filename`; `<crate name>-<stable id>.json` for a compilation without one), with the types of `crates/rcbom-facts/src/lib.rs` (version
-`FACTS_VERSION = 8`):
+`FACTS_VERSION = 9`):
 
 ```text
 CrateFacts {
-  facts_version: 8,
+  facts_version: 9,
   krate: { name, stable_id, package, version, manifest_dir, cwd, primary, crate_types, unit },
   sites: [Site],
   data_edges: [{ owner: Owner, target: DefRef }],   // static or const -> static, from evaluated values only
-  reach: null | { roots: [String], instances, truncated, statics: [DefRef], fns: [String] },
+  reach: null | { roots: [String], instances, truncated, statics: [DefRef], fns: [String],
+                  paths: [String] },                // fns: owner ids; paths: defining paths
   links: Links,                                     // values across functions (section 23.1)
 }
 Links {
-  fields:  [{ adt, path: [int], value: Origin, func, via_ref }],  // a store in adt.path[0].path[1]..
-  returns: [{ func, path: [int], value: Origin }],                 // what func returns (a field path of it)
+  fields:  [{ adt, path: [int], value: Origin, func, via_ref }],  // a store in adt.path[0].path[1]..;
+                                                                   // adt a struct or an enum's variant
+  returns: [{ func, path: [int], value: Origin }],                 // what func returns (a field path of it);
+                                                                   // func also "<trait method> for <Self>"
   calls:   [{ callee, caller, args: [Origin] }],                   // Unknown for arguments that carry nothing
   statics: [{ def: DefRef, mutable, values: [Origin] }],           // what a static holds at run time
 }
 Site {
   tier: "Present" | "Reachable",
   owner: { kind: "Fn" | "Static", name, id, krate: CrateRef, path },   // path: the defining path
-  span: Loc,                                   // where the name appears (outermost macro call)
+  span: Loc,                                   // where the name appears (the macro call in the source)
   text: null | String,                         // the source text of span (one line, no macro)
   line_text: null | String,                    // the source line of the position, trimmed
   expansion: null | { kind: "Bang" | "Derive" | "Attr" | "Desugaring", macro_name, def_site: Loc },
@@ -1919,11 +1963,12 @@ TyTree = Adt { krate: CrateRef, path, args: [TyTree] } | Ref(TyTree) | Slice(TyT
 Origin = Const { value, len, span } | Data { def: DefRef, value? } | Param { index }
        | Call { callee, krate, self_ty: null | path, args: [Origin], span: null | Loc }
        | Unit { path, krate, value? } | Through { callee } | Field { adt, field, base: Origin }
-       | Any([Origin]) | All([Origin]) | Truncated | Unknown
+       | Any([Origin]) | All([Origin]) | Loop | Truncated | Unknown
                                      // value: an integer const's value, an enum variant's
                                      // discriminant; Through: written through a borrow callee
-                                     // returned; Field: field `field` of struct `adt` of base;
-                                     // Any: one of these; All: made of all of these
+                                     // returned; Field: field `field` of struct (or variant)
+                                     // `adt` of base; Any: one of these; All: made of all of
+                                     // these; Loop: its own earlier value (a loop)
 ```
 
 Section 31 shows a real site.
@@ -1993,9 +2038,9 @@ added on the left; the file is unchanged):
 
 **Stage 1: Cargo invokes the driver.** `cargo +nightly-2026-09-25 check` reaches the crate
 `micro` and runs `rcbom-driver .../rustc --crate-name micro --crate-type bin src/main.rs ...
--C extra-filename=-e87b3d69f49ed255 ...`, with `CARGO_PRIMARY_PACKAGE=1`, from `fixtures/micro`.
-The driver adds `--sysroot ...`, `-Zalways-encode-mir` and `-Zmir-opt-level=0`, and runs the
-compiler.
+-C extra-filename=-05f1e0ab197f5bd2 ...`, with `CARGO_PRIMARY_PACKAGE=1`, from `fixtures/micro`.
+The driver adds `--sysroot ...`, `-Zalways-encode-mir`, `-Zmir-opt-level=0` and
+`-Zspan-free-formats`, and runs the compiler.
 
 **Stage 2: MIR.** After analysis, the optimized MIR of `ring_seal` is the following. It was
 printed by the same compiler with the same MIR flags:
@@ -2118,15 +2163,15 @@ The two `Result::unwrap` calls are not recorded: their callee is in `core`, and 
 construct nor convert to a crypto type (section 19).
 
 The `Reachable` copy of the `seal_in_place_append_tag` site, as written to
-`fixtures/micro/target/rcbom/facts/micro-e87b3d69f49ed255.json` (the unit id is the
+`fixtures/micro/target/rcbom/facts/micro-05f1e0ab197f5bd2.json` (the unit id is the
 `-C extra-filename` above; the `Present` copy differs only in its tier). Repeated crate records
 are elided as `...`:
 
 ```json
 {
   "tier": "Reachable",
-  "owner": { "kind": "Fn", "name": "micro::ring_seal", "id": "_RNvCscTT69CrhWaT_5micro9ring_seal",
-             "krate": { "name": "micro", "stable_id": "96455c7400928135" },
+  "owner": { "kind": "Fn", "name": "micro::ring_seal", "id": "_RNvCshUiPcX6YYPZ_5micro9ring_seal",
+             "krate": { "name": "micro", "stable_id": "d09644dded550829" },
              "path": "micro::ring_seal" },
   "span": { "file": "src/main.rs", "line": 42, "col": 7, "end_line": 42, "end_col": 31 },
   "text": "seal_in_place_append_tag",
@@ -2286,7 +2331,7 @@ kept in `<dir>`; `results/fixtures` was made this way.
   - dead code, an unused dependency
 - `libonly`: a library with public API roots, a public generic function, private dead code.
 - `threads`: crypto reached only through `std::thread::spawn`, a `Box<dyn FnOnce>` and a function pointer.
-- `regress/*` (with `--regress`): 39 small programs, 19 from the first three independent audits of the pipeline, 2 from the corpus runs after them, 9 from a second round of audits and the review of its outputs, and 9 from a third round (with a review of four real projects held out from the corpus, and of the corpus outputs after it), each with commented cases that once produced a wrong CBOM, a driver panic, or a shifted position the verifier accepted (`fixtures/regress/README.md` lists them).
+- `regress/*` (with `--regress`): 46 small programs, 19 from the first three independent audits of the pipeline, 2 from the corpus runs after them, 9 from a second round of audits and the review of its outputs, 9 from a third round (with a review of four real projects held out from the corpus, and of the corpus outputs after it), and 7 from a fourth round (with four more held-out projects), each with commented cases that once produced a wrong CBOM, a driver panic, or a shifted position the verifier accepted (`fixtures/regress/README.md` lists them).
 
 **Labelled fixtures.**
 - *Labels:* each `labels.toml` lists core and extended assets per line, components, uses, parameters, provenance per role, negative lines, capabilities and crates, each with a written reason.
@@ -2359,14 +2404,15 @@ to regenerate each part.
 
 - **Values do not prune reachability.** jsonwebtoken's `encode` matches on a run-time algorithm, so all its signing algorithms are reachable; a provider's default group list counts even when a struct update replaces it.
 - **The walk is not proven sound.** It over-approximates what it walks, but can miss edges through standard-library code that has no MIR in the sysroot (section 10), or through function pointers it cannot see created. A missed use is reported `present`, never dropped. A library's public API is a root even in a package whose binary does not call it.
-- **Provenance is mostly intraprocedural.** Within a function it follows reaching definitions; across functions it follows only struct fields, parameters, the program's own return values and statics written at run time (section 23.1), and only for values that can carry an algorithm or a key. Otherwise it stops at the boundary (`parameter`, `computed`): a key computed by the program's own function is "computed (that function)".
+- **Provenance is mostly intraprocedural.** Within a function it follows reaching definitions; across functions it follows only struct fields (and enum variants' fields), parameters, the program's own return values and statics written at run time (section 23.1), and only for values that can carry an algorithm or a key. The links are recorded from the program's item bodies: a call a generic function makes with a value of its type arguments (`helper(T::ALG, ..)` in `fn each<T: Plain>`) is not linked per instance, so the callee's use has no algorithm there. Otherwise it stops at the boundary (`parameter`, `computed`): a key computed by the program's own function is "computed (that function)".
 - **Values across functions are over-approximated.** A field holds any value stored in it anywhere in the build, a parameter any value a caller passes: when several algorithms may reach a call, each is reported as "one of N that may reach the call", including one that no execution actually brings there. A struct written through a reference (`self.alg = ..` in a `&mut self` method) may be part of any struct holding one: what is stored there counts for every field path ending there. A trait method's parameters have no recorded callers (the call is to the trait's method): its fields fall back to everything stored there.
 - **Indirect calls are linked only when local.** A call through a function pointer is attributed to its function only when the pointer is created in the same body; a call through `dyn` or a pointer from elsewhere has no arguments to link.
-- **Some parameters are run-time values.** Argon2 built by `Argon2::new` with costs in a `Params` value, aws-lc-rs block-cipher keys whose mode a separate constructor picks, a scrypt work factor computed at run time (age's `log_n`): the name says what the code determines (`Argon2i`, `AES-128`) and nothing more. Likewise an aws-lc-rs key-encryption key (`AesKek::new(&key_wrap::AES_256, k)`) is AES-256 for key wrapping; the scheme is named at the call that wraps (`wrap` is AES-256-KW, `wrap_with_padding` AES-256-KWP), since one key can serve both. A bare family name (`Argon2`) has no registry pattern and is flagged `rcbom:registry-name = unmatched`, as are variants the registry does not list (`ChaCha8-Poly1305`).
+- **Some parameters are run-time values.** Argon2 built by `Argon2::new` with costs in a `Params` value built elsewhere, aws-lc-rs block-cipher keys whose mode a separate constructor picks, a scrypt work factor computed at run time (age's `log_n`): the name says what the code determines (`Argon2i`, `AES-128`) and nothing more. Likewise an aws-lc-rs key-encryption key (`AesKek::new(&key_wrap::AES_256, k)`) is AES-256 for key wrapping; the scheme is named at the call that wraps (`wrap` is AES-256-KW, `wrap_with_padding` AES-256-KWP), since one key can serve both. A bare family name (`Argon2`) has no registry pattern and is flagged `rcbom:registry-name = unmatched`, as are variants the registry does not list (`ChaCha8-Poly1305`).
 - **A table of algorithms chosen at run time** (`DIGESTS[i]`) names no single algorithm; its descriptors are reported where the table is named, and the call through it has no use.
-- **Some names stop short.** The padding a CBC call chooses (`encrypt_padded_vec_mut::<Pkcs7>`) is a generic argument of the call, not of the cipher's type, and is not part of the name (`AES-256-CBC`, where the registry also has `AES-256-CBC-PKCS7`). RustCrypto's `pbkdf2_hmac::<Sha512>` lists SHA-512 as its component, not the HMAC-SHA-512 it uses as PRF (ring's `PBKDF2_HMAC_SHA512` names both). Accessor calls on a crypto value (`CtOutput::into_bytes`, `VerifyingKey::as_bytes`) are occurrences of its asset, as setups.
-- **The knowledge base is a seed.** Self-implemented cryptography (minisign's Ed25519 and BLAKE2b) and crates outside it are invisible. Crypto crates in unsupported versions are flagged. A call through a trait of a crate outside it is not recorded even on a knowledge-base type: `RsaPrivateKey::from_pkcs8_pem(PEM)` is pkcs8's `DecodePrivateKey`, so a private key embedded as a PEM string has no occurrence there and no hard-coded-key finding (the signing key built from it has its own).
-- **Verification has blind spots.** Aliases are read per file (then per package and per crate the path goes through), not per scope; `#[cfg(..)]` is not evaluated; a macro occurrence is checked for the macro's name, not for the symbol inside it.
+- **Some names stop short.** The padding a CBC call chooses (`encrypt_padded_vec_mut::<Pkcs7>`) is a generic argument of the call, not of the cipher's type, and is not part of the name (`AES-256-CBC`, where the registry also has `AES-256-CBC-PKCS7`). RustCrypto's `pbkdf2_hmac::<Sha512>` lists SHA-512 as its component, not the HMAC-SHA-512 it uses as PRF (ring's `PBKDF2_HMAC_SHA512` names both). Accessor calls on a crypto value (`CtOutput::into_bytes`, `VerifyingKey::as_bytes`) are occurrences of its asset, as setups. rsa's `Pss::new::<D>()` uses `D`'s output size as its salt length, which is not recorded (only `new_with_salt`'s is). A BLAKE3 `Hasher` is named `BLAKE3`, its output length open until `finalize` (32 bytes) or `finalize_xof`: a program hashing with both `blake3::hash` (`BLAKE3-256`) and a `Hasher` has two assets. scrypt's `hash_password_customized` takes its output length from the `Params` value, which the name leaves out (`scrypt-32768-8-1`).
+- **The knowledge base is a seed.** Self-implemented cryptography (minisign's Ed25519 and BLAKE2b) and crates outside it are invisible. Crypto crates in unsupported versions are flagged. A call through a trait of a crate outside it is not recorded even on a knowledge-base type: `RsaPrivateKey::from_pkcs8_pem(PEM)` is pkcs8's `DecodePrivateKey`, so a private key embedded as a PEM string has no occurrence there and no hard-coded-key finding (the signing key built from it has its own). aws-lc-rs's streaming cipher (`StreamingEncryptingKey::update`, `finish`) is set up but its calls are not uses: its methods' names are generic, and the key decides whether they encrypt or decrypt.
+- **Verification has blind spots.** Aliases are read per file (then per package and per crate the path goes through), not per scope; `#[cfg(..)]` is not evaluated, so an identical statement in a `#[cfg]` alternative of the same function is not told apart; a macro occurrence is checked for the macro's name and for the symbol on the macro's line, not for which of the macro's calls it is; what a procedural macro generates is not visible.
+- **`async` closures.** `rustc_public` cannot convert an `async` closure's type yet: the statements of a body that involve one are skipped (not counted as errors), and the closure's body, reached only through it, is `present`.
 - **Panics inside compiler queries.** A panic raised inside a compiler query leaves the query marked as running, which aborts an incremental build at its end (section 18); a `bug!` raised there also emits an error diagnostic before it unwinds. The driver checks before asking the queries found to panic (extern statics, trivial constants of dependencies); any other would still fail the build. No caught panic remains in the fixtures or the corpus.
 - **Execution.** Layer 2 compiles the project, so build scripts and proc macros run. Use trusted code, or a container.
 - **Scope of one run.** The host platform only; default features unless `--features`; development dependencies are out of scope.

@@ -1117,7 +1117,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:Argon2id",
+      "bom-ref": "crypto:algorithm:Argon2id-19456-2-1",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "Argon2",
@@ -1138,6 +1138,13 @@
             "symbol": "argon2::Argon2::<'key>::new_with_secret"
           },
           {
+            "additionalContext": "[reachable] [call] in t9::argon2_secret; default: setup, not a use; line: `let a = Argon2::new_with_secret(b\"pepper-pepper\", Algorithm::Argon2id, Version::V0x13, Params::default()).unwrap();`; code: `Params::default`",
+            "line": 153,
+            "location": "src/main.rs",
+            "offset": 91,
+            "symbol": "core::default::Default::default"
+          },
+          {
             "additionalContext": "[reachable] [call] in t9::argon2_secret; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`",
             "line": 155,
             "location": "src/main.rs",
@@ -1146,7 +1153,7 @@
           }
         ]
       },
-      "name": "Argon2id",
+      "name": "Argon2id-19456-2-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -1186,7 +1193,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -1302,13 +1309,6 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; line: `ecdsa::sign(ecdsa::alg_to_ec_signing(algorithm), key.inner(), message)`; code: `ecdsa::sign`",
-            "line": 32,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 12,
-            "symbol": "jsonwebtoken::crypto::ecdsa::sign"
-          },
-          {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -1345,7 +1345,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -1395,13 +1395,6 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; line: `ecdsa::sign(ecdsa::alg_to_ec_signing(algorithm), key.inner(), message)`; code: `ecdsa::sign`",
-            "line": 32,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 12,
-            "symbol": "jsonwebtoken::crypto::ecdsa::sign"
-          },
-          {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -1438,7 +1431,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -2305,13 +2298,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
-          {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -2442,7 +2428,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "16"
+          "value": "15"
         }
       ],
       "type": "cryptographic-asset"
@@ -2462,13 +2448,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
           {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
@@ -2530,7 +2509,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -2550,13 +2529,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
           {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
@@ -2618,7 +2590,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -2696,13 +2668,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA256; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
           {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
@@ -2814,7 +2779,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "12"
+          "value": "11"
         }
       ],
       "type": "cryptographic-asset"
@@ -2834,13 +2799,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA384; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
           {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
@@ -2902,7 +2860,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -2922,13 +2880,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA512; line: `| Algorithm::PS512 => rsa::sign(rsa::alg_to_rsa_signing(algorithm), key.inner(), message),`; code: `rsa::sign`",
-            "line": 42,
-            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
-            "offset": 30,
-            "symbol": "jsonwebtoken::crypto::rsa::sign"
-          },
           {
             "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
@@ -2990,7 +2941,63 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:material:private-key:RSA",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "private-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`",
+            "line": 41,
+            "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
+            "offset": 19,
+            "symbol": "ring::rsa::keypair::KeyPair::from_der"
+          }
+        ]
+      },
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "RSA"
         }
       ],
       "type": "cryptographic-asset"
@@ -3812,7 +3819,7 @@
         "pkg:cargo/password-hash@0.5.0"
       ],
       "provides": [
-        "crypto:algorithm:Argon2id"
+        "crypto:algorithm:Argon2id-19456-2-1"
       ],
       "ref": "pkg:cargo/argon2@0.5.3"
     },
@@ -3957,7 +3964,8 @@
         "crypto:algorithm:RSA-PSS-SHA-512",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -4140,6 +4148,82 @@
         "crypto:algorithm:SHA-512"
       ],
       "ref": "crypto:algorithm:RSA-PSS-SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-192-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2id-19456-2-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:secret-key:HMAC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:PBKDF2-SHA-256-600000-32"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA-2048"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:scrypt-131072-8-1-32"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:scrypt"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:x25519"
     }
   ],
   "metadata": {
@@ -4200,7 +4284,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2425226d-ea5c-8220-a4ff-f863f6a4eaff",
+  "serialNumber": "urn:uuid:4f68132f-8df3-8245-a35f-d30c51833c20",
   "specVersion": "1.7",
   "version": 1
 }

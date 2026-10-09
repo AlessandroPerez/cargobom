@@ -158,17 +158,20 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
             let StatementKind::Assign(place, rv) = &stmt.kind else {
                 continue;
             };
-            // `S { f: v }`: what each part of `v` that can carry an algorithm or a key is
+            // `S { f: v }`, `E::V(v)`: what each part of `v` that can carry an algorithm or a key
+            // is, in the struct or in the enum's variant (`KeyPairKind::Ec(kp)`), as
+            // `Origin::Field` names them
             if let Rvalue::Aggregate(AggregateKind::Adt(def, variant, args, ..), ops) = rv {
                 let adt_did = rustc_internal::internal(tcx, def.def_id());
                 let adt = tcx.adt_def(adt_did);
-                if !adt.is_struct() || cx.is_std(tcx.crate_name(adt_did.krate).as_str()) {
+                if adt.is_union() || cx.is_std(tcx.crate_name(adt_did.krate).as_str()) {
                     continue;
                 }
                 let iargs = rustc_internal::internal(tcx, args);
                 let v = adt.variant(rustc_abi::VariantIdx::from_usize(
                     crate::origins::variant_index(variant),
                 ));
+                let named = if adt.is_enum() { v.def_id } else { adt_did };
                 for (f, op) in ops.iter().enumerate() {
                     let Some(field) = v.fields.get(rustc_abi::FieldIdx::from_usize(f)) else {
                         continue;
@@ -179,7 +182,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                             let mut path = vec![f];
                             path.extend(inner);
                             out.fields.push(FieldStore {
-                                adt: path_of(tcx, adt_did),
+                                adt: path_of(tcx, named),
                                 path,
                                 value,
                                 func: here.clone(),
@@ -189,6 +192,19 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                     }
                 }
                 continue;
+            }
+            // `ALG2 = v` on a `static mut`, `*ALG.write().unwrap() = v` through a lock's guard:
+            // a value the static holds at run time
+            if fills_static && matches!(place.projection.first(), Some(ProjectionElem::Deref)) {
+                let base = rustc_public::mir::Place {
+                    local: place.local,
+                    projection: Vec::new(),
+                };
+                let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
+                if let Some(def) = static_behind(&ptr) {
+                    let value = origins.rvalue_part_at(rv, stmt.source_info.span, &[], bb, idx);
+                    push_static(out, def, value);
+                }
             }
             // `x.f = v`, `x.a.f = v`, `self.f = v`: a store in each struct along the fields
             if matches!(
@@ -269,6 +285,36 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                 }
             }
         }
+        // a call of a closure of this crate (`f(&SHA512, d)` is `Fn::call(&f, (&SHA512, d))`):
+        // its parameters receive the tuple's elements (the closure's own parameter 0 is
+        // itself)
+        if matches!(method, "call" | "call_mut" | "call_once")
+            && cx.is_std(&krate)
+            && let (Some(f), Some(tuple)) = (args.first(), args.get(1))
+            && let Ok(fty) = f.ty(locals)
+            && let rustc_middle::ty::Closure(cl, _) =
+                *rustc_internal::internal(tcx, fty).peel_refs().kind()
+            && cl.is_local()
+            && let Ok(tty) = tuple.ty(locals)
+            && let rustc_middle::ty::Tuple(ts) = *rustc_internal::internal(tcx, tty).kind()
+        {
+            let mut cargs_o = vec![Origin::Unknown];
+            for (i, t) in ts.iter().enumerate() {
+                cargs_o.push(if carrying_parts(cx, t).is_empty() {
+                    Origin::Unknown
+                } else {
+                    origins.operand_part_at(tuple, &[Step::Field(i)], bb, idx)
+                });
+            }
+            if cargs_o.iter().any(|o| !empty(o)) {
+                out.calls.push(LocalCall {
+                    callee: path_of(tcx, cl),
+                    caller: here.clone(),
+                    args: cargs_o,
+                });
+            }
+            continue;
+        }
         // a call of a function whose code is analysed (not the standard library's, nor a stop
         // crate's), passing values that can carry an algorithm or a key
         if cx.stop_crate(cdid.krate) || cx.is_std(&krate) || cargs.has_non_region_param() {
@@ -301,17 +347,51 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
             });
         }
     }
-    // what a function returns, and each part of it that can carry an algorithm or a key
+    // a static whose contents change at run time starts with its initializer's value (a
+    // `static mut`'s, a lock's), unless it starts empty (`OnceLock`) or its value is the
+    // closure a `LazyLock` runs (recorded above)
+    if static_init && mutable_static(cx, did) {
+        let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+        let lazy = matches!(ty.kind(), rustc_middle::ty::Adt(adt, _)
+            if re_lazy(&path_of(tcx, adt.did())));
+        // the initializer itself, not one of its promoted constants
+        let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
+        if !lazy && tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty) {
+            push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
+        }
+    }
+    // what a function returns, and each part of it that can carry an algorithm or a key; a
+    // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
+    // have (`ExternalError::_err` on a `Result`: `rcgen::error::ExternalError::_err for
+    // core::result::Result`)
     if func {
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
-        for (path, steps) in carrying_parts(cx, ret) {
+        let mut names = vec![here.clone()];
+        if let Some(item) = tcx.trait_item_of(did)
+            && let Some(self_ty) = crate::origins::self_adt_path(
+                tcx,
+                did,
+                rustc_middle::ty::GenericArgs::identity_for_item(tcx, did),
+            )
+        {
+            names.push(rcbom_facts::impl_key(&path_of(tcx, item), &self_ty));
+        }
+        let mut parts = carrying_parts(cx, ret);
+        // a generic function's result may be of any type: kept whole (`fn _err(self) ->
+        // Result<T, Error>`, a plain wrapper)
+        if parts.is_empty() && ret.has_non_region_param() {
+            parts.push((Vec::new(), Vec::new()));
+        }
+        for (path, steps) in parts {
             let value = origins.returned_part(&steps);
             if !empty(&value) {
-                out.returns.push(Returned {
-                    func: here.clone(),
-                    path,
-                    value,
-                });
+                for func in &names {
+                    out.returns.push(Returned {
+                        func: func.clone(),
+                        path: path.clone(),
+                        value: value.clone(),
+                    });
+                }
             }
         }
     }
@@ -457,6 +537,49 @@ pub(crate) fn promoted_links(cx: &Cx<'_>, did: DefId, out: &mut Links) {
         }
         let body: Body = rustc_internal::stable(&tcx.promoted_mir(did)[p]);
         body_links(cx, &body, did, false, out);
+    }
+}
+
+/// Cells whose value is set later or computed on first use: `OnceLock`, `OnceCell`, `LazyLock`,
+/// `LazyCell`, once_cell's `Lazy`.
+fn re_lazy(path: &str) -> bool {
+    let last = path.rsplit("::").next().unwrap_or(path);
+    matches!(
+        last,
+        "OnceLock" | "OnceCell" | "LazyLock" | "LazyCell" | "Lazy" | "OnceBox"
+    )
+}
+
+/// The static a pointer written through leads to: its address (`static mut`), or a lock's
+/// guard or a cell's reference of it (`ALG.write().unwrap()`, `deref_mut`).
+fn static_behind(o: &Origin) -> Option<rcbom_facts::DefRef> {
+    const THROUGH: &[&str] = &[
+        "::deref_mut",
+        "::deref",
+        "::unwrap",
+        "::expect",
+        "::write",
+        "::lock",
+        "::borrow_mut",
+        "::get_mut",
+        "::as_mut",
+    ];
+    let mut o = o;
+    loop {
+        match o {
+            Origin::Data { def, .. } => return Some(def.clone()),
+            Origin::Call {
+                callee,
+                krate,
+                args,
+                ..
+            } if matches!(krate.as_str(), "core" | "std" | "alloc")
+                && THROUGH.iter().any(|t| callee.ends_with(t)) =>
+            {
+                o = args.first()?;
+            }
+            _ => return None,
+        }
     }
 }
 

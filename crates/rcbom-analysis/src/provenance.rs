@@ -185,9 +185,28 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 }
                 return;
             }
+            // a generator's method on the program's own type (its own `RngCore` impl) is that
+            // type's code, not a known source
+            let own_type = self_ty.is_some_and(|t| {
+                let k = t.split("::").next().unwrap_or("");
+                !matches!(k, "core" | "std" | "alloc") && kb.crate_by_name(k).is_none()
+            });
+            if own_type
+                && kb
+                    .sources
+                    .iter()
+                    .any(|s| matches(&s.pattern, callee, self_ty))
+            {
+                out.insert(class(
+                    "computed",
+                    format!("{}::{}", short(self_ty.unwrap_or("")), last(&path)),
+                ));
+                return;
+            }
             if let Some(s) = kb
                 .sources
                 .iter()
+                .filter(|_| !own_type)
                 .find(|s| matches(&s.pattern, callee, self_ty))
             {
                 // a generator built from a seed is as predictable as the seed
@@ -219,11 +238,18 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 .find(|p| matches(&p.pattern, callee, self_ty))
             {
                 // the data arguments only: the value of `Engine::decode(&STANDARD, input)` is
-                // `input`, of `result.context("message")` the result
-                for i in &p.args {
-                    if let Some(a) = args.get(*i) {
-                        classify(kb, links, a, depth + 1, out);
-                    }
+                // `input`, of `result.context("message")` the result; of `key.push_str(s)`
+                // both, together (hard-coded only if both are)
+                let data: Vec<Origin> = p
+                    .args
+                    .iter()
+                    .filter_map(|i| args.get(*i).cloned())
+                    .collect();
+                if data.len() > 1 {
+                    of_inputs(kb, links, &data, depth, out);
+                } else {
+                    data.iter()
+                        .for_each(|a| classify(kb, links, a, depth + 1, out));
                 }
             } else if path.ends_with("::default::Default::default") && args.is_empty() {
                 // `[u8; 32]::default()`, `GenericArray::default()`, a crypto type's default: a
@@ -250,6 +276,8 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     "hard-coded",
                     format!("initial state, {}", short(self_ty.unwrap_or(&path))),
                 ));
+            } else if empty_container(o) {
+                // an empty `String` or `Vec` (`String::new()` before `push_str`): no data
             } else if args.is_empty() {
                 // returned by code that takes nothing from here: an interprocedural question
                 out.insert(class("computed", short(&path)));
@@ -259,12 +287,23 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 // since (`*key.lock().unwrap()` filled by `fill_bytes`), not followed
                 out.insert(class("computed", format!("contents of {}", short(&path))));
             } else if matches!(krate.as_str(), "core" | "std" | "alloc") {
-                if INDEXING.iter().any(|m| path.ends_with(m))
-                    || ERROR_ARGS.iter().any(|m| path.ends_with(m))
+                if INDEXING.iter().any(|m| path.ends_with(m)) {
+                    // part of the receiver: `&key[..32]` (the range is not key material), of a
+                    // length of its own (`&zeroes[..32]` is not the 64 bytes of `zeroes`); all
+                    // of it with `[..]`
+                    let mut inner = BTreeSet::new();
+                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    if whole_range(args.get(1)) {
+                        out.extend(inner);
+                    } else {
+                        out.extend(inner.into_iter().map(without_length));
+                    }
+                } else if ERROR_ARGS.iter().any(|m| path.ends_with(m))
+                    || REPEATING.iter().any(|m| path.ends_with(m))
                 {
-                    // the value is (part of) the receiver: `&key[..32]` (the range is not key
-                    // material), `expect(msg)`, `ok_or(err)`, `map_err(f)` (the other argument
-                    // is what an error carries)
+                    // the value is the receiver: `expect(msg)`, `ok_or(err)`, `map_err(f)` (the
+                    // other argument is what an error carries); copies of the element:
+                    // `vec![0; n]` (the length is not data)
                     classify(kb, links, &args[0], depth + 1, out);
                 } else if FALLBACKS.iter().any(|m| path.ends_with(m)) {
                     // the receiver, or what the fallback supplies instead
@@ -284,7 +323,13 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 // its arguments only (generators are sources, matched above). Indexing takes its
                 // data from the receiver (`&key[..32]`: the range is not key material).
                 if INDEXING.iter().any(|m| path.ends_with(m)) {
-                    classify(kb, links, &args[0], depth + 1, out);
+                    let mut inner = BTreeSet::new();
+                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    if whole_range(args.get(1)) {
+                        out.extend(inner);
+                    } else {
+                        out.extend(inner.into_iter().map(without_length));
+                    }
                 } else {
                     of_inputs(kb, links, args, depth, out);
                 }
@@ -302,9 +347,27 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 format!("written through {}", short(&strip_generics(callee))),
             ));
         }
+        // a value updated from its own earlier value (`ctr += 1`): a counter, whose constant
+        // alternatives are only where it starts
+        Origin::Any(alts) if alts.iter().any(recurs) => {
+            let mut inner = BTreeSet::new();
+            alts.iter()
+                .for_each(|a| classify(kb, links, a, depth + 1, &mut inner));
+            out.extend(inner.into_iter().filter(|c| c.kind != "hard-coded"));
+            out.insert(class(
+                "computed",
+                "changes with each iteration of a loop".into(),
+            ));
+        }
         Origin::Any(alts) => alts
             .iter()
             .for_each(|a| classify(kb, links, a, depth + 1, out)),
+        Origin::Loop => {
+            out.insert(class(
+                "computed",
+                "changes with each iteration of a loop".into(),
+            ));
+        }
         // built from all of these parts (`[user, b"pepper"].concat()`, `key[31] = 1` after the
         // key was read from the environment): a constant only if every part is
         Origin::All(parts) => of_inputs(kb, links, parts, depth, out),
@@ -312,6 +375,44 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
             out.insert(class("unknown", "origin search bound reached".into()));
         }
         Origin::Unknown => {}
+    }
+}
+
+/// The index `..`: all of the value.
+fn whole_range(o: Option<&Origin>) -> bool {
+    matches!(o, Some(Origin::Unit { path, .. }) if path.ends_with("RangeFull"))
+}
+
+/// A class of a part of the value: the whole's byte count (`hard-coded (64 bytes, literal at
+/// line 263)`) is not the part's.
+fn without_length(c: Class) -> Class {
+    let detail = c
+        .detail
+        .split(", ")
+        .filter(|d| !d.ends_with(" bytes"))
+        .collect::<Vec<_>>()
+        .join(", ");
+    Class { detail, ..c }
+}
+
+/// A new, empty `String` or `Vec` (`String::new()`, `Vec::with_capacity(32)`): it holds no data
+/// until something is put in it.
+fn empty_container(o: &Origin) -> bool {
+    matches!(o, Origin::Call { callee, krate, .. }
+        if matches!(krate.as_str(), "core" | "std" | "alloc")
+            && ["String::new", "String::with_capacity", "Vec::new", "Vec::with_capacity"]
+                .iter()
+                .any(|m| strip_generics(callee).ends_with(m)))
+}
+
+/// Does the value depend on its own earlier value (a loop's `Origin::Loop` inside it)?
+fn recurs(o: &Origin) -> bool {
+    match o {
+        Origin::Loop => true,
+        Origin::Any(v) | Origin::All(v) => v.iter().any(recurs),
+        Origin::Call { args, .. } => args.iter().any(recurs),
+        Origin::Field { base, .. } => recurs(base),
+        _ => false,
     }
 }
 
@@ -330,7 +431,8 @@ fn of_inputs(kb: &Kb, links: &LinkIndex, args: &[Origin], depth: usize, out: &mu
         classify(kb, links, a, depth + 1, &mut classes);
         if classes.is_empty() {
             let no_data = matches!(a, Origin::Unit { .. })
-                || matches!(a, Origin::Data { def, .. } if is_descriptor(kb, def));
+                || matches!(a, Origin::Data { def, .. } if is_descriptor(kb, def))
+                || empty_container(a);
             constant &= no_data;
             continue;
         }
@@ -458,14 +560,49 @@ fn direct_data(
     if depth > 6 {
         return;
     }
+    // a static that changes at run time, also behind std wrappers (`*LAZY`,
+    // `ONCE.get().unwrap()`): what the program puts there (`ONCE.set(&SHA512)`, `ALG2 =
+    // &SHA1`, its initial value), looked up with the values from elsewhere
+    if let Origin::Data { def, .. } = crate::links::peel(o)
+        && let Some((ix, _)) = links
+        && let Some(values) = ix.mutable_static(&def.id)
+    {
+        let values = values.to_vec();
+        let key = Origin::Data {
+            def: def.clone(),
+            value: None,
+        };
+        if seen.insert((false, key, String::new())) {
+            for v in &values {
+                direct_data(kb, Some((ix, "")), v, depth + 1, out, seen);
+            }
+        }
+        return;
+    }
+    // (through std wrappers: `RwLock::new(&SHA256)`)
+    let o = crate::links::peel(o);
     match o {
-        Origin::Data { def, .. } if !out.contains(def) => out.push(def.clone()),
+        Origin::Data { def, .. } => {
+            if let Some((ix, owner)) = links {
+                ix.note(&def.id, owner);
+            }
+            if !out.contains(def) {
+                out.push(def.clone());
+            }
+        }
+        // what a `LazyLock`'s closure returns
+        Origin::Call { callee, args, .. } if callee == "<closure>" => args
+            .iter()
+            .for_each(|a| direct_data(kb, links, a, depth + 1, out, seen)),
         Origin::Any(alts) | Origin::All(alts) => alts
             .iter()
             .for_each(|a| direct_data(kb, links, a, depth + 1, out, seen)),
         // a field of a static (`TABLE.alg`): the static, whose own data says which descriptor
         // (`TABLE.alg = &SHA256`), not what every value of its type holds there
         Origin::Field { .. } if let Some(def) = static_root(o) => {
+            if let Some((ix, _)) = links {
+                ix.note(&def.id, "");
+            }
             if !out.contains(def) {
                 out.push(def.clone());
             }
@@ -507,6 +644,24 @@ fn receiver_data(
     if depth > 8 {
         return;
     }
+    // a key kept in a static that changes at run time (`KEY.get().unwrap().seal_in_place(..)`):
+    // the chains of the values put there
+    if let Origin::Data { def, .. } = crate::links::peel(o)
+        && let Some((ix, _)) = links
+        && let Some(values) = ix.mutable_static(&def.id)
+    {
+        let values = values.to_vec();
+        let key = Origin::Data {
+            def: def.clone(),
+            value: None,
+        };
+        if seen.insert((true, key, String::new())) {
+            for v in &values {
+                receiver_data(kb, Some((ix, "")), v, depth + 1, out, seen);
+            }
+        }
+        return;
+    }
     // a receiver from another function (a field, a parameter, the program's own constructor):
     // the chains of the values that reach it
     if from_elsewhere(kb, o)
@@ -542,11 +697,12 @@ fn receiver_data(
     }
 }
 
-/// Access to what a lock or a cell holds (`Mutex::lock`, `RefCell::borrow_mut`): a value that
-/// may have been written through a guard elsewhere.
+/// Access to what a lock, a cell or an atomic holds (`Mutex::lock`, `RefCell::borrow_mut`,
+/// `Cell::get`, `AtomicU64::fetch_add`): a value that may have been written through a guard or
+/// a shared reference elsewhere (`c.set(fresh)`), or a counter.
 static GUARDED: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(
-        r"::(Mutex|RwLock|RefCell|ReentrantLock)::(lock|try_lock|read|try_read|write|try_write|borrow|borrow_mut|try_borrow|try_borrow_mut)$",
+        r"::(Mutex|RwLock|RefCell|ReentrantLock)::(lock|try_lock|read|try_read|write|try_write|borrow|borrow_mut|try_borrow|try_borrow_mut|take|replace|replace_with)$|::(Cell|OnceCell)::(get|take|replace|into_inner)$|::Atomic\w*::(load|swap|fetch_\w+|compare_exchange\w*|into_inner)$",
     )
     .unwrap()
 });
@@ -581,9 +737,22 @@ const INDEXING: &[&str] = &[
     "::get",
     "::get_mut",
     "::split_at",
+    "::split_at_mut",
+    "::split_first",
+    "::split_first_mut",
+    "::split_last",
+    "::split_last_mut",
     "::first_chunk",
+    "::first_chunk_mut",
     "::chunks",
+    "::chunks_mut",
+    "::chunks_exact",
+    "::chunks_exact_mut",
 ];
+
+/// Calls whose result is copies of their first argument: `vec![0u8; n]` is zeros whatever
+/// `n` is, `[0u8; 4].repeat(n)` its element.
+const REPEATING: &[&str] = &["vec::from_elem", "::repeat"];
 
 fn strip_generics(path: &str) -> String {
     let mut s = path.to_string();

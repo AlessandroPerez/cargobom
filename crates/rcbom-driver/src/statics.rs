@@ -119,7 +119,7 @@ pub(crate) fn used_promoted(tcx: TyCtxt<'_>, did: DefId) -> Vec<mir::Promoted> {
     }
     let body = tcx.optimized_mir(did);
     let mut v = Refs::new(tcx, None);
-    v.dead = dead_blocks(body);
+    v.dead = dead_blocks(tcx, body);
     v.owner = Some(did);
     v.visit_body(body);
     let mut used: Vec<mir::Promoted> = v.promoted_used.into_iter().collect();
@@ -146,7 +146,7 @@ pub(crate) fn fn_data_sites<'tcx>(
         // build), nor the promoted constants only such a branch uses
         let body = tcx.optimized_mir(did);
         let mut v = Refs::new(tcx, args);
-        v.dead = dead_blocks(body);
+        v.dead = dead_blocks(tcx, body);
         v.owner = Some(did);
         v.visit_body(body);
         v.dead = Vec::new();
@@ -252,7 +252,18 @@ impl<'tcx> Refs<'tcx> {
 
 /// The blocks of a body no execution reaches: those only a branch on a constant leads to
 /// (`if cfg!(debug_assertions)` is `if false` in a release build, which MIR level 0 keeps).
-fn dead_blocks(body: &mir::Body<'_>) -> Vec<bool> {
+fn dead_blocks<'tcx>(tcx: TyCtxt<'tcx>, body: &mir::Body<'tcx>) -> Vec<bool> {
+    // a constant's value, a named one's too (`if FLAG` with `const FLAG: bool = false`)
+    let value_of = |c: &mir::ConstOperand<'tcx>| {
+        c.const_.try_to_scalar_int().or_else(|| {
+            (!c.const_.ty().has_non_region_param())
+                .then(|| {
+                    c.const_
+                        .try_eval_scalar_int(tcx, TypingEnv::fully_monomorphized())
+                })
+                .flatten()
+        })
+    };
     let n = body.basic_blocks.len();
     let mut live = vec![false; n];
     let mut work = vec![mir::START_BLOCK];
@@ -265,7 +276,7 @@ fn dead_blocks(body: &mir::Body<'_>) -> Vec<bool> {
         let term = block.terminator();
         if let mir::TerminatorKind::SwitchInt { discr, targets } = &term.kind {
             let value = match discr {
-                mir::Operand::Constant(c) => c.const_.try_to_scalar_int(),
+                mir::Operand::Constant(c) => value_of(c),
                 mir::Operand::Copy(p) | mir::Operand::Move(p) if p.projection.is_empty() => block
                     .statements
                     .iter()
@@ -275,9 +286,7 @@ fn dead_blocks(body: &mir::Body<'_>) -> Vec<bool> {
                             if a.0.local == p.local && a.0.projection.is_empty() =>
                         {
                             Some(match &a.1 {
-                                mir::Rvalue::Use(mir::Operand::Constant(c), ..) => {
-                                    c.const_.try_to_scalar_int()
-                                }
+                                mir::Rvalue::Use(mir::Operand::Constant(c), ..) => value_of(c),
                                 _ => None,
                             })
                         }
@@ -339,8 +348,9 @@ impl<'tcx> Visitor<'tcx> for Refs<'tcx> {
                     }
                     // `const aead::AES_256_GCM` (aws-lc-rs), `Self::ALG`, `<T as Tr>::ALG`
                     DefKind::Const | DefKind::AssocConst => {
-                        let def = resolve_const(self.tcx, uv.def, uv.args, self.args);
-                        self.found.push((Named::Const(def), c.span));
+                        if let Some(def) = resolve_const(self.tcx, uv.def, uv.args, self.args) {
+                            self.found.push((Named::Const(def), c.span));
+                        }
                     }
                     _ => {}
                 }
@@ -358,16 +368,19 @@ impl<'tcx> Visitor<'tcx> for Refs<'tcx> {
 }
 
 /// The const item a (possibly generic) constant refers to: an associated const resolves to
-/// the impl's item once the instance's arguments are known.
+/// the impl's item once the instance's arguments are known. A trait's const whose type is not
+/// known yet (`T::ALG` in `fn hash<T: Scheme>`, read in the generic body) is none: its default
+/// (`const ALG = &SHA256` in the trait) is only one of the values the instances may have.
 pub(crate) fn resolve_const<'tcx>(
     tcx: TyCtxt<'tcx>,
     def: DefId,
     uv_args: GenericArgsRef<'tcx>,
     inst_args: Option<GenericArgsRef<'tcx>>,
-) -> DefId {
+) -> Option<DefId> {
     if !matches!(tcx.def_kind(def), DefKind::AssocConst) {
-        return def;
+        return Some(def);
     }
+    let of_trait = tcx.trait_of_assoc(def).is_some();
     let args = match inst_args {
         Some(a) => ty::EarlyBinder::bind(tcx, uv_args)
             .instantiate(tcx, a)
@@ -375,13 +388,13 @@ pub(crate) fn resolve_const<'tcx>(
         None => uv_args,
     };
     if args.has_non_region_param() {
-        return def;
+        return (!of_trait).then_some(def);
     }
     let env = TypingEnv::fully_monomorphized();
     let args = tcx.normalize_erasing_regions(env, ty::Unnormalized::new_wip(args));
     match ty::Instance::try_resolve(tcx, env, def, args) {
-        Ok(Some(i)) => i.def_id(),
-        _ => def,
+        Ok(Some(i)) => Some(i.def_id()),
+        _ => Some(def),
     }
 }
 

@@ -93,6 +93,7 @@
         "algorithmProperties": {
           "algorithmFamily": "ECDSA",
           "cryptoFunctions": [
+            "keygen",
             "sign"
           ],
           "ellipticCurve": "nist/P-256",
@@ -110,6 +111,13 @@
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "line": 101,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `} else if alg == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 241,
             "location": "src/key_pair.rs",
@@ -122,6 +130,13 @@
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
+            "line": 457,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
             "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `ecdsa_from_pkcs8(&signature::ECDSA_P256_SHA256_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
@@ -190,7 +205,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -202,7 +217,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "10"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -213,6 +228,7 @@
         "algorithmProperties": {
           "algorithmFamily": "ECDSA",
           "cryptoFunctions": [
+            "keygen",
             "sign"
           ],
           "ellipticCurve": "nist/P-384",
@@ -222,6 +238,13 @@
       },
       "evidence": {
         "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "line": 101,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
+          },
           {
             "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `} else if alg == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 247,
@@ -235,6 +258,13 @@
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
+            "line": 457,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
             "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `ecdsa_from_pkcs8(&signature::ECDSA_P384_SHA384_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
@@ -303,7 +333,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -315,7 +345,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "9"
+          "value": "11"
         }
       ],
       "type": "cryptographic-asset"
@@ -484,6 +514,13 @@
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "line": 470,
+            "location": "src/key_pair.rs",
+            "offset": 7,
+            "symbol": "ring::rsa::keypair::KeyPair::sign"
+          },
+          {
             "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 550,
             "location": "src/key_pair.rs",
@@ -543,7 +580,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -551,7 +588,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "9"
         }
       ],
       "type": "cryptographic-asset"
@@ -583,6 +620,13 @@
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "line": 470,
+            "location": "src/key_pair.rs",
+            "offset": 7,
+            "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
             "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `} else if self == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
@@ -630,7 +674,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -638,7 +682,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -670,6 +714,13 @@
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "line": 470,
+            "location": "src/key_pair.rs",
+            "offset": 7,
+            "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
             "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `} else if self == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
@@ -717,7 +768,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -725,7 +776,84 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:material:private-key:RSA",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "private-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "line": 254,
+            "location": "src/key_pair.rs",
+            "offset": 15,
+            "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "line": 257,
+            "location": "src/key_pair.rs",
+            "offset": 15,
+            "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "line": 260,
+            "location": "src/key_pair.rs",
+            "offset": 15,
+            "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `} else if let Ok(rsakp) = RsaKeyPair::from_pkcs8(pkcs8) {`; code: `RsaKeyPair::from_pkcs8`",
+            "line": 548,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
+          }
+        ]
+      },
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "computed"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "RSA"
         }
       ],
       "type": "cryptographic-asset"
@@ -1191,7 +1319,8 @@
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1224,6 +1353,26 @@
         "crypto:algorithm:SHA-512"
       ],
       "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -1284,7 +1433,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:73c89a5c-da12-8199-9367-9e6d9598be1f",
+  "serialNumber": "urn:uuid:dc6e4257-51ed-8985-b738-a71574731702",
   "specVersion": "1.7",
   "version": 1
 }

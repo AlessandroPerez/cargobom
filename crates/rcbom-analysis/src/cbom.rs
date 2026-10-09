@@ -407,6 +407,24 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                     ap.insert("algorithmFamily".into(), json!(t.family));
                 }
             }
+            let mut props = vec![
+                prop("rcbom:detection:method", "manifest"),
+                prop("rcbom:confidence", "low"),
+                prop(
+                    "rcbom:usage",
+                    if an.layer2 && p.scope == Scope::Required {
+                        "declared-not-used"
+                    } else {
+                        "unknown"
+                    },
+                ),
+                prop("rcbom:kb:version", &kb.version),
+            ];
+            // as for the assets found: a name the registry has no pattern for is flagged
+            // (`SHA-2`, the family name of the sha2 crate)
+            if template.is_some_and(|t| !rcbom_kb::registry::valid(name, &t.family)) {
+                props.push(prop("rcbom:registry-name", "unmatched"));
+            }
             out.push(json!({
                 "type": "cryptographic-asset",
                 "rcbom-from": pkg_ref(&p.name, &p.version.to_string()),
@@ -414,19 +432,7 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                 "name": name,
                 "cryptoProperties": { "assetType": "algorithm", "algorithmProperties": ap },
                 "evidence": { "occurrences": manifest_occurrences(man, p) },
-                "properties": [
-                    prop("rcbom:detection:method", "manifest"),
-                    prop("rcbom:confidence", "low"),
-                    prop(
-                        "rcbom:usage",
-                        if an.layer2 && p.scope == Scope::Required {
-                            "declared-not-used"
-                        } else {
-                            "unknown"
-                        },
-                    ),
-                    prop("rcbom:kb:version", &kb.version),
-                ],
+                "properties": props,
             }));
         }
     }
@@ -530,6 +536,19 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         }
     }
     components.extend(candidates);
+    // every component is in the graph, those without dependencies as empty elements (CycloneDX
+    // 1.7 `dependencies`)
+    let listed: HashSet<String> = deps
+        .iter()
+        .filter_map(|d| d["ref"].as_str().map(str::to_string))
+        .collect();
+    for c in &components {
+        if let Some(r) = c["bom-ref"].as_str()
+            && !listed.contains(r)
+        {
+            deps.push(json!({ "ref": r, "dependsOn": [] }));
+        }
+    }
 
     // the package `--manifest-path` names; in a virtual workspace, the first member by name
     let root = included

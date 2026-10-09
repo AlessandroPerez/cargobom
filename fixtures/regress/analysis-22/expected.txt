@@ -1,0 +1,102 @@
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:12:34 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [static] in a22::main; line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:13:14 | aws_lc_rs::signature::ParsedPublicKey::verify_sig | [reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; line: `let _ = p.verify_sig(b"msg", &a);`; code: `verify_sig`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:10:12 | aws_lc_rs::signature::ED25519 | [reachable] [static] in a22::main; line: `let _ = signature::ED25519.verify_sig(&a, b"msg", &a);`; code: `signature::ED25519`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:10:31 | aws_lc_rs::signature::VerificationAlgorithm::verify_sig | [reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ED25519 in the arguments; line: `let _ = signature::ED25519.verify_sig(&a, b"msg", &a);`; code: `verify_sig`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:21:13 | aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::generate | [reachable] [call] in a22::main; use: keygen; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `signature::PqdsaKeyPair::generate`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:21:48 | aws_lc_rs::unstable::signature::MLDSA_44_SIGNING | [reachable] [via-static] in a22::main; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44_SIGNING; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `aws_lc_rs::unstable::signature::MLDSA_44_SIGNING`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:24:15 | aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::sign | [reachable] [call] in a22::main; use: sign; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let _ = kp.sign(b"msg", &mut sig);`; code: `sign`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:15:36 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 | [reachable] [static] in a22::main; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:16:14 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; line: `let _ = u.verify(b"msg", &a);`; code: `verify`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:34 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in a22::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:36 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 | [reachable] [component] in a22::main; part of RSA-PSS-SHA-256 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:18:36 | aws_lc_rs::digest::sha::SHA384 | [reachable] [static] in a22::main; line: `let ctx = digest::Context::new(&digest::SHA384);`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:16 | aws_lc_rs::digest::Context::finish | [reachable] [call] in a22::main; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `let d = ctx.finish();`; code: `finish`
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:13:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via a22 -> aws-lc-rs
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by a22 (dependencies); features ["legacy-des", "unstable"]
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=2
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:confidence=high
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:detection:method=type-resolved
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:functions:source=observed
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:kb:version=0.2.0
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:occurrences=3
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:reachability=reachable
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:confidence=high
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:crypto-role=algorithm
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:ffi-boundary=true
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign"], "parameterSetIdentifier": "44", "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
+component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/a22@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:Ed25519
+dependency crypto:algorithm:ML-DSA-44
+dependency crypto:algorithm:RSA-PSS-SHA-256
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency pkg:cargo/a22@0.1.0
+dependency pkg:cargo/aws-lc-rs@1.18.1
+dependency pkg:cargo/aws-lc-sys@0.45.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:Ed25519
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ML-DSA-44
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:RSA-PSS-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/a22@0.1.0", "name": "a22", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a22@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=14
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=119
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -1,6 +1,6 @@
 # cargo-cbom: proof-of-concept evaluation
 
-*9 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 8.*
+*9 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 9.*
 
 This is the evaluation of the first, deliberately narrow paper: Layers 1 and 2 of
 `docs/rust-cbom-proposal2.md`, intraprocedural provenance, and a small labelled test set. A
@@ -46,7 +46,7 @@ Crypto crates in other versions are reported as `unsupported-version` rather tha
 | micro, libonly, threads | written for this work | 3 | golden files (designed cases) |
 | rusi fixtures | cdxgen-plugins-bin@6a64635, MIT, unchanged | 3 | `labels.toml`, written from source before scoring |
 | realapp | Phase 0 corpus (age, jsonwebtoken, rustls/ring) | 1 | Phase 0 output as oracle |
-| regression probes | written by independent audits of the pipeline, and after the corpus runs (section 8) | 39 | golden files (each case commented) |
+| regression probes | written by independent audits of the pipeline, and after the corpus runs (section 8) | 46 | golden files (each case commented) |
 | corpus | crates.io releases: rage, jwt-cli, rcgen, minisign, xh | 5 | none (feasibility) |
 
 The cases micro and libonly cover:
@@ -78,15 +78,15 @@ With `--self-test` it shifts every position by ±1 line and ±1 column and count
 | micro | 54 | 54 | 188/188 |
 | libonly | 20 | 20 | 72/72 |
 | threads | 15 | 15 | 54/54 |
-| rusi fixtures (3) | 820 | 820 | 3,213/3,213 |
-| realapp | 550 | 550 | 2,173/2,173 |
-| regression probes (39) | 4,896 | 4,896 | 19,089/19,089 |
-| corpus (5 projects) | 1,018 | 1,018 | 4,018/4,018 |
-| **total** | **7,373** | **7,373** | **28,807/28,807** |
+| rusi fixtures (3) | 814 | 814 | 3,189/3,189 |
+| realapp | 544 | 544 | 2,149/2,149 |
+| regression probes (46) | 5,287 | 5,287 | 20,479/20,479 |
+| corpus (5 projects) | 1,029 | 1,029 | 4,062/4,062 |
+| **total** | **7,763** | **7,763** | **30,193/30,193** |
 
-Positions come from rustc's spans, which are offsets into the original files, so comments and formatting cannot shift them. Code from a function-like macro is attributed to the outermost call site in the user's source, with the definition site kept in the context.
+Positions come from rustc's spans, which are offsets into the original files, so comments and formatting cannot shift them. Code from a function-like macro is attributed to the macro call written in the user's source (`hash_all!` for the `vec!` its body calls; `inner!` in `outer!(inner!(x))`), with the definition site kept in the context.
 
-The self-test measures the verifier, not the positions: a shifted position the verifier accepts means the CBOM's evidence did not pin the position down. Every shift is now rejected. Earlier rounds accepted some: 17 of 6,964 shifts in the first evaluation, where the same identifier sat at the same column on adjacent lines (adjacent `new_from_slice` calls in the crates-app fixture, rcgen's `sign_algo.rs`, the hpke crate's `kdf.rs`). The audits removed those by recording the exact text at each position (section 8). One more appeared in the re-run after them, in rcgen: `KeyPairKind::Ec(kp) => kp.public_key()` above `KeyPairKind::Ed(kp) => kp.public_key()`, the same text at the same column. Only the line tells them apart, so each occurrence now records its line too (section 7, item 8).
+The self-test measures the verifier, not the positions: a shifted position the verifier accepts means the CBOM's evidence did not pin the position down. Every shift is now rejected. Earlier rounds accepted some: 17 of 6,964 shifts in the first evaluation (in rustls and age sources) and 17 of 6,881 in the next, where the same identifier sat at the same column on adjacent lines (adjacent `new_from_slice` calls in the crates-app fixture, rcgen's `sign_algo.rs`, the hpke crate's `kdf.rs`). The audits removed those by recording the exact text at each position (section 8). One more appeared in the re-run after them, in rcgen: `KeyPairKind::Ec(kp) => kp.public_key()` above `KeyPairKind::Ed(kp) => kp.public_key()`, the same text at the same column. Only the line tells them apart, so each occurrence now records its line too (section 7, item 8).
 
 ## 4. RQ2: detection on labelled programs
 
@@ -96,7 +96,7 @@ Labels (`fixtures/rusi/*/labels.toml`) give, per program line:
 - the use, and the origin of its key material
 - negative lines, which must stay empty (imports, a secret's provenance, a length constant `SHA256_OUTPUT_LEN`)
 
-The scorer (`scripts/score.py`) counts (asset, line) pairs. A name counts if it is listed in the label's `accept` list: the complete registry name and the valid less specific registry names (`AES-GCM`, `AES` for AES-256-GCM; `HMAC` for HMAC-SHA-256; not `Argon2`, which has no registry pattern). "Fully named" means the complete registry name with parameters. Provenance is scored on the core assets.
+The scorer (`scripts/score.py`) counts (asset, line) pairs. A name counts if it is listed in the label's `accept` list: the complete registry name, the valid less specific registry names (`AES-GCM`, `AES` for AES-256-GCM; `HMAC` for HMAC-SHA-256), and, for key material, the key's name and its family (`RSA-2048`, `RSA`); no label accepts `Argon2`, a family name without a registry pattern. The scorer compares names, not asset types: an algorithm named `RSA` is credited for the labelled RSA-2048 private key. "Fully named" means the complete registry name with parameters. Provenance is scored on the core assets.
 
 | | recall | precision | fully named |
 |---|---|---|---|
@@ -104,7 +104,7 @@ The scorer (`scripts/score.py`) counts (asset, line) pairs. A name counts if it 
 | cargo-cbom, current | 14/14 | 17/17 | 14/14 |
 | rusi 4.1.1 | 12/14 | 12/15 | 7/14 |
 
-The first row is the honest held-out number: it was measured before the knowledge base covered these crates, and every miss is a missing entry. The second row is a development-set score, because the entries for md5, blake3, pbkdf2, argon2, rsa, ed25519-dalek and aws-lc-rs were written after that run. rusi's two misses are names the registry has no pattern for, which the scorer does not accept: `Argon2` for the Argon2id use, and `Ring-AEAD` for ring's AES-256-GCM. Both count again as false positives. Neither tool falls for `SHA256_OUTPUT_LEN`.
+The first row is the honest held-out number: it was measured before the knowledge base covered these crates, and every miss is a missing entry. The second row is a development-set score, because the entries for md5, blake3, pbkdf2, argon2, rsa, ed25519-dalek and aws-lc-rs were written after that run. rusi's two misses are names no label accepts, which have no registry pattern: `Argon2` for the Argon2id use, and `Ring-AEAD` for ring's AES-256-GCM. Both count again as false positives. Neither tool falls for `SHA256_OUTPUT_LEN`.
 
 Both tools find nearly the same lines. The difference is what they say:
 
@@ -135,9 +135,10 @@ For the knowledge base's roles (key, nonce, IV, salt, password, rng), the driver
 
 The labels include the hard case of these fixtures: secrets read with `env::var("…").unwrap_or_else(|_| "literal".to_string())`. The right answer is "environment or hard-coded", which needs the closure. Findings are emitted for hard-coded key material.
 
-On realapp this finds two real patterns:
+On realapp this finds three real patterns:
 - **A hard-coded HMAC key:** the program's own `EncodingKey::from_secret(b"secret")`.
 - **A hard-coded nonce in age-core:** `c.encrypt(&[0; 12].into(), …)`. It is correct by design, because age uses each file key once. That is the case Layer 3 (purpose) exists for. realapp never reaches age's encryption from `main`, so this one is reported as `rcbom:finding:present`, apart from the reachable findings (`rcbom:finding`).
+- **A zero HKDF input key and salt in rustls:** the TLS 1.3 key schedule starts from a zero input key and a zero salt (`rustls/src/crypto/ring/tls13.rs`), as RFC 8446 (section 7.1) specifies: `hard-coded-ikm` and `hard-coded-salt` on HKDF-SHA-256 and HKDF-SHA-384, correct by design too.
 
 ## 6. RQ4: ablation
 
@@ -148,11 +149,11 @@ On realapp this finds two real patterns:
 | micro | 26 / 20 | 6 | 25 | 24 / 18 |
 | libonly | 12 / 4 | 8 | 11 | 10 / 4 |
 | threads | 9 / 9 | 0 | 9 | 7 / 7 |
-| rusi crates-app | 745 / 745 | 0 | 384 | 11 / 11 |
+| rusi crates-app | 739 / 739 | 0 | 389 | 11 / 11 |
 | rusi asymmetric-app | 6 / 6 | 0 | 6 | 4 / 4 |
 | rusi modern-app | 2 / 2 | 0 | 2 | 2 / 2 |
-| realapp | 523 / 523 | 0 | 408 | 2 / 2 |
-| rcgen (library) | 94 / 94 | 6 | 92 | 93 / 93 |
+| realapp | 517 / 517 | 0 | 406 | 2 / 2 |
+| rcgen (library) | 105 / 105 | 6 | 103 | 104 / 104 |
 | rage | 119 / 86 | 37 | 116 | 0 / 0 |
 
 The walk does two things.
@@ -172,14 +173,14 @@ Five crates.io applications and libraries (`scripts/corpus.py`). Each was built 
 
 | project | packages | plain check | cargo cbom | overhead | peak RSS | instances walked | algorithms (reachable) | other assets | occurrences (reachable) | findings |
 |---|---|---|---|---|---|---|---|---|---|---|
-| rage 0.12.1 | 192 | 18.0 s | 35.6 s | ×1.98 | 429 MiB | 45,099 | 14 (14) | – | 119 (116) | hard-coded nonce |
-| jwt-cli 6.2.0 | 73 | 14.5 s | 24.1 s | ×1.66 | 350 MiB | 16,606 | 15 (15) | HMAC key | 86 (86) | hard-coded key |
-| rcgen 0.14.10 (library) | 19 | 10.9 s | 15.1 s | ×1.38 | 257 MiB | 2,470 | 9 (9) | – | 94 (92) | – |
-| minisign 0.10.0 | 22 | 2.4 s | 8.8 s | ×3.68 | 246 MiB | 1,298 | 1 (1) | – | 2 (2) | – |
-| xh 0.26.2 | 213 | 55.9 s | 103.3 s | ×1.85 | 871 MiB | 56,319 | 39 (36) | TLS (aws-lc-rs) | 657 (380) | hard-coded IKM and salt (TLS 1.3 key schedule) |
+| rage 0.12.1 | 192 | 18.4 s | 40.4 s | ×2.20 | 437 MiB | 45,099 | 14 (14) | – | 119 (116) | hard-coded nonce |
+| jwt-cli 6.2.0 | 73 | 15.0 s | 24.9 s | ×1.66 | 352 MiB | 16,606 | 15 (15) | HMAC, RSA, ECDSA and Ed25519 keys | 85 (85) | hard-coded key |
+| rcgen 0.14.10 (library) | 19 | 10.9 s | 15.0 s | ×1.38 | 257 MiB | 2,470 | 9 (9) | RSA key | 105 (103) | – |
+| minisign 0.10.0 | 22 | 2.3 s | 8.9 s | ×3.83 | 246 MiB | 1,298 | 1 (1) | – | 2 (2) | – |
+| xh 0.26.2 | 213 | 58.8 s | 108.5 s | ×1.85 | 889 MiB | 56,319 | 39 (36) | TLS (aws-lc-rs), RSA key | 658 (381) | hard-coded IKM and salt (TLS 1.3 key schedule) |
 
-- **Cost.** On the four projects larger than minisign the overhead is ×1.4 to ×2.0. minisign's ×3.7 is fixed per-crate cost on a two-second build. Memory peaks at 871 MiB, for xh. Packages are those of the analysed build as Layer 1 counts them (`rcbom:run:packages`): the host platform's, without development-only packages and optional dependencies that only a weak feature names.
-- **Evidence.** All 1,018 positions verify, and the self-test rejects all 4,018 shifted ones. The driver caught no panic in any of the five builds.
+- **Cost.** On the four projects larger than minisign the overhead is ×1.4 to ×2.2. minisign's ×3.8 is fixed per-crate cost on a two-second build. Memory peaks at 889 MiB, for xh. Packages are those of the analysed build as Layer 1 counts them (`rcbom:run:packages`): the host platform's, without development-only packages and optional dependencies that only a weak feature names.
+- **Evidence.** All 1,029 positions verify, and the self-test rejects all 4,062 shifted ones. The driver caught no panic in any of the five builds.
 - **rusi.** rusi (stable backend) reports 2 crypto components across the five projects: `JWT` in jwt-cli, and `SHA-256` in xh's `src/message_signature.rs`, a module compiled only with the non-default feature `http-message-signatures` (which cargo-cbom, analysing default features, does not see). These programs reach their crypto through dependencies (age, jsonwebtoken, reqwest/rustls), which a source-level scan of the workspace does not enter.
 - **Findings.** All are real and intentional, and all show why purpose (Layer 3) matters:
   - age-core's `[0; 12]` nonce: age uses each file key once.
@@ -314,10 +315,62 @@ became reachable: rustls's reachable ML-KEM code reads its algorithm from a fiel
 the values stored there is listed only by `ALL_KX_GROUPS`, which no entry point names. An
 algorithm reaching a call only from data no entry point reaches is now present at that call.
 
+**A fourth round.** Four new reviewers audited the driver; Layer 1, the knowledge base,
+matching and provenance; verification, the harness and the documents; and, held out, four
+more crates.io projects (totp-rs 5.7.0, cookie 0.18.2, rusty_paseto 0.10.1, gcp_auth 0.12.7).
+They reported 58 findings (9 high, 21 medium, 28 low; three "low-medium" counted as medium),
+all reproduced, and the review of the regenerated outputs one more (rcgen's signing keys, below).
+All high and medium ones are fixed; the low ones are fixed or documented as limits (section 34
+of `docs/poc_workflow.md`):
+- **Values read wrongly.** A match arm read the payload of whatever enum variant was built
+  (`Pick::B(y)` took `Pick::A`'s SHA-384); a trait's associated const in generic code took the
+  trait's default (SHA-256 reachable where only SHA-384 runs); a static written at run time
+  (a lock's guard, a `static mut`) kept its initializer's algorithm; a program static naming a
+  composite descriptor (`&hmac::HMAC_SHA256`, which names SHA-256 too) made its calls vanish,
+  and a hard-coded key with them.
+- **False findings.** A secret with a constant appended (`key.extend_from_slice(b"pepper")`)
+  was hard-coded; so were a loop counter nonce, an atomic counter, keys in a `Cell` or filled by
+  a closure holding `&mut`, a key overwritten after an `.await`, and a nonce filled by the
+  generator in a buffer split with `split_at_mut` (cookie). A zero nonce in `vec![0u8; n]` was
+  "parameter", from its length.
+- **Missed values across functions.** Keys and algorithms in enum variants (rcgen's
+  `KeyPairKind`: its ECDSA and RSA signing calls had no occurrence), behind a generic extension
+  trait (rcgen's `_err`), in `LazyLock` and `OnceLock` statics, and passed to a local closure.
+- **Tiers.** An algorithm only an unreachable caller passes was reachable at the call; crypto in
+  a library's generic public type (cookie's `PrivateJar<J>`) and a trait's default method were
+  present; a branch on a named `const` was not pruned.
+- **Knowledge base.** Ed25519ph was Ed25519; ring's `RsaKeyPair` (an alias) never matched its
+  key role, so a hard-coded RSA private key was not flagged; aws-lc-rs's `verify_sig`, digest
+  `finish`, argon2's `hash_password_into_with_memory`, blake3's `update_reader`, jsonwebtoken's
+  PEM keys and ed25519-dalek's `from_keypair_bytes` were missing; Argon2 built with
+  `Algorithm::default()` or `From<Params>` had no costs; rsa's `SigningKey::random` made its
+  scheme a part of the key; a generator lent to `encrypt` took the call's data; TLS 1.3 suites
+  carried rustls's names, not IANA's.
+- **Driver.** A procedural derive spanning its code at an input token was cited there (verify
+  failed); an `async` closure passed to a generic function counted as driver errors.
+- **Verification.** A position moved to an identical statement elsewhere in the file was
+  accepted (398 occurrences had such a twin): the verifier now checks that a position is in the
+  item its context names, of the impl block's type and trait, and not in a `macro_rules!` body;
+  macro, derive and attribute occurrences now get the descriptor and component checks; the lines
+  the details cite must be in the caller and name what it instantiates, or be in the macro's
+  body and name the symbol; a made-up crate in a symbol, absolute or non-normalised locations,
+  and a component naming no parent are rejected. Of the 398 twins, 23 remain accepted, all
+  `#[cfg]` alternatives (a documented limit).
+- **Documents and harness.** Numbers and statements the code or results contradicted (the
+  driver's MIR level, the knowledge base's counts, the scoring rule, which macro call a position
+  names), `corpus.py` not failing on a caught panic, the facts stamp leaving out the instance
+  limit, components missing from the dependency graph.
+
+**Reviewing the regenerated outputs** of the round's fixes found two more defects, fixed: the
+enum links made rustls's own `KeySchedule::derive` an HKDF-SHA-384 occurrence naming one of the
+suites only (a protocol crate's own functions are no longer looked up this way, section 24.5 of
+`docs/poc_workflow.md`), and a generator passed as the first argument of `RsaPrivateKey::new`
+counted as its receiver, naming a second key after the first (RSA-2048 for an RSA-3072 key).
+
 The probes are kept as regression fixtures (`fixtures/regress`, run by `scripts/e2e.sh
 --regress`), each compared with its reviewed CBOM: 19 from the first audits, 2 from the corpus
-re-run (section 7), 9 from the second round and the review of its outputs, and 9 from the
-third round and the review of its outputs.
+re-run (section 7), 9 from the second round and the review of its outputs, 9 from the third
+round and the review of its outputs, and 7 from the fourth.
 
 ## 9. Limitations and threats
 

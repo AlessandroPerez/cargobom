@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 8;
+pub const FACTS_VERSION: u32 = 9;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -83,10 +83,11 @@ impl Links {
     }
 }
 
-/// A value stored in a struct field, or in a field of a struct inside it.
+/// A value stored in a struct field (or a field of a struct inside it), or in a field of an
+/// enum variant built by the program (`KeyPairKind::Ec(kp)`).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct FieldStore {
-    /// Defining path of the struct.
+    /// Defining path of the struct, or of the enum variant (`rcgen::key_pair::KeyPairKind::Ec`).
     pub adt: String,
     /// The field, then the fields inside it (`c.aead.alg`: `aead`'s index, then `alg`'s).
     pub path: Vec<usize>,
@@ -99,10 +100,18 @@ pub struct FieldStore {
     pub via_ref: bool,
 }
 
+/// The name under which a method implementing a trait records what it returns, besides its
+/// own path: the trait's method and the `Self` type a call names (`Origin::Call`'s `callee`
+/// and `self_ty`).
+pub fn impl_key(trait_method: &str, self_ty: &str) -> String {
+    format!("{trait_method} for {self_ty}")
+}
+
 /// What a function returns, or a field of it (`path`, as in `FieldStore`).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Returned {
-    /// Defining path of the function.
+    /// Defining path of the function; for a method implementing a trait's, also recorded
+    /// under `impl_key`.
     pub func: String,
     pub path: Vec<usize>,
     pub value: Origin,
@@ -317,6 +326,9 @@ pub enum Origin {
     },
     /// Field `field` of a struct `adt` read from a value whose origin is `base` (a parameter,
     /// a call's result, a static): any value the crate stores in that field (`Links::fields`).
+    /// For an enum outside the standard library, `adt` is the variant (`match &self.kind {
+    /// KeyPairKind::Ec(kp) => .. }`); a standard-library enum's field (`Some(k)`) is the whole
+    /// value.
     Field {
         adt: String,
         field: usize,
@@ -328,6 +340,9 @@ pub enum Origin {
     /// struct built here, the operands of an arithmetic operation, a value with some of its
     /// elements written afterwards (`key[31] = 1`).
     All(Vec<Origin>),
+    /// The value depends on its own earlier value (`ctr += 1` in a loop): it changes with
+    /// each iteration; the other alternatives say where it starts.
+    Loop,
     /// A bound of the search was hit here (depth, width or size): the origin is incomplete.
     Truncated,
     Unknown,
@@ -397,4 +412,8 @@ pub struct Reach {
     /// of their definitions: sites found by the per-item scan inside one of them, generic or
     /// not, are reachable too.
     pub fns: Vec<String>,
+    /// The defining paths of the reached functions (as `Links` names them): a value named in
+    /// one of them reaches a call at run time.
+    #[serde(default)]
+    pub paths: Vec<String>,
 }

@@ -263,7 +263,7 @@ fn run_driver(
     // input of the driver other than the sources (the driver itself, the compiler, the crate
     // lists, features, walk) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -276,7 +276,8 @@ fn run_driver(
         a.features,
         a.no_walk,
         a.profile,
-        local_dirs
+        local_dirs,
+        std::env::var("RCBOM_MAX_INSTANCES").ok()
     );
     let stamp_path = dir.join("stamp");
     if std::fs::read_to_string(&stamp_path).ok().as_deref() != Some(stamp.as_str()) {

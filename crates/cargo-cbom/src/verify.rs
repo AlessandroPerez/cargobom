@@ -445,6 +445,40 @@ struct Source {
     /// Rust: where each `use` or `extern crate` item is, from (line, col) to (line, col)
     /// (1-based lines, 0-based char columns, end exclusive): a path there is an import, not a use
     use_spans: Vec<((usize, usize), (usize, usize))>,
+    /// Rust: the items with a body (functions, statics, consts, impl blocks, traits, modules,
+    /// `macro_rules!`), where a position's enclosing item is looked up
+    items: Vec<Item>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ItemKind {
+    Fn,
+    Static,
+    Impl,
+    Trait,
+    Mod,
+    Macro,
+    /// a macro's invocation (`thread_local! { .. }`): the items it makes are named by it
+    MacroCall,
+}
+
+/// An item of a Rust file, from its keyword to the end of its body ((line, col), end
+/// exclusive), with its name: a function's, static's or const's, a trait's, a module's, a
+/// `macro_rules!`'s; for an impl block, the last segment of its self type (and `trait_name`,
+/// the trait's).
+#[derive(Debug)]
+struct Item {
+    kind: ItemKind,
+    name: String,
+    trait_name: Option<String>,
+    start: (usize, usize),
+    end: (usize, usize),
+}
+
+impl Item {
+    fn contains(&self, at: (usize, usize)) -> bool {
+        self.start <= at && at < self.end
+    }
 }
 
 impl Source {
@@ -465,6 +499,7 @@ impl Source {
                 locals: HashSet::new(),
                 toml: if toml { toml_keys(text) } else { Vec::new() },
                 use_spans: Vec::new(),
+                items: Vec::new(),
             };
         }
         let (mut class, code_text) = lex(text);
@@ -487,6 +522,17 @@ impl Source {
             .find_iter(&code_text)
             .map(|m| (at(char_of(m.start())), at(char_of(m.end()))))
             .collect();
+        let chars: Vec<char> = code_text.chars().collect();
+        let items = items(&chars)
+            .into_iter()
+            .map(|(kind, name, trait_name, a, b)| Item {
+                kind,
+                name,
+                trait_name,
+                start: at(a),
+                end: at(b),
+            })
+            .collect();
         Source {
             lines,
             class,
@@ -494,8 +540,275 @@ impl Source {
             locals: locals(&code_text),
             toml: Vec::new(),
             use_spans,
+            items,
         }
     }
+
+    /// The innermost item of one of `kinds` that contains the position.
+    fn enclosing(&self, at: (usize, usize), kinds: &[ItemKind]) -> Option<&Item> {
+        self.items
+            .iter()
+            .filter(|i| kinds.contains(&i.kind) && i.contains(at))
+            .max_by_key(|i| i.start)
+    }
+}
+
+/// The items of a Rust file with comments and literals blanked: (kind, name, trait, start, end)
+/// in chars. A keyword counts at an item's place (not `-> impl Trait`, `*const T`, `<const N>`,
+/// `const { .. }`); a function without a body (a trait's declaration) has none.
+#[allow(clippy::type_complexity)]
+fn items(s: &[char]) -> Vec<(ItemKind, String, Option<String>, usize, usize)> {
+    let word_at = |i: usize| -> String {
+        s[i..]
+            .iter()
+            .take_while(|c| is_ident(**c))
+            .collect::<String>()
+    };
+    let skip_ws = |mut i: usize| {
+        while i < s.len() && s[i].is_whitespace() {
+            i += 1;
+        }
+        i
+    };
+    // the code before `i`: its last non-blank char, and the word ending there
+    let prev = |i: usize| s[..i].iter().rev().find(|c| !c.is_whitespace()).copied();
+    let prev_word = |i: usize| -> String {
+        let mut j = i;
+        while j > 0 && s[j - 1].is_whitespace() {
+            j -= 1;
+        }
+        let end = j;
+        while j > 0 && is_ident(s[j - 1]) {
+            j -= 1;
+        }
+        s[j..end].iter().collect()
+    };
+    // an item's place: after another item, a block's start, an attribute, a visibility or a
+    // qualifier
+    let item_place = |i: usize| {
+        matches!(prev(i), None | Some('}' | ';' | '{' | ']' | ')'))
+            || matches!(
+                prev_word(i).as_str(),
+                "pub" | "unsafe" | "default" | "extern" | "auto"
+            )
+    };
+    // the matching close of the bracket at `open`
+    let close_of = |open: usize| -> Option<usize> {
+        let (o, c) = match s[open] {
+            '{' => ('{', '}'),
+            '(' => ('(', ')'),
+            '[' => ('[', ']'),
+            _ => return None,
+        };
+        let mut depth = 0;
+        for (j, ch) in s.iter().enumerate().skip(open) {
+            if *ch == o {
+                depth += 1;
+            } else if *ch == c {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(j + 1);
+                }
+            }
+        }
+        None
+    };
+    // from `i`, the first `{` (or `;` when `semi`) outside parentheses, brackets and generic
+    // arguments: a body, or the end of a declaration
+    let body_or_end = |i: usize| -> Option<(usize, bool)> {
+        let mut depth = 0i32;
+        let mut j = i;
+        while j < s.len() {
+            match s[j] {
+                '(' | '[' => depth += 1,
+                ')' | ']' => depth -= 1,
+                '<' => depth += 1,
+                '>' if j > 0 && s[j - 1] != '-' && s[j - 1] != '=' => depth -= 1,
+                '{' if depth <= 0 => return Some((j, true)),
+                ';' if depth <= 0 => return Some((j, false)),
+                _ => {}
+            }
+            j += 1;
+        }
+        None
+    };
+    let last_segment = |t: &str| -> String {
+        // `&'a mut path::Type<A, B>` -> `Type`
+        let t = strip_generics(t);
+        let t = t.trim().trim_start_matches(['&', '*']).trim();
+        let t = t
+            .split_whitespace()
+            .rfind(|w| !w.starts_with('\'') && *w != "mut" && *w != "dyn" && *w != "const")
+            .unwrap_or("");
+        t.rsplit("::").next().unwrap_or(t).trim().to_string()
+    };
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < s.len() {
+        if !is_ident(s[i]) || (i > 0 && is_ident(s[i - 1])) {
+            i += 1;
+            continue;
+        }
+        let w = word_at(i);
+        let after = skip_ws(i + w.len());
+        match w.as_str() {
+            "fn" if after < s.len() && is_ident(s[after]) => {
+                let name = word_at(after);
+                let name = name.strip_prefix("r#").unwrap_or(&name).to_string();
+                if let Some((b, true)) = body_or_end(after + name.len())
+                    && let Some(e) = close_of(b)
+                {
+                    out.push((ItemKind::Fn, name, None, i, e));
+                }
+            }
+            "static" | "const"
+                if after < s.len()
+                    && is_ident(s[after])
+                    && item_place(i)
+                    && !matches!(
+                        word_at(after).as_str(),
+                        "fn" | "unsafe" | "extern" | "async"
+                    ) =>
+            {
+                let mut n = after;
+                if word_at(n) == "mut" {
+                    n = skip_ws(n + 3);
+                }
+                let name = word_at(n);
+                // `static NAME: T = ..;`: to the `;` outside all brackets
+                let mut depth = 0i32;
+                let mut j = n;
+                while j < s.len() {
+                    match s[j] {
+                        '(' | '[' | '{' => depth += 1,
+                        ')' | ']' | '}' => depth -= 1,
+                        ';' if depth == 0 => break,
+                        _ => {}
+                    }
+                    if depth < 0 {
+                        break;
+                    }
+                    j += 1;
+                }
+                if !name.is_empty() {
+                    out.push((ItemKind::Static, name, None, i, (j + 1).min(s.len())));
+                }
+            }
+            "impl" if item_place(i) && prev(i) != Some(')') => {
+                if let Some((b, true)) = body_or_end(i + 4)
+                    && let Some(e) = close_of(b)
+                {
+                    let mut header: String = s[i + 4..b].iter().collect();
+                    // the impl's own generic parameters
+                    let mut params = Vec::new();
+                    if header.trim_start().starts_with('<') {
+                        let h = header.trim_start().to_string();
+                        let hc: Vec<char> = h.chars().collect();
+                        let cls = vec![Class::Code; hc.len()];
+                        if let Some(end) = skip_angle(&hc, &cls, 0) {
+                            let inner: String = hc[1..end.saturating_sub(1)].iter().collect();
+                            params = strip_generics(&inner)
+                                .split(',')
+                                .filter_map(|p| {
+                                    let p = p.trim().trim_start_matches("const ").trim();
+                                    let n: String =
+                                        p.chars().take_while(|c| is_ident(*c)).collect();
+                                    (!n.is_empty() && !p.starts_with('\'')).then_some(n)
+                                })
+                                .collect();
+                        }
+                        header = strip_generics(&h).to_string();
+                    }
+                    // blanks collapsed: a `where` or `for` may start a line
+                    let one_line = |h: &str| h.split_whitespace().collect::<Vec<_>>().join(" ");
+                    let header = one_line(&header);
+                    let header = header.split(" where ").next().unwrap_or("").to_string();
+                    let header_full: String = one_line(&s[i + 4..b].iter().collect::<String>());
+                    let header_full = header_full
+                        .split(" where ")
+                        .next()
+                        .unwrap_or("")
+                        .to_string();
+                    let (tr, ty) = match header.split_once(" for ") {
+                        Some((_, y)) => {
+                            // the trait with its arguments (`TryFrom<&PrivateKeyDer<'_>>`),
+                            // unless they are the impl's own parameters: then its name
+                            let t = header_full
+                                .split_once(" for ")
+                                .map(|(t, _)| t.trim().to_string())
+                                .unwrap_or_default();
+                            let t = if t.starts_with('<') {
+                                let tc: Vec<char> = t.chars().collect();
+                                let cls = vec![Class::Code; tc.len()];
+                                skip_angle(&tc, &cls, 0)
+                                    .map(|e| tc[e..].iter().collect::<String>())
+                                    .unwrap_or(t)
+                            } else {
+                                t
+                            };
+                            let generic = re!(r"\w+")
+                                .find_iter(&t)
+                                .any(|m| params.iter().any(|p| p == m.as_str()));
+                            let t = if generic {
+                                last_segment(&t)
+                            } else {
+                                norm_path(&t)
+                            };
+                            (Some(t), y.to_string())
+                        }
+                        None => (None, header.clone()),
+                    };
+                    // a blanket impl (`impl<T: Foo> Bar for T`): any type, named by its trait
+                    let ty = last_segment(&ty);
+                    let ty = if params.contains(&ty) {
+                        String::new()
+                    } else {
+                        ty
+                    };
+                    out.push((ItemKind::Impl, ty, tr, i, e));
+                }
+            }
+            "trait" | "mod" if after < s.len() && is_ident(s[after]) && item_place(i) => {
+                let name = word_at(after);
+                if let Some((b, true)) = body_or_end(after + name.len())
+                    && let Some(e) = close_of(b)
+                {
+                    let kind = if w == "trait" {
+                        ItemKind::Trait
+                    } else {
+                        ItemKind::Mod
+                    };
+                    out.push((kind, name, None, i, e));
+                }
+            }
+            "macro_rules" if s.get(after) == Some(&'!') => {
+                let n = skip_ws(after + 1);
+                let name = word_at(n);
+                let b = skip_ws(n + name.len());
+                if b < s.len()
+                    && let Some(e) = close_of(b)
+                {
+                    // the body: inside its brackets
+                    out.push((ItemKind::Macro, name, None, b, e));
+                }
+            }
+            // `name! (..)`, `name! [..]`, `name! { .. }`
+            _ if after < s.len()
+                && s[after] == '!'
+                && w != "macro_rules"
+                && s.get(skip_ws(after + 1))
+                    .is_some_and(|c| matches!(c, '(' | '[' | '{')) =>
+            {
+                let b = skip_ws(after + 1);
+                if let Some(e) = close_of(b) {
+                    out.push((ItemKind::MacroCall, w.clone(), None, b, e));
+                }
+            }
+            _ => {}
+        }
+        i += w.len().max(1);
+    }
+    out
 }
 
 struct Files<'a> {
@@ -1603,6 +1916,16 @@ impl Files<'_> {
     /// commit must be that toolchain's.
     fn resolve(&mut self, location: &str) -> Result<PathBuf, String> {
         let Some(rest) = location.strip_prefix("/rustc/") else {
+            // as the generator writes them: relative, without `.`, `..` or empty segments
+            if location.starts_with('/')
+                || location
+                    .split('/')
+                    .any(|g| g.is_empty() || g == "." || g == "..")
+            {
+                return Err(format!(
+                    "`{location}` is not a normalised relative location"
+                ));
+            }
             return Ok(self.man.resolve(location));
         };
         let (commit, rest) = rest
@@ -1757,22 +2080,23 @@ impl Files<'_> {
         }
         // the positions the details name: where a generic instance was instantiated, where a
         // macro's code was written
-        self.check_details(ctx.details)?;
-        // the macro tags are among the leading tags, never in the recorded source text
+        self.check_details(ctx.details, ctx.tags, &o.symbol, ctx.line)?;
+        // the macro tags are among the leading tags, never in the recorded source text; a tagged
+        // position is the macro's, derive's or attribute's name, not the symbol's
+        let mut tagged = false;
         if let Some(m) = re!(r"\[macro ([\w:]+!)\]").captures(ctx.tags) {
             let name = &m[1];
             let ok = Regex::new(&format!(r"^(?:\w+::)*{}", regex::escape(name)))
                 .unwrap()
                 .is_match(&at);
-            return if ok && starts_token {
-                Ok(())
-            } else {
-                Err(format!("expected `{name}` in {text:?}"))
-            };
+            if !(ok && starts_token) {
+                return Err(format!("expected `{name}` in {text:?}"));
+            }
+            tagged = true;
         }
         // derive: the position is the derive's name inside `#[derive(..)]` (or a `cfg_attr`'s
         // `derive(..)`)
-        if let Some(m) = re!(r"\[derive ([\w:]+)\]").captures(ctx.tags) {
+        if !tagged && let Some(m) = re!(r"\[derive ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
             let ok = Regex::new(&format!(r"^(?:\w+::)*{}\b", regex::escape(&name)))
                 .unwrap()
@@ -1780,16 +2104,15 @@ impl Files<'_> {
             let in_derive = attribute_before(&src, line, offset).is_some_and(|a| {
                 re!(r"^(?:derive|cfg_attr)\s*\(").is_match(&a) && open_in(&a, "derive")
             });
-            return if ok && starts_token && in_derive {
-                Ok(())
-            } else {
-                Err(format!(
+            if !(ok && starts_token && in_derive) {
+                return Err(format!(
                     "expected derive `{name}` inside `#[derive(..)]` in {text:?}"
-                ))
-            };
+                ));
+            }
+            tagged = true;
         }
         // attribute macro: the position is the attribute, or its name inside a `cfg_attr`
-        if let Some(m) = re!(r"\[attribute ([\w:]+)\]").captures(ctx.tags) {
+        if !tagged && let Some(m) = re!(r"\[attribute ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
             let direct = Regex::new(&format!(r"^#!?\[\s*(?:\w+::)*{}\b", regex::escape(&name)))
                 .unwrap()
@@ -1800,97 +2123,127 @@ impl Files<'_> {
                 .is_match(&at)
                 && attribute_before(&src, line, offset)
                     .is_some_and(|a| re!(r"^cfg_attr\s*\(").is_match(&a));
-            return if (direct || in_cfg_attr) && starts_token {
-                Ok(())
-            } else {
-                Err(format!("expected an attribute in {text:?}"))
-            };
+            if !((direct || in_cfg_attr) && starts_token) {
+                return Err(format!("expected an attribute in {text:?}"));
+            }
+            tagged = true;
         }
-        // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
-        if let Some(w) = word_before(&src, line, offset)
-            && matches!(
-                w.as_str(),
-                "fn" | "struct"
-                    | "enum"
-                    | "union"
-                    | "trait"
-                    | "type"
-                    | "mod"
-                    | "static"
-                    | "const"
-                    | "let"
-                    | "macro_rules"
-            )
-        {
-            return Err(format!("position after `{w}`: a definition, in {text:?}"));
-        }
-        // code: the callee or static, by name or by an import alias of it
+        // the symbol's crate is a package of the CBOM (or the standard library): a made-up one
+        // would switch the checks below off
         let sym = strip_generics(&o.symbol);
         let sym_crate = sym.split("::").next().unwrap_or("").to_string();
-        let ident = sym
-            .trim_end_matches(':')
-            .rsplit("::")
+        // (a qualified path's, `<t14::S384 as t14::Scheme>::ALG`, is its type's)
+        let first = o
+            .symbol
+            .trim_start_matches('<')
+            .split("::")
             .next()
-            .unwrap_or("")
-            .to_string();
-        if ident.is_empty() {
-            return Err("no identifier in symbol".into());
+            .unwrap_or("");
+        let known = matches!(first, "core" | "std" | "alloc")
+            || self.libs.as_ref().is_some_and(|l| l.contains_key(first))
+            || self
+                .man
+                .packages
+                .iter()
+                .any(|p| p.name.replace('-', "_") == first);
+        if !known {
+            return Err(format!("`{}`: no crate `{first}` in the build", o.symbol));
         }
-        // the path, from the position on over the next lines (rustfmt breaks long paths);
-        // generic arguments balanced, so it cannot run on into the next expression
-        let (rs, rc) = rest(&src, line, offset);
-        let parsed = path_and_generics(&rs, &rc);
+        let mut parsed = None;
         let owner = man.owner_of(&path);
         let owner_id = owner.map(|p| p.id.repr.clone());
-        let mut ok = parsed.as_ref().is_some_and(|(_, last, _)| {
-            *last == ident
-                || src.binds.iter().any(|b| {
-                    b.name == *last
-                        && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &src.binds)
-                })
-        });
-        // an alias another file defines: of this package, or of the crate the path goes
-        // through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in mylib)
-        if !ok
-            && starts_token
-            && let Some((quals, last, _)) = &parsed
-        {
-            let mut dirs: Vec<PathBuf> =
-                owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
-            for root in import_roots(&src.binds, quals.first().unwrap_or(last))
-                .into_iter()
-                .flatten()
+        if !tagged {
+            // the enclosing item the context names (an identical statement in another
+            // function, or in another type's method of that name, is another occurrence), and
+            // no macro's body (a macro's code is cited where it is called)
+            check_item(
+                &src,
+                ctx.details.strip_prefix(ctx.tags).unwrap_or(ctx.details),
+                (line, offset),
+            )?;
+            // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
+            if let Some(w) = word_before(&src, line, offset)
+                && matches!(
+                    w.as_str(),
+                    "fn" | "struct"
+                        | "enum"
+                        | "union"
+                        | "trait"
+                        | "type"
+                        | "mod"
+                        | "static"
+                        | "const"
+                        | "let"
+                        | "macro_rules"
+                )
             {
-                for r in self.crate_refs(owner_id.as_deref(), &root) {
-                    let pkg = r
-                        .strip_prefix("pkg:cargo/")
-                        .and_then(|nv| nv.split_once('@'))
-                        .and_then(|(n, v)| man.by_name_version(n, v));
-                    if let Some(p) = pkg
-                        && !dirs.contains(&p.manifest_dir)
-                    {
-                        dirs.push(p.manifest_dir.clone());
+                return Err(format!("position after `{w}`: a definition, in {text:?}"));
+            }
+            // code: the callee or static, by name or by an import alias of it
+            let ident = sym
+                .trim_end_matches(':')
+                .rsplit("::")
+                .next()
+                .unwrap_or("")
+                .to_string();
+            if ident.is_empty() {
+                return Err("no identifier in symbol".into());
+            }
+            // the path, from the position on over the next lines (rustfmt breaks long paths);
+            // generic arguments balanced, so it cannot run on into the next expression
+            let (rs, rc) = rest(&src, line, offset);
+            parsed = path_and_generics(&rs, &rc);
+            let mut ok = parsed.as_ref().is_some_and(|(_, last, _)| {
+                *last == ident
+                    || src.binds.iter().any(|b| {
+                        b.name == *last
+                            && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &src.binds)
+                    })
+            });
+            // an alias another file defines: of this package, or of the crate the path goes
+            // through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in mylib)
+            if !ok
+                && starts_token
+                && let Some((quals, last, _)) = &parsed
+            {
+                let mut dirs: Vec<PathBuf> =
+                    owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
+                for root in import_roots(&src.binds, quals.first().unwrap_or(last))
+                    .into_iter()
+                    .flatten()
+                {
+                    for r in self.crate_refs(owner_id.as_deref(), &root) {
+                        let pkg = r
+                            .strip_prefix("pkg:cargo/")
+                            .and_then(|nv| nv.split_once('@'))
+                            .and_then(|(n, v)| man.by_name_version(n, v));
+                        if let Some(p) = pkg
+                            && !dirs.contains(&p.manifest_dir)
+                        {
+                            dirs.push(p.manifest_dir.clone());
+                        }
+                    }
+                }
+                for d in dirs {
+                    let binds = self.package_binds(&d);
+                    if binds.iter().any(|b| {
+                        b.name == *last
+                            && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
+                    }) {
+                        ok = true;
+                        break;
                     }
                 }
             }
-            for d in dirs {
-                let binds = self.package_binds(&d);
-                if binds.iter().any(|b| {
-                    b.name == *last
-                        && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
-                }) {
-                    ok = true;
-                    break;
-                }
+            if !(ok && starts_token) {
+                return Err(format!("expected `{ident}` in {text:?}"));
             }
         }
-        if !(ok && starts_token) {
-            return Err(format!("expected `{ident}` in {text:?}"));
-        }
         // a component is used where the asset it is part of is used
-        if kind == "component"
-            && let Some(m) = re!(r"; part of ([^\s;(]+)").captures(ctx.details)
-        {
+        if kind == "component" {
+            let Some(m) = re!(r"; part of ([^\s;(]+)").captures(ctx.details) else {
+                return Err("a component that names no asset it is part of".into());
+            };
             let parent = &m[1];
             let here = self
                 .at_pos
@@ -2070,37 +2423,296 @@ impl Files<'_> {
         }
     }
 
-    /// The positions a context's details name: `instantiated by .. at <file>:<line>` (where a
-    /// generic instance was instantiated) and `expanded from <file>:<line>` (where a macro's
-    /// code is written) must be lines of code of files that exist; a standard-library file is
-    /// read from the pinned toolchain, whose commit it must name.
-    fn check_details(&mut self, details: &str) -> Result<(), String> {
+    /// The positions a context's details name: `instantiated by <caller> at <file>:<line>`
+    /// (where a generic instance was instantiated) and `expanded from <file>:<line>` (where a
+    /// macro's code is written) must be lines of code of files that exist; a standard-library
+    /// file is read from the pinned toolchain, whose commit it must name. Outside the standard
+    /// library, an instantiation's line is in the caller and names what it instantiates (the
+    /// occurrence's item, then each caller in turn; a closure is instantiated where it is
+    /// written), and a macro's line is in the body of the `macro_rules!` of its tag.
+    fn check_details(
+        &mut self,
+        details: &str,
+        tags: &str,
+        symbol: &str,
+        call_line: Option<&str>,
+    ) -> Result<(), String> {
+        let mut callee = details
+            .strip_prefix(tags)
+            .unwrap_or(details)
+            .strip_prefix("in ")
+            .and_then(|d| d.split("; ").next())
+            .map(str::to_string);
+        // the names of the occurrence's item and of the callers so far
+        let mut earlier: Vec<String> = callee
+            .as_deref()
+            .and_then(in_item)
+            .map(|n| n.name)
+            .into_iter()
+            .collect();
         for part in details.split("; ") {
             let Some(m) =
-                re!(r"^(?:instantiated by .* at|expanded from) ([^\s;]+):(\d+)$").captures(part)
+                re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+):(\d+)$").captures(part)
             else {
                 continue;
             };
-            let (file, line) = (m[1].to_string(), m[2].parse::<usize>().unwrap_or(0));
+            let (file, line) = (m[3].to_string(), m[4].parse::<usize>().unwrap_or(0));
+            let caller = m.get(2).map(|c| c.as_str().to_string());
             let path = self.resolve(&file)?;
             let src = self
                 .source(&path)
                 .ok_or_else(|| format!("cannot read {file}, named in `{part}`"))?;
-            let code = src
+            let cols: Vec<usize> = src
                 .class
                 .get(line.wrapping_sub(1))
                 .zip(src.lines.get(line.wrapping_sub(1)))
-                .is_some_and(|(cls, l)| {
+                .map(|(cls, l)| {
                     l.chars()
                         .zip(cls)
-                        .any(|(c, k)| *k == Class::Code && !c.is_whitespace())
-                });
-            if !code {
+                        .enumerate()
+                        .filter(|(_, (c, k))| **k == Class::Code && !c.is_whitespace())
+                        .map(|(j, _)| j)
+                        .collect()
+                })
+                .unwrap_or_default();
+            if cols.is_empty() {
                 return Err(format!("`{part}`: no code at line {line} of {file}"));
+            }
+            if file.starts_with("/rustc/") {
+                if let Some(n) = caller.as_deref().and_then(in_item) {
+                    earlier.push(n.name);
+                }
+                callee = caller;
+                continue;
+            }
+            match &caller {
+                Some(c) => {
+                    let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
+                    let inside = cols.iter().any(|&col| {
+                        src.enclosing((line, col), &[ItemKind::Fn, ItemKind::Static])
+                            .is_some_and(|i| i.name == want.name)
+                            || src.enclosing((line, col), &[ItemKind::MacroCall]).is_some()
+                    });
+                    if !inside {
+                        return Err(format!("`{part}`: line {line} is not in `{}`", want.name));
+                    }
+                    // the line names what it instantiates, unless that is a closure: the item
+                    // or a caller before it (an occurrence instantiated along two chains lists
+                    // both last callers, each naming the item before them)
+                    if let Some(prev) = &callee
+                        && !prev.trim_end().ends_with('}')
+                    {
+                        let text = &src.lines[line - 1];
+                        let named = earlier.iter().any(|n| {
+                            Regex::new(&format!(r"\b{}\b", regex::escape(n)))
+                                .unwrap()
+                                .is_match(text)
+                        });
+                        if !named {
+                            return Err(format!(
+                                "`{part}`: line {line} does not name `{}`",
+                                in_item(prev).map(|n| n.name).unwrap_or_default()
+                            ));
+                        }
+                    }
+                    if let Some(n) = in_item(c) {
+                        earlier.push(n.name);
+                    }
+                    callee = Some(c.clone());
+                }
+                None => {
+                    // a derive's or an attribute's code is the procedural macro's: only the line
+                    // of its use is known
+                    let Some(t) = re!(r"\[macro (?:[\w]+::)*(\w+)!\]").captures(tags) else {
+                        continue;
+                    };
+                    let inside = src
+                        .enclosing((line, cols[0]), &[ItemKind::Macro])
+                        .is_some_and(|m| m.name == t[1]);
+                    if !inside {
+                        return Err(format!(
+                            "`{part}`: line {line} is not in the body of `macro_rules! {}`",
+                            &t[1]
+                        ));
+                    }
+                    // the macro's line names the symbol, or the call passes it in
+                    // (`hash_with!(SHA384)` for a body calling `digest(&$alg, ..)`)
+                    let sym = strip_generics(symbol);
+                    let ident = sym.rsplit("::").next().unwrap_or(&sym);
+                    let word = Regex::new(&format!(r"\b{}\b", regex::escape(ident))).unwrap();
+                    if !word.is_match(&src.lines[line - 1])
+                        && !call_line.is_some_and(|l| word.is_match(l))
+                    {
+                        return Err(format!(
+                            "`{part}`: line {line} of the macro does not name `{ident}`"
+                        ));
+                    }
+                }
             }
         }
         Ok(())
     }
+}
+
+/// The item a context says an occurrence is in (`in t1::xchacha`, `in <A as T>::f::{closure#0}`,
+/// `in r1::Jar::<J>::seal`): its name, and the type and trait of the impl block it is a
+/// method of (`A`, `T`), when its path names them.
+struct InItem {
+    name: String,
+    self_ty: Option<String>,
+    trait_name: Option<String>,
+}
+
+fn in_item(item: &str) -> Option<InItem> {
+    // the path's segments, generic arguments kept whole
+    let chars: Vec<char> = item.chars().collect();
+    let mut segs = Vec::new();
+    let (mut depth, mut cur, mut k) = (0i32, String::new(), 0);
+    while k < chars.len() {
+        let c = chars[k];
+        match c {
+            '<' => depth += 1,
+            '>' if k == 0 || chars[k - 1] != '-' => depth -= 1,
+            _ => {}
+        }
+        if depth == 0 && c == ':' && chars.get(k + 1) == Some(&':') {
+            segs.push(std::mem::take(&mut cur));
+            k += 2;
+            continue;
+        }
+        cur.push(c);
+        k += 1;
+    }
+    segs.push(cur);
+    let last_of = |t: &str| {
+        let t = strip_generics(t);
+        let t = t.trim().trim_start_matches(['&', '*']).trim().to_string();
+        t.rsplit("::").next().unwrap_or(&t).trim().to_string()
+    };
+    // generic arguments (`<J>`, `<..>`) and what the compiler makes (`{closure#0}`) are not
+    // items written in the source
+    segs.retain(|g| {
+        !g.starts_with('{')
+            && !(g.starts_with('<') && !g.contains(" as ") && !g.starts_with("<impl "))
+    });
+    let name = segs.pop()?;
+    let (mut self_ty, mut trait_name) = (None, None);
+    if let Some(g) = segs.last() {
+        if let Some(inner) = g.strip_prefix('<').and_then(|g| g.strip_suffix('>')) {
+            if let Some(t) = inner.strip_prefix("impl ") {
+                self_ty = Some(last_of(t));
+            } else if let Some((t, tr)) = inner.split_once(" as ") {
+                self_ty = Some(last_of(t));
+                trait_name = Some(norm_path(tr));
+            }
+        } else if g.chars().next().is_some_and(char::is_uppercase) {
+            self_ty = Some(last_of(g));
+        }
+    }
+    Some(InItem {
+        name: strip_generics(&name),
+        self_ty,
+        trait_name,
+    })
+}
+
+/// A type or trait path as compared between a context and the source: paths cut to their last
+/// segment at every level, lifetimes and blanks dropped (`core::convert::TryFrom<&rustls_pki_types::
+/// PrivateKeyDer<'_>>` -> `TryFrom<&PrivateKeyDer>`).
+fn norm_path(t: &str) -> String {
+    let t = re!(r"\b\w+::").replace_all(t.trim(), "");
+    let t = re!(r"'\w+\s*,?").replace_all(&t, "");
+    let t: String = t.chars().filter(|c| !c.is_whitespace()).collect();
+    t.replace("<>", "").replace(",>", ">")
+}
+
+/// Two traits are one: the same path, or the same name where either has no arguments.
+fn same_trait(a: &str, b: &str) -> bool {
+    let name = |t: &str| t.split('<').next().unwrap_or(t).to_string();
+    a == b || (name(a) == name(b) && (!a.contains('<') || !b.contains('<')))
+}
+
+/// A code position is inside the item its context names (`in <item>; ..`): the innermost
+/// function, static or const around it has the item's name, and, for a method whose path names
+/// its type, the impl block (or the trait, for a default method) around that names it too. Not
+/// inside a `macro_rules!` body.
+fn check_item(src: &Source, details: &str, at: (usize, usize)) -> Result<(), String> {
+    if let Some(m) = src.enclosing(at, &[ItemKind::Macro]) {
+        return Err(format!(
+            "position inside the body of `macro_rules! {}`",
+            m.name
+        ));
+    }
+    let Some(want) = details
+        .strip_prefix("in ")
+        .and_then(|d| d.split("; ").next())
+        .and_then(in_item)
+    else {
+        return Err("no enclosing item in the context".into());
+    };
+    let Some(item) = src.enclosing(at, &[ItemKind::Fn, ItemKind::Static]) else {
+        if src.enclosing(at, &[ItemKind::MacroCall]).is_some() {
+            return Ok(());
+        }
+        return Err(format!("position outside any item, not in `{}`", want.name));
+    };
+    // code a macro's invocation wraps (`thread_local! { static TL: .. = digest(..) }`) is in
+    // the items the macro makes, named by it
+    let in_call = src.enclosing(at, &[ItemKind::MacroCall]).is_some();
+    if item.name != want.name {
+        if in_call {
+            return Ok(());
+        }
+        return Err(format!(
+            "position in `{}`, not in `{}`",
+            item.name, want.name
+        ));
+    }
+    // the block the function is written in (not the function itself)
+    let container = src
+        .items
+        .iter()
+        .filter(|i| {
+            matches!(i.kind, ItemKind::Impl | ItemKind::Trait | ItemKind::Fn)
+                && i.start < item.start
+                && i.contains(item.start)
+        })
+        .max_by_key(|i| i.start);
+    if let Some(ty) = &want.self_ty
+        && let Some(block) = container
+    {
+        let ok = match block.kind {
+            // a blanket impl's type is any type: its trait is named
+            ItemKind::Impl if block.name.is_empty() => {
+                matches!((&block.trait_name, &want.trait_name), (Some(a), Some(b)) if same_trait(a, b))
+            }
+            // its type, and the trait it implements: `impl TryFrom<&PrivateKeyDer<'_>> for
+            // KeyPair` is not `impl TryFrom<&[u8]> for KeyPair`
+            ItemKind::Impl => {
+                block.name == *ty
+                    && match (&block.trait_name, &want.trait_name) {
+                        (Some(a), Some(b)) => same_trait(a, b),
+                        _ => true,
+                    }
+            }
+            ItemKind::Trait => {
+                block.name == *ty
+                    || want
+                        .trait_name
+                        .as_deref()
+                        .is_some_and(|t| same_trait(&block.name, t))
+            }
+            // a function inside a function: no impl block of its own
+            _ => true,
+        };
+        if !ok {
+            return Err(format!(
+                "position in a method of `{}`, not of `{ty}`",
+                block.name
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// The text of the attribute a position is in, from after its `#[` (or `#![`) to the position:
@@ -2215,6 +2827,65 @@ fn rest(src: &Source, line: usize, offset: usize) -> (Vec<char>, Vec<Class>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn items_and_their_names() {
+        let src = Source::new(
+            "impl<T: AsRef<[u8]>> Sealer<T> {\n    fn seal(&self) -> impl Fn() -> u8 {\n        || 1\n    }\n}\nimpl TryFrom<&PrivateKeyDer<'_>> for KeyPair {\n    fn try_from(k: &PrivateKeyDer) -> Self { todo!() }\n}\nstatic S: &'static str = \"fn x() {\";\nmacro_rules! m {\n    () => { fn inner() {} };\n}\n",
+            true,
+            false,
+        );
+        let at = |l, c| {
+            src.enclosing((l, c), &[ItemKind::Fn, ItemKind::Static])
+                .map(|i| i.name.clone())
+        };
+        assert_eq!(at(3, 8).as_deref(), Some("seal"));
+        assert_eq!(at(7, 45).as_deref(), Some("try_from"));
+        assert_eq!(at(9, 30).as_deref(), Some("S"));
+        let imp = src.enclosing((3, 8), &[ItemKind::Impl]).unwrap();
+        assert_eq!(imp.name, "Sealer");
+        let tf = src.enclosing((7, 45), &[ItemKind::Impl]).unwrap();
+        assert_eq!(
+            (tf.name.as_str(), tf.trait_name.as_deref()),
+            ("KeyPair", Some("TryFrom<&PrivateKeyDer>"))
+        );
+        assert!(src.enclosing((11, 12), &[ItemKind::Macro]).is_some());
+        // a `where` clause on its own line (hpke's `impl<D> LabeledExpand for Hkdf<D>`)
+        let w = Source::new(
+            "impl<D> Expand for Hkdf<D>\nwhere\n    D: BlockSizeUser,\n{\n    fn f() {}\n}\n",
+            true,
+            false,
+        );
+        let imp = w.enclosing((5, 8), &[ItemKind::Impl]).unwrap();
+        assert_eq!(
+            (imp.name.as_str(), imp.trait_name.as_deref()),
+            ("Hkdf", Some("Expand"))
+        );
+        assert!(src.enclosing((9, 30), &[ItemKind::Macro]).is_none());
+    }
+
+    #[test]
+    fn the_item_a_context_names() {
+        let i = in_item("<rcgen::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from").unwrap();
+        assert_eq!(i.name, "try_from");
+        assert_eq!(i.self_ty.as_deref(), Some("KeyPair"));
+        assert_eq!(i.trait_name.as_deref(), Some("TryFrom<&PrivateKeyDer>"));
+        let i = in_item("r1::Jar::<J>::seal::{closure#0}").unwrap();
+        assert_eq!(
+            (i.name.as_str(), i.self_ty.as_deref()),
+            ("seal", Some("Jar"))
+        );
+        let i = in_item("v4_public::<impl rusty_paseto::core::Paseto<'_, V4, Public>>::try_sign")
+            .unwrap();
+        assert_eq!(
+            (i.name.as_str(), i.self_ty.as_deref()),
+            ("try_sign", Some("Paseto"))
+        );
+        let i = in_item("t1::xchacha").unwrap();
+        assert_eq!((i.name.as_str(), i.self_ty), ("xchacha", None));
+        assert!(same_trait("TryFrom", "TryFrom<&PrivateKeyDer>"));
+        assert!(!same_trait("TryFrom<&[u8]>", "TryFrom<&PrivateKeyDer>"));
+    }
 
     fn code_at(src: &str, needle: &str) -> bool {
         let (code, _) = lex(src);
