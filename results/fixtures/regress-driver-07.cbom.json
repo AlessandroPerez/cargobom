@@ -115,7 +115,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t7::t2; line: `let alg = const { &SHA256 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t7::t2; use: digest; line: `let alg = const { &SHA256 };`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 23,
@@ -181,7 +181,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t7::TL::__rust_std_internal_init_fn; line: `static TL: usize = digest(&SHA384, b\"tl\").as_ref().len();`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in t7::TL::__rust_std_internal_init_fn; use: digest; line: `static TL: usize = digest(&SHA384, b\"tl\").as_ref().len();`; code: `SHA384`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 31,
@@ -233,14 +233,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t7::LAZY::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by <{closure@src/main.rs:16:46: 16:48} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t7::LAZY::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by <{closure@t7::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 48,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t7::LAZY::{closure#0}; instantiated by <{closure@src/main.rs:16:46: 16:48} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t7::LAZY::{closure#0}; use: digest; instantiated by <{closure@t7::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<usize> = LazyLock::new(|| digest(&SHA512, b\"lazy\").as_ref().len());`; code: `SHA512`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 56,
@@ -322,6 +322,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -344,7 +352,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5ad01dd0-d0fe-88c7-8e4b-88cadf572356",
+  "serialNumber": "urn:uuid:0196e290-80f5-8354-9a52-ac81a0c507d4",
   "specVersion": "1.7",
   "version": 1
 }

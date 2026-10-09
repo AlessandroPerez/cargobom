@@ -7,9 +7,12 @@
 //! `rustc_middle` directly.
 //!
 //! Environment (set by `cargo cbom`):
-//!   RCBOM_OUT          directory for `<crate>-<stable id>.json`
+//!   RCBOM_OUT          directory for `<crate><unit>.json` (`<crate>-<stable id>.json`
+//!                      without a unit)
 //!   RCBOM_KB_CRATES    comma-separated crate names the knowledge base covers; only sites
 //!                      naming items of these crates are recorded
+//!   RCBOM_LOCAL_DIRS   directories of the program's own packages (workspace members, path
+//!                      dependencies), one per line: their crates are never KB or stop crates
 //!   RCBOM_STOP_CRATES  crates whose bodies the reachability walk does not enter (algorithm
 //!                      implementations: the call into them is the fact, not their internals)
 //!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
@@ -94,6 +97,9 @@ fn main() {
     // by a constant without a span, and CopyProp and SingleUseConsts merge the definitions the
     // argument origins follow.
     args.push("-Zmir-opt-level=0".into());
+    // closures print by their path (`{closure@micro::seal::{closure#0}}`), not by their file
+    // and position, which would put local paths (`OUT_DIR`) into owner names
+    args.push("-Zspan-free-formats".into());
     let result = run_with_tcx!(&args, |tcx| {
         // A panic inside the analysis is caught per item and counted; rustc's ICE hook would
         // otherwise turn it into a compilation error of the user's crate. The guard puts the
@@ -180,18 +186,26 @@ fn env_set(name: &str) -> HashSet<String> {
 /// Shared state for one crate's analysis.
 pub(crate) struct Cx<'tcx> {
     pub tcx: TyCtxt<'tcx>,
-    pub kb_crates: HashSet<String>,
+    kb_crates: HashSet<String>,
     stop_crates: HashSet<String>,
+    /// The program's own crates (workspace members, path dependencies), by crate number and
+    /// stable id: never the crates the knowledge base describes, whatever their names (a member
+    /// called `signature`).
+    local: HashSet<rustc_span::def_id::CrateNum>,
+    local_ids: HashSet<String>,
     /// Memo: does this static (by def-path hash) lead to a knowledge-base static?
     interesting_statics: HashMap<String, bool>,
     pub errors: usize,
 }
 
 fn analyze(tcx: TyCtxt<'_>) {
+    let (local, local_ids) = local_crates(tcx);
     let mut cx = Cx {
         tcx,
         kb_crates: env_set("RCBOM_KB_CRATES"),
         stop_crates: env_set("RCBOM_STOP_CRATES"),
+        local,
+        local_ids,
         interesting_statics: HashMap::new(),
         errors: 0,
     };
@@ -266,6 +280,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                     Tier::Present,
                     vec![],
                     &mut out,
+                    None,
                 );
                 sc.visit_body(&body);
             }
@@ -484,6 +499,17 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
 }
 
 fn raw_loc(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Loc {
+    // no position at all (a call the compiler generated, in the standard library's MIR): not
+    // the first line of whatever file is first in the source map
+    if span.is_dummy() {
+        return Loc {
+            file: String::new(),
+            line: 0,
+            col: 0,
+            end_line: 0,
+            end_col: 0,
+        };
+    }
     let sm = tcx.sess.source_map();
     let (_, line, col, end_line, end_col) = sm.span_to_location_info(span);
     let mut file = sm
@@ -627,18 +653,65 @@ fn const_int(op: &Operand) -> Option<i128> {
     }
 }
 
-fn tree_mentions(t: &TyTree, crates: &HashSet<String>) -> bool {
+fn tree_mentions(t: &TyTree, cx: &Cx<'_>) -> bool {
     match t {
         TyTree::Adt { krate, args, .. } => {
-            crates.contains(&krate.name) || args.iter().any(|a| tree_mentions(a, crates))
+            cx.kb_ref(krate) || args.iter().any(|a| tree_mentions(a, cx))
         }
-        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => tree_mentions(t, crates),
-        TyTree::Tuple(ts) => ts.iter().any(|a| tree_mentions(a, crates)),
+        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => tree_mentions(t, cx),
+        TyTree::Tuple(ts) => ts.iter().any(|a| tree_mentions(a, cx)),
         _ => false,
     }
 }
 
+/// The crates of the program's own packages: those whose root file is in the directory of a
+/// workspace member or path dependency (`RCBOM_LOCAL_DIRS`, one per line).
+fn local_crates(tcx: TyCtxt<'_>) -> (HashSet<rustc_span::def_id::CrateNum>, HashSet<String>) {
+    let dirs: Vec<PathBuf> = std::env::var("RCBOM_LOCAL_DIRS")
+        .unwrap_or_default()
+        .lines()
+        .filter(|l| !l.is_empty())
+        .map(PathBuf::from)
+        .collect();
+    let cwd = std::env::current_dir().unwrap_or_default();
+    let sm = tcx.sess.source_map();
+    let mut nums = HashSet::new();
+    let mut ids = HashSet::new();
+    for c in tcx
+        .crates(())
+        .iter()
+        .copied()
+        .chain([rustc_span::def_id::LOCAL_CRATE])
+    {
+        let root = sm
+            .span_to_filename(tcx.def_span(c.as_def_id()))
+            .prefer_local_unconditionally()
+            .to_string();
+        let root = cwd.join(root);
+        if dirs.iter().any(|d| root.starts_with(d)) {
+            nums.insert(c);
+            ids.insert(format!("{:016x}", tcx.stable_crate_id(c).as_u64()));
+        }
+    }
+    (nums, ids)
+}
+
 impl Cx<'_> {
+    /// Is this crate one the knowledge base describes?
+    pub(crate) fn kb_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
+        !self.local.contains(&c) && self.kb_crates.contains(self.tcx.crate_name(c).as_str())
+    }
+
+    /// The same for a crate as the facts name it.
+    fn kb_ref(&self, k: &rcbom_facts::CrateRef) -> bool {
+        !self.local_ids.contains(&k.stable_id) && self.kb_crates.contains(&k.name)
+    }
+
+    /// Is this crate one whose code the walk does not enter (an algorithm implementation)?
+    fn stop_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
+        !self.local.contains(&c) && self.stop_crates.contains(self.tcx.crate_name(c).as_str())
+    }
+
     /// A static is worth recording if it belongs to a KB crate, or its value points (through
     /// any depth of allocations) at a static that is.
     pub(crate) fn static_interesting(&mut self, did: rustc_span::def_id::DefId) -> bool {
@@ -646,32 +719,56 @@ impl Cx<'_> {
         if let Some(v) = self.interesting_statics.get(&key) {
             return *v;
         }
-        self.interesting_statics.insert(key.clone(), false); // breaks cycles
-        let krate = self.tcx.crate_name(did.krate).to_string();
+        // A search through the statics the initializers point at. Only complete answers are
+        // remembered: an answer computed while another static of the same cycle was still being
+        // searched could miss what that one leads to.
         let tcx = self.tcx;
-        // an extern static (FFI) has no initializer to evaluate
-        let v = self.kb_crates.contains(&krate)
-            || !tcx.is_foreign_item(did)
-                && catch_unwind(AssertUnwindSafe(|| {
-                    tcx.eval_static_initializer(did).ok().map(|a| {
-                        let mut found = Vec::new();
-                        for (_, prov) in a.inner().provenance().ptrs().iter() {
-                            statics::statics_in(
-                                tcx,
-                                prov.alloc_id(),
-                                &mut found,
-                                &mut HashSet::new(),
-                                0,
-                            );
-                        }
-                        found
-                    })
-                }))
-                .ok()
-                .flatten()
-                .is_some_and(|found| found.into_iter().any(|s| self.static_interesting(s)));
-        self.interesting_statics.insert(key, v);
-        v
+        let mut stack = vec![did];
+        let mut seen = HashSet::from([did]);
+        let mut found = false;
+        while let Some(s) = stack.pop() {
+            match self.interesting_statics.get(&def_hash(tcx, s)) {
+                Some(true) => {
+                    found = true;
+                    break;
+                }
+                Some(false) => continue,
+                None => {}
+            }
+            if self.kb_crate(s.krate) {
+                found = true;
+                break;
+            }
+            // an extern static (FFI) has no initializer to evaluate
+            if tcx.is_foreign_item(s) {
+                continue;
+            }
+            let next = catch_unwind(AssertUnwindSafe(|| {
+                tcx.eval_static_initializer(s).ok().map(|a| {
+                    let mut found = Vec::new();
+                    for (_, prov) in a.inner().provenance().ptrs().iter() {
+                        statics::statics_in(
+                            tcx,
+                            prov.alloc_id(),
+                            &mut found,
+                            &mut HashSet::new(),
+                            0,
+                        );
+                    }
+                    found
+                })
+            }))
+            .ok()
+            .flatten()
+            .unwrap_or_default();
+            for t in next {
+                if seen.insert(t) {
+                    stack.push(t);
+                }
+            }
+        }
+        self.interesting_statics.insert(key, found);
+        found
     }
 
     fn is_std(&self, krate: &str) -> bool {
@@ -718,6 +815,7 @@ struct Scanner<'a, 'tcx> {
 }
 
 impl<'a, 'tcx> Scanner<'a, 'tcx> {
+    #[allow(clippy::too_many_arguments)]
     fn new(
         cx: &'a mut Cx<'tcx>,
         body: &'a Body,
@@ -726,8 +824,15 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         tier: Tier,
         via: Vec<ViaStep>,
         out: &'a mut Vec<Site>,
+        item: Option<(
+            rustc_span::def_id::DefId,
+            rustc_middle::ty::GenericArgsRef<'tcx>,
+        )>,
     ) -> Self {
-        let origins = origins::Origins::new(cx.tcx, body, def);
+        let mut origins = origins::Origins::new(cx.tcx, body, def);
+        if let Some((item, args)) = item {
+            origins = origins.with_item(item, args);
+        }
         Scanner {
             cx,
             body,
@@ -779,11 +884,11 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             return false;
         }
         let krate = tcx.crate_name(did.krate).to_string();
-        if self.cx.kb_crates.contains(&krate) {
+        if self.cx.kb_crate(did.krate) {
             return true;
         }
         let trees = arg_trees(tcx, &args.0, 0);
-        if !trees.iter().any(|t| tree_mentions(t, &self.cx.kb_crates)) {
+        if !trees.iter().any(|t| tree_mentions(t, self.cx)) {
             return false;
         }
         if self.cx.is_std(&krate) {
@@ -803,13 +908,13 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             };
             return matches!(
                 constructed,
-                Some(TyTree::Adt { krate, .. }) if self.cx.kb_crates.contains(&krate.name)
+                Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate)
             );
         }
         // another crate's generic function with a crypto type as argument: a crypto fact only
         // if that parameter is bounded by a trait of a KB crate (`fn seal<A: Aead>`), not a
         // container (`Mutex::new(cipher)`)
-        kb_bounded(tcx, did, iargs, &self.cx.kb_crates)
+        kb_bounded(tcx, did, iargs, &|c| self.cx.kb_crate(c))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -852,7 +957,9 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                     .zip(&origins)
                     .map(|(a, o)| {
                         const_int(a).or(match o {
-                            Origin::Const { value, .. } => *value,
+                            Origin::Const { value, .. }
+                            | Origin::Data { value, .. }
+                            | Origin::Unit { value, .. } => *value,
                             _ => None,
                         })
                     })
@@ -911,7 +1018,7 @@ fn kb_bounded<'tcx>(
     tcx: TyCtxt<'tcx>,
     did: rustc_span::def_id::DefId,
     args: rustc_middle::ty::GenericArgsRef<'tcx>,
-    kb: &HashSet<String>,
+    kb: &dyn Fn(rustc_span::def_id::CrateNum) -> bool,
 ) -> bool {
     let clauses = tcx.clauses_of(did).instantiate_identity(tcx);
     clauses.clauses.into_iter().any(|c| {
@@ -919,7 +1026,7 @@ fn kb_bounded<'tcx>(
             return false;
         };
         let tc = tc.skip_binder();
-        if !kb.contains(tcx.crate_name(tc.def_id().krate).as_str()) {
+        if !kb(tc.def_id().krate) {
             return false;
         }
         let rustc_middle::ty::Param(p) = tc.self_ty().kind() else {
@@ -930,9 +1037,7 @@ fn kb_bounded<'tcx>(
             .is_some_and(|t| {
                 t.walk().any(|g| {
                     g.as_type().is_some_and(|t| match t.kind() {
-                        rustc_middle::ty::Adt(adt, _) => {
-                            kb.contains(tcx.crate_name(adt.did().krate).as_str())
-                        }
+                        rustc_middle::ty::Adt(adt, _) => kb(adt.did().krate),
                         _ => false,
                     })
                 })
@@ -956,8 +1061,15 @@ impl MirVisitor for Scanner<'_, '_> {
                 // call expression; for a callee held in a local, where it was named
                 let span = match func {
                     Operand::Constant(c) => Some(c.span),
-                    _ => self.origins.callee_name_span(func),
+                    _ => self.origins.callee_name_span(func, term),
                 };
+                if span.is_none() && std::env::var_os("RCBOM_DEBUG").is_some() {
+                    eprintln!(
+                        "rcbom-driver: call of {} without a position for its callee dropped in {}",
+                        def.name(),
+                        self.owner.name
+                    );
+                }
                 if let Some(span) = span {
                     self.record_call(def, args, span, Some((call_args, term)));
                 }
@@ -1155,7 +1267,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let tcx = self.cx.tcx;
         let foreign = |did: rustc_span::def_id::DefId| {
             let k = tcx.crate_name(did.krate).to_string();
-            !self.cx.stop_crates.contains(&k) && !self.cx.is_std(&k)
+            !self.cx.stop_crate(did.krate) && !self.cx.is_std(&k)
         };
         let i = rustc_internal::internal(tcx, callee);
         if foreign(i.def_id()) {
@@ -1178,7 +1290,6 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
 
     fn visit(&mut self, inst: Instance) {
         let did = rustc_internal::internal(self.cx.tcx, inst.def.def_id());
-        let krate = self.cx.tcx.crate_name(did.krate).to_string();
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
@@ -1197,7 +1308,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         if debug.is_some() {
             eprintln!("rcbom-walk: {} ({:?})", inst.name(), inst.kind);
         }
-        let stop = self.cx.stop_crates.contains(&krate);
+        let stop = self.cx.stop_crate(did.krate);
         if !stop {
             let owner = fn_owner(self.cx, &inst);
             self.fns.push(owner.id.clone());
@@ -1212,12 +1323,17 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             // (`SSH_ED25519_RECIPIENT_KEY_LABEL` would read as a literal). The statics it
             // reaches are still taken from the instance body, where a const pointing at a static
             // has become that pointer.
-            let item_body = (item
-                && !rustc_public::CrateItem(inst.def.def_id()).requires_monomorphization())
-            .then(|| rustc_public::CrateItem(inst.def.def_id()).body())
-            .flatten();
+            let generic =
+                item && rustc_public::CrateItem(inst.def.def_id()).requires_monomorphization();
+            let item_body = (item && !generic)
+                .then(|| rustc_public::CrateItem(inst.def.def_id()).body())
+                .flatten();
             let mut sites = Vec::new();
             let scanned = item_body.as_ref().unwrap_or(&body);
+            // A generic instance (or a closure) must be scanned in its instance body, where the
+            // types are concrete; its constants are named in the item's MIR at the same span.
+            let inst_args = rustc_internal::internal(self.cx.tcx, inst).args;
+            let lookup = (item && generic).then_some((did, inst_args));
             let mut sc = Scanner::new(
                 self.cx,
                 scanned,
@@ -1226,6 +1342,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 Tier::Reachable,
                 via.clone(),
                 &mut sites,
+                lookup,
             );
             sc.visit_body(scanned);
             let mut statics = std::mem::take(&mut sc.statics);

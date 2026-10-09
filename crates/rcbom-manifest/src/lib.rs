@@ -10,7 +10,7 @@ use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use cargo_metadata::{DependencyKind, Metadata, MetadataCommand, Package, PackageId};
+use cargo_metadata::{Dependency, DependencyKind, Metadata, MetadataCommand, Package, PackageId};
 use rcbom_kb::{Kb, Role};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -39,6 +39,9 @@ pub struct Pkg {
     pub version: semver::Version,
     pub manifest_dir: PathBuf,
     pub member: bool,
+    /// The program's own code: a workspace member or a path dependency (no registry or git
+    /// source).
+    pub local: bool,
     pub scope: Scope,
     pub features: Vec<String>,
     pub links: Option<String>,
@@ -185,10 +188,27 @@ fn load_with(
     }
     cmd.other_options(opts);
     let md = cmd.exec().context("cargo metadata")?;
-    build(&md, kb)
+    build(&md, kb, target, &target_cfg(target)?)
 }
 
-fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
+/// The `cfg` values of the target, for platform-specific dependency tables.
+fn target_cfg(target: &str) -> Result<Vec<cargo_metadata::cargo_platform::Cfg>> {
+    let out = std::process::Command::new("rustc")
+        .args(["--print", "cfg", "--target", target])
+        .output()
+        .context("rustc --print cfg")?;
+    Ok(String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .filter_map(|l| l.parse().ok())
+        .collect())
+}
+
+fn build(
+    md: &Metadata,
+    kb: &Kb,
+    target: &str,
+    cfg: &[cargo_metadata::cargo_platform::Cfg],
+) -> Result<Manifest> {
     let resolve = md
         .resolve
         .as_ref()
@@ -196,6 +216,47 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
     let nodes: HashMap<&PackageId, &cargo_metadata::Node> =
         resolve.nodes.iter().map(|n| (&n.id, n)).collect();
     let pkgs: HashMap<&PackageId, &Package> = md.packages.iter().map(|p| (&p.id, p)).collect();
+
+    // The declarations of `parent` that this resolve edge comes from: same package, a
+    // matching version requirement, and a kind and target cargo applied on this platform.
+    let declarations = |parent: &Package, d: &cargo_metadata::NodeDep| -> Vec<Dependency> {
+        let dp = pkgs[&d.pkg];
+        parent
+            .dependencies
+            .iter()
+            .filter(|x| {
+                x.name == dp.name.as_str()
+                    && x.req.matches(&dp.version)
+                    && d.dep_kinds.iter().any(|k| k.kind == x.kind)
+                    // the edge lists every table it comes from; this one may be another
+                    // platform's (`[target.'cfg(windows)'.dependencies]`)
+                    && x.target.as_ref().is_none_or(|t| t.matches(target, cfg))
+            })
+            .cloned()
+            .collect()
+    };
+    // Is the edge really part of the build? The resolve also lists an optional dependency
+    // that a weak feature only mentions (`alloc = ["ring?/alloc"]` in rustls-webpki): it is
+    // built only if an enabled feature of `parent` activates it (`dep:x`, `x`, `x/f`).
+    let activated = |parent: &Package, node: &cargo_metadata::Node, d: &cargo_metadata::NodeDep| {
+        let decls = declarations(parent, d);
+        if decls.is_empty() || decls.iter().any(|x| !x.optional) {
+            return true;
+        }
+        let keys: Vec<String> = decls
+            .iter()
+            .map(|x| x.rename.clone().unwrap_or_else(|| x.name.clone()))
+            .collect();
+        node.features.iter().any(|f| {
+            keys.iter().any(|k| f.as_str() == k)
+                || parent.features.get(f.as_str()).is_some_and(|vals| {
+                    vals.iter().any(|v| {
+                        keys.iter()
+                            .any(|k| *v == format!("dep:{k}") || v.starts_with(&format!("{k}/")))
+                    })
+                })
+        })
+    };
 
     // Walk from the members: normal edges keep the scope, build edges (and anything below a
     // proc macro) only run on the host. Dev-dependencies do not ship and are not followed.
@@ -210,6 +271,9 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
         let here = scope[&id];
         let proc_macro = pkgs[&id].targets.iter().any(|t| t.is_proc_macro());
         for d in &nodes[&id].deps {
+            if !activated(pkgs[&id], nodes[&id], d) {
+                continue;
+            }
             let kinds: Vec<DependencyKind> = d.dep_kinds.iter().map(|k| k.kind).collect();
             let s = if kinds.contains(&DependencyKind::Normal) && !proc_macro {
                 here
@@ -243,9 +307,17 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
     for (id, s) in &scope {
         let p = pkgs[id];
         let node = nodes[id];
-        let exact = kb.crate_by_package(&p.name, &p.version);
-        let entry = exact.or_else(|| kb.crates.iter().find(|c| c.package == p.name.as_str()));
         let member = md.workspace_members.contains(id);
+        // the program's own packages, and local path packages, are not the crates the
+        // knowledge base describes, whatever their names (a member called `signature`)
+        let foreign = !member && p.source.is_some();
+        let exact = kb.crate_by_package(&p.name, &p.version).filter(|_| foreign);
+        let entry = exact.or_else(|| {
+            kb.crates
+                .iter()
+                .find(|c| c.package == p.name.as_str())
+                .filter(|_| foreign)
+        });
         let mut chain = vec![p.name.to_string()];
         let mut cur = id;
         while let Some(par) = parent.get(cur) {
@@ -269,6 +341,7 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
         let proc_macro = p.targets.iter().any(|t| t.is_proc_macro());
         let edge = |d: &&cargo_metadata::NodeDep, normal_only: bool| {
             scope.contains_key(&d.pkg)
+                && activated(p, node, d)
                 && d.dep_kinds.iter().any(|k| match k.kind {
                     DependencyKind::Normal => !(normal_only && proc_macro),
                     DependencyKind::Build => !normal_only,
@@ -281,15 +354,15 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
             // Direct dependency of a member: the declaring line(s).
             for m in &md.workspace_members {
                 let mp = pkgs[m];
-                let declares = nodes[m].deps.iter().any(|d| &d.pkg == id);
-                if !declares {
+                // the declarations cargo applies on this platform (not a
+                // `[target.'cfg(target_arch = "wasm32")'.dependencies]` table on another)
+                let Some(nd) = nodes[m].deps.iter().find(|d| &d.pkg == id) else {
+                    continue;
+                };
+                if !activated(mp, nodes[m], nd) {
                     continue;
                 }
-                for dep in mp
-                    .dependencies
-                    .iter()
-                    .filter(|d| d.name == p.name.as_str() && d.req.matches(&p.version))
-                {
+                for dep in &declarations(mp, nd) {
                     let key = dep.rename.clone().unwrap_or_else(|| dep.name.clone());
                     let path = mp.manifest_path.as_std_path().to_path_buf();
                     if let Some(text) = read(&path)
@@ -358,6 +431,7 @@ fn build(md: &Metadata, kb: &Kb) -> Result<Manifest> {
                 .as_std_path()
                 .to_path_buf(),
             member,
+            local: !foreign,
             scope: *s,
             features,
             links: p.links.clone(),

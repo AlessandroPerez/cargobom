@@ -90,13 +90,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] declared by minisign (dependencies); features [\"wasm_js\"]; default-features = false",
-            "line": 51,
-            "location": "Cargo.toml",
-            "offset": 108,
-            "symbol": "getrandom"
-          },
-          {
             "additionalContext": "[manifest] declared by minisign (dependencies); default-features = false",
             "line": 60,
             "location": "Cargo.toml",
@@ -298,6 +291,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in minisign::helpers::raw_scrypt_params; new: setup, not a use; line: `scrypt::Params::new(n_log2, r, p, scrypt::Params::RECOMMENDED_LEN).map_err(Into::into)`; code: `scrypt::Params::new`",
+            "line": 73,
+            "location": "src/helpers.rs",
+            "offset": 4,
+            "symbol": "scrypt::params::Params::new"
+          },
+          {
             "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
             "line": 138,
             "location": "src/secret_key.rs",
@@ -329,8 +329,16 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:dk_len",
+          "value": "104"
+        },
+        {
+          "name": "rcbom:param:r",
+          "value": "8"
+        },
+        {
           "name": "rcbom:param:unresolved",
-          "value": "work factor (log_n, r, p) computed at run time"
+          "value": "N, p: not a constant where scrypt::Params is built"
         },
         {
           "name": "rcbom:provenance:password",
@@ -342,7 +350,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -428,6 +436,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "22"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -437,7 +453,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "1360"
+        "value": "1351"
       }
     ],
     "tools": {
@@ -450,7 +466,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:26979e64-29e6-8d45-9502-f53cd67d5eeb",
+  "serialNumber": "urn:uuid:fa428a9b-612c-8cad-bf5c-c7e7b1e3543c",
   "specVersion": "1.7",
   "version": 1
 }

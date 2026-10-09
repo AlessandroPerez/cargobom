@@ -1,58 +1,67 @@
-  occ SHA-256 | src/gen.rs:2:26 | ring::digest::SHA256 | [reachable] [static] in t9::included; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::SHA256`
-  occ SHA-256 | src/gen.rs:2:4 | ring::digest::digest | [reachable] [call] in t9::included; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::digest`
-  occ SHA-384 | src/main.rs:10:11 | t9::H::A | [present] [via-static] in t9::dead; t9::H::A -> ring::digest::SHA384; line: `digest(H::A, d).as_ref().len()`; code: `H::A`
-  occ SHA-384 | src/main.rs:10:4 | ring::digest::digest | [present] [call] in t9::dead; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(H::A, d).as_ref().len()`; code: `digest`
-  occ SHA-384 | src/main.rs:5:35 | ring::digest::SHA384 | [present] [static] in t9::H::A; line: `const A: &'static Algorithm = &SHA384;`; code: `SHA384`
-  occ SHA-512 | src/main.rs:15:20 | ring::digest::SHA512 | [present] [static] in t9::dead2; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `SHA512`
-  occ SHA-512 | src/main.rs:15:4 | ring::digest::digest | [present] [call] in t9::dead2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `digest`
-  occ SHA-512 | src/main.rs:26:12 | ring::digest::digest | [present] [call] in t9::af::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let f = digest;`; code: `digest`
-  occ SHA-512 | src/main.rs:27:7 | ring::digest::SHA512 | [present] [static] in t9::af::{closure#0}; line: `f(&SHA512, d).as_ref().len()`; code: `SHA512`
-  occ getrandom | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t9 -> ring -> getrandom
-  occ ring | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t9 -> ring
-  occ ring | Cargo.toml:9:0 | ring | [manifest] declared by t9 (dependencies)
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=observed
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=2
-  prop SHA-256 | rcbom:reachability=reachable
-  prop SHA-384 | rcbom:confidence=high
-  prop SHA-384 | rcbom:detection:method=type-resolved
-  prop SHA-384 | rcbom:functions:source=observed
-  prop SHA-384 | rcbom:kb:version=0.2.0
-  prop SHA-384 | rcbom:occurrences=3
-  prop SHA-384 | rcbom:reachability=present
-  prop SHA-512 | rcbom:confidence=high
-  prop SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | rcbom:functions:source=observed
-  prop SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | rcbom:occurrences=4
-  prop SHA-512 | rcbom:reachability=present
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=reachable
-  prop t9 | rcbom:scope=required
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/gen.rs:2:26 | ring::digest::SHA256 | [reachable] [static] in t9::included; use: digest; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/gen.rs:2:4 | ring::digest::digest | [reachable] [call] in t9::included; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:11 | t9::H::A | [present] [via-static] in t9::dead; use: digest; t9::H::A -> ring::digest::SHA384; line: `digest(H::A, d).as_ref().len()`; code: `H::A`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:4 | ring::digest::digest | [present] [call] in t9::dead; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(H::A, d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:5:35 | ring::digest::SHA384 | [present] [static] in t9::H::A; use: digest; line: `const A: &'static Algorithm = &SHA384;`; code: `SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:20 | ring::digest::SHA512 | [present] [static] in t9::dead2; use: digest; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:4 | ring::digest::digest | [present] [call] in t9::dead2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:12 | ring::digest::digest | [present] [call] in t9::af::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let f = digest;`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:27:7 | ring::digest::SHA512 | [present] [static] in t9::af::{closure#0}; use: digest; line: `f(&SHA512, d).as_ref().len()`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t9 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t9 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t9 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=3
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=present
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=4
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop t9 | pkg:cargo/t9@0.1.0 | rcbom:scope=required
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application t9 0.1.0 | pkg:cargo/t9@0.1.0
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+component application t9 0.1.0 | pkg:cargo/t9@0.1.0 | purl pkg:cargo/t9@0.1.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t9@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/t9@0.1.0#root", "name": "t9", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=10
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

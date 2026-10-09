@@ -1,104 +1,104 @@
-  occ AES-256-GCM | src/main.rs:10:6 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in t5::aliased; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 10); line: `k.seal_in_place_append_tag(Nonce::assume_unique_for_key([1u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`
-  occ AES-256-GCM | src/main.rs:5:25 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t5::ALG; line: `const ALG: &Algorithm = &AES_256_GCM;`; code: `AES_256_GCM`
-  occ AES-256-GCM | src/main.rs:8:29 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in t5::aliased; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `UnboundKey::new`
-  occ AES-256-GCM | src/main.rs:8:45 | t5::ALG | [reachable] [via-static] in t5::aliased; t5::ALG -> ring::aead::algorithm::AES_256_GCM; line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `ALG`
-  occ HMAC-SHA-256 | src/main.rs:16:13 | digest::mac::Mac::new_from_slice | [reachable] [call] in t5::formatted; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
-  occ HMAC-SHA-256 | src/main.rs:22:13 | digest::mac::Mac::new_from_slice | [reachable] [call] in t5::pushed; new_from_slice: setup, not a use; key: hard-coded (literal at line 21); line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
-  occ PBKDF2-SHA-256-1000-32 | src/main.rs:27:78 | pbkdf2::pbkdf2_hmac_array | [reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`
-  occ PBKDF2-SHA-256-10000-32 | src/main.rs:27:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ SHA-256 | src/main.rs:16:13 | digest::mac::Mac::new_from_slice | [reachable] [component] in t5::formatted; part of HMAC-SHA-256; line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
-  occ SHA-256 | src/main.rs:22:13 | digest::mac::Mac::new_from_slice | [reachable] [component] in t5::pushed; part of HMAC-SHA-256; line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
-  occ SHA-256 | src/main.rs:27:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-10000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ SHA-256 | src/main.rs:27:78 | pbkdf2::pbkdf2_hmac_array | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-1000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`
-  occ crypto-common | Cargo.lock:40:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t5 -> hmac -> digest -> crypto-common
-  occ digest | Cargo.lock:50:0 | digest | [manifest] locked digest 0.10.7; reached via t5 -> hmac -> digest
-  occ getrandom | Cargo.lock:77:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t5 -> ring -> getrandom
-  occ hmac | Cargo.lock:88:0 | hmac | [manifest] locked hmac 0.12.1; reached via t5 -> hmac
-  occ hmac | Cargo.toml:10:0 | hmac | [manifest] declared by t5 (dependencies)
-  occ pbkdf2 | Cargo.lock:103:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t5 -> pbkdf2
-  occ pbkdf2 | Cargo.toml:12:0 | pbkdf2 | [manifest] declared by t5 (dependencies); features ["hmac"]; default-features = false
-  occ ring | Cargo.lock:113:0 | ring | [manifest] locked ring 0.17.14; reached via t5 -> ring
-  occ ring | Cargo.toml:9:0 | ring | [manifest] declared by t5 (dependencies)
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ sha2 | Cargo.lock:127:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t5 -> sha2
-  occ sha2 | Cargo.toml:11:0 | sha2 | [manifest] declared by t5 (dependencies)
-  prop AES-256-GCM | rcbom:confidence=high
-  prop AES-256-GCM | rcbom:detection:method=type-resolved
-  prop AES-256-GCM | rcbom:finding=hard-coded-nonce
-  prop AES-256-GCM | rcbom:functions:source=observed
-  prop AES-256-GCM | rcbom:kb:version=0.2.0
-  prop AES-256-GCM | rcbom:occurrences=4
-  prop AES-256-GCM | rcbom:provenance:key=parameter
-  prop AES-256-GCM | rcbom:provenance:nonce=hard-coded
-  prop AES-256-GCM | rcbom:reachability=reachable
-  prop HMAC-SHA-256 | rcbom:confidence=high
-  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-256 | rcbom:finding=hard-coded-key
-  prop HMAC-SHA-256 | rcbom:functions:source=knowledge-base
-  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-256 | rcbom:occurrences=2
-  prop HMAC-SHA-256 | rcbom:provenance:key=environment,hard-coded
-  prop HMAC-SHA-256 | rcbom:reachability=reachable
-  prop PBKDF2-SHA-256-1000-32 | rcbom:confidence=high
-  prop PBKDF2-SHA-256-1000-32 | rcbom:detection:method=type-resolved
-  prop PBKDF2-SHA-256-1000-32 | rcbom:finding=hard-coded-salt
-  prop PBKDF2-SHA-256-1000-32 | rcbom:functions:source=observed
-  prop PBKDF2-SHA-256-1000-32 | rcbom:kb:version=0.2.0
-  prop PBKDF2-SHA-256-1000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-1000-32 | rcbom:provenance:password=parameter
-  prop PBKDF2-SHA-256-1000-32 | rcbom:provenance:salt=hard-coded
-  prop PBKDF2-SHA-256-1000-32 | rcbom:reachability=reachable
-  prop PBKDF2-SHA-256-10000-32 | rcbom:confidence=high
-  prop PBKDF2-SHA-256-10000-32 | rcbom:detection:method=type-resolved
-  prop PBKDF2-SHA-256-10000-32 | rcbom:finding=hard-coded-salt
-  prop PBKDF2-SHA-256-10000-32 | rcbom:functions:source=observed
-  prop PBKDF2-SHA-256-10000-32 | rcbom:kb:version=0.2.0
-  prop PBKDF2-SHA-256-10000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-10000-32 | rcbom:provenance:password=parameter
-  prop PBKDF2-SHA-256-10000-32 | rcbom:provenance:salt=hard-coded
-  prop PBKDF2-SHA-256-10000-32 | rcbom:reachability=reachable
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=knowledge-base
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=4
-  prop SHA-256 | rcbom:only-as-component=true
-  prop SHA-256 | rcbom:reachability=reachable
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop hmac | rcbom:crypto-role=algorithm
-  prop hmac | rcbom:scope=required
-  prop hmac | rcbom:usage=reachable
-  prop pbkdf2 | rcbom:crypto-role=algorithm
-  prop pbkdf2 | rcbom:scope=required
-  prop pbkdf2 | rcbom:usage=reachable
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=reachable
-  prop sha2 | rcbom:crypto-role=algorithm
-  prop sha2 | rcbom:scope=required
-  prop sha2 | rcbom:usage=reachable
-  prop t5 | rcbom:scope=required
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:10:6 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in t5::aliased; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 10); line: `k.seal_in_place_append_tag(Nonce::assume_unique_for_key([1u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:5:25 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t5::ALG; line: `const ALG: &Algorithm = &AES_256_GCM;`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:8:29 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in t5::aliased; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:8:45 | t5::ALG | [reachable] [via-static] in t5::aliased; t5::ALG -> ring::aead::algorithm::AES_256_GCM; line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `ALG`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:16:13 | digest::mac::Mac::new_from_slice | [reachable] [call] in t5::formatted; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:22:13 | digest::mac::Mac::new_from_slice | [reachable] [call] in t5::pushed; new_from_slice: setup, not a use; key: hard-coded (literal at line 21); line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
+  occ PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | src/main.rs:27:78 | pbkdf2::pbkdf2_hmac_array | [reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`
+  occ PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | src/main.rs:27:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:13 | digest::mac::Mac::new_from_slice | [reachable] [component] in t5::formatted; part of HMAC-SHA-256; line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:13 | digest::mac::Mac::new_from_slice | [reachable] [component] in t5::pushed; part of HMAC-SHA-256; line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-10000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:78 | pbkdf2::pbkdf2_hmac_array | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-1000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:40:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t5 -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:50:0 | digest | [manifest] locked digest 0.10.7; reached via t5 -> hmac -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:77:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t5 -> ring -> getrandom
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:88:0 | hmac | [manifest] locked hmac 0.12.1; reached via t5 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:10:0 | hmac | [manifest] declared by t5 (dependencies)
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:103:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t5 -> pbkdf2
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:12:0 | pbkdf2 | [manifest] declared by t5 (dependencies); features ["hmac"]; default-features = false
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:113:0 | ring | [manifest] locked ring 0.17.14; reached via t5 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t5 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:127:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t5 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:11:0 | sha2 | [manifest] declared by t5 (dependencies)
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=4
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=2
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=environment,hard-coded
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:confidence=high
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:confidence=high
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop t5 | pkg:cargo/t5@0.1.0 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application t5 0.1.0 | pkg:cargo/t5@0.1.0
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
-component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
-component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+component application t5 0.1.0 | pkg:cargo/t5@0.1.0 | purl pkg:cargo/t5@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-1000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-10000-32 -> crypto:algorithm:SHA-256
@@ -112,6 +112,20 @@ dep pkg:cargo/t5@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/t5@0.1.0 -> pkg:cargo/pbkdf2@0.12.2
 dep pkg:cargo/t5@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/t5@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:PBKDF2-SHA-256-1000-32
+dependency crypto:algorithm:PBKDF2-SHA-256-10000-32
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/pbkdf2@0.12.2
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/t5@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-1000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-10000-32
@@ -120,7 +134,10 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t5@0.1.0#root", "name": "t5", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=20
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=258
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

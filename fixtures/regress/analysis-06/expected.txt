@@ -1,190 +1,190 @@
-  occ ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
-  occ ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
-  occ ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
-  occ ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
-  occ Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:12:29 | ring::ec::curve25519::ed25519::verification::ED25519 | [present] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`
-  occ Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:20:22 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked | [present] [call] in jsonwebtoken::crypto::eddsa::sign; from_pkcs8_maybe_unchecked: setup, not a use; line: `let signing_key = signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked(key)?;`; code: `signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked`
-  occ Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:21:26 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [present] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; line: `let out = signing_key.sign(message);`; code: `sign`
-  occ HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
-  occ HMAC | src/main.rs:4:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t6::main; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 4); line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b"k").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`
-  occ HMAC | src/main.rs:5:6 | digest::mac::Mac::update | [reachable] [call] in t6::main; use: tag; line: `m.update(b"x");`; code: `update`
-  occ HMAC | src/main.rs:6:13 | jsonwebtoken::encoding::EncodingKey::from_secret | [reachable] [call] in t6::main; from_secret: setup, not a use; key: hard-coded (6 bytes, literal at line 6); line: `let _k = jsonwebtoken::EncodingKey::from_secret(b"secret");`; code: `jsonwebtoken::EncodingKey::from_secret`
-  occ HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
-  occ HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
-  occ HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
-  occ RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
-  occ RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
-  occ RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
-  occ RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
-  occ RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
-  occ RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
-  occ RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
-  occ RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
-  occ RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
-  occ RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
-  occ RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
-  occ RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
-  occ SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
-  occ SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
-  occ SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
-  occ SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
-  occ SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
-  occ SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
-  occ SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
-  occ crypto-common | Cargo.lock:58:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t6 -> hmac -> digest -> crypto-common
-  occ digest | Cargo.lock:74:0 | digest | [manifest] locked digest 0.10.7; reached via t6 -> hmac -> digest
-  occ getrandom | Cargo.lock:125:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t6 -> jsonwebtoken -> ring -> getrandom
-  occ hmac | Cargo.lock:138:0 | hmac | [manifest] locked hmac 0.12.1; reached via t6 -> hmac
-  occ hmac | Cargo.toml:10:0 | hmac | [manifest] declared by t6 (dependencies)
-  occ jsonwebtoken | Cargo.lock:164:0 | jsonwebtoken | [manifest] locked jsonwebtoken 9.3.1; reached via t6 -> jsonwebtoken
-  occ jsonwebtoken | Cargo.toml:9:0 | jsonwebtoken | [manifest] declared by t6 (dependencies)
-  occ ring | Cargo.lock:280:0 | ring | [manifest] locked ring 0.17.14; reached via t6 -> jsonwebtoken -> ring
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  prop ECDSA-P-256-SHA-256 | rcbom:confidence=high
-  prop ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
-  prop ECDSA-P-256-SHA-256 | rcbom:functions:source=knowledge-base
-  prop ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
-  prop ECDSA-P-256-SHA-256 | rcbom:occurrences=2
-  prop ECDSA-P-256-SHA-256 | rcbom:reachability=present
-  prop ECDSA-P-384-SHA-384 | rcbom:confidence=high
-  prop ECDSA-P-384-SHA-384 | rcbom:detection:method=type-resolved
-  prop ECDSA-P-384-SHA-384 | rcbom:functions:source=knowledge-base
-  prop ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
-  prop ECDSA-P-384-SHA-384 | rcbom:occurrences=2
-  prop ECDSA-P-384-SHA-384 | rcbom:reachability=present
-  prop Ed25519 | rcbom:confidence=high
-  prop Ed25519 | rcbom:detection:method=type-resolved
-  prop Ed25519 | rcbom:functions:source=observed
-  prop Ed25519 | rcbom:kb:version=0.2.0
-  prop Ed25519 | rcbom:occurrences=3
-  prop Ed25519 | rcbom:reachability=present
-  prop HMAC | rcbom:algorithm-family=HMAC
-  prop HMAC | rcbom:confidence=high
-  prop HMAC | rcbom:confidence=high
-  prop HMAC | rcbom:detection:method=type-resolved
-  prop HMAC | rcbom:detection:method=type-resolved
-  prop HMAC | rcbom:finding=hard-coded-key
-  prop HMAC | rcbom:finding=hard-coded-key
-  prop HMAC | rcbom:functions:source=knowledge-base
-  prop HMAC | rcbom:functions:source=observed
-  prop HMAC | rcbom:kb:version=0.2.0
-  prop HMAC | rcbom:kb:version=0.2.0
-  prop HMAC | rcbom:note=JWT HMAC key; HS256, HS384 or HS512 is chosen by the token header, not here
-  prop HMAC | rcbom:occurrences=2
-  prop HMAC | rcbom:occurrences=2
-  prop HMAC | rcbom:provenance:key=hard-coded
-  prop HMAC | rcbom:provenance:key=hard-coded,parameter
-  prop HMAC | rcbom:reachability=reachable
-  prop HMAC | rcbom:reachability=reachable
-  prop HMAC-SHA-256 | rcbom:confidence=high
-  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-256 | rcbom:functions:source=knowledge-base
-  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-256 | rcbom:occurrences=1
-  prop HMAC-SHA-256 | rcbom:reachability=present
-  prop HMAC-SHA-384 | rcbom:confidence=high
-  prop HMAC-SHA-384 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-384 | rcbom:functions:source=knowledge-base
-  prop HMAC-SHA-384 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-384 | rcbom:occurrences=1
-  prop HMAC-SHA-384 | rcbom:reachability=present
-  prop HMAC-SHA-512 | rcbom:confidence=high
-  prop HMAC-SHA-512 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-512 | rcbom:functions:source=knowledge-base
-  prop HMAC-SHA-512 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-512 | rcbom:occurrences=1
-  prop HMAC-SHA-512 | rcbom:reachability=present
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=knowledge-base
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=2
-  prop RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=present
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:confidence=high
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:detection:method=type-resolved
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:functions:source=knowledge-base
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=2
-  prop RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=present
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:confidence=high
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:detection:method=type-resolved
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:functions:source=knowledge-base
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:kb:version=0.2.0
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:occurrences=2
-  prop RSA-PKCS1-1.5-SHA-512 | rcbom:reachability=present
-  prop RSA-PSS-SHA-256 | rcbom:confidence=high
-  prop RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
-  prop RSA-PSS-SHA-256 | rcbom:functions:source=knowledge-base
-  prop RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
-  prop RSA-PSS-SHA-256 | rcbom:occurrences=2
-  prop RSA-PSS-SHA-256 | rcbom:reachability=present
-  prop RSA-PSS-SHA-384 | rcbom:confidence=high
-  prop RSA-PSS-SHA-384 | rcbom:detection:method=type-resolved
-  prop RSA-PSS-SHA-384 | rcbom:functions:source=knowledge-base
-  prop RSA-PSS-SHA-384 | rcbom:kb:version=0.2.0
-  prop RSA-PSS-SHA-384 | rcbom:occurrences=2
-  prop RSA-PSS-SHA-384 | rcbom:reachability=present
-  prop RSA-PSS-SHA-512 | rcbom:confidence=high
-  prop RSA-PSS-SHA-512 | rcbom:detection:method=type-resolved
-  prop RSA-PSS-SHA-512 | rcbom:functions:source=knowledge-base
-  prop RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
-  prop RSA-PSS-SHA-512 | rcbom:occurrences=2
-  prop RSA-PSS-SHA-512 | rcbom:reachability=present
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=knowledge-base
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=7
-  prop SHA-256 | rcbom:only-as-component=true
-  prop SHA-256 | rcbom:reachability=present
-  prop SHA-384 | rcbom:confidence=high
-  prop SHA-384 | rcbom:detection:method=type-resolved
-  prop SHA-384 | rcbom:functions:source=knowledge-base
-  prop SHA-384 | rcbom:kb:version=0.2.0
-  prop SHA-384 | rcbom:occurrences=7
-  prop SHA-384 | rcbom:only-as-component=true
-  prop SHA-384 | rcbom:reachability=present
-  prop SHA-512 | rcbom:confidence=high
-  prop SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | rcbom:functions:source=knowledge-base
-  prop SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | rcbom:occurrences=5
-  prop SHA-512 | rcbom:only-as-component=true
-  prop SHA-512 | rcbom:reachability=present
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=present
-  prop hmac | rcbom:crypto-role=algorithm
-  prop hmac | rcbom:scope=required
-  prop hmac | rcbom:usage=reachable
-  prop jsonwebtoken | rcbom:crypto-role=protocol
-  prop jsonwebtoken | rcbom:scope=required
-  prop jsonwebtoken | rcbom:usage=reachable
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=present
-  prop t6 | rcbom:scope=required
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; use: verify; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; use: sign; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; use: verify; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; use: sign; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:12:29 | ring::ec::curve25519::ed25519::verification::ED25519 | [present] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; use: verify; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:20:22 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked | [present] [call] in jsonwebtoken::crypto::eddsa::sign; from_pkcs8_maybe_unchecked: setup, not a use; line: `let signing_key = signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked(key)?;`; code: `signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:21:26 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [present] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; line: `let out = signing_key.sign(message);`; code: `sign`
+  occ HMAC | crypto:algorithm:HMAC | src/main.rs:4:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t6::main; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 4); line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b"k").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`
+  occ HMAC | crypto:algorithm:HMAC | src/main.rs:5:6 | digest::mac::Mac::update | [reachable] [call] in t6::main; use: tag; line: `m.update(b"x");`; code: `update`
+  occ HMAC | crypto:material:secret-key:HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
+  occ HMAC | crypto:material:secret-key:HMAC | src/main.rs:6:13 | jsonwebtoken::encoding::EncodingKey::from_secret | [reachable] [call] in t6::main; from_secret: setup, not a use; key: hard-coded (6 bytes, literal at line 6); line: `let _k = jsonwebtoken::EncodingKey::from_secret(b"secret");`; code: `jsonwebtoken::EncodingKey::from_secret`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [static] in jsonwebtoken::crypto::sign; use: tag; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [static] in jsonwebtoken::crypto::sign; use: tag; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [static] in jsonwebtoken::crypto::sign; use: tag; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; use: verify; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; use: sign; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:58:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t6 -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:74:0 | digest | [manifest] locked digest 0.10.7; reached via t6 -> hmac -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:125:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t6 -> jsonwebtoken -> ring -> getrandom
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:138:0 | hmac | [manifest] locked hmac 0.12.1; reached via t6 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:10:0 | hmac | [manifest] declared by t6 (dependencies)
+  occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.lock:164:0 | jsonwebtoken | [manifest] locked jsonwebtoken 9.3.1; reached via t6 -> jsonwebtoken
+  occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.toml:9:0 | jsonwebtoken | [manifest] declared by t6 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:280:0 | ring | [manifest] locked ring 0.17.14; reached via t6 -> jsonwebtoken -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=present
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:confidence=high
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:functions:source=observed
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=2
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=present
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=3
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=present
+  prop HMAC | crypto:algorithm:HMAC | rcbom:confidence=high
+  prop HMAC | crypto:algorithm:HMAC | rcbom:detection:method=type-resolved
+  prop HMAC | crypto:algorithm:HMAC | rcbom:finding=hard-coded-key
+  prop HMAC | crypto:algorithm:HMAC | rcbom:functions:source=observed
+  prop HMAC | crypto:algorithm:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:algorithm:HMAC | rcbom:occurrences=2
+  prop HMAC | crypto:algorithm:HMAC | rcbom:provenance:key=hard-coded
+  prop HMAC | crypto:algorithm:HMAC | rcbom:reachability=reachable
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:algorithm-family=HMAC
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:confidence=high
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:detection:method=type-resolved
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:finding=hard-coded-key
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:functions:source=knowledge-base
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:note=JWT HMAC key; HS256, HS384 or HS512 is chosen by the token header, not here
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:occurrences=2
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:provenance:key=hard-coded,parameter
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=1
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=present
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:functions:source=observed
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:occurrences=1
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:reachability=present
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=observed
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=1
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=2
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=2
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:occurrences=2
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:reachability=present
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:confidence=high
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=present
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:confidence=high
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:reachability=present
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:confidence=high
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:reachability=present
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=7
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=present
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=7
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=present
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:crypto-role=protocol
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:scope=required
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=present
+  prop t6 | pkg:cargo/t6@0.1.0 | rcbom:scope=required
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
 asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
-asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset HMAC | crypto:algorithm:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC | crypto:material:secret-key:HMAC | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "secret-key"}}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
@@ -199,13 +199,13 @@ asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application t6 0.1.0 | pkg:cargo/t6@0.1.0
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
-component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
+component application t6 0.1.0 | pkg:cargo/t6@0.1.0 | purl pkg:cargo/t6@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1 | purl pkg:cargo/jsonwebtoken@9.3.1
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
@@ -224,6 +224,27 @@ dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t6@0.1.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/t6@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/t6@0.1.0 -> pkg:cargo/jsonwebtoken@9.3.1
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:ECDSA-P-384-SHA-384
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-384
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-512
+dependency crypto:algorithm:RSA-PSS-SHA-256
+dependency crypto:algorithm:RSA-PSS-SHA-384
+dependency crypto:algorithm:RSA-PSS-SHA-512
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/jsonwebtoken@9.3.1
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t6@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:secret-key:HMAC
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-256-SHA-256
@@ -244,7 +265,10 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/t6@0.1.0#root", "name": "t6", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=46
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=226
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

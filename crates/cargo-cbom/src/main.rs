@@ -64,6 +64,10 @@ struct GenArgs {
     /// generic code is not monomorphized (the ablation of the type-resolved walk).
     #[arg(long)]
     no_walk: bool,
+    /// The cargo profile whose code is analysed. The default is what ships: `release`, where
+    /// `cfg(debug_assertions)` code is not compiled.
+    #[arg(long, default_value = "release")]
+    profile: String,
 }
 
 #[derive(Subcommand)]
@@ -108,7 +112,7 @@ fn generate(a: &GenArgs) -> Result<()> {
     } else {
         let dir = man.target_directory.join("rcbom");
         let facts_dir = dir.join("facts");
-        let units = run_driver(a, &kb, &dir, &facts_dir)?;
+        let units = run_driver(a, &kb, &man, &dir, &facts_dir)?;
         load_facts(&facts_dir, Some(&units))?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
@@ -123,6 +127,12 @@ fn generate(a: &GenArgs) -> Result<()> {
         },
         target,
         features: a.features.clone(),
+        profile: if a.manifest_only {
+            "none".into()
+        } else {
+            a.profile.clone()
+        },
+        packages: man.packages.len(),
         sandbox: "none (draft: run only on trusted code)".into(),
     };
     let bom = to_cyclonedx(&kb, &man, &an, &run);
@@ -198,9 +208,19 @@ fn find_driver(explicit: Option<&Path>) -> Result<PathBuf> {
 fn run_driver(
     a: &GenArgs,
     kb: &Kb,
+    man: &rcbom_manifest::Manifest,
     dir: &Path,
     facts_dir: &Path,
 ) -> Result<std::collections::BTreeSet<String>> {
+    // the program's own packages: their crates are never knowledge-base or stop crates, even
+    // when named like one
+    let mut local_dirs: Vec<String> = man
+        .packages
+        .iter()
+        .filter(|p| p.local)
+        .map(|p| p.manifest_dir.display().to_string())
+        .collect();
+    local_dirs.sort();
     let driver = find_driver(a.driver.as_deref())?;
     let sysroot = sysroot()?;
     let compiler = Command::new("rustc")
@@ -215,7 +235,7 @@ fn run_driver(
     // input of the driver other than the sources (the driver itself, the compiler, the crate
     // lists, features, walk) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\nkb={}\nstop={}\n{:?}\nno-walk={}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -225,7 +245,9 @@ fn run_driver(
         kb_crates,
         stop_crates,
         a.features,
-        a.no_walk
+        a.no_walk,
+        a.profile,
+        local_dirs
     );
     let stamp_path = dir.join("stamp");
     if std::fs::read_to_string(&stamp_path).ok().as_deref() != Some(stamp.as_str()) {
@@ -245,6 +267,8 @@ fn run_driver(
             "check",
             "--workspace",
             "--message-format=json-render-diagnostics",
+            "--profile",
+            a.profile.as_str(),
             "--manifest-path",
         ])
         .arg(&a.manifest_path)
@@ -254,6 +278,7 @@ fn run_driver(
         .env("RCBOM_OUT", facts_dir)
         .env("RCBOM_KB_CRATES", &kb_crates)
         .env("RCBOM_STOP_CRATES", &stop_crates)
+        .env("RCBOM_LOCAL_DIRS", local_dirs.join("\n"))
         .env("RCBOM_SYSROOT", &sysroot)
         .env("LD_LIBRARY_PATH", ld);
     // the walk is on unless asked off, whatever the caller's environment says

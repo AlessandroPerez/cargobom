@@ -1,0 +1,118 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:31:8 | digest::digest::Digest::digest | [reachable] [call] in v02::a::f; use: digest; line: `H::digest(d).len()`; code: `H::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:4 | digest::digest::Digest::digest | [reachable] [call] in v02::direct; use: digest; line: `Sha256::digest(d).len()`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:4 | digest::digest::Digest::digest | [reachable] [call] in v02::qualified; use: digest; line: `sha2::Sha256::digest(d).len()`; code: `sha2::Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:8 | digest::digest::Digest::digest | [reachable] [call] in v02::b::f; use: digest; line: `H::digest(d).len()`; code: `H::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:49:4 | digest::digest::Digest::digest | [reachable] [call] in v02::chosen; use: digest; line: `Hasher::digest(d).len()`; code: `Hasher::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:13 | ring::digest::SHA256 | [reachable] [static] in v02::aliased; use: digest; line: `hash_it(&ALG, d).as_ref().len()`; code: `ALG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:4 | ring::digest::digest | [reachable] [call] in v02::aliased; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `hash_it(&ALG, d).as_ref().len()`; code: `hash_it`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:59:4 | digest::digest::Digest::digest | [reachable] [call] in v02::raw; use: digest; line: `Sha256::r#digest(d).len()`; code: `Sha256::r#digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:18 | digest::digest::Digest::digest | [reachable] [call] in v02::colon; use: digest; line: `let w = W { n:Sha256::digest(d).len() };`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:74:4 | digest::digest::Digest::digest | [reachable] [call] in v02::tags; use: digest; line: `Sha256::digest(d).len() // see [derive Foo] and [macro bar!]`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:79:12 | digest::digest::Digest::digest | [reachable] [call] in v02::split; use: digest; line: `let h = sha2::Sha256 // first`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:85:4 | digest::digest::Digest::digest | [reachable] [call] in v02::rooted; use: digest; line: `::sha2::Sha256::digest(d).len()`; code: `::sha2::Sha256::digest`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:64:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via v02 -> sha1 -> digest -> crypto-common
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:74:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via v02 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:83:0 | digest | [manifest] locked digest 0.10.7; reached via v02 -> sha1 -> digest
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:93:0 | digest | [manifest] locked digest 0.11.3; reached via v02 -> sha2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:120:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via v02 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:146:0 | ring | [manifest] locked ring 0.17.14; reached via v02 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:17:0 | ring | [manifest] declared by v02 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.lock:160:0 | sha1 | [manifest] locked sha1 0.10.7; reached via v02 -> sha1
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.toml:16:0 | sha1 | [manifest] declared by v02 (dependencies)
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.toml:22:0 | sha1 | [manifest] declared by v02 (dev-dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:171:0 | sha2 | [manifest] locked sha2 0.10.9; reached via v02 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by v02 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.lock:182:0 | sha2 | [manifest] locked sha2 0.11.0; reached via v02 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.toml:19:0 | sha2_11 | [manifest] declared by v02 (dependencies)
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=1
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=11
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:kb-coverage=unsupported-version
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:usage=unknown
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:usage=unknown
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:crypto-role=algorithm
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:scope=required
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:kb-coverage=unsupported-version
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=unknown
+  prop v02 | pkg:cargo/v02@0.1.0 | rcbom:scope=required
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application v02 0.1.0 | pkg:cargo/v02@0.1.0 | purl pkg:cargo/v02@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha2 0.11.0 | pkg:cargo/sha2@0.11.0 | purl pkg:cargo/sha2@0.11.0
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/v02@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/v02@0.1.0 -> pkg:cargo/sha1@0.10.7
+dep pkg:cargo/v02@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/v02@0.1.0 -> pkg:cargo/sha2@0.11.0
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/sha1@0.10.7
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha2@0.11.0
+dependency pkg:cargo/v02@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha1@0.10.7 -> crypto:algorithm:SHA-1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/v02@0.1.0#root", "name": "v02", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=25
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=127
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

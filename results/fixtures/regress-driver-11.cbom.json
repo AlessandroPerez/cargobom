@@ -115,7 +115,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in t11::sha256_table; line: `Table { alg: &SHA256 }`; code: `SHA256`",
+            "additionalContext": "[present] [static] in t11::sha256_table; use: digest; line: `Table { alg: &SHA256 }`; code: `SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 18,
@@ -129,7 +129,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE`",
+            "additionalContext": "[reachable] [via-static] in t11::main; use: digest; t11::TABLE -> ring::digest::SHA256; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 33,
@@ -181,7 +181,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t11::TABLE2; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in t11::TABLE2; use: digest; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 37,
@@ -195,7 +195,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE2`",
+            "additionalContext": "[reachable] [via-static] in t11::main; use: digest; t11::TABLE2 -> ring::digest::SHA384; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE2`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 58,
@@ -276,6 +276,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -298,7 +306,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:eefd616f-99e7-87e6-9f14-31869e27258d",
+  "serialNumber": "urn:uuid:c8181c9c-5e2a-89f4-b802-26db9b0bf3f3",
   "specVersion": "1.7",
   "version": 1
 }

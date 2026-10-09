@@ -134,8 +134,8 @@ fn classify(kb: &Kb, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
         }
         // an algorithm descriptor (`&AES_256_GCM`, `HKDF_SHA256`) says which algorithm, not
         // what the key material is; any other static or const is data compiled in
-        Origin::Data { def } if is_descriptor(kb, def) => {}
-        Origin::Data { def } => {
+        Origin::Data { def, .. } if is_descriptor(kb, def) => {}
+        Origin::Data { def, .. } => {
             out.insert(class("hard-coded", format!("static {}", short(&def.path))));
         }
         Origin::Param { index } => {
@@ -212,14 +212,24 @@ fn classify(kb: &Kb, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
                 // returned by code that takes nothing from here: an interprocedural question
                 out.insert(class("computed", short(&path)));
             } else if matches!(krate.as_str(), "core" | "std" | "alloc") {
-                // standard-library plumbing (`as_bytes`, `unwrap`, `into`): the value comes from
-                // the receiver (`expect(msg)`, `ok_or(err)`, `map_err(f)`), except for the
-                // fallbacks that can supply it from another argument instead
-                // (`unwrap_or_else(|_| "literal")`): either one, so all of them count
-                let receiver_only = !FALLBACKS.iter().any(|m| path.ends_with(m))
-                    || INDEXING.iter().any(|m| path.ends_with(m));
-                for a in args.iter().take(if receiver_only { 1 } else { args.len() }) {
-                    classify(kb, a, depth + 1, out);
+                if INDEXING.iter().any(|m| path.ends_with(m))
+                    || ERROR_ARGS.iter().any(|m| path.ends_with(m))
+                {
+                    // the value is (part of) the receiver: `&key[..32]` (the range is not key
+                    // material), `expect(msg)`, `ok_or(err)`, `map_err(f)` (the other argument
+                    // is what an error carries)
+                    classify(kb, &args[0], depth + 1, out);
+                } else if FALLBACKS.iter().any(|m| path.ends_with(m)) {
+                    // the receiver, or what the fallback supplies instead
+                    // (`unwrap_or_else(|_| "literal")`): either one
+                    for a in args {
+                        classify(kb, a, depth + 1, out);
+                    }
+                } else {
+                    // anything else computes its result from all its inputs
+                    // (`b"..".iter().chain(secret.iter())`, `1_000u64.wrapping_add(seq)`,
+                    // `u64::from_str_radix(s, 16)`): hard-coded only if all of them are
+                    of_inputs(kb, args, depth, out);
                 }
             } else if kb.crate_by_name(krate).is_some() {
                 // a crypto crate's constructor or computation (`Nonce::assume_unique_for_key`,
@@ -238,6 +248,9 @@ fn classify(kb: &Kb, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
             }
         }
         Origin::Any(alts) => alts.iter().for_each(|a| classify(kb, a, depth + 1, out)),
+        // built from all of these parts (`[user, b"pepper"].concat()`, `key[31] = 1` after the
+        // key was read from the environment): a constant only if every part is
+        Origin::All(parts) => of_inputs(kb, parts, depth, out),
         Origin::Truncated => {
             out.insert(class("unknown", "origin search bound reached".into()));
         }
@@ -260,7 +273,7 @@ fn of_inputs(kb: &Kb, args: &[Origin], depth: usize, out: &mut BTreeSet<Class>) 
         classify(kb, a, depth + 1, &mut classes);
         if classes.is_empty() {
             let no_data = matches!(a, Origin::Unit { .. })
-                || matches!(a, Origin::Data { def } if is_descriptor(kb, def));
+                || matches!(a, Origin::Data { def, .. } if is_descriptor(kb, def));
             constant &= no_data;
             continue;
         }
@@ -302,56 +315,71 @@ fn seeded<'a>(kb: &Kb, o: &'a Origin, depth: usize) -> Option<&'a Origin> {
             }
             args.first().and_then(|a| seeded(kb, a, depth + 1))
         }
-        Origin::Any(alts) => alts.iter().find_map(|a| seeded(kb, a, depth + 1)),
+        Origin::Any(alts) | Origin::All(alts) => alts.iter().find_map(|a| seeded(kb, a, depth + 1)),
         _ => None,
     }
 }
 
-/// Algorithm descriptors a call names: its own arguments (`digest(&SHA256, msg)`,
-/// `UnboundKey::new(&AES_256_GCM, key)`), and those its receiver was built from
-/// (`key.seal_in_place_append_tag(..)` with `key` from `LessSafeKey::new(UnboundKey::new(
-/// &AES_256_GCM, ..))`). Other arguments are data, not the algorithm: a buffer filled by
+/// Algorithm descriptors a call names, in two places to try in turn: its own arguments
+/// (`digest(&SHA256, msg)`, `UnboundKey::new(&AES_256_GCM, key)`), then those its receiver was
+/// built from (`key.seal_in_place_append_tag(..)` with `key` from `LessSafeKey::new(
+/// UnboundKey::new(&AES_256_GCM, ..))`). The receiver's are for a call whose own say nothing
+/// of it: `prk.expand(&[info], &AES_256_GCM)` is an HKDF use, of the `HKDF_SHA256` `prk` was
+/// built with. Other arguments are data, not the algorithm: a buffer filled by
 /// `digest(&SHA256, ..)` passed to `seal_in_place_append_tag` does not make the seal SHA-256.
-/// Also returns, second, the other statics and consts in those places (the user's
+/// Each place also gives, second, the other statics and consts in it (the user's
 /// `TABLE.alg`), whose descriptors the caller can look up.
-pub fn data_in_args(kb: &Kb, target: &Target) -> (Vec<DefRef>, Vec<DefRef>) {
+pub fn data_in_args(kb: &Kb, target: &Target) -> [(Vec<DefRef>, Vec<DefRef>); 2] {
     let Target::Call { arg_origins, .. } = target else {
-        return (Vec::new(), Vec::new());
+        return Default::default();
     };
-    let mut out = Vec::new();
+    let mut own = Vec::new();
     for o in arg_origins {
-        direct_data(o, &mut out);
+        direct_data(o, &mut own);
     }
+    let mut chain = Vec::new();
     if let Some(r) = arg_origins.first() {
-        receiver_data(r, 0, &mut out);
+        receiver_data(kb, r, 0, &mut chain);
     }
-    out.into_iter().partition(|d| is_descriptor(kb, d))
+    chain.retain(|d| !own.contains(d));
+    [own, chain].map(|v| v.into_iter().partition(|d| is_descriptor(kb, d)))
 }
 
 fn direct_data(o: &Origin, out: &mut Vec<DefRef>) {
     match o {
-        Origin::Data { def } if !out.contains(def) => out.push(def.clone()),
-        Origin::Any(alts) => alts.iter().for_each(|a| direct_data(a, out)),
+        Origin::Data { def, .. } if !out.contains(def) => out.push(def.clone()),
+        Origin::Any(alts) | Origin::All(alts) => alts.iter().for_each(|a| direct_data(a, out)),
         _ => {}
     }
 }
 
 /// Descriptors along the chain of calls that built a receiver: each call's own descriptor
-/// arguments, then its own receiver.
-fn receiver_data(o: &Origin, depth: usize, out: &mut Vec<DefRef>) {
+/// arguments, then its own receiver, down to the first call that names a descriptor. That one
+/// says what the value is (`prk.expand(&[info], &AES_256_GCM)` makes an AES-256-GCM key);
+/// what built its own receiver (`Salt::new(HKDF_SHA256, ..)`) is another algorithm's.
+fn receiver_data(kb: &Kb, o: &Origin, depth: usize, out: &mut Vec<DefRef>) {
     if depth > 8 {
         return;
     }
     match o {
         Origin::Call { args, .. } => {
+            let mut here = Vec::new();
             for a in args {
-                direct_data(a, out);
+                direct_data(a, &mut here);
             }
-            if let Some(r) = args.first() {
-                receiver_data(r, depth + 1, out);
+            let named = here.iter().any(|d| is_descriptor(kb, d));
+            for d in here {
+                if !out.contains(&d) {
+                    out.push(d);
+                }
+            }
+            if !named && let Some(r) = args.first() {
+                receiver_data(kb, r, depth + 1, out);
             }
         }
-        Origin::Any(alts) => alts.iter().for_each(|a| receiver_data(a, depth + 1, out)),
+        Origin::Any(alts) | Origin::All(alts) => alts
+            .iter()
+            .for_each(|a| receiver_data(kb, a, depth + 1, out)),
         _ => {}
     }
 }
@@ -366,6 +394,17 @@ const FALLBACKS: &[&str] = &[
     "::map_or_else",
     "::get_or_insert",
     "::get_or_insert_with",
+];
+
+/// Standard-library calls whose other arguments are what an error carries, not the value.
+const ERROR_ARGS: &[&str] = &[
+    "::ok_or",
+    "::ok_or_else",
+    "::map_err",
+    "::expect",
+    "::expect_err",
+    "::inspect",
+    "::inspect_err",
 ];
 
 /// Calls whose result is part of their receiver.
@@ -436,6 +475,7 @@ mod tests {
                 path: path.into(),
                 id: "0".into(),
             },
+            value: None,
         }
     }
 

@@ -305,7 +305,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -425,7 +429,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by core::iter::adapters::map::map_fold::<..> at src/main.rs:0; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..> at src/main.rs:0; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@src/main.rs:10:14: 10:17}> as core::iter::traits::iterator::Iterator>::fold::<..> at src/main.rs:0; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..> at src/main.rs:0; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t2::o1::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 21,
@@ -553,6 +557,9 @@
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
       ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM"
+      ],
       "ref": "pkg:cargo/aes@0.8.4"
     },
     {
@@ -649,6 +656,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "26"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -671,7 +686,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6deef122-e0f5-8355-8cdb-d4875fbc3837",
+  "serialNumber": "urn:uuid:c8733dc7-3fe8-8570-9632-e918c0bb5f77",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,6 +1,6 @@
 # Results
 
-The outputs behind `docs/poc-evaluation.md`, generated on 8 October 2026 by cargo-cbom 0.1.0
+The outputs behind `docs/poc-evaluation.md`, generated on 9 October 2026 by cargo-cbom 0.1.0
 (driver on `nightly-2026-09-25`, knowledge base 0.2.0, facts version 7). Every `*.cbom.json` is a CycloneDX 1.7
 CBOM that validated against the official schema when it was written.
 

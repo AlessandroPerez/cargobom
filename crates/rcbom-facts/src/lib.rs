@@ -172,9 +172,12 @@ pub enum Origin {
         len: Option<u64>,
         span: Option<Loc>,
     },
-    /// A named static or const item (`&ring::aead::AES_256_GCM`).
+    /// A named static or const item (`&ring::aead::AES_256_GCM`). `value` is an integer
+    /// const's value (`const ITERATIONS: u32 = 600_000`), when the compiler can evaluate it.
     Data {
         def: DefRef,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        value: Option<i128>,
     },
     /// Argument `index` of the enclosing function.
     Param {
@@ -200,9 +203,16 @@ pub enum Origin {
     Unit {
         path: String,
         krate: String,
+        /// For an enum variant, its discriminant (`argon2::Algorithm::Argon2i` is 1).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        value: Option<i128>,
     },
-    /// Several definitions reach the value.
+    /// Several definitions reach the value: it is one of these.
     Any(Vec<Origin>),
+    /// A value built from all of these parts: the elements of an array or the fields of a
+    /// struct built here, the operands of an arithmetic operation, a value with some of its
+    /// elements written afterwards (`key[31] = 1`).
+    All(Vec<Origin>),
     /// A bound of the search was hit here (depth, width or size): the origin is incomplete.
     Truncated,
     Unknown,

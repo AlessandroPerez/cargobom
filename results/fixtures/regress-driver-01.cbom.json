@@ -372,7 +372,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "declared-not-used"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -535,7 +539,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::bom::b; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t1::bom::b; use: digest; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::SHA256`",
             "line": 1,
             "location": "src/bom.rs",
             "offset": 52,
@@ -556,7 +560,7 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::ALG; line: `const ALG: &Algorithm = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t1::ALG; use: digest; line: `const ALG: &Algorithm = &SHA256;`; code: `SHA256`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 25,
@@ -570,14 +574,14 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t1::p1; t1::ALG -> ring::digest::SHA256; line: `digest::digest(ALG, d).as_ref().len()`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in t1::p1; use: digest; t1::ALG -> ring::digest::SHA256; line: `digest::digest(ALG, d).as_ref().len()`; code: `ALG`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "t1::ALG"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::p2; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t1::p2; use: digest; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA256`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 33,
@@ -591,7 +595,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t1::p4; t1::ALG -> ring::digest::SHA256; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in t1::p4; use: digest; t1::ALG -> ring::digest::SHA256; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `ALG`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 19,
@@ -650,14 +654,14 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::crlf::c; line: `let s = \"é日🔑\"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::SHA384`",
+            "additionalContext": "[reachable] [static] in t1::crlf::c; use: digest; line: `let s = \"é日🔑\"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::SHA384`",
             "line": 2,
             "location": "src/crlf.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::H::A; line: `const A: &'static Algorithm = &digest::SHA384;`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in t1::H::A; use: digest; line: `const A: &'static Algorithm = &digest::SHA384;`; code: `digest::SHA384`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 35,
@@ -671,7 +675,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t1::H::h; t1::H::A -> ring::digest::SHA384; line: `digest::digest(Self::A, d).as_ref().len()`; code: `Self::A`",
+            "additionalContext": "[reachable] [via-static] in t1::H::h; use: digest; t1::H::A -> ring::digest::SHA384; line: `digest::digest(Self::A, d).as_ref().len()`; code: `Self::A`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 23,
@@ -730,14 +734,14 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::r3; line: `h(&SHA512, d).as_ref().len()`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t1::r3; use: digest; line: `h(&SHA512, d).as_ref().len()`; code: `SHA512`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in t1::p2; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t1::p2; use: digest; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA512`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 42,
@@ -1009,6 +1013,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "30"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -1031,7 +1043,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b4a83db3-9aba-88b1-a9f4-5a116d0deb08",
+  "serialNumber": "urn:uuid:6015b7d7-b394-861a-bc53-306f86c619cf",
   "specVersion": "1.7",
   "version": 1
 }

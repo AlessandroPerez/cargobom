@@ -1,103 +1,104 @@
-  occ AES-256-GCM | src/main.rs:12:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9); line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `UnboundKey::new`
-  occ AES-256-GCM | src/main.rs:12:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `AES_256_GCM`
-  occ Ed25519 | src/main.rs:16:12 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`
-  occ RSA-2048 | src/main.rs:15:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`
-  occ SHA-256 | src/main.rs:11:12 | ring::digest::digest | [reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`
-  occ SHA-256 | src/main.rs:11:20 | ring::digest::SHA256 | [reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`
-  occ crypto-common | Cargo.lock:68:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via cbom-real-asymmetric-app -> rsa -> digest -> crypto-common
-  occ digest | Cargo.lock:116:0 | digest | [manifest] locked digest 0.10.7; reached via cbom-real-asymmetric-app -> rsa -> digest
-  occ ed25519-dalek | Cargo.lock:137:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via cbom-real-asymmetric-app -> ed25519-dalek
-  occ ed25519-dalek | Cargo.toml:9:0 | ed25519-dalek | [manifest] declared by cbom-real-asymmetric-app (dependencies)
-  occ getrandom | Cargo.lock:173:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via cbom-real-asymmetric-app -> ring -> getrandom
-  occ rand | Cargo.lock:308:0 | rand | [manifest] locked rand 0.8.6; reached via cbom-real-asymmetric-app -> rand
-  occ rand | Cargo.toml:10:0 | rand | [manifest] declared by cbom-real-asymmetric-app (dependencies)
-  occ rand_chacha | Cargo.lock:319:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via cbom-real-asymmetric-app -> rand -> rand_chacha
-  occ rand_core | Cargo.lock:329:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via cbom-real-asymmetric-app -> rand -> rand_core
-  occ ring | Cargo.lock:338:0 | ring | [manifest] locked ring 0.17.14; reached via cbom-real-asymmetric-app -> ring
-  occ ring | Cargo.toml:11:0 | ring | [manifest] declared by cbom-real-asymmetric-app (dependencies)
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ rsa | Cargo.lock:352:0 | rsa | [manifest] locked rsa 0.9.10; reached via cbom-real-asymmetric-app -> rsa
-  occ rsa | Cargo.toml:12:0 | rsa | [manifest] declared by cbom-real-asymmetric-app (dependencies)
-  occ sha2 | Cargo.lock:416:0 | sha2 | [manifest] locked sha2 0.10.9; reached via cbom-real-asymmetric-app -> ed25519-dalek -> sha2
-  occ signature | Cargo.lock:433:0 | signature | [manifest] locked signature 2.2.0; reached via cbom-real-asymmetric-app -> rsa -> signature
-  prop AES-256-GCM | rcbom:confidence=high
-  prop AES-256-GCM | rcbom:detection:method=type-resolved
-  prop AES-256-GCM | rcbom:finding=hard-coded-key
-  prop AES-256-GCM | rcbom:functions:source=knowledge-base
-  prop AES-256-GCM | rcbom:kb:version=0.2.0
-  prop AES-256-GCM | rcbom:occurrences=2
-  prop AES-256-GCM | rcbom:provenance:key=environment,hard-coded
-  prop AES-256-GCM | rcbom:reachability=reachable
-  prop Ed25519 | rcbom:confidence=high
-  prop Ed25519 | rcbom:detection:method=type-resolved
-  prop Ed25519 | rcbom:finding=hard-coded-key
-  prop Ed25519 | rcbom:functions:source=knowledge-base
-  prop Ed25519 | rcbom:kb:version=0.2.0
-  prop Ed25519 | rcbom:occurrences=1
-  prop Ed25519 | rcbom:provenance:key=hard-coded
-  prop Ed25519 | rcbom:reachability=reachable
-  prop RSA-2048 | rcbom:algorithm-family=RSA
-  prop RSA-2048 | rcbom:confidence=high
-  prop RSA-2048 | rcbom:detection:method=type-resolved
-  prop RSA-2048 | rcbom:functions:source=observed
-  prop RSA-2048 | rcbom:kb:version=0.2.0
-  prop RSA-2048 | rcbom:occurrences=1
-  prop RSA-2048 | rcbom:provenance:rng=rng
-  prop RSA-2048 | rcbom:reachability=reachable
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=observed
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=2
-  prop SHA-256 | rcbom:reachability=reachable
-  prop cbom-real-asymmetric-app | rcbom:scope=required
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop ed25519-dalek | rcbom:crypto-role=algorithm
-  prop ed25519-dalek | rcbom:scope=required
-  prop ed25519-dalek | rcbom:usage=reachable
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop rand | rcbom:crypto-role=algorithm
-  prop rand | rcbom:scope=required
-  prop rand | rcbom:usage=reachable
-  prop rand_chacha | rcbom:crypto-role=algorithm
-  prop rand_chacha | rcbom:scope=required
-  prop rand_chacha | rcbom:usage=reachable
-  prop rand_core | rcbom:crypto-role=trait
-  prop rand_core | rcbom:scope=required
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=reachable
-  prop rsa | rcbom:crypto-role=algorithm
-  prop rsa | rcbom:scope=required
-  prop rsa | rcbom:usage=reachable
-  prop sha2 | rcbom:crypto-role=algorithm
-  prop sha2 | rcbom:scope=required
-  prop sha2 | rcbom:usage=reachable
-  prop signature | rcbom:crypto-role=trait
-  prop signature | rcbom:scope=required
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:12:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9); line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:12:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `AES_256_GCM`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:16:12 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:15:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:12 | ring::digest::digest | [reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:20 | ring::digest::SHA256 | [reachable] [static] in cbom_real_asymmetric_app::main; use: digest; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:68:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via cbom-real-asymmetric-app -> rsa -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:116:0 | digest | [manifest] locked digest 0.10.7; reached via cbom-real-asymmetric-app -> rsa -> digest
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:137:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via cbom-real-asymmetric-app -> ed25519-dalek
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:9:0 | ed25519-dalek | [manifest] declared by cbom-real-asymmetric-app (dependencies)
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:173:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via cbom-real-asymmetric-app -> ring -> getrandom
+  occ rand | pkg:cargo/rand@0.8.6 | Cargo.lock:308:0 | rand | [manifest] locked rand 0.8.6; reached via cbom-real-asymmetric-app -> rand
+  occ rand | pkg:cargo/rand@0.8.6 | Cargo.toml:10:0 | rand | [manifest] declared by cbom-real-asymmetric-app (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:319:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via cbom-real-asymmetric-app -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:329:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via cbom-real-asymmetric-app -> rand -> rand_core
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:338:0 | ring | [manifest] locked ring 0.17.14; reached via cbom-real-asymmetric-app -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:11:0 | ring | [manifest] declared by cbom-real-asymmetric-app (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.lock:352:0 | rsa | [manifest] locked rsa 0.9.10; reached via cbom-real-asymmetric-app -> rsa
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:12:0 | rsa | [manifest] declared by cbom-real-asymmetric-app (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:416:0 | sha2 | [manifest] locked sha2 0.10.9; reached via cbom-real-asymmetric-app -> ed25519-dalek -> sha2
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:433:0 | signature | [manifest] locked signature 2.2.0; reached via cbom-real-asymmetric-app -> rsa -> signature
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=knowledge-base
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=2
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:finding=hard-coded-key
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=knowledge-base
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=1
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=hard-coded
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:detection:method=type-resolved
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:functions:source=observed
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=1
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop cbom-real-asymmetric-app | pkg:cargo/cbom-real-asymmetric-app@0.1.0 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.6 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.6 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.6 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application cbom-real-asymmetric-app 0.1.0 | pkg:cargo/cbom-real-asymmetric-app@0.1.0
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library rand 0.8.6 | pkg:cargo/rand@0.8.6
-component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1
-component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
-component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10
-component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
-component library signature 2.2.0 | pkg:cargo/signature@2.2.0
+component application cbom-real-asymmetric-app 0.1.0 | pkg:cargo/cbom-real-asymmetric-app@0.1.0 | purl pkg:cargo/cbom-real-asymmetric-app@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library rand 0.8.6 | pkg:cargo/rand@0.8.6 | purl pkg:cargo/rand@0.8.6
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10 | purl pkg:cargo/rsa@0.9.10
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/rand@0.8.6
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/ring@0.17.14
@@ -118,6 +119,21 @@ dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/signature@2.2.0
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/cbom-real-asymmetric-app@0.1.0
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/rand@0.8.6
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/rsa@0.9.10
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/signature@2.2.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
@@ -125,7 +141,10 @@ provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
 root {"bom-ref": "pkg:cargo/cbom-real-asymmetric-app@0.1.0#root", "name": "cbom-real-asymmetric-app", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=52
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=416
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

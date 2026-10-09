@@ -1,0 +1,115 @@
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:44:9 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [static] in t14::k3; use: verify; instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:47:6 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in t14::k3::<&[u8; 2]>; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; instantiated by t14::main at src/main.rs:84; line: `k.verify(msg, sig).is_ok()`; code: `verify`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:51:9 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [static] in t14::k3m; use: verify; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:54:6 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in t14::k3m; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; line: `k.verify(msg, sig).is_ok()`; code: `verify`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:31:18 | ring::digest::SHA256 | [present] [static] in t14::suite; use: digest; line: `Suite { alg: &SHA256 }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:10 | ring::digest::digest | [reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:17 | t14::SUITE | [reachable] [via-static] in t14::k2; use: digest; t14::SUITE -> ring::digest::SHA256; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `SUITE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:9 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in t14::k3; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:51:9 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in t14::k3m; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:59:12 | ring::digest::digest | [reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:61; line: `let f = digest;`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:60:26 | ring::digest::SHA256 | [reachable] [static] in t14::f1::{closure#0}; use: digest; instantiated by t14::f1 at src/main.rs:61; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:77:53 | ring::digest::digest | [reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> Digest = digest::digest;`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:78:15 | ring::digest::SHA256 | [reachable] [static] in t14::f3; use: digest; line: `let x = h(&SHA256, d);`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:37 | ring::digest::SHA384 | [reachable] [static] in <t14::S384 as t14::Scheme>::ALG; use: digest; line: `const ALG: &'static Algorithm = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:15 | <t14::S384 as t14::Scheme>::ALG | [reachable] [via-static] in <t14::S384 as t14::Scheme>::hash; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `digest(Self::ALG, d).as_ref().len()`; code: `Self::ALG`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:8 | ring::digest::digest | [reachable] [call] in <t14::S384 as t14::Scheme>::hash; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(Self::ALG, d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:20 | ring::digest::digest | [reachable] [call] in t14::k1; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:27 | <t14::S384 as t14::Scheme>::ALG | [reachable] [via-static] in t14::k1; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `S384::ALG`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:69:24 | ring::digest::digest | [reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let h = Holder { f: digest };`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:71:11 | ring::digest::SHA384 | [reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:79:12 | ring::digest::SHA384 | [reachable] [static] in t14::f3; use: digest; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:79:4 | ring::digest::digest | [reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:5 | ring::digest::SHA512 | [present] [static] in t14::pick; use: digest; line: `&SHA512`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:35:11 | t14::PICKED | [reachable] [via-static] in t14::k2; use: digest; t14::PICKED -> ring::digest::SHA512; line: `digest(PICKED, d).as_ref().len()`; code: `PICKED`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:35:4 | ring::digest::digest | [reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(PICKED, d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:37:10 | ring::digest::digest | [reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `+ digest(const { pick() }, d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:70:13 | ring::digest::digest | [reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let t = (digest, 1u8);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:71:46 | ring::digest::SHA512 | [reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA512`
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:6:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via t14 -> aws-lc-rs
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:10:0 | aws-lc-rs | [manifest] declared by t14 (dependencies)
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:75:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t14 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:125:0 | ring | [manifest] locked ring 0.17.14; reached via t14 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t14 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=4
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=9
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=9
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=6
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:crypto-role=algorithm
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:ffi-boundary=true
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop t14 | pkg:cargo/t14@0.1.0 | rcbom:scope=required
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application t14 0.1.0 | pkg:cargo/t14@0.1.0 | purl pkg:cargo/t14@0.1.0
+component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
+component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t14@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
+dep pkg:cargo/t14@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency pkg:cargo/aws-lc-rs@1.18.1
+dependency pkg:cargo/aws-lc-sys@0.45.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t14@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/t14@0.1.0#root", "name": "t14", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=18
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=40
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

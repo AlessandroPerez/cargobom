@@ -1,134 +1,135 @@
-  occ AES-GCM | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
-  occ AES-GCM | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t1 (dependencies)
-  occ HMAC | Cargo.lock:153:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
-  occ HMAC | Cargo.toml:12:0 | hmac | [manifest] declared by t1 (dependencies)
-  occ SHA-256 | src/bom.rs:1:30 | ring::digest::digest | [reachable] [call] in t1::bom::b; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::digest`
-  occ SHA-256 | src/bom.rs:1:52 | ring::digest::SHA256 | [reachable] [static] in t1::bom::b; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::SHA256`
-  occ SHA-256 | src/main.rs:14:26 | digest::digest::Digest::digest | [reachable] [call] in t1::r2; use: digest; line: `d.iter().copied().map(Sha256::digest).count()`; code: `Sha256::digest`
-  occ SHA-256 | src/main.rs:24:25 | ring::digest::SHA256 | [reachable] [static] in t1::ALG; line: `const ALG: &Algorithm = &SHA256;`; code: `SHA256`
-  occ SHA-256 | src/main.rs:26:19 | t1::ALG | [reachable] [via-static] in t1::p1; t1::ALG -> ring::digest::SHA256; line: `digest::digest(ALG, d).as_ref().len()`; code: `ALG`
-  occ SHA-256 | src/main.rs:26:4 | ring::digest::digest | [reachable] [call] in t1::p1; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `digest::digest(ALG, d).as_ref().len()`; code: `digest::digest`
-  occ SHA-256 | src/main.rs:31:33 | ring::digest::SHA256 | [reachable] [static] in t1::p2; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA256`
-  occ SHA-256 | src/main.rs:46:19 | t1::ALG | [reachable] [via-static] in t1::p4; t1::ALG -> ring::digest::SHA256; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `ALG`
-  occ SHA-256 | src/main.rs:46:4 | ring::digest::digest | [reachable] [call] in t1::p4; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `digest::digest`
-  occ SHA-256 | src/main.rs:8:12 | digest::digest::Digest::digest | [reachable] [call] in t1::r1; use: digest; line: `let f = Sha256::digest;`; code: `Sha256::digest`
-  occ SHA-384 | src/crlf.rs:2:24 | ring::digest::digest | [reachable] [call] in t1::crlf::c; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let s = "é日🔑"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::digest`
-  occ SHA-384 | src/crlf.rs:2:46 | ring::digest::SHA384 | [reachable] [static] in t1::crlf::c; line: `let s = "é日🔑"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::SHA384`
-  occ SHA-384 | src/main.rs:38:35 | ring::digest::SHA384 | [reachable] [static] in t1::H::A; line: `const A: &'static Algorithm = &digest::SHA384;`; code: `digest::SHA384`
-  occ SHA-384 | src/main.rs:40:23 | t1::H::A | [reachable] [via-static] in t1::H::h; t1::H::A -> ring::digest::SHA384; line: `digest::digest(Self::A, d).as_ref().len()`; code: `Self::A`
-  occ SHA-384 | src/main.rs:40:8 | ring::digest::digest | [reachable] [call] in t1::H::h; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest::digest(Self::A, d).as_ref().len()`; code: `digest::digest`
-  occ SHA-512 | src/main.rs:19:61 | ring::digest::digest | [reachable] [call] in t1::r3; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> digest::Digest = digest::digest;`; code: `digest::digest`
-  occ SHA-512 | src/main.rs:20:7 | ring::digest::SHA512 | [reachable] [static] in t1::r3; line: `h(&SHA512, d).as_ref().len()`; code: `SHA512`
-  occ SHA-512 | src/main.rs:31:42 | ring::digest::SHA512 | [reachable] [static] in t1::p2; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA512`
-  occ aead | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t1 -> aes-gcm -> aead
-  occ aes | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t1 -> aes-gcm -> aes
-  occ aes-gcm | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
-  occ aes-gcm | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t1 (dependencies)
-  occ cipher | Cargo.lock:66:0 | cipher | [manifest] locked cipher 0.4.4; reached via t1 -> aes-gcm -> cipher
-  occ crypto-common | Cargo.lock:85:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t1 -> aes-gcm -> aead -> crypto-common
-  occ ctr | Cargo.lock:96:0 | ctr | [manifest] locked ctr 0.9.2; reached via t1 -> aes-gcm -> ctr
-  occ digest | Cargo.lock:105:0 | digest | [manifest] locked digest 0.10.7; reached via t1 -> hmac -> digest
-  occ getrandom | Cargo.lock:132:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t1 -> ring -> getrandom
-  occ ghash | Cargo.lock:143:0 | ghash | [manifest] locked ghash 0.5.1; reached via t1 -> aes-gcm -> ghash
-  occ hmac | Cargo.lock:153:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
-  occ hmac | Cargo.toml:12:0 | hmac | [manifest] declared by t1 (dependencies)
-  occ polyval | Cargo.lock:183:0 | polyval | [manifest] locked polyval 0.6.2; reached via t1 -> aes-gcm -> ghash -> polyval
-  occ rand_core | Cargo.lock:195:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t1 -> aes-gcm -> aead -> crypto-common -> rand_core
-  occ ring | Cargo.lock:204:0 | ring | [manifest] locked ring 0.17.14; reached via t1 -> ring
-  occ ring | Cargo.toml:10:0 | ring | [manifest] declared by t1 (dependencies)
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ sha2 | Cargo.lock:218:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t1 -> sha2
-  occ sha2 | Cargo.toml:11:0 | sha2 | [manifest] declared by t1 (dependencies)
-  occ universal-hash | Cargo.lock:257:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> aes-gcm -> ghash -> polyval -> universal-hash
-  prop AES-GCM | rcbom:confidence=low
-  prop AES-GCM | rcbom:detection:method=manifest
-  prop AES-GCM | rcbom:kb:version=0.2.0
-  prop AES-GCM | rcbom:usage=declared-not-used
-  prop HMAC | rcbom:confidence=low
-  prop HMAC | rcbom:detection:method=manifest
-  prop HMAC | rcbom:kb:version=0.2.0
-  prop HMAC | rcbom:usage=declared-not-used
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=observed
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=10
-  prop SHA-256 | rcbom:reachability=reachable
-  prop SHA-384 | rcbom:confidence=high
-  prop SHA-384 | rcbom:detection:method=type-resolved
-  prop SHA-384 | rcbom:functions:source=observed
-  prop SHA-384 | rcbom:kb:version=0.2.0
-  prop SHA-384 | rcbom:occurrences=5
-  prop SHA-384 | rcbom:reachability=reachable
-  prop SHA-512 | rcbom:confidence=high
-  prop SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | rcbom:functions:source=observed
-  prop SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | rcbom:occurrences=3
-  prop SHA-512 | rcbom:reachability=reachable
-  prop aead | rcbom:crypto-role=trait
-  prop aead | rcbom:scope=required
-  prop aes | rcbom:crypto-role=algorithm
-  prop aes | rcbom:scope=required
-  prop aes | rcbom:usage=declared-not-used
-  prop aes-gcm | rcbom:crypto-role=algorithm
-  prop aes-gcm | rcbom:scope=required
-  prop aes-gcm | rcbom:usage=declared-not-used
-  prop cipher | rcbom:crypto-role=trait
-  prop cipher | rcbom:scope=required
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop ctr | rcbom:crypto-role=algorithm
-  prop ctr | rcbom:scope=required
-  prop ctr | rcbom:usage=declared-not-used
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop ghash | rcbom:crypto-role=algorithm
-  prop ghash | rcbom:scope=required
-  prop ghash | rcbom:usage=declared-not-used
-  prop hmac | rcbom:crypto-role=algorithm
-  prop hmac | rcbom:scope=required
-  prop hmac | rcbom:usage=declared-not-used
-  prop polyval | rcbom:crypto-role=algorithm
-  prop polyval | rcbom:scope=required
-  prop polyval | rcbom:usage=declared-not-used
-  prop rand_core | rcbom:crypto-role=trait
-  prop rand_core | rcbom:scope=required
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=reachable
-  prop sha2 | rcbom:crypto-role=algorithm
-  prop sha2 | rcbom:scope=required
-  prop sha2 | rcbom:usage=reachable
-  prop t1 | rcbom:scope=required
-  prop universal-hash | rcbom:crypto-role=trait
-  prop universal-hash | rcbom:scope=required
+  occ AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
+  occ AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t1 (dependencies)
+  occ HMAC | crypto:candidate:hmac@0.12.1:HMAC | Cargo.lock:153:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
+  occ HMAC | crypto:candidate:hmac@0.12.1:HMAC | Cargo.toml:12:0 | hmac | [manifest] declared by t1 (dependencies)
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/bom.rs:1:30 | ring::digest::digest | [reachable] [call] in t1::bom::b; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/bom.rs:1:52 | ring::digest::SHA256 | [reachable] [static] in t1::bom::b; use: digest; line: `pub fn b(d: &[u8]) -> usize { ring::digest::digest(&ring::digest::SHA256, d).as_ref().len() }`; code: `ring::digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:14:26 | digest::digest::Digest::digest | [reachable] [call] in t1::r2; use: digest; line: `d.iter().copied().map(Sha256::digest).count()`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:25 | ring::digest::SHA256 | [reachable] [static] in t1::ALG; use: digest; line: `const ALG: &Algorithm = &SHA256;`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:19 | t1::ALG | [reachable] [via-static] in t1::p1; use: digest; t1::ALG -> ring::digest::SHA256; line: `digest::digest(ALG, d).as_ref().len()`; code: `ALG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:4 | ring::digest::digest | [reachable] [call] in t1::p1; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `digest::digest(ALG, d).as_ref().len()`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:31:33 | ring::digest::SHA256 | [reachable] [static] in t1::p2; use: digest; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:19 | t1::ALG | [reachable] [via-static] in t1::p4; use: digest; t1::ALG -> ring::digest::SHA256; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `ALG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:4 | ring::digest::digest | [reachable] [call] in t1::p4; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t1::main at src/main.rs:51; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:8:12 | digest::digest::Digest::digest | [reachable] [call] in t1::r1; use: digest; line: `let f = Sha256::digest;`; code: `Sha256::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/crlf.rs:2:24 | ring::digest::digest | [reachable] [call] in t1::crlf::c; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let s = "é日🔑"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/crlf.rs:2:46 | ring::digest::SHA384 | [reachable] [static] in t1::crlf::c; use: digest; line: `let s = "é日🔑"; let x = ring::digest::digest(&ring::digest::SHA384, d);`; code: `ring::digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:38:35 | ring::digest::SHA384 | [reachable] [static] in t1::H::A; use: digest; line: `const A: &'static Algorithm = &digest::SHA384;`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:23 | t1::H::A | [reachable] [via-static] in t1::H::h; use: digest; t1::H::A -> ring::digest::SHA384; line: `digest::digest(Self::A, d).as_ref().len()`; code: `Self::A`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:8 | ring::digest::digest | [reachable] [call] in t1::H::h; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest::digest(Self::A, d).as_ref().len()`; code: `digest::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:61 | ring::digest::digest | [reachable] [call] in t1::r3; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> digest::Digest = digest::digest;`; code: `digest::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:20:7 | ring::digest::SHA512 | [reachable] [static] in t1::r3; use: digest; line: `h(&SHA512, d).as_ref().len()`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:31:42 | ring::digest::SHA512 | [reachable] [static] in t1::p2; use: digest; line: `let algs: &[&Algorithm] = &[&SHA256, &SHA512];`; code: `SHA512`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t1 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t1 -> aes-gcm -> aes
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t1 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:66:0 | cipher | [manifest] locked cipher 0.4.4; reached via t1 -> aes-gcm -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:85:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t1 -> aes-gcm -> aead -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:96:0 | ctr | [manifest] locked ctr 0.9.2; reached via t1 -> aes-gcm -> ctr
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:105:0 | digest | [manifest] locked digest 0.10.7; reached via t1 -> hmac -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:132:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t1 -> ring -> getrandom
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:143:0 | ghash | [manifest] locked ghash 0.5.1; reached via t1 -> aes-gcm -> ghash
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:153:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:12:0 | hmac | [manifest] declared by t1 (dependencies)
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:183:0 | polyval | [manifest] locked polyval 0.6.2; reached via t1 -> aes-gcm -> ghash -> polyval
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:195:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t1 -> aes-gcm -> aead -> crypto-common -> rand_core
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:204:0 | ring | [manifest] locked ring 0.17.14; reached via t1 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:10:0 | ring | [manifest] declared by t1 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:218:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t1 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:11:0 | sha2 | [manifest] declared by t1 (dependencies)
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:257:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:confidence=low
+  prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:detection:method=manifest
+  prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:kb:version=0.2.0
+  prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:usage=declared-not-used
+  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:confidence=low
+  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:detection:method=manifest
+  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:usage=declared-not-used
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=10
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=5
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=3
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=declared-not-used
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=declared-not-used
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=declared-not-used
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=declared-not-used
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=declared-not-used
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=declared-not-used
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=declared-not-used
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop t1 | pkg:cargo/t1@0.1.0 | rcbom:scope=required
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "primitive": "ae"}, "assetType": "algorithm"}
 asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application t1 0.1.0 | pkg:cargo/t1@0.1.0
-component library aead 0.5.2 | pkg:cargo/aead@0.5.2
-component library aes 0.8.4 | pkg:cargo/aes@0.8.4
-component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3
-component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1
-component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
-component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2
-component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
-component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
-component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1
+component application t1 0.1.0 | pkg:cargo/t1@0.1.0 | purl pkg:cargo/t1@0.1.0
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
@@ -151,6 +152,25 @@ dep pkg:cargo/t1@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/t1@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/t1@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/t1@0.1.0
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:candidate:aes-gcm@0.10.3:AES-GCM
 provides pkg:cargo/hmac@0.12.1 -> crypto:candidate:hmac@0.12.1:HMAC
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
@@ -160,7 +180,10 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t1@0.1.0#root", "name": "t1", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=30
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=145
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

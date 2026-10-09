@@ -190,6 +190,15 @@ pub struct Param {
     /// U10>>, U12>`).
     #[serde(default)]
     pub path: Vec<usize>,
+    /// (`[[type]]` entries) The entry matches only when this parameter resolves: the `AES` of
+    /// `cbc::Encryptor<C>` holds only when `C` is an AES type, not for `Encryptor<Blowfish>`.
+    #[serde(default)]
+    pub required: bool,
+    /// (`[[fn]]` entries) A fixed value, the crate's own default: `scrypt::Params::recommended()`
+    /// is log_n 17, r 8, p 1, 32 bytes. A call the value is passed to can override it (the
+    /// output length of `scrypt(.., &params, out)`).
+    #[serde(default)]
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -218,6 +227,11 @@ struct StaticRaw {
     /// `cmac`).
     #[serde(default)]
     module: Option<String>,
+    /// The asset's name when the call that names the descriptor (in its arguments or in its
+    /// receiver's construction) is one of these methods: the key-wrapping key of aws-lc-rs's
+    /// `key_wrap::AES_256` is AES-256-KW for `wrap`, AES-256-KWP for `wrap_with_padding`.
+    #[serde(default)]
+    asset_by_method: BTreeMap<String, String>,
     #[serde(flatten)]
     algo: Algo,
 }
@@ -245,6 +259,8 @@ pub struct PatternEntry {
     pub module: Option<Regex>,
     pub self_type: Option<String>,
     pub params: BTreeMap<String, Param>,
+    /// For statics: method -> asset name template (`asset_by_method`).
+    pub asset_by_method: BTreeMap<String, String>,
     pub algo: Algo,
 }
 
@@ -339,6 +355,27 @@ const PRIMITIVES: &[&str] = &[
     "unknown",
 ];
 
+/// `algorithmFamily` values CycloneDX 1.7 accepts (the enum of `cryptography-defs.schema.json`,
+/// which lags the registry: it has no `TLS-PRF`).
+static FAMILY_ENUM: std::sync::LazyLock<Vec<String>> = std::sync::LazyLock::new(|| {
+    let schema: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../schema/cryptography-defs.schema.json"
+    ))
+    .expect("cryptography-defs.schema.json");
+    schema["definitions"]["algorithmFamiliesEnum"]["enum"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|f| f.as_str().map(str::to_string))
+        .collect()
+});
+
+/// Can `algorithmFamily` say this family? A registry family the 1.7 enum lacks (`TLS-PRF`)
+/// cannot: the field is optional, and the family goes in a property instead.
+pub fn in_family_enum(family: &str) -> bool {
+    FAMILY_ENUM.iter().any(|f| f == family)
+}
+
 fn de_req<'de, D: serde::Deserializer<'de>>(d: D) -> Result<semver::VersionReq, D::Error> {
     let s = String::deserialize(d)?;
     semver::VersionReq::parse(&s).map_err(serde::de::Error::custom)
@@ -366,6 +403,7 @@ impl Kb {
                         module: s.module.as_deref().map(pat).transpose()?,
                         self_type: None,
                         params: BTreeMap::new(),
+                        asset_by_method: s.asset_by_method,
                         algo: s.algo,
                     })
                 })
@@ -380,6 +418,7 @@ impl Kb {
                         module: None,
                         self_type: s.self_type,
                         params: s.params,
+                        asset_by_method: BTreeMap::new(),
                         algo: s.algo,
                     })
                 })
@@ -457,6 +496,12 @@ impl Kb {
     }
 
     fn validate(&self) -> Result<()> {
+        // a `[[type]]` module restriction is matched later, by path; it must compile now
+        for t in &self.types {
+            if let Some(m) = &t.module {
+                Regex::new(m).with_context(|| format!("[[type]] {}: module {m:?}", t.name))?;
+            }
+        }
         let algos = self
             .types
             .iter()
@@ -464,6 +509,16 @@ impl Kb {
             .chain(self.statics.iter().map(|s| &s.algo))
             .chain(self.fns.iter().map(|f| &f.algo));
         for a in algos {
+            // a family of the 1.7 enum, or one the registry has added since (written as a
+            // property); key material has no algorithmProperties, its family is a property
+            if a.material.is_none() && !in_family_enum(&a.family) && !registry::family(&a.family) {
+                bail!(
+                    "{}: algorithm family {:?} is neither a CycloneDX 1.7 algorithmFamily nor \
+                     a Cryptography Registry family",
+                    a.asset,
+                    a.family
+                );
+            }
             if !PRIMITIVES.contains(&a.primitive.as_str()) {
                 bail!(
                     "{}: primitive {:?} is not a CycloneDX value",
@@ -475,6 +530,28 @@ impl Kb {
                 if !FUNCTIONS.contains(&f.as_str()) {
                     bail!("{}: cryptoFunction {f:?} is not a CycloneDX value", a.asset);
                 }
+            }
+            // what a `[[fn]]` call does (`use = "keygen"`) is a cryptoFunction too
+            if let Some(u) = &a.implied_use
+                && !FUNCTIONS.contains(&u.as_str())
+            {
+                bail!("{}: use {u:?} is not a CycloneDX cryptoFunction", a.asset);
+            }
+        }
+        for f in &self.fns {
+            if f.params.values().any(|p| p.required) {
+                bail!(
+                    "{}: `required` is for [[type]] parameters; a [[fn]] entry names its asset whatever resolves",
+                    f.algo.asset
+                );
+            }
+        }
+        for t in &self.types {
+            if t.params.values().any(|p| p.value.is_some()) {
+                bail!(
+                    "{}: a fixed `value` is for [[fn]] parameters (a constructor's defaults)",
+                    t.algo.asset
+                );
             }
         }
         for u in &self.uses {
@@ -569,5 +646,24 @@ mod tests {
     fn rejects_values_outside_the_cyclonedx_enums() {
         let bad = SEED.replace("primitive = \"ae\"", "primitive = \"aead\"");
         assert!(Kb::parse(&bad).is_err());
+    }
+
+    #[test]
+    fn rejects_a_family_outside_cyclonedx_and_the_registry() {
+        let bad = SEED.replacen("family = \"HKDF\"", "family = \"NOT-A-FAMILY\"", 1);
+        let err = Kb::parse(&bad).unwrap_err().to_string();
+        assert!(err.contains("NOT-A-FAMILY"), "{err}");
+        // a registry family the 1.7 enum lacks is accepted, and not written as algorithmFamily
+        let ok = SEED.replacen("family = \"HKDF\"", "family = \"TLS-PRF\"", 1);
+        assert!(Kb::parse(&ok).is_ok());
+        assert!(!in_family_enum("TLS-PRF") && in_family_enum("HKDF"));
+    }
+
+    #[test]
+    fn rejects_a_fn_use_outside_the_cyclonedx_enum() {
+        assert!(SEED.contains("use = \"keygen\""));
+        let bad = SEED.replacen("use = \"keygen\"", "use = \"keygeneration\"", 1);
+        let err = Kb::parse(&bad).unwrap_err().to_string();
+        assert!(err.contains("keygeneration"), "{err}");
     }
 }

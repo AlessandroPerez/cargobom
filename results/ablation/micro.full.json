@@ -488,7 +488,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -976,14 +980,14 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[reachable] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
@@ -1007,7 +1011,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -1042,7 +1046,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
+            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; use: digest; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 12,
@@ -1094,14 +1098,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; use: digest; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 64,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[reachable] [via-static] in micro::digests; use: digest; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
@@ -1132,7 +1136,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -1205,6 +1209,9 @@
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
       ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM"
+      ],
       "ref": "pkg:cargo/aes@0.8.4"
     },
     {
@@ -1223,6 +1230,9 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha20-Poly1305"
       ],
       "ref": "pkg:cargo/chacha20@0.9.1"
     },
@@ -1375,6 +1385,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "35"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -1397,7 +1415,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:80ca431c-a913-8d24-af44-eda259911ee0",
+  "serialNumber": "urn:uuid:aeaadec2-bbc0-8f86-8266-34076bdbf930",
   "specVersion": "1.7",
   "version": 1
 }

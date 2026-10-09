@@ -122,7 +122,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::init; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b\"init\");`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t4::init; use: digest; line: `let _ = digest(&SHA1_FOR_LEGACY_USE_ONLY, b\"init\");`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 20,
@@ -181,7 +181,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4::{closure#0}; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t4::w4::{closure#0}; use: digest; instantiated by ring::agreement::agree_ephemeral_::<..> at ring-0.17.14/src/agreement.rs:310; instantiated by ring::agreement::agree_ephemeral::<..> at ring-0.17.14/src/agreement.rs:262; instantiated by t4::w4 at src/main.rs:52; line: `agree_ephemeral(my, &peer, |km| digest(&SHA256, km).as_ref().len()).unwrap()`; code: `SHA256`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 44,
@@ -195,7 +195,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::Fp as core::fmt::Display>::fmt; line: `write!(f, \"{:?}\", digest(&SHA256, b\"fp\"))`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <t4::Fp as core::fmt::Display>::fmt; use: digest; line: `write!(f, \"{:?}\", digest(&SHA256, b\"fp\"))`; code: `SHA256`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 34,
@@ -254,7 +254,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::X as t4::Base>::h; line: `digest(&SHA384, b\"x\").as_ref().len()`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <t4::X as t4::Base>::h; use: digest; line: `digest(&SHA384, b\"x\").as_ref().len()`; code: `SHA384`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 16,
@@ -313,7 +313,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t4::Inner as core::ops::drop::Drop>::drop; line: `let _ = digest(&SHA512, b\"drop\");`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <t4::Inner as core::ops::drop::Drop>::drop; use: digest; line: `let _ = digest(&SHA512, b\"drop\");`; code: `SHA512`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 24,
@@ -374,14 +374,14 @@
             "symbol": "ring::agreement::EphemeralPrivateKey::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in t4::w4; use: keyderive; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::ec::curve25519::x25519::X25519"
           },
           {
-            "additionalContext": "[reachable] [static] in t4::w4; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in t4::w4; use: keyderive; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 39,
@@ -472,6 +472,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -494,7 +502,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:378c0acb-57a3-85a5-98b7-01934f756f23",
+  "serialNumber": "urn:uuid:1be8520a-28a1-8c56-86cc-2a8799e3cf59",
   "specVersion": "1.7",
   "version": 1
 }

@@ -233,7 +233,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -603,7 +607,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; use: digest; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
@@ -752,6 +756,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "52"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -774,7 +786,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:240a57c1-c62e-8981-8925-3add5f9a4f71",
+  "serialNumber": "urn:uuid:4043ebd0-9fcc-82b3-911b-07e43312f5e1",
   "specVersion": "1.7",
   "version": 1
 }

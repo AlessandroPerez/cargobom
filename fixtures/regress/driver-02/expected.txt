@@ -1,86 +1,87 @@
-  occ AES-256-GCM | src/main.rs:106:4 | crypto_common::KeyInit::new_from_slice | [present] [call] in t2::o11; new_from_slice: setup, not a use; key: environment (std::env::var); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:11:21 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by core::iter::adapters::map::map_fold::<..> at src/main.rs:0; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..> at src/main.rs:0; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@src/main.rs:10:14: 10:17}> as core::iter::traits::iterator::Iterator>::fold::<..> at src/main.rs:0; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..> at src/main.rs:0; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:19:23 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:20; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:27:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o3::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 25); instantiated by t2::main at src/main.rs:94; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:37:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o4; new_from_slice: setup, not a use; key: environment (std::env::var); line: `Aes256Gcm::new_from_slice(&cfg.key).is_ok() && cfg.rounds > 0`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:50:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o6; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 49); line: `let ok = Aes256Gcm::new_from_slice(&key).is_ok();`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:61:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 60); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:69:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o8; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 67) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o9; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 79) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function) or parameter (argument 3 of the enclosing function); line: `Aes256Gcm::new_from_slice(k).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:87:4 | aead::AeadCore::generate_nonce | [reachable] [call] in t2::o10; generate_nonce: setup, not a use; line: `Aes256Gcm::generate_nonce(OsRng).len()`; code: `Aes256Gcm::generate_nonce`
-  occ aead | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t2 -> aes-gcm -> aead
-  occ aes | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t2 -> aes-gcm -> aes
-  occ aes-gcm | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t2 -> aes-gcm
-  occ aes-gcm | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t2 (dependencies)
-  occ cipher | Cargo.lock:57:0 | cipher | [manifest] locked cipher 0.4.4; reached via t2 -> aes-gcm -> cipher
-  occ crypto-common | Cargo.lock:76:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t2 -> aes-gcm -> aead -> crypto-common
-  occ ctr | Cargo.lock:87:0 | ctr | [manifest] locked ctr 0.9.2; reached via t2 -> aes-gcm -> ctr
-  occ getrandom | Cargo.lock:112:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t2 -> ring -> getrandom
-  occ ghash | Cargo.lock:123:0 | ghash | [manifest] locked ghash 0.5.1; reached via t2 -> aes-gcm -> ghash
-  occ polyval | Cargo.lock:154:0 | polyval | [manifest] locked polyval 0.6.2; reached via t2 -> aes-gcm -> ghash -> polyval
-  occ rand_core | Cargo.lock:166:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t2 -> aes-gcm -> aead -> crypto-common -> rand_core
-  occ ring | Cargo.lock:175:0 | ring | [manifest] locked ring 0.17.14; reached via t2 -> ring
-  occ ring | Cargo.toml:10:0 | ring | [manifest] declared by t2 (dependencies)
-  occ ring | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ universal-hash | Cargo.lock:215:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t2 -> aes-gcm -> ghash -> polyval -> universal-hash
-  prop AES-256-GCM | rcbom:confidence=high
-  prop AES-256-GCM | rcbom:detection:method=type-resolved
-  prop AES-256-GCM | rcbom:finding=hard-coded-key
-  prop AES-256-GCM | rcbom:functions:source=knowledge-base
-  prop AES-256-GCM | rcbom:kb:version=0.2.0
-  prop AES-256-GCM | rcbom:occurrences=10
-  prop AES-256-GCM | rcbom:param:nonce_bytes=12
-  prop AES-256-GCM | rcbom:param:tag_bytes=16
-  prop AES-256-GCM | rcbom:provenance:key=environment,hard-coded,parameter
-  prop AES-256-GCM | rcbom:reachability=reachable
-  prop aead | rcbom:crypto-role=trait
-  prop aead | rcbom:scope=required
-  prop aes | rcbom:crypto-role=algorithm
-  prop aes | rcbom:scope=required
-  prop aes | rcbom:usage=reachable
-  prop aes-gcm | rcbom:crypto-role=algorithm
-  prop aes-gcm | rcbom:scope=required
-  prop aes-gcm | rcbom:usage=reachable
-  prop cipher | rcbom:crypto-role=trait
-  prop cipher | rcbom:scope=required
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop ctr | rcbom:crypto-role=algorithm
-  prop ctr | rcbom:scope=required
-  prop ctr | rcbom:usage=reachable
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop ghash | rcbom:crypto-role=algorithm
-  prop ghash | rcbom:scope=required
-  prop ghash | rcbom:usage=reachable
-  prop polyval | rcbom:crypto-role=algorithm
-  prop polyval | rcbom:scope=required
-  prop polyval | rcbom:usage=reachable
-  prop rand_core | rcbom:crypto-role=trait
-  prop rand_core | rcbom:scope=required
-  prop ring | rcbom:crypto-role=algorithm
-  prop ring | rcbom:ffi-boundary=true
-  prop ring | rcbom:native-links=ring_core_0_17_14_
-  prop ring | rcbom:scope=required
-  prop ring | rcbom:usage=reachable
-  prop t2 | rcbom:scope=required
-  prop universal-hash | rcbom:crypto-role=trait
-  prop universal-hash | rcbom:scope=required
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:106:4 | crypto_common::KeyInit::new_from_slice | [present] [call] in t2::o11; new_from_slice: setup, not a use; key: environment (std::env::var); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:11:21 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 8); instantiated by core::iter::adapters::map::map_fold::<..>; instantiated by <core::slice::iter::Iter<'_, &[u8]> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, &[u8]>, {closure@t2::o1::{closure#0}}> as core::iter::traits::iterator::Iterator>::fold::<..>; instantiated by <usize as core::iter::traits::accum::Sum>::sum::<..>; line: `let _c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:19:23 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:20; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:27:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o3::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 25); instantiated by t2::main at src/main.rs:94; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:37:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o4; new_from_slice: setup, not a use; key: environment (std::env::var); line: `Aes256Gcm::new_from_slice(&cfg.key).is_ok() && cfg.rounds > 0`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:50:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o6; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 49); line: `let ok = Aes256Gcm::new_from_slice(&key).is_ok();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:61:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 60); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:69:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o8; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 67) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o9; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 79) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function) or parameter (argument 3 of the enclosing function); line: `Aes256Gcm::new_from_slice(k).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:87:4 | aead::AeadCore::generate_nonce | [reachable] [call] in t2::o10; generate_nonce: setup, not a use; line: `Aes256Gcm::generate_nonce(OsRng).len()`; code: `Aes256Gcm::generate_nonce`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t2 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t2 -> aes-gcm -> aes
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t2 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t2 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:57:0 | cipher | [manifest] locked cipher 0.4.4; reached via t2 -> aes-gcm -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:76:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t2 -> aes-gcm -> aead -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:87:0 | ctr | [manifest] locked ctr 0.9.2; reached via t2 -> aes-gcm -> ctr
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:112:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t2 -> ring -> getrandom
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:123:0 | ghash | [manifest] locked ghash 0.5.1; reached via t2 -> aes-gcm -> ghash
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:154:0 | polyval | [manifest] locked polyval 0.6.2; reached via t2 -> aes-gcm -> ghash -> polyval
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:166:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t2 -> aes-gcm -> aead -> crypto-common -> rand_core
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:175:0 | ring | [manifest] locked ring 0.17.14; reached via t2 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:10:0 | ring | [manifest] declared by t2 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:215:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t2 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=knowledge-base
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=10
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,hard-coded,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop t2 | pkg:cargo/t2@0.1.0 | rcbom:scope=required
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
-component application t2 0.1.0 | pkg:cargo/t2@0.1.0
-component library aead 0.5.2 | pkg:cargo/aead@0.5.2
-component library aes 0.8.4 | pkg:cargo/aes@0.8.4
-component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3
-component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1
-component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2
-component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
-component library ring 0.17.14 | pkg:cargo/ring@0.17.14
-component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1
+component application t2 0.1.0 | pkg:cargo/t2@0.1.0 | purl pkg:cargo/t2@0.1.0
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
@@ -98,11 +99,31 @@ dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t2@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
 dep pkg:cargo/t2@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t2@0.1.0
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
 root {"bom-ref": "pkg:cargo/t2@0.1.0#root", "name": "t2", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=26
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=224
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

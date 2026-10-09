@@ -659,7 +659,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1233,7 +1237,7 @@
           "value": "computed,hard-coded"
         },
         {
-          "name": "rcbom:finding",
+          "name": "rcbom:finding:present",
           "value": "hard-coded-nonce"
         },
         {
@@ -1424,6 +1428,66 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:PBKDF2",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "PBKDF2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in bcrypt_pbkdf::bcrypt_pbkdf_with_memory; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2::<Bhash>(&Sha512::digest(passphrase), salt, rounds, memory)`; code: `pbkdf2::pbkdf2::<Bhash>`",
+            "line": 190,
+            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
+            "offset": 4,
+            "symbol": "pbkdf2::pbkdf2"
+          }
+        ]
+      },
+      "name": "PBKDF2",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:RSA-OAEP-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1489,6 +1553,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:mgf_hash",
+          "value": "SHA-256"
         },
         {
           "name": "rcbom:occurrences",
@@ -1742,6 +1810,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[present] [call] in age::primitives::scrypt; new: setup, not a use; line: `let params = ScryptParams::new(log_n, 8, 1, 32)?;`; code: `ScryptParams::new`",
+            "line": 65,
+            "location": "age-0.12.1/src/primitives.rs",
+            "offset": 17,
+            "symbol": "scrypt::params::Params::new"
+          },
+          {
             "additionalContext": "[present] [call] in age::primitives::scrypt; use: keyderive; password: parameter (argument 2 of the enclosing function); salt: parameter (argument 0 of the enclosing function); line: `scrypt_inner(password.as_bytes(), salt, &params, &mut output)`; code: `scrypt_inner`",
             "line": 68,
             "location": "age-0.12.1/src/primitives.rs",
@@ -1773,8 +1848,20 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:dk_len",
+          "value": "32"
+        },
+        {
+          "name": "rcbom:param:p",
+          "value": "1"
+        },
+        {
+          "name": "rcbom:param:r",
+          "value": "8"
+        },
+        {
           "name": "rcbom:param:unresolved",
-          "value": "work factor (log_n, r, p) computed at run time"
+          "value": "N: not a constant where scrypt::Params is built"
         },
         {
           "name": "rcbom:provenance:password",
@@ -1786,7 +1873,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -1885,7 +1972,7 @@
             "symbol": "x25519_dalek::x25519::PublicKey::as_bytes"
           },
           {
-            "additionalContext": "[present] [call] in <age::native::x25519::Recipient as age::Recipient>::wrap_file_key; use: keygen; line: `let esk = EphemeralSecret::random_from_rng(rng);`; code: `EphemeralSecret::random_from_rng`",
+            "additionalContext": "[present] [call] in <age::native::x25519::Recipient as age::Recipient>::wrap_file_key; use: keygen; rng: rng (rand_core::os::OsRng); line: `let esk = EphemeralSecret::random_from_rng(rng);`; code: `EphemeralSecret::random_from_rng`",
             "line": 203,
             "location": "age-0.12.1/src/native/x25519.rs",
             "offset": 18,
@@ -1997,7 +2084,7 @@
             "symbol": "core::convert::Into::into"
           },
           {
-            "additionalContext": "[present] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: keygen; line: `let esk = EphemeralSecret::random_from_rng(rng);`; code: `EphemeralSecret::random_from_rng`",
+            "additionalContext": "[present] [call] in <age::ssh::recipient::Recipient as age::Recipient>::wrap_file_key; use: keygen; rng: rng (rand_core::os::OsRng); line: `let esk = EphemeralSecret::random_from_rng(rng);`; code: `EphemeralSecret::random_from_rng`",
             "line": 177,
             "location": "age-0.12.1/src/ssh/recipient.rs",
             "offset": 26,
@@ -2110,6 +2197,13 @@
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
       ],
+      "provides": [
+        "crypto:algorithm:AES-128-CTR",
+        "crypto:algorithm:AES-192-CTR",
+        "crypto:algorithm:AES-256-CBC",
+        "crypto:algorithm:AES-256-CTR",
+        "crypto:algorithm:AES-256-GCM"
+      ],
       "ref": "pkg:cargo/aes@0.8.4"
     },
     {
@@ -2137,6 +2231,9 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha20-Poly1305"
       ],
       "ref": "pkg:cargo/chacha20@0.9.1"
     },
@@ -2217,6 +2314,9 @@
       "dependsOn": [
         "pkg:cargo/digest@0.10.7",
         "pkg:cargo/hmac@0.12.1"
+      ],
+      "provides": [
+        "crypto:algorithm:PBKDF2"
       ],
       "ref": "pkg:cargo/pbkdf2@0.12.2"
     },
@@ -2370,6 +2470,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "192"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -2392,7 +2500,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ce55699c-b8dd-8bc6-9052-65a4cc78b524",
+  "serialNumber": "urn:uuid:2ac8a033-86b6-8172-9ae7-a446a9cf53e4",
   "specVersion": "1.7",
   "version": 1
 }

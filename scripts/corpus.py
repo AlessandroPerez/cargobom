@@ -10,9 +10,8 @@ import json, os, pathlib, re, shutil, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CBOM = ROOT / "target" / "debug" / "cargo-cbom"
+DRIVER = ROOT / "crates" / "rcbom-driver" / "target" / "debug" / "rcbom-driver"
 TOOLCHAIN = "nightly-2026-09-25"
-HOST = next(l.split()[1] for l in subprocess.run(["rustc", "-vV"], capture_output=True, text=True).stdout.splitlines()
-            if l.startswith("host:"))
 
 
 def run(cmd, cwd, env=None):
@@ -67,17 +66,20 @@ def main():
     rows = []
     for proj in map(pathlib.Path, args[1:]):
         name = proj.name
-        # the packages a host build resolves, as cargo cbom's Layer 1 counts them
-        meta = subprocess.run(["cargo", "metadata", "--format-version", "1", "--locked", "--quiet",
-                               "--filter-platform", HOST], cwd=proj, capture_output=True, text=True)
-        packages = len(json.loads(meta.stdout)["packages"]) if meta.returncode == 0 else -1
         plain_dir = out / f"{name}.plain-target"
         shutil.rmtree(plain_dir, ignore_errors=True)
-        c0, t_plain, rss_plain, err0 = run(["cargo", f"+{TOOLCHAIN}", "check", "--locked", "--quiet", "--target-dir", str(plain_dir)], proj)
+        c0, t_plain, rss_plain, err0 = run(["cargo", f"+{TOOLCHAIN}", "check", "--release", "--locked", "--quiet", "--target-dir", str(plain_dir)], proj)
         shutil.rmtree(plain_dir, ignore_errors=True)
         shutil.rmtree(proj / "target" / "rcbom", ignore_errors=True)
         cbom = out / f"{name}.cbom.json"
-        c1, t_cbom, rss_cbom, err1 = run([str(CBOM), "cbom", "-o", str(cbom)], proj)
+        # the driver built from this tree, not $RCBOM_DRIVER or a stale release build
+        c1, t_cbom, rss_cbom, err1 = run([str(CBOM), "cbom", "--driver", str(DRIVER), "-o", str(cbom)], proj)
+        # the packages of the build Layer 1 resolved (normal and build edges, host platform,
+        # only the optional dependencies features activate), as the CBOM records them
+        packages = -1
+        if c1 == 0:
+            props = json.load(open(cbom))["metadata"].get("properties", [])
+            packages = int(next((p["value"] for p in props if p["name"] == "rcbom:run:packages"), -1))
         row = {"project": name, "packages": packages, "plain_check_s": round(t_plain, 1), "cbom_s": round(t_cbom, 1),
                "overhead": round(t_cbom / t_plain, 2) if t_plain else None, "plain_peak_rss_mib": round(rss_plain),
                "peak_rss_mib": round(rss_cbom),

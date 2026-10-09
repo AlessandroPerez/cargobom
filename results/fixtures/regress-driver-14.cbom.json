@@ -1,0 +1,665 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/aws-lc-rs@1.18.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t14 (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] locked aws-lc-rs 1.18.1; reached via t14 -> aws-lc-rs",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-rs"
+          },
+          {
+            "additionalContext": "[manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-rs-1.18.1/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-rs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_rs_1_18_1_sys"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-rs@1.18.1",
+      "type": "library",
+      "version": "1.18.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/aws-lc-sys@0.45.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed",
+            "line": 19,
+            "location": "aws-lc-sys-0.45.0/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "aws-lc-sys",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "aws_lc_0_45_0"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        }
+      ],
+      "purl": "pkg:cargo/aws-lc-sys@0.45.0",
+      "type": "library",
+      "version": "0.45.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via t14 -> ring -> getrandom",
+            "line": 75,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t14 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via t14 -> ring",
+            "line": 125,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/t14@0.1.0",
+      "name": "t14",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/t14@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in t14::k3; use: verify; instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k3::<&[u8; 2]>; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; instantiated by t14::main at src/main.rs:84; line: `k.verify(msg, sig).is_ok()`; code: `verify`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::k3m; use: verify; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k3m; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; line: `k.verify(msg, sig).is_ok()`; code: `verify`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [static] in t14::suite; use: digest; line: `Suite { alg: &SHA256 }`; code: `SHA256`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in t14::k2; use: digest; t14::SUITE -> ring::digest::SHA256; line: `+ digest(SUITE.alg, d).as_ref().len()`; code: `SUITE`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "t14::SUITE"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t14::k3; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t14::k3m; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:61; line: `let f = digest;`; code: `digest`",
+            "line": 59,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::f1::{closure#0}; use: digest; instantiated by t14::f1 at src/main.rs:61; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> Digest = digest::digest;`; code: `digest::digest`",
+            "line": 77,
+            "location": "src/main.rs",
+            "offset": 53,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::f3; use: digest; line: `let x = h(&SHA256, d);`; code: `SHA256`",
+            "line": 78,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in <t14::S384 as t14::Scheme>::ALG; use: digest; line: `const ALG: &'static Algorithm = &SHA384;`; code: `SHA384`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <t14::S384 as t14::Scheme>::hash; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(Self::ALG, d).as_ref().len()`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in <t14::S384 as t14::Scheme>::hash; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `digest(Self::ALG, d).as_ref().len()`; code: `Self::ALG`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "<t14::S384 as t14::Scheme>::ALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k1; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in t14::k1; use: digest; <t14::S384 as t14::Scheme>::ALG -> ring::digest::SHA384; line: `S384::hash(d) + digest(S384::ALG, d).as_ref().len()`; code: `S384::ALG`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "<t14::S384 as t14::Scheme>::ALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let h = Holder { f: digest };`; code: `digest`",
+            "line": 69,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA384`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `digest`",
+            "line": 79,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::f3; use: digest; line: `digest(&SHA384, x.as_ref()).as_ref().len()`; code: `SHA384`",
+            "line": 79,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "9"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [static] in t14::pick; use: digest; line: `&SHA512`; code: `SHA512`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 5,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(PICKED, d).as_ref().len()`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in t14::k2; use: digest; t14::PICKED -> ring::digest::SHA512; line: `digest(PICKED, d).as_ref().len()`; code: `PICKED`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "t14::PICKED"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `+ digest(const { pick() }, d).as_ref().len()`; code: `digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let t = (digest, 1u8);`; code: `digest`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::f2; use: digest; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `SHA512`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-sys@0.45.0"
+      ],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/aws-lc-rs@1.18.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/aws-lc-sys@0.45.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-rs@1.18.1",
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/t14@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/t14@0.1.0#root",
+      "name": "t14",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "18"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "40"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:f277615a-5c87-8c85-bf43-5a6376c4341a",
+  "specVersion": "1.7",
+  "version": 1
+}

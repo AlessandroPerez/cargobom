@@ -730,7 +730,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1214,7 +1218,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t1::ed; use: keygen; line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
+            "additionalContext": "[reachable] [call] in t1::ed; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 13,
@@ -1264,6 +1268,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -1512,6 +1520,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:dk_len",
+          "value": "32"
         },
         {
           "name": "rcbom:provenance:password",
@@ -1920,7 +1932,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:scrypt",
+      "bom-ref": "crypto:algorithm:scrypt-131072-8-1-32",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "scrypt",
@@ -1934,6 +1946,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in t1::scrypt_lit; recommended: setup, not a use; line: `let p = scrypt::Params::recommended();`; code: `scrypt::Params::recommended`",
+            "line": 64,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "scrypt::params::Params::recommended"
+          },
+          {
             "additionalContext": "[reachable] [call] in t1::scrypt_lit; use: keyderive; password: hard-coded (8 bytes, literal at line 65); salt: hard-coded (10 bytes, literal at line 65); line: `scrypt::scrypt(b\"password\", b\"fixed-salt\", &p, &mut out).unwrap();`; code: `scrypt::scrypt`",
             "line": 65,
             "location": "src/main.rs",
@@ -1942,7 +1961,7 @@
           }
         ]
       },
-      "name": "scrypt",
+      "name": "scrypt-131072-8-1-32",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -1965,10 +1984,6 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:param:unresolved",
-          "value": "work factor (log_n, r, p) computed at run time"
-        },
-        {
           "name": "rcbom:provenance:password",
           "value": "hard-coded"
         },
@@ -1986,7 +2001,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -2002,6 +2017,10 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM",
+        "crypto:algorithm:AES-256-GCM-128-128"
       ],
       "ref": "pkg:cargo/aes@0.8.4"
     },
@@ -2032,6 +2051,9 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:XChaCha20-Poly1305"
       ],
       "ref": "pkg:cargo/chacha20@0.9.1"
     },
@@ -2178,7 +2200,7 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
-        "crypto:algorithm:scrypt"
+        "crypto:algorithm:scrypt-131072-8-1-32"
       ],
       "ref": "pkg:cargo/scrypt@0.11.0"
     },
@@ -2270,6 +2292,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "69"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -2292,7 +2322,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:005d9084-4005-8a0e-b5ed-323bd9690807",
+  "serialNumber": "urn:uuid:7aee8825-58eb-84da-8881-ece60fb109f2",
   "specVersion": "1.7",
   "version": 1
 }

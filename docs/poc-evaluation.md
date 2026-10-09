@@ -1,6 +1,6 @@
 # cargo-cbom: proof-of-concept evaluation
 
-*8 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 7.*
+*9 October 2026. cargo-cbom 0.1.0 (driver on `nightly-2026-09-25`), knowledge base 0.2.0, facts version 7.*
 
 This is the evaluation of the first, deliberately narrow paper: Layers 1 and 2 of
 `docs/rust-cbom-proposal2.md`, intraprocedural provenance, and a small labelled test set. A
@@ -46,7 +46,7 @@ Crypto crates in other versions are reported as `unsupported-version` rather tha
 | micro, libonly, threads | written for this work | 3 | golden files (designed cases) |
 | rusi fixtures | cdxgen-plugins-bin@6a64635, MIT, unchanged | 3 | `labels.toml`, written from source before scoring |
 | realapp | Phase 0 corpus (age, jsonwebtoken, rustls/ring) | 1 | Phase 0 output as oracle |
-| regression probes | written by three independent audits of the pipeline, and after the corpus runs (section 8) | 21 | golden files (each case commented) |
+| regression probes | written by independent audits of the pipeline, and after the corpus runs (section 8) | 30 | golden files (each case commented) |
 | corpus | crates.io releases: rage, jwt-cli, rcgen, minisign, xh | 5 | none (feasibility) |
 
 The cases micro and libonly cover:
@@ -77,15 +77,15 @@ With `--self-test` it shifts every position by ±1 line and ±1 column and count
 | micro | 54 | 54 | 188/188 |
 | libonly | 20 | 20 | 72/72 |
 | threads | 15 | 15 | 54/54 |
-| rusi fixtures (3) | 613 | 613 | 2,385/2,385 |
-| realapp | 395 | 395 | 1,553/1,553 |
-| regression probes (21) | 2,038 | 2,038 | 7,924/7,924 |
-| corpus (5 projects) | 812 | 812 | 3,187/3,187 |
-| **total** | **3,947** | **3,947** | **15,363/15,363** |
+| rusi fixtures (3) | 635 | 635 | 2,473/2,473 |
+| realapp | 396 | 396 | 1,557/1,557 |
+| regression probes (30) | 3,104 | 3,104 | 12,036/12,036 |
+| corpus (5 projects) | 831 | 831 | 3,270/3,270 |
+| **total** | **5,055** | **5,055** | **19,650/19,650** |
 
 Positions come from rustc's spans, which are offsets into the original files, so comments and formatting cannot shift them. Code from a function-like macro is attributed to the outermost call site in the user's source, with the definition site kept in the context.
 
-The self-test measures the verifier, not the positions: a shifted position the verifier accepts means the CBOM's evidence did not pin the position down. Every shift is now rejected. Earlier rounds accepted some: 17 of 6,881 shifts in the first evaluation, where the same identifier sat at the same column on adjacent lines (adjacent `new_from_slice` calls in the crates-app fixture, rcgen's `sign_algo.rs`, the hpke crate's `kdf.rs`). The audits removed those by recording the exact text at each position (section 8). One more appeared in the re-run after them, in rcgen: `KeyPairKind::Ec(kp) => kp.public_key()` above `KeyPairKind::Ed(kp) => kp.public_key()`, the same text at the same column. Only the line tells them apart, so each occurrence now records its line too (section 7, item 8).
+The self-test measures the verifier, not the positions: a shifted position the verifier accepts means the CBOM's evidence did not pin the position down. Every shift is now rejected. Earlier rounds accepted some: 17 of 6,964 shifts in the first evaluation, where the same identifier sat at the same column on adjacent lines (adjacent `new_from_slice` calls in the crates-app fixture, rcgen's `sign_algo.rs`, the hpke crate's `kdf.rs`). The audits removed those by recording the exact text at each position (section 8). One more appeared in the re-run after them, in rcgen: `KeyPairKind::Ec(kp) => kp.public_key()` above `KeyPairKind::Ed(kp) => kp.public_key()`, the same text at the same column. Only the line tells them apart, so each occurrence now records its line too (section 7, item 8).
 
 ## 4. RQ2: detection on labelled programs
 
@@ -136,7 +136,7 @@ The labels include the hard case of these fixtures: secrets read with `env::var(
 
 On realapp this finds two real patterns:
 - **A hard-coded HMAC key:** the program's own `EncodingKey::from_secret(b"secret")`.
-- **A hard-coded nonce in age-core:** `c.encrypt(&[0; 12].into(), …)`. It is correct by design, because age uses each file key once. That is the case Layer 3 (purpose) exists for.
+- **A hard-coded nonce in age-core:** `c.encrypt(&[0; 12].into(), …)`. It is correct by design, because age uses each file key once. That is the case Layer 3 (purpose) exists for. realapp never reaches age's encryption from `main`, so this one is reported as `rcbom:finding:present`, apart from the reachable findings (`rcbom:finding`).
 
 ## 6. RQ4: ablation
 
@@ -147,38 +147,38 @@ On realapp this finds two real patterns:
 | micro | 26 / 20 | 6 | 25 | 24 / 18 |
 | libonly | 12 / 4 | 8 | 11 | 10 / 4 |
 | threads | 9 / 9 | 0 | 9 | 7 / 7 |
-| rusi crates-app | 538 / 538 | 0 | 264 | 11 / 11 |
+| rusi crates-app | 560 / 560 | 0 | 278 | 11 / 11 |
 | rusi asymmetric-app | 6 / 6 | 0 | 6 | 4 / 4 |
 | rusi modern-app | 2 / 2 | 0 | 2 | 2 / 2 |
-| realapp | 368 / 368 | 0 | 275 | 2 / 2 |
+| realapp | 369 / 369 | 0 | 275 | 2 / 2 |
 | rcgen (library) | 92 / 92 | 0 | 84 | 91 / 91 |
-| rage | 117 / 84 | 36 | 117 | 0 / 0 |
+| rage | 119 / 86 | 37 | 116 | 0 / 0 |
 
 The walk does two things.
 
 - **Generic code.** Crypto written inside generic code is attributed only through monomorphization:
   - the designed cases: `fn seal<A: Aead>` (micro) and `pub fn tag<M: Mac>` (libonly)
-  - in rage, 36 occurrences, 31% of its total, all in dependencies. age decrypts passphrase-protected OpenSSH keys with generic helpers, `aes_gcm::<C: AeadMut + KeyInit>`, `aes_ctr::<C>` and `aes_cbc::<C>`: they are AES-256-GCM, AES-128/192/256-CTR and AES-256-CBC only once instantiated. The hpke crate, generic over its KDF and AEAD, resolves to HKDF-SHA-256, HMAC-SHA-256, SHA-256 and ChaCha20-Poly1305 (one of them inside the `nistp_dhkex!` macro); bcrypt-pbkdf to SHA-512.
+  - in rage, 37 occurrences, 31% of its total, all in dependencies. age decrypts passphrase-protected OpenSSH keys with generic helpers, `aes_gcm::<C: AeadMut + KeyInit>`, `aes_ctr::<C>` and `aes_cbc::<C>`: they are AES-256-GCM, AES-128/192/256-CTR and AES-256-CBC only once instantiated; two x25519 key conversions sit in closures of its key parsers, which only age-core's generic `bech32_decode` instantiates. The hpke crate, generic over its KDF and AEAD, resolves to HKDF-SHA-256, HMAC-SHA-256, SHA-256 and ChaCha20-Poly1305; bcrypt-pbkdf, generic over its password type, to PBKDF2 and SHA-512.
 
   A syntax-level tool cannot name any of these.
-- **Tiers.** It separates capability from use. In realapp, scrypt and both age `diffie_hellman` calls are present but not reachable from `main`. In xh, ML-KEM-1024 and HMAC-SHA-512 are present only, while the default provider's algorithms are reachable through reqwest's client builder.
+- **Tiers.** It separates capability from use. In realapp, scrypt and both age `diffie_hellman` calls are present but not reachable from `main`. In xh, ML-KEM-1024, ECDH-P-521 and HMAC-SHA-512 are present only, while the default provider's algorithms are reachable through reqwest's client builder.
 
 Programs that call crypto APIs directly from non-generic code (the rusi fixtures, realapp's own `main`, rcgen) lose nothing without the walk except the tier split.
 
 ## 7. RQ5: feasibility on real projects
 
-Five crates.io applications and libraries (`scripts/corpus.py`). Each was built from a cold cache with the pinned nightly, against a plain `cargo check` with the same toolchain, on a 6-core machine.
+Five crates.io applications and libraries (`scripts/corpus.py`). Each was built from a cold cache with the pinned nightly, against a plain `cargo check --release` with the same toolchain, on a 6-core machine. Both analyse the release profile, in which build scripts compile C code (ring, aws-lc) optimised: the plain checks take longer than a development-profile check would.
 
 | project | packages | plain check | cargo cbom | overhead | peak RSS | instances walked | algorithms (reachable) | other assets | occurrences (reachable) | findings |
 |---|---|---|---|---|---|---|---|---|---|---|
-| rage 0.12.1 | 223 | 17.4 s | 33.8 s | ×1.94 | 517 MiB | 48,161 | 13 (13) | – | 117 (117) | hard-coded nonce |
-| jwt-cli 6.2.0 | 76 | 9.0 s | 17.2 s | ×1.90 | 430 MiB | 17,272 | 15 (15) | HMAC key | 45 (45) | hard-coded key |
-| rcgen 0.14.10 (library) | 57 | 4.5 s | 8.3 s | ×1.82 | 316 MiB | 2,074 | 9 (9) | – | 92 (84) | – |
-| minisign 0.10.0 | 22 | 2.1 s | 8.2 s | ×3.81 | 311 MiB | 1,360 | 1 (1) | – | 1 (1) | – |
-| xh 0.26.2 | 251 | 36.4 s | 72.7 s | ×2.00 | 968 MiB | 57,460 | 37 (34) | TLS (aws-lc-rs) | 489 (256) | – |
+| rage 0.12.1 | 192 | 18.4 s | 33.8 s | ×1.84 | 436 MiB | 46,363 | 14 (14) | – | 119 (116) | hard-coded nonce |
+| jwt-cli 6.2.0 | 73 | 14.9 s | 22.6 s | ×1.51 | 350 MiB | 16,837 | 15 (15) | HMAC key | 47 (47) | hard-coded key |
+| rcgen 0.14.10 (library) | 21 | 10.8 s | 14.5 s | ×1.34 | 266 MiB | 2,074 | 9 (9) | – | 92 (84) | – |
+| minisign 0.10.0 | 22 | 2.3 s | 8.5 s | ×3.65 | 246 MiB | 1,351 | 1 (1) | – | 2 (2) | – |
+| xh 0.26.2 | 215 | 59.5 s | 91.4 s | ×1.53 | 879 MiB | 57,024 | 39 (36) | TLS (aws-lc-rs) | 511 (270) | – |
 
-- **Cost.** On the four projects larger than minisign the overhead is ×1.8 to ×2.0. minisign's ×3.8 is fixed per-crate cost on a two-second build. Memory peaks at 968 MiB, for xh. Packages are those a host build resolves (`cargo metadata --filter-platform`), as Layer 1 counts them.
-- **Evidence.** All 812 positions verify, and the self-test rejects all 3,187 shifted ones. The driver caught no panic in any of the five builds.
+- **Cost.** On the four projects larger than minisign the overhead is ×1.3 to ×1.8. minisign's ×3.7 is fixed per-crate cost on a two-second build. Memory peaks at 879 MiB, for xh. Packages are those of the analysed build as Layer 1 counts them (`rcbom:run:packages`): the host platform's, without development-only packages and optional dependencies that only a weak feature names.
+- **Evidence.** All 831 positions verify, and the self-test rejects all 3,270 shifted ones. The driver caught no panic in any of the five builds.
 - **rusi.** rusi (stable backend) reports 2 crypto components across the five projects: `JWT` in jwt-cli, and `SHA-256` in xh's `src/message_signature.rs`, a module compiled only with the non-default feature `http-message-signatures` (which cargo-cbom, analysing default features, does not see). These programs reach their crypto through dependencies (age, jsonwebtoken, reqwest/rustls), which a source-level scan of the workspace does not enter.
 - **Findings.** Both are real and intentional, and both show why purpose (Layer 3) matters:
   - age-core's `[0; 12]` nonce: age uses each file key once.
@@ -204,7 +204,7 @@ The re-run after the audits (section 8) found seven more. All are fixed, and eac
 12. **Names and uses in code first analysed.** With rage's items analysed, four rules proved wrong or too narrow. age encrypts with `RsaPublicKey::encrypt(.., Oaep::new_with_label::<Sha256, _>(label), ..)`: the call was a bare RSA-OAEP, because `Oaep` keeps its digest at run time, and only the constructor on the next line was RSA-OAEP-SHA-256. A call now takes the name of a same-family constructor found in its arguments, located by position. `decrypt_blinded` was "setup, not a use", and a stream cipher's `apply_keystream`, in age's SSH-key *decryption*, was `encrypt`. It is now `encrypt or decrypt`. Last, a call matching a `[[fn]]` entry also matched its own type, of the same family, as a component of itself: age's x25519 `diffie_hellman` calls read "part of x25519" in the golden files. That type match is now skipped.
 13. **Machine paths.** Standard-library positions in `instantiated by` details named the local rust-src directory (`/home/<user>/.rustup/...`). They are now named as rustc names them, `/rustc/<commit>/library/...`, so a CBOM no longer depends on the machine that made it.
 
-## 8. Three independent audits
+## 8. Independent audits
 
 The pipeline is deterministic, so every wrong position, classification or accepted shifted
 position is a bug in the code, not noise. To look for them systematically, three independent
@@ -224,9 +224,38 @@ What they found, by kind, and what changed:
 - **Verification.** All 17 shifted positions the verifier accepted were its own laxness, not wrong positions: names inside strings and comments, generic arguments crossing expressions, two calls of one name on adjacent lines. The verifier now lexes the source, checks the exact source text the CBOM records at each position, and checks component placement and the receiver's crate. It rejects every shifted position.
 - **Scoring and harness.** The scorer accepted names no registry pattern produces and counted extended assets' provenance; e2e did not fail on golden-file differences or on accepted shifts. Fixed; the golden files now hold the whole CBOM.
 
+**A second round.** After the fixes above and the corpus re-run (section 7), four new
+independent reviewers, again without knowledge of the code's history, audited the driver; Layer 1,
+the knowledge base, matching and provenance; verification, scoring and the evaluation's numbers;
+and, a new scope, every asset and occurrence of the real-world CBOMs (the corpus, realapp and the
+labelled programs) against the projects' and dependencies' sources. They reported 66 findings,
+some found twice; all were reproduced, and all are fixed except where noted:
+- **Layer 1.** Optional dependencies that a weak feature only names (`alloc = ["ring?/alloc"]` in rustls-webpki) were in the build graph: ring and its native library appeared in every rustls program on aws-lc-rs, and in xh five packages that are never compiled. A dependency table of another platform (`[target.'cfg(windows)'.dependencies]`) was cited for the host. A workspace member named like a knowledge-base crate (`signature`) lost all its crypto: its code was taken for RustCrypto's and skipped. The build was analysed in the `dev` profile, so code compiled only with debug assertions counted (rage hashes embedded files at run time only in debug builds); the release profile is now analysed, and recorded.
+- **Argument origins.** A write to one element (`key[31] = 1`, clamping a random key) was taken as overwriting the whole array, which gave a false hard-coded key; values built from parts (`[user, b"pepper"].concat()`, `b"..".iter().chain(secret)`, `1_000u64.wrapping_add(seq)`) read as hard-coded when one part was a constant; a fill through one of two references erased both keys' constants; a field written after the whole struct did not hide the struct's value. Origins now distinguish "one of these" from "made of all of these", element writes are partial, and an out-parameter replaces an initialization only through a single target.
+- **Constants.** Integer arguments given by a named or associated const were lost (`PBKDF2-SHA-256` instead of `PBKDF2-SHA-256-600000-32`, `RSA` instead of `RSA-3072`), and so was Argon2's variant given as an enum value; associated consts named the trait's declaration; consts computed by a `const fn` linked to nothing; in a generic instance or a closure, the walk saw aws-lc-rs's const descriptors already evaluated away. The driver now records evaluated values, resolves associated consts, evaluates consts for data edges, and names a generic instance's constants from the item's MIR.
+- **Calls.** A crypto function called from a capture, a struct field or a tuple had no position and was dropped. Closure names carried the build directory of code generated into `OUT_DIR`. A standard-library call without a position appeared as `at src/main.rs:0`. Cyclic statics could hide each other's descriptors, and a dependency's const naming a ring static was ignored.
+- **Knowledge base.** cbc and ctr over Blowfish were reported as AES; RSA PKCS#1 v1.5 and PSS signing, `pbkdf2::pbkdf2`, scrypt's and pbkdf2's password-hash APIs, md5's streaming API, ML-KEM encapsulation, aws-lc-rs's SHA-3, secp256k1, DES and TLS 1.2 PRF, x25519's free function, jsonwebtoken's base64 secrets and several uses were missing; aws-lc-rs key constructors had no key roles, so their literal keys were never flagged; verification-only descriptors were tagged `sign`.
+- **Matching and provenance.** An AEAD seal took the HKDF descriptor that derived its key; a plain BLAKE3 hasher fed a derived key became the KDF; a keyed hasher passed through the program's own helper made the helper's result keyed; OAEP calls were bare RSA-OAEP although the padding built in their argument names the hash; a key derived by the program's own HKDF helper read as hard-coded; a generator seeded with a constant raised no finding unless it made a symmetric key; usage spread through interface crates (getrandom reachable in programs that draw no randomness); findings ignored whether their evidence was reachable.
+- **Verification and harness.** The verifier rejected correct positions with two versions of one crate, an alias bound to two crates, an alias defined in another file, raw identifiers, a path after `n:` or broken by a comment, tag-like text in a comment and CRLF lockfiles; it accepted manifest positions in comments, inside quoted keys and in the wrong table, and `/rustc/` locations of another toolchain. The golden-file summary keyed lines by name, so a swap between two same-named components was invisible. e2e could test a driver other than the one it built.
+- **Documents.** Nine statements of `docs/poc_workflow.md` did not match the code; the corpus package counts included development-only packages; an RQ4 example named a macro the results do not show.
+
+**Reviewing the regenerated outputs.** Every golden file the fixes changed was compared with its
+previous version, line by line after normalising the intended changes, and each remaining
+difference traced to the source, and the corpus CBOMs were reviewed the same way. Five more
+defects surfaced, all fixed with a probe:
+- a `scrypt(pw, salt, &params, out)` call and the `Params::recommended()` that built `params` were two assets, the call a bare `scrypt` and the constructor `scrypt-131072-8-1-32`; with `Params::new(15, 8, 1, 32)` and a 64-byte `out`, the constructor's name claimed a 32-byte derivation that nothing performs. A call matched by a `[[fn]]` entry now takes the parameters of a same-family constructor found in its arguments (also through `.unwrap()`, `.ok()` and `?`), with its own output length over the constructor's, and the constructor's setup occurrence takes the name of the calls its value reaches: one asset, `scrypt-32768-8-1-64`. The `Params` length, which only the password-hash API uses, is no longer read as the derived key's: minisign, which builds its `Params` in a helper and derives 104 bytes, showed both lengths on one asset;
+- a ChaCha20-Poly1305 type read its provider from the outer generic argument instead of the one its parameter names, and credited the trait crate `cipher` instead of `chacha20`;
+- the TLS 1.2 PRF of aws-lc-rs, whose registry family TLS-PRF is missing from the 1.7 schema's `algorithmFamily` enum, was given the family HMAC; it now omits the optional field and gives TLS-PRF as a property;
+- the second round made a descriptor that permits one operation stand for it wherever reachable code names it (webpki's verification algorithms verify). rcgen keeps ring's verification `ED25519` as a tag of its Ed25519 signing scheme and never verifies, and its Ed25519 asset gained `verify`. Such a descriptor now stands for its operation only where the program calls into the descriptor's package to perform it;
+- one fix of the second round, a call linked to the descriptor in its own arguments rather than to its receiver's, lost `prk.expand(&[info], &AES_256_GCM)` as an HKDF use (`keyderive` does not apply to the AES-256-GCM it is given). The receiver's descriptors are now the fallback when the call's own give no use.
+
+The one finding left as a known limit is in the verifier's self-test: it does not evaluate
+`#[cfg]`, so a shift onto an identical statement the configuration removes is accepted. The
+generator never cites such code.
+
 The probes are kept as regression fixtures (`fixtures/regress`, run by `scripts/e2e.sh
---regress`), each compared with its reviewed CBOM: 19 from the audits, and 2 from the corpus
-re-run (section 7).
+--regress`), each compared with its reviewed CBOM: 19 from the first audits, 2 from the corpus
+re-run (section 7), and 9 from the second round and the review of its outputs.
 
 ## 9. Limitations and threats
 
@@ -236,7 +265,7 @@ re-run (section 7).
 - **Reachability is not value-sensitive.** jsonwebtoken's `encode` matches on a run-time algorithm, so all its signing algorithms are reachable.
 - **Reachability is not proven sound.** It over-approximates within what it walks, like rustc's mono-item collector: vtables of every unsized type, function pointers, drop glue, code that crypto crates call back. It can still miss edges through non-generic std code, or through function pointers it cannot see created. A crypto use the walk misses is reported `present`, not dropped. The xh case (section 7) shows how a single missing edge kind changes the tier picture, and why the threads fixture now guards it.
 - **Provenance is intraprocedural.** Values crossing a function boundary are reported as `parameter` or `computed`; only what a closure or `async` body captured is traced into its parent.
-- **Run-time parameters.** A name says what the code determines: `Argon2::new` with costs in a `Params` value is `Argon2i`, an aws-lc-rs block-cipher key whose mode a separate constructor picks is `AES-128`. A bare family name has no registry pattern and is flagged.
+- **Run-time parameters.** A name says what the code determines: `Argon2::new` with costs in a `Params` value is `Argon2i`, an aws-lc-rs block-cipher key whose mode a separate constructor picks is `AES-128`, and a key-encryption key is AES for key wrapping until a `wrap` or `wrap_with_padding` call names KW or KWP. A bare family name has no registry pattern and is flagged.
 - **Standard library.** Non-generic std code has no MIR without a std sysroot, so the walk does not enter it. Generic std code (threads, iterators, closures, `dyn` calls) is walked.
 - **Knowledge-base tool.** Self-implemented cryptography is invisible (minisign's own Ed25519 and BLAKE2b), and so are crates outside the seed. Trait-based inference (any `Digest` or `Aead` implementation) is future work.
 - **Corpus.** Five projects, chosen by us for their crypto dependencies; the feasibility numbers say nothing about recall on them, which is unlabelled.

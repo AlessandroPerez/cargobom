@@ -282,7 +282,11 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "trait"
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -465,7 +469,7 @@
           "value": "environment,hard-coded"
         },
         {
-          "name": "rcbom:finding",
+          "name": "rcbom:finding:present",
           "value": "hard-coded-key"
         },
         {
@@ -546,6 +550,9 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha20-Poly1305"
       ],
       "ref": "pkg:cargo/chacha20@0.9.1"
     },
@@ -638,6 +645,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "28"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -660,7 +675,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4e2e5a71-5040-8763-94ff-fc57df6482af",
+  "serialNumber": "urn:uuid:956a9f36-cf82-80fb-b897-8bab9b30da2b",
   "specVersion": "1.7",
   "version": 1
 }

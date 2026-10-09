@@ -74,7 +74,7 @@ scripts/ablation.py <out> <project>...                              # with and w
 | `crates/rcbom-manifest` | Layer 1 |
 | `crates/rcbom-analysis` | matching, provenance, CycloneDX assembly |
 | `crates/cargo-cbom` | CLI, schema validation, `verify` |
-| `fixtures/` | micro, libonly, threads (designed cases, golden files); rusi fixtures (labelled); `regress/` (21 probes from the audits and the corpus runs, golden files) |
+| `fixtures/` | micro, libonly, threads (designed cases, golden files); rusi fixtures (labelled); `regress/` (30 probes from the audits and the corpus runs, golden files) |
 | `phase0/` | the Phase 0 spike and its corpus |
 | `schema/` | CycloneDX 1.7 schemas and the Cryptography Registry (Apache-2.0) |
 | `scripts/` | checks, scoring, corpus runner, rusi converter, review sheet |

@@ -16,7 +16,9 @@ use rcbom_kb::{Algo, Kb, Role};
 use rcbom_manifest::Manifest;
 
 pub use cbom::{RunInfo, to_cyclonedx};
-use matcher::{Match, match_constructor, match_fn, match_protocol, match_static, match_types};
+use matcher::{
+    Match, match_constructor, match_fn, match_fn_with, match_protocol, match_static, match_types,
+};
 
 /// What an occurrence is evidence of.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -69,6 +71,8 @@ pub struct Occurrence {
     /// Key material arguments of the call and where they come from: (role, kind), e.g.
     /// ("nonce", "hard-coded").
     pub provenance: Vec<(String, String)>,
+    /// The knowledge-base note of the entry this occurrence matched (`QUIC header protection`).
+    pub note: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -84,6 +88,8 @@ pub struct Asset {
     pub components: BTreeSet<String>,
     /// Packages (name, version) implementing it.
     pub providers: BTreeSet<(String, String)>,
+    /// The notes of the knowledge-base entries that matched it (`None`: an entry without).
+    pub entry_notes: BTreeSet<Option<String>>,
 }
 
 impl Asset {
@@ -204,8 +210,26 @@ struct Ctx<'a> {
     kb: &'a Kb,
     /// (crate name, stable id) -> (package, version)
     crates: HashMap<(String, String), (String, String)>,
+    /// The program's own packages (members, path dependencies), by (name, version): never
+    /// the crates the knowledge base describes.
+    local: BTreeSet<(String, String)>,
     /// Call sites by (owner, file, line, column): the site of a call an argument comes from.
-    calls: HashMap<(&'a str, &'a str, usize, usize), &'a Site>,
+    calls: HashMap<CallKey<'a>, &'a Site>,
+    /// What the calls a constructor's value is passed to matched, by the constructor's call
+    /// site: `Params::new(15, 8, 1, 32)` set up for `scrypt(.., &p, out)` with a 64-byte `out`
+    /// is scrypt-32768-8-1-64, as the call is.
+    consumers: HashMap<CallKey<'a>, Vec<Match>>,
+}
+
+type CallKey<'a> = (&'a str, &'a str, usize, usize);
+
+fn call_key(s: &Site) -> CallKey<'_> {
+    (
+        s.owner.id.as_str(),
+        s.span.file.as_str(),
+        s.span.line,
+        s.span.col,
+    )
 }
 
 impl Ctx<'_> {
@@ -218,13 +242,14 @@ impl Ctx<'_> {
     /// The knowledge base covers this exact crate: known package, version in range.
     fn supported(&self, k: &rcbom_facts::CrateRef) -> bool {
         self.package_of_crate(&k.name, &k.stable_id)
+            .filter(|p| !self.local.contains(p))
             .and_then(|(n, v)| Some((n, semver::Version::parse(&v).ok()?)))
             .is_some_and(|(n, v)| self.kb.crate_by_package(&n, &v).is_some())
     }
 }
 
 pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
-    let ctx = Ctx {
+    let mut ctx = Ctx {
         kb,
         crates: facts
             .iter()
@@ -235,23 +260,29 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 )
             })
             .collect(),
+        local: man
+            .packages
+            .iter()
+            .filter(|p| p.local)
+            .map(|p| (p.name.clone(), p.version.to_string()))
+            .collect(),
         calls: facts
             .iter()
             .flat_map(|f| &f.sites)
             .filter(|s| matches!(s.target, Target::Call { .. }))
-            .map(|s| {
-                (
-                    (
-                        s.owner.id.as_str(),
-                        s.span.file.as_str(),
-                        s.span.line,
-                        s.span.col,
-                    ),
-                    s,
-                )
-            })
+            .map(|s| (call_key(s), s))
             .collect(),
+        consumers: HashMap::new(),
     };
+    let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
+    keys.sort();
+    let mut consumers: HashMap<CallKey<'_>, Vec<Match>> = HashMap::new();
+    for k in keys {
+        if let Some((m, Some(c))) = fn_site_match(&ctx, ctx.calls[&k]) {
+            consumers.entry(call_key(c)).or_default().push(m);
+        }
+    }
+    ctx.consumers = consumers;
     let mut notes = Vec::new();
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
 
@@ -348,6 +379,45 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             "reachability walk hit its instance limit; the reachable tier is incomplete".into(),
         );
     }
+
+    // The methods called on knowledge-base packages, and whether from reachable code: a
+    // descriptor that permits one operation stands for it only where a call performs it (rcgen
+    // keeps ring's verification `ED25519` as a tag of its signing algorithm, and never verifies)
+    let mut called: HashMap<((String, String), &str), Tier> = HashMap::new();
+    for f in facts {
+        let cwd = PathBuf::from(&f.krate.cwd);
+        for s in &f.sites {
+            // calls inside an algorithm or trait crate are its implementation (section 24.3)
+            let file = PathBuf::from(&s.span.file);
+            let implementation = man
+                .owner_of(&if file.is_absolute() {
+                    file
+                } else {
+                    cwd.join(file)
+                })
+                .is_some_and(|o| matches!(o.role, Some(Role::Algorithm | Role::Trait)));
+            if let Target::Call { callee, method, .. } = &s.target
+                && !implementation
+                && kb.crate_by_name(&callee.krate.name).is_some()
+                && let Some(p) = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
+            {
+                let t = if reached_fns.contains(s.owner.id.as_str()) {
+                    Tier::Reachable
+                } else {
+                    s.tier
+                };
+                let e = called.entry((p, method.as_str())).or_insert(t);
+                *e = (*e).max(t);
+            }
+        }
+    }
+    let performed = |m: &Match, f: &str, tier: Tier| {
+        called.iter().any(|((p, method), t)| {
+            *t >= tier
+                && m.providers.contains(p)
+                && kb.use_of(method, &m.algo.primitive).as_deref() == Some(f)
+        })
+    };
 
     // --- sites -> occurrences ---------------------------------------------------------------
     let mut assets: BTreeMap<String, Asset> = BTreeMap::new();
@@ -484,6 +554,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     detail: vec![],
                     package: pkg.clone(),
                     provenance: Vec::new(),
+                    note: None,
                 });
             }
             // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age)
@@ -499,6 +570,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let matches = site_matches(&ctx, site, &closure);
             let prov = provenance::of_call(kb, &site.target);
             for (m, kind, function, symbol, detail) in matches {
+                let function = match (kind, function) {
+                    (Kind::Static | Kind::ViaStatic, Some(f)) if !performed(&m, &f, tier) => None,
+                    (_, f) => f,
+                };
                 for prov in &m.providers {
                     let u = usage.entry(prov.clone()).or_insert(Usage::Present);
                     if tier == Tier::Reachable {
@@ -540,6 +615,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     ));
                 }
                 for v in &site.via {
+                    // a call without a position (in the standard library's optimized MIR)
+                    if v.span.line == 0 {
+                        detail.push(format!("instantiated by {}", short(&v.caller)));
+                        continue;
+                    }
                     let vp = PathBuf::from(&v.span.file);
                     let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
                     detail.push(format!(
@@ -573,6 +653,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                             cs.iter().map(move |c| (role.clone(), c.kind.clone()))
                         })
                         .collect(),
+                    note: m.algo.note.clone(),
                 };
                 let a = assets.entry(m.key()).or_insert_with(|| Asset {
                     key: m.key(),
@@ -582,7 +663,29 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     occurrences: Vec::new(),
                     components: BTreeSet::new(),
                     providers: BTreeSet::new(),
+                    entry_notes: BTreeSet::new(),
                 });
+                // Several entries can name one asset: a verification and a signing descriptor of
+                // one algorithm (`ECDSA_P256_SHA256_ASN1`, `.._SIGNING`), aws-lc-rs's
+                // `cipher::AES_256` and its QUIC header-protection `AES_256`. What the asset can do
+                // is what they say together; as for observed uses, those reached from an entry
+                // point count alone if there are any. Their notes are kept per occurrence when
+                // they differ (below).
+                a.entry_notes.insert(m.algo.note.clone());
+                let reached = a.occurrences.iter().any(|o| o.tier == Tier::Reachable);
+                if tier == Tier::Reachable && !reached {
+                    a.algo.functions = m.algo.functions.clone();
+                } else if tier == Tier::Reachable || !reached {
+                    let known = a.algo.functions.len();
+                    for f in &m.algo.functions {
+                        if !a.algo.functions.contains(f) {
+                            a.algo.functions.push(f.clone());
+                        }
+                    }
+                    if a.algo.functions.len() > known {
+                        a.algo.functions.sort();
+                    }
+                }
                 // parameters that differ between occurrences are all listed
                 for (k, v) in &m.params {
                     a.params.entry(k.clone()).or_default().insert(v.clone());
@@ -629,6 +732,20 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
     }
     merge_less_specific(&mut assets);
+    // entries with different notes behind one asset: each note goes with its occurrences
+    for a in assets.values_mut() {
+        if a.entry_notes.len() > 1 {
+            a.algo.note = None;
+            for o in &mut a.occurrences {
+                if let Some(n) = &o.note {
+                    let d = format!("note: {n}");
+                    if !o.detail.contains(&d) {
+                        o.detail.push(d);
+                    }
+                }
+            }
+        }
+    }
     protocols.retain(|_, p| !p.occurrences.is_empty());
     for p in protocols.values_mut() {
         let backends: Vec<String> = if !p.named_backends.is_empty() {
@@ -687,13 +804,21 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
         }
     }
+    // An interface crate passes its usage on only when the program calls into it: aes-gcm
+    // using `aead` does not run `aead`'s `getrandom` (through crypto-common and rand_core),
+    // while `OsRng` called directly does.
+    let direct: BTreeSet<(String, String)> = usage.keys().cloned().collect();
     loop {
         let mut changed = false;
         for p in &man.packages {
             if p.role == Some(Role::Protocol) {
                 continue;
             }
-            let Some(&u) = usage.get(&(p.name.clone(), p.version.to_string())) else {
+            let key = (p.name.clone(), p.version.to_string());
+            if p.role == Some(Role::Trait) && !direct.contains(&key) {
+                continue;
+            }
+            let Some(&u) = usage.get(&key) else {
                 continue;
             };
             for d in &p.runtime_deps {
@@ -734,51 +859,184 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
 
 type SiteMatch = (Match, Kind, Option<String>, String, Vec<String>);
 
-/// Every asset a site is evidence of, with the kind of evidence, the use and the symbol named.
+/// The use a descriptor named in code stands for, when it permits only one
+/// (`ECDSA_P256_SHA384_ASN1` verifies; `AES_256_GCM` encrypts and decrypts, which one the
+/// calls say), and a call into its package performs that operation (see `performed`).
+fn sole_function(m: &Match) -> Option<String> {
+    match m.algo.functions.as_slice() {
+        [f] => Some(f.clone()),
+        _ => None,
+    }
+}
+
 /// What the call an argument of `site` comes from matched, when it is a [[fn]] entry of
 /// `family`: the one such call among the arguments, found by its position in the same function.
-fn argument_constructor(ctx: &Ctx<'_>, site: &Site, family: &str) -> Option<Match> {
-    let Target::Call { arg_origins, .. } = &site.target else {
+/// It must build a type the call names in its generic arguments, or one of `own` crate (the
+/// `Params` of `scrypt::scrypt`, whose parameter types the facts do not list). `overrides` are
+/// parameters the site itself fixes.
+fn argument_constructor<'a>(
+    ctx: &Ctx<'a>,
+    site: &Site,
+    family: &str,
+    own: Option<&str>,
+    overrides: &BTreeMap<String, String>,
+) -> Option<(Match, &'a Site)> {
+    let Target::Call {
+        arg_origins,
+        self_ty: site_self,
+        args: site_args,
+        ..
+    } = &site.target
+    else {
         return None;
     };
-    let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
-    let mut found: Vec<Match> = Vec::new();
+    // the ADTs the call names in its types (`RsaPublicKey::encrypt::<R, Oaep>`): a
+    // constructor counts only if it builds one of them
+    let mut adts: Vec<&str> = Vec::new();
+    fn collect<'t>(t: &'t rcbom_facts::TyTree, out: &mut Vec<&'t str>) {
+        match t {
+            rcbom_facts::TyTree::Adt { path, args, .. } => {
+                out.push(path);
+                args.iter().for_each(|a| collect(a, out));
+            }
+            rcbom_facts::TyTree::Ref(x)
+            | rcbom_facts::TyTree::Slice(x)
+            | rcbom_facts::TyTree::Array(x, _) => collect(x, out),
+            rcbom_facts::TyTree::Tuple(xs) => xs.iter().for_each(|x| collect(x, out)),
+            _ => {}
+        }
+    }
+    site_self
+        .iter()
+        .chain(site_args.iter())
+        .for_each(|t| collect(t, &mut adts));
+    let mut found: Vec<(Match, &Site)> = Vec::new();
     for o in arg_origins {
-        let rcbom_facts::Origin::Call { span: Some(at), .. } = o else {
-            continue;
-        };
-        let Some(Target::Call {
-            callee,
-            self_ty,
-            args,
-            const_args,
-            arg_lens,
-            ..
-        }) = ctx
-            .calls
-            .get(&(site.owner.id.as_str(), at.file.as_str(), at.line, at.col))
-            .map(|s| &s.target)
-        else {
-            continue;
-        };
-        if let Some(m) = match_fn(
-            ctx.kb,
-            callee,
-            self_ty.as_ref(),
-            args,
-            const_args,
-            arg_lens,
-            &supported,
-        ) && m.algo.family == family
-            && !found.iter().any(|f| f.key() == m.key())
-        {
-            found.push(m);
+        // the constructor itself, or through plumbing (`Params::new(..).ok()?`, `.unwrap()`)
+        let mut o = o;
+        for _ in 0..8 {
+            let rcbom_facts::Origin::Call {
+                krate,
+                args: inner,
+                span,
+                ..
+            } = o
+            else {
+                break;
+            };
+            let at = span.as_ref().and_then(|at| {
+                ctx.calls
+                    .get(&(site.owner.id.as_str(), at.file.as_str(), at.line, at.col))
+            });
+            if let Some(&c) = at
+                && let Some(m) = constructed(ctx, c, &adts, own, overrides)
+            {
+                if m.algo.family == family && !found.iter().any(|(f, _)| f.key() == m.key()) {
+                    found.push((m, c));
+                }
+                break;
+            }
+            match inner.first() {
+                Some(a) if matches!(krate.as_str(), "core" | "std" | "alloc") => o = a,
+                _ => break,
+            }
         }
     }
     // two constructors of the family with different names: the call does not say which
     match found.len() {
         1 => found.pop(),
         _ => None,
+    }
+}
+
+/// What the call at `site` matched as a constructor of one of `adts` or of a type of `own`
+/// crate: a [[fn]] entry whose call builds such a value (`Oaep::new_with_label` builds an
+/// `Oaep`; `blake3::derive_key` builds no `Hasher`).
+fn constructed(
+    ctx: &Ctx<'_>,
+    site: &Site,
+    adts: &[&str],
+    own: Option<&str>,
+    overrides: &BTreeMap<String, String>,
+) -> Option<Match> {
+    let Target::Call {
+        callee,
+        self_ty,
+        args,
+        const_args,
+        arg_lens,
+        ..
+    } = &site.target
+    else {
+        return None;
+    };
+    let Some(rcbom_facts::TyTree::Adt { path: built, .. }) = self_ty else {
+        return None;
+    };
+    if !adts.contains(&built.as_str()) && !own.is_some_and(|k| built.starts_with(&format!("{k}::")))
+    {
+        return None;
+    }
+    let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
+    match_fn_with(
+        ctx.kb,
+        callee,
+        self_ty.as_ref(),
+        args,
+        const_args,
+        arg_lens,
+        &supported,
+        overrides,
+    )
+}
+
+/// The [[fn]] entry a call matches, named by the constructor of a value of its family passed
+/// to it (`scrypt(pw, salt, &Params::recommended(), out)` is scrypt-131072-8-1-32), with what
+/// the call fixes itself (the length of `out`) standing over the constructor's; and that
+/// constructor's call.
+fn fn_site_match<'a>(ctx: &Ctx<'a>, site: &Site) -> Option<(Match, Option<&'a Site>)> {
+    let Target::Call {
+        callee,
+        self_ty,
+        args,
+        const_args,
+        arg_lens,
+        ..
+    } = &site.target
+    else {
+        return None;
+    };
+    let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
+    let m = match_fn(
+        ctx.kb,
+        callee,
+        self_ty.as_ref(),
+        args,
+        const_args,
+        arg_lens,
+        &supported,
+    )?;
+    let own = Some(callee.krate.name.as_str());
+    Some(
+        match argument_constructor(ctx, site, &m.algo.family, own, &m.params) {
+            Some((c, at)) => (adopt(c, m), Some(at)),
+            None => (m, None),
+        },
+    )
+}
+
+/// `named`'s asset and parameters, with what `entry` says the call does (its functions, use and
+/// note).
+fn adopt(named: Match, entry: Match) -> Match {
+    Match {
+        algo: Algo {
+            functions: entry.algo.functions,
+            implied_use: entry.algo.implied_use,
+            note: entry.algo.note,
+            ..named.algo
+        },
+        provider_crates: entry.provider_crates,
+        ..named
     }
 }
 
@@ -815,7 +1073,8 @@ fn site_matches(
                         out.push((c, Kind::Component, None, symbol.clone(), d));
                     }
                 }
-                out.insert(0, (m, Kind::Static, None, symbol, vec![]));
+                let f = sole_function(&m);
+                out.insert(0, (m, Kind::Static, f, symbol, vec![]));
             } else {
                 // descriptors this item leads to; one reached only inside another descriptor
                 // (the SHA-256 in rcgen's PKCS_ECDSA_P256_SHA256 -> ECDSA_P256_SHA256_ASN1) is
@@ -848,7 +1107,8 @@ fn site_matches(
                         None => {
                             let detail =
                                 vec![format!("{} -> {}", short(&def.path), short(&inner.path))];
-                            out.push((m, Kind::ViaStatic, None, symbol.clone(), detail));
+                            let f = sole_function(&m);
+                            out.push((m, Kind::ViaStatic, f, symbol.clone(), detail));
                         }
                     }
                 }
@@ -881,20 +1141,18 @@ fn site_matches(
             method,
             self_ty,
             args,
-            const_args,
-            arg_lens,
             ..
         } => {
             let symbol = callee.path.clone();
-            let fn_match = match_fn(
-                kb,
-                callee,
-                self_ty.as_ref(),
-                args,
-                const_args,
-                arg_lens,
-                &supported,
-            );
+            let fn_match = fn_site_match(ctx, site).map(|(m, _)| {
+                // a constructor set up for calls that all compute one asset is part of it
+                match ctx.consumers.get(&call_key(site)).map(Vec::as_slice) {
+                    Some([u, rest @ ..]) if rest.iter().all(|r| r.key() == u.key()) => {
+                        adopt(u.clone(), m)
+                    }
+                    _ => m,
+                }
+            });
             // a fn entry with `self_type` already accounts for the self type
             let skip_self = fn_match.is_some()
                 && kb
@@ -955,7 +1213,9 @@ fn site_matches(
                     m = c;
                     m.components = comps;
                 } else if outer.is_none()
-                    && let Some(c) = argument_constructor(ctx, site, &m.algo.family)
+                    && let Some(c) =
+                        argument_constructor(ctx, site, &m.algo.family, None, &BTreeMap::new())
+                            .map(|(c, _)| c)
                 {
                     // or a value built in an argument: `encrypt(&mut rng,
                     // Oaep::new_with_label::<Sha256, _>(label), msg)` is RSA-OAEP-SHA-256, the
@@ -998,34 +1258,42 @@ fn site_matches(
             // `UnboundKey::new(&AES_256_GCM, ..)` in the origin of `k`.
             if out.is_empty() && into_kb {
                 let has_roles = !provenance::of_call(kb, &site.target).is_empty();
-                let (mut descriptors, others) = provenance::data_in_args(kb, &site.target);
-                // the user's own data naming exactly one descriptor (`digest(TABLE.alg, ..)`
-                // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`) is
-                // chosen at run time
-                for d in others {
-                    let found: Vec<rcbom_facts::DefRef> = closure(&d.id)
-                        .into_iter()
-                        .filter(|x| match_static(kb, x, &supported).is_some())
-                        .collect();
-                    if let [one] = found.as_slice()
-                        && !descriptors.contains(one)
-                    {
-                        descriptors.push(one.clone());
-                    }
-                }
-                for def in descriptors {
-                    if let Some(mut m) = match_static(kb, &def, &supported) {
-                        let f = kb.use_of(method, &m.algo.primitive);
-                        if f.is_none() && !has_roles {
-                            continue;
+                // the call's own arguments; if what they name is not used here, its receiver's
+                for (mut descriptors, others) in provenance::data_in_args(kb, &site.target) {
+                    // the user's own data naming exactly one descriptor (`digest(TABLE.alg, ..)`
+                    // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`)
+                    // is chosen at run time
+                    for d in others {
+                        let found: Vec<rcbom_facts::DefRef> = closure(&d.id)
+                            .into_iter()
+                            .filter(|x| match_static(kb, x, &supported).is_some())
+                            .collect();
+                        if let [one] = found.as_slice()
+                            && !descriptors.contains(one)
+                        {
+                            descriptors.push(one.clone());
                         }
-                        m.providers
-                            .extend(ctx.package_of_crate(&def.krate.name, &def.krate.stable_id));
-                        let d = vec![format!(
-                            "algorithm from {} in the arguments",
-                            short(&def.path)
-                        )];
-                        out.push((m, Kind::Call, f, symbol.clone(), d));
+                    }
+                    for def in descriptors {
+                        if let Some(mut m) =
+                            matcher::match_static_called(kb, &def, Some(method), &supported)
+                        {
+                            let f = kb.use_of(method, &m.algo.primitive);
+                            if f.is_none() && !has_roles {
+                                continue;
+                            }
+                            m.providers.extend(
+                                ctx.package_of_crate(&def.krate.name, &def.krate.stable_id),
+                            );
+                            let d = vec![format!(
+                                "algorithm from {} in the arguments",
+                                short(&def.path)
+                            )];
+                            out.push((m, Kind::Call, f, symbol.clone(), d));
+                        }
+                    }
+                    if !out.is_empty() {
+                        break;
                     }
                 }
             }

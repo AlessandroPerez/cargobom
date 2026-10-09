@@ -78,14 +78,19 @@ pub(crate) fn local_data_sites(cx: &mut Cx<'_>) -> (Vec<Site>, Vec<DataEdge>) {
                 out.push(s);
             }
         }
-        // `static T: Table = make_table();`: the pointers are only in the evaluated value
-        if matches!(tcx.def_kind(did), DefKind::Static { .. })
-            && let Ok(alloc) = tcx.eval_static_initializer(did)
-        {
-            let mut statics = Vec::new();
-            for (_, prov) in alloc.inner().provenance().ptrs().iter() {
-                statics_in(tcx, prov.alloc_id(), &mut statics, &mut HashSet::new(), 0);
+        // `static T: Table = make_table();`, `const PICKED: &Algorithm = pick();`: the pointers
+        // are only in the evaluated value
+        let mut statics = Vec::new();
+        if matches!(tcx.def_kind(did), DefKind::Static { .. }) {
+            if let Ok(alloc) = tcx.eval_static_initializer(did) {
+                for (_, prov) in alloc.inner().provenance().ptrs().iter() {
+                    statics_in(tcx, prov.alloc_id(), &mut statics, &mut HashSet::new(), 0);
+                }
             }
+        } else {
+            statics = const_value_statics(tcx, did).unwrap_or_default();
+        }
+        {
             for s in statics {
                 if s != did && named.insert(s) {
                     edges.push(DataEdge {
@@ -129,13 +134,14 @@ pub(crate) fn fn_data_sites<'tcx>(
     for (named, span) in found {
         // local data, data of knowledge-base crates, and statics leading to them
         let keep = match named {
-            Named::Static(d) => {
-                d.is_local()
-                    || cx.kb_crates.contains(tcx.crate_name(d.krate).as_str())
-                    || cx.static_interesting(d)
-            }
+            Named::Static(d) => d.is_local() || cx.kb_crate(d.krate) || cx.static_interesting(d),
+            // a dependency's const that leads to a knowledge-base static (`pub const ALG_C:
+            // &Algorithm = &SHA384;` in a non-KB crate) as well
             Named::Const(d) => {
-                d.is_local() || cx.kb_crates.contains(tcx.crate_name(d.krate).as_str())
+                d.is_local()
+                    || cx.kb_crate(d.krate)
+                    || const_value_statics(tcx, d)
+                        .is_some_and(|s| s.into_iter().any(|s| cx.static_interesting(s)))
             }
         };
         if keep && let Some(s) = site(tcx, owner, named, span, did, tier, via) {
@@ -258,7 +264,7 @@ impl<'tcx> Visitor<'tcx> for Refs<'tcx> {
 
 /// The const item a (possibly generic) constant refers to: an associated const resolves to
 /// the impl's item once the instance's arguments are known.
-fn resolve_const<'tcx>(
+pub(crate) fn resolve_const<'tcx>(
     tcx: TyCtxt<'tcx>,
     def: DefId,
     uv_args: GenericArgsRef<'tcx>,
@@ -297,6 +303,19 @@ pub(crate) fn ctfe_mir<'tcx>(
     }
 }
 
+/// The statics the evaluated value of a non-generic const or associated const points at;
+/// `None` when it cannot be evaluated on its own (generic, or no value).
+pub(crate) fn const_value_statics(tcx: TyCtxt<'_>, did: DefId) -> Option<Vec<DefId>> {
+    if !matches!(tcx.def_kind(did), DefKind::Const | DefKind::AssocConst)
+        || tcx.generics_of(did).requires_monomorphization(tcx)
+    {
+        return None;
+    }
+    let value = tcx.const_eval_poly(did).ok()?;
+    let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+    Some(statics_of_value(tcx, value, ty))
+}
+
 /// The statics a constant value points at, through any depth of allocations.
 pub(crate) fn statics_of_value<'tcx>(
     tcx: TyCtxt<'tcx>,
@@ -323,8 +342,12 @@ fn alloc_ids(c: &mir::Const<'_>) -> Vec<AllocId> {
 
 /// The statics and named consts one constant operand names (for argument origins): a
 /// pointer's static, a named const, and through an inline const its contents.
-pub(crate) fn named_by_const<'tcx>(tcx: TyCtxt<'tcx>, c: &mir::ConstOperand<'tcx>) -> Vec<DefId> {
-    let mut v = Refs::new(tcx, None);
+pub(crate) fn named_by_const<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    c: &mir::ConstOperand<'tcx>,
+    args: Option<GenericArgsRef<'tcx>>,
+) -> Vec<DefId> {
+    let mut v = Refs::new(tcx, args);
     v.visit_const_operand(
         c,
         mir::Location {

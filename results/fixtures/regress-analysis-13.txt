@@ -1,0 +1,95 @@
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:32:15 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING | [reachable] [static] in t13::sign_ecdsa; use: sign; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:33:16 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8 | [reachable] [call] in t13::sign_ecdsa; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, &rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:35:7 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign | [reachable] [call] in t13::sign_ecdsa; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; line: `kp.sign(&rng, msg).unwrap().as_ref().to_vec()`; code: `sign`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:40:65 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 | [reachable] [static] in t13::ACCEPTED; line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:45:43 | t13::ACCEPTED | [reachable] [via-static] in t13::main; t13::ACCEPTED -> ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1; line: `println!("{} {} {}", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:15:10 | ring::ec::curve25519::ed25519::verification::ED25519 | [reachable] [static] in t13::ED; line: `tag: &signature::ED25519,`; code: `signature::ED25519`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:20:16 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8 | [reachable] [call] in t13::sign_tagged; use: keygen; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:21:13 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8 | [reachable] [call] in t13::sign_tagged; from_pkcs8: setup, not a use; line: `let kp = Ed25519KeyPair::from_pkcs8(pkcs8.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:22:33 | ring::ec::curve25519::ed25519::verification::ED25519 | [reachable] [static] in t13::sign_tagged; line: `if std::ptr::eq(scheme.tag, &signature::ED25519) {`; code: `signature::ED25519`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:23:11 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [reachable] [call] in t13::sign_tagged; use: sign; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:25:11 | ring::signature::KeyPair::public_key | [reachable] [call] in t13::sign_tagged; public_key: setup, not a use; line: `kp.public_key().as_ref().to_vec()`; code: `public_key`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:43:25 | t13::ED | [reachable] [via-static] in t13::main; t13::ED -> ring::ec::curve25519::ed25519::verification::ED25519; line: `let a = sign_tagged(&ED, b"m");`; code: `ED`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:15 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING | [reachable] [component] in t13::sign_ecdsa; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:65 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 | [reachable] [component] in t13::ACCEPTED; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:45:43 | t13::ACCEPTED | [reachable] [component] in t13::main; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `println!("{} {} {}", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t13 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t13 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t13 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=3
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:confidence=high
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:functions:source=knowledge-base
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=2
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=7
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop t13 | pkg:cargo/t13@0.1.0 | rcbom:scope=required
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component application t13 0.1.0 | pkg:cargo/t13@0.1.0 | purl pkg:cargo/t13@0.1.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t13@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:ECDSA-P-384-SHA-384
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t13@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-384-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:Ed25519
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/t13@0.1.0#root", "name": "t13", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=109
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

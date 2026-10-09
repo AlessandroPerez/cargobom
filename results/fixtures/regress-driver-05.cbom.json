@@ -122,7 +122,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t5::unused_by_bin; line: `digest(&SHA256, d).as_ref().len()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t5::unused_by_bin; use: digest; line: `digest(&SHA256, d).as_ref().len()`; code: `SHA256`",
             "line": 19,
             "location": "src/lib.rs",
             "offset": 12,
@@ -181,7 +181,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t5::H384 as t5::Hasher>::hash; line: `digest(&SHA384, d).as_ref().len()`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <t5::H384 as t5::Hasher>::hash; use: digest; line: `digest(&SHA384, d).as_ref().len()`; code: `SHA384`",
             "line": 13,
             "location": "src/lib.rs",
             "offset": 16,
@@ -233,7 +233,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t5::ALGS; line: `pub static ALGS: [&Algorithm; 1] = [&SHA512];`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in t5::ALGS; use: digest; line: `pub static ALGS: [&Algorithm; 1] = [&SHA512];`; code: `SHA512`",
             "line": 4,
             "location": "src/lib.rs",
             "offset": 37,
@@ -257,7 +257,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -315,6 +315,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -337,7 +345,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1af635f7-ba9f-8307-af33-5550386de394",
+  "serialNumber": "urn:uuid:93cac4f6-df62-8dad-acf5-d2af391be68c",
   "specVersion": "1.7",
   "version": 1
 }

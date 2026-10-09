@@ -122,7 +122,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t9::included; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t9::included; use: digest; line: `ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()`; code: `ring::digest::SHA256`",
             "line": 2,
             "location": "src/gen.rs",
             "offset": 26,
@@ -174,7 +174,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in t9::H::A; line: `const A: &'static Algorithm = &SHA384;`; code: `SHA384`",
+            "additionalContext": "[present] [static] in t9::H::A; use: digest; line: `const A: &'static Algorithm = &SHA384;`; code: `SHA384`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 35,
@@ -188,7 +188,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [via-static] in t9::dead; t9::H::A -> ring::digest::SHA384; line: `digest(H::A, d).as_ref().len()`; code: `H::A`",
+            "additionalContext": "[present] [via-static] in t9::dead; use: digest; t9::H::A -> ring::digest::SHA384; line: `digest(H::A, d).as_ref().len()`; code: `H::A`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 11,
@@ -247,7 +247,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in t9::dead2; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `SHA512`",
+            "additionalContext": "[present] [static] in t9::dead2; use: digest; line: `digest(const { &SHA512 }, d).as_ref().len()`; code: `SHA512`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 20,
@@ -261,7 +261,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in t9::af::{closure#0}; line: `f(&SHA512, d).as_ref().len()`; code: `SHA512`",
+            "additionalContext": "[present] [static] in t9::af::{closure#0}; use: digest; line: `f(&SHA512, d).as_ref().len()`; code: `SHA512`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 7,
@@ -343,6 +343,14 @@
         "value": ""
       },
       {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
         "name": "rcbom:run:sandbox",
         "value": "none (draft: run only on trusted code)"
       },
@@ -365,7 +373,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3d184406-7dce-89fb-ba12-8b8ef4c3018e",
+  "serialNumber": "urn:uuid:deee34ef-6251-85d1-881b-12e4441b5c30",
   "specVersion": "1.7",
   "version": 1
 }

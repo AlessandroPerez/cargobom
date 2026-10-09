@@ -212,7 +212,9 @@ role = "algorithm"
 [[crate]]
 package = "rand_core"
 versions = ">=0.6, <0.10"
-role = "trait"
+# not only the RngCore traits: rand_core's OsRng is the operating-system generator itself, and
+# calls getrandom
+role = "algorithm"
 
 [[crate]]
 package = "getrandom"
@@ -227,13 +229,15 @@ role = "algorithm"
 #   { arg = N, asset = true }   arg N contains another KB type; its asset name (composition)
 #   { parent_arg = N, .. }      the same, but on the type that contains the matched one
 #   { .., path = [i, j] }       the argument's own argument i, then that one's argument j
+#   { .., required = true }     the entry matches only when the parameter resolves
 # An argument read as a parameter (map, typenum) is part of the name, not a component.
 # `functions` are the asset's defaults when no call reveals the use. `[..]` in a name is written
 # only when its parameters differ from `defaults`.
 
 # AES-256-GCM is the standard 16-byte tag and 12-byte nonce; AES-256-GCM-128-128 the same
 # cipher with a 16-byte nonce (registry: AES[-(128|192|256)][-(GCM|CCM)][-{tagLength}]
-# [-{ivLength}], lengths in bits).
+# [-{ivLength}], lengths in bits). `AesGcm<C, ..>` takes any 128-bit block cipher: the entry
+# holds for aes 0.8's AES types only (`Aes256`, and the encrypt-only `Aes256Enc`).
 [[type]]
 crate = "aes_gcm"
 name = "AesGcm"
@@ -244,7 +248,7 @@ mode = "gcm"
 functions = ["encrypt", "decrypt"]
 parameter_set = "{key}"
 defaults = { tag_bits = "128", nonce_bits = "96" }
-params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } }, nonce_bytes = { arg = 1, typenum = true }, tag_bytes = { arg = 2, typenum = true }, nonce_bits = { arg = 1, typenum = true, scale = 8 }, tag_bits = { arg = 2, typenum = true, scale = 8 } }
+params = { key = { arg = 0, map = { Aes128 = "128", Aes128Enc = "128", Aes128Dec = "128", Aes192 = "192", Aes192Enc = "192", Aes192Dec = "192", Aes256 = "256", Aes256Enc = "256", Aes256Dec = "256" }, required = true }, nonce_bytes = { arg = 1, typenum = true }, tag_bytes = { arg = 2, typenum = true }, nonce_bits = { arg = 1, typenum = true, scale = 8 }, tag_bits = { arg = 2, typenum = true, scale = 8 } }
 
 # chacha20 0.9: ChaCha20 = StreamCipherCoreWrapper<ChaChaCore<U10>>, XChaCha20 =
 # ..<XChaChaCore<U10>>; the typenum counts double rounds (U4 = 8 rounds, U6 = 12, U10 = 20).
@@ -258,7 +262,10 @@ primitive = "ae"
 functions = ["encrypt", "decrypt"]
 params = { core = { arg = 0, path = [0], map = { ChaChaCore = "ChaCha", XChaChaCore = "XChaCha" } }, rounds = { arg = 0, path = [0, 0], typenum = true, scale = 2 }, nonce_bytes = { arg = 1, typenum = true } }
 
-# A block cipher in a mode: the cipher is a parameter of the mode.
+# A block cipher in a mode: the cipher is a parameter of the mode, and these entries hold for
+# AES ciphers only (`required`): `cbc::Encryptor<blowfish::Blowfish>` and
+# `ctr::Ctr64BE<blowfish::Blowfish>` are not AES. aes 0.8's encrypt-only and decrypt-only types
+# (`Aes128Enc`, `Aes128Dec`, autodetect.rs) are the same cipher as `Aes128`.
 [[type]]
 crate = "cbc"
 name = "Encryptor"
@@ -268,7 +275,7 @@ primitive = "block-cipher"
 mode = "cbc"
 functions = ["encrypt"]
 parameter_set = "{key}"
-params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
+params = { key = { arg = 0, map = { Aes128 = "128", Aes128Enc = "128", Aes128Dec = "128", Aes192 = "192", Aes192Enc = "192", Aes192Dec = "192", Aes256 = "256", Aes256Enc = "256", Aes256Dec = "256" }, required = true } }
 
 [[type]]
 crate = "cbc"
@@ -279,7 +286,7 @@ primitive = "block-cipher"
 mode = "cbc"
 functions = ["decrypt"]
 parameter_set = "{key}"
-params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
+params = { key = { arg = 0, map = { Aes128 = "128", Aes128Enc = "128", Aes128Dec = "128", Aes192 = "192", Aes192Enc = "192", Aes192Dec = "192", Aes256 = "256", Aes256Enc = "256", Aes256Dec = "256" }, required = true } }
 
 [[type]]
 crate = "ctr"
@@ -290,7 +297,7 @@ primitive = "block-cipher"
 mode = "ctr"
 functions = ["encrypt", "decrypt"]
 parameter_set = "{key}"
-params = { key = { arg = 0, map = { Aes128 = "128", Aes192 = "192", Aes256 = "256" } } }
+params = { key = { arg = 0, map = { Aes128 = "128", Aes128Enc = "128", Aes128Dec = "128", Aes192 = "192", Aes192Enc = "192", Aes192Dec = "192", Aes256 = "256", Aes256Enc = "256", Aes256Dec = "256" }, required = true } }
 
 [[type]]
 crate = "hmac"
@@ -359,6 +366,15 @@ family = "SHA-1"
 primitive = "hash"
 functions = ["digest"]
 
+# md5 0.7's streaming API: `Context::new()`, `consume(data)`, `compute()`
+[[type]]
+crate = "md5"
+name = "Context"
+asset = "MD5"
+family = "MD5"
+primitive = "hash"
+functions = ["digest"]
+
 # blake3: the constructor of a Hasher says its mode ([[fn]] entries below)
 [[type]]
 crate = "blake3"
@@ -376,6 +392,25 @@ crate = "argon2"
 name = "Argon2"
 asset = "Argon2"
 family = "Argon2"
+primitive = "kdf"
+functions = ["keyderive"]
+
+# The password-hash API types. Their parameters are chosen per call: `hash_password` uses the
+# crate's defaults ([[fn]] entries below), `hash_password_customized` the caller's, and
+# `verify_password` those of the stored hash string, so the type alone is the family name.
+[[type]]
+crate = "scrypt"
+name = "Scrypt"
+asset = "scrypt"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+
+[[type]]
+crate = "pbkdf2"
+name = "Pbkdf2"
+asset = "PBKDF2"
+family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
 
@@ -503,6 +538,26 @@ primitive = "signature"
 functions = ["verify"]
 params = { hash = { arg = 0, asset = true } }
 
+# rsa 0.9's signature padding values, passed to `RsaPrivateKey::sign` / `sign_with_rng` and
+# `RsaPublicKey::verify`: their digest is a run-time field; the constructor names it
+# (`Pkcs1v15Sign::new::<Sha256>()`, `Pss::new::<Sha256>()`, [[fn]] entries below), found in
+# the call's arguments. `Pkcs1v15Sign::new_unprefixed()` signs a raw digest: no hash.
+[[type]]
+crate = "rsa"
+name = "Pkcs1v15Sign"
+asset = "RSA-PKCS1-1.5"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
+
+[[type]]
+crate = "rsa"
+name = "Pss"
+asset = "RSA-PSS"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+
 [[type]]
 crate = "rsa"
 name = "Pkcs1v15Encrypt"
@@ -510,6 +565,47 @@ asset = "RSA-PKCS1-1.5"
 family = "RSAES-PKCS1"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+
+# rsa 0.9's encryption key types (`RandomizedEncryptor::encrypt_with_rng`, `Decryptor::decrypt`,
+# `RandomizedDecryptor::decrypt_with_rng`): `oaep::EncryptingKey<D, MGD = D>` hashes with D and
+# MGF1 with MGD, like `Oaep::new_with_mgf_hash::<D, MGD>()`
+[[type]]
+crate = "rsa"
+name = "EncryptingKey"
+module = "^oaep::"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt"]
+params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "DecryptingKey"
+module = "^oaep::"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["decrypt"]
+params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "EncryptingKey"
+module = "^pkcs1v15::"
+asset = "RSA-PKCS1-1.5"
+family = "RSAES-PKCS1"
+primitive = "pke"
+functions = ["encrypt"]
+
+[[type]]
+crate = "rsa"
+name = "DecryptingKey"
+module = "^pkcs1v15::"
+asset = "RSA-PKCS1-1.5"
+family = "RSAES-PKCS1"
+primitive = "pke"
+functions = ["decrypt"]
 
 # The digest of an Oaep value is a run-time field; `Oaep::new::<D>()` ([[fn]] below) names it.
 [[type]]
@@ -523,7 +619,9 @@ functions = ["encrypt", "decrypt"]
 # --- Layer 2: statics (ring and aws-lc-rs style) --------------------------------------------
 # `name` is a regex over the item's own name; {1}, {2} are its groups. `module` restricts the
 # item's path inside its crate when the name alone is ambiguous. aws-lc-rs keeps ring's API and
-# names, so most entries cover both crates.
+# names, so most entries cover both crates. `asset_by_method`: the name when the call that
+# names the descriptor (in its arguments or its receiver's construction) is one of these
+# methods. `functions` say what the descriptor can do: a verification algorithm verifies only.
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
@@ -585,6 +683,38 @@ primitive = "block-cipher"
 parameter_set = "{1}"
 functions = ["encrypt", "decrypt"]
 
+# aws-lc-rs 1.17+ `cipher` (feature legacy-des): DES and 2-key / 3-key Triple DES (2TDEA,
+# 3TDEA), named by their effective key length (56, 112, 168 bits)
+[[static]]
+crate = "aws_lc_rs"
+name = "^DES_FOR_LEGACY_USE_ONLY$"
+module = "^cipher::"
+asset = "DES-56"
+family = "DES"
+primitive = "block-cipher"
+parameter_set = "56"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^DES_EDE_FOR_LEGACY_USE_ONLY$"
+module = "^cipher::"
+asset = "3DES-112"
+family = "3DES"
+primitive = "block-cipher"
+parameter_set = "112"
+functions = ["encrypt", "decrypt"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^DES_EDE3_FOR_LEGACY_USE_ONLY$"
+module = "^cipher::"
+asset = "3DES-168"
+family = "3DES"
+primitive = "block-cipher"
+parameter_set = "168"
+functions = ["encrypt", "decrypt"]
+
 [[static]]
 crate = "aws_lc_rs"
 name = "^AES_(128|192|256)$"
@@ -594,11 +724,25 @@ family = "CMAC"
 primitive = "mac"
 functions = ["tag"]
 
+# `TDES_FOR_LEGACY_USE_ONLY` is a deprecated alias of `DES_EDE3_FOR_LEGACY_USE_ONLY` (cmac.rs)
+[[static]]
+crate = "aws_lc_rs"
+name = "^(DES_EDE3|TDES)_FOR_LEGACY_USE_ONLY$"
+module = "^cmac::"
+asset = "CMAC-3DES-168"
+family = "CMAC"
+primitive = "mac"
+functions = ["tag"]
+
+# A key-encryption key (`AesKek::new(&key_wrap::AES_256, kek)`) is AES-256 for key wrapping;
+# the method used says which scheme: `wrap`/`unwrap` are KW (RFC 3394), `wrap_with_padding`/
+# `unwrap_with_padding` KWP (RFC 5649, `KeyWrapPadded`), registry AES[-(128|192|256)][-(KW|KWP)].
 [[static]]
 crate = "aws_lc_rs"
 name = "^AES_(128|192|256)$"
 module = "^key_wrap::"
-asset = "AES-{1}-KW"
+asset = "AES-{1}"
+asset_by_method = { wrap = "AES-{1}-KW", unwrap = "AES-{1}-KW", wrap_with_padding = "AES-{1}-KWP", unwrap_with_padding = "AES-{1}-KWP" }
 family = "AES"
 primitive = "key-wrap"
 parameter_set = "{1}"
@@ -669,49 +813,161 @@ primitive = "hash"
 functions = ["digest"]
 
 [[static]]
+crate = "aws_lc_rs"
+name = "^SHA3_(224|256|384|512)$"
+asset = "SHA3-{1}"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+# aws-lc-rs `tls_prf` (rustls's TLS 1.2 PRF on aws-lc-rs; on ring, rustls builds it from
+# `hmac::HMAC_SHA256`/`HMAC_SHA384`, matched above). The registry family TLS-PRF is not in
+# CycloneDX 1.7's algorithmFamily enum: the CBOM leaves that optional field out and gives the
+# family as the property rcbom:algorithm-family.
+[[static]]
+crate = "aws_lc_rs"
+name = "^P_SHA(256|384|512)$"
+module = "^tls_prf::"
+asset = "TLS12-PRF-SHA-{1}"
+family = "TLS-PRF"
+primitive = "kdf"
+functions = ["keyderive"]
+note = "TLS 1.2 PRF (RFC 5246 P_hash)"
+
+# ECDSA: `ECDSA_P256_SHA256_ASN1` and `_FIXED` are verification algorithms (ring
+# `ec::suite_b::ecdsa::verification`, aws-lc-rs `EcdsaVerificationAlgorithm`), the `_SIGNING`
+# ones signing algorithms (`EcdsaKeyPair`).
+[[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^ECDSA_P(256|384|521)_SHA(1|224|256|384|512)_"
+name = "^ECDSA_P(256|384|521)_SHA(1|224|256|384|512)_(ASN1|FIXED)$"
 asset = "ECDSA-P-{1}-SHA-{2}"
 family = "ECDSA"
 primitive = "signature"
-functions = ["sign", "verify"]
+functions = ["verify"]
+curve = "nist/P-{1}"
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^ECDSA_P(256|384|521)_SHA(1|224|256|384|512)_(ASN1|FIXED)_SIGNING$"
+asset = "ECDSA-P-{1}-SHA-{2}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
 curve = "nist/P-{1}"
 
 [[static]]
 crate = "aws_lc_rs"
-name = "^ECDSA_P(256|384|521)_SHA3_(256|384|512)_"
+name = "^ECDSA_P(256|384|521)_SHA3_(256|384|512)_(ASN1|FIXED)$"
 asset = "ECDSA-P-{1}-SHA3-{2}"
 family = "ECDSA"
 primitive = "signature"
-functions = ["sign", "verify"]
+functions = ["verify"]
 curve = "nist/P-{1}"
 
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P(256|384|521)_SHA3_(256|384|512)_(ASN1|FIXED)_SIGNING$"
+asset = "ECDSA-P-{1}-SHA3-{2}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "nist/P-{1}"
+
+# aws-lc-rs secp256k1 (`ECDSA_P256K1_SHA256_ASN1`, `ECDSA_P256K1_SHA3_256_FIXED_SIGNING`, ..)
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P256K1_SHA256_(ASN1|FIXED)$"
+asset = "ECDSA-secp256k1-SHA-256"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+curve = "secg/secp256k1"
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P256K1_SHA256_(ASN1|FIXED)_SIGNING$"
+asset = "ECDSA-secp256k1-SHA-256"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "secg/secp256k1"
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P256K1_SHA3_256_(ASN1|FIXED)$"
+asset = "ECDSA-secp256k1-SHA3-256"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+curve = "secg/secp256k1"
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^ECDSA_P256K1_SHA3_256_(ASN1|FIXED)_SIGNING$"
+asset = "ECDSA-secp256k1-SHA3-256"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
+curve = "secg/secp256k1"
+
+# ring `ec::curve25519::ed25519::verification::ED25519`, aws-lc-rs `signature::ED25519`
+# (`EdDSAParameters`): verification; signing is `Ed25519KeyPair` ([[type]] above)
 [[static]]
 crate = ["ring", "aws_lc_rs"]
 name = "^ED25519$"
 asset = "Ed25519"
 family = "EdDSA"
 primitive = "signature"
-functions = ["sign", "verify"]
+functions = ["verify"]
 curve = "other/Ed25519"
 
-# ring: RSA_PKCS1_SHA256 (signing), RSA_PKCS1_2048_8192_SHA256, RSA_PKCS1_3072_8192_SHA384,
-# RSA_PKCS1_1024_8192_SHA1_FOR_LEGACY_USE_ONLY (verification, key-size bounds)
+# RSA: the parameters with key-size bounds verify (`RSA_PKCS1_2048_8192_SHA256`,
+# `RSA_PSS_2048_8192_SHA256`, `RSA_PKCS1_1024_8192_SHA1_FOR_LEGACY_USE_ONLY`: ring
+# `rsa::verification`, aws-lc-rs `RsaParameters`); the encodings without bounds sign
+# (`RSA_PKCS1_SHA256`, `RSA_PSS_SHA256`: ring `RsaEncoding`, aws-lc-rs `RsaSignatureEncoding`,
+# what `RsaKeyPair::sign` takes). ring's verification parameters name their padding encoding
+# (`RSA_PKCS1_2048_8192_SHA256` -> `RSA_PKCS1_SHA256`), so a ring verification reached through
+# them also lists `sign`; ring's private `RSA_PKCS1_SHA1_FOR_LEGACY_USE_ONLY` padding is used by
+# verification only.
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PKCS1_(?:[0-9]+_[0-9]+_)?SHA(1|256|384|512)"
+name = "^RSA_PKCS1_[0-9]+_[0-9]+_SHA(1|256|384|512)(_FOR_LEGACY_USE_ONLY)?$"
 asset = "RSA-PKCS1-1.5-SHA-{1}"
 family = "RSASSA-PKCS1"
 primitive = "signature"
-functions = ["sign", "verify"]
+functions = ["verify"]
+
+[[static]]
+crate = "ring"
+name = "^RSA_PKCS1_SHA(1)_FOR_LEGACY_USE_ONLY$"
+asset = "RSA-PKCS1-1.5-SHA-{1}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["verify"]
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PSS_(?:[0-9]+_[0-9]+_)?SHA(256|384|512)"
+name = "^RSA_PKCS1_SHA(256|384|512)$"
+asset = "RSA-PKCS1-1.5-SHA-{1}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_[0-9]+_[0-9]+_SHA(256|384|512)$"
 asset = "RSA-PSS-SHA-{1}"
 family = "RSASSA-PSS"
 primitive = "signature"
-functions = ["sign", "verify"]
+functions = ["verify"]
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_SHA(256|384|512)$"
+asset = "RSA-PSS-SHA-{1}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
 
 [[static]]
 crate = "aws_lc_rs"
@@ -739,6 +995,8 @@ primitive = "kem"
 parameter_set = "{1}"
 functions = ["encapsulate", "decapsulate"]
 
+# aws-lc-rs `ML_DSA_65` is a verification algorithm, `ML_DSA_65_SIGNING` (which names it) the
+# signing one (`PqdsaKeyPair`)
 [[static]]
 crate = "aws_lc_rs"
 name = "^ML_DSA_(44|65|87)$"
@@ -746,7 +1004,16 @@ asset = "ML-DSA-{1}"
 family = "ML-DSA"
 primitive = "signature"
 parameter_set = "{1}"
-functions = ["sign", "verify"]
+functions = ["verify"]
+
+[[static]]
+crate = "aws_lc_rs"
+name = "^ML_DSA_(44|65|87)_SIGNING$"
+asset = "ML-DSA-{1}"
+family = "ML-DSA"
+primitive = "signature"
+parameter_set = "{1}"
+functions = ["sign"]
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
@@ -764,6 +1031,9 @@ curve = "other/Curve25519"
 # `{ arg_len = N }`: the length of the array behind value argument N (`&mut [0u8; 32]`).
 # `{ arg = N, .. }`: generic argument N, as for types. `use`: what the call does when its method
 # is not a listed use (`keygen` for a key generator); without it the call sets the asset up.
+# A parameter the name cannot show (a positional part before it is unknown) is reported as a
+# property; `unresolved` is a note on what is not known, `{missing}` the name's placeholders
+# without a value (the note is left out when there are none).
 
 [[fn]]
 crate = "x25519_dalek"
@@ -774,6 +1044,30 @@ primitive = "key-agree"
 functions = ["keyderive"]
 curve = "other/Curve25519"
 
+# `x25519_dalek::x25519(k, u)`: the scalar multiplication of the key agreement, on bytes
+[[fn]]
+crate = "x25519_dalek"
+path = "^x25519::x25519$"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+use = "keyderive"
+curve = "other/Curve25519"
+
+# x25519-dalek 2.0's deprecated `new(rng)`, renamed `random_from_rng` (a listed keygen method)
+[[fn]]
+crate = "x25519_dalek"
+path = "(StaticSecret|EphemeralSecret|ReusableSecret)::new$"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keygen"]
+use = "keygen"
+curve = "other/Curve25519"
+
+# `scrypt(password, salt, &params, output)`: the work factor is in the `Params` value, named
+# where it is built (entries below); the output length is the buffer's
 [[fn]]
 crate = "scrypt"
 path = "^scrypt$"
@@ -781,7 +1075,53 @@ asset = "scrypt"
 family = "scrypt"
 primitive = "kdf"
 functions = ["keyderive"]
-unresolved = "work factor (log_n, r, p) computed at run time"
+params = { dk_len = { arg_len = 3 } }
+
+# scrypt 0.11 `Params::new(log_n, r, p, len)` (registry scrypt[-{N}][-{r}][-{p}][-{dkLen}],
+# N = 2^log_n); an argument that is not a constant here is reported, not guessed (age:
+# `Params::new(log_n, 8, 1, 32)` with log_n chosen at run time). `len` is the output length of
+# the password-hash API only: `scrypt(.., &params, out)` derives `out.len()` bytes, so dk_len
+# (declared without a source) comes from the call the value is passed to.
+[[fn]]
+crate = "scrypt"
+path = "Params::new$"
+asset = "scrypt-{N}-{r}-{p}-{dk_len}"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+unresolved = "{missing}: not a constant where scrypt::Params is built"
+params = { dk_len = {}, N = { const_arg = 0, map = { "1" = "2", "2" = "4", "3" = "8", "4" = "16", "5" = "32", "6" = "64", "7" = "128", "8" = "256", "9" = "512", "10" = "1024", "11" = "2048", "12" = "4096", "13" = "8192", "14" = "16384", "15" = "32768", "16" = "65536", "17" = "131072", "18" = "262144", "19" = "524288", "20" = "1048576", "21" = "2097152", "22" = "4194304", "23" = "8388608", "24" = "16777216", "25" = "33554432", "26" = "67108864", "27" = "134217728", "28" = "268435456", "29" = "536870912", "30" = "1073741824", "31" = "2147483648", "32" = "4294967296", "33" = "8589934592", "34" = "17179869184", "35" = "34359738368", "36" = "68719476736", "37" = "137438953472", "38" = "274877906944", "39" = "549755813888", "40" = "1099511627776", "41" = "2199023255552", "42" = "4398046511104", "43" = "8796093022208", "44" = "17592186044416", "45" = "35184372088832", "46" = "70368744177664", "47" = "140737488355328", "48" = "281474976710656", "49" = "562949953421312", "50" = "1125899906842624", "51" = "2251799813685248", "52" = "4503599627370496", "53" = "9007199254740992", "54" = "18014398509481984", "55" = "36028797018963968", "56" = "72057594037927936", "57" = "144115188075855872", "58" = "288230376151711744", "59" = "576460752303423488", "60" = "1152921504606846976", "61" = "2305843009213693952", "62" = "4611686018427387904", "63" = "9223372036854775808" } }, r = { const_arg = 1 }, p = { const_arg = 2 } }
+
+# `Params::recommended()`, `Params::default()`: log_n 17, r 8, p 1 (scrypt 0.11 params.rs; the
+# 32-byte length is the password-hash API's). Passed to `scrypt(.., &params, out)`, the output
+# length is out's. `Scrypt.hash_password(..)` (password-hash API) uses them, 32 bytes.
+[[fn]]
+crate = "scrypt"
+path = "Params::recommended$"
+asset = "scrypt-{N}-{r}-{p}-{dk_len}"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { N = { value = "131072" }, r = { value = "8" }, p = { value = "1" }, dk_len = {} }
+
+[[fn]]
+crate = "scrypt"
+self_type = "Params"
+path = "Default::default$"
+asset = "scrypt-{N}-{r}-{p}-{dk_len}"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { N = { value = "131072" }, r = { value = "8" }, p = { value = "1" }, dk_len = {} }
+
+[[fn]]
+crate = "scrypt"
+self_type = "Scrypt"
+path = "PasswordHasher::hash_password$"
+asset = "scrypt-131072-8-1-32"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
 
 [[fn]]
 crate = "md5"
@@ -858,6 +1198,39 @@ primitive = "kdf"
 functions = ["keyderive"]
 params = { hash = { arg = 0, asset = true }, iterations = { const_arg = 2 }, dk_len = { arg = 1, typenum = true } }
 
+# pbkdf2 0.12's generic API over the PRF: `pbkdf2::<Hmac<Sha256>>(password, salt, rounds, out)`,
+# `pbkdf2_array::<Hmac<Sha256>, N>(..)`. The hash is the one inside the HMAC
+# (`CoreWrapper<HmacCore<D>>` or `SimpleHmac<D>`: argument 0's argument 0's argument 0, or the
+# first KB type below it); the HMAC is a component.
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2$"
+asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, path = [0, 0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg_len = 3 } }
+
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2_array$"
+asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, path = [0, 0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg = 1, typenum = true } }
+
+# `Pbkdf2.hash_password(..)` (password-hash API): pbkdf2 0.12 `Algorithm::default()` is
+# PBKDF2-SHA256, `Params::default()` 600000 rounds and 32 bytes (simple.rs)
+[[fn]]
+crate = "pbkdf2"
+self_type = "Pbkdf2"
+path = "PasswordHasher::hash_password$"
+asset = "PBKDF2-SHA-256-600000-32"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+
 # A std trait implemented by the crypto type: `self_type` names it, `path` matches the callee.
 # argon2 0.5: Algorithm::default() = Argon2id, Params::default() = m 19 MiB, t 2, p 1 (params.rs).
 [[fn]]
@@ -893,7 +1266,11 @@ material = "private-key"
 size = "{bits}"
 params = { bits = { const_arg = 1 } }
 
-# rsa 0.9: Oaep::new::<D>(), Oaep::new_with_label::<D, S>(label)
+# rsa 0.9: Oaep::new::<D>(), Oaep::new_with_label::<D, S>(label): D is the OAEP hash and
+# MGF1's. Oaep::new_with_mgf_hash::<D, M>(), new_with_mgf_hash_and_label::<D, M, S>(label):
+# MGF1 hashes with M. The registry's RSA-OAEP[-{hashAlgorithm}][-{maskGenAlgorithm}] has no
+# notation for the mask generation function: the name has the OAEP hash, `mgf_hash` the MGF1
+# one, and both hashes are components.
 [[fn]]
 crate = "rsa"
 path = "Oaep::new(_with_label)?$"
@@ -901,12 +1278,43 @@ asset = "RSA-OAEP-{hash}"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "Oaep::new_with_mgf_hash(_and_label)?$"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
+
+# rsa 0.9 signature paddings: Pkcs1v15Sign::new::<D>() (RSASSA-PKCS1-v1_5 with D's DigestInfo
+# prefix), Pss::new::<D>(), new_with_salt::<D>(len), new_blinded::<D>(),
+# new_blinded_with_salt::<D>(len) (salt length: D's output size unless given)
+[[fn]]
+crate = "rsa"
+path = "Pkcs1v15Sign::new$"
+asset = "RSA-PKCS1-1.5-{hash}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
 params = { hash = { arg = 0, asset = true } }
 
+[[fn]]
+crate = "rsa"
+path = "Pss::new(_with_salt|_blinded|_blinded_with_salt)?$"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+params = { hash = { arg = 0, asset = true }, salt_len = { const_arg = 0 } }
+
 # A JWT HMAC key: the algorithm (HS256/384/512) is chosen by the header at encode time.
+# `from_base64_secret(text)`: the base64 text is the key.
 [[fn]]
 crate = "jsonwebtoken"
-path = "(EncodingKey|DecodingKey)::from_secret$"
+path = "(EncodingKey|DecodingKey)::from_(base64_)?secret$"
 asset = "HMAC"
 family = "HMAC"
 primitive = "mac"
@@ -937,41 +1345,60 @@ groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1
 [[use]]
 function = "encrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["encrypt", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place_append_tag", "seal_in_place_separate_tag", "encrypt_padded_mut", "encrypt_padded_vec_mut", "apply_keystream", "wrap", "wrap_with_padding"]
+methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place_append_tag", "seal_in_place_separate_tag", "encrypt_padded_mut", "encrypt_padded_vec_mut", "apply_keystream", "wrap", "wrap_with_padding"]
 
 [[use]]
 function = "decrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["decrypt", "decrypt_blinded", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_within", "decrypt_padded_mut", "decrypt_padded_vec_mut", "apply_keystream", "unwrap", "unwrap_with_padding"]
+methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_within", "decrypt_padded_mut", "decrypt_padded_vec_mut", "apply_keystream", "unwrap", "unwrap_with_padding"]
 
 [[use]]
 function = "digest"
 primitives = ["hash"]
-methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "new_with_prefix", "compute", "hash"]
+methods = ["digest", "update", "chain_update", "finalize", "finalize_reset", "finalize_xof", "new_with_prefix", "compute", "consume", "hash"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "chain_update", "finalize", "finalize_reset", "sign", "keyed_hash"]
+methods = ["update", "chain_update", "finalize", "finalize_reset", "finalize_xof", "sign", "keyed_hash"]
 
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_truncated_left", "verify_password", "verify_strict"]
+methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash"]
 
 [[use]]
 function = "keyderive"
 primitives = ["kdf", "key-agree"]
-methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "hash_password", "hash_password_into", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "fill"]
+methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_into", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
 
+# the `signature` crate's traits: Signer, RandomizedSigner, DigestSigner,
+# RandomizedDigestSigner, hazmat::PrehashSigner, RandomizedPrehashSigner
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign", "sign_with_rng"]
+methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng"]
 
 [[use]]
 function = "keygen"
 methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8"]
+
+# x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom)
+[[use]]
+function = "keygen"
+primitives = ["key-agree"]
+methods = ["random"]
+
+# aws-lc-rs `kem`: `EncapsulationKey::encapsulate()`, `DecapsulationKey::decapsulate(ct)`
+[[use]]
+function = "encapsulate"
+primitives = ["kem"]
+methods = ["encapsulate"]
+
+[[use]]
+function = "decapsulate"
+primitives = ["kem"]
+methods = ["decapsulate"]
 
 # --- Provenance -------------------------------------------------------------------------------
 # Roles: which value argument of an API is key material (method calls count the receiver as
@@ -1001,6 +1428,30 @@ args = { "1" = "nonce" }
 path = "UnboundKey::new$"
 args = { "1" = "key" }
 
+# aws-lc-rs keys built from an algorithm and bytes (defining paths: `aead::rand_nonce::`,
+# `aead::tls::`, `cipher::`, `cmac::`, `key_wrap::KeyEncryptionKey` = `AesKek`); the QUIC
+# header-protection key of ring and aws-lc-rs
+[[role]]
+path = "^aws_lc_rs::(aead::rand_nonce::RandomizedNonceKey|cipher::UnboundCipherKey|cmac::Key|key_wrap::KeyEncryptionKey)::new$"
+args = { "1" = "key" }
+
+[[role]]
+path = "^aws_lc_rs::aead::tls::(TlsRecordSealingKey|TlsRecordOpeningKey)::new$"
+args = { "2" = "key" }
+
+[[role]]
+path = "^(ring|aws_lc_rs)::aead::quic::HeaderProtectionKey::new$"
+args = { "1" = "key" }
+
+# a pseudorandom key used as is (`Prk::new_less_safe(alg, prk)`); the TLS 1.2 PRF secret
+[[role]]
+path = "^(ring|aws_lc_rs)::hkdf::Prk::new_less_safe$"
+args = { "1" = "key" }
+
+[[role]]
+path = "^aws_lc_rs::tls_prf::Secret::new$"
+args = { "1" = "key" }
+
 [[role]]
 path = "Nonce::assume_unique_for_key$"
 args = { "0" = "nonce" }
@@ -1015,6 +1466,10 @@ args = { "1" = "key" }
 
 [[role]]
 path = "pbkdf2_hmac(_array)?$"
+args = { "0" = "password", "1" = "salt" }
+
+[[role]]
+path = "^pbkdf2::pbkdf2(_array)?$"
 args = { "0" = "password", "1" = "salt" }
 
 # ring/aws-lc-rs pbkdf2::derive(algorithm, iterations, salt, secret, out)
@@ -1033,6 +1488,11 @@ args = { "1" = "password", "2" = "salt" }
 [[role]]
 path = "Argon2::hash_password_into$"
 args = { "1" = "password", "2" = "salt" }
+
+# the secret (pepper) of `Argon2::new_with_secret(secret, algorithm, version, params)`
+[[role]]
+path = "^argon2::Argon2::new_with_secret$"
+args = { "0" = "key" }
 
 [[role]]
 path = "^scrypt::scrypt$"
@@ -1064,7 +1524,7 @@ path = "SigningKey::(from_bytes|try_from|from)$"
 args = { "0" = "key" }
 
 [[role]]
-path = "(EncodingKey|DecodingKey)::from_secret$"
+path = "(EncodingKey|DecodingKey)::from_(base64_)?secret$"
 args = { "0" = "key" }
 
 [[role]]
@@ -1077,7 +1537,16 @@ path = "StaticSecret::(from|into)$"
 args = { "0" = "key" }
 
 [[role]]
-path = "StaticSecret::random_from_rng$"
+path = "^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random_from_rng|new)$"
+args = { "0" = "rng" }
+
+# `x25519_dalek::x25519(k, u)`: k is the secret scalar, u the peer's public coordinate
+[[role]]
+path = "^x25519_dalek::x25519::x25519$"
+args = { "0" = "key" }
+
+[[role]]
+path = "^ed25519_dalek::signing::SigningKey::generate$"
 args = { "0" = "rng" }
 
 [[role]]
@@ -1103,12 +1572,12 @@ path = "^std::fs::(read|read_to_string)$|^std::io::(Read|BufRead)::read"
 
 [[source]]
 kind = "rng"
-path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|OsRng)"
+path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random|new)$|OsRng)"
 
 # the output of a key derivation (the PRK, the OKM, a shared secret) is derived, whatever went in
 [[source]]
 kind = "derived"
-path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::agree_ephemeral$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac(_array)?)?$|^blake3::derive_key$)"
+path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password$|::hash_password_into$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$)"
 
 # Calls whose result carries only some arguments' data (receiver = argument 0).
 [[passthrough]]

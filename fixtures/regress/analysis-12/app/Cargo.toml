@@ -1,0 +1,15 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+signature = { path = "../signature" }
+sha2 = "0.10"
+# L2: rustls with its default features (aws-lc-rs): rustls-webpki's `alloc = ["ring?/alloc"]`
+# names ring without enabling it, so ring is not part of the build
+rustls = "0.23"
+
+# L3: a declaration for another platform: not cited for this one
+[target.'cfg(windows)'.dependencies]
+sha2 = { version = "0.10", features = ["oid"] }

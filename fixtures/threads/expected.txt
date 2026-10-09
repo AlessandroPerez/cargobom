@@ -1,61 +1,73 @@
-  occ HMAC-SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
-  occ HMAC-SHA-256 | src/main.rs:12:6 | digest::mac::Mac::update | [reachable] [call] in threads::mac; use: tag; line: `m.update(data);`; code: `update`
-  occ HMAC-SHA-256 | src/main.rs:13:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in threads::mac; into_bytes: setup, not a use; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
-  occ HMAC-SHA-256 | src/main.rs:13:6 | digest::mac::Mac::finalize | [reachable] [call] in threads::mac; use: tag; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
-  occ SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
-  occ SHA-256 | src/main.rs:12:6 | digest::mac::Mac::update | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.update(data);`; code: `update`
-  occ SHA-256 | src/main.rs:13:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
-  occ SHA-256 | src/main.rs:13:6 | digest::mac::Mac::finalize | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
-  occ SHA-256 | src/main.rs:7:4 | digest::digest::Digest::digest | [reachable] [call] in threads::hash; use: digest; line: `Sha256::digest(data).to_vec()`; code: `Sha256::digest`
-  occ crypto-common | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via threads -> hmac -> digest -> crypto-common
-  occ digest | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via threads -> hmac -> digest
-  occ hmac | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via threads -> hmac
-  occ hmac | Cargo.toml:11:0 | hmac | [manifest] declared by threads (dependencies)
-  occ sha2 | Cargo.lock:76:0 | sha2 | [manifest] locked sha2 0.10.9; reached via threads -> sha2
-  occ sha2 | Cargo.toml:10:0 | sha2 | [manifest] declared by threads (dependencies)
-  prop HMAC-SHA-256 | rcbom:confidence=high
-  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-256 | rcbom:functions:source=observed
-  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-256 | rcbom:occurrences=4
-  prop HMAC-SHA-256 | rcbom:provenance:key=parameter
-  prop HMAC-SHA-256 | rcbom:reachability=reachable
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=observed
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=5
-  prop SHA-256 | rcbom:reachability=reachable
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop hmac | rcbom:crypto-role=algorithm
-  prop hmac | rcbom:scope=required
-  prop hmac | rcbom:usage=reachable
-  prop sha2 | rcbom:crypto-role=algorithm
-  prop sha2 | rcbom:scope=required
-  prop sha2 | rcbom:usage=reachable
-  prop threads | rcbom:scope=required
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:12:6 | digest::mac::Mac::update | [reachable] [call] in threads::mac; use: tag; line: `m.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:13:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in threads::mac; into_bytes: setup, not a use; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:13:6 | digest::mac::Mac::finalize | [reachable] [call] in threads::mac; use: tag; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:6 | digest::mac::Mac::update | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:6 | digest::mac::Mac::finalize | [reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:4 | digest::digest::Digest::digest | [reachable] [call] in threads::hash; use: digest; line: `Sha256::digest(data).to_vec()`; code: `Sha256::digest`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via threads -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via threads -> hmac -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via threads -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:11:0 | hmac | [manifest] declared by threads (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:76:0 | sha2 | [manifest] locked sha2 0.10.9; reached via threads -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:10:0 | sha2 | [manifest] declared by threads (dependencies)
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop threads | pkg:cargo/threads@0.1.0 | rcbom:scope=required
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-component application threads 0.1.0 | pkg:cargo/threads@0.1.0
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
-component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
+component application threads 0.1.0 | pkg:cargo/threads@0.1.0 | purl pkg:cargo/threads@0.1.0
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/threads@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/threads@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:HMAC-SHA-256
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/threads@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/threads@0.1.0#root", "name": "threads", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=12
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=327
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

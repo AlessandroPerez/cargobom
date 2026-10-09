@@ -49,6 +49,12 @@ fn to_regex(pattern: &str) -> String {
     out
 }
 
+/// Is this a family of the registry? It lists some that the 1.7 schema's `algorithmFamily`
+/// enum does not (`TLS-PRF`): see [`crate::in_family_enum`].
+pub fn family(family: &str) -> bool {
+    PATTERNS.iter().any(|(f, _)| f == family)
+}
+
 /// Does some registry pattern produce this name?
 pub fn valid(name: &str, _family: &str) -> bool {
     PATTERNS.iter().any(|(_, r)| r.is_match(name))
@@ -90,5 +96,7 @@ mod tests {
         for bad in ["Argon2", "SHA-2", "SHA-257", "ChaCha8-Poly1305"] {
             assert!(!valid(bad, ""), "{bad}");
         }
+        assert!(valid("TLS12-PRF-SHA-256", ""));
+        assert!(family("TLS-PRF") && family("HMAC") && !family("NOT-A-FAMILY"));
     }
 }

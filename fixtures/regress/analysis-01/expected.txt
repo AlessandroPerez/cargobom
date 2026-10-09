@@ -1,276 +1,279 @@
-  occ AES-256-GCM | src/main.rs:16:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::hkdf_key; new_from_slice: setup, not a use; key: derived (hkdf::Hkdf::expand); line: `let c = Aes256Gcm::new_from_slice(&okm).unwrap();`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:17:6 | aead::Aead::encrypt | [reachable] [call] in t1::hkdf_key; use: encrypt; nonce: hard-coded (default value); line: `c.encrypt(&Default::default(), &b"x"[..]).unwrap()`; code: `encrypt`
-  occ AES-256-GCM | src/main.rs:22:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::env_key; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _c = Aes256Gcm::new_from_slice(k.as_bytes());`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | src/main.rs:29:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::copied_key; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 28); line: `let _c = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM-128-128 | src/main.rs:81:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::aes_nonce16; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 81); line: `let c = aes_gcm::AesGcm::<aes_gcm::aes::Aes256, aes_gcm::aead::consts::U16>::new_from_slice(&[0u8; 32]).unwrap();`; code: `aes_gcm::AesGcm::<aes_gcm::aes::Aes256, aes_gcm::aead::consts::U16>::new_from_slice`
-  occ AES-256-GCM-128-128 | src/main.rs:82:14 | aead::Aead::encrypt | [reachable] [call] in t1::aes_nonce16; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b"x"[..]);`; code: `encrypt`
-  occ Argon2id-19456-2-1 | src/main.rs:51:17 | core::default::Default::default | [reachable] [call] in t1::argon_two_lines; default: setup, not a use; line: `let argon2 = Argon2::default();`; code: `Argon2::default`
-  occ Argon2id-19456-2-1 | src/main.rs:53:11 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t1::argon_two_lines; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (16 bytes, literal at line 52); line: `argon2.hash_password(pw, &salt).unwrap().to_string()`; code: `hash_password`
-  occ Argon2id-19456-2-1 | src/main.rs:58:22 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t1::argon_into; use: keyderive; password: hard-coded (8 bytes, literal at line 58); salt: hard-coded (16 bytes, literal at line 58); line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `hash_password_into`
-  occ Argon2id-19456-2-1 | src/main.rs:58:4 | core::default::Default::default | [reachable] [call] in t1::argon_into; default: setup, not a use; line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `Argon2::default`
-  occ Ed25519 | src/main.rs:70:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [call] in t1::ed; use: keygen; line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`
-  occ Ed25519 | src/main.rs:71:17 | signature::signer::Signer::sign | [reachable] [call] in t1::ed; use: sign; line: `let sig = sk.sign(b"msg");`; code: `sign`
-  occ Ed25519 | src/main.rs:72:16 | ed25519_dalek::signing::SigningKey::verifying_key | [reachable] [call] in t1::ed; verifying_key: setup, not a use; line: `let vk = sk.verifying_key();`; code: `verifying_key`
-  occ Ed25519 | src/main.rs:73:7 | signature::verifier::Verifier::verify | [reachable] [call] in t1::ed; use: verify; line: `vk.verify(b"msg", &sig).unwrap();`; code: `verify`
-  occ HKDF-SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] in t1::hkdf_key; new: setup, not a use; ikm: environment (std::env::args); line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
-  occ HKDF-SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in t1::hkdf_key; use: keyderive; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
-  occ HMAC-SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
-  occ HMAC-SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
-  occ HMAC-SHA-512/256 | src/main.rs:40:12 | digest::mac::Mac::new_from_slice | [reachable] [call] in t1::sha512_trunc; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`
-  occ HMAC-SHA-512/256 | src/main.rs:41:26 | digest::mac::Mac::finalize | [reachable] [call] in t1::sha512_trunc; use: tag; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `finalize`
-  occ HMAC-SHA-512/256 | src/main.rs:41:37 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in t1::sha512_trunc; into_bytes: setup, not a use; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `into_bytes`
-  occ PBKDF2-SHA-256 | src/main.rs:46:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t1::pbkdf; use: keyderive; password: hard-coded (2 bytes, literal at line 46); salt: hard-coded (4 bytes, literal at line 46); line: `pbkdf2::pbkdf2_hmac::<Sha256>(b"pw", b"salt", iters, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ RSA-2048 | src/main.rs:77:13 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t1::rsa_osrng; use: keygen; rng: rng (rand_core::os::OsRng); line: `let _k = rsa::RsaPrivateKey::new(&mut OsRng, 2048).unwrap();`; code: `rsa::RsaPrivateKey::new`
-  occ SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
-  occ SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
-  occ SHA-256 | src/main.rs:46:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t1::pbkdf; part of PBKDF2-SHA-256; line: `pbkdf2::pbkdf2_hmac::<Sha256>(b"pw", b"salt", iters, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ SHA-512 | curve25519-dalek-4.1.3/src/scalar.rs:676:36 | digest::digest::Digest::finalize | [reachable] [call] in curve25519_dalek::scalar::Scalar::from_hash::<..>; use: digest; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:548; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:515; instantiated by ed25519_dalek::verifying::VerifyingKey::raw_verify::<..> at ed25519-dalek-2.2.0/src/verifying.rs:211; instantiated by <ed25519_dalek::verifying::VerifyingKey as signature::verifier::Verifier<ed25519::Signature>>::verify at ed25519-dalek-2.2.0/src/verifying.rs:564; line: `output.copy_from_slice(hash.finalize().as_slice());`; code: `finalize`
-  occ SHA-512/224 | src/main.rs:39:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let b = Sha512_224::digest(d);`; code: `Sha512_224::digest`
-  occ SHA-512/256 | src/main.rs:38:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let a = Sha512_256::digest(d);`; code: `Sha512_256::digest`
-  occ SHA-512/256 | src/main.rs:40:12 | digest::mac::Mac::new_from_slice | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`
-  occ SHA-512/256 | src/main.rs:41:26 | digest::mac::Mac::finalize | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `finalize`
-  occ SHA-512/256 | src/main.rs:41:37 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `into_bytes`
-  occ XChaCha20-Poly1305 | src/main.rs:33:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::xchacha; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 33); line: `let c = XChaCha20Poly1305::new_from_slice(&[1u8; 32]).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`
-  occ XChaCha20-Poly1305 | src/main.rs:34:14 | aead::Aead::encrypt | [reachable] [call] in t1::xchacha; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b"x"[..]);`; code: `encrypt`
-  occ aead | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t1 -> aes-gcm -> aead
-  occ aes | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t1 -> aes-gcm -> aes
-  occ aes-gcm | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
-  occ aes-gcm | Cargo.toml:10:0 | aes-gcm | [manifest] declared by t1 (dependencies)
-  occ argon2 | Cargo.lock:47:0 | argon2 | [manifest] locked argon2 0.5.3; reached via t1 -> argon2
-  occ argon2 | Cargo.toml:16:0 | argon2 | [manifest] declared by t1 (dependencies)
-  occ chacha20 | Cargo.lock:95:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via t1 -> chacha20poly1305 -> chacha20
-  occ chacha20poly1305 | Cargo.lock:106:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via t1 -> chacha20poly1305
-  occ chacha20poly1305 | Cargo.toml:11:0 | chacha20poly1305 | [manifest] declared by t1 (dependencies)
-  occ cipher | Cargo.lock:119:0 | cipher | [manifest] locked cipher 0.4.4; reached via t1 -> aes-gcm -> cipher
-  occ crypto-common | Cargo.lock:145:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t1 -> aes-gcm -> aead -> crypto-common
-  occ ctr | Cargo.lock:156:0 | ctr | [manifest] locked ctr 0.9.2; reached via t1 -> aes-gcm -> ctr
-  occ digest | Cargo.lock:203:0 | digest | [manifest] locked digest 0.10.7; reached via t1 -> hmac -> digest
-  occ ed25519-dalek | Cargo.lock:225:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via t1 -> ed25519-dalek
-  occ ed25519-dalek | Cargo.toml:18:0 | ed25519-dalek | [manifest] declared by t1 (dependencies); features ["rand_core"]
-  occ getrandom | Cargo.lock:256:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t1 -> ed25519-dalek -> rand_core -> getrandom
-  occ ghash | Cargo.lock:267:0 | ghash | [manifest] locked ghash 0.5.1; reached via t1 -> aes-gcm -> ghash
-  occ hkdf | Cargo.lock:277:0 | hkdf | [manifest] locked hkdf 0.12.4; reached via t1 -> hkdf
-  occ hkdf | Cargo.toml:14:0 | hkdf | [manifest] declared by t1 (dependencies)
-  occ hmac | Cargo.lock:286:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
-  occ hmac | Cargo.toml:13:0 | hmac | [manifest] declared by t1 (dependencies)
-  occ password-hash | Cargo.lock:376:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via t1 -> argon2 -> password-hash
-  occ pbkdf2 | Cargo.lock:387:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t1 -> pbkdf2
-  occ pbkdf2 | Cargo.toml:15:0 | pbkdf2 | [manifest] declared by t1 (dependencies); features ["hmac"]; default-features = false
-  occ poly1305 | Cargo.lock:427:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via t1 -> chacha20poly1305 -> poly1305
-  occ polyval | Cargo.lock:438:0 | polyval | [manifest] locked polyval 0.6.2; reached via t1 -> aes-gcm -> ghash -> polyval
-  occ rand | Cargo.lock:477:0 | rand | [manifest] locked rand 0.8.8; reached via t1 -> rand
-  occ rand | Cargo.toml:20:0 | rand | [manifest] declared by t1 (dependencies)
-  occ rand_chacha | Cargo.lock:488:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t1 -> rand -> rand_chacha
-  occ rand_core | Cargo.lock:498:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t1 -> ed25519-dalek -> rand_core
-  occ rsa | Cargo.lock:507:0 | rsa | [manifest] locked rsa 0.9.10; reached via t1 -> rsa
-  occ rsa | Cargo.toml:19:0 | rsa | [manifest] declared by t1 (dependencies)
-  occ scrypt | Cargo.lock:545:0 | scrypt | [manifest] locked scrypt 0.11.0; reached via t1 -> scrypt
-  occ scrypt | Cargo.toml:17:0 | scrypt | [manifest] declared by t1 (dependencies); default-features = false
-  occ scrypt | src/main.rs:65:4 | scrypt::scrypt | [reachable] [call] in t1::scrypt_lit; use: keyderive; password: hard-coded (8 bytes, literal at line 65); salt: hard-coded (10 bytes, literal at line 65); line: `scrypt::scrypt(b"password", b"fixed-salt", &p, &mut out).unwrap();`; code: `scrypt::scrypt`
-  occ sha2 | Cargo.lock:591:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t1 -> sha2
-  occ sha2 | Cargo.toml:12:0 | sha2 | [manifest] declared by t1 (dependencies)
-  occ signature | Cargo.lock:602:0 | signature | [manifest] locked signature 2.2.0; reached via t1 -> rsa -> signature
-  occ universal-hash | Cargo.lock:692:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> chacha20poly1305 -> poly1305 -> universal-hash
-  prop AES-256-GCM | rcbom:confidence=high
-  prop AES-256-GCM | rcbom:detection:method=type-resolved
-  prop AES-256-GCM | rcbom:finding=hard-coded-key
-  prop AES-256-GCM | rcbom:finding=hard-coded-nonce
-  prop AES-256-GCM | rcbom:functions:source=observed
-  prop AES-256-GCM | rcbom:kb:version=0.2.0
-  prop AES-256-GCM | rcbom:occurrences=4
-  prop AES-256-GCM | rcbom:param:nonce_bytes=12
-  prop AES-256-GCM | rcbom:param:tag_bytes=16
-  prop AES-256-GCM | rcbom:provenance:key=derived,environment,hard-coded
-  prop AES-256-GCM | rcbom:provenance:nonce=hard-coded
-  prop AES-256-GCM | rcbom:reachability=reachable
-  prop AES-256-GCM-128-128 | rcbom:confidence=high
-  prop AES-256-GCM-128-128 | rcbom:detection:method=type-resolved
-  prop AES-256-GCM-128-128 | rcbom:finding=hard-coded-key
-  prop AES-256-GCM-128-128 | rcbom:finding=hard-coded-nonce
-  prop AES-256-GCM-128-128 | rcbom:functions:source=observed
-  prop AES-256-GCM-128-128 | rcbom:kb:version=0.2.0
-  prop AES-256-GCM-128-128 | rcbom:occurrences=2
-  prop AES-256-GCM-128-128 | rcbom:param:nonce_bytes=16
-  prop AES-256-GCM-128-128 | rcbom:param:tag_bytes=16
-  prop AES-256-GCM-128-128 | rcbom:provenance:key=hard-coded
-  prop AES-256-GCM-128-128 | rcbom:provenance:nonce=hard-coded
-  prop AES-256-GCM-128-128 | rcbom:reachability=reachable
-  prop Argon2id-19456-2-1 | rcbom:confidence=high
-  prop Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
-  prop Argon2id-19456-2-1 | rcbom:finding=hard-coded-password
-  prop Argon2id-19456-2-1 | rcbom:finding=hard-coded-salt
-  prop Argon2id-19456-2-1 | rcbom:functions:source=observed
-  prop Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
-  prop Argon2id-19456-2-1 | rcbom:occurrences=4
-  prop Argon2id-19456-2-1 | rcbom:provenance:password=hard-coded,parameter
-  prop Argon2id-19456-2-1 | rcbom:provenance:salt=hard-coded
-  prop Argon2id-19456-2-1 | rcbom:reachability=reachable
-  prop Ed25519 | rcbom:confidence=high
-  prop Ed25519 | rcbom:detection:method=type-resolved
-  prop Ed25519 | rcbom:functions:source=observed
-  prop Ed25519 | rcbom:kb:version=0.2.0
-  prop Ed25519 | rcbom:occurrences=4
-  prop Ed25519 | rcbom:reachability=reachable
-  prop HKDF-SHA-256 | rcbom:confidence=high
-  prop HKDF-SHA-256 | rcbom:detection:method=type-resolved
-  prop HKDF-SHA-256 | rcbom:functions:source=observed
-  prop HKDF-SHA-256 | rcbom:kb:version=0.2.0
-  prop HKDF-SHA-256 | rcbom:occurrences=2
-  prop HKDF-SHA-256 | rcbom:provenance:ikm=environment
-  prop HKDF-SHA-256 | rcbom:reachability=reachable
-  prop HMAC-SHA-256 | rcbom:confidence=high
-  prop HMAC-SHA-256 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-256 | rcbom:functions:source=knowledge-base
-  prop HMAC-SHA-256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-256 | rcbom:occurrences=2
-  prop HMAC-SHA-256 | rcbom:only-as-component=true
-  prop HMAC-SHA-256 | rcbom:reachability=reachable
-  prop HMAC-SHA-512/256 | rcbom:confidence=high
-  prop HMAC-SHA-512/256 | rcbom:detection:method=type-resolved
-  prop HMAC-SHA-512/256 | rcbom:functions:source=observed
-  prop HMAC-SHA-512/256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-512/256 | rcbom:occurrences=3
-  prop HMAC-SHA-512/256 | rcbom:provenance:key=parameter
-  prop HMAC-SHA-512/256 | rcbom:reachability=reachable
-  prop PBKDF2-SHA-256 | rcbom:confidence=high
-  prop PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
-  prop PBKDF2-SHA-256 | rcbom:finding=hard-coded-password
-  prop PBKDF2-SHA-256 | rcbom:finding=hard-coded-salt
-  prop PBKDF2-SHA-256 | rcbom:functions:source=observed
-  prop PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
-  prop PBKDF2-SHA-256 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256 | rcbom:provenance:password=hard-coded
-  prop PBKDF2-SHA-256 | rcbom:provenance:salt=hard-coded
-  prop PBKDF2-SHA-256 | rcbom:reachability=reachable
-  prop RSA-2048 | rcbom:algorithm-family=RSA
-  prop RSA-2048 | rcbom:confidence=high
-  prop RSA-2048 | rcbom:detection:method=type-resolved
-  prop RSA-2048 | rcbom:functions:source=observed
-  prop RSA-2048 | rcbom:kb:version=0.2.0
-  prop RSA-2048 | rcbom:occurrences=1
-  prop RSA-2048 | rcbom:provenance:rng=rng
-  prop RSA-2048 | rcbom:reachability=reachable
-  prop SHA-256 | rcbom:confidence=high
-  prop SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | rcbom:functions:source=knowledge-base
-  prop SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | rcbom:occurrences=3
-  prop SHA-256 | rcbom:only-as-component=true
-  prop SHA-256 | rcbom:reachability=reachable
-  prop SHA-512 | rcbom:confidence=high
-  prop SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | rcbom:functions:source=observed
-  prop SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | rcbom:occurrences=1
-  prop SHA-512 | rcbom:reachability=reachable
-  prop SHA-512/224 | rcbom:confidence=high
-  prop SHA-512/224 | rcbom:detection:method=type-resolved
-  prop SHA-512/224 | rcbom:functions:source=observed
-  prop SHA-512/224 | rcbom:kb:version=0.2.0
-  prop SHA-512/224 | rcbom:occurrences=1
-  prop SHA-512/224 | rcbom:reachability=reachable
-  prop SHA-512/256 | rcbom:confidence=high
-  prop SHA-512/256 | rcbom:detection:method=type-resolved
-  prop SHA-512/256 | rcbom:functions:source=observed
-  prop SHA-512/256 | rcbom:kb:version=0.2.0
-  prop SHA-512/256 | rcbom:occurrences=4
-  prop SHA-512/256 | rcbom:reachability=reachable
-  prop XChaCha20-Poly1305 | rcbom:confidence=high
-  prop XChaCha20-Poly1305 | rcbom:detection:method=type-resolved
-  prop XChaCha20-Poly1305 | rcbom:finding=hard-coded-key
-  prop XChaCha20-Poly1305 | rcbom:finding=hard-coded-nonce
-  prop XChaCha20-Poly1305 | rcbom:functions:source=observed
-  prop XChaCha20-Poly1305 | rcbom:kb:version=0.2.0
-  prop XChaCha20-Poly1305 | rcbom:occurrences=2
-  prop XChaCha20-Poly1305 | rcbom:param:nonce_bytes=24
-  prop XChaCha20-Poly1305 | rcbom:provenance:key=hard-coded
-  prop XChaCha20-Poly1305 | rcbom:provenance:nonce=hard-coded
-  prop XChaCha20-Poly1305 | rcbom:reachability=reachable
-  prop aead | rcbom:crypto-role=trait
-  prop aead | rcbom:scope=required
-  prop aes | rcbom:crypto-role=algorithm
-  prop aes | rcbom:scope=required
-  prop aes | rcbom:usage=reachable
-  prop aes-gcm | rcbom:crypto-role=algorithm
-  prop aes-gcm | rcbom:scope=required
-  prop aes-gcm | rcbom:usage=reachable
-  prop argon2 | rcbom:crypto-role=algorithm
-  prop argon2 | rcbom:scope=required
-  prop argon2 | rcbom:usage=reachable
-  prop chacha20 | rcbom:crypto-role=algorithm
-  prop chacha20 | rcbom:scope=required
-  prop chacha20 | rcbom:usage=reachable
-  prop chacha20poly1305 | rcbom:crypto-role=algorithm
-  prop chacha20poly1305 | rcbom:scope=required
-  prop chacha20poly1305 | rcbom:usage=reachable
-  prop cipher | rcbom:crypto-role=trait
-  prop cipher | rcbom:scope=required
-  prop crypto-common | rcbom:crypto-role=trait
-  prop crypto-common | rcbom:scope=required
-  prop ctr | rcbom:crypto-role=algorithm
-  prop ctr | rcbom:scope=required
-  prop ctr | rcbom:usage=reachable
-  prop digest | rcbom:crypto-role=trait
-  prop digest | rcbom:scope=required
-  prop ed25519-dalek | rcbom:crypto-role=algorithm
-  prop ed25519-dalek | rcbom:scope=required
-  prop ed25519-dalek | rcbom:usage=reachable
-  prop getrandom | rcbom:crypto-role=algorithm
-  prop getrandom | rcbom:scope=required
-  prop getrandom | rcbom:usage=reachable
-  prop ghash | rcbom:crypto-role=algorithm
-  prop ghash | rcbom:scope=required
-  prop ghash | rcbom:usage=reachable
-  prop hkdf | rcbom:crypto-role=algorithm
-  prop hkdf | rcbom:scope=required
-  prop hkdf | rcbom:usage=reachable
-  prop hmac | rcbom:crypto-role=algorithm
-  prop hmac | rcbom:scope=required
-  prop hmac | rcbom:usage=reachable
-  prop password-hash | rcbom:crypto-role=trait
-  prop password-hash | rcbom:scope=required
-  prop pbkdf2 | rcbom:crypto-role=algorithm
-  prop pbkdf2 | rcbom:scope=required
-  prop pbkdf2 | rcbom:usage=reachable
-  prop poly1305 | rcbom:crypto-role=algorithm
-  prop poly1305 | rcbom:scope=required
-  prop poly1305 | rcbom:usage=reachable
-  prop polyval | rcbom:crypto-role=algorithm
-  prop polyval | rcbom:scope=required
-  prop polyval | rcbom:usage=reachable
-  prop rand | rcbom:crypto-role=algorithm
-  prop rand | rcbom:scope=required
-  prop rand | rcbom:usage=present
-  prop rand_chacha | rcbom:crypto-role=algorithm
-  prop rand_chacha | rcbom:scope=required
-  prop rand_chacha | rcbom:usage=present
-  prop rand_core | rcbom:crypto-role=trait
-  prop rand_core | rcbom:scope=required
-  prop rsa | rcbom:crypto-role=algorithm
-  prop rsa | rcbom:scope=required
-  prop rsa | rcbom:usage=reachable
-  prop scrypt | rcbom:confidence=high
-  prop scrypt | rcbom:crypto-role=algorithm
-  prop scrypt | rcbom:detection:method=type-resolved
-  prop scrypt | rcbom:finding=hard-coded-password
-  prop scrypt | rcbom:finding=hard-coded-salt
-  prop scrypt | rcbom:functions:source=observed
-  prop scrypt | rcbom:kb:version=0.2.0
-  prop scrypt | rcbom:occurrences=1
-  prop scrypt | rcbom:param:unresolved=work factor (log_n, r, p) computed at run time
-  prop scrypt | rcbom:provenance:password=hard-coded
-  prop scrypt | rcbom:provenance:salt=hard-coded
-  prop scrypt | rcbom:reachability=reachable
-  prop scrypt | rcbom:scope=required
-  prop scrypt | rcbom:usage=reachable
-  prop sha2 | rcbom:crypto-role=algorithm
-  prop sha2 | rcbom:scope=required
-  prop sha2 | rcbom:usage=reachable
-  prop signature | rcbom:crypto-role=trait
-  prop signature | rcbom:scope=required
-  prop t1 | rcbom:scope=required
-  prop universal-hash | rcbom:crypto-role=trait
-  prop universal-hash | rcbom:scope=required
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::hkdf_key; new_from_slice: setup, not a use; key: derived (hkdf::Hkdf::expand); line: `let c = Aes256Gcm::new_from_slice(&okm).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:17:6 | aead::Aead::encrypt | [reachable] [call] in t1::hkdf_key; use: encrypt; nonce: hard-coded (default value); line: `c.encrypt(&Default::default(), &b"x"[..]).unwrap()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:22:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::env_key; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _c = Aes256Gcm::new_from_slice(k.as_bytes());`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:29:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::copied_key; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 28); line: `let _c = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | src/main.rs:81:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::aes_nonce16; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 81); line: `let c = aes_gcm::AesGcm::<aes_gcm::aes::Aes256, aes_gcm::aead::consts::U16>::new_from_slice(&[0u8; 32]).unwrap();`; code: `aes_gcm::AesGcm::<aes_gcm::aes::Aes256, aes_gcm::aead::consts::U16>::new_from_slice`
+  occ AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | src/main.rs:82:14 | aead::Aead::encrypt | [reachable] [call] in t1::aes_nonce16; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b"x"[..]);`; code: `encrypt`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:51:17 | core::default::Default::default | [reachable] [call] in t1::argon_two_lines; default: setup, not a use; line: `let argon2 = Argon2::default();`; code: `Argon2::default`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:53:11 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t1::argon_two_lines; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (16 bytes, literal at line 52); line: `argon2.hash_password(pw, &salt).unwrap().to_string()`; code: `hash_password`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:58:22 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t1::argon_into; use: keyderive; password: hard-coded (8 bytes, literal at line 58); salt: hard-coded (16 bytes, literal at line 58); line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:58:4 | core::default::Default::default | [reachable] [call] in t1::argon_into; default: setup, not a use; line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `Argon2::default`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:70:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [call] in t1::ed; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:71:17 | signature::signer::Signer::sign | [reachable] [call] in t1::ed; use: sign; line: `let sig = sk.sign(b"msg");`; code: `sign`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:72:16 | ed25519_dalek::signing::SigningKey::verifying_key | [reachable] [call] in t1::ed; verifying_key: setup, not a use; line: `let vk = sk.verifying_key();`; code: `verifying_key`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:73:7 | signature::verifier::Verifier::verify | [reachable] [call] in t1::ed; use: verify; line: `vk.verify(b"msg", &sig).unwrap();`; code: `verify`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] in t1::hkdf_key; new: setup, not a use; ikm: environment (std::env::args); line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in t1::hkdf_key; use: keyderive; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | src/main.rs:40:12 | digest::mac::Mac::new_from_slice | [reachable] [call] in t1::sha512_trunc; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`
+  occ HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | src/main.rs:41:26 | digest::mac::Mac::finalize | [reachable] [call] in t1::sha512_trunc; use: tag; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `finalize`
+  occ HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | src/main.rs:41:37 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in t1::sha512_trunc; into_bytes: setup, not a use; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `into_bytes`
+  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:46:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t1::pbkdf; use: keyderive; password: hard-coded (2 bytes, literal at line 46); salt: hard-coded (4 bytes, literal at line 46); line: `pbkdf2::pbkdf2_hmac::<Sha256>(b"pw", b"salt", iters, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:77:13 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t1::rsa_osrng; use: keygen; rng: rng (rand_core::os::OsRng); line: `let _k = rsa::RsaPrivateKey::new(&mut OsRng, 2048).unwrap();`; code: `rsa::RsaPrivateKey::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(None, &std::env::args().next().unwrap().into_bytes());`; code: `Hkdf::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in t1::hkdf_key; part of HKDF-SHA-256; line: `hk.expand(b"my app info", &mut okm).unwrap();`; code: `expand`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t1::pbkdf; part of PBKDF2-SHA-256; line: `pbkdf2::pbkdf2_hmac::<Sha256>(b"pw", b"salt", iters, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ SHA-512 | crypto:algorithm:SHA-512 | curve25519-dalek-4.1.3/src/scalar.rs:676:36 | digest::digest::Digest::finalize | [reachable] [call] in curve25519_dalek::scalar::Scalar::from_hash::<..>; use: digest; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:548; instantiated by ed25519_dalek::verifying::RCompute::<..> at ed25519-dalek-2.2.0/src/verifying.rs:515; instantiated by ed25519_dalek::verifying::VerifyingKey::raw_verify::<..> at ed25519-dalek-2.2.0/src/verifying.rs:211; instantiated by <ed25519_dalek::verifying::VerifyingKey as signature::verifier::Verifier<ed25519::Signature>>::verify at ed25519-dalek-2.2.0/src/verifying.rs:564; line: `output.copy_from_slice(hash.finalize().as_slice());`; code: `finalize`
+  occ SHA-512/224 | crypto:algorithm:SHA-512/224 | src/main.rs:39:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let b = Sha512_224::digest(d);`; code: `Sha512_224::digest`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:38:12 | digest::digest::Digest::digest | [reachable] [call] in t1::sha512_trunc; use: digest; line: `let a = Sha512_256::digest(d);`; code: `Sha512_256::digest`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:40:12 | digest::mac::Mac::new_from_slice | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:41:26 | digest::mac::Mac::finalize | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `finalize`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:41:37 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in t1::sha512_trunc; part of HMAC-SHA-512/256; line: `a.len() + b.len() + m.finalize().into_bytes().len()`; code: `into_bytes`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:33:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t1::xchacha; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 33); line: `let c = XChaCha20Poly1305::new_from_slice(&[1u8; 32]).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:34:14 | aead::Aead::encrypt | [reachable] [call] in t1::xchacha; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b"x"[..]);`; code: `encrypt`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t1 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t1 -> aes-gcm -> aes
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t1 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:10:0 | aes-gcm | [manifest] declared by t1 (dependencies)
+  occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.lock:47:0 | argon2 | [manifest] locked argon2 0.5.3; reached via t1 -> argon2
+  occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.toml:16:0 | argon2 | [manifest] declared by t1 (dependencies)
+  occ chacha20 | pkg:cargo/chacha20@0.9.1 | Cargo.lock:95:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via t1 -> chacha20poly1305 -> chacha20
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.lock:106:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via t1 -> chacha20poly1305
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.toml:11:0 | chacha20poly1305 | [manifest] declared by t1 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:119:0 | cipher | [manifest] locked cipher 0.4.4; reached via t1 -> aes-gcm -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:145:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t1 -> aes-gcm -> aead -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:156:0 | ctr | [manifest] locked ctr 0.9.2; reached via t1 -> aes-gcm -> ctr
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:203:0 | digest | [manifest] locked digest 0.10.7; reached via t1 -> hmac -> digest
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:225:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via t1 -> ed25519-dalek
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:18:0 | ed25519-dalek | [manifest] declared by t1 (dependencies); features ["rand_core"]
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:256:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t1 -> ed25519-dalek -> rand_core -> getrandom
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:267:0 | ghash | [manifest] locked ghash 0.5.1; reached via t1 -> aes-gcm -> ghash
+  occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.lock:277:0 | hkdf | [manifest] locked hkdf 0.12.4; reached via t1 -> hkdf
+  occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.toml:14:0 | hkdf | [manifest] declared by t1 (dependencies)
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:286:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:13:0 | hmac | [manifest] declared by t1 (dependencies)
+  occ password-hash | pkg:cargo/password-hash@0.5.0 | Cargo.lock:376:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via t1 -> argon2 -> password-hash
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:387:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t1 -> pbkdf2
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:15:0 | pbkdf2 | [manifest] declared by t1 (dependencies); features ["hmac"]; default-features = false
+  occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:427:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via t1 -> chacha20poly1305 -> poly1305
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:438:0 | polyval | [manifest] locked polyval 0.6.2; reached via t1 -> aes-gcm -> ghash -> polyval
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:477:0 | rand | [manifest] locked rand 0.8.8; reached via t1 -> rand
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.toml:20:0 | rand | [manifest] declared by t1 (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:488:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t1 -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:498:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t1 -> ed25519-dalek -> rand_core
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.lock:507:0 | rsa | [manifest] locked rsa 0.9.10; reached via t1 -> rsa
+  occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:19:0 | rsa | [manifest] declared by t1 (dependencies)
+  occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.lock:545:0 | scrypt | [manifest] locked scrypt 0.11.0; reached via t1 -> scrypt
+  occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.toml:17:0 | scrypt | [manifest] declared by t1 (dependencies); default-features = false
+  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:64:12 | scrypt::params::Params::recommended | [reachable] [call] in t1::scrypt_lit; recommended: setup, not a use; line: `let p = scrypt::Params::recommended();`; code: `scrypt::Params::recommended`
+  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:65:4 | scrypt::scrypt | [reachable] [call] in t1::scrypt_lit; use: keyderive; password: hard-coded (8 bytes, literal at line 65); salt: hard-coded (10 bytes, literal at line 65); line: `scrypt::scrypt(b"password", b"fixed-salt", &p, &mut out).unwrap();`; code: `scrypt::scrypt`
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:591:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t1 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:12:0 | sha2 | [manifest] declared by t1 (dependencies)
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:602:0 | signature | [manifest] locked signature 2.2.0; reached via t1 -> rsa -> signature
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:692:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> chacha20poly1305 -> poly1305 -> universal-hash
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=4
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=derived,environment,hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:confidence=high
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:detection:method=type-resolved
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:finding=hard-coded-key
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:functions:source=observed
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:kb:version=0.2.0
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:occurrences=2
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:param:nonce_bytes=16
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:param:tag_bytes=16
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:provenance:key=hard-coded
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | rcbom:reachability=reachable
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:finding=hard-coded-password
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:finding=hard-coded-salt
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=observed
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=4
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=hard-coded,parameter
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=hard-coded
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=4
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:rng=rng
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=2
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=environment
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=2
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:confidence=high
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:functions:source=observed
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:occurrences=3
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-512/256 | crypto:algorithm:HMAC-SHA-512/256 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:confidence=high
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:finding=hard-coded-password
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:param:dk_len=32
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:password=hard-coded
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:reachability=reachable
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:detection:method=type-resolved
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:functions:source=observed
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=1
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:confidence=high
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:detection:method=type-resolved
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:functions:source=observed
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:kb:version=0.2.0
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:occurrences=1
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:reachability=reachable
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:confidence=high
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:detection:method=type-resolved
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:kb:version=0.2.0
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:occurrences=4
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:reachability=reachable
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:confidence=high
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:finding=hard-coded-key
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:finding=hard-coded-nonce
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:occurrences=2
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:param:nonce_bytes=24
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:key=hard-coded
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:nonce=hard-coded
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=reachable
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:crypto-role=algorithm
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:scope=required
+  prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:usage=reachable
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:crypto-role=algorithm
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:scope=required
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:crypto-role=algorithm
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:scope=required
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:crypto-role=trait
+  prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=present
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=present
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
+  prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:crypto-role=algorithm
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:scope=required
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:usage=reachable
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:confidence=high
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:detection:method=type-resolved
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:finding=hard-coded-password
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:finding=hard-coded-salt
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:functions:source=observed
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:kb:version=0.2.0
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:occurrences=2
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:provenance:password=hard-coded
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:provenance:salt=hard-coded
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:reachability=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop t1 | pkg:cargo/t1@0.1.0 | rcbom:scope=required
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset AES-256-GCM-128-128 | crypto:algorithm:AES-256-GCM-128-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
@@ -285,35 +288,35 @@ asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFa
 asset SHA-512/224 | crypto:algorithm:SHA-512/224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
-asset scrypt | crypto:algorithm:scrypt | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
-component application t1 0.1.0 | pkg:cargo/t1@0.1.0
-component library aead 0.5.2 | pkg:cargo/aead@0.5.2
-component library aes 0.8.4 | pkg:cargo/aes@0.8.4
-component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3
-component library argon2 0.5.3 | pkg:cargo/argon2@0.5.3
-component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1
-component library chacha20poly1305 0.10.1 | pkg:cargo/chacha20poly1305@0.10.1
-component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4
-component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7
-component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2
-component library digest 0.10.7 | pkg:cargo/digest@0.10.7
-component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0
-component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17
-component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1
-component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4
-component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1
-component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0
-component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2
-component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0
-component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2
-component library rand 0.8.8 | pkg:cargo/rand@0.8.8
-component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1
-component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4
-component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10
-component library scrypt 0.11.0 | pkg:cargo/scrypt@0.11.0
-component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9
-component library signature 2.2.0 | pkg:cargo/signature@2.2.0
-component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1
+asset scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+component application t1 0.1.0 | pkg:cargo/t1@0.1.0 | purl pkg:cargo/t1@0.1.0
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library argon2 0.5.3 | pkg:cargo/argon2@0.5.3 | purl pkg:cargo/argon2@0.5.3
+component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1 | purl pkg:cargo/chacha20@0.9.1
+component library chacha20poly1305 0.10.1 | pkg:cargo/chacha20poly1305@0.10.1 | purl pkg:cargo/chacha20poly1305@0.10.1
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4 | purl pkg:cargo/hkdf@0.12.4
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0 | purl pkg:cargo/password-hash@0.5.0
+component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
+component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10 | purl pkg:cargo/rsa@0.9.10
+component library scrypt 0.11.0 | pkg:cargo/scrypt@0.11.0 | purl pkg:cargo/scrypt@0.11.0
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
 dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
@@ -375,9 +378,47 @@ dep pkg:cargo/t1@0.1.0 -> pkg:cargo/rsa@0.9.10
 dep pkg:cargo/t1@0.1.0 -> pkg:cargo/scrypt@0.11.0
 dep pkg:cargo/t1@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency crypto:algorithm:HKDF-SHA-256
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-512/256
+dependency crypto:algorithm:PBKDF2-SHA-256
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/argon2@0.5.3
+dependency pkg:cargo/chacha20@0.9.1
+dependency pkg:cargo/chacha20poly1305@0.10.1
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/hkdf@0.12.4
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/password-hash@0.5.0
+dependency pkg:cargo/pbkdf2@0.12.2
+dependency pkg:cargo/poly1305@0.8.0
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand@0.8.8
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/rsa@0.9.10
+dependency pkg:cargo/scrypt@0.11.0
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/t1@0.1.0
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM-128-128
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM-128-128
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-19456-2-1
+provides pkg:cargo/chacha20@0.9.1 -> crypto:algorithm:XChaCha20-Poly1305
 provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:algorithm:XChaCha20-Poly1305
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/hkdf@0.12.4 -> crypto:algorithm:HKDF-SHA-256
@@ -385,7 +426,7 @@ provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-512/256
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
-provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt
+provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt-131072-8-1-32
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/224
@@ -393,7 +434,10 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/256
 root {"bom-ref": "pkg:cargo/t1@0.1.0#root", "name": "t1", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
+run rcbom:run:packages=69
+run rcbom:run:profile=release
 run rcbom:run:reachable-instances=1806
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

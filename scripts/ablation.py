@@ -4,13 +4,15 @@ project and compare what the CBOM says.
 
 usage: ablation.py OUT_DIR PROJECT_DIR...
 Columns: assets with code evidence, code occurrences, of which reachable, of which found
-inside a monomorphized generic instance ("instantiated by"), and (asset, line) pairs in the
-project's own sources (src/).
+inside a monomorphized generic instance ("instantiated by"), and (asset, file, line) triples in
+the project's own sources (src/), reported as `own_pairs`. The CBOMs are generated with the debug
+driver (as scripts/e2e.sh builds it), not a stale release build the CLI would otherwise prefer.
 """
 import json, pathlib, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CBOM = ROOT / "target" / "debug" / "cargo-cbom"
+DRIVER = ROOT / "crates" / "rcbom-driver" / "target" / "debug" / "rcbom-driver"
 
 
 def stats(path):
@@ -18,7 +20,8 @@ def stats(path):
     crypto = [c for c in d["components"] if c["type"] == "cryptographic-asset"]
     occ = [(c["name"], o) for c in crypto for o in c["evidence"]["occurrences"]
            if not o["additionalContext"].startswith("[manifest]")]
-    own = {(n, o["line"]) for n, o in occ if o["location"].startswith("src/")}
+    # one asset on the same line number of two files is two pairs
+    own = {(n, o["location"], o["line"]) for n, o in occ if o["location"].startswith("src/")}
     return {
         "assets": len({n for n, _ in occ}),
         "occurrences": len(occ),
@@ -31,18 +34,18 @@ def stats(path):
 def main():
     out = pathlib.Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
-    print(f"{'project':28} {'mode':8} {'assets':>6} {'occ':>5} {'reach':>5} {'in-mono':>7} {'own (asset,line)':>16}")
+    print(f"{'project':28} {'mode':8} {'assets':>6} {'occ':>5} {'reach':>5} {'in-mono':>7} {'own (asset,file,line)':>21}")
     rows = []
     for proj in map(pathlib.Path, sys.argv[2:]):
         res = {}
         for mode, flags in (("full", []), ("no-walk", ["--no-walk"])):
             path = out / f"{proj.name}.{mode}.json"
-            subprocess.run([str(CBOM), "cbom", *flags, "-o", str(path)], cwd=proj, check=True,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([str(CBOM), "cbom", "--driver", str(DRIVER), *flags, "-o", str(path)],
+                           cwd=proj, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             res[mode] = stats(path)
             s = res[mode]
             print(f"{proj.name:28} {mode:8} {s['assets']:6} {s['occurrences']:5} {s['reachable']:5} "
-                  f"{s['in_generic_instance']:7} {len(s['own_pairs']):16}")
+                  f"{s['in_generic_instance']:7} {len(s['own_pairs']):21}")
         lost = sorted(res["full"]["own_pairs"] - res["no-walk"]["own_pairs"])
         if lost:
             print(f"   only with the walk: {lost}")

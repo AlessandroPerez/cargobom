@@ -13,6 +13,8 @@
 #   scripts/e2e.sh                       the fixtures
 #   scripts/e2e.sh --realapp             also phase0/realapp
 #   scripts/e2e.sh --realapp --regress   also fixtures/regress/* (the audit probes)
+# Every CBOM is generated with the driver this script builds (debug, passed with --driver), not
+# one $RCBOM_DRIVER names or a stale release build the CLI would otherwise prefer.
 # RCBOM_BLESS=1 rewrites the golden files and committed scores instead of comparing (after a
 # deliberate change, to be reviewed with git diff). Outputs go to $RCBOM_RESULTS if set
 # (results/fixtures is the committed copy), else to a temporary directory.
@@ -22,6 +24,8 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 (cd "$root/crates/rcbom-driver" && cargo build -q)
 (cd "$root" && cargo build -q)
 cbom="$root/target/debug/cargo-cbom"
+driver="$root/crates/rcbom-driver/target/debug/rcbom-driver"
+unset RCBOM_DRIVER
 out=${RCBOM_RESULTS:-$(mktemp -d)}
 mkdir -p "$out"
 realapp=0
@@ -38,7 +42,7 @@ done
 run() {
     local dir=$1 name=$2
     echo "== ${dir#"$root"/}"
-    (cd "$dir" && "$cbom" cbom -o "$out/$name.cbom.json" 2> "$out/$name.log") || { cat "$out/$name.log"; exit 1; }
+    (cd "$dir" && "$cbom" cbom --driver "$driver" -o "$out/$name.cbom.json" 2> "$out/$name.log") || { cat "$out/$name.log"; exit 1; }
     if grep 'could not be analysed' "$out/$name.log"; then
         echo "the driver caught panics: each is a bug (RCBOM_DEBUG=1 prints them)"; exit 1
     fi

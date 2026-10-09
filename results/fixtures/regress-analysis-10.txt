@@ -1,0 +1,381 @@
+  occ 3DES-112 | crypto:algorithm:3DES-112 | src/main.rs:86:51 | aws_lc_rs::cipher::DES_EDE_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `for alg in [&cipher::DES_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE3_FOR_LEGACY_USE_ONLY] {`; code: `cipher::DES_EDE_FOR_LEGACY_USE_ONLY`
+  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:86:89 | aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `for alg in [&cipher::DES_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE3_FOR_LEGACY_USE_ONLY] {`; code: `cipher::DES_EDE3_FOR_LEGACY_USE_ONLY`
+  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:89:13 | aws_lc_rs::cipher::UnboundCipherKey::new | [reachable] [call] in t10::legacy_and_sha3; algorithm from aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cipher::UnboundCipherKey::new`
+  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:89:44 | aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `let uk = cipher::UnboundCipherKey::new(&cipher::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cipher::DES_EDE3_FOR_LEGACY_USE_ONLY`
+  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:91:15 | aws_lc_rs::cipher::padded::PaddedBlockEncryptingKey::encrypt | [reachable] [call] in t10::legacy_and_sha3; use: encrypt; algorithm from aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = ek.encrypt(&mut buf);`; code: `encrypt`
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:19:13 | aws_lc_rs::aead::quic::HeaderProtectionKey::new | [reachable] [call] in t10::literal_keys; algorithm from aws_lc_rs::aead::quic::AES_128 in the arguments; key: hard-coded (16 bytes, literal at line 19); line: `let hp = aead::quic::HeaderProtectionKey::new(&aead::quic::AES_128, &[2u8; 16]).unwrap();`; code: `aead::quic::HeaderProtectionKey::new`
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:19:51 | aws_lc_rs::aead::quic::AES_128 | [reachable] [static] in t10::literal_keys; use: encrypt; line: `let hp = aead::quic::HeaderProtectionKey::new(&aead::quic::AES_128, &[2u8; 16]).unwrap();`; code: `aead::quic::AES_128`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:13:12 | aws_lc_rs::aead::rand_nonce::RandomizedNonceKey::new | [reachable] [call] in t10::literal_keys; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: hard-coded (16 bytes, literal at line 13); line: `let k = aead::RandomizedNonceKey::new(&aead::AES_128_GCM, &[0u8; 16]).unwrap();`; code: `aead::RandomizedNonceKey::new`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:13:43 | aws_lc_rs::aead::aes_gcm::AES_128_GCM | [reachable] [static] in t10::literal_keys; line: `let k = aead::RandomizedNonceKey::new(&aead::AES_128_GCM, &[0u8; 16]).unwrap();`; code: `aead::AES_128_GCM`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:15:15 | aws_lc_rs::aead::rand_nonce::RandomizedNonceKey::seal_in_place_append_tag | [reachable] [call] in t10::literal_keys; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; line: `let _n = k.seal_in_place_append_tag(aead::Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`
+  occ AES-256 | crypto:algorithm:AES-256:block-cipher | src/main.rs:21:13 | aws_lc_rs::cipher::UnboundCipherKey::new | [reachable] [call] in t10::literal_keys; algorithm from aws_lc_rs::cipher::AES_256 in the arguments; key: hard-coded (32 bytes, literal at line 21); line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_256, &[3u8; 32]).unwrap();`; code: `cipher::UnboundCipherKey::new`
+  occ AES-256 | crypto:algorithm:AES-256:block-cipher | src/main.rs:21:44 | aws_lc_rs::cipher::AES_256 | [reachable] [static] in t10::literal_keys; line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_256, &[3u8; 32]).unwrap();`; code: `cipher::AES_256`
+  occ AES-256 | crypto:algorithm:AES-256:block-cipher | src/main.rs:23:15 | aws_lc_rs::cipher::padded::PaddedBlockEncryptingKey::encrypt | [reachable] [call] in t10::literal_keys; use: encrypt; algorithm from aws_lc_rs::cipher::AES_256 in the arguments; line: `let _ = ek.encrypt(&mut buf);`; code: `encrypt`
+  occ AES-256 | crypto:algorithm:AES-256:key-wrap | src/main.rs:72:14 | aws_lc_rs::key_wrap::KeyEncryptionKey::<Cipher>::new | [reachable] [call] in t10::key_wrapping; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; key: hard-coded (32 bytes, literal at line 72); line: `let kek = key_wrap::AesKek::new(&key_wrap::AES_256, &[7u8; 32]).unwrap();`; code: `key_wrap::AesKek::new`
+  occ AES-256 | crypto:algorithm:AES-256:key-wrap | src/main.rs:72:37 | aws_lc_rs::key_wrap::AES_256 | [reachable] [static] in t10::key_wrapping; line: `let kek = key_wrap::AesKek::new(&key_wrap::AES_256, &[7u8; 32]).unwrap();`; code: `key_wrap::AES_256`
+  occ AES-256 | crypto:algorithm:AES-256:key-wrap | src/main.rs:75:15 | aws_lc_rs::key_wrap::KeyEncryptionKey::<Cipher>::new | [reachable] [call] in t10::key_wrapping; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; key: hard-coded (32 bytes, literal at line 75); line: `let kek2 = key_wrap::AesKek::new(&key_wrap::AES_256, &[8u8; 32]).unwrap();`; code: `key_wrap::AesKek::new`
+  occ AES-256 | crypto:algorithm:AES-256:key-wrap | src/main.rs:75:38 | aws_lc_rs::key_wrap::AES_256 | [reachable] [static] in t10::key_wrapping; line: `let kek2 = key_wrap::AesKek::new(&key_wrap::AES_256, &[8u8; 32]).unwrap();`; code: `key_wrap::AES_256`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:16 | aws_lc_rs::aead::tls::TlsRecordSealingKey::new | [reachable] [call] in t10::literal_keys; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 16); line: `let mut t = aead::TlsRecordSealingKey::new(&aead::AES_256_GCM, aead::TlsProtocolId::TLS13, &[1u8; 32]).unwrap();`; code: `aead::TlsRecordSealingKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:48 | aws_lc_rs::aead::aes_gcm::AES_256_GCM | [reachable] [static] in t10::literal_keys; line: `let mut t = aead::TlsRecordSealingKey::new(&aead::AES_256_GCM, aead::TlsProtocolId::TLS13, &[1u8; 32]).unwrap();`; code: `aead::AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:18:14 | aws_lc_rs::aead::tls::TlsRecordSealingKey::seal_in_place_append_tag | [reachable] [call] in t10::literal_keys; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; line: `let _ = t.seal_in_place_append_tag(nonce, aead::Aad::empty(), &mut buf);`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:63:13 | aws_lc_rs::aead::unbound_key::UnboundKey::new | [reachable] [call] in t10::agreements; algorithm from aws_lc_rs::aead::aes_gcm::AES_256_GCM in the arguments; key: derived (agreement::ephemeral::agree_ephemeral); line: `let ok = aead::UnboundKey::new(&aead::AES_256_GCM, &shared).is_ok();`; code: `aead::UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:63:36 | aws_lc_rs::aead::aes_gcm::AES_256_GCM | [reachable] [static] in t10::agreements; line: `let ok = aead::UnboundKey::new(&aead::AES_256_GCM, &shared).is_ok();`; code: `aead::AES_256_GCM`
+  occ AES-256-KW | crypto:algorithm:AES-256-KW | src/main.rs:74:16 | aws_lc_rs::key_wrap::KeyWrap::wrap | [reachable] [call] in t10::key_wrapping; use: encrypt; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; line: `let a = kek.wrap(&key[..16], &mut out).map(|o| o.len()).unwrap_or(0);`; code: `wrap`
+  occ AES-256-KWP | crypto:algorithm:AES-256-KWP | src/main.rs:76:17 | aws_lc_rs::key_wrap::KeyWrapPadded::wrap_with_padding | [reachable] [call] in t10::key_wrapping; use: encrypt; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; line: `let b = kek2.wrap_with_padding(key, &mut out).map(|o| o.len()).unwrap_or(0);`; code: `wrap_with_padding`
+  occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:92:13 | aws_lc_rs::cmac::Key::new | [reachable] [call] in t10::legacy_and_sha3; algorithm from aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: parameter (argument 0 of the enclosing function); line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::Key::new`
+  occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:92:28 | aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; use: tag; line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::DES_EDE3_FOR_LEGACY_USE_ONLY`
+  occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:93:12 | aws_lc_rs::cmac::sign | [reachable] [call] in t10::legacy_and_sha3; use: tag; algorithm from aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = cmac::sign(&ck, msg);`; code: `cmac::sign`
+  occ CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | src/main.rs:24:13 | aws_lc_rs::cmac::Key::new | [reachable] [call] in t10::literal_keys; algorithm from aws_lc_rs::cmac::AES_128 in the arguments; key: hard-coded (16 bytes, literal at line 24); line: `let ck = cmac::Key::new(cmac::AES_128, &[4u8; 16]).unwrap();`; code: `cmac::Key::new`
+  occ CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | src/main.rs:24:28 | aws_lc_rs::cmac::AES_128 | [reachable] [static] in t10::literal_keys; use: tag; line: `let ck = cmac::Key::new(cmac::AES_128, &[4u8; 16]).unwrap();`; code: `cmac::AES_128`
+  occ CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | src/main.rs:25:15 | aws_lc_rs::cmac::sign | [reachable] [call] in t10::literal_keys; use: tag; algorithm from aws_lc_rs::cmac::AES_128 in the arguments; line: `let _tag = cmac::sign(&ck, msg);`; code: `cmac::sign`
+  occ DES-56 | crypto:algorithm:DES-56 | src/main.rs:86:17 | aws_lc_rs::cipher::DES_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `for alg in [&cipher::DES_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE3_FOR_LEGACY_USE_ONLY] {`; code: `cipher::DES_FOR_LEGACY_USE_ONLY`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:64:13 | aws_lc_rs::agreement::PrivateKey::generate | [reachable] [call] in t10::agreements; use: keygen; algorithm from aws_lc_rs::agreement::ECDH_P256 in the arguments; line: `let pk = agreement::PrivateKey::generate(&agreement::ECDH_P256).unwrap();`; code: `agreement::PrivateKey::generate`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:64:46 | aws_lc_rs::agreement::ECDH_P256 | [reachable] [static] in t10::agreements; use: keyderive; line: `let pk = agreement::PrivateKey::generate(&agreement::ECDH_P256).unwrap();`; code: `agreement::ECDH_P256`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:65:12 | aws_lc_rs::agreement::agree | [reachable] [call] in t10::agreements; use: keyderive; algorithm from aws_lc_rs::agreement::ECDH_P256 in the arguments; line: `let _ = agreement::agree(&pk, agreement::UnparsedPublicKey::new(&agreement::ECDH_P256, peer), aws_lc_rs::error::Unspecified, |km| Ok(km.to_vec()));`; code: `agreement::agree`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:65:69 | aws_lc_rs::agreement::ECDH_P256 | [reachable] [static] in t10::agreements; use: keyderive; line: `let _ = agreement::agree(&pk, agreement::UnparsedPublicKey::new(&agreement::ECDH_P256, peer), aws_lc_rs::error::Unspecified, |km| Ok(km.to_vec()));`; code: `agreement::ECDH_P256`
+  occ ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | src/main.rs:108:24 | aws_lc_rs::signature::ECDSA_P384_SHA256_ASN1 | [reachable] [static] in t10::descriptor_functions; use: verify; line: `let _verify_only = &signature::ECDSA_P384_SHA256_ASN1;`; code: `signature::ECDSA_P384_SHA256_ASN1`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:103:14 | aws_lc_rs::ec::key_pair::EcdsaKeyPair::generate_pkcs8 | [reachable] [call] in t10::descriptor_functions; use: keygen; algorithm from aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING in the arguments; line: `let doc = signature::EcdsaKeyPair::generate_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, &rng).unwrap();`; code: `signature::EcdsaKeyPair::generate_pkcs8`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:103:55 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING | [reachable] [static] in t10::descriptor_functions; use: sign; line: `let doc = signature::EcdsaKeyPair::generate_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, &rng).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:104:50 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING | [reachable] [static] in t10::descriptor_functions; use: sign; line: `let kp = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, doc.as_ref()).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:105:17 | aws_lc_rs::ec::key_pair::EcdsaKeyPair::sign | [reachable] [call] in t10::descriptor_functions; use: sign; algorithm from aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING in the arguments; line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:106:48 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1 | [reachable] [static] in t10::descriptor_functions; use: verify; line: `let pk = signature::UnparsedPublicKey::new(&signature::ECDSA_P256K1_SHA256_ASN1, kp.public_key().as_ref());`; code: `signature::ECDSA_P256K1_SHA256_ASN1`
+  occ ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | src/main.rs:107:16 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in t10::descriptor_functions; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1 in the arguments; line: `let ok = pk.verify(msg, sig.as_ref()).is_ok();`; code: `verify`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:110:27 | aws_lc_rs::signature::ED25519 | [reachable] [static] in t10::descriptor_functions; use: verify; line: `let _ed_verify_only = &signature::ED25519;`; code: `signature::ED25519`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:33:14 | aws_lc_rs::hkdf::Prk::new_less_safe | [reachable] [call] in t10::prk_and_prf; algorithm from aws_lc_rs::hkdf::HKDF_SHA256 in the arguments; key: hard-coded (32 bytes, literal at line 33); line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::Prk::new_less_safe`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:33:39 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:35:19 | aws_lc_rs::hkdf::Prk::expand | [reachable] [call] in t10::prk_and_prf; use: keyderive; algorithm from aws_lc_rs::hkdf::HKDF_SHA256 in the arguments; line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `expand`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:35:33 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:33:39 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [component] in t10::prk_and_prf; part of HKDF-SHA-256 (aws_lc_rs::hkdf::HKDF_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:35:33 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [component] in t10::prk_and_prf; part of HKDF-SHA-256 (aws_lc_rs::hkdf::HKDF_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `hkdf::HKDF_SHA256`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:44:13 | aws_lc_rs::kem::DecapsulationKey::<Id>::generate | [reachable] [call] in t10::ml_kem; use: keygen; algorithm from aws_lc_rs::kem::ML_KEM_768 in the arguments; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_768).unwrap();`; code: `kem::DecapsulationKey::generate`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:44:46 | aws_lc_rs::kem::ML_KEM_768 | [reachable] [static] in t10::ml_kem; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_768).unwrap();`; code: `kem::ML_KEM_768`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:46:23 | aws_lc_rs::kem::EncapsulationKey::<Id>::encapsulate | [reachable] [call] in t10::ml_kem; use: encapsulate; algorithm from aws_lc_rs::kem::ML_KEM_768 in the arguments; line: `let (ct, ss1) = ek.encapsulate().unwrap();`; code: `encapsulate`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:47:17 | aws_lc_rs::kem::DecapsulationKey::<Id>::decapsulate | [reachable] [call] in t10::ml_kem; use: decapsulate; algorithm from aws_lc_rs::kem::ML_KEM_768 in the arguments; line: `let ss2 = dk.decapsulate(ct).unwrap();`; code: `decapsulate`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | src/main.rs:111:26 | aws_lc_rs::signature::RSA_PKCS1_SHA384 | [reachable] [static] in t10::descriptor_functions; use: sign; line: `let _rsa_sign_only = &signature::RSA_PKCS1_SHA384;`; code: `signature::RSA_PKCS1_SHA384`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | src/main.rs:109:28 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA512 | [reachable] [static] in t10::descriptor_functions; use: verify; line: `let _rsa_verify_only = &signature::RSA_PSS_2048_8192_SHA512;`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:103:55 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING | [reachable] [component] in t10::descriptor_functions; part of ECDSA-secp256k1-SHA-256 (aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING -> aws_lc_rs::digest::sha::SHA256); line: `let doc = signature::EcdsaKeyPair::generate_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, &rng).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:104:50 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING | [reachable] [component] in t10::descriptor_functions; part of ECDSA-secp256k1-SHA-256 (aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1_SIGNING -> aws_lc_rs::digest::sha::SHA256); line: `let kp = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256K1_SHA256_ASN1_SIGNING, doc.as_ref()).unwrap();`; code: `signature::ECDSA_P256K1_SHA256_ASN1_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:106:48 | aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1 | [reachable] [component] in t10::descriptor_functions; part of ECDSA-secp256k1-SHA-256 (aws_lc_rs::signature::ECDSA_P256K1_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let pk = signature::UnparsedPublicKey::new(&signature::ECDSA_P256K1_SHA256_ASN1, kp.public_key().as_ref());`; code: `signature::ECDSA_P256K1_SHA256_ASN1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:108:24 | aws_lc_rs::signature::ECDSA_P384_SHA256_ASN1 | [reachable] [component] in t10::descriptor_functions; part of ECDSA-P-384-SHA-256 (aws_lc_rs::signature::ECDSA_P384_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let _verify_only = &signature::ECDSA_P384_SHA256_ASN1;`; code: `signature::ECDSA_P384_SHA256_ASN1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:33:39 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [component] in t10::prk_and_prf; part of HKDF-SHA-256 (aws_lc_rs::hkdf::HKDF_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let prk = hkdf::Prk::new_less_safe(hkdf::HKDF_SHA256, &[5u8; 32]);`; code: `hkdf::HKDF_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:33 | aws_lc_rs::hkdf::HKDF_SHA256 | [reachable] [component] in t10::prk_and_prf; part of HKDF-SHA-256 (aws_lc_rs::hkdf::HKDF_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let _okm = prk.expand(&info, hkdf::HKDF_SHA256).is_ok();`; code: `hkdf::HKDF_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:111:26 | aws_lc_rs::signature::RSA_PKCS1_SHA384 | [reachable] [component] in t10::descriptor_functions; part of RSA-PKCS1-1.5-SHA-384 (aws_lc_rs::signature::RSA_PKCS1_SHA384 -> aws_lc_rs::digest::sha::SHA384); line: `let _rsa_sign_only = &signature::RSA_PKCS1_SHA384;`; code: `signature::RSA_PKCS1_SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:109:28 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA512 | [reachable] [component] in t10::descriptor_functions; part of RSA-PSS-SHA-512 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `let _rsa_verify_only = &signature::RSA_PSS_2048_8192_SHA512;`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:83:12 | aws_lc_rs::digest::digest | [reachable] [call] in t10::legacy_and_sha3; use: digest; algorithm from aws_lc_rs::digest::sha::SHA3_256 in the arguments; line: `let a = digest::digest(&digest::SHA3_256, msg);`; code: `digest::digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:83:28 | aws_lc_rs::digest::sha::SHA3_256 | [reachable] [static] in t10::legacy_and_sha3; use: digest; line: `let a = digest::digest(&digest::SHA3_256, msg);`; code: `digest::SHA3_256`
+  occ SHA3-512 | crypto:algorithm:SHA3-512 | src/main.rs:84:12 | aws_lc_rs::digest::digest | [reachable] [call] in t10::legacy_and_sha3; use: digest; algorithm from aws_lc_rs::digest::sha::SHA3_512 in the arguments; line: `let b = digest::digest(&digest::SHA3_512, msg);`; code: `digest::digest`
+  occ SHA3-512 | crypto:algorithm:SHA3-512 | src/main.rs:84:28 | aws_lc_rs::digest::sha::SHA3_512 | [reachable] [static] in t10::legacy_and_sha3; use: digest; line: `let b = digest::digest(&digest::SHA3_512, msg);`; code: `digest::SHA3_512`
+  occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | src/main.rs:36:12 | aws_lc_rs::tls_prf::Secret::new | [reachable] [call] in t10::prk_and_prf; algorithm from aws_lc_rs::tls_prf::P_SHA256 in the arguments; key: hard-coded (48 bytes, literal at line 36); line: `let s = tls_prf::Secret::new(&tls_prf::P_SHA256, &[6u8; 48]).unwrap();`; code: `tls_prf::Secret::new`
+  occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | src/main.rs:36:34 | aws_lc_rs::tls_prf::P_SHA256 | [reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let s = tls_prf::Secret::new(&tls_prf::P_SHA256, &[6u8; 48]).unwrap();`; code: `tls_prf::P_SHA256`
+  occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | src/main.rs:37:16 | aws_lc_rs::tls_prf::Secret::derive | [reachable] [call] in t10::prk_and_prf; use: keyderive; algorithm from aws_lc_rs::tls_prf::P_SHA256 in the arguments; line: `let out = s.derive(b"master secret", b"seed", 48).unwrap();`; code: `derive`
+  occ TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | src/main.rs:38:18 | aws_lc_rs::tls_prf::P_SHA384 | [reachable] [static] in t10::prk_and_prf; use: keyderive; line: `let _other = &tls_prf::P_SHA384;`; code: `tls_prf::P_SHA384`
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:6:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via t10 -> aws-lc-rs
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by t10 (dependencies); features ["legacy-des"]
+  occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:13 | aws_lc_rs::agreement::ephemeral::EphemeralPrivateKey::generate | [reachable] [call] in t10::agreements; use: keygen; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::EphemeralPrivateKey::generate`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:55 | aws_lc_rs::agreement::X25519 | [reachable] [static] in t10::agreements; use: keyderive; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::X25519`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:57:27 | aws_lc_rs::agreement::ephemeral::agree_ephemeral | [reachable] [call] in t10::agreements; use: keyderive; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::agree_ephemeral`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:57:93 | aws_lc_rs::agreement::X25519 | [reachable] [static] in t10::agreements; use: keyderive; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::X25519`
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:confidence=high
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:detection:method=type-resolved
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:functions:source=knowledge-base
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:kb:version=0.2.0
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:occurrences=1
+  prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:reachability=reachable
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:confidence=high
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:detection:method=type-resolved
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:functions:source=observed
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:kb:version=0.2.0
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:occurrences=4
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:provenance:key=parameter
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:reachability=reachable
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:finding=hard-coded-key
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:functions:source=observed
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:kb:version=0.2.0
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:note=QUIC header protection
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:occurrences=2
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:provenance:key=hard-coded
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:reachability=reachable
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:confidence=high
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:detection:method=type-resolved
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:finding=hard-coded-key
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:functions:source=observed
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:kb:version=0.2.0
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:occurrences=3
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:key=hard-coded
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:reachability=reachable
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:confidence=high
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:detection:method=type-resolved
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:finding=hard-coded-key
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:functions:source=observed
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:kb:version=0.2.0
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:occurrences=3
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:provenance:key=hard-coded
+  prop AES-256 | crypto:algorithm:AES-256:block-cipher | rcbom:reachability=reachable
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:confidence=high
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:detection:method=type-resolved
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:finding=hard-coded-key
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:functions:source=knowledge-base
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:kb:version=0.2.0
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:occurrences=4
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:provenance:key=hard-coded
+  prop AES-256 | crypto:algorithm:AES-256:key-wrap | rcbom:reachability=reachable
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=5
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=derived,hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:confidence=high
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:detection:method=type-resolved
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:functions:source=observed
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:kb:version=0.2.0
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:occurrences=1
+  prop AES-256-KW | crypto:algorithm:AES-256-KW | rcbom:reachability=reachable
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:confidence=high
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:detection:method=type-resolved
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:functions:source=observed
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:kb:version=0.2.0
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:occurrences=1
+  prop AES-256-KWP | crypto:algorithm:AES-256-KWP | rcbom:reachability=reachable
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:confidence=high
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:detection:method=type-resolved
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:functions:source=observed
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:kb:version=0.2.0
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:occurrences=3
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:provenance:key=parameter
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:reachability=reachable
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:confidence=high
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:detection:method=type-resolved
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:finding=hard-coded-key
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:functions:source=observed
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:kb:version=0.2.0
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:occurrences=3
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:provenance:key=hard-coded
+  prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:reachability=reachable
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:confidence=high
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:detection:method=type-resolved
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:functions:source=knowledge-base
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:kb:version=0.2.0
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:occurrences=1
+  prop DES-56 | crypto:algorithm:DES-56 | rcbom:reachability=reachable
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=4
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:occurrences=1
+  prop ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | rcbom:reachability=reachable
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:confidence=high
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:occurrences=6
+  prop ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | rcbom:reachability=reachable
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=1
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:finding=hard-coded-key
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=4
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:key=hard-coded
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=2
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:confidence=high
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:detection:method=type-resolved
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:functions:source=observed
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=4
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=1
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=reachable
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:confidence=high
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:occurrences=1
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=2
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:confidence=high
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:detection:method=type-resolved
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:functions:source=observed
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:kb:version=0.2.0
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:occurrences=2
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:reachability=reachable
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:algorithm-family=TLS-PRF
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:confidence=high
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:detection:method=type-resolved
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:finding=hard-coded-key
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:functions:source=observed
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:kb:version=0.2.0
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:note=TLS 1.2 PRF (RFC 5246 P_hash)
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:occurrences=3
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:provenance:key=hard-coded
+  prop TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rcbom:reachability=reachable
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:algorithm-family=TLS-PRF
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:confidence=high
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:detection:method=type-resolved
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:functions:source=observed
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:kb:version=0.2.0
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:note=TLS 1.2 PRF (RFC 5246 P_hash)
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:occurrences=1
+  prop TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rcbom:reachability=reachable
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:crypto-role=algorithm
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:ffi-boundary=true
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
+  prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop t10 | pkg:cargo/t10@0.1.0 | rcbom:scope=required
+  prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
+  prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
+  prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
+  prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
+  prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=4
+  prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
+asset 3DES-112 | crypto:algorithm:3DES-112 | {"algorithmProperties": {"algorithmFamily": "3DES", "cryptoFunctions": ["encrypt", "decrypt"], "parameterSetIdentifier": "112", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset 3DES-168 | crypto:algorithm:3DES-168 | {"algorithmProperties": {"algorithmFamily": "3DES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "168", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256 | crypto:algorithm:AES-256:block-cipher | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256 | crypto:algorithm:AES-256:key-wrap | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "parameterSetIdentifier": "256", "primitive": "key-wrap"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-KW | crypto:algorithm:AES-256-KW | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "key-wrap"}, "assetType": "algorithm"}
+asset AES-256-KWP | crypto:algorithm:AES-256-KWP | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "key-wrap"}, "assetType": "algorithm"}
+asset CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | {"algorithmProperties": {"algorithmFamily": "CMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | {"algorithmProperties": {"algorithmFamily": "CMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset DES-56 | crypto:algorithm:DES-56 | {"algorithmProperties": {"algorithmFamily": "DES", "cryptoFunctions": ["encrypt", "decrypt"], "parameterSetIdentifier": "56", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "nist/P-256", "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDSA-P-384-SHA-256 | crypto:algorithm:ECDSA-P-384-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-secp256k1-SHA-256 | crypto:algorithm:ECDSA-secp256k1-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign", "verify"], "ellipticCurve": "secg/secp256k1", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "parameterSetIdentifier": "768", "primitive": "kem"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-512 | crypto:algorithm:SHA3-512 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | {"algorithmProperties": {"cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | {"algorithmProperties": {"cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+component application t10 0.1.0 | pkg:cargo/t10@0.1.0 | purl pkg:cargo/t10@0.1.0
+component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
+component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+dep crypto:algorithm:ECDSA-P-384-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:ECDSA-secp256k1-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/t10@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
+dependency crypto:algorithm:ECDSA-P-384-SHA-256
+dependency crypto:algorithm:ECDSA-secp256k1-SHA-256
+dependency crypto:algorithm:HKDF-SHA-256
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+dependency crypto:algorithm:RSA-PSS-SHA-512
+dependency pkg:cargo/aws-lc-rs@1.18.1
+dependency pkg:cargo/aws-lc-sys@0.45.0
+dependency pkg:cargo/t10@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:3DES-112
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:3DES-168
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-128
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-128-GCM
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-256-KW
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-256-KWP
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-256:block-cipher
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:AES-256:key-wrap
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:CMAC-3DES-168
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:CMAC-AES-128
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:DES-56
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ECDSA-P-384-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ECDSA-secp256k1-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:Ed25519
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:HKDF-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ML-KEM-768
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:RSA-PSS-SHA-512
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-384
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-512
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA3-512
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:TLS12-PRF-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:TLS12-PRF-SHA-384
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:x25519
+root {"bom-ref": "pkg:cargo/t10@0.1.0#root", "name": "t10", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=14
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=374
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -15,12 +15,23 @@ pub struct RunInfo {
     pub toolchain: String,
     pub target: String,
     pub features: Vec<String>,
+    /// The cargo profile analysed (`none` for Layer 1 only).
+    pub profile: String,
+    /// Packages in the build Layer 1 resolved (normal and build edges, host platform).
+    pub packages: usize,
     pub sandbox: String,
 }
 
 /// Roles whose value must not be a constant: a literal key, nonce, IV, salt or password is a
-/// finding.
-const SECRET_ROLES: &[&str] = &["key", "nonce", "iv", "salt", "password", "ikm"];
+/// finding, and so is a generator seeded with a constant (`predictable-rng`).
+const SECRET_ROLES: &[&str] = &["key", "nonce", "iv", "salt", "password", "ikm", "rng"];
+
+fn finding(role: &str) -> String {
+    match role {
+        "rng" => "predictable-rng".into(),
+        r => format!("hard-coded-{r}"),
+    }
+}
 
 fn prop(name: &str, value: impl ToString) -> Value {
     json!({ "name": name, "value": value.to_string() })
@@ -99,7 +110,10 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     };
     let mut ap = serde_json::Map::new();
     ap.insert("primitive".into(), json!(a.algo.primitive));
-    ap.insert("algorithmFamily".into(), json!(a.algo.family));
+    // a registry family the 1.7 enum lacks (`TLS-PRF`) is a property, as for key material
+    if rcbom_kb::in_family_enum(&a.algo.family) {
+        ap.insert("algorithmFamily".into(), json!(a.algo.family));
+    }
     if let Some(p) = &a.algo.parameter_set {
         ap.insert("parameterSetIdentifier".into(), json!(p));
     }
@@ -148,9 +162,19 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     }
     // where the key material handed to this asset's APIs comes from (intraprocedural)
     let mut by_role: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
+    // the hard-coded roles in reachable code, and those only in code not reachable from the
+    // entry points
+    let mut reachable_hc: BTreeSet<&str> = BTreeSet::new();
+    let mut present_hc: BTreeSet<&str> = BTreeSet::new();
     for o in &a.occurrences {
         for (role, kind) in &o.provenance {
             by_role.entry(role).or_default().insert(kind);
+            if kind == "hard-coded" && SECRET_ROLES.contains(&role.as_str()) {
+                match o.tier {
+                    Tier::Reachable => reachable_hc.insert(role),
+                    Tier::Present => present_hc.insert(role),
+                };
+            }
         }
     }
     for (role, kinds) in &by_role {
@@ -158,8 +182,10 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
             &format!("rcbom:provenance:{role}"),
             kinds.iter().copied().collect::<Vec<_>>().join(","),
         ));
-        if kinds.contains("hard-coded") && SECRET_ROLES.contains(role) {
-            props.push(prop("rcbom:finding", format!("hard-coded-{role}")));
+        if reachable_hc.contains(role) {
+            props.push(prop("rcbom:finding", finding(role)));
+        } else if present_hc.contains(role) {
+            props.push(prop("rcbom:finding:present", finding(role)));
         }
     }
     if let Some(n) = &a.algo.note {
@@ -171,6 +197,9 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
         props.push(prop("rcbom:registry-name", "unmatched"));
     }
     props.push(prop("rcbom:occurrences", a.occurrences.len()));
+    if a.algo.material.is_none() && !rcbom_kb::in_family_enum(&a.algo.family) {
+        props.push(prop("rcbom:algorithm-family", &a.algo.family));
+    }
     let crypto = match &a.algo.material {
         // a key with no scheme: material, linked to its family by a property
         Some(m) => {
@@ -358,7 +387,9 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
             let mut ap = serde_json::Map::new();
             if let Some(t) = template {
                 ap.insert("primitive".into(), json!(t.primitive));
-                ap.insert("algorithmFamily".into(), json!(t.family));
+                if rcbom_kb::in_family_enum(&t.family) {
+                    ap.insert("algorithmFamily".into(), json!(t.family));
+                }
             }
             out.push(json!({
                 "type": "cryptographic-asset",
@@ -489,6 +520,8 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         prop("rcbom:run:toolchain", &run.toolchain),
         prop("rcbom:run:target", &run.target),
         prop("rcbom:run:features", run.features.join(",")),
+        prop("rcbom:run:profile", &run.profile),
+        prop("rcbom:run:packages", run.packages),
         prop("rcbom:run:sandbox", &run.sandbox),
         prop("rcbom:kb:version", &kb.version),
         prop("rcbom:run:reachable-instances", an.instances),

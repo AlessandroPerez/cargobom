@@ -1,0 +1,22 @@
+[package]
+name = "v02"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[features]
+legacy = []
+
+# V7: manifest keys. sha1 is named in this comment; its key below is quoted (cited at the
+# opening quote), and it is declared again in [dev-dependencies]: each declaration is cited in
+# its own table. Cargo.lock has CRLF line ends.
+[dependencies]
+sha2 = "0.10"
+"sha1" = "0.10"
+ring = "0.17"
+# V1: a second version of sha2, renamed
+sha2_11 = { package = "sha2", version = "0.11" }
+
+[dev-dependencies]
+sha1 = "0.10"

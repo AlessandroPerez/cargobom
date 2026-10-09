@@ -96,6 +96,24 @@ fn placeholders(s: &str) -> Vec<String> {
     out
 }
 
+/// The parameters the filled name `name` actually spells out: a template placeholder can be
+/// left out (`PBKDF2-SHA-256-{iterations}-{dk_len}` with the iterations unknown ends after the
+/// hash), and then its value must stay a property.
+fn in_name(algo: &Algo, vals: &BTreeMap<String, String>, name: &str) -> BTreeSet<String> {
+    vals.keys()
+        .filter(|k| algo.asset.contains(&format!("{{{k}}}")))
+        .filter(|k| {
+            // an optional part left out at its default value is implied by the name
+            algo.defaults.contains_key(*k) || {
+                let mut without = vals.clone();
+                without.remove(*k);
+                fill(&algo.asset, &without, &algo.defaults) != name
+            }
+        })
+        .cloned()
+        .collect()
+}
+
 fn filled_algo(algo: &Algo, vals: &BTreeMap<String, String>) -> Algo {
     let mut a = algo.clone();
     let none = BTreeMap::new();
@@ -119,6 +137,18 @@ fn filled_algo(algo: &Algo, vals: &BTreeMap<String, String>) -> Algo {
 pub type Supported<'a> = &'a dyn Fn(&CrateRef) -> bool;
 
 pub fn match_static(kb: &Kb, def: &DefRef, supported: Supported) -> Option<Match> {
+    match_static_called(kb, def, None, supported)
+}
+
+/// A descriptor named by a call to `method`, which may say more than the descriptor alone
+/// (`asset_by_method`): aws-lc-rs's `key_wrap::AES_256` is AES-256-KWP for
+/// `wrap_with_padding`.
+pub fn match_static_called(
+    kb: &Kb,
+    def: &DefRef,
+    method: Option<&str>,
+    supported: Supported,
+) -> Option<Match> {
     if !supported(&def.krate) {
         return None;
     }
@@ -134,7 +164,11 @@ pub fn match_static(kb: &Kb, def: &DefRef, supported: Supported) -> Option<Match
             let vals: BTreeMap<String, String> = (1..c.len())
                 .filter_map(|i| c.get(i).map(|m| (i.to_string(), m.as_str().to_string())))
                 .collect();
-            let algo = filled_algo(&e.algo, &vals);
+            let mut algo = e.algo.clone();
+            if let Some(t) = method.and_then(|m| e.asset_by_method.get(m)) {
+                algo.asset = t.clone();
+            }
+            let algo = filled_algo(&algo, &vals);
             return Some(Match {
                 name: algo.asset.clone(),
                 params: BTreeMap::new(),
@@ -161,15 +195,38 @@ pub fn match_fn(
     arg_lens: &[Option<u64>],
     supported: Supported,
 ) -> Option<Match> {
+    let none = BTreeMap::new();
+    match_fn_with(
+        kb, callee, self_ty, args, const_args, arg_lens, supported, &none,
+    )
+}
+
+/// [`match_fn`], with parameter values known from elsewhere standing over the call's own:
+/// the constructor of a value passed to a call, with what the call itself says
+/// (`scrypt(.., &Params::new(15, 8, 1, 32), out)` derives `out.len()` bytes).
+#[allow(clippy::too_many_arguments)]
+pub fn match_fn_with(
+    kb: &Kb,
+    callee: &DefRef,
+    self_ty: Option<&TyTree>,
+    args: &[TyTree],
+    const_args: &[Option<i128>],
+    arg_lens: &[Option<u64>],
+    supported: Supported,
+    overrides: &BTreeMap<String, String>,
+) -> Option<Match> {
     let prefix = format!("{}::", callee.krate.name);
     let path = callee.path.strip_prefix(&prefix).unwrap_or(&callee.path);
+    // with and without the impl's generic arguments (`argon2::Argon2::<'key>::new`)
+    let bare = strip_generics(path);
+    let full_bare = strip_generics(&callee.path);
     let mut provider = None;
     let e = kb.fns.iter().find(|e| match &e.self_type {
         Some(st) => match self_ty {
             Some(TyTree::Adt {
                 krate, path: tp, ..
             }) if e.krates.contains(&krate.name) && last(tp) == st && supported(krate) => {
-                let ok = e.pattern.is_match(&callee.path);
+                let ok = e.pattern.is_match(&callee.path) || e.pattern.is_match(&full_bare);
                 if ok {
                     provider = Some(krate.clone());
                 }
@@ -180,7 +237,7 @@ pub fn match_fn(
         None => {
             let ok = e.krates.contains(&callee.krate.name)
                 && supported(&callee.krate)
-                && e.pattern.is_match(path);
+                && (e.pattern.is_match(path) || e.pattern.is_match(&bare));
             if ok {
                 provider = Some(callee.krate.clone());
             }
@@ -188,11 +245,12 @@ pub fn match_fn(
         }
     })?;
     Some(fn_entry_match(
-        kb, e, args, const_args, arg_lens, provider, supported,
+        kb, e, args, const_args, arg_lens, provider, supported, overrides,
     ))
 }
 
-/// The asset of a `[[fn]]` entry, with its parameters from the call.
+/// The asset of a `[[fn]]` entry, with its parameters from the call and `overrides`.
+#[allow(clippy::too_many_arguments)]
 fn fn_entry_match(
     kb: &Kb,
     e: &rcbom_kb::PatternEntry,
@@ -201,6 +259,7 @@ fn fn_entry_match(
     arg_lens: &[Option<u64>],
     provider: Option<CrateRef>,
     supported: Supported,
+    overrides: &BTreeMap<String, String>,
 ) -> Match {
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
@@ -212,16 +271,47 @@ fn fn_entry_match(
                 .map(|v| (v * p.scale.unwrap_or(1) as i128).to_string())
                 .and_then(|v| mapped(p, v)),
             (None, Some(i)) => arg_lens.get(i).copied().flatten().map(|v| v.to_string()),
-            _ => eval_param(kb, p, args, None, supported),
+            _ => p
+                .value
+                .clone()
+                .or_else(|| eval_param(kb, p, args, None, supported)),
         };
         if let Some(v) = v {
             params.insert(k.clone(), v);
         }
     }
+    for (k, v) in overrides.iter().filter(|(k, _)| *k != "unresolved") {
+        params.insert(k.clone(), v.clone());
+    }
     let algo = filled_algo(&e.algo, &params);
-    params.retain(|k, _| !e.algo.asset.contains(&format!("{{{k}}}")));
+    // placeholders of the name left without a value (`{missing}` in `unresolved`); a parameter
+    // declared without a source is the call's to give (`dk_len` of `scrypt::Params::new`, which
+    // `scrypt(.., &params, out)` derives as `out.len()`), not one this call failed to resolve
+    let from_call = |k: &String| {
+        e.params.get(k).is_some_and(|p| {
+            p.arg.is_none()
+                && p.parent_arg.is_none()
+                && p.const_arg.is_none()
+                && p.arg_len.is_none()
+                && p.value.is_none()
+        })
+    };
+    let missing: Vec<String> = placeholders(&e.algo.asset)
+        .into_iter()
+        .filter(|k| !params.contains_key(k) && !from_call(k))
+        .collect();
+    let shown = in_name(&e.algo, &params, &algo.asset);
+    params.retain(|k, _| !shown.contains(k));
     if let Some(u) = &e.algo.unresolved {
-        params.insert("unresolved".to_string(), u.clone());
+        // `{missing}`: only what is unknown at this call, and nothing when all is known
+        if !u.contains("{missing}") {
+            params.insert("unresolved".to_string(), u.clone());
+        } else if !missing.is_empty() {
+            params.insert(
+                "unresolved".to_string(),
+                u.replace("{missing}", &missing.join(", ")),
+            );
+        }
     }
     Match {
         name: algo.asset.clone(),
@@ -270,11 +360,29 @@ pub fn match_constructor(kb: &Kb, family: &str, receiver: &Origin) -> Option<Mat
             let consts: Vec<Option<i128>> = args
                 .iter()
                 .map(|a| match a {
-                    Origin::Const { value, .. } => *value,
+                    Origin::Const { value, .. }
+                    | Origin::Data { value, .. }
+                    | Origin::Unit { value, .. } => *value,
                     _ => None,
                 })
                 .collect();
-            return Some(fn_entry_match(kb, e, &[], &consts, &[], None, &|_| true));
+            let none = BTreeMap::new();
+            return Some(fn_entry_match(
+                kb,
+                e,
+                &[],
+                &consts,
+                &[],
+                None,
+                &|_| true,
+                &none,
+            ));
+        }
+        // only plumbing hands its receiver on (`unwrap`, `as_ref`, a crypto crate's
+        // conversion); what the program's own function returns is not its argument
+        if !matches!(krate.as_str(), "core" | "std" | "alloc") && kb.crate_by_name(krate).is_none()
+        {
+            return None;
         }
         cur = args.first()?;
     }
@@ -331,21 +439,22 @@ fn walk(
             let within = path
                 .strip_prefix(&format!("{}::", krate.name))
                 .unwrap_or(path);
-            let entry = kb.types.iter().find(|e| {
-                e.krate == krate.name
-                    && e.name == last(path)
-                    && e.module
-                        .as_deref()
-                        .is_none_or(|m| regex::Regex::new(m).is_ok_and(|r| r.is_match(within)))
-                    && supported(krate)
-            });
-            if let Some(e) = entry {
-                let mut m = type_match(kb, e, args, parent, supported);
+            // an entry whose required parameter does not resolve does not match (`cbc::Encryptor`
+            // is AES-CBC for an AES cipher only)
+            let entry = kb
+                .types
+                .iter()
+                .filter(|e| {
+                    e.krate == krate.name
+                        && e.name == last(path)
+                        && e.module
+                            .as_deref()
+                            .is_none_or(|m| regex::Regex::new(m).is_ok_and(|r| r.is_match(within)))
+                        && supported(krate)
+                })
+                .find_map(|e| Some((e, type_match(kb, e, args, parent, supported)?)));
+            if let Some((e, mut m)) = entry {
                 m.provider_crates = vec![krate.clone()];
-                let name = m.name.clone();
-                let idx = out.len();
-                out.push((m, outer.map(str::to_string)));
-                let before = out.len();
                 // an argument read as a parameter (the `Aes256` of `AesGcm<Aes256, ..>`, a
                 // nonce size) is part of this asset's name, not a component of its own
                 let consumed: Vec<usize> = e
@@ -354,6 +463,30 @@ fn walk(
                     .filter(|p| !p.asset && p.parent_arg.is_none())
                     .filter_map(|p| p.arg)
                     .collect();
+                // ... and the crate of the type a `map` parameter reads provides the asset too
+                // (the `aes` of `cbc::Encryptor<aes::Aes128>`; the `chacha20` of the
+                // `ChaChaCore` inside cipher's `StreamCipherCoreWrapper`, not cipher)
+                for p in e.params.values().filter(|p| !p.map.is_empty() && !p.asset) {
+                    let Some(mut node) = p.arg.and_then(|i| args.get(i)) else {
+                        continue;
+                    };
+                    for &j in &p.path {
+                        match node {
+                            TyTree::Adt { args: inner, .. } if inner.len() > j => node = &inner[j],
+                            _ => break,
+                        }
+                    }
+                    if let TyTree::Adt { krate: k, .. } = node
+                        && kb.crate_by_name(&k.name).is_some()
+                        && !m.provider_crates.contains(k)
+                    {
+                        m.provider_crates.push(k.clone());
+                    }
+                }
+                let name = m.name.clone();
+                let idx = out.len();
+                out.push((m, outer.map(str::to_string)));
+                let before = out.len();
                 for (i, a) in args.iter().enumerate() {
                     if consumed.contains(&i) {
                         continue;
@@ -391,17 +524,22 @@ fn type_match(
     args: &[TyTree],
     parent: Option<&[TyTree]>,
     supported: Supported,
-) -> Match {
+) -> Option<Match> {
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
-        if let Some(v) = eval_param(kb, p, args, parent, supported) {
-            params.insert(k.clone(), v);
+        match eval_param(kb, p, args, parent, supported) {
+            Some(v) => {
+                params.insert(k.clone(), v);
+            }
+            None if p.required => return None,
+            None => {}
         }
     }
     let algo = filled_algo(&e.algo, &params);
+    let shown = in_name(&e.algo, &params, &algo.asset);
     // parameters already spelled out in the name or the parameter set are not repeated
     params.retain(|k, _| {
-        !e.algo.asset.contains(&format!("{{{k}}}"))
+        !shown.contains(k)
             && !e
                 .algo
                 .parameter_set
@@ -409,14 +547,14 @@ fn type_match(
                 .unwrap_or("")
                 .contains(&format!("{{{k}}}"))
     });
-    Match {
+    Some(Match {
         name: algo.asset.clone(),
         algo,
         params,
         components: BTreeSet::new(),
         providers: BTreeSet::new(),
         provider_crates: Vec::new(),
-    }
+    })
 }
 
 fn eval_param(
@@ -582,6 +720,105 @@ mod tests {
             vec![("HMAC-SHA-256", None), ("SHA-256", Some("HMAC-SHA-256"))]
         );
         assert!(m[0].0.components.contains("SHA-256|hash|"));
+    }
+
+    #[test]
+    fn a_mode_entry_holds_for_its_cipher_only() {
+        let kb = Kb::seed().unwrap();
+        let cbc = |cipher: TyTree| adt("cbc", "cbc::encrypt::Encryptor", vec![cipher]);
+        let aes = cbc(adt("aes", "aes::autodetect::Aes128Enc", vec![]));
+        let m = match_types(&kb, &[aes], &all);
+        assert_eq!(m[0].0.name, "AES-128-CBC");
+        // `Encryptor<Blowfish>` is not AES-CBC: the required key size does not resolve
+        let blowfish = cbc(adt("blowfish", "blowfish::Blowfish", vec![]));
+        assert!(match_types(&kb, &[blowfish], &all).is_empty());
+    }
+
+    #[test]
+    fn a_descriptor_named_by_a_method_takes_its_name() {
+        let kb = Kb::seed().unwrap();
+        let def = DefRef {
+            krate: CrateRef {
+                name: "aws_lc_rs".into(),
+                stable_id: "0".into(),
+            },
+            path: "aws_lc_rs::key_wrap::AES_256".into(),
+            id: "0".into(),
+        };
+        let named = |m| match_static_called(&kb, &def, m, &all).unwrap().name;
+        assert_eq!(named(None), "AES-256");
+        assert_eq!(named(Some("wrap")), "AES-256-KW");
+        assert_eq!(named(Some("wrap_with_padding")), "AES-256-KWP");
+    }
+
+    #[test]
+    fn fn_parameters_the_name_cannot_show_are_kept() {
+        let kb = Kb::seed().unwrap();
+        let e = kb
+            .fns
+            .iter()
+            .find(|e| e.pattern.as_str() == "Params::new$")
+            .unwrap();
+        // `Params::new(log_n, 8, 1, 32)` with log_n computed at run time
+        let m = fn_entry_match(
+            &kb,
+            e,
+            &[],
+            &[None, Some(8), Some(1), Some(32)],
+            &[],
+            None,
+            &all,
+            &BTreeMap::new(),
+        );
+        assert_eq!(m.name, "scrypt");
+        assert_eq!(m.params["r"], "8");
+        assert_eq!(m.params["p"], "1");
+        // the `Params` length is not the derived key's: dk_len is the call's to give
+        assert!(!m.params.contains_key("dk_len"));
+        assert_eq!(
+            m.params["unresolved"],
+            "N: not a constant where scrypt::Params is built"
+        );
+        // all constants: the name says everything, nothing is unresolved
+        let m = fn_entry_match(
+            &kb,
+            e,
+            &[],
+            &[Some(15), Some(8), Some(1), Some(32)],
+            &[],
+            None,
+            &all,
+            &BTreeMap::new(),
+        );
+        assert_eq!(m.name, "scrypt-32768-8-1");
+        assert!(m.params.is_empty());
+        // passed to `scrypt(.., out)` with a 64-byte `out`: the call derives 64 bytes
+        let call: BTreeMap<String, String> = [("dk_len", "64"), ("unresolved", "x")]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+        let m = fn_entry_match(
+            &kb,
+            e,
+            &[],
+            &[Some(15), Some(8), Some(1), Some(32)],
+            &[],
+            None,
+            &all,
+            &call,
+        );
+        assert_eq!(m.name, "scrypt-32768-8-1-64");
+        assert!(m.params.is_empty());
+        // `Params::recommended()`: the crate's defaults, the output length the call's
+        let e = kb
+            .fns
+            .iter()
+            .find(|e| e.pattern.as_str() == "Params::recommended$")
+            .unwrap();
+        let m = fn_entry_match(&kb, e, &[], &[], &[], None, &all, &BTreeMap::new());
+        assert_eq!(m.name, "scrypt-131072-8-1");
+        let m = fn_entry_match(&kb, e, &[], &[], &[], None, &all, &call);
+        assert_eq!(m.name, "scrypt-131072-8-1-64");
     }
 
     #[test]

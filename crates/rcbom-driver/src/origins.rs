@@ -18,7 +18,7 @@ use std::cell::{Cell, OnceCell, RefCell};
 use std::collections::{HashMap, HashSet};
 
 use rcbom_facts::{Loc, Origin};
-use rustc_middle::ty::TyCtxt;
+use rustc_middle::ty::{GenericArgsRef, TyCtxt};
 use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::{
     AggregateKind, Body, Local, Mutability, Operand, Place, ProjectionElem, Rvalue, StatementKind,
@@ -43,6 +43,9 @@ enum Step {
     Deref,
     Field(usize),
     Variant(usize),
+    /// Some element or elements of an array or slice (`a[i]`, `a[2..]`, slice patterns): a
+    /// part of it, not the whole.
+    Elem,
 }
 
 type Path = Vec<Step>;
@@ -65,8 +68,11 @@ fn path_of_place(p: &Place) -> Path {
             ProjectionElem::Field(f, _) => out.push(Step::Field(*f)),
             ProjectionElem::Downcast(v) => out.push(Step::Variant(variant_index(v))),
             ProjectionElem::OpaqueCast(_) => {}
-            // `a[i]`, slice patterns: an element stands for the whole array
-            _ => break,
+            // `a[i]`, `a[2..]`, slice patterns: some part of the array, whichever it is
+            _ => {
+                out.push(Step::Elem);
+                break;
+            }
         }
     }
     out
@@ -105,6 +111,9 @@ struct Def {
     /// An initialization (a constant, `String::new()`): a later out-parameter call that fills
     /// the place replaces it.
     init: bool,
+    /// The definition certainly lands on this place (not one of several a pointer may target):
+    /// only then does an out-parameter call replace the place's initialization.
+    sole: bool,
 }
 
 /// What kind of body this is, for its first local.
@@ -134,7 +143,21 @@ pub(crate) struct Origins<'a, 'tcx> {
     /// Captures looked up in the parent body, computed once.
     parent_captures: RefCell<Option<Option<Vec<Origin>>>>,
     nodes: Cell<usize>,
+    /// For an instance body (a generic function's instance, a closure in the walk): the item
+    /// it was instantiated from and the instance's generic arguments. The instance body has its
+    /// named constants evaluated away (`&ECDSA_P256_SHA256_ASN1` is a bare pointer there); the
+    /// item's MIR, at the same span, still names them.
+    item: Option<(DefId, GenericArgsRef<'tcx>)>,
+    /// The item MIR's unevaluated constants by span (`None`: several share the span).
+    item_consts: OnceCell<HashMap<rustc_span::Span, Option<Uneval<'tcx>>>>,
 }
+
+/// An unevaluated constant, as `rustc_middle` has it: item, arguments, promoted index.
+type Uneval<'tcx> = (
+    DefId,
+    GenericArgsRef<'tcx>,
+    Option<rustc_middle::mir::Promoted>,
+);
 
 /// Reaching definitions of one body.
 struct Flow {
@@ -163,7 +186,61 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             captures: None,
             parent_captures: RefCell::new(None),
             nodes: Cell::new(0),
+            item: None,
+            item_consts: OnceCell::new(),
         }
+    }
+
+    /// The origins of an instance body, whose constants are looked up in the MIR of `item` at
+    /// the same span, and whose generic constants resolve with the instance's `args`.
+    pub(crate) fn with_item(mut self, item: DefId, args: GenericArgsRef<'tcx>) -> Self {
+        self.item = Some((item, args));
+        self
+    }
+
+    /// The instance's generic arguments, when this is an instance body.
+    fn inst_args(&self) -> Option<GenericArgsRef<'tcx>> {
+        self.item.map(|(_, a)| a)
+    }
+
+    /// The item MIR's unevaluated constant at `span`, if exactly one is there. Read with
+    /// `rustc_middle`: converting a generic body to `rustc_public` fails on constants whose
+    /// layout depends on a parameter (`None::<&T>` in the standard library's optimized MIR).
+    fn item_const(&self, span: Span) -> Option<Uneval<'tcx>> {
+        let (item, _) = self.item?;
+        let tcx = self.tcx;
+        self.item_consts
+            .get_or_init(|| {
+                use rustc_middle::mir::visit::Visitor;
+                struct V<'tcx>(HashMap<rustc_span::Span, Option<Uneval<'tcx>>>);
+                impl<'tcx> Visitor<'tcx> for V<'tcx> {
+                    fn visit_const_operand(
+                        &mut self,
+                        c: &rustc_middle::mir::ConstOperand<'tcx>,
+                        _: rustc_middle::mir::Location,
+                    ) {
+                        if let rustc_middle::mir::Const::Unevaluated(uv, _) = c.const_ {
+                            let u = (uv.def, uv.args, uv.promoted);
+                            self.0
+                                .entry(c.span)
+                                .and_modify(|e| {
+                                    if *e != Some(u) {
+                                        *e = None;
+                                    }
+                                })
+                                .or_insert(Some(u));
+                        }
+                    }
+                }
+                let mut v = V(HashMap::new());
+                if tcx.is_mir_available(item) {
+                    v.visit_body(tcx.optimized_mir(item));
+                }
+                v.0
+            })
+            .get(&rustc_internal::internal(tcx, span))
+            .copied()
+            .flatten()
     }
 
     fn flow(&self) -> &Flow {
@@ -183,6 +260,7 @@ impl Flow {
                 kind: DefKind::Entry,
                 strong: true,
                 init: false,
+                sole: true,
             });
         }
         let mut term_bb = HashMap::new();
@@ -242,7 +320,7 @@ impl Flow {
                 // with a single possible target the write certainly lands there (a strong
                 // update); otherwise it may (weak)
                 let targets = ptr.targets(place.local, &path[..i], 0);
-                let single = targets.len() == 1;
+                let single = sole_target(&targets);
                 for (t, tp) in targets {
                     let mut p = tp;
                     p.extend_from_slice(&path[i + 1..]);
@@ -257,7 +335,9 @@ impl Flow {
                         if let Operand::Copy(p) | Operand::Move(p) = a
                             && is_mut_ptr(body, p)
                         {
-                            for (t, tp) in ptr.targets(p.local, &path_of_place(p), 0) {
+                            let targets = ptr.targets(p.local, &path_of_place(p), 0);
+                            let single = sole_target(&targets);
+                            for (t, tp) in targets {
                                 extra.push((
                                     t,
                                     tp,
@@ -266,7 +346,7 @@ impl Flow {
                                         func: func.clone(),
                                         args: args.clone(),
                                     },
-                                    false,
+                                    single,
                                 ));
                             }
                         }
@@ -274,10 +354,14 @@ impl Flow {
                 }
             }
         }
+        // a write to an element (`key[31] = 1`, through `&mut key[3]`, or a fill of
+        // `&mut key[..16]`) changes part of the array: it neither overwrites the whole nor
+        // replaces its initialization
+        let partial = |path: &[Step]| path.contains(&Step::Elem);
         for (place, at, kind) in pending {
             let path = path_of_place(&place);
-            let strong = !path.contains(&Step::Deref);
-            let init = is_init(body, &kind);
+            let strong = !path.contains(&Step::Deref) && !partial(&path);
+            let init = is_init(body, &kind) && !partial(&path);
             defs.push(Def {
                 local: place.local,
                 path,
@@ -285,10 +369,16 @@ impl Flow {
                 kind,
                 strong,
                 init,
+                sole: true,
             });
         }
-        for (local, path, at, kind, strong) in extra {
-            let init = is_init(body, &kind);
+        for (local, path, at, kind, single) in extra {
+            let out_param = matches!(kind, DefKind::OutParam { .. });
+            let init = is_init(body, &kind) && !partial(&path);
+            // through a reference: certain only with a single target; an out-parameter call
+            // may or may not write, so it never overwrites
+            let strong = single && !out_param && !partial(&path);
+            let sole = single && !partial(&path);
             defs.push(Def {
                 local,
                 path,
@@ -296,6 +386,7 @@ impl Flow {
                 kind,
                 strong,
                 init,
+                sole,
             });
         }
         for (i, d) in defs.iter().enumerate() {
@@ -325,29 +416,126 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         self.operand(op, at, 0, &mut HashSet::new())
     }
 
-    /// The span that names the callee when it is held in a local (`let f = Sha256::digest;
-    /// f(d)`): the constant assigned to that local.
-    pub(crate) fn callee_name_span(&self, func: &Operand) -> Option<Span> {
-        let (Operand::Copy(p) | Operand::Move(p)) = func else {
-            return None;
+    /// The span that names the callee of the call terminating `term` when it is held in a
+    /// place rather than named at the call: in a local (`let f = Sha256::digest; f(d)`), a
+    /// field of a struct or tuple built here (`(h.f)(&SHA384, d)`), or a closure's capture
+    /// (`let f = digest; move |x| f(&SHA256, x)`): where the function item was named.
+    pub(crate) fn callee_name_span(&self, func: &Operand, term: &Terminator) -> Option<Span> {
+        let bb = *self.flow().term_bb.get(&(term as *const Terminator))?;
+        let at = At {
+            bb,
+            idx: self.body.blocks[bb].statements.len(),
         };
-        let mut local = p.local;
-        // `let f = Sha256::digest; f(d)`: the call reads a copy of `f`
-        for _ in 0..8 {
-            let mut defs = self.flow().by_local.get(&local)?.iter().filter_map(|&i| {
-                match &self.flow().defs[i].kind {
-                    DefKind::Assign(Rvalue::Use(op, _), _) => Some(op),
-                    _ => None,
-                }
-            });
-            let op = defs.next()?;
-            if defs.next().is_some() {
-                return None;
+        self.callee_span_at(func, at)
+    }
+
+    fn callee_span_at(&self, func: &Operand, at: At) -> Option<Span> {
+        match func {
+            Operand::Constant(c) => Some(c.span),
+            Operand::Copy(p) | Operand::Move(p) => {
+                self.fn_item_span(p.local, &path_of_place(p), at, 0)
             }
-            match op {
-                Operand::Constant(c) => return Some(c.span),
-                Operand::Copy(q) | Operand::Move(q) if q.projection.is_empty() => local = q.local,
-                _ => return None,
+            _ => None,
+        }
+    }
+
+    /// Where the function item held in `local.path` at `at` was named; the first naming when
+    /// several definitions reach (a function item type names one function, so any of them
+    /// names it).
+    fn fn_item_span(&self, local: Local, path: &[Step], at: At, depth: usize) -> Option<Span> {
+        if depth > 8 {
+            return None;
+        }
+        for i in self.reaching_at(local, at) {
+            let d = &self.flow().defs[i];
+            let Some(rest) = path.strip_prefix(d.path.as_slice()) else {
+                continue;
+            };
+            let found = match &d.kind {
+                DefKind::Entry => self.capture_fn_span(local, rest, depth),
+                DefKind::Assign(rv, _) => self.rvalue_fn_span(rv, rest, d.at, depth),
+                _ => None,
+            };
+            if found.is_some() {
+                return found;
+            }
+        }
+        None
+    }
+
+    fn rvalue_fn_span(&self, rv: &Rvalue, rest: &[Step], at: At, depth: usize) -> Option<Span> {
+        let place_span = |q: &Place, tail: &[Step]| {
+            let mut p = path_of_place(q);
+            p.extend_from_slice(tail);
+            self.fn_item_span(q.local, &p, at, depth + 1)
+        };
+        let operand_span = |o: &Operand, tail: &[Step]| match o {
+            Operand::Constant(c) if tail.is_empty() => {
+                matches!(c.const_.ty().kind().rigid(), Some(RigidTy::FnDef(..))).then_some(c.span)
+            }
+            Operand::Copy(q) | Operand::Move(q) => place_span(q, tail),
+            _ => None,
+        };
+        match rv {
+            Rvalue::Use(o, _) | Rvalue::Cast(_, o, _) => operand_span(o, rest),
+            Rvalue::CopyForDeref(q) => place_span(q, rest),
+            Rvalue::Ref(_, _, q) | Rvalue::Reborrow(_, _, q) | Rvalue::AddressOf(_, q) => {
+                place_span(q, rest.strip_prefix(&[Step::Deref]).unwrap_or(rest))
+            }
+            // a struct or tuple built here: the field read
+            Rvalue::Aggregate(kind, ops) => {
+                let (f, tail) = match (kind, rest) {
+                    (
+                        AggregateKind::Adt(_, v, ..),
+                        [Step::Variant(w), Step::Field(f), tail @ ..],
+                    ) if variant_index(v) == *w => (*f, tail),
+                    (_, [Step::Field(f), tail @ ..]) => (*f, tail),
+                    _ => return None,
+                };
+                operand_span(ops.get(f)?, tail)
+            }
+            _ => None,
+        }
+    }
+
+    /// A closure's capture holding a function item: where the parent named it.
+    fn capture_fn_span(&self, local: Local, rest: &[Step], depth: usize) -> Option<Span> {
+        if local != 1 || self.kind != BodyKind::Closure {
+            return None;
+        }
+        let (k, tail) = match rest {
+            [Step::Deref, Step::Field(k), tail @ ..] | [Step::Field(k), tail @ ..] => (*k, tail),
+            _ => return None,
+        };
+        let did = self.def?;
+        let parent = self.tcx.parent(did);
+        let body = rustc_public::CrateItem(rustc_internal::stable(parent)).body()?;
+        let outer = Origins::new(self.tcx, &body, Some(parent));
+        for (bb, block) in body.blocks.iter().enumerate() {
+            for (idx, s) in block.statements.iter().enumerate() {
+                let StatementKind::Assign(_, Rvalue::Aggregate(AggregateKind::Closure(d, _), ops)) =
+                    &s.kind
+                else {
+                    continue;
+                };
+                if rustc_internal::internal(self.tcx, d.def_id()) != did {
+                    continue;
+                }
+                let at = At { bb, idx };
+                // a capture by reference holds `&f`: what it points to
+                let tail = tail.strip_prefix(&[Step::Deref]).unwrap_or(tail);
+                let found = match ops.get(k)? {
+                    Operand::Constant(c) if tail.is_empty() => Some(c.span),
+                    Operand::Copy(q) | Operand::Move(q) => {
+                        let mut p = path_of_place(q);
+                        p.extend_from_slice(tail);
+                        outer.fn_item_span(q.local, &p, at, depth + 1)
+                    }
+                    _ => None,
+                };
+                if found.is_some() {
+                    return found;
+                }
             }
         }
         None
@@ -502,31 +690,101 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return Origin::Unknown; // a loop: the other definitions say where it starts
         }
         let defs = self.reaching_at(local, at);
+        // definitions of the place, or of a whole it is part of: it is one of these
         let mut alts: Vec<Origin> = Vec::new();
-        for i in defs {
+        // writes to a part of it (`key[31] = 1`, `cfg.key = ..`): it is also made of these
+        let mut parts: Vec<Origin> = Vec::new();
+        for &i in &defs {
             let d = &self.flow().defs[i];
-            let rest = if is_prefix(&d.path, &path) {
-                path[d.path.len()..].to_vec()
+            let (list, rest) = if is_prefix(&d.path, &path) {
+                if self.shadowed(i, &defs, &path, at) {
+                    continue;
+                }
+                (&mut alts, path[d.path.len()..].to_vec())
             } else if is_prefix(&path, &d.path) {
-                Vec::new() // a part of the place was written
+                (&mut parts, Vec::new())
             } else {
                 continue;
             };
             let o = self.def_origin(d, &rest, depth, seen);
-            if !alts.contains(&o) {
-                if alts.len() >= MAX_WIDTH {
-                    alts.push(Origin::Truncated);
+            if !list.contains(&o) {
+                if list.len() >= MAX_WIDTH {
+                    list.push(Origin::Truncated);
                     break;
                 }
-                alts.push(o);
+                list.push(o);
             }
         }
         seen.remove(&key);
-        match alts.len() {
-            0 => Origin::Unknown,
-            1 => alts.pop().unwrap(),
-            _ => Origin::Any(alts),
+        let whole = match alts.len() {
+            0 => None,
+            1 => alts.pop(),
+            _ => Some(Origin::Any(alts)),
+        };
+        match (whole, parts.len()) {
+            (None, 0) => Origin::Unknown,
+            (Some(w), 0) => w,
+            (None, 1) => parts.pop().unwrap(),
+            (None, _) => Origin::All(parts),
+            (Some(w), _) => {
+                parts.insert(0, w);
+                Origin::All(parts)
+            }
         }
+    }
+
+    /// Is definition `i`, of a whole that contains `path`, overwritten for `path` before the
+    /// read at `at`: does a definition of a more specific place covering `path` (`c.key =
+    /// [8; 32]` after `c = Cfg { key: env_key(), .. }`) lie on every way from `i` to `at`?
+    fn shadowed(&self, i: usize, defs: &[usize], path: &[Step], at: At) -> bool {
+        let d = &self.flow().defs[i];
+        defs.iter().any(|&j| {
+            let e = &self.flow().defs[j];
+            j != i
+                && e.strong
+                && e.path.len() > d.path.len()
+                && is_prefix(&d.path, &e.path)
+                && is_prefix(&e.path, path)
+                && self.always_through(d, e.at, at)
+        })
+    }
+
+    /// Does every way from definition `d` to the point `to` pass through the point `via`?
+    fn always_through(&self, d: &Def, via: At, to: At) -> bool {
+        let blocks = &self.body.blocks;
+        // the positions after `d` (an argument is defined before the first statement)
+        let start = if matches!(d.kind, DefKind::Entry) {
+            At { bb: 0, idx: 0 }
+        } else {
+            At {
+                bb: d.at.bb,
+                idx: d.at.idx + 1,
+            }
+        };
+        let mut work = vec![start];
+        let mut seen: HashSet<(usize, usize)> = HashSet::new();
+        while let Some(p) = work.pop() {
+            if !seen.insert((p.bb, p.idx)) {
+                continue;
+            }
+            let len = blocks[p.bb].statements.len();
+            let mut blocked = false;
+            for idx in p.idx..=len {
+                if p.bb == to.bb && idx == to.idx {
+                    return false; // reached the read without passing `via`
+                }
+                if p.bb == via.bb && idx == via.idx {
+                    blocked = true;
+                    break;
+                }
+            }
+            if !blocked {
+                for s in blocks[p.bb].terminator.successors() {
+                    work.push(At { bb: s, idx: 0 });
+                }
+            }
+        }
+        true
     }
 
     fn def_origin(&self, d: &Def, rest: &[Step], depth: usize, seen: &mut HashSet<Key>) -> Origin {
@@ -560,7 +818,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     self_adt_path(self.tcx, did, gargs),
                 )
             }
-            _ => ("<indirect>".to_string(), String::new(), None),
+            // a pointer to a function reified here (`let h: fn(..) = digest; h(..)`)
+            _ => match self.callee_through_pointer(func) {
+                Some((def, gargs, _)) => {
+                    let did = rustc_internal::internal(self.tcx, def.def_id());
+                    let gargs = rustc_internal::internal(self.tcx, gargs);
+                    (
+                        path_of(self.tcx, did),
+                        self.tcx.crate_name(did.krate).to_string(),
+                        self_adt_path(self.tcx, did, gargs),
+                    )
+                }
+                None => ("<indirect>".to_string(), String::new(), None),
+            },
         };
         let mut out = Vec::new();
         for (n, a) in args.iter().enumerate() {
@@ -571,12 +841,11 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             out.push(self.operand(a, at, depth + 1, seen));
         }
         // the position the scanner gives this call's site
-        let span = match func {
-            Operand::Constant(c) => Some(c.span),
-            _ => self.callee_name_span(func),
-        }
-        .map(|s| crate::locate_stable(self.tcx, s).0)
-        .filter(|l| l.line > 0);
+        let span = self
+            .callee_span_at(func, at)
+            .or_else(|| self.callee_through_pointer(func).map(|(_, _, s)| s))
+            .map(|s| crate::locate_stable(self.tcx, s).0)
+            .filter(|l| l.line > 0);
         Origin::Call {
             callee,
             krate,
@@ -618,6 +887,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 _ => self.operand(op, at, depth, seen),
             },
             Rvalue::Aggregate(kind, ops) => self.aggregate(kind, ops, span, rest, at, depth, seen),
+            // `key[0] & 248`, `seq ^ IV`: a value computed from both operands
+            Rvalue::BinaryOp(_, a, b) | Rvalue::CheckedBinaryOp(_, a, b) => {
+                let a = self.operand(a, at, depth + 1, seen);
+                let b = self.operand(b, at, depth + 1, seen);
+                if a == b { a } else { Origin::All(vec![a, b]) }
+            }
+            Rvalue::UnaryOp(_, a) => self.operand(a, at, depth + 1, seen),
             _ => Origin::Unknown,
         }
     }
@@ -669,15 +945,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             AggregateKind::Adt(def, v, ..) if ops.is_empty() => {
                 let adt = rustc_internal::internal(self.tcx, def.def_id());
                 let adt_def = self.tcx.adt_def(adt);
-                let variant = adt_def.variant(rustc_abi::VariantIdx::from_usize(variant_index(v)));
-                let did = if adt_def.is_enum() {
-                    variant.def_id
+                let idx = rustc_abi::VariantIdx::from_usize(variant_index(v));
+                let variant = adt_def.variant(idx);
+                // an enum variant is also a number (`Algorithm::Argon2i` is 1)
+                let (did, value) = if adt_def.is_enum() {
+                    (variant.def_id, discriminant(self.tcx, adt_def, idx))
                 } else {
-                    adt
+                    (adt, None)
                 };
                 Origin::Unit {
                     path: path_of(self.tcx, did),
                     krate: self.tcx.crate_name(did.krate).to_string(),
+                    value,
                 }
             }
             AggregateKind::Tuple if ops.is_empty() => Origin::Unknown,
@@ -710,7 +989,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 match parts.len() {
                     0 => Origin::Unknown,
                     1 => parts.pop().unwrap(),
-                    _ => Origin::Any(parts),
+                    // one element of an array literal (`[a, b][i]`): one of them
+                    _ if matches!(rest.first(), Some(Step::Elem)) => Origin::Any(parts),
+                    // the value itself: made of all of them (`[user, b"pepper"].concat()`)
+                    _ => Origin::All(parts),
                 }
             }
         }
@@ -864,8 +1146,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 let did = rustc_internal::internal(self.tcx, def.def_id());
                 return self.follow_closure(did, Some(Vec::new()), depth);
             }
-            // a function passed as a value is code, not data
-            Some(RigidTy::FnDef(..)) => return Origin::Unknown,
+            // a function passed as a value is code, not data: a value without data
+            Some(RigidTy::FnDef(def, _)) => {
+                let did = rustc_internal::internal(self.tcx, def.def_id());
+                return Origin::Unit {
+                    path: path_of(self.tcx, did),
+                    krate: self.tcx.crate_name(did.krate).to_string(),
+                    value: None,
+                };
+            }
             Some(RigidTy::Tuple(ts)) if ts.is_empty() => return Origin::Unknown,
             _ => {}
         }
@@ -873,8 +1162,23 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return unit;
         }
         let span = Some(self.loc(c.span));
+        // integers, and values of a field-less enum, which are their discriminant
+        // (`const ALG: Algorithm = Algorithm::Argon2d`)
+        let int_ty = matches!(ty.kind().rigid(), Some(RigidTy::Uint(_) | RigidTy::Int(_)))
+            || self.fieldless_enum(&ty);
         match c.const_.kind() {
             ConstantKind::Allocated(a) => {
+                let value = match ty.kind().rigid() {
+                    Some(RigidTy::Int(_)) => a.read_int().ok(),
+                    _ if int_ty => a.read_uint().ok().and_then(|v| i128::try_from(v).ok()),
+                    _ => None,
+                };
+                // an instance body: the item body may name what was evaluated here
+                if let Some(u) = self.item_const(c.span)
+                    && let Some(o) = self.unevaluated(u, &ty, value, true)
+                {
+                    return o;
+                }
                 // `&STATIC`: a pointer to a static allocation
                 let mut statics = Vec::new();
                 for (_, prov) in &a.provenance.ptrs {
@@ -882,6 +1186,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                         let did = rustc_internal::internal(self.tcx, s.def_id());
                         let o = Origin::Data {
                             def: def_ref_internal(self.tcx, did),
+                            value: None,
                         };
                         if !statics.contains(&o) {
                             statics.push(o);
@@ -893,13 +1198,6 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     1 => return statics.pop().unwrap(),
                     _ => return Origin::Any(statics),
                 }
-                let value = match ty.kind().rigid() {
-                    Some(RigidTy::Uint(_)) => {
-                        a.read_uint().ok().and_then(|v| i128::try_from(v).ok())
-                    }
-                    Some(RigidTy::Int(_)) => a.read_int().ok(),
-                    _ => None,
-                };
                 Origin::Const {
                     value,
                     len: bytes_of_ty(&ty),
@@ -908,51 +1206,132 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             }
             // `&CONST`, `&[42u8; 32]`, `const { &SHA256 }`: what the promoted or inline
             // constant names, else literal data of this function
-            ConstantKind::Unevaluated(u) => {
-                let did = rustc_internal::internal(self.tcx, u.def.def_id());
-                let named = match u.promoted {
-                    Some(p) => named_in(
-                        self.tcx,
-                        &self.tcx.promoted_mir(did)[rustc_middle::mir::Promoted::from_u32(p)],
+            ConstantKind::Unevaluated(u) => self
+                .unevaluated(
+                    (
+                        rustc_internal::internal(self.tcx, u.def.def_id()),
+                        rustc_internal::internal(self.tcx, &u.args),
+                        u.promoted.map(rustc_middle::mir::Promoted::from_u32),
                     ),
-                    None if matches!(
-                        self.tcx.def_kind(did),
-                        rustc_hir::def::DefKind::AnonConst
-                    ) =>
-                    {
-                        match crate::statics::ctfe_mir(self.tcx, did) {
-                            Ok(body) => named_in(self.tcx, body),
-                            Err((value, ty)) => {
-                                crate::statics::statics_of_value(self.tcx, value, ty)
-                            }
-                        }
-                    }
-                    // a named const (aws-lc-rs algorithms) not yet evaluated
-                    None => vec![did],
-                };
-                let mut data: Vec<Origin> = named
-                    .into_iter()
-                    .map(|d| Origin::Data {
-                        def: def_ref_internal(self.tcx, d),
-                    })
-                    .collect();
-                data.dedup();
-                match data.len() {
-                    0 => Origin::Const {
-                        value: None,
-                        len: bytes_of_ty(&ty),
-                        span,
-                    },
-                    1 => data.pop().unwrap(),
-                    _ => Origin::Any(data),
-                }
-            }
+                    &ty,
+                    None,
+                    int_ty,
+                )
+                .unwrap_or(Origin::Const {
+                    value: None,
+                    len: bytes_of_ty(&ty),
+                    span,
+                }),
             _ => Origin::Const {
                 value: None,
                 len: bytes_of_ty(&ty),
                 span,
             },
         }
+    }
+
+    /// What an unevaluated constant names: a named const (an associated const resolved to the
+    /// impl's item when the arguments are known), or the statics and consts a promoted or
+    /// inline constant names, else those its evaluated value points at (`const { pick() }`).
+    /// `None` when it names nothing. An integer const carries its value (`value` if the
+    /// caller already has it, else evaluated here when `int` and the arguments are known).
+    fn unevaluated(
+        &self,
+        (did, uargs, promoted): Uneval<'tcx>,
+        ty: &Ty,
+        value: Option<i128>,
+        int: bool,
+    ) -> Option<Origin> {
+        use rustc_middle::ty::TypeVisitableExt;
+        let tcx = self.tcx;
+        // the constant's arguments in terms of the instance (when this is one)
+        let args = match self.inst_args() {
+            Some(a) if uargs.has_non_region_param() => {
+                rustc_middle::ty::EarlyBinder::bind(tcx, uargs)
+                    .instantiate(tcx, a)
+                    .skip_norm_wip()
+            }
+            _ => uargs,
+        };
+        let mut named = match promoted {
+            // promoted constants share the enclosing item's generics
+            Some(p) => named_in(tcx, &tcx.promoted_mir(did)[p], self.inst_args()),
+            None if matches!(tcx.def_kind(did), rustc_hir::def::DefKind::AnonConst) => {
+                match crate::statics::ctfe_mir(tcx, did) {
+                    Ok(body) => named_in(tcx, body, Some(args)),
+                    Err((v, t)) => crate::statics::statics_of_value(tcx, v, t),
+                }
+            }
+            // a named const (aws-lc-rs algorithms) not yet evaluated
+            None => vec![crate::statics::resolve_const(
+                tcx,
+                did,
+                uargs,
+                self.inst_args(),
+            )],
+        };
+        let evaluate = || {
+            if args.has_non_region_param() {
+                return None;
+            }
+            tcx.const_eval_resolve(
+                rustc_middle::ty::TypingEnv::fully_monomorphized(),
+                rustc_middle::mir::UnevaluatedConst {
+                    def: did,
+                    args,
+                    promoted,
+                },
+                rustc_span::DUMMY_SP,
+            )
+            .ok()
+        };
+        // a promoted or inline constant that names nothing itself (`const { pick() }`, a
+        // `const fn` result): the statics its value points at
+        if named.is_empty()
+            && (promoted.is_some()
+                || matches!(tcx.def_kind(did), rustc_hir::def::DefKind::AnonConst))
+            && let Some(v) = evaluate()
+        {
+            named = crate::statics::statics_of_value(tcx, v, rustc_internal::internal(tcx, ty));
+        }
+        named.dedup();
+        let value = match named.as_slice() {
+            [_] if int => value.or_else(|| match evaluate()? {
+                rustc_middle::mir::ConstValue::Scalar(
+                    rustc_middle::mir::interpret::Scalar::Int(i),
+                ) => Some(match ty.kind().rigid() {
+                    Some(RigidTy::Int(_)) => i.to_int(i.size()),
+                    _ => i128::try_from(i.to_uint(i.size())).ok()?,
+                }),
+                _ => None,
+            }),
+            _ => None,
+        };
+        let mut data: Vec<Origin> = named
+            .into_iter()
+            .map(|d| Origin::Data {
+                def: def_ref_internal(tcx, d),
+                value,
+            })
+            .collect();
+        data.dedup();
+        match data.len() {
+            0 => None,
+            1 => data.pop(),
+            _ => Some(Origin::Any(data)),
+        }
+    }
+
+    /// An enum whose variants have no fields: its values are their discriminants.
+    fn fieldless_enum(&self, ty: &Ty) -> bool {
+        let kind = ty.kind();
+        let Some(RigidTy::Adt(def, _)) = kind.rigid() else {
+            return false;
+        };
+        let adt = self
+            .tcx
+            .adt_def(rustc_internal::internal(self.tcx, def.def_id()));
+        adt.is_enum() && adt.all_fields().next().is_none()
     }
 
     /// A value of a struct without fields (`OsRng`): it names its type.
@@ -966,6 +1345,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         (adt.is_struct() && adt.all_fields().next().is_none()).then(|| Origin::Unit {
             path: path_of(self.tcx, did),
             krate: self.tcx.crate_name(did.krate).to_string(),
+            value: None,
         })
     }
 
@@ -1001,7 +1381,7 @@ fn is_prefix(a: &[Step], b: &[Step]) -> bool {
 fn kills(d: &Def, e: &Def) -> bool {
     d.local == e.local
         && is_prefix(&d.path, &e.path)
-        && (d.strong || (matches!(d.kind, DefKind::OutParam { .. }) && e.init))
+        && (d.strong || (matches!(d.kind, DefKind::OutParam { .. }) && d.sole && e.init))
 }
 
 /// An initialization rather than a value: a constant, or a standard-library constructor taking
@@ -1080,6 +1460,17 @@ impl Pointees<'_> {
         }
         out
     }
+}
+
+/// Does a pointer with these targets point at one place? The targets also list the references
+/// a reborrow went through (`_7` behind `_6 = &mut (*_7)`, with a `Deref` path), which stand for
+/// the place they point at, not for another place.
+fn sole_target(targets: &[(Local, Path)]) -> bool {
+    targets
+        .iter()
+        .filter(|(_, p)| !p.contains(&Step::Deref))
+        .count()
+        == 1
 }
 
 fn is_mut_ptr(body: &Body, p: &Place) -> bool {
@@ -1200,11 +1591,34 @@ impl BitSet {
     }
 }
 
+/// The discriminant of an enum's variant, as the integer it is.
+fn discriminant<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    adt: rustc_middle::ty::AdtDef<'tcx>,
+    idx: rustc_abi::VariantIdx,
+) -> Option<i128> {
+    use rustc_middle::ty::layout::IntegerExt;
+    let d = adt.discriminant_for_variant(tcx, idx);
+    match d.ty.kind() {
+        rustc_middle::ty::Int(ity) => Some(
+            rustc_abi::Integer::from_int_ty(&tcx, *ity)
+                .size()
+                .sign_extend(d.val),
+        ),
+        _ => i128::try_from(d.val).ok(),
+    }
+}
+
 /// The statics and named consts a promoted or inline constant's body refers to.
-fn named_in<'tcx>(tcx: TyCtxt<'tcx>, body: &rustc_middle::mir::Body<'tcx>) -> Vec<DefId> {
+fn named_in<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    body: &rustc_middle::mir::Body<'tcx>,
+    args: Option<GenericArgsRef<'tcx>>,
+) -> Vec<DefId> {
     use rustc_middle::mir::visit::Visitor;
     struct V<'tcx> {
         tcx: TyCtxt<'tcx>,
+        args: Option<GenericArgsRef<'tcx>>,
         out: Vec<DefId>,
     }
     impl<'tcx> Visitor<'tcx> for V<'tcx> {
@@ -1213,7 +1627,7 @@ fn named_in<'tcx>(tcx: TyCtxt<'tcx>, body: &rustc_middle::mir::Body<'tcx>) -> Ve
             c: &rustc_middle::mir::ConstOperand<'tcx>,
             _: rustc_middle::mir::Location,
         ) {
-            for d in crate::statics::named_by_const(self.tcx, c) {
+            for d in crate::statics::named_by_const(self.tcx, c, self.args) {
                 if !self.out.contains(&d) {
                     self.out.push(d);
                 }
@@ -1222,6 +1636,7 @@ fn named_in<'tcx>(tcx: TyCtxt<'tcx>, body: &rustc_middle::mir::Body<'tcx>) -> Ve
     }
     let mut v = V {
         tcx,
+        args,
         out: Vec::new(),
     };
     v.visit_body(body);
