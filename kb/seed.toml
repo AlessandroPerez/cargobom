@@ -493,7 +493,8 @@ functions = ["digest"]
 # names them (`Argon2::default()`, `Argon2::new(Algorithm::Argon2i, ..)`, [[fn]] entries below);
 # without one the asset is the family name, which the registry has no pattern for. Two methods
 # do not use the receiver's: `verify_password` hashes with the algorithm and costs of the stored
-# hash, `hash_password_customized(pw, alg, version, params, salt)` with its arguments.
+# hash, `hash_password_customized(pw, alg, version, params, salt)` with its arguments, and with
+# `Algorithm::default()` (Argon2id) when `alg` is `None` (argon2 0.5.3 lib.rs:607).
 [[type]]
 crate = "argon2"
 name = "Argon2"
@@ -502,6 +503,7 @@ family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
 own_params = ["verify_password", "hash_password_customized"]
+own_defaults = { variant = "id" }
 
 # The password-hash API types. Their parameters are chosen per call: `hash_password` uses the
 # crate's defaults ([[fn]] entries below), `hash_password_customized` the caller's, and
@@ -1505,6 +1507,30 @@ material = "private-key"
 size = "{bits}"
 params = { bits = { const_arg = 1 } }
 
+# rsa 0.9 `pkcs1v15::SigningKey::<D>::new_unprefixed(key)` / `VerifyingKey::new_unprefixed`:
+# the D digest of the message, signed raw, without the DigestInfo prefix (signing_key.rs
+# `new_unprefixed`): not the standard RSASSA-PKCS1-v1_5 with D, whose signatures it does not
+# verify. The registry has no name for it apart from the bare scheme, which raw-digest
+# signing (`Pkcs1v15Sign::new_unprefixed()`) also is.
+[[fn]]
+crate = "rsa"
+path = "pkcs1v15::.*(SigningKey|VerifyingKey)::<.*>::new_unprefixed$|pkcs1v15::.*(SigningKey|VerifyingKey)::new_unprefixed$"
+asset = "RSA-PKCS1-1.5"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
+note = "RSASSA-PKCS1-v1_5 of the message's digest without the DigestInfo prefix"
+
+# rsa 0.9: an RSA private key built from its components (`from_components(n, e, d, primes)`,
+# `from_p_q(p, q, e)`, `from_primes(primes, e)`, key.rs): key material, its size in `n`
+[[fn]]
+crate = "rsa"
+path = "RsaPrivateKey::(from_components|from_p_q|from_primes)$"
+asset = "RSA"
+family = "RSA"
+primitive = "pke"
+material = "private-key"
+
 # ring / aws-lc-rs: an RSA private key decoded from PKCS#8 or DER (`RsaKeyPair::from_pkcs8`):
 # key material whose size is in the encoding and whose padding is chosen at each `sign`
 # (`RSA-PKCS1-1.5-SHA-256` there)
@@ -1605,6 +1631,35 @@ primitive = "signature"
 material = "private-key"
 curve = "other/Ed25519"
 
+# jsonwebtoken 9 verification keys (`DecodingKey::from_rsa_pem(pem)`, `from_ec_components(x,
+# y)`, decoding.rs): public key material of the family, the scheme chosen by the token header
+[[fn]]
+crate = "jsonwebtoken"
+path = "DecodingKey::from_rsa_(pem|der|components|raw_components)$"
+asset = "RSA"
+family = "RSA"
+primitive = "signature"
+material = "public-key"
+note = "JWT RSA verification key; RS256/384/512 or PS256/384/512 is chosen by the token header"
+
+[[fn]]
+crate = "jsonwebtoken"
+path = "DecodingKey::from_ec_(pem|der|components)$"
+asset = "ECDSA"
+family = "ECDSA"
+primitive = "signature"
+material = "public-key"
+note = "JWT EC verification key; ES256 or ES384 is chosen by the token header"
+
+[[fn]]
+crate = "jsonwebtoken"
+path = "DecodingKey::from_ed_(pem|der|components)$"
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+material = "public-key"
+curve = "other/Ed25519"
+
 # --- Protocols ---------------------------------------------------------------------------------
 # A call that configures a protocol stack. Suites and groups are the protocol crate's statics
 # reachable from it; versions come from the crate's enabled features.
@@ -1629,22 +1684,22 @@ groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1
 [[use]]
 function = "encrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place", "seal_in_place_append_tag", "seal_in_place_separate_tag", "seal_in_place_scatter", "seal_out_of_place_scatter", "less_safe_encrypt", "encrypt_padded", "encrypt_padded_mut", "encrypt_padded_vec", "encrypt_padded_vec_mut", "encrypt_padded_b2b", "encrypt_padded_b2b_mut", "encrypt_padded_inout", "encrypt_padded_inout_mut", "encrypt_block", "encrypt_block_mut", "encrypt_block_b2b", "encrypt_block_b2b_mut", "encrypt_block_inout", "encrypt_block_inout_mut", "encrypt_blocks", "encrypt_blocks_mut", "encrypt_blocks_b2b", "encrypt_blocks_b2b_mut", "encrypt_blocks_inout", "encrypt_blocks_inout_mut", "encrypt_b2b", "encrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "wrap", "wrap_with_padding"]
+methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place", "seal_in_place_append_tag", "seal_in_place_separate_tag", "seal_in_place_scatter", "seal_out_of_place_scatter", "less_safe_encrypt", "encrypt_padded", "encrypt_padded_mut", "encrypt_padded_vec", "encrypt_padded_vec_mut", "encrypt_padded_b2b", "encrypt_padded_b2b_mut", "encrypt_padded_inout", "encrypt_padded_inout_mut", "encrypt_block", "encrypt_block_mut", "encrypt_block_b2b", "encrypt_block_b2b_mut", "encrypt_block_inout", "encrypt_block_inout_mut", "encrypt_blocks", "encrypt_blocks_mut", "encrypt_blocks_b2b", "encrypt_blocks_b2b_mut", "encrypt_blocks_inout", "encrypt_blocks_inout_mut", "encrypt_b2b", "encrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "wrap", "wrap_with_padding", "encrypt_next", "encrypt_last", "encrypt_next_in_place", "encrypt_last_in_place"]
 
 [[use]]
 function = "decrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_in_place_separate_tag", "open_separate_gather", "open_within", "decrypt_padded", "decrypt_padded_mut", "decrypt_padded_vec", "decrypt_padded_vec_mut", "decrypt_padded_b2b", "decrypt_padded_b2b_mut", "decrypt_padded_inout", "decrypt_padded_inout_mut", "decrypt_block", "decrypt_block_mut", "decrypt_block_b2b", "decrypt_block_b2b_mut", "decrypt_block_inout", "decrypt_block_inout_mut", "decrypt_blocks", "decrypt_blocks_mut", "decrypt_blocks_b2b", "decrypt_blocks_b2b_mut", "decrypt_blocks_inout", "decrypt_blocks_inout_mut", "decrypt_b2b", "decrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "unwrap", "unwrap_with_padding"]
+methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_in_place_separate_tag", "open_separate_gather", "open_within", "decrypt_padded", "decrypt_padded_mut", "decrypt_padded_vec", "decrypt_padded_vec_mut", "decrypt_padded_b2b", "decrypt_padded_b2b_mut", "decrypt_padded_inout", "decrypt_padded_inout_mut", "decrypt_block", "decrypt_block_mut", "decrypt_block_b2b", "decrypt_block_b2b_mut", "decrypt_block_inout", "decrypt_block_inout_mut", "decrypt_blocks", "decrypt_blocks_mut", "decrypt_blocks_b2b", "decrypt_blocks_b2b_mut", "decrypt_blocks_inout", "decrypt_blocks_inout_mut", "decrypt_b2b", "decrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "unwrap", "unwrap_with_padding", "decrypt_next", "decrypt_last", "decrypt_next_in_place", "decrypt_last_in_place"]
 
 [[use]]
 function = "digest"
 primitives = ["hash"]
-methods = ["digest", "update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash", "finish"]
+methods = ["digest", "update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash"]
+methods = ["update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy"]
 
 [[use]]
 function = "verify"
@@ -1755,6 +1810,25 @@ args = { "0" = "nonce" }
 path = "LessSafeKey::(seal_\\w+|open_\\w+)$"
 args = { "1" = "nonce" }
 
+# aead 0.5's STREAM construction: `Encryptor::new(key, nonce)`, `from_aead(aead, nonce)`, the
+# nonce being the stream's prefix (aead 0.5.2 stream.rs)
+[[role]]
+path = "^aead::stream::(Encryptor|Decryptor)::new$"
+args = { "0" = "key", "1" = "nonce" }
+
+[[role]]
+path = "^aead::stream::(Encryptor|Decryptor)::from_aead$"
+args = { "1" = "nonce" }
+
+# a `SealingKey`/`OpeningKey` takes its nonces from the program's `NonceSequence`: ring calls
+# `advance()` before each seal or open (ring 0.17 aead.rs `BoundKey`), so the nonces are what
+# the program's `advance` returns
+[[produces]]
+path = "^(ring|aws_lc_rs)::aead::(BoundKey|SealingKey|OpeningKey)::new$"
+role = "nonce"
+method = "NonceSequence::advance"
+
+
 # aws-lc-rs TLS record keys: `seal_in_place_append_tag(nonce, aad, in_out)`
 [[role]]
 path = "^aws_lc_rs::aead::tls::(TlsRecordSealingKey|TlsRecordOpeningKey)::(seal|open)_\\w+$"
@@ -1846,6 +1920,13 @@ args = { "0" = "salt", "1" = "ikm" }
 path = "Hkdf::<.*>::from_prk$"
 args = { "0" = "key" }
 
+# ring/aws-lc-rs `Prk::expand(&self, info, len)`: `len` only gives the output length; an
+# `hkdf::Algorithm` passed there (it implements `KeyType`) is not the algorithm, which is the
+# PRK's (ring 0.17 hkdf.rs `expand<L: KeyType>`)
+[[role]]
+path = "^(ring|aws_lc_rs)::hkdf::Prk::expand$"
+args = { "2" = "length" }
+
 # ring/aws-lc-rs hkdf::Salt::new(algorithm, value), Salt::extract(&self, secret)
 [[role]]
 path = "hkdf::Salt::new$"
@@ -1875,10 +1956,25 @@ args = { "0" = "rng" }
 path = "^rsa::(pkcs1v15|pss)::.*::random$"
 args = { "0" = "rng" }
 
+# the secret parts of an RSA key built from its components: the private exponent and the primes
+[[role]]
+path = "^rsa::key::RsaPrivateKey::from_components$"
+args = { "2" = "key", "3" = "key" }
+
+[[role]]
+path = "^rsa::key::RsaPrivateKey::(from_p_q|from_primes)$"
+args = { "0" = "key", "1" = "key" }
+
+# ring / aws-lc-rs `UnparsedPublicKey::new(algorithm, bytes)`: the verification key, set up with
+# its algorithm (a public key is no secret: no finding when it is a constant)
+[[role]]
+path = "^(ring|aws_lc_rs)::signature::UnparsedPublicKey::new$"
+args = { "1" = "public-key" }
+
 # rsa: `pub_key.encrypt(&mut rng, padding, msg)`, `priv_key.decrypt_blinded(&mut rng, ..)`, and
 # the signature traits' randomized signing (`sign_with_rng(&mut rng, msg)`)
 [[role]]
-path = "^rsa::key::(RsaPublicKey::encrypt|RsaPrivateKey::decrypt_blinded)$|RandomizedSigner::(try_)?sign_with_rng$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$|RandomizedPrehashSigner::sign_prehash_with_rng$"
+path = "^rsa::key::(RsaPublicKey::encrypt|RsaPrivateKey::(decrypt_blinded|sign_with_rng))$|RandomizedSigner::(try_)?sign_with_rng$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$|RandomizedPrehashSigner::sign_prehash_with_rng$|^rsa::traits::encryption::RandomizedEncryptor::encrypt_with_rng$"
 args = { "1" = "rng" }
 
 # ed25519-dalek's hazmat key: `ExpandedSecretKey::from_bytes(&bytes)`
@@ -1942,6 +2038,17 @@ args = [0]
 [[passthrough]]
 path = "^base64::engine::Engine::(decode|decode_vec|decode_slice|decode_slice_unchecked)$"
 args = [1]
+
+# a nonce made of the bytes given (ring 0.17 aead/nonce.rs `Nonce::assume_unique_for_key`)
+[[passthrough]]
+path = "^(ring|aws_lc_rs)::aead::(nonce::)?Nonce::assume_unique_for_key$"
+args = [0]
+
+# secret wrappers hold the value they are given (`Zeroizing::new([7; 32])`, `SecretBox::new(
+# Box::new(key))`): what is read back out of them is that value
+[[passthrough]]
+path = "^zeroize::Zeroizing::<.*>::new$|^zeroize::Zeroizing::new$|^secrecy::(SecretBox|SecretBox::<.*>|SecretString|SecretSlice)::(new|init_with|init_with_mut)$"
+args = [0]
 
 # secrecy's wrappers hand out the secret they hold (`key.expose_secret()`, age)
 [[passthrough]]

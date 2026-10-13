@@ -189,18 +189,32 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t14::k3; instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [call] in t14::k3::<&[u8; 2]>; new: setup, not a use; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; public-key: parameter (argument 0 of the enclosing function); instantiated by t14::main at src/main.rs:84:22; line: `let k = aws_lc_rs::signature::UnparsedPublicKey::new(`; code: `aws_lc_rs::signature::UnparsedPublicKey::new`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in t14::k3; instantiated by t14::main at src/main.rs:84:22; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::k3::<&[u8; 2]>; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; instantiated by t14::main at src/main.rs:84; line: `k.verify(msg, sig).is_ok()`; code: `verify`",
+            "additionalContext": "[reachable] [call] in t14::k3::<&[u8; 2]>; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; instantiated by t14::main at src/main.rs:84:22; line: `k.verify(msg, sig).is_ok()`; code: `verify`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t14::k3m; new: setup, not a use; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; public-key: parameter (argument 0 of the enclosing function); line: `let k = aws_lc_rs::signature::UnparsedPublicKey::new(`; code: `aws_lc_rs::signature::UnparsedPublicKey::new`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
           },
           {
             "additionalContext": "[reachable] [static] in t14::k3m; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
@@ -241,8 +255,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:public-key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -283,7 +301,7 @@
             "symbol": "t14::SUITE"
           },
           {
-            "additionalContext": "[reachable] [component] in t14::k3; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); instantiated by t14::main at src/main.rs:84; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [component] in t14::k3; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); instantiated by t14::main at src/main.rs:84:22; line: `&aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1,`; code: `aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 9,
@@ -297,14 +315,14 @@
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:60; line: `let f = digest;`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:60:12; line: `let f = digest;`; code: `digest`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t14::f1::{closure#0}; instantiated by t14::f1 at src/main.rs:60; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in t14::f1::{closure#0}; instantiated by t14::f1 at src/main.rs:60:12; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `SHA256`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 26,
@@ -665,7 +683,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1d53aabb-aafe-8e50-8d63-49da6a02d75a",
+  "serialNumber": "urn:uuid:b7f7c554-7756-884e-b413-ecd94e51b549",
   "specVersion": "1.7",
   "version": 1
 }

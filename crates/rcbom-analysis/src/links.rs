@@ -26,6 +26,8 @@ pub struct LinkIndex {
     calls: HashMap<String, Vec<(String, Vec<Origin>)>>,
     /// By def id: (contents change at run time, values put there).
     statics: HashMap<String, (bool, Vec<Origin>)>,
+    /// By function and parameter: what it writes through the parameter.
+    writes: HashMap<(String, usize), Vec<Origin>>,
     /// Lookups left for the current `values` call.
     budget: Cell<usize>,
     /// Answers already given: the same field is read at many calls.
@@ -44,6 +46,8 @@ struct Stored {
     func: String,
     /// Stored in a struct reached through a reference, which may be a part of another one.
     via_ref: bool,
+    /// The struct's type arguments, when known.
+    args: Option<String>,
 }
 
 /// Values found per lookup, lookups chained, and lookups per question.
@@ -51,8 +55,9 @@ const MAX_VALUES: usize = 64;
 const MAX_DEPTH: usize = 10;
 const MAX_STEPS: usize = 4096;
 
-/// A field read, from the outermost struct in: (struct, field).
-type FieldPath = [(String, usize)];
+/// A field read, from the outermost struct in: (struct, field, the struct's type arguments when
+/// known).
+type FieldPath = [(String, usize, Option<String>)];
 
 impl LinkIndex {
     pub fn new(facts: &[CrateFacts]) -> LinkIndex {
@@ -67,6 +72,7 @@ impl LinkIndex {
                     value: s.value.clone(),
                     func: s.func.clone(),
                     via_ref: s.via_ref,
+                    args: s.args.clone(),
                 };
                 if !v.contains(&stored) {
                     v.push(stored);
@@ -86,6 +92,12 @@ impl LinkIndex {
                 let call = (c.caller.clone(), c.args.clone());
                 if !v.contains(&call) {
                     v.push(call);
+                }
+            }
+            for w in &f.links.writes {
+                let v = ix.writes.entry((w.func.clone(), w.index)).or_default();
+                if !v.contains(&w.value) {
+                    v.push(w.value.clone());
                 }
             }
             for s in &f.links.statics {
@@ -113,6 +125,37 @@ impl LinkIndex {
     /// The functions noted since the last call, by descriptor.
     pub fn take_named(&self) -> HashMap<String, std::collections::BTreeSet<String>> {
         std::mem::take(&mut *self.named_in.borrow_mut())
+    }
+
+    /// A call of a trait method the program implements for the type it names, with a result
+    /// that does not depend on the arguments (`<LS as Deref>::deref` of a `lazy_static!`).
+    pub fn own_impl(&self, o: &Origin) -> bool {
+        let Origin::Call {
+            callee,
+            self_ty: Some(t),
+            ..
+        } = o
+        else {
+            return false;
+        };
+        self.returns
+            .get(&(rcbom_facts::impl_key(callee, t), Vec::new()))
+            .is_some_and(|rs| rs.iter().all(|r| !names_param(r)))
+    }
+
+    /// What the program's implementations of a trait method (its path ending in `method`) for
+    /// type `self_ty` return.
+    pub fn impl_returns(&self, method: &str, self_ty: &str) -> Vec<Origin> {
+        let suffix = format!(" for {self_ty}");
+        self.returns
+            .iter()
+            .filter(|((f, path), _)| {
+                path.is_empty()
+                    && f.strip_suffix(&suffix)
+                        .is_some_and(|m| m.ends_with(&format!("::{method}")) || m == method)
+            })
+            .flat_map(|(_, v)| v.iter().cloned())
+            .collect()
     }
 
     /// A static whose contents change at run time, with the values recorded for it.
@@ -173,13 +216,38 @@ impl LinkIndex {
             return;
         }
         self.budget.set(self.budget.get() - 1);
-        let o = peel(o);
+        let o = peel_ix(Some(self), o);
         match o {
             // the field read, outermost struct first (bounded by the origin: not a hop)
-            Origin::Field { adt, field, base } => {
-                let mut p = vec![(adt.clone(), *field)];
+            Origin::Field {
+                adt,
+                field,
+                base,
+                args,
+            } => {
+                let mut p = vec![(adt.clone(), *field, args.clone())];
                 p.extend_from_slice(path);
                 return self.resolve(base, &p, owner, depth, out);
+            }
+            // what a function the program calls writes through the parameter (`set_slot(&mut
+            // c.alg)`), its parameters being the call's arguments
+            Origin::Written {
+                callee,
+                index,
+                args,
+            } => {
+                let mut found = Vec::new();
+                for w in self
+                    .writes
+                    .get(&(callee.clone(), *index))
+                    .into_iter()
+                    .flatten()
+                {
+                    let v = substitute(w, args);
+                    self.resolve(&v, path, owner, depth + 1, &mut found);
+                }
+                found.into_iter().for_each(|v| push(out, v));
+                return;
             }
             Origin::Any(alts) | Origin::All(alts) => {
                 for a in alts {
@@ -188,7 +256,9 @@ impl LinkIndex {
                 return;
             }
             // a parameter of a function the program calls: what its callers pass
-            Origin::Param { index } => {
+            // (of the function it names: a closure reads its parent's through a capture)
+            Origin::Param { index, owner: of } => {
+                let owner = of.as_deref().unwrap_or(owner);
                 if let Some(callers) = self.calls.get(owner) {
                     let mut unknown = false;
                     for (caller, args) in callers {
@@ -246,12 +316,22 @@ impl LinkIndex {
         let keys: Vec<(String, Vec<usize>)> = (0..path.len())
             .map(|j| (path[j].0.clone(), fields(&path[j..])))
             .collect();
-        let Some(first) = keys.iter().position(|k| self.fields.contains_key(k)) else {
+        // a store in a struct of other type arguments (`Wrapper<&aead::Algorithm>` for a read
+        // of a `Wrapper<&digest::Algorithm>`) is not seen; either unknown, it is
+        let seen = |j: usize, s: &Stored| match (&path[j].2, &s.args) {
+            (Some(a), Some(b)) => a == b,
+            _ => true,
+        };
+        let Some(first) = keys.iter().enumerate().position(|(j, k)| {
+            self.fields
+                .get(k)
+                .is_some_and(|v| v.iter().any(|s| seen(j, s)))
+        }) else {
             return;
         };
         for (j, key) in keys.iter().enumerate().skip(first) {
             for s in self.fields.get(key).into_iter().flatten() {
-                if j == first || s.via_ref {
+                if (j == first || s.via_ref) && seen(j, s) {
                     self.resolve(&s.value, &[], &s.func, depth + 1, out);
                 }
             }
@@ -260,7 +340,7 @@ impl LinkIndex {
 }
 
 fn fields(path: &FieldPath) -> Vec<usize> {
-    path.iter().map(|(_, f)| *f).collect()
+    path.iter().map(|(_, f, _)| *f).collect()
 }
 
 /// Standard-library calls whose result is their first argument's value, unwrapped, wrapped or
@@ -290,11 +370,28 @@ const WRAPPERS: &[&str] = &[
     "OnceLock::<T>::get",
     "OnceCell::<T>::get",
     "LazyLock::<T, F>::force",
+    // a cell's value, a `thread_local!` cell's (`TA.get()`), what is put in one
+    "Cell::<T>::new",
+    "Cell::<T>::get",
+    "RefCell::<T>::new",
+    "RefCell::<T>::borrow",
+    "Cell<T>>::get",
 ];
+
+/// Calls outside the standard library that read a static's value: `lazy_static!`'s
+/// `Lazy::get(&LAZY, init)`.
+const STATIC_READS: &[&str] = &["lazy_static::lazy::Lazy::<T>::get"];
 
 /// `o` without the standard-library calls that only unwrap, wrap or borrow a value
 /// (`p256_key_pair_from_pkcs8(..)?`, `Arc::new(key)`).
 pub fn peel(o: &Origin) -> &Origin {
+    peel_ix(None, o)
+}
+
+/// `peel`, keeping a call of a trait method the program implements with a result that does
+/// not depend on its arguments (`lazy_static!`'s `Deref` of a static: `*LS` is what the
+/// static was initialized with, not the unit-like `LS`).
+pub fn peel_ix<'a>(ix: Option<&LinkIndex>, o: &'a Origin) -> &'a Origin {
     let mut o = o;
     while let Origin::Call {
         callee,
@@ -302,13 +399,26 @@ pub fn peel(o: &Origin) -> &Origin {
         args,
         ..
     } = o
-        && matches!(krate.as_str(), "core" | "std" | "alloc")
-        && WRAPPERS.iter().any(|w| callee.ends_with(w))
+        && ((matches!(krate.as_str(), "core" | "std" | "alloc")
+            && WRAPPERS.iter().any(|w| callee.ends_with(w)))
+            || STATIC_READS.contains(&callee.as_str()))
+        && !ix.is_some_and(|ix| ix.own_impl(o))
         && let Some(a) = args.first()
     {
         o = a;
     }
     o
+}
+
+/// Does `o` name a parameter of its function?
+fn names_param(o: &Origin) -> bool {
+    match o {
+        Origin::Param { .. } => true,
+        Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(names_param),
+        Origin::Field { base, .. } => names_param(base),
+        Origin::Any(v) | Origin::All(v) => v.iter().any(names_param),
+        _ => false,
+    }
 }
 
 fn push(out: &mut Vec<(Origin, String)>, v: (Origin, String)) {
@@ -321,11 +431,28 @@ fn push(out: &mut Vec<(Origin, String)>, v: (Origin, String)) {
 /// them.
 fn substitute(r: &Origin, args: &[Origin]) -> Origin {
     match r {
-        Origin::Param { index } => args.get(*index).cloned().unwrap_or(Origin::Unknown),
-        Origin::Field { adt, field, base } => Origin::Field {
+        Origin::Param { index, owner: None } => {
+            args.get(*index).cloned().unwrap_or(Origin::Unknown)
+        }
+        Origin::Field {
+            adt,
+            field,
+            base,
+            args: a,
+        } => Origin::Field {
             adt: adt.clone(),
             field: *field,
             base: Box::new(substitute(base, args)),
+            args: a.clone(),
+        },
+        Origin::Written {
+            callee,
+            index,
+            args: inner,
+        } => Origin::Written {
+            callee: callee.clone(),
+            index: *index,
+            args: inner.iter().map(|a| substitute(a, args)).collect(),
         },
         Origin::Call {
             callee,

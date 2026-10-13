@@ -5,6 +5,7 @@
   occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:21:13 | aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::generate | [reachable] [call] in a22::main; use: keygen; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `signature::PqdsaKeyPair::generate`
   occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:21:48 | aws_lc_rs::unstable::signature::MLDSA_44_SIGNING | [reachable] [via-static] in a22::main; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44_SIGNING; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `aws_lc_rs::unstable::signature::MLDSA_44_SIGNING`
   occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:24:15 | aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::sign | [reachable] [call] in a22::main; use: sign; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let _ = kp.sign(b"msg", &mut sig);`; code: `sign`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:15:12 | aws_lc_rs::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in a22::main; new: setup, not a use; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; public-key: environment (std::env::args); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `UnparsedPublicKey::new`
   occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:15:36 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 | [reachable] [static] in a22::main; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`
   occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:16:14 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; line: `let _ = u.verify(b"msg", &a);`; code: `verify`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:34 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in a22::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`
@@ -37,7 +38,8 @@
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
-  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=3
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:public-key=environment
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved

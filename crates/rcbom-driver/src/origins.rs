@@ -170,8 +170,8 @@ pub(crate) struct Origins<'a, 'tcx> {
     followed: bool,
     /// Origins of the captures, when known (a closure followed from the place it is built).
     captures: Option<Vec<Origin>>,
-    /// Captures looked up in the parent body, computed once.
-    parent_captures: RefCell<Option<Option<Vec<Origin>>>>,
+    /// Captures looked up in the parent body (capture, what is read of it), computed once.
+    parent_captures: RefCell<HashMap<CaptureRead, Option<Origin>>>,
     nodes: Cell<usize>,
     /// For an instance body (a generic function's instance, a closure in the walk): the item
     /// it was instantiated from and the instance's generic arguments. The instance body has its
@@ -181,6 +181,9 @@ pub(crate) struct Origins<'a, 'tcx> {
     /// The item MIR's unevaluated constants by span (`None`: several share the span).
     item_consts: OnceCell<HashMap<rustc_span::Span, Option<Uneval<'tcx>>>>,
 }
+
+/// A capture of a closure and what is read of it (`(*(*_1).0).key`: capture 0, then `.key`).
+type CaptureRead = (usize, Vec<Step>);
 
 /// An unevaluated constant, as `rustc_middle` has it: item, arguments, promoted index.
 type Uneval<'tcx> = (
@@ -214,7 +217,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             flow: OnceCell::new(),
             followed: false,
             captures: None,
-            parent_captures: RefCell::new(None),
+            parent_captures: RefCell::new(HashMap::new()),
             nodes: Cell::new(0),
             item: None,
             item_consts: OnceCell::new(),
@@ -675,9 +678,38 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
     }
 
-    /// The origin of a closure passed as a value (`LazyLock::new(|| ..)`): what it returns.
+    /// The origin of a closure passed as a value (`LazyLock::new(|| ..)`): what it returns; of
+    /// a function passed as one (`LazyLock::new(pick)`), a call of it.
     pub(crate) fn closure_value(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
-        self.operand_at(op, bb, idx)
+        if let Operand::Constant(c) = op
+            && let Some(RigidTy::FnDef(def, _)) = c.const_.ty().kind().rigid()
+        {
+            let did = rustc_internal::internal(self.tcx, def.def_id());
+            return Origin::Call {
+                callee: path_of(self.tcx, did),
+                krate: self.tcx.crate_name(did.krate).to_string(),
+                self_ty: None,
+                args: Vec::new(),
+                span: None,
+            };
+        }
+        match self.operand_at(op, bb, idx) {
+            // a function made a pointer first (`LazyLock::new(pick)` for a `LazyLock<T>`)
+            Origin::Unit { path, krate, .. }
+                if op
+                    .ty(self.body.locals())
+                    .is_ok_and(|t| matches!(t.kind().rigid(), Some(RigidTy::FnPtr(_)))) =>
+            {
+                Origin::Call {
+                    callee: path,
+                    krate,
+                    self_ty: None,
+                    args: Vec::new(),
+                    span: None,
+                }
+            }
+            o => o,
+        }
     }
 
     /// `o`, the origin of a value of type `ty`, read further along `rest`: a field of a struct
@@ -718,6 +750,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                                 adt: crate::path_of(tcx, named),
                                 field: *f,
                                 base: Box::new(o),
+                                args: crate::adt_args(tcx, args),
                             };
                         }
                         ty = field.ty(tcx, args).skip_norm_wip();
@@ -1273,6 +1306,30 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             }
             out.push(self.operand(a, at, depth + 1, seen));
         }
+        // `opt.unwrap_or_default()`: the default is a constant when the type's default is data
+        // (an array of zeros, a number), nothing when it is empty (a `String`, a `Vec`)
+        if krate == "core"
+            && callee.ends_with("::unwrap_or_default")
+            && let Some(TyKind::RigidTy(RigidTy::FnDef(_, gargs))) =
+                func.ty(self.body.locals()).ok().map(|t| t.kind())
+            && let Some(rustc_public::ty::GenericArgKind::Type(t)) = gargs.0.first()
+            && matches!(
+                t.kind().rigid(),
+                Some(
+                    RigidTy::Array(..)
+                        | RigidTy::Int(_)
+                        | RigidTy::Uint(_)
+                        | RigidTy::Bool
+                        | RigidTy::Char
+                )
+            )
+        {
+            out.push(Origin::Const {
+                value: None,
+                len: bytes_of_ty(t),
+                span: None,
+            });
+        }
         // the position the scanner gives this call's site
         let span = self
             .callee_span_at(func, at)
@@ -1524,18 +1581,24 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     fn entry_origin(&self, local: Local, rest: &[Step], depth: usize) -> Origin {
         match self.kind {
             BodyKind::Fn if self.followed => Origin::Unknown,
-            BodyKind::Fn => Origin::Param { index: local - 1 },
+            BodyKind::Fn => Origin::Param {
+                index: local - 1,
+                owner: None,
+            },
             BodyKind::Closure | BodyKind::Coroutine if local == 1 => {
-                // captures: `(*_1).k` (by reference), `_1.k` (by value), `(*_1.0).k` (pinned)
-                let k = match (self.kind, rest) {
-                    (BodyKind::Coroutine, [Step::Field(0), Step::Deref, Step::Field(k), ..]) => {
-                        Some(*k)
-                    }
-                    (BodyKind::Closure, [Step::Deref, Step::Field(k), ..])
-                    | (BodyKind::Closure, [Step::Field(k), ..]) => Some(*k),
-                    _ => None,
+                // captures: `(*_1).k` (by reference), `_1.k` (by value), `(*_1.0).k` (pinned);
+                // what is read of the capture after it (`(*(*_1).0).key`, the field of a value
+                // the closure captured whole) is read of the parent's value
+                let (k, tail) = match (self.kind, rest) {
+                    (
+                        BodyKind::Coroutine,
+                        [Step::Field(0), Step::Deref, Step::Field(k), tail @ ..],
+                    ) => (Some(*k), tail),
+                    (BodyKind::Closure, [Step::Deref, Step::Field(k), tail @ ..])
+                    | (BodyKind::Closure, [Step::Field(k), tail @ ..]) => (Some(*k), tail),
+                    _ => (None, &[][..]),
                 };
-                match k.and_then(|k| self.capture(k, depth)) {
+                match k.and_then(|k| self.capture(k, tail, depth)) {
                     Some(o) => o,
                     None => Origin::Unknown,
                 }
@@ -1543,32 +1606,33 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             // a coroutine's other argument is its resume value
             BodyKind::Coroutine => Origin::Unknown,
             BodyKind::Closure if self.followed => Origin::Unknown,
-            BodyKind::Closure => Origin::Param { index: local - 2 },
+            BodyKind::Closure => Origin::Param {
+                index: local - 2,
+                owner: None,
+            },
         }
     }
 
-    fn capture(&self, k: usize, depth: usize) -> Option<Origin> {
+    fn capture(&self, k: usize, tail: &[Step], depth: usize) -> Option<Origin> {
         if let Some(c) = &self.captures {
             return c.get(k).cloned();
         }
         if self.followed {
             return None;
         }
-        if self.parent_captures.borrow().is_none() {
-            let found = self.captures_from_parent(depth);
-            *self.parent_captures.borrow_mut() = Some(found);
+        let key = (k, tail.to_vec());
+        if let Some(o) = self.parent_captures.borrow().get(&key) {
+            return o.clone();
         }
-        self.parent_captures
-            .borrow()
-            .as_ref()
-            .unwrap()
-            .as_ref()
-            .and_then(|c| c.get(k).cloned())
+        let found = self.captures_from_parent(k, tail, depth);
+        self.parent_captures.borrow_mut().insert(key, found.clone());
+        found
     }
 
-    /// The operands of the aggregate that builds this closure (or coroutine) in its parent's
-    /// body, as origins there: a captured key is what the parent put in.
-    fn captures_from_parent(&self, depth: usize) -> Option<Vec<Origin>> {
+    /// Capture `k` as the parent's body builds this closure (or coroutine), as an origin there,
+    /// with `tail` read of it: a captured key is what the parent put in; a capture of the
+    /// parent's parameter is that parameter of the parent (`Origin::Param`'s `owner`).
+    fn captures_from_parent(&self, k: usize, tail: &[Step], depth: usize) -> Option<Origin> {
         let did = self.def?;
         if depth >= MAX_DEPTH {
             return None;
@@ -1582,7 +1646,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             let n = self.tcx.generics_of(parent).count().min(a.len());
             outer = outer.with_item(parent, self.tcx.mk_args(&a[..n]));
         }
-        let mut caps: Option<Vec<Vec<Origin>>> = None;
+        let mut found: Option<Vec<Origin>> = None;
         for (bb, block) in body.blocks.iter().enumerate() {
             for (idx, s) in block.statements.iter().enumerate() {
                 let StatementKind::Assign(_, Rvalue::Aggregate(kind, ops)) = &s.kind else {
@@ -1598,25 +1662,30 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     continue;
                 }
                 let at = At { bb, idx };
-                let c = caps.get_or_insert_with(|| vec![Vec::new(); ops.len()]);
-                for (k, o) in ops.iter().enumerate() {
-                    let x = outer.operand(o, at, depth + 1, &mut HashSet::new());
-                    if let Some(v) = c.get_mut(k)
-                        && !v.contains(&x)
-                    {
-                        v.push(x);
+                let Some(o) = ops.get(k) else { continue };
+                let x = match o {
+                    Operand::Copy(p) | Operand::Move(p) if !tail.is_empty() => {
+                        let mut path = path_of_place(p);
+                        path.extend_from_slice(tail);
+                        outer.place(p.local, path, at, depth + 1, &mut HashSet::new())
                     }
+                    _ => outer.operand(o, at, depth + 1, &mut HashSet::new()),
+                };
+                let v = found.get_or_insert_with(Vec::new);
+                if !v.contains(&x) {
+                    v.push(x);
                 }
             }
         }
-        caps.map(|c| {
-            c.into_iter()
-                .map(|mut v| match v.len() {
-                    0 => Origin::Unknown,
-                    1 => v.pop().unwrap(),
-                    _ => Origin::Any(v),
-                })
-                .collect()
+        let owner = path_of(self.tcx, parent);
+        found.map(|mut v| {
+            let o = match v.len() {
+                0 => Origin::Unknown,
+                1 => v.pop().unwrap(),
+                _ => Origin::Any(v),
+            };
+            // a parameter of the parent (a closure too); its own captures name theirs
+            o.params_of(&owner)
         })
     }
 
@@ -1766,7 +1835,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 .collect(),
         };
         let evaluate = || {
-            if args.has_non_region_param() {
+            let def = match promoted {
+                Some(_) => Some(did),
+                None => crate::statics::resolve_const(tcx, did, args, None),
+            };
+            if args.has_non_region_param()
+                || !def.is_some_and(|d| crate::statics::evaluable(tcx, d, promoted))
+            {
                 return None;
             }
             tcx.const_eval_resolve(
@@ -1995,6 +2070,23 @@ fn is_constant_init(d: &DefKind) -> bool {
     }
 }
 
+/// Is `q` a box's pointer (`b.0`, its `Unique`, or a field further in): how many fields from
+/// the box `b` (as `Origins::box_pointer`, from the stable types).
+fn box_field(body: &Body, q: &Place) -> Option<usize> {
+    let n = q.projection.len();
+    (1..=n.min(3)).find(|&k| {
+        q.projection[n - k..]
+            .iter()
+            .all(|e| matches!(e, ProjectionElem::Field(0, _)))
+            && Place {
+                local: q.local,
+                projection: q.projection[..n - k].to_vec(),
+            }
+            .ty(body.locals())
+            .is_ok_and(|t| t.kind().is_box())
+    })
+}
+
 /// What a pointer-typed place may point to, from the definitions that took the address.
 struct Pointees<'a> {
     body: &'a Body,
@@ -2011,6 +2103,36 @@ struct Target {
 }
 
 impl Pointees<'_> {
+    /// The boxes a box `local.path` is the same allocation as: itself, and, for a copy of a
+    /// box read through a reference (`_28 = copy (*_4)`), the box the reference points to.
+    fn same_box(&self, local: Local, path: Path, depth: usize) -> Vec<(Local, Path)> {
+        let mut out = vec![(local, path.clone())];
+        if depth > 6 || !path.is_empty() {
+            return out;
+        }
+        for k in self.direct.get(&local).into_iter().flatten() {
+            if let DefKind::Assign(
+                Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _) | Rvalue::CopyForDeref(q),
+                _,
+            ) = k
+            {
+                let qp = path_of_place(q);
+                match qp.split_first() {
+                    Some((Step::Deref, rest)) => {
+                        for t in self.targets(q.local, &[], depth + 1) {
+                            let mut p = t.path;
+                            p.extend_from_slice(rest);
+                            out.push((t.local, p));
+                        }
+                    }
+                    None => out.extend(self.same_box(q.local, Vec::new(), depth + 1)),
+                    _ => {}
+                }
+            }
+        }
+        out
+    }
+
     /// Places that `local.path` (a reference or raw pointer) points to.
     fn targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<Target> {
         if depth > 6 || !path.is_empty() {
@@ -2043,6 +2165,27 @@ impl Pointees<'_> {
                     if q.projection.is_empty() =>
                 {
                     out.extend(self.targets(q.local, &[], depth + 1))
+                }
+                // a box's pointer (`(_1.0).0 as *const T`, how `&mut *key` reaches a
+                // `Box`'s contents): its contents, `*_1`; of a copy of the box made through a
+                // reference to it (`_28 = copy (*_4)`, `_4 = &mut _1`), the original's
+                DefKind::Assign(Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _), _)
+                | DefKind::Assign(Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _), _)
+                    if let Some(k) = box_field(self.body, q) =>
+                {
+                    let mut qp = path_of_place(q);
+                    qp.truncate(qp.len() - k);
+                    let boxes = self.same_box(q.local, qp, depth + 1);
+                    let originals = boxes.len() > 1;
+                    for (i, (local, mut path)) in boxes.into_iter().enumerate() {
+                        path.push(Step::Deref);
+                        // the copy stands for the box it was read from
+                        out.push(Target {
+                            local,
+                            path,
+                            alias: i == 0 && originals,
+                        });
+                    }
                 }
                 // `_9 = copy ((*_1).0)`, `_49 = deref_copy (_1.0)`: a copy of the pointer held in
                 // a place (a closure's capture by reference, an `async` body's saved locals

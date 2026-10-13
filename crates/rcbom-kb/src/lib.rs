@@ -37,6 +37,16 @@ struct Raw {
     passthroughs: Vec<PassthroughRaw>,
     #[serde(rename = "seeded", default)]
     seeded: Vec<SourceRaw>,
+    #[serde(rename = "produces", default)]
+    produces: Vec<ProducesRaw>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ProducesRaw {
+    path: String,
+    role: String,
+    method: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -72,6 +82,17 @@ pub struct RoleEntry {
 pub struct SourceEntry {
     pub kind: String,
     pub pattern: Regex,
+}
+
+/// A call handing the library a value of the program's type that the library asks for data
+/// through a trait method (`SealingKey::new(key, seq)`: ring calls `seq.advance()` for each
+/// nonce): the `role` of the call is what the program's implementation of `method` (a suffix of
+/// the trait method's path) returns, for the types among the call's generic arguments.
+#[derive(Debug)]
+pub struct ProducesEntry {
+    pub pattern: Regex,
+    pub role: String,
+    pub method: String,
 }
 
 /// A call whose result carries the value of some of its arguments only: the data, not the
@@ -152,6 +173,11 @@ pub struct Algo {
     /// `hash_password_customized` from its arguments.
     #[serde(default)]
     pub own_params: Vec<String>,
+    /// (`[[type]]` entries) Parameters a method of `own_params` uses when its arguments leave
+    /// them out: `hash_password_customized(pw, None, ..)` hashes with the crate's default
+    /// variant (`{ variant = "id" }` for argon2), not the receiver's.
+    #[serde(default)]
+    pub own_defaults: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -322,6 +348,7 @@ pub struct Kb {
     /// Random generators built from a seed (`StdRng::seed_from_u64(42)`): their output is as
     /// predictable as the seed. `kind` is unused.
     pub seeded: Vec<SourceEntry>,
+    pub produces: Vec<ProducesEntry>,
 }
 
 /// `cryptoFunctions` values CycloneDX 1.7 accepts.
@@ -482,6 +509,17 @@ impl Kb {
                     Ok(PassthroughEntry {
                         pattern: pat(&p.path)?,
                         args: p.args,
+                    })
+                })
+                .collect::<Result<_>>()?,
+            produces: raw
+                .produces
+                .into_iter()
+                .map(|p| {
+                    Ok(ProducesEntry {
+                        pattern: pat(&p.path)?,
+                        role: p.role,
+                        method: p.method,
                     })
                 })
                 .collect::<Result<_>>()?,

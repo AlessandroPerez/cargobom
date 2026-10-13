@@ -667,10 +667,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     let vp = PathBuf::from(&v.span.file);
                     let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
                     detail.push(format!(
-                        "instantiated by {} at {}:{}",
+                        "instantiated by {} at {}:{}:{}",
                         short(&v.caller),
                         man.location(&vp),
-                        v.span.line
+                        v.span.line,
+                        v.span.col.saturating_sub(1)
                     ));
                 }
                 let occ = Occurrence {
@@ -909,6 +910,29 @@ type SiteMatch = (Match, Kind, Option<String>, String, Vec<String>, bool);
 const OWN_PARAMS: &str = ": its own parameters, not its receiver's";
 
 /// `None` (`Option::None` passed for an optional argument).
+/// The variant a value names by a unit variant of the family's enum (`Some(Algorithm::Argon2d
+/// .ident())`): `d`, its name after the family's.
+fn named_variant(o: &rcbom_facts::Origin, family: &str) -> Option<String> {
+    use rcbom_facts::Origin;
+    match o {
+        Origin::Unit { path, .. } => {
+            let last = path.rsplit("::").next()?;
+            last.strip_prefix(family)
+                .filter(|v| !v.is_empty())
+                .map(str::to_lowercase)
+        }
+        Origin::Call { args, .. } => args.iter().find_map(|a| named_variant(a, family)),
+        Origin::Any(v) => {
+            let found: Vec<String> = v.iter().filter_map(|a| named_variant(a, family)).collect();
+            match found.as_slice() {
+                [one] => Some(one.clone()),
+                _ => None,
+            }
+        }
+        _ => None,
+    }
+}
+
 fn is_none_origin(o: &rcbom_facts::Origin) -> bool {
     matches!(o, rcbom_facts::Origin::Unit { path, .. } if path.ends_with("Option::None"))
 }
@@ -1252,11 +1276,18 @@ fn site_matches(
                 Target::Call { arg_origins, .. } => arg_origins.first(),
                 _ => None,
             };
+            // a type's asset the constructor of the value renamed (`SigningKey::<Sha1>::
+            // new_unprefixed` is `RSA-PKCS1-1.5`): its components are parts of the new name
+            let mut renamed: HashMap<String, String> = HashMap::new();
             for (mut m, outer) in match_types(kb, &trees, &supported) {
+                let outer = outer.map(|p| renamed.get(&p).cloned().unwrap_or(p));
                 // the fn entry already names this algorithm, with what its arguments add:
                 // `Oaep::new_with_label::<Sha256, _>` is RSA-OAEP-SHA-256, not also an `Oaep`
                 // that is part of it
                 if fn_family.as_deref() == Some(m.algo.family.as_str()) {
+                    if let Some(f) = &fn_name {
+                        renamed.insert(m.name.clone(), f.clone());
+                    }
                     continue;
                 }
                 let providers = std::mem::take(&mut m.provider_crates);
@@ -1264,18 +1295,19 @@ fn site_matches(
                 // is Argon2id-19456-2-1, `Hasher::new_keyed(k)` a keyed BLAKE3
                 // ..unless the method takes its parameters from elsewhere: `verify_password`
                 // from the stored hash, `hash_password_customized` from its arguments (a
-                // `Params` built there, with the receiver's variant when the call passes `None`)
+                // `Params` built there; the variant its algorithm argument names, the crate's
+                // default when that is `None`)
                 let own_params = m.algo.own_params.iter().any(|x| x == method);
                 let family = m.algo.family.clone();
                 let from_receiver = |r| match_constructor(kb, &family, r);
-                let overrides = match receiver {
-                    Some(r)
-                        if own_params
-                            && matches!(&site.target, Target::Call { arg_origins, .. }
-                                if arg_origins.get(2).is_some_and(is_none_origin)) =>
-                    {
-                        from_receiver(r).map(|(c, _)| c.values).unwrap_or_default()
-                    }
+                let overrides = match &site.target {
+                    Target::Call { arg_origins, .. } if own_params => match arg_origins.get(2) {
+                        Some(o) if is_none_origin(o) => m.algo.own_defaults.clone(),
+                        Some(o) => named_variant(o, &family)
+                            .map(|v| BTreeMap::from([("variant".to_string(), v)]))
+                            .unwrap_or_default(),
+                        None => BTreeMap::new(),
+                    },
                     _ => BTreeMap::new(),
                 };
                 let own_crate = providers.first().map(|k| k.name.clone());
@@ -1285,6 +1317,7 @@ fn site_matches(
                     && let Some((c, at)) = from_receiver(r)
                 {
                     let comps = std::mem::take(&mut m.components);
+                    renamed.insert(m.name.clone(), c.name.clone());
                     m = c;
                     m.components = comps;
                     if let Some(at) = at
@@ -1312,12 +1345,16 @@ fn site_matches(
                     // Oaep::new_with_label::<Sha256, _>(label), msg)` is RSA-OAEP-SHA-256, the
                     // `Oaep` type alone RSA-OAEP
                     let comps = std::mem::take(&mut m.components);
+                    renamed.insert(m.name.clone(), c.name.clone());
                     m = c;
                     m.components = comps;
                 }
-                // the receiver of such a method is set up for what the method computes
+                // the receiver of such a method is set up for what the method computes, unless
+                // the call fixes what the receiver's constructor chose (the variant of
+                // `hash_password_customized(pw, None, ..)` is the crate's default)
                 if outer.is_none()
                     && own_params
+                    && overrides.is_empty()
                     && let Some((_, Some(at))) = receiver.and_then(from_receiver)
                     && let Some(c) =
                         ctx.calls
@@ -1447,7 +1484,7 @@ fn site_matches(
                             );
                             // several algorithms reach it (rustls's record keys, one per cipher
                             // suite): which one is chosen at run time
-                            let d = vec![match (from_elsewhere, n) {
+                            let mut d = vec![match (from_elsewhere, n) {
                                 (false, _) => {
                                     format!("algorithm from {} in the arguments", short(&def.path))
                                 }
@@ -1474,6 +1511,11 @@ fn site_matches(
                                     }
                                 }) && !(owners.is_empty() && reachable(&def.id))
                             };
+                            // a call that is no use sets the asset up, as for a typed call
+                            // (`UnboundKey::new(&AES_256_GCM, k)`, `hmac::Key::new(..)`)
+                            if f.is_none() {
+                                d.insert(0, format!("{method}: setup, not a use"));
+                            }
                             out.push((m, Kind::Call, f, symbol.clone(), d, unreached));
                         }
                     }
@@ -1545,13 +1587,16 @@ fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                                 o.provenance.push(p);
                             }
                         }
-                        merged.push((g.location, g.line));
+                        merged.push((g.location, g.line, g.offset, g.symbol));
                     }
                 }
             }
+            // only the occurrences merged: another on the line (`Argon2::from(Params::default())
+            // .verify_password(..)`, a call naming its own parameters) stays
             let g = assets.get_mut(general).unwrap();
-            g.occurrences
-                .retain(|o| !merged.contains(&(o.location.clone(), o.line)));
+            g.occurrences.retain(|o| {
+                !merged.contains(&(o.location.clone(), o.line, o.offset, o.symbol.clone()))
+            });
         }
     }
     assets.retain(|_, a| !a.occurrences.is_empty());

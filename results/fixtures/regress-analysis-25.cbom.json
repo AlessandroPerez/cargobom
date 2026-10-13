@@ -1,0 +1,586 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via app -> sha2 -> digest -> crypto-common",
+            "line": 131,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via app -> sha2 -> digest",
+            "line": 141,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/hkdf@0.12.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by lib1 (dependencies)",
+            "line": 10,
+            "location": "lib1/Cargo.toml",
+            "offset": 0,
+            "symbol": "hkdf"
+          },
+          {
+            "additionalContext": "[manifest] locked hkdf 0.12.4; reached via lib1 -> hkdf",
+            "line": 179,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "hkdf"
+          }
+        ]
+      },
+      "name": "hkdf",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/hkdf@0.12.4",
+      "type": "library",
+      "version": "0.12.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/hmac@0.12.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by app (build-dependencies)",
+            "line": 22,
+            "location": "app/Cargo.toml",
+            "offset": 0,
+            "symbol": "hmac"
+          },
+          {
+            "additionalContext": "[manifest] locked hmac 0.12.1; reached via lib1 -> hkdf -> hmac",
+            "line": 188,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "hmac"
+          }
+        ]
+      },
+      "name": "hmac",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/hmac@0.12.1",
+      "type": "library",
+      "version": "0.12.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/lib1@0.1.0",
+      "name": "lib1",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/lib1@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by app (dependencies)",
+            "line": 14,
+            "location": "app/Cargo.toml",
+            "offset": 0,
+            "symbol": "hashing"
+          },
+          {
+            "additionalContext": "[manifest] declared by app (build-dependencies)",
+            "line": 23,
+            "location": "app/Cargo.toml",
+            "offset": 0,
+            "symbol": "hashing"
+          },
+          {
+            "additionalContext": "[manifest] declared by lib1 (dependencies)",
+            "line": 11,
+            "location": "lib1/Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via app -> sha2",
+            "line": 289,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HKDF-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in lib1::derive; new: setup, not a use; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "line": 2,
+            "location": "lib1/src/lib.rs",
+            "offset": 13,
+            "symbol": "hkdf::Hkdf::<H, I>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in lib1::derive; use: keyderive; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "line": 4,
+            "location": "lib1/src/lib.rs",
+            "offset": 7,
+            "symbol": "hkdf::Hkdf::<H, I>::expand"
+          }
+        ]
+      },
+      "name": "HKDF-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:ikm",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "line": 2,
+            "location": "lib1/src/lib.rs",
+            "offset": 13,
+            "symbol": "hkdf::Hkdf::<H, I>::new"
+          },
+          {
+            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "line": 4,
+            "location": "lib1/src/lib.rs",
+            "offset": 7,
+            "symbol": "hkdf::Hkdf::<H, I>::expand"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b\"x\");`; code: `hashing::Sha256::digest`",
+            "line": 8,
+            "location": "app/src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "line": 2,
+            "location": "lib1/src/lib.rs",
+            "offset": 13,
+            "symbol": "hkdf::Hkdf::<H, I>::new"
+          },
+          {
+            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "line": 4,
+            "location": "lib1/src/lib.rs",
+            "offset": 7,
+            "symbol": "hkdf::Hkdf::<H, I>::expand"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512/256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`",
+            "line": 9,
+            "location": "lib1/src/lib.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512/256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/hmac@0.12.1",
+        "pkg:cargo/lib1@0.1.0",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/app@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/hmac@0.12.1"
+      ],
+      "provides": [
+        "crypto:algorithm:HKDF-SHA-256"
+      ],
+      "ref": "pkg:cargo/hkdf@0.12.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:HMAC-SHA-256"
+      ],
+      "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/hkdf@0.12.4",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/lib1@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512/256"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HKDF-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512/256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/app@0.1.0",
+      "name": "app",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/app@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "14"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "51"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:d3383cac-cec9-8d15-9010-7727aa3ff6a4",
+  "specVersion": "1.7",
+  "version": 1
+}

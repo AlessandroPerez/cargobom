@@ -105,7 +105,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::scatter; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a17::scatter; new: setup, not a use; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 29,
@@ -198,7 +198,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::ctr_iv; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::UnboundCipherKey::new`",
+            "additionalContext": "[reachable] [call] in a17::ctr_iv; new: setup, not a use; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::UnboundCipherKey::new`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 13,
@@ -284,6 +284,13 @@
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
             "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; line: `.verify(msg, sig)`; code: `verify`",
             "line": 71,
             "location": "src/main.rs",
@@ -322,8 +329,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:public-key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -364,6 +375,13 @@
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "aws_lc_rs::signature::ED25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
           },
           {
             "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; line: `.verify(msg, sig)`; code: `verify`",
@@ -412,8 +430,12 @@
           "value": "hard-coded-key"
         },
         {
+          "name": "rcbom:provenance:public-key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -489,7 +511,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::mac_kdf; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; new: setup, not a use; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::Key::new`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 12,
@@ -1019,7 +1041,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:43ac1c98-e769-868e-905e-c9f61eb4a61c",
+  "serialNumber": "urn:uuid:3720bdc2-27d3-87be-b727-d7c5e3375290",
   "specVersion": "1.7",
   "version": 1
 }

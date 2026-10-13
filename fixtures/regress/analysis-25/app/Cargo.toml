@@ -1,0 +1,26 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["weak"]
+weak = ["blake3?/std", "argon2?/std"]
+fast = ["dep:blake3"]
+legacy = ["lib1/legacy"]
+
+[dependencies]
+lib1 = { path = "../lib1" }
+hashing = { package = "sha2", version = "0.10" }
+blake3 = { version = "1", optional = true }
+argon2 = { version = "0.5", optional = true }
+
+[target.'cfg(windows)'.dependencies]
+md5 = "0.7"
+
+[build-dependencies]
+hmac = "0.12"
+hashing = { package = "sha2", version = "0.10" }
+
+[dev-dependencies]
+sha1 = "0.10"

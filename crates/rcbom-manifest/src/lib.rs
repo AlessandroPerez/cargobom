@@ -130,7 +130,7 @@ impl Manifest {
 }
 
 /// Lexical normalization: drops `.` and folds `dir/..`, without touching the file system.
-fn normalize(path: &Path) -> PathBuf {
+pub fn normalize(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for c in path.components() {
         match c {
@@ -365,7 +365,9 @@ fn build(
             let better = scope.get(&d.pkg).is_none_or(|old| s < *old);
             if better {
                 scope.insert(d.pkg.clone(), s);
-                parent.entry(d.pkg.clone()).or_insert_with(|| id.clone());
+                // the chain shown is the one that gives the scope (`lib1 -> hkdf -> hmac` for a
+                // required hmac, not a build edge found first)
+                parent.insert(d.pkg.clone(), id.clone());
                 queue.push_back(d.pkg.clone());
             }
         }

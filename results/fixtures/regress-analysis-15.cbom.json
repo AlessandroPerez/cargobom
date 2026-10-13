@@ -1399,6 +1399,58 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:Argon2id-19456-2-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "Argon2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "core::default::Default::default"
+          }
+        ]
+      },
+      "name": "Argon2id-19456-2-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:Argon2id-65536-3-4",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1418,13 +1470,6 @@
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "argon2::params::Params::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`",
-            "line": 33,
-            "location": "src/main.rs",
-            "offset": 4,
-            "symbol": "core::default::Default::default"
           },
           {
             "additionalContext": "[reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`",
@@ -1467,7 +1512,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -2633,6 +2678,7 @@
       "provides": [
         "crypto:algorithm:Argon2",
         "crypto:algorithm:Argon2i-19456-2-1",
+        "crypto:algorithm:Argon2id-19456-2-1",
         "crypto:algorithm:Argon2id-65536-3-4"
       ],
       "ref": "pkg:cargo/argon2@0.5.3"
@@ -2858,6 +2904,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:Argon2id-19456-2-1"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:Argon2id-65536-3-4"
     },
     {
@@ -2955,7 +3005,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7a194354-5753-8b32-9c63-24881a5e3564",
+  "serialNumber": "urn:uuid:411b018a-14c5-8f0b-bbe0-ac92c36f5133",
   "specVersion": "1.7",
   "version": 1
 }

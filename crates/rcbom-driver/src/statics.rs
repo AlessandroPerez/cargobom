@@ -256,7 +256,7 @@ fn dead_blocks<'tcx>(tcx: TyCtxt<'tcx>, body: &mir::Body<'tcx>) -> Vec<bool> {
     // a constant's value, a named one's too (`if FLAG` with `const FLAG: bool = false`)
     let value_of = |c: &mir::ConstOperand<'tcx>| {
         c.const_.try_to_scalar_int().or_else(|| {
-            (!c.const_.ty().has_non_region_param())
+            (!c.const_.ty().has_non_region_param() && evaluable_const(tcx, &c.const_, None))
                 .then(|| {
                     c.const_
                         .try_eval_scalar_int(tcx, TypingEnv::fully_monomorphized())
@@ -412,16 +412,228 @@ pub(crate) fn ctfe_mir<'tcx>(
 }
 
 /// The statics the evaluated value of a non-generic const or associated const points at;
-/// `None` when it cannot be evaluated on its own (generic, or no value).
+/// `None` when it cannot be evaluated on its own (generic, or no value). An associated const
+/// that evaluating could fail (see `evaluable`) is not evaluated: its statics are then those
+/// its body and the `const fn`s it calls name, any of which its value may point at.
 pub(crate) fn const_value_statics(tcx: TyCtxt<'_>, did: DefId) -> Option<Vec<DefId>> {
     if !matches!(tcx.def_kind(did), DefKind::Const | DefKind::AssocConst)
         || tcx.generics_of(did).requires_monomorphization(tcx)
     {
         return None;
     }
+    if !evaluable(tcx, did, None) {
+        return Some(named_statics(tcx, did));
+    }
     let value = tcx.const_eval_poly(did).ok()?;
     let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
     Some(statics_of_value(tcx, value, ty))
+}
+
+/// Whether evaluating constant `def` (or its promoted constant `promoted`) cannot fail. rustc
+/// evaluates every free const and static of a crate, but an associated, inline or promoted
+/// constant only when code that runs uses it, and evaluating one nothing uses reports its
+/// error and fails the build (zerocopy 0.7's never used `const INTO_REF_INTO_MUT_ARE_SOUND:
+/// bool = panic!(..)`). Such a constant is evaluable when neither its body nor those of the
+/// constants and `const fn`s it uses can panic, assert or call code without MIR.
+pub(crate) fn evaluable(tcx: TyCtxt<'_>, def: DefId, promoted: Option<mir::Promoted>) -> bool {
+    match (tcx.def_kind(def), promoted) {
+        (DefKind::Const | DefKind::Static { .. }, None) => return true,
+        (DefKind::AssocConst | DefKind::AnonConst, _) | (_, Some(_)) => {}
+        _ => return false,
+    }
+    let body = match promoted {
+        Some(p) if def.is_local() || tcx.is_mir_available(def) => &tcx.promoted_mir(def)[p],
+        Some(_) => return false,
+        None => match ctfe_body(tcx, def) {
+            Some(Ok(b)) => b,
+            Some(Err(())) => return true,
+            None => return false,
+        },
+    };
+    !may_fail(tcx, body, &mut HashSet::new(), 0)
+}
+
+/// `evaluable` for a MIR constant: a named or promoted one resolved to its definition with the
+/// instance's arguments `args`; a value or a type-level constant always is.
+pub(crate) fn evaluable_const<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    c: &mir::Const<'tcx>,
+    args: Option<GenericArgsRef<'tcx>>,
+) -> bool {
+    match c {
+        mir::Const::Unevaluated(uv, _) => match uv.promoted {
+            Some(p) => evaluable(tcx, uv.def, Some(p)),
+            None => {
+                resolve_const(tcx, uv.def, uv.args, args).is_some_and(|d| evaluable(tcx, d, None))
+            }
+        },
+        _ => true,
+    }
+}
+
+/// The MIR evaluation runs for a const or `const fn`: `Err` when a dependency's constant
+/// needed none (see `ctfe_mir`), `None` when there is none (a trait's const without default,
+/// a function that is not `const`).
+fn ctfe_body<'tcx>(tcx: TyCtxt<'tcx>, def: DefId) -> Option<Result<&'tcx mir::Body<'tcx>, ()>> {
+    match tcx.def_kind(def) {
+        DefKind::Const | DefKind::AssocConst | DefKind::AnonConst => {
+            if !def.is_local() && tcx.trivial_const(def).is_some() {
+                return Some(Err(()));
+            }
+            if let Some(l) = def.as_local()
+                && !tcx.mir_keys(()).contains(&l)
+            {
+                return None;
+            }
+        }
+        DefKind::Fn | DefKind::AssocFn if tcx.is_const_fn(def) => {}
+        _ => return None,
+    }
+    if def.is_local() {
+        return Some(Ok(tcx.mir_for_ctfe(def)));
+    }
+    // a dependency may not have encoded it (rustc's metadata decoder panics then): not known
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tcx.mir_for_ctfe(def)))
+        .ok()
+        .map(Ok)
+}
+
+/// Whether evaluating `body` may fail: an assertion (overflow, bounds, `assert!`), a call to a
+/// diverging function (`panic!`), to code without MIR, or to a `const fn` or a use of a
+/// constant that may fail itself.
+fn may_fail<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    body: &mir::Body<'tcx>,
+    seen: &mut HashSet<DefId>,
+    depth: usize,
+) -> bool {
+    if depth > 8 {
+        return true;
+    }
+    for block in body.basic_blocks.iter() {
+        match &block.terminator().kind {
+            mir::TerminatorKind::Assert { .. } => return true,
+            mir::TerminatorKind::Call { func, .. } | mir::TerminatorKind::TailCall { func, .. } => {
+                let ty::FnDef(callee, _) = *func.ty(body, tcx).kind() else {
+                    return true;
+                };
+                let diverges = tcx
+                    .fn_sig(callee)
+                    .skip_binder()
+                    .output()
+                    .skip_binder()
+                    .is_never();
+                if diverges {
+                    return true;
+                }
+                if let Some(i) = tcx.intrinsic(callee) {
+                    // `assert_inhabited::<T>()` and the like panic; the others compute
+                    if i.name.as_str().starts_with("assert_") {
+                        return true;
+                    }
+                    continue;
+                }
+                if !seen.insert(callee) {
+                    continue;
+                }
+                match ctfe_body(tcx, callee) {
+                    Some(Ok(b)) if !may_fail(tcx, b, seen, depth + 1) => {}
+                    _ => return true,
+                }
+            }
+            _ => {}
+        }
+    }
+    // the constants it uses (not free consts: rustc evaluates those anyway)
+    let mut uses = ConstUses(Vec::new());
+    uses.visit_body(body);
+    for (def, promoted) in uses.0 {
+        if promoted.is_none() && matches!(tcx.def_kind(def), DefKind::Const) {
+            continue;
+        }
+        if promoted.is_none() && !seen.insert(def) {
+            continue;
+        }
+        let failing = match promoted {
+            Some(p) if def.is_local() || tcx.is_mir_available(def) => {
+                may_fail(tcx, &tcx.promoted_mir(def)[p], seen, depth + 1)
+            }
+            Some(_) => true,
+            None => match ctfe_body(tcx, def) {
+                Some(Ok(b)) => may_fail(tcx, b, seen, depth + 1),
+                Some(Err(())) => false,
+                None => true,
+            },
+        };
+        if failing {
+            return true;
+        }
+    }
+    false
+}
+
+/// The unevaluated constants a body uses: (definition, promoted index).
+struct ConstUses(Vec<(DefId, Option<mir::Promoted>)>);
+
+impl<'tcx> Visitor<'tcx> for ConstUses {
+    fn visit_const_operand(&mut self, c: &mir::ConstOperand<'tcx>, _: mir::Location) {
+        if let mir::Const::Unevaluated(uv, _) = c.const_ {
+            self.0.push((uv.def, uv.promoted));
+        }
+    }
+}
+
+/// The statics a constant's body names, with those the `const fn`s it calls name and the
+/// values of the constants they use: all its value may point at.
+fn named_statics(tcx: TyCtxt<'_>, def: DefId) -> Vec<DefId> {
+    let mut out = Vec::new();
+    let mut seen = HashSet::new();
+    let mut work = vec![(def, 0usize)];
+    while let Some((d, depth)) = work.pop() {
+        if depth > 8 || !seen.insert(d) {
+            continue;
+        }
+        let body = match ctfe_body(tcx, d) {
+            Some(Ok(b)) => b,
+            Some(Err(())) => {
+                if let Some((v, t)) = tcx.trivial_const(d) {
+                    out.extend(statics_of_value(tcx, v, t));
+                }
+                continue;
+            }
+            None => continue,
+        };
+        let mut v = Refs::new(tcx, None);
+        v.visit_body(body);
+        if d.is_local() || tcx.is_mir_available(d) {
+            for p in tcx.promoted_mir(d).iter() {
+                v.visit_body(p);
+            }
+        }
+        for (n, _) in v.found {
+            match n {
+                Named::Static(s) => out.push(s),
+                Named::Const(c) if matches!(tcx.def_kind(c), DefKind::Const) => {
+                    out.extend(const_value_statics(tcx, c).unwrap_or_default())
+                }
+                Named::Const(c) => work.push((c, depth + 1)),
+            }
+        }
+        for block in body.basic_blocks.iter() {
+            if let mir::TerminatorKind::Call { func, .. } = &block.terminator().kind
+                && let ty::FnDef(callee, _) = *func.ty(body, tcx).kind()
+            {
+                work.push((callee, depth + 1));
+            }
+        }
+    }
+    let mut kept = Vec::new();
+    for s in out {
+        if !kept.contains(&s) {
+            kept.push(s);
+        }
+    }
+    kept
 }
 
 /// The statics a constant value points at, through any depth of allocations.

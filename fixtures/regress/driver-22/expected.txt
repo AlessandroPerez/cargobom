@@ -1,0 +1,204 @@
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:122:31 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in t22::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args); line: `let key = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, &k).unwrap_or_else(|_| {`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:122:48 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t22::main; line: `let key = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, &k).unwrap_or_else(|_| {`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:123:25 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t22::main::{closure#0}; instantiated by t22::main at src/main.rs:122:80; line: `UnboundKey::new(&AES_256_GCM, &[0; 32]).unwrap()`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:123:8 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in t22::main::{closure#0}; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 123); instantiated by t22::main at src/main.rs:122:80; line: `UnboundKey::new(&AES_256_GCM, &[0; 32]).unwrap()`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:136:27 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in t22::main; line: `use_aead(&Wrapper(&AES_256_GCM), &k),`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:20:32 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t22::c1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 19); instantiated by t22::c1 at src/main.rs:20:12; line: `let f = || cfg.name.len() + Aes256Gcm::new_from_slice(&cfg.key).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:27:16 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in t22::c2_async::{closure#0}; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 27); instantiated by t22::main at src/main.rs:128:62; line: `let _ = key.seal_in_place_append_tag(Nonce::assume_unique_for_key([2; 12]), Aad::empty(), buf);`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:30:34 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in t22::c2_closure::{closure#0}; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 30); instantiated by t22::c2_closure at src/main.rs:30:12; line: `let f = |b: &mut Vec<u8>| key.seal_in_place_append_tag(Nonce::assume_unique_for_key([3; 12]), Aad::empty(), b);`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:80:4 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in t22::use_aead; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(w.0, k).is_ok()`; code: `UnboundKey::new`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:100:19 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in t22::c6; line: `set_alg(&ALG, &SHA1);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:104:4 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `digest(*ALG.read().unwrap(), d).as_ref().len()`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:54:4 | ring::digest::digest | [reachable] [call] in t22::use_ctx; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `digest(c.alg, d).as_ref().len()`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:57:4 | ring::digest::digest | [reachable] [call] in t22::use_multi; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `digest(m.a[0], d).as_ref().len() + digest(m.v[0], d).as_ref().len()`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:66:10 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in t22::c4; line: `*r = &SHA1;`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:68:14 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in t22::c4; line: `m.a[0] = &SHA1;`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:100:13 | t22::ALG | [reachable] [via-static] in t22::c6; t22::ALG -> ring::digest::SHA256; line: `set_alg(&ALG, &SHA1);`; code: `ALG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:104:12 | t22::ALG | [reachable] [via-static] in t22::c6; t22::ALG -> ring::digest::SHA256; line: `digest(*ALG.read().unwrap(), d).as_ref().len()`; code: `ALG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:104:4 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest(*ALG.read().unwrap(), d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:107:10 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `+ digest(TA.get(), d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:135:29 | ring::digest::SHA256 | [reachable] [static] in t22::main; line: `use_digest(&Wrapper(&SHA256), &d),`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:59 | ring::digest::digest | [reachable] [call] in t22::c3::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; instantiated by t22::c3 at src/main.rs:36:12; line: `let f = |a: &'static Algorithm, b: &'static Algorithm| digest(a, d).as_ref().len() + digest(b, d).as_ref().len();`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:37:7 | ring::digest::SHA256 | [reachable] [static] in t22::c3; line: `f(&SHA256, &SHA512)`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:4 | ring::digest::digest | [reachable] [call] in t22::use_ctx; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA256; line: `digest(c.alg, d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:57:4 | ring::digest::digest | [reachable] [call] in t22::use_multi; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest(m.a[0], d).as_ref().len() + digest(m.v[0], d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:60:29 | ring::digest::SHA256 | [reachable] [static] in t22::c4; line: `let mut c1 = Ctx { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:62:29 | ring::digest::SHA256 | [reachable] [static] in t22::c4; line: `let mut c2 = Ctx { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:64:29 | ring::digest::SHA256 | [reachable] [static] in t22::c4; line: `let mut c3 = Ctx { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:67:29 | ring::digest::SHA256 | [reachable] [static] in t22::c4; line: `let mut m = Multi { a: [&SHA256], v: Vec::new() };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:77:4 | ring::digest::digest | [reachable] [call] in t22::use_digest; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; line: `digest(w.0, d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:86:54 | ring::digest::SHA256 | [reachable] [static] in t22::ALG; line: `static ALG: RwLock<&'static Algorithm> = RwLock::new(&SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:98:65 | ring::digest::SHA256 | [reachable] [static] in t22::TA::__rust_std_internal_init_fn; line: `thread_local! { static TA: Cell<&'static Algorithm> = Cell::new(&SHA256); }`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:105:10 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; line: `+ digest(*LZ, d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:54:4 | ring::digest::digest | [reachable] [call] in t22::use_ctx; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; line: `digest(c.alg, d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:57:39 | ring::digest::digest | [reachable] [call] in t22::use_multi; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; line: `digest(m.a[0], d).as_ref().len() + digest(m.v[0], d).as_ref().len()`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:61:44 | ring::digest::SHA384 | [reachable] [static] in t22::c4; line: `let _ = std::mem::replace(&mut c1.alg, &SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:69:14 | ring::digest::SHA384 | [reachable] [static] in t22::c4; line: `m.v.push(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:91:5 | ring::digest::SHA384 | [reachable] [static] in t22::pick; line: `&SHA384`; code: `SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:102:16 | ring::digest::SHA512 | [reachable] [static] in t22::c6; line: `TA.set(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:106:10 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; line: `+ digest(OL.get_or_init(pick2), d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:107:10 | ring::digest::digest | [reachable] [call] in t22::c6; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; line: `+ digest(TA.get(), d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:112:4 | ring::digest::digest | [reachable] [call] in t22::hash_with; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; line: `digest(a, x).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:116:7 | ring::digest::SHA512 | [reachable] [static] in t22::c7; line: `f(&SHA512, d)`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:36:89 | ring::digest::digest | [reachable] [call] in t22::c3::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; instantiated by t22::c3 at src/main.rs:36:12; line: `let f = |a: &'static Algorithm, b: &'static Algorithm| digest(a, d).as_ref().len() + digest(b, d).as_ref().len();`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:37:16 | ring::digest::SHA512 | [reachable] [static] in t22::c3; line: `f(&SHA256, &SHA512)`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:51:13 | ring::digest::SHA512 | [reachable] [static] in t22::set_slot; line: `*slot = &SHA512;`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:54:4 | ring::digest::digest | [reachable] [call] in t22::use_ctx; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; line: `digest(c.alg, d).as_ref().len()`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:94:5 | ring::digest::SHA512 | [reachable] [static] in t22::pick2; line: `&SHA512`; code: `SHA512`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t22 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t22 -> aes-gcm -> aes
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t22 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t22 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:57:0 | cipher | [manifest] locked cipher 0.4.4; reached via t22 -> aes-gcm -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:76:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t22 -> aes-gcm -> aead -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:87:0 | ctr | [manifest] locked ctr 0.9.2; reached via t22 -> aes-gcm -> ctr
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:112:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t22 -> ring -> getrandom
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:123:0 | ghash | [manifest] locked ghash 0.5.1; reached via t22 -> aes-gcm -> ghash
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:154:0 | polyval | [manifest] locked polyval 0.6.2; reached via t22 -> aes-gcm -> ghash -> polyval
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:166:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t22 -> aes-gcm -> aead -> crypto-common -> rand_core
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:175:0 | ring | [manifest] locked ring 0.17.14; reached via t22 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:10:0 | ring | [manifest] declared by t22 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:215:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t22 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=9
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,hard-coded,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=6
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=16
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=6
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=10
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=declared-not-used
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/t22@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
+dep pkg:cargo/t22@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/t22@0.1.0
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/t22@0.1.0", "name": "t22", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t22@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=26
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=274
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

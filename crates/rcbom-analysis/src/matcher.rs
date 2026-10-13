@@ -741,11 +741,12 @@ impl Match {
 }
 
 pub fn asset_key(name: &str, algo: &Algo) -> String {
-    format!(
-        "{name}|{}|{}",
-        algo.primitive,
-        algo.material.as_deref().unwrap_or("")
-    )
+    // key material is what it is whatever it is used for: rsa's `RsaPrivateKey::new` (for
+    // encryption) and ring's `RsaKeyPair::from_pkcs8` (for signatures) hold one kind of key
+    match &algo.material {
+        Some(m) => format!("{name}||{m}"),
+        None => format!("{name}|{}|", algo.primitive),
+    }
 }
 
 pub fn typenum(t: &TyTree) -> Option<u64> {

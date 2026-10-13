@@ -38,6 +38,24 @@ pub fn call_paths(target: &Target) -> Vec<String> {
 }
 
 /// Key material arguments of a call, with the classes of their origins: (role, classes).
+/// The role of an argument that only gives an output length: neither key material nor the
+/// algorithm.
+const LENGTH: &str = "length";
+
+/// The arguments of a call (by its callee's paths) that only give a length.
+fn length_args(kb: &Kb, paths: &[String]) -> HashSet<usize> {
+    kb.roles
+        .iter()
+        .filter(|r| paths.iter().any(|p| r.pattern.is_match(p)))
+        .flat_map(|r| {
+            r.args
+                .iter()
+                .filter(|(_, role)| *role == LENGTH)
+                .map(|(i, _)| *i)
+        })
+        .collect()
+}
+
 pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTreeSet<Class>)> {
     let Target::Call {
         arg_origins,
@@ -55,6 +73,10 @@ pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTre
         .filter(|r| paths.iter().any(|p| r.pattern.is_match(p)))
     {
         for (i, role) in &r.args {
+            // an output length (`Prk::expand`'s `len`) is not key material
+            if role == LENGTH {
+                continue;
+            }
             if let Some(o) = arg_origins.get(*i) {
                 let mut classes = BTreeSet::new();
                 classify(kb, links, o, 0, &mut classes);
@@ -83,7 +105,48 @@ pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTre
             }
         }
     }
+    // a value of the program's type the library asks for data (`SealingKey::new(key, seq)`:
+    // each nonce is what the program's `NonceSequence::advance` returns)
+    let Target::Call { self_ty, args, .. } = target else {
+        return out;
+    };
+    for p in kb
+        .produces
+        .iter()
+        .filter(|p| paths.iter().any(|x| p.pattern.is_match(x)))
+    {
+        let mut tys = Vec::new();
+        for t in self_ty.iter().chain(args) {
+            adt_paths(t, &mut tys);
+        }
+        let mut classes = BTreeSet::new();
+        for ty in tys {
+            for v in links.impl_returns(&p.method, &ty) {
+                classify(kb, links, &v, 0, &mut classes);
+            }
+        }
+        if classes.is_empty() {
+            continue;
+        }
+        match out.iter_mut().find(|(r, _)| *r == p.role) {
+            Some((_, c)) => c.extend(classes),
+            None => out.push((p.role.clone(), classes)),
+        }
+    }
     out
+}
+
+/// The paths of the types a type tree names (`SealingKey<Fixed>`: both).
+fn adt_paths(t: &TyTree, out: &mut Vec<String>) {
+    match t {
+        TyTree::Adt { path, args, .. } => {
+            out.push(strip_generics(path));
+            args.iter().for_each(|a| adt_paths(a, out));
+        }
+        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => adt_paths(t, out),
+        TyTree::Tuple(ts) => ts.iter().for_each(|a| adt_paths(a, out)),
+        _ => {}
+    }
 }
 
 /// The origin is the data itself (a constant or a static, possibly one of several), not
@@ -156,10 +219,13 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         // a field of a value from elsewhere: as for that value (a parameter's field is the
         // parameter's)
         Origin::Field { base, .. } => classify(kb, links, base, depth + 1, out),
-        Origin::Param { index } => {
+        Origin::Param { index, owner } => {
             out.insert(class(
                 "parameter",
-                format!("argument {index} of the enclosing function"),
+                match owner {
+                    Some(f) => format!("argument {index} of {}", short(f)),
+                    None => format!("argument {index} of the enclosing function"),
+                },
             ));
         }
         // a value of a field-less type: its type may be a source (`OsRng`)
@@ -167,6 +233,19 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
             if let Some(s) = kb.sources.iter().find(|s| s.pattern.is_match(path)) {
                 out.insert(class(&s.kind, short(path)));
             }
+        }
+        // `opt.unwrap_or_default()`: the value, or the type's default, which the driver gives as a
+        // constant when it is data (zeros), not when it is empty
+        Origin::Call {
+            callee,
+            krate,
+            args,
+            ..
+        } if matches!(krate.as_str(), "core" | "std" | "alloc")
+            && callee.ends_with("::unwrap_or_default") =>
+        {
+            args.iter()
+                .for_each(|a| classify(kb, links, a, depth + 1, out));
         }
         Origin::Call {
             callee,
@@ -339,6 +418,19 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 out.insert(class("computed", short(&path)));
             }
         }
+        // what a function of the program writes through a parameter (`set_key(&mut c.key)`):
+        // the values it writes, with the call's arguments for its parameters
+        Origin::Written { callee, .. } => match links.values(o, "") {
+            Some(vs) if !vs.is_empty() => vs
+                .iter()
+                .for_each(|(v, _)| classify(kb, links, v, depth + 1, out)),
+            _ => {
+                out.insert(class(
+                    "computed",
+                    format!("written by {}", short(&strip_generics(callee))),
+                ));
+            }
+        },
         // written through a borrow the call returned (`key.chunks_mut(16)`, `split_at_mut`):
         // what was written is not followed
         Origin::Through { callee } => {
@@ -503,12 +595,19 @@ pub fn data_in_args(
     };
     let mut seen = HashSet::new();
     let mut own = Vec::new();
-    for o in arg_origins {
-        direct_data(kb, links, o, 0, &mut own, &mut seen);
+    // an argument that only gives a length names no algorithm (`prk.expand(info,
+    // hkdf::HKDF_SHA256)` expands with the PRK's algorithm; the descriptor is its output length)
+    let lengths = length_args(kb, &call_paths(target));
+    for (i, o) in arg_origins.iter().enumerate() {
+        if !lengths.contains(&i) {
+            direct_data(kb, links, o, 0, &mut own, &mut seen);
+        }
     }
     let mut chain = Vec::new();
+    let hkdf_use =
+        !lengths.is_empty() || matches!(target, Target::Call { method, .. } if method == "fill");
     if let Some(r) = arg_origins.first() {
-        receiver_data(kb, links, r, 0, &mut chain, &mut seen);
+        receiver_data(kb, links, r, 0, &mut chain, &mut seen, hkdf_use);
     }
     chain.retain(|d| !own.contains(d));
     [own, chain].map(|v| v.into_iter().partition(|d| is_descriptor(kb, d)))
@@ -517,9 +616,10 @@ pub fn data_in_args(
 /// A value that comes from outside the function: a field read, a parameter, or a call of a
 /// function whose code is analysed (not the standard library's, nor an algorithm or trait
 /// crate's: a protocol crate's, rustls's, is).
-fn from_elsewhere(kb: &Kb, o: &Origin) -> bool {
-    match crate::links::peel(o) {
-        Origin::Field { .. } | Origin::Param { .. } => true,
+fn from_elsewhere(kb: &Kb, ix: Option<&LinkIndex>, o: &Origin) -> bool {
+    match crate::links::peel_ix(ix, o) {
+        Origin::Field { .. } | Origin::Param { .. } | Origin::Written { .. } => true,
+        c @ Origin::Call { .. } if ix.is_some_and(|ix| ix.own_impl(c)) => true,
         Origin::Call { krate, .. } => {
             !matches!(krate.as_str(), "core" | "std" | "alloc")
                 && kb
@@ -563,7 +663,7 @@ fn direct_data(
     // a static that changes at run time, also behind std wrappers (`*LAZY`,
     // `ONCE.get().unwrap()`): what the program puts there (`ONCE.set(&SHA512)`, `ALG2 =
     // &SHA1`, its initial value), looked up with the values from elsewhere
-    if let Origin::Data { def, .. } = crate::links::peel(o)
+    if let Origin::Data { def, .. } = crate::links::peel_ix(links.map(|(ix, _)| ix), o)
         && let Some((ix, _)) = links
         && let Some(values) = ix.mutable_static(&def.id)
     {
@@ -580,7 +680,7 @@ fn direct_data(
         return;
     }
     // (through std wrappers: `RwLock::new(&SHA256)`)
-    let o = crate::links::peel(o);
+    let o = crate::links::peel_ix(links.map(|(ix, _)| ix), o);
     match o {
         Origin::Data { def, .. } => {
             if let Some((ix, owner)) = links {
@@ -607,7 +707,7 @@ fn direct_data(
                 out.push(def.clone());
             }
         }
-        _ if from_elsewhere(kb, o) => {
+        _ if from_elsewhere(kb, links.map(|(ix, _)| ix), o) => {
             if let Some((ix, owner)) = links {
                 // a value from elsewhere, read in its own function: what it names there is
                 // followed too (a key pair stored by `start`, built from `self.alg`)
@@ -633,6 +733,9 @@ fn static_root(o: &Origin) -> Option<&DefRef> {
 /// arguments, then its own receiver, down to the first call that names a descriptor. That one
 /// says what the value is (`prk.expand(&[info], &AES_256_GCM)` makes an AES-256-GCM key);
 /// what built its own receiver (`Salt::new(HKDF_SHA256, ..)`) is another algorithm's.
+/// `lengths`: the descriptors only given as an output length along the chain (`expand(info,
+/// HKDF_SHA256)`) are skipped, for an operation of the HKDF itself (`Okm::fill`); a key made
+/// from the output (`UnboundKey::from(okm)`) is of that length's algorithm.
 fn receiver_data(
     kb: &Kb,
     links: Option<(&LinkIndex, &str)>,
@@ -640,13 +743,14 @@ fn receiver_data(
     depth: usize,
     out: &mut Vec<DefRef>,
     seen: &mut Seen,
+    lengths: bool,
 ) {
     if depth > 8 {
         return;
     }
     // a key kept in a static that changes at run time (`KEY.get().unwrap().seal_in_place(..)`):
     // the chains of the values put there
-    if let Origin::Data { def, .. } = crate::links::peel(o)
+    if let Origin::Data { def, .. } = crate::links::peel_ix(links.map(|(ix, _)| ix), o)
         && let Some((ix, _)) = links
         && let Some(values) = ix.mutable_static(&def.id)
     {
@@ -657,28 +761,35 @@ fn receiver_data(
         };
         if seen.insert((true, key, String::new())) {
             for v in &values {
-                receiver_data(kb, Some((ix, "")), v, depth + 1, out, seen);
+                receiver_data(kb, Some((ix, "")), v, depth + 1, out, seen, lengths);
             }
         }
         return;
     }
     // a receiver from another function (a field, a parameter, the program's own constructor):
     // the chains of the values that reach it
-    if from_elsewhere(kb, o)
+    if from_elsewhere(kb, links.map(|(ix, _)| ix), o)
         && let Some((ix, owner)) = links
     {
         for (v, w) in elsewhere(ix, o, owner, true, seen) {
-            if !from_elsewhere(kb, &v) {
-                receiver_data(kb, Some((ix, &w)), &v, depth + 1, out, seen);
+            if !from_elsewhere(kb, Some(ix), &v) {
+                receiver_data(kb, Some((ix, &w)), &v, depth + 1, out, seen, lengths);
             }
         }
         return;
     }
     match o {
-        Origin::Call { args, .. } => {
+        Origin::Call { args, callee, .. } => {
             let mut here = Vec::new();
-            for a in args {
-                direct_data(kb, links, a, 0, &mut here, seen);
+            let skip = if lengths {
+                length_args(kb, &[strip_generics(callee), callee.clone()])
+            } else {
+                HashSet::new()
+            };
+            for (i, a) in args.iter().enumerate() {
+                if !skip.contains(&i) {
+                    direct_data(kb, links, a, 0, &mut here, seen);
+                }
             }
             let named = here.iter().any(|d| is_descriptor(kb, d));
             for d in here {
@@ -687,12 +798,12 @@ fn receiver_data(
                 }
             }
             if !named && let Some(r) = args.first() {
-                receiver_data(kb, links, r, depth + 1, out, seen);
+                receiver_data(kb, links, r, depth + 1, out, seen, lengths);
             }
         }
         Origin::Any(alts) | Origin::All(alts) => alts
             .iter()
-            .for_each(|a| receiver_data(kb, links, a, depth + 1, out, seen)),
+            .for_each(|a| receiver_data(kb, links, a, depth + 1, out, seen, lengths)),
         _ => {}
     }
 }
@@ -826,7 +937,10 @@ mod tests {
             self_ty: None,
             args: vec![
                 data("ring", "ring::aead::AES_256_GCM"),
-                Origin::Param { index: 0 },
+                Origin::Param {
+                    index: 0,
+                    owner: None,
+                },
             ],
             span: None,
         };
@@ -878,7 +992,13 @@ mod tests {
         let mixed = call(
             "ring::hkdf::Salt::new",
             "ring",
-            vec![Origin::Param { index: 0 }, lit()],
+            vec![
+                Origin::Param {
+                    index: 0,
+                    owner: None,
+                },
+                lit(),
+            ],
         );
         assert_eq!(kinds(&kb, &mixed), ["parameter"]);
         // of constants only, it is a constant
@@ -899,7 +1019,14 @@ mod tests {
         let own = call(
             "age::primitives::hkdf",
             "age",
-            vec![Origin::Param { index: 0 }, data("age", "age::LABEL"), lit()],
+            vec![
+                Origin::Param {
+                    index: 0,
+                    owner: None,
+                },
+                data("age", "age::LABEL"),
+                lit(),
+            ],
         );
         assert_eq!(kinds(&kb, &own), ["computed"]);
         // a closure of this function is looked through
@@ -909,7 +1036,13 @@ mod tests {
         let fallback = call(
             "core::result::Result::<T, E>::unwrap_or",
             "core",
-            vec![Origin::Param { index: 0 }, lit()],
+            vec![
+                Origin::Param {
+                    index: 0,
+                    owner: None,
+                },
+                lit(),
+            ],
         );
         assert_eq!(kinds(&kb, &fallback), ["hard-coded", "parameter"]);
     }

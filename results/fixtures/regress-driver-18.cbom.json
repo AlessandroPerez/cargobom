@@ -824,7 +824,7 @@
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::mac; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (19 bytes, literal at line 106); line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in t18::mac; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (19 bytes, literal at line 106); line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `hmac::Key::new`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 14,
@@ -1121,7 +1121,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::LAZY::{closure#0}; instantiated by <{closure@t18::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250; line: `static LAZY: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA384);`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in t18::LAZY::{closure#0}; instantiated by <{closure@t18::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `static LAZY: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA384);`; code: `digest::SHA384`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 70,
@@ -1142,14 +1142,14 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::hash::<t18::S384>; use: digest; algorithm from ring::digest::SHA384 in the arguments; instantiated by t18::main at src/main.rs:111; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::hash::<t18::S384>; use: digest; algorithm from ring::digest::SHA384 in the arguments; instantiated by t18::main at src/main.rs:111:38; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `digest::digest`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::hash::<t18::S384>; <t18::S384 as t18::Scheme>::ALG -> ring::digest::SHA384; instantiated by t18::main at src/main.rs:111; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `T::ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::hash::<t18::S384>; <t18::S384 as t18::Scheme>::ALG -> ring::digest::SHA384; instantiated by t18::main at src/main.rs:111:38; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `T::ALG`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 19,
@@ -1347,14 +1347,14 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::each::<t18::P512>; <t18::P512 as t18::Plain>::ALG -> ring::digest::SHA512; instantiated by t18::main at src/main.rs:111; line: `let alg = T::ALG;`; code: `T::ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::each::<t18::P512>; <t18::P512 as t18::Plain>::ALG -> ring::digest::SHA512; instantiated by t18::main at src/main.rs:111:59; line: `let alg = T::ALG;`; code: `T::ALG`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "<t18::P512 as t18::Plain>::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::each::<t18::P512>::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by t18::each::<t18::P512> at src/main.rs:69; instantiated by t18::main at src/main.rs:111; line: `items.iter().map(move |d| digest::digest(alg, d).as_ref().len()).sum()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::each::<t18::P512>::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by t18::each::<t18::P512> at src/main.rs:69:21; instantiated by t18::main at src/main.rs:111:59; line: `items.iter().map(move |d| digest::digest(alg, d).as_ref().len()).sum()`; code: `digest::digest`",
             "line": 69,
             "location": "src/main.rs",
             "offset": 30,
@@ -1375,7 +1375,7 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::main::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; instantiated by t18::main at src/main.rs:113; line: `let f = |a: &'static digest::Algorithm, d: &[u8]| digest::digest(a, d).as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::main::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; instantiated by t18::main at src/main.rs:113:12; line: `let f = |a: &'static digest::Algorithm, d: &[u8]| digest::digest(a, d).as_ref().len();`; code: `digest::digest`",
             "line": 113,
             "location": "src/main.rs",
             "offset": 54,
@@ -2009,7 +2009,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fd6635ec-f24e-8fce-a2cd-ea65c145d45a",
+  "serialNumber": "urn:uuid:380a3be4-e14d-87a5-a48b-c0045676f9a3",
   "specVersion": "1.7",
   "version": 1
 }

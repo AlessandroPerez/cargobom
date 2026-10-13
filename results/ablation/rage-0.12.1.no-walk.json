@@ -1557,6 +1557,62 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:material:private-key:RSA",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "private-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in age::ssh::read_ssh::openssh_rsa_privkey::{closure#0}; from_components: setup, not a use; key: parameter (argument 0 of the enclosing function); key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `|(n, e, d, _iqmp, p, q)| rsa::RsaPrivateKey::from_components(n, e, d, vec![p, q]),`; code: `rsa::RsaPrivateKey::from_components`",
+            "line": 354,
+            "location": "age-0.12.1/src/ssh.rs",
+            "offset": 41,
+            "symbol": "rsa::key::RsaPrivateKey::from_components"
+          }
+        ]
+      },
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "computed,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "RSA"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -2373,7 +2429,8 @@
         "pkg:cargo/signature@2.2.0"
       ],
       "provides": [
-        "crypto:algorithm:RSA-OAEP-SHA-256"
+        "crypto:algorithm:RSA-OAEP-SHA-256",
+        "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/rsa@0.9.10"
     },
@@ -2469,6 +2526,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:SHA-256"
     },
     {
@@ -2542,7 +2603,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fc1d7a92-e9b7-8a32-bb26-bd8a645b473e",
+  "serialNumber": "urn:uuid:b235e9a9-d12c-82d5-8adb-37bce0a49946",
   "specVersion": "1.7",
   "version": 1
 }

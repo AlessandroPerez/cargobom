@@ -481,6 +481,32 @@ pub(crate) fn instance_name(tcx: TyCtxt<'_>, inst: &Instance) -> String {
     local_crate_name(tcx, p)
 }
 
+/// A struct's type arguments, printed as `path_of` prints paths, regions erased: `None` when it
+/// has none, or when they are not known yet (a generic function's own parameters).
+pub(crate) fn adt_args<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Option<String> {
+    use rustc_middle::ty::print::{
+        with_crate_prefix, with_no_trimmed_paths, with_no_visible_paths,
+    };
+    let tys: Vec<_> = args.types().collect();
+    if tys.is_empty() || args.has_non_region_param() {
+        return None;
+    }
+    let p = tys
+        .iter()
+        .map(|t| {
+            let t = tcx.erase_and_anonymize_regions(*t);
+            with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(format!(
+                "{t}"
+            ))))
+        })
+        .collect::<Vec<_>>()
+        .join(", ");
+    Some(local_crate_name(tcx, p))
+}
+
 /// `crate::` (how rustc prints the local crate under `with_crate_prefix!`) as the crate's name:
 /// `<crate::AesSealer as crate::Sealer>::seal` is `<micro::AesSealer as micro::Sealer>::seal`.
 fn local_crate_name(tcx: TyCtxt<'_>, p: String) -> String {
@@ -1064,13 +1090,16 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             // `Result::unwrap`, `Vec::push`, `Clone::clone`, drop glue: the standard library
             // handling a crypto value is not a use of it. Constructors and conversions the
             // crypto type implements are: `<Argon2 as Default>::default()`,
-            // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`.
+            // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`;
+            // so is data written into it through its `io::Write` impl (`h.write_all(data)`,
+            // `io::copy(&mut file, &mut h)` hashing a file)
             let Some(tr) = tcx.trait_of_assoc(did) else {
-                return false;
+                return path_of(tcx, did).ends_with("io::copy::copy")
+                    && matches!(trees.get(1), Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate));
             };
             let name = tcx.get_diagnostic_name(tr).map(|s| s.to_string());
             let constructed = match name.as_deref() {
-                Some("Default" | "From" | "TryFrom" | "FromStr") => trees.first(),
+                Some("Default" | "From" | "TryFrom" | "FromStr" | "IoWrite") => trees.first(),
                 // `Into<T>`: `Self` is the source, `T` the crypto type
                 Some("Into" | "TryInto") => trees.get(1),
                 _ => None,
@@ -1114,6 +1143,10 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             && !own.is_empty()
         {
             self_ty = Some(own.remove(0));
+        }
+        // `io::copy(&mut reader, &mut h)` writes into its writer: the crypto type it is about
+        if self_ty.is_none() && own.len() == 2 && path_of(tcx, did).ends_with("io::copy::copy") {
+            self_ty = Some(own.remove(1));
         }
         let (const_args, arg_origins, arg_lens) = match call {
             Some((call_args, term)) => {
@@ -1235,7 +1268,7 @@ fn switch_value(
         ConstantKind::Unevaluated(_) => {
             use rustc_middle::ty::TypeVisitableExt;
             let k = rustc_internal::internal(tcx, &c.const_);
-            if k.ty().has_non_region_param() {
+            if k.ty().has_non_region_param() || !statics::evaluable_const(tcx, &k, None) {
                 return None;
             }
             k.try_eval_bits(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized())

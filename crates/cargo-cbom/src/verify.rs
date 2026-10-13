@@ -46,6 +46,7 @@ use rcbom_kb::Kb;
 use regex::Regex;
 use serde_json::Value;
 
+#[derive(Clone)]
 struct Occ {
     component: String,
     component_ref: String,
@@ -63,6 +64,13 @@ macro_rules! re {
     }};
 }
 
+/// A package's `#[path]` modules and `include!`d files (see `Files::pkg_mods`).
+#[derive(Default)]
+struct PkgMods {
+    paths: Vec<(PathBuf, PathBuf, String)>,
+    included: HashSet<PathBuf>,
+}
+
 /// What the CBOM says about packages: which assets each provides, and its dependencies.
 struct Graph {
     /// bom-refs of the packages that are components of the CBOM
@@ -72,6 +80,9 @@ struct Graph {
     providers: HashMap<String, HashSet<String>>,
     /// asset bom-ref -> its algorithm family
     family: HashMap<String, String>,
+    /// asset bom-ref -> its `cryptoFunctions`, and whether it is reachable (its functions are
+    /// then those of its reachable occurrences or entries)
+    functions: HashMap<String, (Vec<String>, bool)>,
 }
 
 impl Graph {
@@ -109,7 +120,7 @@ fn load_externs(
     manifest_path: &Path,
     target: &str,
     features: &[String],
-) -> Option<(Externs, Libs)> {
+) -> Option<(Externs, Libs, Vec<PathBuf>)> {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut cmd = Command::new(cargo);
     cmd.args([
@@ -133,6 +144,7 @@ fn load_externs(
     let mut refs: HashMap<&str, String> = HashMap::new();
     let mut ext: Externs = HashMap::new();
     let mut libs: Libs = HashMap::new();
+    let mut roots = Vec::new();
     for p in md["packages"].as_array()? {
         let (Some(id), Some(n), Some(v)) =
             (p["id"].as_str(), p["name"].as_str(), p["version"].as_str())
@@ -144,6 +156,17 @@ fn load_externs(
         // its own library, as its binaries name it
         let own = ext.entry(id.to_string()).or_default();
         for t in p["targets"].as_array().into_iter().flatten() {
+            // (a build script's modules are not the crate's)
+            let build = t["kind"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .any(|k| k == "custom-build");
+            if let Some(sp) = t["src_path"].as_str()
+                && !build
+            {
+                roots.push(PathBuf::from(sp));
+            }
             let lib = t["kind"].as_array().into_iter().flatten().any(|k| {
                 matches!(
                     k.as_str(),
@@ -173,7 +196,7 @@ fn load_externs(
             }
         }
     }
-    Some((ext, libs))
+    Some((ext, libs, roots))
 }
 
 /// The pinned toolchain's sysroot and commit (`rustc -vV`).
@@ -221,11 +244,11 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         None => rcbom_manifest::host_triple()?,
     };
     let man = rcbom_manifest::load_locked(manifest_path, &target, &features, &kb)?;
-    let (externs, libs) = match load_externs(manifest_path, &target, &features) {
-        Some((e, l)) => (Some(e), Some(l)),
+    let (externs, libs, roots) = match load_externs(manifest_path, &target, &features) {
+        Some((e, l, r)) => (Some(e), Some(l), Some(r)),
         None => {
             eprintln!("verify: cargo metadata failed; crate names are resolved by package name");
-            (None, None)
+            (None, None, None)
         }
     };
     let mut graph = Graph {
@@ -233,6 +256,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         depends_on: HashMap::new(),
         providers: HashMap::new(),
         family: HashMap::new(),
+        functions: HashMap::new(),
     };
     // the components, and the root package (`metadata.component`)
     let root = doc["metadata"]["component"].clone();
@@ -265,6 +289,27 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     .or(prop)
                 {
                     graph.family.insert(r.to_string(), f.to_string());
+                }
+                let prop = |n: &str| {
+                    c["properties"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .find(|p| p["name"] == n)
+                        .and_then(|p| p["value"].as_str())
+                };
+                if let Some(fs) =
+                    c["cryptoProperties"]["algorithmProperties"]["cryptoFunctions"].as_array()
+                {
+                    graph.functions.insert(
+                        r.to_string(),
+                        (
+                            fs.iter()
+                                .filter_map(|f| f.as_str().map(str::to_string))
+                                .collect(),
+                            prop("rcbom:reachability") == Some("reachable"),
+                        ),
+                    );
                 }
             }
             _ => {}
@@ -343,6 +388,10 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         toolchain: None,
         cache: HashMap::new(),
         pkg_binds: HashMap::new(),
+        pkg_aliases: HashMap::new(),
+        roots,
+        pkg_mods: HashMap::new(),
+        std_items: HashMap::new(),
         occs: &occs,
         at_pos,
         at_line,
@@ -406,6 +455,66 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 shifted.len()
             );
         }
+        // the positions the details cite (`instantiated by X at F:L:C`, `expanded from F:L`)
+        for (dl, dc, what) in [
+            (1i64, 0i64, "detail line +1"),
+            (-1, 0, "detail line -1"),
+            (0, 1, "detail column +1"),
+            (0, -1, "detail column -1"),
+        ] {
+            let (mut caught, mut total) = (0, 0);
+            for (i, o) in occs.iter().enumerate().filter(|&(i, _)| verified[i]) {
+                for m in re!(
+                    r"(?:instantiated by .*? at|expanded from) [^\s;]+?:(\d+)(?::(\d+))?(?:;|$)"
+                )
+                .captures_iter(&o.context)
+                {
+                    let (Some(lg), cg) = (m.get(1), m.get(2)) else {
+                        continue;
+                    };
+                    let l: i64 = lg.as_str().parse().unwrap_or(0);
+                    let shifted = match (dc, cg) {
+                        (0, _) if l + dl >= 1 => format!(
+                            "{}{}{}",
+                            &o.context[..lg.start()],
+                            l + dl,
+                            &o.context[lg.end()..]
+                        ),
+                        (0, _) => continue,
+                        (_, Some(cg)) => {
+                            let c: i64 = cg.as_str().parse().unwrap_or(0);
+                            if c + dc < 0 {
+                                continue;
+                            }
+                            format!(
+                                "{}{}{}",
+                                &o.context[..cg.start()],
+                                c + dc,
+                                &o.context[cg.end()..]
+                            )
+                        }
+                        (_, None) => continue,
+                    };
+                    total += 1;
+                    if files
+                        .check_with(i, o.line, o.offset, Some(&shifted))
+                        .is_err()
+                    {
+                        caught += 1;
+                    } else {
+                        println!(
+                            "ACCEPTED {what}: {} {}:{}:{} cites {}",
+                            o.component,
+                            o.location,
+                            o.line,
+                            o.offset,
+                            m[0].trim_end_matches(';')
+                        );
+                    }
+                }
+            }
+            println!("self-test {what}: {caught}/{total} shifted positions rejected");
+        }
     }
     if bad > 0 {
         anyhow::bail!("{bad} positions do not match the source");
@@ -457,6 +566,8 @@ enum ItemKind {
     Impl,
     Trait,
     Mod,
+    /// a type's definition (`struct S`, `enum E`, `union U`, `type T`): its keyword only
+    TypeDef,
     Macro,
     /// a macro's invocation (`thread_local! { .. }`): the items it makes are named by it
     MacroCall,
@@ -632,16 +743,7 @@ fn items(s: &[char]) -> Vec<(ItemKind, String, Option<String>, usize, usize)> {
         }
         None
     };
-    let last_segment = |t: &str| -> String {
-        // `&'a mut path::Type<A, B>` -> `Type`
-        let t = strip_generics(t);
-        let t = t.trim().trim_start_matches(['&', '*']).trim();
-        let t = t
-            .split_whitespace()
-            .rfind(|w| !w.starts_with('\'') && *w != "mut" && *w != "dyn" && *w != "const")
-            .unwrap_or("");
-        t.rsplit("::").next().unwrap_or(t).trim().to_string()
-    };
+    let last_segment = type_name;
     let mut out = Vec::new();
     let mut i = 0;
     while i < s.len() {
@@ -653,9 +755,11 @@ fn items(s: &[char]) -> Vec<(ItemKind, String, Option<String>, usize, usize)> {
         let after = skip_ws(i + w.len());
         match w.as_str() {
             "fn" if after < s.len() && is_ident(s[after]) => {
-                let name = word_at(after);
-                let name = name.strip_prefix("r#").unwrap_or(&name).to_string();
-                if let Some((b, true)) = body_or_end(after + name.len())
+                // a raw identifier (`fn r#type`) is named without its `r#`
+                let raw = s.get(after + 1) == Some(&'#') && s[after] == 'r';
+                let name = word_at(if raw { after + 2 } else { after });
+                let len = name.len() + if raw { 2 } else { 0 };
+                if let Some((b, true)) = body_or_end(after + len)
                     && let Some(e) = close_of(b)
                 {
                     out.push((ItemKind::Fn, name, None, i, e));
@@ -671,8 +775,9 @@ fn items(s: &[char]) -> Vec<(ItemKind, String, Option<String>, usize, usize)> {
                     ) =>
             {
                 let mut n = after;
-                if word_at(n) == "mut" {
-                    n = skip_ws(n + 3);
+                // `static mut X`, `lazy_static!`'s `static ref X`
+                if matches!(word_at(n).as_str(), "mut" | "ref") {
+                    n = skip_ws(n + word_at(n).len());
                 }
                 let name = word_at(n);
                 // `static NAME: T = ..;`: to the `;` outside all brackets
@@ -762,11 +867,28 @@ fn items(s: &[char]) -> Vec<(ItemKind, String, Option<String>, usize, usize)> {
                     let ty = last_segment(&ty);
                     let ty = if params.contains(&ty) {
                         String::new()
+                    } else if ty.starts_with(['(', '[']) {
+                        // the impl's parameters in a tuple or array are any type or value
+                        // (`[u8; N]`): `?`
+                        re!(r"\b\w+\b")
+                            .replace_all(&ty, |m: &regex::Captures| {
+                                if params.iter().any(|p| p == &m[0]) {
+                                    "?".to_string()
+                                } else {
+                                    m[0].to_string()
+                                }
+                            })
+                            .to_string()
                     } else {
                         ty
                     };
                     out.push((ItemKind::Impl, ty, tr, i, e));
                 }
+            }
+            "struct" | "enum" | "union" | "type"
+                if after < s.len() && is_ident(s[after]) && item_place(i) =>
+            {
+                out.push((ItemKind::TypeDef, word_at(after), None, i, i + w.len()));
             }
             "trait" | "mod" if after < s.len() && is_ident(s[after]) && item_place(i) => {
                 let name = word_at(after);
@@ -822,6 +944,16 @@ struct Files<'a> {
     cache: HashMap<PathBuf, Option<Rc<Source>>>,
     /// the `use` bindings of every Rust file of a package, by package directory
     pkg_binds: HashMap<PathBuf, Rc<Vec<Binding>>>,
+    /// the type aliases of a package, by package directory: name -> what they stand for
+    pkg_aliases: HashMap<PathBuf, Rc<HashMap<String, Vec<String>>>>,
+    /// the root files of every target of the build (`src/lib.rs`, `src/bin/x.rs`), from
+    /// `cargo metadata`
+    roots: Option<Vec<PathBuf>>,
+    /// a package's `#[path = ".."] mod name;` declarations, by package directory: (declaring
+    /// file, the file named, the module's name); and the files an `include!` reads
+    pkg_mods: HashMap<PathBuf, Rc<PkgMods>>,
+    /// standard-library paths checked (`std_item`)
+    std_items: HashMap<String, bool>,
     occs: &'a [Occ],
     at_pos: HashMap<(String, usize, usize), Vec<usize>>,
     at_line: HashMap<(String, usize), Vec<usize>>,
@@ -1910,6 +2042,190 @@ impl Files<'_> {
         b
     }
 
+    /// The type aliases the Rust files of the package in `dir` define (`pub type Sha256 =
+    /// CoreWrapper<..>;`): name -> the types they stand for, as `norm_path` writes them. Only
+    /// aliases without generic parameters.
+    fn package_aliases(&mut self, dir: &Path) -> Rc<HashMap<String, Vec<String>>> {
+        if let Some(a) = self.pkg_aliases.get(dir) {
+            return a.clone();
+        }
+        let mut out: HashMap<String, Vec<String>> = HashMap::new();
+        for f in package_files(dir) {
+            let Ok(t) = std::fs::read_to_string(&f) else {
+                continue;
+            };
+            for m in re!(r"\btype\s+(\w+)\s*=\s*([^;{}]+);").captures_iter(&t) {
+                out.entry(m[1].to_string())
+                    .or_default()
+                    .push(norm_path(&m[2]));
+            }
+        }
+        let a = Rc::new(out);
+        self.pkg_aliases.insert(dir.to_path_buf(), a.clone());
+        a
+    }
+
+    /// Whether a standard-library path (`core::convert::From::from`, generics stripped) names a
+    /// type or trait of the module it names (its file, or the files of its directory) with a
+    /// function of the last name. True when the toolchain's sources cannot be read.
+    fn std_item(&mut self, path: &str) -> bool {
+        if let Some(&k) = self.std_items.get(path) {
+            return k;
+        }
+        let Some((sysroot, _)) = self.toolchain.get_or_insert_with(toolchain).clone() else {
+            return true;
+        };
+        let segs: Vec<&str> = path.split("::").collect();
+        let ok = match segs.as_slice() {
+            [krate, mods @ .., ty, f] => {
+                let base = sysroot
+                    .join("lib/rustlib/src/rust/library")
+                    .join(krate)
+                    .join("src");
+                let dir = mods.iter().fold(base.clone(), |d, m| d.join(m));
+                let mut files = package_files(&dir);
+                files.push(dir.with_extension("rs"));
+                if mods.is_empty() {
+                    files = vec![base.join("lib.rs")];
+                }
+                let ty_re = Regex::new(&format!(
+                    r"\b(?:trait|struct|enum|union|type)\s+{}\b",
+                    regex::escape(ty)
+                ))
+                .unwrap();
+                let fn_re = Regex::new(&format!(r"\bfn\s+{}\b", regex::escape(f))).unwrap();
+                let texts: Vec<String> = files
+                    .iter()
+                    .filter_map(|f| std::fs::read_to_string(f).ok())
+                    .collect();
+                // or a free function of the module the path names up to it (`alloc::io::copy::
+                // copy`)
+                let mut mod_files = package_files(&dir.join(ty));
+                mod_files.push(dir.join(format!("{ty}.rs")));
+                let in_module = mod_files
+                    .iter()
+                    .filter_map(|f| std::fs::read_to_string(f).ok())
+                    .any(|t| fn_re.is_match(&t));
+                texts.is_empty()
+                    || (texts.iter().any(|t| ty_re.is_match(t))
+                        && texts.iter().any(|t| fn_re.is_match(t)))
+                    || in_module
+            }
+            _ => false,
+        };
+        self.std_items.insert(path.to_string(), ok);
+        ok
+    }
+
+    /// The `#[path]` module declarations and `include!`d files of the package in `dir`.
+    fn package_mods(&mut self, dir: &Path) -> Rc<PkgMods> {
+        if let Some(m) = self.pkg_mods.get(dir) {
+            return m.clone();
+        }
+        let mut out = PkgMods::default();
+        for f in package_files(dir) {
+            let Ok(t) = std::fs::read_to_string(&f) else {
+                continue;
+            };
+            let here = f.parent().unwrap_or(dir);
+            for m in re!(r#"#\[path\s*=\s*"([^"]+)"\s*\]\s*(?:#\[[^\]]*\]\s*)*(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+(\w+)\s*;"#)
+                .captures_iter(&t)
+            {
+                out.paths.push((f.clone(), rcbom_manifest::normalize(&here.join(&m[1])), m[2].to_string()));
+            }
+            for m in re!(r#"\binclude!\s*\(\s*"([^"]+)"\s*\)"#).captures_iter(&t) {
+                out.included
+                    .insert(rcbom_manifest::normalize(&here.join(&m[1])));
+            }
+        }
+        let m = Rc::new(out);
+        self.pkg_mods.insert(dir.to_path_buf(), m.clone());
+        m
+    }
+
+    /// The module paths the code of a file is compiled as, from its crate's root:
+    /// `src/crypto/ring/tls12.rs` is `crypto::ring::tls12` (a crate root is `[]`), also as a
+    /// `#[path]` module of another file (rustls's `aws_lc_rs::kx` is `src/crypto/ring/kx.rs`).
+    /// None when unknown: no `cargo metadata`, a file outside every target's directory, one an
+    /// `include!` reads, or a build script's output.
+    fn module_chains(&mut self, path: &Path, depth: usize) -> Option<Vec<Vec<String>>> {
+        let roots = self.roots.as_ref()?;
+        // code a build script wrote (`<target>/build/<pkg>-<hash>/out/gen.rs`), included where
+        // the crate says
+        let comps: Vec<_> = path.components().map(|c| c.as_os_str()).collect();
+        if comps.windows(3).any(|w| w[0] == "build" && w[2] == "out") {
+            return None;
+        }
+        let mut out = Vec::new();
+        if roots.iter().any(|r| r == path) {
+            out.push(Vec::new());
+        } else if let Some(dir) = roots
+            .iter()
+            .filter_map(|r| r.parent())
+            .filter(|d| path.starts_with(d))
+            .max_by_key(|d| d.as_os_str().len())
+        {
+            let rel = path.strip_prefix(dir).ok()?;
+            let mut comps: Vec<String> = rel
+                .components()
+                .map(|c| c.as_os_str().to_string_lossy().to_string())
+                .collect();
+            let last = comps.pop()?;
+            if last != "mod.rs" {
+                comps.push(last.strip_suffix(".rs").unwrap_or(&last).to_string());
+            }
+            out.push(comps);
+        }
+        let dir = self.man.owner_of(path).map(|p| p.manifest_dir.clone())?;
+        let mods = self.package_mods(&dir);
+        if mods.included.contains(path) {
+            return None;
+        }
+        if depth < 3 {
+            for (decl, target, name) in &mods.paths {
+                if target == path {
+                    for mut c in self.module_chains(decl, depth + 1).unwrap_or_default() {
+                        c.push(name.clone());
+                        out.push(c);
+                    }
+                }
+            }
+        }
+        (!out.is_empty()).then_some(out)
+    }
+
+    /// The types a name in a file of package `owner` may be an alias of: those its own
+    /// package defines under that name, else those of the packages the file imports the name
+    /// from (ssh-encoding's `impl Writer for Sha256` names sha2's alias).
+    fn alias_targets(
+        &mut self,
+        src: &Source,
+        owner: Option<&rcbom_manifest::Pkg>,
+        name: &str,
+    ) -> Vec<String> {
+        let mut dirs: Vec<PathBuf> = owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
+        let owner_id = owner.map(|p| p.id.repr.clone());
+        for r in import_roots(&src.binds, name).into_iter().flatten() {
+            for p in self.crate_refs(owner_id.as_deref(), &r) {
+                if let Some(pkg) = self
+                    .man
+                    .packages
+                    .iter()
+                    .find(|k| pkg_ref(&k.name, &k.version.to_string()) == p)
+                {
+                    dirs.push(pkg.manifest_dir.clone());
+                }
+            }
+        }
+        let mut out = Vec::new();
+        for d in dirs {
+            if let Some(t) = self.package_aliases(&d).get(name) {
+                out.extend(t.iter().cloned());
+            }
+        }
+        out
+    }
+
     /// A location's file. The standard library's sources are named as rustc names them
     /// (`/rustc/<commit>/library/core/src/ops/function.rs`); they are read from the pinned
     /// toolchain's rust-src component (`<sysroot>/lib/rustlib/src/rust/library/..`), and the
@@ -1987,9 +2303,25 @@ impl Files<'_> {
     }
 
     fn check(&mut self, oi: usize, line: usize, offset: usize) -> Result<(), String> {
+        self.check_with(oi, line, offset, None)
+    }
+
+    /// `check`, with the occurrence's context replaced by `context` when given (the self-test
+    /// shifts the lines its details cite).
+    fn check_with(
+        &mut self,
+        oi: usize,
+        line: usize,
+        offset: usize,
+        context: Option<&str>,
+    ) -> Result<(), String> {
         let occs = self.occs;
         let man = self.man;
-        let o = &occs[oi];
+        let mut o = occs[oi].clone();
+        if let Some(c) = context {
+            o.context = c.to_string();
+        }
+        let o = &o;
         let path = self.resolve(&o.location)?;
         let src = self
             .source(&path)
@@ -2080,10 +2412,11 @@ impl Files<'_> {
         }
         // the positions the details name: where a generic instance was instantiated, where a
         // macro's code was written
-        self.check_details(ctx.details, ctx.tags, &o.symbol, ctx.line)?;
+        self.check_details(ctx.details, ctx.tags, &o.symbol, ctx.line, (&path, line))?;
         // the macro tags are among the leading tags, never in the recorded source text; a tagged
         // position is the macro's, derive's or attribute's name, not the symbol's
         let mut tagged = false;
+        let mut macro_tagged = false;
         if let Some(m) = re!(r"\[macro ([\w:]+!)\]").captures(ctx.tags) {
             let name = &m[1];
             let ok = Regex::new(&format!(r"^(?:\w+::)*{}", regex::escape(name)))
@@ -2093,6 +2426,7 @@ impl Files<'_> {
                 return Err(format!("expected `{name}` in {text:?}"));
             }
             tagged = true;
+            macro_tagged = true;
         }
         // derive: the position is the derive's name inside `#[derive(..)]` (or a `cfg_attr`'s
         // `derive(..)`)
@@ -2149,17 +2483,41 @@ impl Files<'_> {
         if !known {
             return Err(format!("`{}`: no crate `{first}` in the build", o.symbol));
         }
+        // a standard-library path names a type or trait and a function of it that exist
+        // (`core::convert::From::from`), in the module it names or one inside it
+        if matches!(first, "core" | "std" | "alloc") && !self.std_item(&sym) {
+            return Err(format!(
+                "`{}`: no such item in the standard library",
+                o.symbol
+            ));
+        }
         let mut parsed = None;
         let owner = man.owner_of(&path);
         let owner_id = owner.map(|p| p.id.repr.clone());
-        if !tagged {
-            // the enclosing item the context names (an identical statement in another
-            // function, or in another type's method of that name, is another occurrence), and
-            // no macro's body (a macro's code is cited where it is called)
+        // a macro's invocation is in the item the context names, as any position
+        if macro_tagged {
+            let chains = self.module_chains(&path, 0);
+            let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
             check_item(
                 &src,
                 ctx.details.strip_prefix(ctx.tags).unwrap_or(ctx.details),
                 (line, offset),
+                &mut aliases,
+                chains.as_deref(),
+            )?;
+        }
+        if !tagged {
+            // the enclosing item the context names (an identical statement in another
+            // function, or in another type's method of that name, is another occurrence), and
+            // no macro's body (a macro's code is cited where it is called)
+            let chains = self.module_chains(&path, 0);
+            let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
+            check_item(
+                &src,
+                ctx.details.strip_prefix(ctx.tags).unwrap_or(ctx.details),
+                (line, offset),
+                &mut aliases,
+                chains.as_deref(),
             )?;
             // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
             if let Some(w) = word_before(&src, line, offset)
@@ -2273,6 +2631,21 @@ impl Files<'_> {
                 return Err(format!("`{parent}`, which this is part of, is not here"));
             }
         }
+        // what a call does is one of the asset's functions (those of its reachable occurrences,
+        // observed or the knowledge base's, when it has any): an encryption is no use of SHA-512
+        if let Some(f) = parts(ctx.details)
+            .into_iter()
+            .find_map(|p| p.strip_prefix("use: "))
+            && let Some((fs, reachable)) = self.graph.functions.get(&o.component_ref)
+            && (ctx.tags.starts_with("[reachable]") || !reachable)
+            && !f.split(" or ").all(|f| fs.iter().any(|x| x == f))
+        {
+            return Err(format!(
+                "use `{f}` is not among {}'s functions ({})",
+                o.component,
+                fs.join(", ")
+            ));
+        }
         // a descriptor is evidence of the asset the knowledge base names it (`ring::digest::
         // SHA512` is SHA-512, not SHA-384): the static itself, or the one a table leads to
         let descriptor = match kind.as_str() {
@@ -2282,14 +2655,47 @@ impl Files<'_> {
                 .map(|m| m[1].to_string()),
             _ => None,
         };
+        // the descriptor a call's algorithm comes from names the asset too
+        for p in parts(ctx.details) {
+            let named: Vec<&str> = if let Some(m) =
+                re!(r"^algorithm from ([\w:]+)(?: in the arguments|, reaching .*)?$").captures(p)
+            {
+                vec![m.get(1).map_or("", |g| g.as_str())]
+            } else if let Some(m) = re!(r"^algorithm one of \d+ that .*?: (.+)$").captures(p) {
+                m.get(1).map_or("", |g| g.as_str()).split(", ").collect()
+            } else {
+                continue;
+            };
+            let family = self.graph.family.get(&o.component_ref).map(String::as_str);
+            for d in named {
+                let names =
+                    rcbom_analysis::static_names(self.kb, d.split("::").next().unwrap_or(""), d);
+                if !names.is_empty()
+                    && !names
+                        .iter()
+                        .any(|n| *n == o.component || extends(&o.component, n, family))
+                {
+                    return Err(format!(
+                        "the algorithm `{d}` is {}, not {}",
+                        names.join(" or "),
+                        o.component
+                    ));
+                }
+            }
+        }
+        if kind == "via-static" && descriptor.is_none() {
+            return Err("a `[via-static]` occurrence without its chain to a descriptor".into());
+        }
         if let Some(d) = descriptor {
             let k = d.split("::").next().unwrap_or("");
             let names = rcbom_analysis::static_names(self.kb, k, &d);
             let family = self.graph.family.get(&o.component_ref).map(String::as_str);
-            if !names.is_empty()
-                && !names
-                    .iter()
-                    .any(|n| *n == o.component || extends(&o.component, n, family))
+            if names.is_empty() {
+                return Err(format!("`{d}` is no knowledge-base descriptor"));
+            }
+            if !names
+                .iter()
+                .any(|n| *n == o.component || extends(&o.component, n, family))
             {
                 return Err(format!(
                     "`{d}` is {}, not {}",
@@ -2436,12 +2842,13 @@ impl Files<'_> {
         tags: &str,
         symbol: &str,
         call_line: Option<&str>,
+        at: (&Path, usize),
     ) -> Result<(), String> {
         let mut callee = details
             .strip_prefix(tags)
             .unwrap_or(details)
             .strip_prefix("in ")
-            .and_then(|d| d.split("; ").next())
+            .and_then(|d| parts(d).into_iter().next())
             .map(str::to_string);
         // the names of the occurrence's item and of the callers so far
         let mut earlier: Vec<String> = callee
@@ -2450,13 +2857,15 @@ impl Files<'_> {
             .map(|n| n.name)
             .into_iter()
             .collect();
-        for part in details.split("; ") {
+        for part in parts(details) {
             let Some(m) =
-                re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+):(\d+)$").captures(part)
+                re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?$")
+                    .captures(part)
             else {
                 continue;
             };
             let (file, line) = (m[3].to_string(), m[4].parse::<usize>().unwrap_or(0));
+            let col: Option<usize> = m.get(5).and_then(|c| c.as_str().parse().ok());
             let caller = m.get(2).map(|c| c.as_str().to_string());
             let path = self.resolve(&file)?;
             let src = self
@@ -2478,8 +2887,28 @@ impl Files<'_> {
             if cols.is_empty() {
                 return Err(format!("`{part}`: no code at line {line} of {file}"));
             }
+            // in the standard library, the line names the caller: a closure's `call_once` shim
+            // is cited at the trait's declaration of it
             if file.starts_with("/rustc/") {
                 if let Some(n) = caller.as_deref().and_then(in_item) {
+                    // in code (not `#[lang = "drop_glue"]` above the function)
+                    let text = &src.lines[line - 1];
+                    let in_code = Regex::new(&format!(r"\b{}\b", regex::escape(&n.name)))
+                        .unwrap()
+                        .find_iter(text)
+                        .any(|m| cols.contains(&text[..m.start()].chars().count()));
+                    if !in_code {
+                        return Err(format!("`{part}`: line {line} does not name `{}`", n.name));
+                    }
+                    // at the start of a token
+                    if let Some(c0) = col {
+                        let chars: Vec<char> = src.lines[line - 1].chars().collect();
+                        let start = cols.contains(&c0)
+                            && (!is_ident(chars[c0]) || c0 == 0 || !is_ident(chars[c0 - 1]));
+                        if !start {
+                            return Err(format!("`{part}`: no token starts at column {c0}"));
+                        }
+                    }
                     earlier.push(n.name);
                 }
                 callee = caller;
@@ -2488,47 +2917,197 @@ impl Files<'_> {
             match &caller {
                 Some(c) => {
                     let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
-                    let inside = cols.iter().any(|&col| {
-                        src.enclosing((line, col), &[ItemKind::Fn, ItemKind::Static])
-                            .is_some_and(|i| i.name == want.name)
-                            || src.enclosing((line, col), &[ItemKind::MacroCall]).is_some()
+                    // where the line names what it instantiates, as a use (not `fn seal(..)`
+                    // defining the caller): the item or a caller before it (an occurrence
+                    // instantiated along two chains lists both last callers, each naming the
+                    // item before them). A closure is called through a variable, and what
+                    // syntax calls (`.await` polls, a scope's end drops, `?`, operators,
+                    // `for`) is not named: any code of the line then.
+                    let text = &src.lines[line - 1];
+                    // a closure (or `async` body) the caller itself writes is cited where it
+                    // does: `|..|`, `async`, `move`
+                    let own_closure = callee
+                        .as_deref()
+                        .and_then(closure_parent)
+                        .is_some_and(|p| strip_generics(p) == strip_generics(c));
+                    let unnamed = callee.as_deref().is_none_or(|p| {
+                        p.trim_end().ends_with('}') || in_item(p).is_some_and(|n| by_syntax(&n))
                     });
-                    if !inside {
-                        return Err(format!("`{part}`: line {line} is not in `{}`", want.name));
-                    }
-                    // the line names what it instantiates, unless that is a closure: the item
-                    // or a caller before it (an occurrence instantiated along two chains lists
-                    // both last callers, each naming the item before them)
-                    if let Some(prev) = &callee
-                        && !prev.trim_end().ends_with('}')
-                    {
-                        let text = &src.lines[line - 1];
-                        let named = earlier.iter().any(|n| {
-                            Regex::new(&format!(r"\b{}\b", regex::escape(n)))
-                                .unwrap()
-                                .is_match(text)
+                    let chars: Vec<char> = text.chars().collect();
+                    // an `async` closure's body is made where it starts (`async move |d| expr`:
+                    // at `expr`)
+                    let closure_caller = c.trim_end().ends_with('}');
+                    let named: Vec<usize> = if own_closure {
+                        // and an `async fn`'s body at its `{`
+                        let starts = re!(r"\|\|?|\basync\b|\bmove\b|\bstatic\b|\{")
+                            .find_iter(text)
+                            .map(|m| text[..m.start()].chars().count())
+                            .filter(|col| cols.contains(col));
+                        let body = col.filter(|&c0| {
+                            closure_caller
+                                && cols.contains(&c0)
+                                && (c0 == 0 || !is_ident(chars[c0 - 1]))
                         });
-                        if !named {
-                            return Err(format!(
-                                "`{part}`: line {line} does not name `{}`",
-                                in_item(prev).map(|n| n.name).unwrap_or_default()
-                            ));
+                        starts.chain(body).collect()
+                    } else if unnamed {
+                        // a token the language calls through: a name (`poll`, a closure's
+                        // variable), `?`, a bracket
+                        cols.iter()
+                            .copied()
+                            .filter(|&j| {
+                                col.is_none()
+                                    || (is_ident(chars[j]) && (j == 0 || !is_ident(chars[j - 1])))
+                                    || "?{}()[]|".contains(chars[j])
+                            })
+                            .collect()
+                    } else {
+                        // a method is also instantiated where a value of its type is made a
+                        // trait object (`let b: Box<dyn H> = Box::new(A)` makes `<A as H>::h`'s
+                        // vtable): the line names the type or the trait
+                        let owners: Vec<String> = callee
+                            .as_deref()
+                            .and_then(in_item)
+                            .map(|n| {
+                                n.self_ty
+                                    .into_iter()
+                                    .chain(n.owner.map(|(t, _)| t))
+                                    .chain(
+                                        n.trait_name
+                                            .map(|t| t.split('<').next().unwrap_or(&t).to_string()),
+                                    )
+                                    .filter(|t| t.chars().all(is_ident) && !t.is_empty())
+                                    .collect()
+                            })
+                            .unwrap_or_default();
+                        // (a value of a generic type, `Box::new(conn)` in reqwest: a coercion to a
+                        // trait object, for a method of a trait)
+                        let coerces = callee
+                            .as_deref()
+                            .and_then(in_item)
+                            .is_some_and(|n| n.trait_name.is_some() || n.owner.is_some())
+                            && re!(r"\b(Box|Arc|Rc)::(new|pin)\(|\bas\s|\bdyn\s").is_match(text);
+                        let names_owner = coerces || owners.iter().any(|o| path_names(text, o));
+                        earlier
+                            .iter()
+                            .flat_map(|n| {
+                                Regex::new(&format!(r"\b{}\b", regex::escape(n)))
+                                    .unwrap()
+                                    .find_iter(text)
+                                    .map(|m| text[..m.start()].chars().count())
+                                    .collect::<Vec<_>>()
+                            })
+                            // the coercion's expression, from its first token
+                            .chain(col.filter(|_| names_owner))
+                            .chain(
+                                cols.first()
+                                    .copied()
+                                    .filter(|_| col.is_none() && names_owner),
+                            )
+                            .filter(|&j| {
+                                cols.contains(&j) && {
+                                    let before: String = chars[..j].iter().collect();
+                                    !re!(r"\bfn\s+$").is_match(&before)
+                                }
+                            })
+                            // with a column: the path written there names it (`hash::<S384>`,
+                            // `crate::m::seal`, a method's name)
+                            .filter_map(|j| match col {
+                                None => Some(j),
+                                Some(c0) => {
+                                    let start =
+                                        chars.get(c0).is_some_and(|ch| is_ident(*ch) || *ch == '<')
+                                            && (c0 == 0 || !is_ident(chars[c0 - 1]));
+                                    (start
+                                        && ((j >= c0 && j < c0 + path_len(&chars, c0))
+                                            || (j == c0 && names_owner)))
+                                        .then_some(c0)
+                                }
+                            })
+                            .collect()
+                    };
+                    // with a column, that token
+                    let named: Vec<usize> = match col {
+                        Some(c0) => named.into_iter().filter(|&j| j == c0).collect(),
+                        None => named,
+                    };
+                    if named.is_empty() && own_closure {
+                        return Err(format!(
+                            "`{part}`: line {line} writes no closure or `async` body"
+                        ));
+                    }
+                    if named.is_empty() {
+                        return Err(format!(
+                            "`{part}`: line {line} does not name `{}`",
+                            callee
+                                .as_deref()
+                                .and_then(in_item)
+                                .map(|n| n.name)
+                                .unwrap_or_default()
+                        ));
+                    }
+                    // the caller is around it, as for an occurrence: its item, the impl block
+                    // or trait, the module; or the attribute on it (`#[tokio::main]` makes
+                    // `main`'s body)
+                    let chains = self.module_chains(&path, 0);
+                    let man = self.man;
+                    let owner = man.owner_of(&path);
+                    let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
+                    let mut first_err = None;
+                    let mut inside = false;
+                    for &col in &named {
+                        match check_item(
+                            &src,
+                            &format!("in {c}"),
+                            (line, col),
+                            &mut aliases,
+                            chains.as_deref(),
+                        ) {
+                            Ok(()) => {
+                                inside = true;
+                                break;
+                            }
+                            Err(e) => {
+                                first_err.get_or_insert(e);
+                            }
                         }
                     }
-                    if let Some(n) = in_item(c) {
-                        earlier.push(n.name);
+                    if !inside && attribute_of(&src, line).is_some_and(|i| i.name == want.name) {
+                        inside = true;
                     }
+                    if !inside {
+                        return Err(format!(
+                            "`{part}`: line {line} is not in `{}` ({})",
+                            want.name,
+                            first_err.unwrap_or_default()
+                        ));
+                    }
+                    earlier.push(want.name);
                     callee = Some(c.clone());
                 }
                 None => {
-                    // a derive's or an attribute's code is the procedural macro's: only the line
-                    // of its use is known
-                    let Some(t) = re!(r"\[macro (?:[\w]+::)*(\w+)!\]").captures(tags) else {
+                    // a procedural macro's code (a derive's, an attribute's, a function-like
+                    // one's) is cited at its use: the attribute or invocation the position is
+                    // in, from its first line
+                    let bang = re!(r"\[macro (?:[\w]+::)*(\w+)!\]").captures(tags);
+                    let rules = bang.as_ref().is_some_and(|t| {
+                        src.items
+                            .iter()
+                            .any(|i| i.kind == ItemKind::Macro && i.name == t[1])
+                    });
+                    let Some(t) = bang.filter(|_| rules) else {
+                        let first = attribute_start(self, at.0, at.1);
+                        if path != at.0 || first != Some(line) {
+                            return Err(format!(
+                                "`{part}`: not the first line of the attribute or macro call at line {}",
+                                at.1
+                            ));
+                        }
                         continue;
                     };
-                    let inside = src
-                        .enclosing((line, cols[0]), &[ItemKind::Macro])
-                        .is_some_and(|m| m.name == t[1]);
+                    let inside = cols.iter().any(|&col| {
+                        src.enclosing((line, col), &[ItemKind::Macro])
+                            .is_some_and(|m| m.name == t[1])
+                    });
                     if !inside {
                         return Err(format!(
                             "`{part}`: line {line} is not in the body of `macro_rules! {}`",
@@ -2554,13 +3133,189 @@ impl Files<'_> {
     }
 }
 
+/// The first line of the attribute (`#[derive(..)]`, `#[hashed]`) or the macro invocation
+/// (`hash_it!(..)`) a line of a file is in: the line itself when it starts one, else the
+/// nearest line above, within a few, that starts one and that no other line in between does.
+fn attribute_start(files: &mut Files<'_>, path: &Path, line: usize) -> Option<usize> {
+    let src = files.source(path)?;
+    let starts = |l: usize| {
+        src.lines.get(l.wrapping_sub(1)).is_some_and(|t| {
+            let t = t.trim_start();
+            t.starts_with("#[")
+                || t.starts_with("#![")
+                || re!(r"^[\w:]+!\s*[\(\[\{]").is_match(t)
+                || re!(r"[=(,]\s*[\w:]+!\s*[\(\[\{]").is_match(t)
+        })
+    };
+    (line.saturating_sub(12).max(1)..=line)
+        .rev()
+        .find(|&l| starts(l))
+}
+
+/// A method the language calls without naming it: `.await` polls, a scope's end drops, `?`
+/// branches, `for` iterates, operators and indexing, closures called through a variable.
+fn by_syntax(item: &InItem) -> bool {
+    const TRAITS: &[&str] = &[
+        "Future",
+        "IntoFuture",
+        "Drop",
+        "Deref",
+        "DerefMut",
+        "Fn",
+        "FnMut",
+        "FnOnce",
+        "AsyncFn",
+        "AsyncFnMut",
+        "AsyncFnOnce",
+        "Iterator",
+        "IntoIterator",
+        "Try",
+        "FromResidual",
+        "Index",
+        "IndexMut",
+        "Add",
+        "Sub",
+        "Mul",
+        "Div",
+        "Rem",
+        "Neg",
+        "Not",
+        "BitAnd",
+        "BitOr",
+        "BitXor",
+        "Shl",
+        "Shr",
+        "AddAssign",
+        "SubAssign",
+        "MulAssign",
+        "DivAssign",
+        "RemAssign",
+        "BitAndAssign",
+        "BitOrAssign",
+        "BitXorAssign",
+        "ShlAssign",
+        "ShrAssign",
+        "PartialEq",
+        "PartialOrd",
+        "Coroutine",
+    ];
+    matches!(item.name.as_str(), "drop_in_place" | "drop_glue")
+        || item
+            .trait_name
+            .as_deref()
+            .is_some_and(|t| TRAITS.contains(&t.split('<').next().unwrap_or(t)))
+}
+
+/// The function an attribute on a line belongs to (`#[tokio::main]` above `async fn main`): the
+/// line holds an attribute, and the next item after it and any further attributes is that
+/// function.
+fn attribute_of(src: &Source, line: usize) -> Option<&Item> {
+    let text = src.lines.get(line.wrapping_sub(1))?;
+    if !text.trim_start().starts_with("#[") {
+        return None;
+    }
+    src.items
+        .iter()
+        .filter(|i| i.kind == ItemKind::Fn && i.start.0 >= line && i.start.0 <= line + 8)
+        .min_by_key(|i| i.start)
+        .filter(|i| {
+            (line + 1..i.start.0).all(|l| {
+                let t = src.lines[l - 1].trim_start();
+                t.is_empty() || t.starts_with("#[") || t.starts_with("//")
+            })
+        })
+}
+
+/// The length of the path written at `start` of a line: segments, `::`, and generic or
+/// qualified-path brackets (`<T as Tr>::f`, `seal::<Aes256Gcm>`).
+fn path_len(chars: &[char], start: usize) -> usize {
+    let (mut j, mut depth) = (start, 0i32);
+    while j < chars.len() {
+        let c = chars[j];
+        match c {
+            '<' => depth += 1,
+            '>' if depth > 0 => depth -= 1,
+            _ if is_ident(c) || c == ':' => {}
+            _ if depth > 0 => {}
+            _ => break,
+        }
+        j += 1;
+    }
+    j - start
+}
+
+/// The item a closure or `async` body is written in: `t2::o1` for `t2::o1::{closure#0}`.
+fn closure_parent(path: &str) -> Option<&str> {
+    let p = path.trim_end();
+    let i = p.rfind("::{closure#")?;
+    p[i..].ends_with('}').then(|| &p[..i])
+}
+
+/// A path names an item: one of its segments is the item's name.
+fn path_names(path: &str, name: &str) -> bool {
+    re!(r"\w+").find_iter(path).any(|m| m.as_str() == name)
+}
+
+/// A context's parts, split at the `; ` outside brackets (`in <[u8; 32] as From>::from; ..`).
+fn parts(details: &str) -> Vec<&str> {
+    let b = details.as_bytes();
+    let (mut out, mut depth, mut start) = (Vec::new(), 0i32, 0);
+    for (i, &c) in b.iter().enumerate() {
+        match c {
+            b'<' | b'[' | b'(' => depth += 1,
+            b'>' if i == 0 || b[i - 1] != b'-' => depth -= 1,
+            b']' | b')' => depth -= 1,
+            b';' if depth <= 0 && b.get(i + 1) == Some(&b' ') => {
+                out.push(&details[start..i]);
+                start = i + 2;
+            }
+            _ => {}
+        }
+    }
+    out.push(&details[start..]);
+    out
+}
+
+/// A type as an impl header or a context names it: a path's last segment without its
+/// arguments (`&'a mut path::Type<A, B>` -> `Type`), a tuple, array or slice whole, blanks
+/// and paths dropped (`(u8, u8)` -> `(u8,u8)`, `[u8; 32]` -> `[u8;32]`).
+fn type_name(t: &str) -> String {
+    let t = t.trim().trim_start_matches(['&', '*']).trim();
+    let t = t
+        .strip_prefix("mut ")
+        .or_else(|| t.strip_prefix("const "))
+        .unwrap_or(t)
+        .trim();
+    let t = re!(r"^'\w+\s+").replace(t, "");
+    let t = t.strip_prefix("mut ").unwrap_or(&t).trim();
+    if t.starts_with('(') || t.starts_with('[') {
+        return norm_path(t);
+    }
+    let t = strip_generics(t);
+    let t = t
+        .split_whitespace()
+        .rfind(|w| !w.starts_with('\'') && *w != "mut" && *w != "dyn" && *w != "const")
+        .unwrap_or("");
+    t.rsplit("::").next().unwrap_or(t).trim().to_string()
+}
+
 /// The item a context says an occurrence is in (`in t1::xchacha`, `in <A as T>::f::{closure#0}`,
 /// `in r1::Jar::<J>::seal`): its name, and the type and trait of the impl block it is a
 /// method of (`A`, `T`), when its path names them.
 struct InItem {
+    /// the path whole
+    path: String,
     name: String,
     self_ty: Option<String>,
+    /// the type whole, as `norm_path` writes it
+    self_full: Option<String>,
     trait_name: Option<String>,
+    /// the modules and functions a plain path names the item in (`v02::a::f` is in `[a]`,
+    /// `app::outer::inner` in `[outer]`), after the crate; None for a method
+    mods: Option<Vec<String>>,
+    /// a method's type or trait (`<v02::a::S as T>::f`, `v02::a::Tr::f`) and the modules its
+    /// path names it in
+    owner: Option<(String, Vec<String>)>,
 }
 
 fn in_item(item: &str) -> Option<InItem> {
@@ -2584,35 +3339,87 @@ fn in_item(item: &str) -> Option<InItem> {
         k += 1;
     }
     segs.push(cur);
-    let last_of = |t: &str| {
-        let t = strip_generics(t);
-        let t = t.trim().trim_start_matches(['&', '*']).trim().to_string();
-        t.rsplit("::").next().unwrap_or(&t).trim().to_string()
-    };
+    let last_of = type_name;
     // generic arguments (`<J>`, `<..>`) and what the compiler makes (`{closure#0}`) are not
-    // items written in the source
-    segs.retain(|g| {
-        !g.starts_with('{')
-            && !(g.starts_with('<') && !g.contains(" as ") && !g.starts_with("<impl "))
-    });
-    let name = segs.pop()?;
-    let (mut self_ty, mut trait_name) = (None, None);
-    if let Some(g) = segs.last() {
+    // items written in the source; the arguments belong to the segment before them
+    // (`Inner::<u8>::hash` is a method of `Inner<u8>`)
+    let mut kept: Vec<(String, String)> = Vec::new();
+    for g in segs {
+        if g.starts_with('{') {
+            continue;
+        }
+        if g.starts_with('<') && !g.contains(" as ") && !g.starts_with("<impl ") {
+            if let Some((_, full)) = kept.last_mut() {
+                full.push_str(&g);
+            }
+            continue;
+        }
+        kept.push((g.clone(), g));
+    }
+    let (name, _) = kept.pop()?;
+    let name = name.strip_prefix("r#").unwrap_or(&name).to_string();
+    // the modules: a plain path's segments after the crate, up to a type's or trait's
+    let module = |g: &str| g.strip_prefix("r#").unwrap_or(g).to_string();
+    let path_mods = |segs: &[String]| -> Vec<String> {
+        segs.iter()
+            .skip(1)
+            .filter(|g| *g != "_")
+            .map(|g| module(g))
+            .collect()
+    };
+    let (mut mods, mut owner) = (None, None);
+    let plain: Vec<String> = kept.iter().map(|(g, _)| g.clone()).collect();
+    if plain.first().is_some_and(|g| !g.starts_with('<')) {
+        match plain
+            .iter()
+            .skip(1)
+            .position(|g| g.chars().next().is_some_and(char::is_uppercase))
+        {
+            Some(i) => owner = Some((plain[i + 1].clone(), path_mods(&plain[..=i]))),
+            None => mods = Some(path_mods(&plain)),
+        }
+    } else if let Some(inner) = plain
+        .last()
+        .and_then(|g| g.strip_prefix('<'))
+        .and_then(|g| g.strip_suffix('>'))
+    {
+        let t = inner.strip_prefix("impl ").unwrap_or(inner);
+        let t = t.split(" as ").next().unwrap_or(t);
+        let t = strip_generics(t);
+        let segs: Vec<String> = t.trim().split("::").map(str::to_string).collect();
+        if segs.len() >= 2
+            && segs
+                .iter()
+                .all(|g| g.chars().all(is_ident) && !g.is_empty())
+        {
+            let ty = segs.last().cloned().unwrap_or_default();
+            owner = Some((ty, path_mods(&segs[..segs.len() - 1])));
+        }
+    }
+    let (mut self_ty, mut self_full, mut trait_name) = (None, None, None);
+    if let Some((g, full)) = kept.last() {
         if let Some(inner) = g.strip_prefix('<').and_then(|g| g.strip_suffix('>')) {
             if let Some(t) = inner.strip_prefix("impl ") {
                 self_ty = Some(last_of(t));
+                self_full = Some(norm_path(t));
             } else if let Some((t, tr)) = inner.split_once(" as ") {
                 self_ty = Some(last_of(t));
+                self_full = Some(norm_path(t));
                 trait_name = Some(norm_path(tr));
             }
         } else if g.chars().next().is_some_and(char::is_uppercase) {
             self_ty = Some(last_of(g));
+            self_full = Some(norm_path(full));
         }
     }
     Some(InItem {
+        path: item.to_string(),
         name: strip_generics(&name),
         self_ty,
+        self_full,
         trait_name,
+        mods,
+        owner,
     })
 }
 
@@ -2635,8 +3442,15 @@ fn same_trait(a: &str, b: &str) -> bool {
 /// A code position is inside the item its context names (`in <item>; ..`): the innermost
 /// function, static or const around it has the item's name, and, for a method whose path names
 /// its type, the impl block (or the trait, for a default method) around that names it too. Not
-/// inside a `macro_rules!` body.
-fn check_item(src: &Source, details: &str, at: (usize, usize)) -> Result<(), String> {
+/// inside a `macro_rules!` body. The source may name a type through an alias (`impl Writer for
+/// Sha256`, where the context names `CoreWrapper<..>`): `aliases` gives what a name stands for.
+fn check_item(
+    src: &Source,
+    details: &str,
+    at: (usize, usize),
+    aliases: &mut dyn FnMut(&str) -> Vec<String>,
+    chains: Option<&[Vec<String>]>,
+) -> Result<(), String> {
     if let Some(m) = src.enclosing(at, &[ItemKind::Macro]) {
         return Err(format!(
             "position inside the body of `macro_rules! {}`",
@@ -2645,28 +3459,84 @@ fn check_item(src: &Source, details: &str, at: (usize, usize)) -> Result<(), Str
     }
     let Some(want) = details
         .strip_prefix("in ")
-        .and_then(|d| d.split("; ").next())
+        .and_then(|d| parts(d).into_iter().next())
         .and_then(in_item)
     else {
         return Err("no enclosing item in the context".into());
     };
     let Some(item) = src.enclosing(at, &[ItemKind::Fn, ItemKind::Static]) else {
+        // an item a macro invocation outside any item makes (`hash_fn!(..)` at module level)
         if src.enclosing(at, &[ItemKind::MacroCall]).is_some() {
             return Ok(());
         }
         return Err(format!("position outside any item, not in `{}`", want.name));
     };
     // code a macro's invocation wraps (`thread_local! { static TL: .. = digest(..) }`) is in
-    // the items the macro makes, named by it
+    // the items the macro makes inside the item around it, which the context's path names
+    // (`t7::TL::__rust_std_internal_init_fn`); `format!(..)` makes none
     let in_call = src.enclosing(at, &[ItemKind::MacroCall]).is_some();
     if item.name != want.name {
-        if in_call {
+        if in_call && path_names(&want.path, &item.name) {
             return Ok(());
         }
         return Err(format!(
             "position in `{}`, not in `{}`",
             item.name, want.name
         ));
+    }
+    // the module: the file's and those of the inline modules (and functions) around the
+    // position are those the context names; for a method, around its type's or trait's
+    // definition when the file has it. An identical statement in another module or file is
+    // another item (rustls's `crypto::ring::tls12` repeats `crypto::aws_lc_rs::tls12`).
+    if let Some(chains) = chains {
+        let around = |p: (usize, usize)| -> Vec<String> {
+            let mut v: Vec<&Item> = src
+                .items
+                .iter()
+                .filter(|i| matches!(i.kind, ItemKind::Mod | ItemKind::Fn) && i.contains(p))
+                .collect();
+            v.sort_by_key(|i| i.start);
+            v.iter().map(|i| i.name.clone()).collect()
+        };
+        let in_chain = |inner: &[String], want: &[String]| {
+            chains.iter().any(|c| {
+                c.len() + inner.len() == want.len()
+                    && c.iter().chain(inner).zip(want).all(|(a, b)| a == b)
+            })
+        };
+        if let Some(mods) = &want.mods {
+            let mut inner = around(at);
+            if item.kind == ItemKind::Fn {
+                inner.pop();
+            }
+            if !in_chain(&inner, mods) {
+                return Err(format!(
+                    "position in module `{}`, not in `{}`",
+                    chains
+                        .first()
+                        .map(|c| c
+                            .iter()
+                            .chain(&inner)
+                            .cloned()
+                            .collect::<Vec<_>>()
+                            .join("::"))
+                        .unwrap_or_default(),
+                    mods.join("::")
+                ));
+            }
+        } else if let Some((ty, mods)) = &want.owner {
+            let defs: Vec<&Item> = src
+                .items
+                .iter()
+                .filter(|i| matches!(i.kind, ItemKind::TypeDef | ItemKind::Trait) && i.name == *ty)
+                .collect();
+            if !defs.is_empty() && !defs.iter().any(|d| in_chain(&around(d.start), mods)) {
+                return Err(format!(
+                    "`{ty}` of this file is not the one in `{}`",
+                    mods.join("::")
+                ));
+            }
+        }
     }
     // the block the function is written in (not the function itself)
     let container = src
@@ -2684,14 +3554,14 @@ fn check_item(src: &Source, details: &str, at: (usize, usize)) -> Result<(), Str
         let ok = match block.kind {
             // a blanket impl's type is any type: its trait is named
             ItemKind::Impl if block.name.is_empty() => {
-                matches!((&block.trait_name, &want.trait_name), (Some(a), Some(b)) if same_trait(a, b))
+                matches!((&block.trait_name, &want.trait_name), (Some(a), Some(b)) if trait_of(a, b, aliases))
             }
             // its type, and the trait it implements: `impl TryFrom<&PrivateKeyDer<'_>> for
             // KeyPair` is not `impl TryFrom<&[u8]> for KeyPair`
             ItemKind::Impl => {
-                block.name == *ty
+                same_type(&block.name, ty, want.self_full.as_deref(), aliases)
                     && match (&block.trait_name, &want.trait_name) {
-                        (Some(a), Some(b)) => same_trait(a, b),
+                        (Some(a), Some(b)) => trait_of(a, b, aliases),
                         _ => true,
                     }
             }
@@ -2706,13 +3576,99 @@ fn check_item(src: &Source, details: &str, at: (usize, usize)) -> Result<(), Str
             _ => true,
         };
         if !ok {
+            let of = |t: &Option<String>, ty: &str| match t {
+                Some(t) => format!("`impl {t} for {ty}`"),
+                None => format!("`{ty}`"),
+            };
             return Err(format!(
-                "position in a method of `{}`, not of `{ty}`",
-                block.name
+                "position in a method of {}, not of {}",
+                of(&block.trait_name, &block.name),
+                of(&want.trait_name, ty)
             ));
         }
     }
     Ok(())
+}
+
+/// A type as written in an impl header is the type a context names: the same name, or an
+/// alias that stands for the whole type (`Sha256` for sha2's `CoreWrapper<CtVariableCoreWrapper<
+/// Sha256VarCore, U32, OidSha256>>`, which `Sha512` is not).
+fn same_type(
+    written: &str,
+    ty: &str,
+    full: Option<&str>,
+    aliases: &mut dyn FnMut(&str) -> Vec<String>,
+) -> bool {
+    if written == ty {
+        return true;
+    }
+    // `[u8;?]` (`impl<const N: usize> X for [u8; N]`) is `[u8;32]`
+    if written.contains('?') {
+        let pat = regex::escape(written).replace(r"\?", r"[^,;\[\]()]+");
+        return Regex::new(&format!("^{pat}$")).is_ok_and(|r| r.is_match(ty));
+    }
+    let Some(full) = full else {
+        return false;
+    };
+    let full = fold_typenum(full);
+    aliases(written)
+        .iter()
+        .any(|t| fold_typenum(&expand_aliases(t, aliases, 3)) == full)
+}
+
+/// A trait as written in an impl header is the trait a context names (`same_trait`), also once
+/// the aliases among its arguments are replaced (`RandomizedSigner<Signature>` with p521's
+/// `type Signature = ecdsa_core::Signature<NistP521>`).
+fn trait_of(written: &str, want: &str, aliases: &mut dyn FnMut(&str) -> Vec<String>) -> bool {
+    if same_trait(written, want) {
+        return true;
+    }
+    let (head, args) = written.split_at(written.find('<').unwrap_or(written.len()));
+    let expanded = format!("{head}{}", expand_aliases(args, aliases, 3));
+    expanded != written && same_trait(&fold_typenum(&expanded), &fold_typenum(want))
+}
+
+/// A type with the aliases it names replaced by what they stand for, `depth` levels deep (the
+/// names followed by arguments are types, not aliases without parameters).
+fn expand_aliases(t: &str, aliases: &mut dyn FnMut(&str) -> Vec<String>, depth: usize) -> String {
+    let mut out = String::new();
+    let mut last = 0;
+    for m in re!(r"\b[A-Za-z_]\w*\b").find_iter(t) {
+        if t[m.end()..].starts_with('<') {
+            continue;
+        }
+        if let Some(e) = aliases(m.as_str()).first()
+            && e != m.as_str()
+        {
+            out.push_str(&t[last..m.start()]);
+            if depth > 1 {
+                out.push_str(&expand_aliases(e, aliases, depth - 1));
+            } else {
+                out.push_str(e);
+            }
+            last = m.end();
+        }
+    }
+    out.push_str(&t[last..]);
+    out
+}
+
+/// typenum's unsigned integers as their aliases name them: `UInt<UInt<UTerm,B1>,B0>` is `U2`
+/// (rustc prints the type, the source its alias).
+fn fold_typenum(t: &str) -> String {
+    let mut t = t.replace("UTerm", "U0");
+    loop {
+        let n = re!(r"UInt<U(\d+),B([01])>")
+            .replace_all(&t, |c: &regex::Captures| {
+                let v: u128 = c[1].parse().unwrap_or(0);
+                format!("U{}", v * 2 + u128::from(&c[2] == "1"))
+            })
+            .to_string();
+        if n == t {
+            return t;
+        }
+        t = n;
+    }
 }
 
 /// The text of the attribute a position is in, from after its `#[` (or `#![`) to the position:

@@ -104,7 +104,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a16::open_sep; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a16::open_sep; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 29,
@@ -132,7 +132,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a16::ring_hkdf; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `let key = UnboundKey::from(okm);`; code: `UnboundKey::from`",
+            "additionalContext": "[reachable] [call] in a16::ring_hkdf; from: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `let key = UnboundKey::from(okm);`; code: `UnboundKey::from`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 14,
@@ -196,7 +196,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a16::seal_chacha; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a16::seal_chacha; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 29,
@@ -345,11 +345,25 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a16::named_only; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1 in the arguments; public-key: parameter (argument 0 of the enclosing function); line: `let v = signature::UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, pk.to_vec());`; code: `signature::UnparsedPublicKey::new`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
             "additionalContext": "[reachable] [static] in a16::named_only; line: `let v = signature::UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, pk.to_vec());`; code: `signature::ECDSA_P256_SHA256_ASN1`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 47,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a16::keep; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1 in the arguments; public-key: parameter (argument 0 of the enclosing function); line: `let v = signature::UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, pk.to_vec());`; code: `signature::UnparsedPublicKey::new`",
+            "line": 89,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
             "additionalContext": "[reachable] [static] in a16::keep; line: `let v = signature::UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, pk.to_vec());`; code: `signature::ECDSA_P256_SHA256_ASN1`",
@@ -383,8 +397,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:public-key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -405,7 +423,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a16::ring_sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING in the arguments; key: parameter (argument 0 of the enclosing function); line: `let ek = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P384_SHA384_FIXED_SIGNING, der, &rng).unwrap();`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a16::ring_sign; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING in the arguments; key: parameter (argument 0 of the enclosing function); line: `let ek = signature::EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P384_SHA384_FIXED_SIGNING, der, &rng).unwrap();`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 78,
             "location": "src/main.rs",
             "offset": 13,
@@ -547,7 +565,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a16::ring_hkdf; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 52); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"fixed salt\");`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in a16::ring_hkdf; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 52); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"fixed salt\");`; code: `hkdf::Salt::new`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 15,
@@ -640,7 +658,7 @@
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a16::ring_hkdf; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (16 bytes, literal at line 56); line: `let k2 = hmac::Key::new(hmac::HMAC_SHA256, b\"literal hmac key\");`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in a16::ring_hkdf; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (16 bytes, literal at line 56); line: `let k2 = hmac::Key::new(hmac::HMAC_SHA256, b\"literal hmac key\");`; code: `hmac::Key::new`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 13,
@@ -668,7 +686,7 @@
             "symbol": "ring::hmac::Context::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in a16::other; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA256, key);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in a16::other; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA256, key);`; code: `hmac::Key::new`",
             "line": 97,
             "location": "src/main.rs",
             "offset": 12,
@@ -742,7 +760,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a16::hmac_verify; algorithm from ring::hmac::HMAC_SHA384 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA384, key);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in a16::hmac_verify; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA384 in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA384, key);`; code: `hmac::Key::new`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 12,
@@ -1648,7 +1666,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:80f286fd-96f2-86d7-ac27-dec6c535ea63",
+  "serialNumber": "urn:uuid:f2c087d0-19cc-8d9a-98d0-8cbf36904af8",
   "specVersion": "1.7",
   "version": 1
 }

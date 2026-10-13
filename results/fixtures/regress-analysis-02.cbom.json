@@ -111,7 +111,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `LessSafeKey::new(UnboundKey::from(okm))`; code: `UnboundKey::from`",
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; from: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `LessSafeKey::new(UnboundKey::from(okm))`; code: `UnboundKey::from`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 21,
@@ -125,7 +125,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[present] [call] in t2::ring_pbkdf2_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (ring::pbkdf2::derive); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
+            "additionalContext": "[present] [call] in t2::ring_pbkdf2_key; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (ring::pbkdf2::derive); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 13,
@@ -139,7 +139,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[present] [call] in t2::ring_hkdf_key; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Okm::fill); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Okm::fill); line: `let _k = UnboundKey::new(&AES_256_GCM, &key);`; code: `UnboundKey::new`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 13,
@@ -282,7 +282,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 7); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 7); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::Salt::new`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 14,
@@ -310,7 +310,7 @@
             "symbol": "ring::hkdf::Prk::expand"
           },
           {
-            "additionalContext": "[present] [call] in t2::ring_hkdf_key; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::Salt::new`",
+            "additionalContext": "[present] [call] in t2::ring_hkdf_key; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: parameter (argument 1 of the enclosing function); line: `hkdf::Salt::new(hkdf::HKDF_SHA256, salt).extract(ikm).expand(&[b\"ctx\"], hkdf::HKDF_SHA256).unwrap().fill(&mut key).unwrap();`; code: `hkdf::Salt::new`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 4,
@@ -578,6 +578,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in t2::rsa3072; new: setup, not a use; algorithm from ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 in the arguments; public-key: parameter (argument 0 of the enclosing function); line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::UnparsedPublicKey::new`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
             "additionalContext": "[reachable] [static] in t2::rsa3072; line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::RSA_PKCS1_3072_8192_SHA384`",
             "line": 26,
             "location": "src/main.rs",
@@ -616,8 +623,12 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:public-key",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -965,7 +976,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:559c725f-a442-8302-8617-2c994600778b",
+  "serialNumber": "urn:uuid:8d08a003-297d-8bed-9d6f-54f18cdbe322",
   "specVersion": "1.7",
   "version": 1
 }

@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 9;
+pub const FACTS_VERSION: u32 = 10;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -47,6 +47,18 @@ pub struct Links {
     /// Values a static holds at run time: a `LazyLock`'s or `OnceLock`'s initializer, what
     /// `OnceLock::set` or a write to a `static mut` puts there.
     pub statics: Vec<StaticValue>,
+    /// What a function writes through a parameter (`fn set(slot: &mut &Algorithm) { *slot =
+    /// &SHA512 }`, `*l.write().unwrap() = a`): `Origin::Written` at its calls.
+    #[serde(default)]
+    pub writes: Vec<ParamWrite>,
+}
+
+/// Function `func` writes `value` through its parameter `index`; `value` names its parameters.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ParamWrite {
+    pub func: String,
+    pub index: usize,
+    pub value: Origin,
 }
 
 impl Links {
@@ -65,6 +77,11 @@ impl Links {
         for c in other.calls {
             if !self.calls.contains(&c) {
                 self.calls.push(c);
+            }
+        }
+        for w in other.writes {
+            if !self.writes.contains(&w) {
+                self.writes.push(w);
             }
         }
         for s in other.statics {
@@ -98,6 +115,11 @@ pub struct FieldStore {
     /// Stored through a reference (`self.alg = v` in a `&mut self` method): the struct written
     /// may be a part of another one.
     pub via_ref: bool,
+    /// The struct's type arguments, when it has some and they are known (`Wrapper<&ring::
+    /// digest::Algorithm>` is not `Wrapper<&ring::aead::Algorithm>`); a read of other
+    /// arguments does not see the store.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
 }
 
 /// The name under which a method implementing a trait records what it returns, besides its
@@ -291,9 +313,13 @@ pub enum Origin {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         value: Option<i128>,
     },
-    /// Argument `index` of the enclosing function.
+    /// Argument `index` of the enclosing function, or of `owner` (its defining path) when that
+    /// is another: a closure or `async` body reads its parent function's parameter through a
+    /// capture (`fn hash_all(alg, ..) { items.map(|d| digest(alg, d)) }`).
     Param {
         index: usize,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        owner: Option<String>,
     },
     /// The result of a call; `args` are the origins of its value arguments. `callee` is the
     /// defining path; `self_ty` the path of the type a method belongs to, when it is an ADT
@@ -333,6 +359,16 @@ pub enum Origin {
         adt: String,
         field: usize,
         base: Box<Origin>,
+        /// The struct's type arguments, as `FieldStore::args`.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        args: Option<String>,
+    },
+    /// What function `callee` writes through its parameter `index` (`Links::writes`), its
+    /// parameters being `args`: `set_slot(&mut c.alg)` stores it in `c.alg`.
+    Written {
+        callee: String,
+        index: usize,
+        args: Vec<Origin>,
     },
     /// Several definitions reach the value: it is one of these.
     Any(Vec<Origin>),
@@ -346,6 +382,55 @@ pub enum Origin {
     /// A bound of the search was hit here (depth, width or size): the origin is incomplete.
     Truncated,
     Unknown,
+}
+
+impl Origin {
+    /// The origin with its parameters that name no owner made parameters of `owner`: a value
+    /// a closure captured, as its parent function computes it.
+    pub fn params_of(self, owner: &str) -> Origin {
+        match self {
+            Origin::Param { index, owner: None } => Origin::Param {
+                index,
+                owner: Some(owner.to_string()),
+            },
+            Origin::Call {
+                callee,
+                krate,
+                self_ty,
+                args,
+                span,
+            } => Origin::Call {
+                callee,
+                krate,
+                self_ty,
+                args: args.into_iter().map(|a| a.params_of(owner)).collect(),
+                span,
+            },
+            Origin::Field {
+                adt,
+                field,
+                base,
+                args,
+            } => Origin::Field {
+                adt,
+                field,
+                base: Box::new(base.params_of(owner)),
+                args,
+            },
+            Origin::Written {
+                callee,
+                index,
+                args,
+            } => Origin::Written {
+                callee,
+                index,
+                args: args.into_iter().map(|a| a.params_of(owner)).collect(),
+            },
+            Origin::Any(v) => Origin::Any(v.into_iter().map(|a| a.params_of(owner)).collect()),
+            Origin::All(v) => Origin::All(v.into_iter().map(|a| a.params_of(owner)).collect()),
+            o => o,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]

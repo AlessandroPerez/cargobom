@@ -8,9 +8,9 @@
 //! argument a caller passes, a call's result anything the function returns, a mutable static
 //! anything its initializer or a write puts in it.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
-use rcbom_facts::{FieldStore, Links, LocalCall, Origin, Returned, StaticValue};
+use rcbom_facts::{FieldStore, Links, LocalCall, Origin, ParamWrite, Returned, StaticValue};
 use rustc_middle::ty::{Ty, TypeVisitableExt};
 use rustc_public::mir::{
     AggregateKind, Body, ProjectionElem, Rvalue, StatementKind, TerminatorKind,
@@ -153,6 +153,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     } else {
         String::new()
     };
+    let borrows = field_borrows(tcx, body);
     for (bb, block) in body.blocks.iter().enumerate() {
         for (idx, stmt) in block.statements.iter().enumerate() {
             let StatementKind::Assign(place, rv) = &stmt.kind else {
@@ -187,6 +188,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                                 value,
                                 func: here.clone(),
                                 via_ref: false,
+                                args: crate::adt_args(tcx, iargs),
                             });
                         }
                     }
@@ -206,21 +208,50 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                     push_static(out, def, value);
                 }
             }
-            // `x.f = v`, `x.a.f = v`, `self.f = v`: a store in each struct along the fields
+            let span = stmt.source_info.span;
+            let value = |steps: &[Step]| origins.rvalue_part_at(rv, span, steps, bb, idx);
+            // `x.f = v`, `x.a.f = v`, `self.f = v`, `x.a[0] = v`: a store in each struct along
+            // the fields
             if matches!(
                 place.projection.last(),
-                Some(ProjectionElem::Field(..) | ProjectionElem::Deref)
+                Some(
+                    ProjectionElem::Field(..)
+                        | ProjectionElem::Deref
+                        | ProjectionElem::Index(_)
+                        | ProjectionElem::ConstantIndex { .. }
+                )
             ) {
-                field_assign(
-                    cx,
-                    &origins,
-                    place,
-                    rv,
-                    stmt.source_info.span,
-                    (bb, idx),
-                    &here,
-                    out,
-                );
+                field_store(cx, &origins, place, &value, &here, out);
+            }
+            // `let r = &mut c.alg; *r = v`: a store in the field borrowed
+            if matches!(place.projection.first(), Some(ProjectionElem::Deref)) {
+                for b in borrows.get(&place.local).into_iter().flatten() {
+                    let mut p = b.clone();
+                    p.projection.extend_from_slice(&place.projection[1..]);
+                    field_store(cx, &origins, &p, &value, &here, out);
+                }
+            }
+            // `*slot = v` on a parameter (`slot: &mut &Algorithm`), `*l.write().unwrap() = v`
+            // on a parameter's lock: what the function writes through it
+            if func && matches!(place.projection.as_slice(), [ProjectionElem::Deref]) {
+                let base = rustc_public::mir::Place {
+                    local: place.local,
+                    projection: Vec::new(),
+                };
+                let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
+                if let Some(index) = param_behind(&ptr) {
+                    let v = value(&[]);
+                    if !empty(&v) {
+                        let w = ParamWrite {
+                            func: here.clone(),
+                            index,
+                            value: v,
+                        };
+                        if !out.writes.contains(&w) {
+                            out.writes.push(w);
+                        }
+                    }
+                }
             }
         }
         let term = &block.terminator;
@@ -232,6 +263,30 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
         };
         let Ok(fty) = callee.ty(locals) else { continue };
         let fty = rustc_internal::internal(tcx, fty);
+        // a call through a function pointer the body made of one of the program's functions or
+        // closures (`let f: fn(..) = hash_with; f(&SHA512, d)`): a call of that function
+        if let rustc_middle::ty::FnPtr(..) = fty.kind()
+            && let rustc_public::mir::Operand::Copy(p) | rustc_public::mir::Operand::Move(p) =
+                callee
+            && p.projection.is_empty()
+            && let Some(target) = fn_ptr_target(tcx, body, p.local)
+            && !cx.stop_crate(target.krate)
+            && !cx.is_std(tcx.crate_name(target.krate).as_str())
+        {
+            let idx = block.statements.len();
+            let cargs_o: Vec<Origin> = args
+                .iter()
+                .map(|a| origins.operand_at(a, bb, idx))
+                .collect();
+            if cargs_o.iter().any(|o| !empty(o)) {
+                out.calls.push(LocalCall {
+                    callee: path_of(tcx, target),
+                    caller: here.clone(),
+                    args: cargs_o,
+                });
+            }
+            continue;
+        }
         let rustc_middle::ty::FnDef(cdid, cargs) = *fty.kind() else {
             continue;
         };
@@ -285,9 +340,72 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                 }
             }
         }
+        // a call that writes through `&mut` into a field (`mem::replace(&mut c.alg, v)`,
+        // `c.v.push(v)`, `opt.replace(v)`, the program's `set_slot(&mut c.alg)`) or into a
+        // static (the program's `set_alg(&ALG, v)`): a store of what it writes there
+        let std_call = cx.is_std(&krate);
+        let program = !std_call && !cx.stop_crate(cdid.krate);
+        for (i, a) in args.iter().enumerate() {
+            let Ok(aty) = a.ty(locals) else { continue };
+            let aty = rustc_internal::internal(tcx, aty);
+            let written = if std_call && i == 0 && WRITERS.contains(&method) {
+                let rest: Vec<Origin> = args[1..]
+                    .iter()
+                    .map(|a| origins.operand_at(a, bb, idx))
+                    .filter(|o| !empty(o))
+                    .collect();
+                match rest.len() {
+                    0 => None,
+                    1 => rest.into_iter().next(),
+                    _ => Some(Origin::Any(rest)),
+                }
+            } else if program && writable(tcx, aty) && carries(cx, aty) {
+                Some(Origin::Written {
+                    callee: path_of(tcx, cdid),
+                    index: i,
+                    args: args
+                        .iter()
+                        .map(|a| origins.operand_at(a, bb, idx))
+                        .collect(),
+                })
+            } else {
+                None
+            };
+            let Some(w) = written else { continue };
+            if let rustc_public::mir::Operand::Copy(p) | rustc_public::mir::Operand::Move(p) = a
+                && p.projection.is_empty()
+            {
+                let value = |steps: &[Step]| {
+                    if steps.iter().all(|s| matches!(s, Step::Deref)) {
+                        w.clone()
+                    } else {
+                        Origin::Unknown
+                    }
+                };
+                for b in borrows.get(&p.local).into_iter().flatten() {
+                    field_store(cx, &origins, b, &value, &here, out);
+                }
+            }
+            // a static written by the program's function, or by a writer of the standard
+            // library (`TA.set(v)` on a `thread_local!` cell)
+            if (program || (std_call && i == 0))
+                && let Some(def) = static_behind(&origins.operand_at(a, bb, idx))
+            {
+                push_static(out, def, w.clone());
+            }
+        }
+        // `lazy_static!`: its `Lazy::get(&LAZY, __static_ref_initialize)` puts what the
+        // function returns in the static
+        if method == "get"
+            && krate == "lazy_static"
+            && let (Some(s), Some(f)) = (args.first(), args.get(1))
+            && let Origin::Data { def, .. } = origins.operand_at(s, bb, idx)
+        {
+            push_static(out, def, origins.closure_value(f, bb, idx));
+        }
         // a call of a closure of this crate (`f(&SHA512, d)` is `Fn::call(&f, (&SHA512, d))`):
-        // its parameters receive the tuple's elements (the closure's own parameter 0 is
-        // itself)
+        // its parameters receive the tuple's elements, numbered from its first declared one
+        // (as `Origin::Param` numbers them in a closure's body)
         if matches!(method, "call" | "call_mut" | "call_once")
             && cx.is_std(&krate)
             && let (Some(f), Some(tuple)) = (args.first(), args.get(1))
@@ -298,7 +416,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
             && let Ok(tty) = tuple.ty(locals)
             && let rustc_middle::ty::Tuple(ts) = *rustc_internal::internal(tcx, tty).kind()
         {
-            let mut cargs_o = vec![Origin::Unknown];
+            let mut cargs_o = Vec::new();
             for (i, t) in ts.iter().enumerate() {
                 cargs_o.push(if carrying_parts(cx, t).is_empty() {
                     Origin::Unknown
@@ -398,20 +516,36 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
 }
 
 /// `x.a.f = v`: a store of `v` (or of each part of it that can carry an algorithm or a key) in
-/// `f` of `x.a`'s struct, and in `a.f` of `x`'s. A struct reached through a reference
-/// (`self.f = v` in a `&mut self` method) may be a part of another one: marked `via_ref`.
-#[allow(clippy::too_many_arguments)]
-fn field_assign(
+/// `f` of `x.a`'s struct, and in `a.f` of `x`'s; `x.a[0] = v` stores an element of `a`. A
+/// struct reached through a reference (`self.f = v` in a `&mut self` method) may be a part of
+/// another one: marked `via_ref`. `value` gives the origin of each part written, by the steps
+/// that read it from the value.
+fn field_store(
     cx: &Cx<'_>,
     origins: &Origins<'_, '_>,
     place: &rustc_public::mir::Place,
-    rv: &Rvalue,
-    span: rustc_public::ty::Span,
-    (bb, idx): (usize, usize),
+    value: &dyn Fn(&[Step]) -> Origin,
     here: &str,
     out: &mut Links,
 ) {
     let tcx = cx.tcx;
+    let proj = &place.projection;
+    // an element of an array or slice field (`m.a[0] = v`) is stored in the field
+    let mut end = proj.len();
+    while end > 0
+        && matches!(
+            proj[end - 1],
+            ProjectionElem::Index(_)
+                | ProjectionElem::ConstantIndex { .. }
+                | ProjectionElem::Subslice { .. }
+        )
+    {
+        end -= 1;
+    }
+    let field_place = rustc_public::mir::Place {
+        local: place.local,
+        projection: proj[..end].to_vec(),
+    };
     // nothing to record unless what is written can carry an algorithm or a key
     let Ok(written) = place.ty(origins.body().locals()) else {
         return;
@@ -419,7 +553,7 @@ fn field_assign(
     if carrying_parts(cx, rustc_internal::internal(tcx, written)).is_empty() {
         return;
     }
-    let proj = &place.projection;
+    let proj = &field_place.projection;
     // the trailing fields and dereferences
     let mut start = proj.len();
     while start > 0
@@ -438,8 +572,9 @@ fn field_assign(
         return;
     };
     let mut ty = rustc_internal::internal(tcx, ty);
-    // the structs along the way: (struct, fields from it, reached through a reference)
-    let mut chains: Vec<(String, Vec<usize>, bool)> = Vec::new();
+    // the structs along the way: (struct, its type arguments, fields from it, reached through
+    // a reference)
+    let mut chains: Vec<(String, Option<String>, Vec<usize>, bool)> = Vec::new();
     let mut behind_ref = start > 0;
     for e in &proj[start..] {
         match e {
@@ -452,9 +587,13 @@ fn field_assign(
             }
             ProjectionElem::Field(f, _) => {
                 if let Some(adt) = named_struct(cx, ty) {
-                    chains.push((path_of(tcx, adt.did()), Vec::new(), behind_ref));
+                    let args = match ty.kind() {
+                        rustc_middle::ty::Adt(_, a) => crate::adt_args(tcx, a),
+                        _ => None,
+                    };
+                    chains.push((path_of(tcx, adt.did()), args, Vec::new(), behind_ref));
                     for c in &mut chains {
-                        c.1.push(*f);
+                        c.2.push(*f);
                     }
                 }
                 ty = match ty.kind() {
@@ -480,32 +619,179 @@ fn field_assign(
         }
     }
     // `*p = S { .. }`: a whole struct written through a reference
-    if behind_ref && let Some(adt) = named_struct(cx, ty) {
-        chains.push((path_of(tcx, adt.did()), Vec::new(), true));
+    if behind_ref
+        && end == place.projection.len()
+        && let Some(adt) = named_struct(cx, ty)
+    {
+        let args = match ty.kind() {
+            rustc_middle::ty::Adt(_, a) => crate::adt_args(tcx, a),
+            _ => None,
+        };
+        chains.push((path_of(tcx, adt.did()), args, Vec::new(), true));
     }
     if chains.is_empty() {
         return;
     }
-    for (inner, steps) in carrying_parts(cx, ty) {
-        let value = origins.rvalue_part_at(rv, span, &steps, bb, idx);
+    // the parts of what is written: of the element for an element
+    let written = rustc_internal::internal(tcx, written);
+    for (inner, steps) in carrying_parts(cx, written) {
+        let value = value(&steps);
         if empty(&value) {
             continue;
         }
-        for (adt, fields, via_ref) in &chains {
+        for (adt, args, fields, via_ref) in &chains {
             let mut path = fields.clone();
-            path.extend(inner.iter().copied());
+            if end == place.projection.len() {
+                path.extend(inner.iter().copied());
+            }
             if path.is_empty() {
                 continue;
             }
-            out.fields.push(FieldStore {
+            let store = FieldStore {
                 adt: adt.clone(),
                 path,
                 value: value.clone(),
                 func: here.to_string(),
                 via_ref: *via_ref,
-            });
+                args: args.clone(),
+            };
+            if !out.fields.contains(&store) {
+                out.fields.push(store);
+            }
         }
     }
+}
+
+/// The function or closure a function-pointer local was made from (`_5 = hash_with as fn(..)
+/// (ReifyFnPointer)`, a closure's `ClosureFnPointer`, through copies), when that is all it is.
+fn fn_ptr_target(
+    tcx: rustc_middle::ty::TyCtxt<'_>,
+    body: &Body,
+    local: rustc_public::mir::Local,
+) -> Option<DefId> {
+    let mut local = local;
+    for _ in 0..4 {
+        let defs: Vec<&Rvalue> = body
+            .blocks
+            .iter()
+            .flat_map(|b| &b.statements)
+            .filter_map(|st| match &st.kind {
+                StatementKind::Assign(p, rv) if p.local == local && p.projection.is_empty() => {
+                    Some(rv)
+                }
+                _ => None,
+            })
+            .collect();
+        let [rv] = defs.as_slice() else { return None };
+        match rv {
+            Rvalue::Cast(_, rustc_public::mir::Operand::Constant(c), _) => {
+                let ty = rustc_internal::internal(tcx, c.const_.ty());
+                return match *ty.kind() {
+                    rustc_middle::ty::FnDef(d, _) | rustc_middle::ty::Closure(d, _) => Some(d),
+                    _ => None,
+                };
+            }
+            Rvalue::Use(
+                rustc_public::mir::Operand::Copy(q) | rustc_public::mir::Operand::Move(q),
+                _,
+            ) if q.projection.is_empty() => {
+                local = q.local;
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+/// Standard-library methods that write their other arguments into what their first one
+/// borrows mutably (`mem::replace(&mut c.alg, v)`, `c.v.push(v)`, `opt.replace(v)`).
+const WRITERS: &[&str] = &[
+    "replace",
+    "swap",
+    "push",
+    "push_back",
+    "push_front",
+    "insert",
+    "get_or_insert",
+    "extend",
+    "extend_from_slice",
+    "append",
+    "set",
+    "clone_from",
+];
+
+/// A pointer through which a callee can write: `&mut T`, `*mut T`, or `&T` of a type with
+/// interior mutability (a lock, a cell).
+fn writable<'tcx>(tcx: rustc_middle::ty::TyCtxt<'tcx>, ty: Ty<'tcx>) -> bool {
+    match ty.kind() {
+        rustc_middle::ty::Ref(_, t, m) | rustc_middle::ty::RawPtr(t, m) => {
+            m.is_mut()
+                || (!t.has_non_region_param()
+                    && !t.is_freeze(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized()))
+        }
+        _ => false,
+    }
+}
+
+/// The places a local mutably borrows a field of (`let r = &mut c.alg;`, the temporary of
+/// `set_slot(&mut c.alg)`, through reborrows `&mut *r`): a write through it is a store in the
+/// field.
+fn field_borrows(
+    tcx: rustc_middle::ty::TyCtxt<'_>,
+    body: &Body,
+) -> HashMap<rustc_public::mir::Local, Vec<rustc_public::mir::Place>> {
+    // every borrow by a local
+    let mut refs: HashMap<rustc_public::mir::Local, Vec<rustc_public::mir::Place>> = HashMap::new();
+    for block in &body.blocks {
+        for stmt in &block.statements {
+            let StatementKind::Assign(place, rv) = &stmt.kind else {
+                continue;
+            };
+            let (Rvalue::Ref(_, _, q) | Rvalue::Reborrow(_, _, q) | Rvalue::AddressOf(_, q)) = rv
+            else {
+                continue;
+            };
+            let ty = rustc_internal::internal(tcx, body.locals()[place.local].ty);
+            let mutable = matches!(ty.kind(),
+                rustc_middle::ty::Ref(_, _, m) | rustc_middle::ty::RawPtr(_, m) if m.is_mut());
+            if place.projection.is_empty() && mutable {
+                let v = refs.entry(place.local).or_default();
+                if !v.contains(q) {
+                    v.push(q.clone());
+                }
+            }
+        }
+    }
+    // a reborrow (`&mut *r`) borrows what `r` does
+    let resolve = |q: &rustc_public::mir::Place| -> Vec<rustc_public::mir::Place> {
+        let mut out = Vec::new();
+        let mut work = vec![(q.clone(), 0)];
+        while let Some((q, depth)) = work.pop() {
+            match q.projection.first() {
+                Some(ProjectionElem::Deref) if depth < 8 && refs.contains_key(&q.local) => {
+                    for b in &refs[&q.local] {
+                        let mut p = b.clone();
+                        p.projection.extend_from_slice(&q.projection[1..]);
+                        work.push((p, depth + 1));
+                    }
+                }
+                _ => {
+                    if q.projection
+                        .iter()
+                        .any(|e| matches!(e, ProjectionElem::Field(..)))
+                        && !out.contains(&q)
+                    {
+                        out.push(q);
+                    }
+                }
+            }
+        }
+        out
+    };
+    refs.iter()
+        .map(|(l, qs)| (*l, qs.iter().flat_map(&resolve).collect::<Vec<_>>()))
+        .filter(|(_, v)| !v.is_empty())
+        .collect()
 }
 
 /// The links of the promoted constants item `did` uses: a static's `&KxGroup {
@@ -550,20 +836,45 @@ fn re_lazy(path: &str) -> bool {
     )
 }
 
+/// The parameter a pointer written through leads to: itself (`*slot = v`), or a lock's guard
+/// or a cell's reference of it (`*l.write().unwrap() = v`).
+fn param_behind(o: &Origin) -> Option<usize> {
+    let mut o = o;
+    loop {
+        match o {
+            Origin::Param { index, owner: None } => return Some(*index),
+            Origin::Call {
+                callee,
+                krate,
+                args,
+                ..
+            } if matches!(krate.as_str(), "core" | "std" | "alloc")
+                && THROUGH.iter().any(|t| callee.ends_with(t)) =>
+            {
+                o = args.first()?;
+            }
+            _ => return None,
+        }
+    }
+}
+
+/// The std calls a pointer is reached through from what it points into: a lock's guard, a
+/// cell's reference.
+const THROUGH: &[&str] = &[
+    "::deref_mut",
+    "::deref",
+    "::unwrap",
+    "::expect",
+    "::write",
+    "::lock",
+    "::borrow_mut",
+    "::get_mut",
+    "::as_mut",
+];
+
 /// The static a pointer written through leads to: its address (`static mut`), or a lock's
 /// guard or a cell's reference of it (`ALG.write().unwrap()`, `deref_mut`).
 fn static_behind(o: &Origin) -> Option<rcbom_facts::DefRef> {
-    const THROUGH: &[&str] = &[
-        "::deref_mut",
-        "::deref",
-        "::unwrap",
-        "::expect",
-        "::write",
-        "::lock",
-        "::borrow_mut",
-        "::get_mut",
-        "::as_mut",
-    ];
     let mut o = o;
     loop {
         match o {
@@ -613,10 +924,33 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
         match out.statics.iter_mut().find(|s| s.def.id == def.id) {
             Some(s) => s.mutable = true,
             None => out.statics.push(StaticValue {
-                def,
+                def: def.clone(),
                 mutable: true,
                 values: Vec::new(),
             }),
+        }
+        // a `thread_local!` key starts with what its initializer function returns (`static TA:
+        // Cell<..> = Cell::new(&SHA256)` makes `TA::__rust_std_internal_init_fn`)
+        let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+        if local_key(cx, ty) {
+            for f in tcx.hir_body_owners().map(|d| d.to_def_id()) {
+                if matches!(tcx.def_kind(f), rustc_hir::def::DefKind::Fn)
+                    && tcx.opt_parent(f) == Some(did)
+                    && tcx.item_name(f).as_str().contains("init")
+                {
+                    push_static(
+                        out,
+                        def.clone(),
+                        Origin::Call {
+                            callee: path_of(tcx, f),
+                            krate: tcx.crate_name(f.krate).to_string(),
+                            self_ty: None,
+                            args: Vec::new(),
+                            span: None,
+                        },
+                    );
+                }
+            }
         }
     }
 }
@@ -636,15 +970,37 @@ pub(crate) fn mutable_static_defs<'a>(cx: &'a Cx<'_>) -> &'a HashSet<DefId> {
 /// `static mut`, or a type with interior mutability (`LazyLock`, `OnceLock`, a lock, a cell)?
 fn mutable_static(cx: &Cx<'_>, did: DefId) -> bool {
     let tcx = cx.tcx;
-    if !matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. })
-        || tcx.is_foreign_item(did)
-    {
-        return false;
+    match tcx.def_kind(did) {
+        rustc_hir::def::DefKind::Static { .. } if !tcx.is_foreign_item(did) => {
+            let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+            (tcx.static_mutability(did) == Some(rustc_middle::mir::Mutability::Mut)
+                || !ty.is_freeze(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized())
+                || local_key(cx, ty))
+                && carries_or_bytes(cx, ty)
+        }
+        rustc_hir::def::DefKind::Const if !tcx.generics_of(did).requires_monomorphization(tcx) => {
+            let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+            local_key(cx, ty) && carries_or_bytes(cx, ty)
+        }
+        _ => false,
     }
-    let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
-    (tcx.static_mutability(did) == Some(rustc_middle::mir::Mutability::Mut)
-        || !ty.is_freeze(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized()))
-        && carries_or_bytes(cx, ty)
+}
+
+/// A `thread_local!` key over a cell (`TA.set(v)`): each thread's value changes.
+fn local_key<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> bool {
+    let tcx = cx.tcx;
+    match ty.kind() {
+        rustc_middle::ty::Adt(adt, args)
+            if path_of(tcx, adt.did()).ends_with("LocalKey")
+                && cx.is_std(tcx.crate_name(adt.did().krate).as_str()) =>
+        {
+            args.types().next().is_some_and(|t| {
+                !t.has_non_region_param()
+                    && !t.is_freeze(tcx, rustc_middle::ty::TypingEnv::fully_monomorphized())
+            })
+        }
+        _ => false,
+    }
 }
 
 /// Does `body` name a mutable static (a constant pointing at one, of any crate)?

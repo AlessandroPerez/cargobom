@@ -92,11 +92,14 @@ def main():
             print(json.dumps(row), flush=True)
             continue
         v = subprocess.run([str(CBOM), "cbom", "verify", str(cbom), "--self-test"], cwd=proj, capture_output=True, text=True)
-        m = re.search(r"(\d+) positions verified, (\d+) mismatched", v.stdout)
+        m = re.search(r"(\d+) positions verified, (\d+) mismatched, (\d+) occurrences without a line", v.stdout)
+        row["verify_ok"] = v.returncode == 0 and m is not None
         row["positions_verified"] = int(m.group(1)) if m else None
         row["positions_mismatched"] = int(m.group(2)) if m else None
+        row["positions_without_line"] = int(m.group(3)) if m else None
         shifted = [tuple(map(int, x)) for x in re.findall(r"(\d+)/(\d+) shifted positions rejected", v.stdout)]
         row["shift_rejected"] = f"{sum(a for a, _ in shifted)}/{sum(b for _, b in shifted)}"
+        row["shift_all_rejected"] = bool(shifted) and all(a == b for a, b in shifted)
         row.update(stats(cbom))
         if rusi:
             r_out = out / f"{name}.rusi-report.json"
@@ -109,9 +112,13 @@ def main():
         rows.append(row)
         print(json.dumps(row), flush=True)
     json.dump(rows, open(out / "corpus.json", "w"), indent=2)
-    # a caught panic, a failed run or a position that does not verify is a failure of the run
+    # a project plain cargo cannot check, a caught panic, a failed run, a verification that
+    # failed or did not run, a position that does not verify and a shifted one it accepts are
+    # failures of the run
     bad = [r["project"] for r in rows
-           if not r.get("cbom_ok") or r.get("items_not_analysed") or r.get("positions_mismatched")]
+           if not r.get("plain_ok") or not r.get("cbom_ok") or r.get("items_not_analysed")
+           or not r.get("verify_ok") or r.get("positions_mismatched") or r.get("positions_without_line")
+           or not r.get("shift_all_rejected")]
     if bad:
         print(f"corpus: FAILED for {', '.join(bad)}", file=sys.stderr)
         sys.exit(1)

@@ -1,5 +1,5 @@
 // Positions the verifier rejected although they were right, or accepted although they were
-// wrong (see fixtures/regress/README.md).
+// wrong.
 use sha2::{Digest, Sha256};
 
 mod algs;

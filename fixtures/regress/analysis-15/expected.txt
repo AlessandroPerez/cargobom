@@ -27,8 +27,8 @@
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:41:12 | argon2::Argon2::<'key>::new_with_secret | [reachable] [call] in a15::a3; new_with_secret: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Argon2::new_with_secret`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:41:80 | core::default::Default::default | [reachable] [call] in a15::a3; default: setup, not a use; line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Params::default`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:44:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a15::a3; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 2 of the enclosing function); line: `h.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:33:4 | core::default::Default::default | [reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`
   occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:32:17 | argon2::params::Params::new | [reachable] [call] in a15::a2; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`
-  occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:33:4 | core::default::Default::default | [reachable] [call] in a15::a2; default: setup, not a use; line: `Argon2::default()`; code: `Argon2::default`
   occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:34:9 | password_hash::traits::PasswordHasher::hash_password_customized | [reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:51:16 | blake3::Hasher::new_derive_key | [reachable] [call] in a15::a4; new_derive_key: setup, not a use; line: `let mut h = blake3::Hasher::new_derive_key("app 2024 aes key");`; code: `blake3::Hasher::new_derive_key`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:52:6 | blake3::Hasher::update | [reachable] [call] in a15::a4; update: setup, not a use; line: `h.update(secret);`; code: `update`
@@ -181,11 +181,17 @@
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=knowledge-base
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=1
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:confidence=high
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:detection:method=type-resolved
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:functions:source=observed
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:kb:version=0.2.0
-  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:occurrences=3
+  prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:occurrences=2
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:provenance:password=parameter
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:provenance:salt=rng
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:reachability=reachable
@@ -362,6 +368,7 @@ asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"alg
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Argon2 | crypto:algorithm:Argon2 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["verify"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:algorithm:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset ChaCha20 | crypto:algorithm:ChaCha20 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
@@ -463,6 +470,7 @@ dependency crypto:algorithm:AES-256-CBC
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:Argon2
 dependency crypto:algorithm:Argon2i-19456-2-1
+dependency crypto:algorithm:Argon2id-19456-2-1
 dependency crypto:algorithm:Argon2id-65536-3-4
 dependency crypto:algorithm:BLAKE3
 dependency crypto:algorithm:ChaCha20
@@ -514,6 +522,7 @@ provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i-19456-2-1
+provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-19456-2-1
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-65536-3-4
 provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3
 provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-128-CBC

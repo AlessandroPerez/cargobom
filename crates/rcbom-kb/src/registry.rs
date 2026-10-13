@@ -5,64 +5,216 @@
 
 use std::sync::LazyLock;
 
-use regex::Regex;
-
 const DEFS: &str = include_str!("../../../schema/cryptography-defs.json");
 
-static PATTERNS: LazyLock<Vec<(String, Regex)>> = LazyLock::new(|| {
+/// A pattern's parts: text, a bracketed or parenthesised group of alternatives (optional when
+/// in `[..]`), a parameter.
+#[derive(Debug)]
+enum Tok {
+    Lit(Vec<char>),
+    Group { alts: Vec<Vec<Tok>>, optional: bool },
+    Param(Param),
+}
+
+/// What a parameter's value is: a number (`{keyLength}`), another algorithm's name, as the
+/// registry names it (`{hashAlgorithm}` in `HMAC[-{hashAlgorithm}]`), an elliptic curve of the
+/// registry's list, or a word (`{mode}`, `{padding}`, `{namedGroup}`).
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Param {
+    Number,
+    Algorithm,
+    /// A mask generation function: `MGF1`, with its hash (`MGF1-SHA-1`), which the registry
+    /// has no family of its own for
+    MaskGen,
+    Curve,
+    Word,
+}
+
+fn param(name: &str) -> Param {
+    match name {
+        "aead"
+        | "auxFunction"
+        | "blockCipher"
+        | "cipherAlgorithm"
+        | "encryptionAlgorithm"
+        | "hashAlgorithm"
+        | "hashfun"
+        | "kdf"
+        | "kem"
+        | "ksf"
+        | "mac"
+        | "macAlgorithm"
+        | "otherBlockCipher"
+        | "prfFunction"
+        | "symmetricCipher" => Param::Algorithm,
+        "maskGenAlgorithm" => Param::MaskGen,
+        "ellipticCurve" => Param::Curve,
+        "mode" | "padding" | "group" | "namedGroup" | "authmode" => Param::Word,
+        _ => Param::Number,
+    }
+}
+
+struct Registry {
+    patterns: Vec<(String, Vec<Tok>)>,
+    curves: Vec<String>,
+}
+
+static REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
     let defs: serde_json::Value = serde_json::from_str(DEFS).expect("registry JSON");
-    let mut out = Vec::new();
+    let mut patterns = Vec::new();
     for a in defs["algorithms"].as_array().into_iter().flatten() {
         let family = a["family"].as_str().unwrap_or_default().to_string();
         for v in a["variant"].as_array().into_iter().flatten() {
-            if let Some(p) = v["pattern"].as_str()
-                && let Ok(r) = Regex::new(&format!("^(?:{})$", to_regex(p)))
-            {
-                out.push((family.clone(), r));
+            if let Some(p) = v["pattern"].as_str() {
+                let chars: Vec<char> = p.chars().collect();
+                let (toks, _) = parse(&chars, 0);
+                patterns.push((family.clone(), toks));
             }
         }
     }
-    out
+    let mut curves = Vec::new();
+    for e in defs["ellipticCurves"].as_array().into_iter().flatten() {
+        for c in e["curves"].as_array().into_iter().flatten() {
+            curves.extend(c["name"].as_str().map(str::to_string));
+            for a in c["aliases"].as_array().into_iter().flatten() {
+                curves.extend(a["name"].as_str().or(a.as_str()).map(str::to_string));
+            }
+        }
+    }
+    Registry { patterns, curves }
 });
 
-/// The registry notation as a regular expression.
-fn to_regex(pattern: &str) -> String {
-    let mut out = String::new();
-    let mut chars = pattern.chars();
-    while let Some(c) = chars.next() {
-        match c {
-            '[' => out.push_str("(?:"),
-            ']' => out.push_str(")?"),
-            '(' => out.push_str("(?:"),
-            ')' | '|' => out.push(c),
-            '{' => {
-                for d in chars.by_ref() {
-                    if d == '}' {
-                        break;
-                    }
-                }
-                out.push_str(".+?");
+/// The registry notation from `i` to the end of the group it is in: its alternatives' parts,
+/// and where it stopped (at a `]`, `)` or the end).
+fn parse(p: &[char], mut i: usize) -> (Vec<Tok>, usize) {
+    let mut alts: Vec<Vec<Tok>> = vec![Vec::new()];
+    while i < p.len() {
+        match p[i] {
+            '[' | '(' => {
+                let (inner, end) = parse(p, i + 1);
+                let alts_inner = match inner.into_iter().next() {
+                    Some(Tok::Group { alts, .. }) => alts,
+                    _ => vec![Vec::new()],
+                };
+                alts.last_mut().unwrap().push(Tok::Group {
+                    alts: alts_inner,
+                    optional: p[i] == '[',
+                });
+                i = end + 1;
             }
-            _ => out.push_str(&regex::escape(&c.to_string())),
+            ']' | ')' => break,
+            '|' => {
+                alts.push(Vec::new());
+                i += 1;
+            }
+            '{' => {
+                let end = (i..p.len()).find(|&j| p[j] == '}').unwrap_or(p.len());
+                let name: String = p[i + 1..end].iter().collect();
+                alts.last_mut().unwrap().push(Tok::Param(param(&name)));
+                i = end + 1;
+            }
+            c => {
+                match alts.last_mut().unwrap().last_mut() {
+                    Some(Tok::Lit(l)) => l.push(c),
+                    _ => alts.last_mut().unwrap().push(Tok::Lit(vec![c])),
+                }
+                i += 1;
+            }
         }
     }
-    out
+    // one group holding the alternatives (the caller unwraps it)
+    (
+        vec![Tok::Group {
+            alts,
+            optional: false,
+        }],
+        i,
+    )
+}
+
+/// The positions after `name[i..]` matches `toks`, a parameter that names an algorithm being a
+/// registry name itself, at most `depth` levels down.
+fn ends(toks: &[Tok], name: &[char], i: usize, depth: usize, out: &mut Vec<usize>) {
+    let Some((first, rest)) = toks.split_first() else {
+        if !out.contains(&i) {
+            out.push(i);
+        }
+        return;
+    };
+    match first {
+        Tok::Lit(l) => {
+            if name[i..].starts_with(l) {
+                ends(rest, name, i + l.len(), depth, out);
+            }
+        }
+        Tok::Group { alts, optional } => {
+            let mut mids = Vec::new();
+            for a in alts {
+                ends(a, name, i, depth, &mut mids);
+            }
+            if *optional && !mids.contains(&i) {
+                mids.push(i);
+            }
+            for m in mids {
+                ends(rest, name, m, depth, out);
+            }
+        }
+        Tok::Param(kind) => {
+            for e in i + 1..=name.len() {
+                let v = &name[i..e];
+                let ok = match kind {
+                    Param::Number => v.iter().all(char::is_ascii_digit),
+                    Param::Word => v.iter().all(char::is_ascii_alphanumeric) || curve(v),
+                    Param::Curve => curve(v),
+                    Param::Algorithm => {
+                        depth > 0 && named(&v.iter().collect::<String>(), depth - 1)
+                    }
+                    Param::MaskGen => {
+                        let s: String = v.iter().collect();
+                        s == "MGF1"
+                            || s.strip_prefix("MGF1-")
+                                .is_some_and(|h| depth > 0 && named(h, depth - 1))
+                    }
+                };
+                if ok {
+                    ends(rest, name, e, depth, out);
+                }
+            }
+        }
+    }
+}
+
+fn curve(v: &[char]) -> bool {
+    let s: String = v.iter().collect();
+    REGISTRY.curves.contains(&s)
+}
+
+/// Does some registry pattern produce this name, its algorithm parameters `depth` levels down?
+fn named(name: &str, depth: usize) -> bool {
+    let chars: Vec<char> = name.chars().collect();
+    REGISTRY.patterns.iter().any(|(_, toks)| {
+        let mut out = Vec::new();
+        ends(toks, &chars, 0, depth, &mut out);
+        out.contains(&chars.len())
+    })
 }
 
 /// Is this a family of the registry? It lists some that the 1.7 schema's `algorithmFamily`
 /// enum does not (`TLS-PRF`): see [`crate::in_family_enum`].
 pub fn family(family: &str) -> bool {
-    PATTERNS.iter().any(|(f, _)| f == family)
+    REGISTRY.patterns.iter().any(|(f, _)| f == family)
 }
 
-/// Does some registry pattern produce this name?
+/// Does some registry pattern produce this name? A parameter is a number, an elliptic curve of
+/// the registry's list, a word (a mode, a padding, a group), or, for an algorithm
+/// (`{hashAlgorithm}`), a name the registry produces in turn (`RSA-OAEP-SHA-256-MGF1-SHA-1`).
 pub fn valid(name: &str, _family: &str) -> bool {
-    PATTERNS.iter().any(|(_, r)| r.is_match(name))
+    named(name, 3)
 }
 
 /// Number of patterns loaded (for tests).
 pub fn patterns() -> usize {
-    PATTERNS.len()
+    REGISTRY.patterns.len()
 }
 
 #[cfg(test)]
@@ -93,7 +245,15 @@ mod tests {
         ] {
             assert!(valid(ok, ""), "{ok}");
         }
-        for bad in ["Argon2", "SHA-2", "SHA-257", "ChaCha8-Poly1305"] {
+        for bad in [
+            "Argon2",
+            "SHA-2",
+            "SHA-257",
+            "ChaCha8-Poly1305",
+            "HKDF-SHA-257",
+            "HMAC-banana",
+            "AES-256-GCM-x-y",
+        ] {
             assert!(!valid(bad, ""), "{bad}");
         }
         assert!(valid("TLS12-PRF-SHA-256", ""));

@@ -86,6 +86,7 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
     for a in an.assets.values().filter(|a| a.algo.material.is_none()) {
         *by_name.entry(&a.name).or_default() += 1;
     }
+    let mut taken: BTreeMap<String, usize> = BTreeMap::new();
     an.assets
         .values()
         .map(|a| {
@@ -96,6 +97,10 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
                 }
                 None => format!("crypto:algorithm:{}", a.name),
             };
+            // bom-refs are unique whatever the names: a second asset of one ref is numbered
+            let n = taken.entry(r.clone()).or_default();
+            *n += 1;
+            let r = if *n > 1 { format!("{r}:{n}") } else { r };
             (a.key.clone(), r)
         })
         .collect()
