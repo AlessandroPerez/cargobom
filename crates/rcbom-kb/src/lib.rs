@@ -39,6 +39,21 @@ struct Raw {
     seeded: Vec<SourceRaw>,
     #[serde(rename = "produces", default)]
     produces: Vec<ProducesRaw>,
+    #[serde(rename = "operation", default)]
+    operations: Vec<OperationRaw>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct OperationRaw {
+    #[serde(rename = "crate")]
+    krate: OneOrMany,
+    path: String,
+    primitive: String,
+    #[serde(rename = "use")]
+    function: String,
+    #[serde(default)]
+    algorithm: usize,
 }
 
 #[derive(Debug, Deserialize)]
@@ -105,6 +120,22 @@ pub struct PassthroughEntry {
     pub args: Vec<usize>,
 }
 
+/// A call that performs an operation whose algorithm is a run-time value (`ring::digest::
+/// digest(alg, data)`, `LessSafeKey::seal_in_place_append_tag` on a key built from one): it is
+/// always reported, with the algorithms that reach it, or as an unknown algorithm when none
+/// does.
+#[derive(Debug)]
+pub struct OperationEntry {
+    pub krates: Vec<String>,
+    /// Regex over the callee's path inside its crate, generic arguments removed.
+    pub pattern: Regex,
+    pub primitive: String,
+    /// The `cryptoFunctions` value of the call.
+    pub function: String,
+    /// The value argument that carries the algorithm (the receiver is argument 0).
+    pub algorithm: usize,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
@@ -134,7 +165,7 @@ impl CrateEntry {
 }
 
 /// What every algorithm entry carries.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Algo {
     /// Registry-pattern name; `{param}` or `{1}` placeholders.
     pub asset: String,
@@ -349,6 +380,7 @@ pub struct Kb {
     /// predictable as the seed. `kind` is unused.
     pub seeded: Vec<SourceEntry>,
     pub produces: Vec<ProducesEntry>,
+    pub operations: Vec<OperationEntry>,
 }
 
 /// `cryptoFunctions` values CycloneDX 1.7 accepts.
@@ -533,6 +565,19 @@ impl Kb {
                     })
                 })
                 .collect::<Result<_>>()?,
+            operations: raw
+                .operations
+                .into_iter()
+                .map(|o| {
+                    Ok(OperationEntry {
+                        krates: o.krate.into_vec(),
+                        pattern: pat(&o.path)?,
+                        primitive: o.primitive,
+                        function: o.function,
+                        algorithm: o.algorithm,
+                    })
+                })
+                .collect::<Result<_>>()?,
         };
         kb.validate()?;
         Ok(kb)
@@ -602,6 +647,22 @@ impl Kb {
                 bail!("use {:?} is not a CycloneDX cryptoFunction", u.function);
             }
         }
+        for o in &self.operations {
+            if !FUNCTIONS.contains(&o.function.as_str()) {
+                bail!(
+                    "[[operation]] {}: use {:?} is not a CycloneDX cryptoFunction",
+                    o.pattern,
+                    o.function
+                );
+            }
+            if !PRIMITIVES.contains(&o.primitive.as_str()) {
+                bail!(
+                    "[[operation]] {}: primitive {:?} is not a CycloneDX value",
+                    o.pattern,
+                    o.primitive
+                );
+            }
+        }
         let known: Vec<String> = self.crates.iter().map(|c| c.crate_name()).collect();
         let entry_crates = self
             .types
@@ -609,7 +670,8 @@ impl Kb {
             .map(|t| &t.krate)
             .chain(self.statics.iter().flat_map(|s| &s.krates))
             .chain(self.fns.iter().flat_map(|f| &f.krates))
-            .chain(self.protocols.iter().map(|p| &p.krate));
+            .chain(self.protocols.iter().map(|p| &p.krate))
+            .chain(self.operations.iter().flat_map(|o| &o.krates));
         for k in entry_crates {
             if !known.contains(k) {
                 bail!("entry for crate {k:?}, which has no [[crate]] entry");
@@ -644,6 +706,14 @@ impl Kb {
             .filter(|c| c.role != Role::Protocol)
             .map(|c| c.crate_name())
             .collect()
+    }
+
+    /// The `[[operation]]` entry of a callee: its crate name and its path inside the crate,
+    /// generic arguments removed (`digest::Context::update`).
+    pub fn operation(&self, krate: &str, path: &str) -> Option<&OperationEntry> {
+        self.operations
+            .iter()
+            .find(|o| o.krates.iter().any(|k| k == krate) && o.pattern.is_match(path))
     }
 
     /// The use a call to `method` makes of an asset with `primitive`, if it is one. A method
@@ -683,6 +753,31 @@ mod tests {
             kb.use_of("decrypt_blinded", "pke").as_deref(),
             Some("decrypt")
         );
+    }
+
+    #[test]
+    fn operations_match_by_crate_and_path() {
+        let kb = Kb::seed().unwrap();
+        let o = kb.operation("ring", "digest::digest").unwrap();
+        assert_eq!(
+            (o.primitive.as_str(), o.function.as_str()),
+            ("hash", "digest")
+        );
+        assert!(kb.operation("ring", "digest::Context::new").is_none());
+        assert!(kb.operation("sha2", "digest::digest").is_none());
+        let seal = kb
+            .operation(
+                "aws_lc_rs",
+                "aead::less_safe_key::LessSafeKey::seal_in_place_append_tag",
+            )
+            .unwrap();
+        assert_eq!(seal.function, "encrypt");
+        let bad = SEED.replacen(
+            "use = \"digest\"\nalgorithm",
+            "use = \"hashing\"\nalgorithm",
+            1,
+        );
+        assert!(Kb::parse(&bad).is_err());
     }
 
     #[test]

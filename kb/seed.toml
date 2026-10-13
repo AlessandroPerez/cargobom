@@ -1740,6 +1740,98 @@ function = "decapsulate"
 primitives = ["kem"]
 methods = ["decapsulate"]
 
+# --- Operations whose algorithm is a run-time value -----------------------------------------
+# A call matched here is always reported: with the algorithms that reach it, or, when none
+# does, with an unknown algorithm and the reason, never dropped. `path` is a regex over the
+# callee's path inside its crate, generic arguments removed; `algorithm` is the value argument
+# that carries the algorithm, the receiver being argument 0. Constructors (`Context::new`,
+# `UnboundKey::new`) set an algorithm up and are not listed: the calls below use it.
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^digest::(digest|Context::(try_)?(update|finish))$"
+primitive = "hash"
+use = "digest"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^hmac::(sign|Context::(try_)?(update|sign))$"
+primitive = "mac"
+use = "tag"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^hmac::verify$"
+primitive = "mac"
+use = "verify"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^aead::(.+::)?(LessSafeKey|SealingKey|RandomizedNonceKey|TlsRecordSealingKey)::seal_"
+primitive = "ae"
+use = "encrypt"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^aead::(.+::)?(LessSafeKey|OpeningKey|RandomizedNonceKey|TlsRecordOpeningKey)::open_"
+primitive = "ae"
+use = "decrypt"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^pbkdf2::(try_)?derive$"
+primitive = "kdf"
+use = "keyderive"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^pbkdf2::(try_)?verify$"
+primitive = "kdf"
+use = "verify"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^hkdf::(Salt::extract|Prk::expand)$"
+primitive = "kdf"
+use = "keyderive"
+algorithm = 0
+
+# `EcdsaKeyPair::from_pkcs8(alg, ..)` names the receiver's algorithm; RSA's `sign(padding_alg,
+# rng, msg, sig)` takes it as argument 1
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^ec::.*EcdsaKeyPair::sign$"
+primitive = "signature"
+use = "sign"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^rsa::.*KeyPair::sign$"
+primitive = "signature"
+use = "sign"
+algorithm = 1
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^signature::UnparsedPublicKey::verify$"
+primitive = "signature"
+use = "verify"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^agreement::(.+::)?agree(_ephemeral)?$"
+primitive = "key-agree"
+use = "keyderive"
+algorithm = 0
+
 # --- Provenance -------------------------------------------------------------------------------
 # Roles: which value argument of an API is key material (method calls count the receiver as
 # argument 0). `path` is a regex over the callee's defining path, or over `<Self type>::<method>`

@@ -513,7 +513,7 @@ pub fn match_constructor<'o>(
     None
 }
 
-fn strip_generics(path: &str) -> String {
+pub(crate) fn strip_generics(path: &str) -> String {
     let mut out = String::new();
     let mut depth = 0usize;
     for ch in path.chars() {

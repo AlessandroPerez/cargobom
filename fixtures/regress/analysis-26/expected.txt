@@ -1,0 +1,80 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:43:9 | ring::digest::SHA256 | [reachable] [static] in <unresolved::P as unresolved::Pick>::alg; line: `&SHA256`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:55:4 | ring::digest::digest | [reachable] [call] in unresolved::by_param::<unresolved::P>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; instantiated by unresolved::main at src/main.rs:64:12; line: `digest(T::alg(), d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:62:19 | ring::digest::SHA256 | [reachable] [static] in unresolved::main; line: `m.insert("h", &SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:63:21 | ring::digest::SHA256 | [reachable] [static] in unresolved::main; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:9 | ring::digest::SHA384 | [reachable] [static] in <unresolved::S384 as unresolved::Scheme>::alg; line: `&SHA384`; code: `SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:22:9 | ring::digest::SHA512 | [reachable] [static] in <unresolved::S512 as unresolved::Scheme>::alg; line: `&SHA512`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:49:41 | ring::digest::SHA512 | [reachable] [static] in <unresolved::Q as unresolved::Pick>::alg; line: `CHOSEN.get().copied().unwrap_or(&SHA512)`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:55:4 | ring::digest::digest | [reachable] [call] in unresolved::by_param::<unresolved::Q>; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; instantiated by unresolved::main at src/main.rs:64:32; line: `digest(T::alg(), d).as_ref().len()`; code: `digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via unresolved -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via unresolved -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by unresolved (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown | src/main.rs:28:4 | ring::digest::digest | [reachable] [call] in unresolved::by_dyn; use: digest; algorithm unresolved: the result of `unresolved::Scheme::alg`; line: `digest(s.alg(), d).as_ref().len()`; code: `digest`
+  occ unknown | crypto:algorithm:unknown | src/main.rs:33:4 | ring::digest::digest | [reachable] [call] in unresolved::by_map; use: digest; algorithm unresolved: the result of `core::ops::index::Index::index`; line: `digest(m["h"], d).as_ref().len()`; code: `digest`
+  occ unknown | crypto:algorithm:unknown | src/main.rs:63:44 | ring::digest::digest | [reachable] [call] in unresolved::main::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments name no algorithm; instantiated by unresolved::main at src/main.rs:63:40; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `digest`
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=3
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown | rcbom:reachability=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/unresolved@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/unresolved@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown
+root {"bom-ref": "pkg:cargo/unresolved@0.1.0", "name": "unresolved", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/unresolved@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=251
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -198,11 +198,14 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     }
     // a name the Cryptography Registry has no pattern for (a family name for a variant the
     // code does not determine, a variant the registry does not list)
-    if a.algo.material.is_none() && !rcbom_kb::registry::valid(&a.name, &a.algo.family) {
+    // the operations whose algorithm the analysis does not find: no name, no family
+    if a.unresolved() {
+        props.push(prop("rcbom:algorithm", "unresolved"));
+    } else if a.algo.material.is_none() && !rcbom_kb::registry::valid(&a.name, &a.algo.family) {
         props.push(prop("rcbom:registry-name", "unmatched"));
     }
     props.push(prop("rcbom:occurrences", a.occurrences.len()));
-    if a.algo.material.is_none() && !rcbom_kb::in_family_enum(&a.algo.family) {
+    if a.algo.material.is_none() && !a.unresolved() && !rcbom_kb::in_family_enum(&a.algo.family) {
         props.push(prop("rcbom:algorithm-family", &a.algo.family));
     }
     let crypto = match &a.algo.material {

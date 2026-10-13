@@ -766,6 +766,61 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:unknown",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments name no algorithm; instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:candidate:aes-gcm@0.10.3:AES-GCM",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -950,7 +1005,8 @@
       "provides": [
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -989,6 +1045,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown"
     },
     {
       "dependsOn": [],
@@ -1057,7 +1117,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4d9d68b1-c4f7-8a72-bea2-8513f609f951",
+  "serialNumber": "urn:uuid:dced0d3d-f78d-895f-ab54-bb167e8297c8",
   "specVersion": "1.7",
   "version": 1
 }

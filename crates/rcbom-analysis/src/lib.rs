@@ -75,6 +75,9 @@ pub struct Occurrence {
     pub provenance: Vec<(String, String)>,
     /// The knowledge-base note of the entry this occurrence matched (`QUIC header protection`).
     pub note: Option<String>,
+    /// Found only by the per-item scan of a generic function's body, not in an instance of it:
+    /// what its type parameters choose is not known there.
+    pub generic_body: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -95,6 +98,11 @@ pub struct Asset {
 }
 
 impl Asset {
+    /// An operation's asset whose algorithm the analysis does not find.
+    pub fn unresolved(&self) -> bool {
+        self.name == UNKNOWN && self.algo.family.is_empty()
+    }
+
     pub fn reachable(&self) -> bool {
         self.occurrences.iter().any(|o| o.tier == Tier::Reachable)
     }
@@ -574,6 +582,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     package: pkg.clone(),
                     provenance: Vec::new(),
                     note: None,
+                    generic_body: false,
                 });
             }
             // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age); so
@@ -699,6 +708,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         })
                         .collect(),
                     note: m.algo.note.clone(),
+                    generic_body: site.owner.kind == OwnerKind::Fn && is_def_hash(&site.owner.id),
                 };
                 let a = assets.entry(m.key()).or_insert_with(|| Asset {
                     key: m.key(),
@@ -752,6 +762,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     if o.function.is_none() {
                         o.function = occ.function;
                     }
+                    o.generic_body &= occ.generic_body;
                     if o.kind != occ.kind && occ.kind == Kind::Call {
                         o.kind = Kind::Call;
                     }
@@ -777,6 +788,23 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
     }
     merge_less_specific(&mut assets);
+    // the per-item scan of a generic function cannot resolve what its type parameters choose
+    // (`digest(T::A, x)` in `h<T: Pick>`): an instance of it that does at the same position
+    // (`h::<P>`, SHA-1) says what the call uses. An instance that does not stays unknown.
+    let resolved: HashSet<(String, usize, usize, String)> = assets
+        .values()
+        .filter(|a| !a.unresolved())
+        .flat_map(|a| &a.occurrences)
+        .filter(|o| o.kind == Kind::Call)
+        .map(|o| (o.location.clone(), o.line, o.offset, o.symbol.clone()))
+        .collect();
+    for a in assets.values_mut().filter(|a| a.unresolved()) {
+        a.occurrences.retain(|o| {
+            !(o.generic_body
+                && resolved.contains(&(o.location.clone(), o.line, o.offset, o.symbol.clone())))
+        });
+    }
+    assets.retain(|_, a| !(a.unresolved() && a.occurrences.is_empty()));
     // entries with different notes behind one asset: each note goes with its occurrences
     for a in assets.values_mut() {
         if a.entry_notes.len() > 1 {
@@ -1524,6 +1552,55 @@ fn site_matches(
                     }
                 }
             }
+            // an operation whose algorithm is a run-time value is never dropped: when no
+            // algorithm reaches it, it is reported with an unknown one, and why
+            if out.is_empty()
+                && supported(&callee.krate)
+                && let Some(op) = kb.operation(
+                    &callee.krate.name,
+                    &matcher::strip_generics(
+                        callee
+                            .path
+                            .strip_prefix(&format!("{}::", callee.krate.name))
+                            .unwrap_or(&callee.path),
+                    ),
+                )
+            {
+                // a function named as a value (`let f = digest;`) is no call: it has no
+                // arguments, and the call through the pointer is a site of its own
+                let reason = match &site.target {
+                    Target::Call { arg_origins, .. } => arg_origins.get(op.algorithm),
+                    _ => None,
+                }
+                .map(unresolved_reason);
+                let mut m = Match {
+                    name: UNKNOWN.to_string(),
+                    algo: Algo {
+                        asset: UNKNOWN.to_string(),
+                        primitive: op.primitive.clone(),
+                        functions: vec![op.function.clone()],
+                        ..Algo::default()
+                    },
+                    params: BTreeMap::new(),
+                    values: BTreeMap::new(),
+                    components: BTreeSet::new(),
+                    providers: BTreeSet::new(),
+                    provider_crates: Vec::new(),
+                };
+                m.providers
+                    .extend(ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id));
+                if let Some(reason) = reason {
+                    let d = vec![format!("algorithm unresolved: {reason}")];
+                    out.push((
+                        m,
+                        Kind::Call,
+                        Some(op.function.clone()),
+                        symbol.clone(),
+                        d,
+                        false,
+                    ));
+                }
+            }
             if let (Some(n), Some(first)) = (&fn_name, out.first_mut()) {
                 first.0.components.extend(
                     match_types(kb, args, &supported)
@@ -1535,6 +1612,38 @@ fn site_matches(
         }
     }
     out
+}
+
+/// An owner id that is a def-path hash (32 hex digits), as the driver gives a generic function
+/// it scans without an instance; an instance's id is its mangled name.
+fn is_def_hash(id: &str) -> bool {
+    id.len() == 32 && id.bytes().all(|b| b.is_ascii_hexdigit())
+}
+
+/// The name of the asset of operations whose algorithm the analysis does not find; its family
+/// is empty.
+pub const UNKNOWN: &str = "unknown";
+
+/// Why no algorithm reaches an operation, from where the value of its algorithm argument
+/// comes (`the result of `Scheme::alg``).
+fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
+    use rcbom_facts::Origin;
+    match links::peel(o) {
+        Origin::Param { .. } => "a parameter, whose arguments name no algorithm".into(),
+        Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
+        Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
+        Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),
+        Origin::Through { callee } => format!("a value written through `{}`", short(callee)),
+        Origin::Data { def, .. } => {
+            format!("`{}`, which leads to no single algorithm", short(&def.path))
+        }
+        Origin::Any(_) => "one of several values, none naming an algorithm".into(),
+        Origin::Truncated => "the search for the value hit its bound".into(),
+        Origin::Loop | Origin::All(_) | Origin::Const { .. } | Origin::Unit { .. } => {
+            "a value the analysis does not follow".into()
+        }
+        Origin::Unknown => "a value of unknown origin".into(),
+    }
 }
 
 /// One use found twice on a line, once with run-time parameters unresolved (`Argon2` from

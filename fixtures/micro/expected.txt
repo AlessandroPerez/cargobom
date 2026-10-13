@@ -52,6 +52,7 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:277:0 | sha2 | [manifest] locked sha2 0.10.9; reached via micro -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:14:0 | sha2 | [manifest] declared by micro (dependencies)
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:306:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via micro -> chacha20poly1305 -> poly1305 -> universal-hash
+  occ unknown | crypto:algorithm:unknown | src/main.rs:71:12 | ring::digest::digest | [reachable] [call] in micro::digests; use: digest; algorithm unresolved: `micro::DIGESTS`, which leads to no single algorithm; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
@@ -155,6 +156,13 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+  prop unknown | crypto:algorithm:unknown | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown | rcbom:reachability=reachable
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
@@ -162,6 +170,7 @@ asset SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | {"algorithmProperties": {"alg
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
@@ -219,6 +228,7 @@ dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown
 dependency crypto:candidate:sha1@0.10.7:SHA-1
 dependency pkg:cargo/aead@0.5.2
 dependency pkg:cargo/aes-gcm@0.10.3
@@ -252,6 +262,7 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown
 provides pkg:cargo/sha1@0.10.7 -> crypto:candidate:sha1@0.10.7:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512

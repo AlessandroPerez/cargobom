@@ -40,6 +40,7 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:218:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t1 -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:11:0 | sha2 | [manifest] declared by t1 (dependencies)
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:257:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> aes-gcm -> ghash -> polyval -> universal-hash
+  occ unknown | crypto:algorithm:unknown | src/main.rs:32:24 | ring::digest::digest | [reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments name no algorithm; instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:confidence=low
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:detection:method=manifest
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:kb:version=0.2.0
@@ -108,11 +109,19 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+  prop unknown | crypto:algorithm:unknown | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown | rcbom:reachability=reachable
 asset AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "primitive": "ae"}, "assetType": "algorithm"}
 asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
@@ -153,6 +162,7 @@ dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown
 dependency crypto:candidate:aes-gcm@0.10.3:AES-GCM
 dependency crypto:candidate:hmac@0.12.1:HMAC
 dependency pkg:cargo/aead@0.5.2
@@ -179,6 +189,7 @@ provides pkg:cargo/hmac@0.12.1 -> crypto:candidate:hmac@0.12.1:HMAC
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t1@0.1.0", "name": "t1", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t1@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
