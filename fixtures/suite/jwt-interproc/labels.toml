@@ -1,0 +1,19 @@
+# jwt-interproc: what = JWT, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 12
+callee = "encode"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "EdDSA from token_alg(), passed main->issue->sign_claims"
+
+[[site]]
+file = "src/main.rs"
+line = 22
+callee = "decode"
+function = "verify"
+must = ["Ed25519"]
+may = []
+note = "EdDSA passed main->verify into Validation::new"

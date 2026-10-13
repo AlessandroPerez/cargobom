@@ -2,6 +2,42 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via libonly -> hmac -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -173,6 +209,42 @@
       "purl": "pkg:cargo/sha2@0.10.9",
       "type": "library",
       "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via libonly -> hmac -> digest -> subtle",
+            "line": 102,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
     },
     {
       "bom-ref": "crypto:algorithm:HMAC-SHA-256",
@@ -401,11 +473,17 @@
   "dependencies": [
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -441,6 +519,10 @@
         "crypto:algorithm:SHA-256"
       ],
       "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
     },
     {
       "dependsOn": [
@@ -515,7 +597,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2b00a49a-a732-8815-aa5a-fabe380e8577",
+  "serialNumber": "urn:uuid:128a74a9-4c8c-8fa5-ab1d-743253195444",
   "specVersion": "1.7",
   "version": 1
 }

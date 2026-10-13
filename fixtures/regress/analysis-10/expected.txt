@@ -74,11 +74,13 @@
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:6:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via t10 -> aws-lc-rs
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by t10 (dependencies); features ["legacy-des"]
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | Cargo.lock:17:0 | aws-lc-sys | [manifest] locked aws-lc-sys 0.45.0; reached via t10 -> aws-lc-rs -> aws-lc-sys
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:13 | aws_lc_rs::agreement::ephemeral::EphemeralPrivateKey::generate | [reachable] [call] in t10::agreements; use: keygen; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::EphemeralPrivateKey::generate`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:55 | aws_lc_rs::agreement::X25519 | [reachable] [static] in t10::agreements; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::X25519`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:57:27 | aws_lc_rs::agreement::ephemeral::agree_ephemeral | [reachable] [call] in t10::agreements; use: keyderive; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::agree_ephemeral`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:57:93 | aws_lc_rs::agreement::X25519 | [reachable] [static] in t10::agreements; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::X25519`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:133:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via t10 -> aws-lc-rs -> zeroize
   prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:confidence=high
   prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:detection:method=type-resolved
   prop 3DES-112 | crypto:algorithm:3DES-112 | rcbom:functions:source=knowledge-base
@@ -283,15 +285,22 @@
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:crypto-role=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:kb-coverage=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:usage=reachable
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
   prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
   prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
   prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=4
   prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset 3DES-112 | crypto:algorithm:3DES-112 | {"algorithmProperties": {"algorithmFamily": "3DES", "cryptoFunctions": ["encrypt", "decrypt"], "parameterSetIdentifier": "112", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset 3DES-168 | crypto:algorithm:3DES-168 | {"algorithmProperties": {"algorithmFamily": "3DES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "168", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
@@ -323,6 +332,7 @@ asset TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | {"algorithmProper
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-384-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-secp256k1-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
@@ -331,6 +341,7 @@ dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/t10@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
 dependency crypto:algorithm:3DES-112
 dependency crypto:algorithm:3DES-168
@@ -364,6 +375,7 @@ dependency crypto:algorithm:x25519
 dependency pkg:cargo/aws-lc-rs@1.18.1
 dependency pkg:cargo/aws-lc-sys@0.45.0
 dependency pkg:cargo/t10@0.1.0
+dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

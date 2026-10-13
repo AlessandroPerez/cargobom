@@ -1,0 +1,19 @@
+# aead-interproc: what = AEAD, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 14
+callee = "encrypt"
+function = "encrypt"
+must = ["XChaCha20-Poly1305"]
+may = []
+note = "cipher returned by make_cipher, passed main->protect->seal; C instantiated only with XChaCha20Poly1305"
+
+[[site]]
+file = "src/main.rs"
+line = 18
+callee = "decrypt"
+function = "decrypt"
+must = ["XChaCha20-Poly1305"]
+may = []
+note = "same cipher passed main->unprotect"

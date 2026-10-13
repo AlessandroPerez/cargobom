@@ -1,0 +1,19 @@
+# hash-cfg: what = hash, how = cfg negative
+
+[[site]]
+file = "src/main.rs"
+line = 5
+callee = "digest"
+function = "digest"
+must = []
+may = []
+note = "inside #[cfg(any())] fn legacy_checksum: never compiled (R1.5)"
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = []
+note = "live Sha384::digest; the #[cfg(any())] shadowing let on line 11 is never compiled"

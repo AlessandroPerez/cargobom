@@ -1,6 +1,7 @@
   occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:9:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in cbom_real_modern_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 7); line: `let _ = ChaCha20Poly1305::new_from_slice(&shared_secret.as_bytes()[..32]);`; code: `ChaCha20Poly1305::new_from_slice`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:8:12 | digest::digest::Digest::digest | [reachable] [call] in cbom_real_modern_app::main; use: digest; line: `let _ = Sha1::digest(shared_secret.as_bytes());`; code: `Sha1::digest`
   occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via cbom-real-modern-app -> chacha20poly1305 -> aead
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:16:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via cbom-real-modern-app -> sha1 -> digest -> block-buffer
   occ chacha20 | pkg:cargo/chacha20@0.9.1 | Cargo.lock:50:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via cbom-real-modern-app -> chacha20poly1305 -> chacha20
   occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.lock:61:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via cbom-real-modern-app -> chacha20poly1305
   occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.toml:9:0 | chacha20poly1305 | [manifest] declared by cbom-real-modern-app (dependencies)
@@ -15,7 +16,9 @@
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ sha1 | pkg:cargo/sha1@0.10.6 | Cargo.lock:197:0 | sha1 | [manifest] locked sha1 0.10.6; reached via cbom-real-modern-app -> sha1
   occ sha1 | pkg:cargo/sha1@0.10.6 | Cargo.toml:11:0 | sha1 | [manifest] declared by cbom-real-modern-app (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:214:0 | subtle | [manifest] locked subtle 2.6.1; reached via cbom-real-modern-app -> chacha20poly1305 -> poly1305 -> universal-hash -> subtle
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:226:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via cbom-real-modern-app -> chacha20poly1305 -> poly1305 -> universal-hash
+  occ zeroize | pkg:cargo/zeroize@1.8.2 | Cargo.lock:327:0 | zeroize | [manifest] locked zeroize 1.8.2; reached via cbom-real-modern-app -> chacha20poly1305 -> zeroize
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:finding=hard-coded-key
@@ -33,6 +36,10 @@
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:crypto-role=algorithm
   prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:scope=required
   prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:usage=reachable
@@ -62,11 +69,20 @@
   prop sha1 | pkg:cargo/sha1@0.10.6 | rcbom:crypto-role=algorithm
   prop sha1 | pkg:cargo/sha1@0.10.6 | rcbom:scope=required
   prop sha1 | pkg:cargo/sha1@0.10.6 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:usage=reachable
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt", "decrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1 | purl pkg:cargo/chacha20@0.9.1
 component library chacha20poly1305 0.10.1 | pkg:cargo/chacha20poly1305@0.10.1 | purl pkg:cargo/chacha20poly1305@0.10.1
 component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
@@ -77,7 +93,9 @@ component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/pol
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 component library sha1 0.10.6 | pkg:cargo/sha1@0.10.6 | purl pkg:cargo/sha1@0.10.6
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+component library zeroize 1.8.2 | pkg:cargo/zeroize@1.8.2 | purl pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/cbom-real-modern-app@0.1.0 -> pkg:cargo/chacha20poly1305@0.10.1
 dep pkg:cargo/cbom-real-modern-app@0.1.0 -> pkg:cargo/ring@0.17.14
@@ -87,17 +105,22 @@ dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/aead@0.5.2
 dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/chacha20@0.9.1
 dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/poly1305@0.8.0
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/sha1@0.10.6 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
 dependency crypto:algorithm:ChaCha20-Poly1305
 dependency crypto:algorithm:SHA-1
 dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/cbom-real-modern-app@0.1.0
 dependency pkg:cargo/chacha20@0.9.1
 dependency pkg:cargo/chacha20poly1305@0.10.1
@@ -109,7 +132,9 @@ dependency pkg:cargo/poly1305@0.8.0
 dependency pkg:cargo/rand_core@0.6.4
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/sha1@0.10.6
+dependency pkg:cargo/subtle@2.6.1
 dependency pkg:cargo/universal-hash@0.5.1
+dependency pkg:cargo/zeroize@1.8.2
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

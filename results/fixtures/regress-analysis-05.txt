@@ -10,6 +10,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:13 | digest::mac::Mac::new_from_slice | [reachable] [component] in t5::pushed; part of HMAC-SHA-256; line: `let _m = Hmac::<Sha256>::new_from_slice(key.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-10000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:78 | pbkdf2::pbkdf2_hmac_array | [reachable] [component] in t5::two_iters; part of PBKDF2-SHA-256-1000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b"s", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b"s", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via t5 -> hmac -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:40:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t5 -> hmac -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:50:0 | digest | [manifest] locked digest 0.10.7; reached via t5 -> hmac -> digest
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:77:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t5 -> ring -> getrandom
@@ -22,6 +23,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:127:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t5 -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:11:0 | sha2 | [manifest] declared by t5 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:144:0 | subtle | [manifest] locked subtle 2.6.1; reached via t5 -> hmac -> digest -> subtle
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
@@ -64,6 +66,10 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -85,11 +91,16 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-10000-32 | crypto:algorithm:PBKDF2-SHA-256-10000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
@@ -97,10 +108,13 @@ component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-1000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-10000-32 -> crypto:algorithm:SHA-256
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/hmac@0.12.1
@@ -115,6 +129,7 @@ dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:PBKDF2-SHA-256-1000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-10000-32
 dependency crypto:algorithm:SHA-256
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
@@ -122,6 +137,7 @@ dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
 dependency pkg:cargo/t5@0.1.0
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"

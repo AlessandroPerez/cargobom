@@ -1,0 +1,19 @@
+# aead-path: what = AEAD, how = path
+
+[[site]]
+file = "src/main.rs"
+line = 15
+callee = "seal_in_place_append_tag"
+function = "encrypt"
+must = ["AES-256-GCM", "ChaCha20-Poly1305"]
+may = []
+note = "runtime branch on args().count(): both reachable; FIPS_ONLY const false -> AES-128-GCM nothing"
+
+[[site]]
+file = "src/main.rs"
+line = 16
+callee = "open_in_place"
+function = "decrypt"
+must = ["AES-256-GCM", "ChaCha20-Poly1305"]
+may = []
+note = "same key"

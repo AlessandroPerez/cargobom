@@ -1,0 +1,28 @@
+# cipher-basic: what = cipher + mode, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 12
+callee = "encrypt_padded_vec_mut"
+function = "encrypt"
+must = ["AES-256-CBC"]
+may = []
+note = "cbc::Encryptor<Aes256> with PKCS#7 padding (padding not in the name, R10)"
+
+[[site]]
+file = "src/main.rs"
+line = 13
+callee = "decrypt_padded_vec_mut"
+function = "decrypt"
+must = ["AES-256-CBC"]
+may = []
+note = "cbc::Decryptor<Aes256>"
+
+[[site]]
+file = "src/main.rs"
+line = 15
+callee = "apply_keystream"
+function = "encrypt"
+must = ["AES-128-CTR"]
+may = []
+note = "ctr::Ctr128BE<Aes128>; keystream application labelled encrypt (R8)"

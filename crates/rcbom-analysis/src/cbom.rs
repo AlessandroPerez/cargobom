@@ -91,6 +91,21 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
         .values()
         .map(|a| {
             let r = match &a.algo.material {
+                // an unknown algorithm: by primitive and providing packages, whatever else the
+                // CBOM holds
+                None if a.unresolved() => {
+                    let providers: Vec<&str> =
+                        a.providers.iter().map(|(n, _)| n.as_str()).collect();
+                    format!(
+                        "crypto:algorithm:unknown:{}:{}",
+                        a.algo.primitive,
+                        if providers.is_empty() {
+                            "none".to_string()
+                        } else {
+                            providers.join("+")
+                        }
+                    )
+                }
                 Some(m) => format!("crypto:material:{m}:{}", a.name),
                 None if by_name[a.name.as_str()] > 1 => {
                     format!("crypto:algorithm:{}:{}", a.name, a.algo.primitive)
@@ -329,6 +344,29 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
     if p.role.is_some() && !p.kb_supported {
         props.push(prop("rcbom:kb-coverage", "unsupported-version"));
     }
+    // cryptographic by its metadata, not modelled by the knowledge base
+    if let Some(u) = p.unmodelled {
+        props.push(prop(
+            "rcbom:crypto-role",
+            match u {
+                rcbom_kb::Unmodelled::Crypto => "unmodelled",
+                rcbom_kb::Unmodelled::Support => "support",
+            },
+        ));
+        props.push(prop("rcbom:kb-coverage", "unmodelled"));
+        if let Some(u) = usage {
+            let value = if !layer2 || (p.scope == Scope::Build && u == Usage::DeclaredNotUsed) {
+                "unknown"
+            } else {
+                match u {
+                    Usage::Reachable => "reachable",
+                    Usage::Present => "present",
+                    Usage::DeclaredNotUsed => "declared-not-used",
+                }
+            };
+            props.push(prop("rcbom:usage", value));
+        }
+    }
     if !p.backends.is_empty() {
         props.push(prop("rcbom:backend", p.backends.join(",")));
     }
@@ -452,7 +490,7 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
     let included: Vec<&Pkg> = man
         .packages
         .iter()
-        .filter(|p| p.member || p.role.is_some() || p.links.is_some())
+        .filter(|p| p.member || p.role.is_some() || p.unmodelled.is_some() || p.links.is_some())
         .collect();
     let included_ids: HashSet<_> = included.iter().map(|p| p.id.clone()).collect();
     let mut components: Vec<Value> = included

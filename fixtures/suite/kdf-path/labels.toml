@@ -1,0 +1,20 @@
+# kdf-path: what = KDF, how = path
+
+[[site]]
+file = "src/main.rs"
+line = 22
+callee = "extract"
+function = "keyderive"
+must = ["HKDF-SHA-256", "HKDF-SHA-384"]
+may = []
+note = "HKDF-Extract; runtime branch selects SHA-384 or SHA-256; LEGACY const false -> HKDF-SHA-1 nothing"
+
+[[site]]
+file = "src/main.rs"
+line = 25
+callee = "fill"
+function = "keyderive"
+must = ["HKDF-SHA-256", "HKDF-SHA-384"]
+may = []
+params = { length = "32" }
+note = "HKDF-Expand: Prk::expand only builds the lazy Okm; fill computes it (same line)"

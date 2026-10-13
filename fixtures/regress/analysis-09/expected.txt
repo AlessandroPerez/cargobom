@@ -163,15 +163,26 @@
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:9:0 | aes | [manifest] declared by t9 (dependencies)
   occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.lock:17:0 | argon2 | [manifest] locked argon2 0.5.3; reached via t9 -> argon2
   occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.toml:10:0 | argon2 | [manifest] declared by t9 (dependencies)
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:53:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via t9 -> argon2 -> base64ct
+  occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.lock:59:0 | blake2 | [manifest] locked blake2 0.10.6; reached via t9 -> argon2 -> blake2
   occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.lock:68:0 | blake3 | [manifest] locked blake3 1.8.5; reached via t9 -> blake3
   occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.toml:11:0 | blake3 | [manifest] declared by t9 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:82:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via t9 -> hmac -> digest -> block-buffer
+  occ block-padding | pkg:cargo/block-padding@0.3.3 | Cargo.lock:91:0 | block-padding | [manifest] locked block-padding 0.3.3; reached via t9 -> aes -> cipher -> inout -> block-padding
+  occ blowfish | pkg:cargo/blowfish@0.9.1 | Cargo.lock:100:0 | blowfish | [manifest] locked blowfish 0.9.1; reached via t9 -> blowfish
+  occ blowfish | pkg:cargo/blowfish@0.9.1 | Cargo.toml:12:0 | blowfish | [manifest] declared by t9 (dependencies)
   occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.lock:122:0 | cbc | [manifest] locked cbc 0.1.2; reached via t9 -> cbc
   occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.toml:13:0 | cbc | [manifest] declared by t9 (dependencies); features ["alloc"]
   occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:147:0 | cipher | [manifest] locked cipher 0.4.4; reached via t9 -> aes -> cipher
+  occ const-oid | pkg:cargo/const-oid@0.9.6 | Cargo.lock:157:0 | const-oid | [manifest] locked const-oid 0.9.6; reached via t9 -> rsa -> const-oid
+  occ constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | Cargo.lock:163:0 | constant_time_eq | [manifest] locked constant_time_eq 0.4.2; reached via t9 -> blake3 -> constant_time_eq
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:187:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t9 -> aes -> cipher -> crypto-common
   occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:197:0 | ctr | [manifest] locked ctr 0.9.2; reached via t9 -> ctr
   occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.toml:14:0 | ctr | [manifest] declared by t9 (dependencies)
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | Cargo.lock:206:0 | curve25519-dalek | [manifest] locked curve25519-dalek 4.1.3; reached via t9 -> ed25519-dalek -> curve25519-dalek
+  occ der | pkg:cargo/der@0.7.10 | Cargo.lock:233:0 | der | [manifest] locked der 0.7.10; reached via t9 -> rsa -> pkcs1 -> der
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:250:0 | digest | [manifest] locked digest 0.10.7; reached via t9 -> hmac -> digest
+  occ ed25519 | pkg:cargo/ed25519@2.2.3 | Cargo.lock:262:0 | ed25519 | [manifest] locked ed25519 2.2.3; reached via t9 -> ed25519-dalek -> ed25519
   occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:272:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via t9 -> ed25519-dalek
   occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:15:0 | ed25519-dalek | [manifest] declared by t9 (dependencies); features ["rand_core"]
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:333:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t9 -> ed25519-dalek -> rand_core -> getrandom
@@ -184,6 +195,11 @@
   occ password-hash | pkg:cargo/password-hash@0.5.0 | Cargo.lock:497:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via t9 -> argon2 -> password-hash
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:508:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t9 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:19:0 | pbkdf2 | [manifest] declared by t9 (dependencies); features ["simple"]
+  occ pem | pkg:cargo/pem@3.0.6 | Cargo.lock:520:0 | pem | [manifest] locked pem 3.0.6; reached via t9 -> jsonwebtoken -> pem
+  occ pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | Cargo.lock:530:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 0.7.0; reached via t9 -> rsa -> pkcs1 -> der -> pem-rfc7468
+  occ pkcs1 | pkg:cargo/pkcs1@0.7.5 | Cargo.lock:545:0 | pkcs1 | [manifest] locked pkcs1 0.7.5; reached via t9 -> rsa -> pkcs1
+  occ pkcs8 | pkg:cargo/pkcs8@0.10.2 | Cargo.lock:556:0 | pkcs8 | [manifest] locked pkcs8 0.10.2; reached via t9 -> rsa -> pkcs8
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:572:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via t9 -> rand -> rand_chacha -> ppv-lite86
   occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:599:0 | rand | [manifest] locked rand 0.8.8; reached via t9 -> rand
   occ rand | pkg:cargo/rand@0.8.8 | Cargo.toml:20:0 | rand | [manifest] declared by t9 (dependencies)
   occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:610:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t9 -> rand -> rand_chacha
@@ -192,6 +208,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.lock:643:0 | rsa | [manifest] locked rsa 0.9.10; reached via t9 -> rsa
   occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:21:0 | rsa | [manifest] declared by t9 (dependencies)
+  occ salsa20 | pkg:cargo/salsa20@0.10.2 | Cargo.lock:678:0 | salsa20 | [manifest] locked salsa20 0.10.2; reached via t9 -> scrypt -> salsa20
   occ scrypt | crypto:algorithm:scrypt | src/main.rs:105:17 | scrypt::params::Params::new | [reachable] [call] in t9::scrypt_params; new: setup, not a use; line: `let params = scrypt::Params::new(log_n, 8, 1, 32).unwrap();`; code: `scrypt::Params::new`
   occ scrypt | crypto:algorithm:scrypt | src/main.rs:107:4 | scrypt::scrypt | [reachable] [call] in t9::scrypt_params; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 107); line: `scrypt::scrypt(pw, b"salt", &params, &mut out).unwrap();`; code: `scrypt::scrypt`
   occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.lock:687:0 | scrypt | [manifest] locked scrypt 0.11.0; reached via t9 -> scrypt
@@ -204,6 +221,12 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:759:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t9 -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:25:0 | sha2 | [manifest] declared by t9 (dependencies); features ["oid"]
   occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:776:0 | signature | [manifest] locked signature 2.2.0; reached via t9 -> rsa -> signature
+  occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:816:0 | spki | [manifest] locked spki 0.7.3; reached via t9 -> rsa -> spki
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:826:0 | subtle | [manifest] locked subtle 2.6.1; reached via t9 -> ed25519-dalek -> subtle
+  occ unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | src/main.rs:18:8 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] in t9::blowfish_modes; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `enc.encrypt_padded_vec_mut::<Pkcs7>(data)`; code: `encrypt_padded_vec_mut`
+  occ unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | src/main.rs:17:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in t9::blowfish_modes; use: encrypt or decrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `c.apply_keystream(data);`; code: `apply_keystream`
+  occ unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | src/main.rs:15:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let enc = cbc::Encryptor::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `cbc::Encryptor::<blowfish::Blowfish>::new_from_slices`
+  occ unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | src/main.rs:16:16 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:115:4 | x25519_dalek::x25519::x25519 | [reachable] [call] in t9::x25519_free; use: keyderive; key: hard-coded (32 bytes, literal at line 115); line: `x25519_dalek::x25519([7u8; 32], peer)`; code: `x25519_dalek::x25519`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:127:12 | x25519_dalek::x25519::EphemeralSecret::random | [reachable] [call] in t9::keygens; use: keygen; line: `let a = x25519_dalek::EphemeralSecret::random();`; code: `x25519_dalek::EphemeralSecret::random`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:128:12 | x25519_dalek::x25519::EphemeralSecret::random_from_rng | [reachable] [call] in t9::keygens; use: keygen; rng: hard-coded (literal at line 125); line: `let b = x25519_dalek::EphemeralSecret::random_from_rng(&mut seeded);`; code: `x25519_dalek::EphemeralSecret::random_from_rng`
@@ -215,6 +238,7 @@
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:135:7 | x25519_dalek::x25519::ReusableSecret::diffie_hellman | [reachable] [call] in t9::keygens; use: keyderive; line: `*c.diffie_hellman(&pb).as_bytes()`; code: `diffie_hellman`
   occ x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | Cargo.lock:1076:0 | x25519-dalek | [manifest] locked x25519-dalek 2.0.1; reached via t9 -> x25519-dalek
   occ x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | Cargo.toml:26:0 | x25519-dalek | [manifest] declared by t9 (dependencies); features ["static_secrets", "reusable_secrets", "getrandom"]
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:1108:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via t9 -> ed25519-dalek -> zeroize
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:confidence=high
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:detection:method=type-resolved
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:functions:source=observed
@@ -479,21 +503,61 @@
   prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:crypto-role=algorithm
   prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:scope=required
   prop argon2 | pkg:cargo/argon2@0.5.3 | rcbom:usage=reachable
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=reachable
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:scope=required
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:usage=reachable
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:crypto-role=algorithm
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:scope=required
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:crypto-role=support
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:kb-coverage=unmodelled
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:scope=required
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:usage=present
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:crypto-role=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:kb-coverage=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:scope=required
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:usage=reachable
   prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:crypto-role=algorithm
   prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:scope=required
   prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:usage=reachable
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=reachable
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:crypto-role=support
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:kb-coverage=unmodelled
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:usage=reachable
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:usage=reachable
+  prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:crypto-role=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:kb-coverage=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:usage=reachable
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
@@ -514,6 +578,26 @@
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:crypto-role=support
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:kb-coverage=unmodelled
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:scope=required
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:usage=present
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:kb-coverage=unmodelled
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:scope=required
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=present
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:crypto-role=support
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:kb-coverage=unmodelled
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:scope=required
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=reachable
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=reachable
@@ -531,6 +615,10 @@
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:crypto-role=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:scope=required
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:usage=reachable
   prop scrypt | crypto:algorithm:scrypt | rcbom:confidence=high
   prop scrypt | crypto:algorithm:scrypt | rcbom:detection:method=type-resolved
   prop scrypt | crypto:algorithm:scrypt | rcbom:finding=hard-coded-salt
@@ -564,6 +652,46 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:iv=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:key=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:iv=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:key=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:reachability=reachable
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
   prop x25519 | crypto:algorithm:x25519 | rcbom:finding=hard-coded-key
@@ -577,6 +705,10 @@
   prop x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | rcbom:crypto-role=algorithm
   prop x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | rcbom:scope=required
   prop x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-192-CTR | crypto:algorithm:AES-192-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "192", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt"], "mode": "cbc", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
@@ -613,15 +745,29 @@ asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFa
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset scrypt | crypto:algorithm:scrypt | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | {"algorithmProperties": {"cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library argon2 0.5.3 | pkg:cargo/argon2@0.5.3 | purl pkg:cargo/argon2@0.5.3
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library blake2 0.10.6 | pkg:cargo/blake2@0.10.6 | purl pkg:cargo/blake2@0.10.6
 component library blake3 1.8.5 | pkg:cargo/blake3@1.8.5 | purl pkg:cargo/blake3@1.8.5
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library block-padding 0.3.3 | pkg:cargo/block-padding@0.3.3 | purl pkg:cargo/block-padding@0.3.3
+component library blowfish 0.9.1 | pkg:cargo/blowfish@0.9.1 | purl pkg:cargo/blowfish@0.9.1
 component library cbc 0.1.2 | pkg:cargo/cbc@0.1.2 | purl pkg:cargo/cbc@0.1.2
 component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6
+component library constant_time_eq 0.4.2 | pkg:cargo/constant_time_eq@0.4.2 | purl pkg:cargo/constant_time_eq@0.4.2
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library curve25519-dalek 4.1.3 | pkg:cargo/curve25519-dalek@4.1.3 | purl pkg:cargo/curve25519-dalek@4.1.3
+component library der 0.7.10 | pkg:cargo/der@0.7.10 | purl pkg:cargo/der@0.7.10
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519 2.2.3 | pkg:cargo/ed25519@2.2.3 | purl pkg:cargo/ed25519@2.2.3
 component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
@@ -629,16 +775,25 @@ component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1 | purl pkg:c
 component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
 component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0 | purl pkg:cargo/password-hash@0.5.0
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
+component library pem 3.0.6 | pkg:cargo/pem@3.0.6 | purl pkg:cargo/pem@3.0.6
+component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
+component library pkcs1 0.7.5 | pkg:cargo/pkcs1@0.7.5 | purl pkg:cargo/pkcs1@0.7.5
+component library pkcs8 0.10.2 | pkg:cargo/pkcs8@0.10.2 | purl pkg:cargo/pkcs8@0.10.2
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
 component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
 component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10 | purl pkg:cargo/rsa@0.9.10
+component library salsa20 0.10.2 | pkg:cargo/salsa20@0.10.2 | purl pkg:cargo/salsa20@0.10.2
 component library scrypt 0.11.0 | pkg:cargo/scrypt@0.11.0 | purl pkg:cargo/scrypt@0.11.0
 component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
 component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library x25519-dalek 2.0.1 | pkg:cargo/x25519-dalek@2.0.1 | purl pkg:cargo/x25519-dalek@2.0.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
@@ -658,45 +813,80 @@ dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PSS-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
 dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
-dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/blake2@0.10.6
 dep pkg:cargo/argon2@0.5.3 -> pkg:cargo/password-hash@0.5.0
+dep pkg:cargo/blake2@0.10.6 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/blake3@1.8.5 -> pkg:cargo/constant_time_eq@0.4.2
+dep pkg:cargo/blowfish@0.9.1 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/cbc@0.1.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/block-padding@0.3.3
 dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/const-oid@0.9.6
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
-dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/curve25519-dalek@4.1.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/ed25519@2.2.3
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
-dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/pem@3.0.6
 dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/password-hash@0.5.0 -> pkg:cargo/base64ct@1.8.3
 dep pkg:cargo/password-hash@0.5.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/password-hash@0.5.0 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/password-hash@0.5.0
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/pem-rfc7468@0.7.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
 dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/const-oid@0.9.6
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/pkcs1@0.7.5
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/pkcs8@0.10.2
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand@0.8.8
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/signature@2.2.0
-dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/salsa20@0.10.2 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/password-hash@0.5.0
 dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/pbkdf2@0.12.2
+dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/salsa20@0.10.2
 dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/spki@0.7.3 -> pkg:cargo/der@0.7.10
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/aes@0.8.4
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/argon2@0.5.3
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/blake3@1.8.5
+dep pkg:cargo/t9@0.1.0 -> pkg:cargo/blowfish@0.9.1
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/cbc@0.1.2
-dep pkg:cargo/t9@0.1.0 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/ctr@0.9.2
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/hmac@0.12.1
@@ -709,8 +899,9 @@ dep pkg:cargo/t9@0.1.0 -> pkg:cargo/scrypt@0.11.0
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/sha1@0.10.7
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/t9@0.1.0 -> pkg:cargo/x25519-dalek@2.0.1
-dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/curve25519-dalek@4.1.3
 dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/x25519-dalek@2.0.1 -> pkg:cargo/zeroize@1.9.1
 dependency crypto:algorithm:AES-128-CBC
 dependency crypto:algorithm:AES-192-CTR
 dependency crypto:algorithm:AES-256-CBC
@@ -741,6 +932,10 @@ dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
 dependency crypto:algorithm:scrypt
 dependency crypto:algorithm:scrypt-131072-8-1-32
+dependency crypto:algorithm:unknown:block-cipher:blowfish+cbc
+dependency crypto:algorithm:unknown:stream-cipher:blowfish+ctr
+dependency crypto:algorithm:unknown:unknown:blowfish+cbc
+dependency crypto:algorithm:unknown:unknown:blowfish+ctr
 dependency crypto:algorithm:x25519
 dependency crypto:material:private-key:RSA
 dependency crypto:material:private-key:RSA-2048
@@ -750,30 +945,49 @@ dependency crypto:material:public-key:RSA
 dependency crypto:material:secret-key:HMAC
 dependency pkg:cargo/aes@0.8.4
 dependency pkg:cargo/argon2@0.5.3
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/blake2@0.10.6
 dependency pkg:cargo/blake3@1.8.5
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/block-padding@0.3.3
+dependency pkg:cargo/blowfish@0.9.1
 dependency pkg:cargo/cbc@0.1.2
 dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/const-oid@0.9.6
+dependency pkg:cargo/constant_time_eq@0.4.2
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/curve25519-dalek@4.1.3
+dependency pkg:cargo/der@0.7.10
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/ed25519@2.2.3
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/jsonwebtoken@9.3.1
 dependency pkg:cargo/md5@0.7.0
 dependency pkg:cargo/password-hash@0.5.0
 dependency pkg:cargo/pbkdf2@0.12.2
+dependency pkg:cargo/pem-rfc7468@0.7.0
+dependency pkg:cargo/pem@3.0.6
+dependency pkg:cargo/pkcs1@0.7.5
+dependency pkg:cargo/pkcs8@0.10.2
+dependency pkg:cargo/ppv-lite86@0.2.21
 dependency pkg:cargo/rand@0.8.8
 dependency pkg:cargo/rand_chacha@0.3.1
 dependency pkg:cargo/rand_core@0.6.4
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/rsa@0.9.10
+dependency pkg:cargo/salsa20@0.10.2
 dependency pkg:cargo/scrypt@0.11.0
 dependency pkg:cargo/sha1@0.10.7
 dependency pkg:cargo/sha2@0.10.9
 dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/spki@0.7.3
+dependency pkg:cargo/subtle@2.6.1
 dependency pkg:cargo/t9@0.1.0
 dependency pkg:cargo/x25519-dalek@2.0.1
+dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
@@ -782,9 +996,17 @@ provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-192-CTR
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-19456-2-1
 provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:block-cipher:blowfish+cbc
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:stream-cipher:blowfish+ctr
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:unknown:blowfish+cbc
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:unknown:blowfish+ctr
 provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-128-CBC
 provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:unknown:block-cipher:blowfish+cbc
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:unknown:unknown:blowfish+cbc
 provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:AES-192-CTR
+provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:unknown:stream-cipher:blowfish+ctr
+provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:unknown:unknown:blowfish+ctr
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA

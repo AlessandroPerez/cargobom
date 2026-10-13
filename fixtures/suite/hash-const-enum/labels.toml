@@ -1,0 +1,28 @@
+# hash-const-enum: what = hash, how = constant enum branch
+
+[[site]]
+file = "src/main.rs"
+line = 17
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "match on const MODE = Mode::Fast selects &SHA256; the Strong arm (&SHA512) is constant-false, dead (R12.5, R4.9) -> nothing"
+
+[[site]]
+file = "src/main.rs"
+line = 19
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "Sha256::digest in the taken Fast arm"
+
+[[site]]
+file = "src/main.rs"
+line = 20
+callee = "digest"
+function = "digest"
+must = []
+may = []
+note = "Sha512::digest in the Strong arm of match on const MODE = Fast: dead (R1.5, R12.5)"

@@ -371,6 +371,42 @@
       "version": "0.17.14"
     },
     {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via t22 -> aes-gcm -> subtle",
+            "line": 195,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
       "bom-ref": "pkg:cargo/universal-hash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -1001,7 +1037,8 @@
         "pkg:cargo/aes@0.8.4",
         "pkg:cargo/cipher@0.4.4",
         "pkg:cargo/ctr@0.9.2",
-        "pkg:cargo/ghash@0.5.1"
+        "pkg:cargo/ghash@0.5.1",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "provides": [
         "crypto:algorithm:AES-256-GCM"
@@ -1062,6 +1099,10 @@
       "ref": "pkg:cargo/ring@0.17.14"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/aes-gcm@0.10.3",
         "pkg:cargo/ring@0.17.14"
@@ -1070,7 +1111,8 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/universal-hash@0.5.1"
     },
@@ -1153,7 +1195,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:66ef9119-2aef-814c-970e-6eb218a2094c",
+  "serialNumber": "urn:uuid:52d35e48-7dd5-80a0-94b4-7dc52737f4d9",
   "specVersion": "1.7",
   "version": 1
 }

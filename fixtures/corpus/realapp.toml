@@ -1,0 +1,277 @@
+# Ground truth for realapp: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: realapp 0.1.0 (/var/tmp/rcbom-validate/realapp)
+# Build analysed: default features, host x86_64-unknown-linux-gnu, release build of bin "realapp".
+# Layer 1 = normal (non-dev, non-build) dependencies of the artifact, resolver-accurate features,
+# excluding packages reachable only through proc-macros. Layer 2 = calls in src/ into crypto libraries.
+# Labelled from source and package metadata only (see DECISIONS.md).
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aead"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto traits for AEAD ciphers (Aead/AeadInPlace) implemented by chacha20poly1305/aes-gcm"
+
+[[package]]
+name = "age"
+version = "0.11.5"
+kind = "protocol"
+why = "age file-encryption format (default features): X25519/scrypt recipients, header MAC, STREAM payload encryption"
+
+[[package]]
+name = "age-core"
+version = "0.11.0"
+kind = "protocol"
+why = "age format primitives: ChaCha20-Poly1305 key wrap, HKDF-SHA-256, stanza and header format"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "block-buffer"
+version = "0.12.1"
+kind = "support"
+why = "RustCrypto block buffering for sha2 0.11"
+
+[[package]]
+name = "chacha20"
+version = "0.9.1"
+kind = "algorithm"
+why = "ChaCha20 stream cipher implementation"
+
+[[package]]
+name = "chacha20poly1305"
+version = "0.10.1"
+kind = "algorithm"
+why = "ChaCha20-Poly1305 AEAD implementation"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits"
+
+[[package]]
+name = "const-oid"
+version = "0.10.2"
+kind = "support"
+why = "ASN.1 object identifiers; enabled by digest 0.11 feature oid (hash OIDs)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "crypto-common"
+version = "0.2.2"
+kind = "trait"
+why = "common RustCrypto traits (0.2 line) used by digest 0.11"
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+kind = "algorithm"
+why = "Curve25519/Edwards25519 group arithmetic (used by x25519-dalek and age ssh-ed25519)"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs"
+
+[[package]]
+name = "digest"
+version = "0.11.3"
+kind = "trait"
+why = "RustCrypto hash traits (0.11 line) used by sha2 0.11"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source used by ring and rand_core OsRng"
+
+[[package]]
+name = "hkdf"
+version = "0.12.4"
+kind = "algorithm"
+why = "HKDF (RFC 5869) implementation"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC implementation"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types used only by cipher modes"
+
+[[package]]
+name = "jsonwebtoken"
+version = "9.3.1"
+kind = "protocol"
+why = "JWT/JWS encode (sign/MAC) and decode (verify) over ring"
+
+[[package]]
+name = "pbkdf2"
+version = "0.12.2"
+kind = "algorithm"
+why = "PBKDF2 implementation (used by scrypt / bcrypt-pbkdf)"
+
+[[package]]
+name = "pem"
+version = "3.0.6"
+kind = "support"
+why = "PEM encoding/decoding of keys and certificates"
+
+[[package]]
+name = "poly1305"
+version = "0.8.0"
+kind = "algorithm"
+why = "Poly1305 universal hash / one-time MAC"
+
+[[package]]
+name = "ppv-lite86"
+version = "0.2.21"
+kind = "support"
+why = "cryptography-oriented SIMD backend used only by rand_chacha's ChaCha core"
+
+[[package]]
+name = "rand"
+version = "0.8.8"
+kind = "rng"
+why = "random number generation (OsRng, ThreadRng/StdRng ChaCha12)"
+
+[[package]]
+name = "rand_chacha"
+version = "0.3.1"
+kind = "rng"
+why = "ChaCha-based CSPRNG (StdRng)"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits (RngCore/CryptoRng) and OsRng via getrandom"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "crypto library: AEAD, digests, HMAC, HKDF, PBKDF2, ECDSA/Ed25519/RSA, X25519/ECDH, SystemRandom"
+
+[[package]]
+name = "rustls"
+version = "0.23.45"
+kind = "protocol"
+why = "TLS 1.2/1.3 implementation (features ring, std, tls12)"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.15.1"
+kind = "pki"
+why = "shared X.509/PKI types (certificate and private-key DER wrappers, PEM parsing)"
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.15"
+kind = "pki"
+why = "WebPKI X.509 certificate path validation and signature verification (ring backend)"
+
+[[package]]
+name = "salsa20"
+version = "0.10.2"
+kind = "algorithm"
+why = "Salsa20 stream cipher / Salsa20/8 core used by scrypt"
+
+[[package]]
+name = "scrypt"
+version = "0.11.0"
+kind = "algorithm"
+why = "scrypt password-based KDF"
+
+[[package]]
+name = "secrecy"
+version = "0.10.3"
+kind = "support"
+why = "secret-wrapper types that zeroize and avoid exposing key/passphrase material"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-2 hash family implementation"
+
+[[package]]
+name = "sha2"
+version = "0.11.0"
+kind = "algorithm"
+why = "SHA-2 implementation; pulled in at run time by rust-embed-utils (SHA-256 metadata of embedded i18n files), not by age"
+
+[[package]]
+name = "simple_asn1"
+version = "0.6.4"
+kind = "support"
+why = "ASN.1 DER encoding/decoding used for key formats"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "universal-hash"
+version = "0.5.1"
+kind = "trait"
+why = "universal hash function traits (Poly1305, GHASH, POLYVAL)"
+
+[[package]]
+name = "x25519-dalek"
+version = "2.0.1"
+kind = "algorithm"
+why = "X25519 Diffie-Hellman key agreement"
+
+[[package]]
+name = "zeroize"
+version = "1.9.1"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/main.rs"
+line = 3
+callee = "generate"
+function = "keygen"
+must = ["x25519"]
+may = []
+note = "age::x25519::Identity::generate draws a fresh X25519 StaticSecret from OsRng (age 0.11.5 x25519.rs:65); the following to_public() on line 4 is a getter (R1.1), not a site"
+
+[[site]]
+file = "src/main.rs"
+line = 5
+callee = "encode"
+function = "tag"
+must = ["HMAC-SHA-256"]
+may = []
+note = "jsonwebtoken::encode with Header::default(), whose alg is HS256 (header.rs:104-107), and EncodingKey::from_secret: HMAC-SHA-256 via ring"
+
+[[protocol]]
+file = "src/main.rs"
+line = 8
+what = "rustls::crypto::ring::default_provider(): rustls ring CryptoProvider with its default cipher suites and key-exchange groups; only its cipher_suites list is read, no ClientConfig/ServerConfig is built and no TLS session can run"

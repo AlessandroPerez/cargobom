@@ -89,6 +89,7 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:27:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via a23 -> hmac -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:67:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a23 -> hmac -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:83:0 | digest | [manifest] locked digest 0.10.7; reached via a23 -> hmac -> digest
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:134:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a23 -> jsonwebtoken -> ring -> getrandom
@@ -96,8 +97,13 @@
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:10:0 | hmac | [manifest] declared by a23 (dependencies)
   occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.lock:173:0 | jsonwebtoken | [manifest] locked jsonwebtoken 9.3.1; reached via a23 -> jsonwebtoken
   occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.toml:9:0 | jsonwebtoken | [manifest] declared by a23 (dependencies)
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:188:0 | keccak | [manifest] locked keccak 0.1.6; reached via a23 -> sha3 -> keccak
+  occ pem | pkg:cargo/pem@3.0.6 | Cargo.lock:249:0 | pem | [manifest] locked pem 3.0.6; reached via a23 -> jsonwebtoken -> pem
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:289:0 | ring | [manifest] locked ring 0.17.14; reached via a23 -> jsonwebtoken -> ring
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:352:0 | sha3 | [manifest] locked sha3 0.10.9; reached via a23 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:11:0 | sha3 | [manifest] declared by a23 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:386:0 | subtle | [manifest] locked subtle 2.6.1; reached via a23 -> hmac -> digest -> subtle
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:algorithm-family=ECDSA
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:confidence=high
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:detection:method=type-resolved
@@ -260,6 +266,10 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -273,11 +283,27 @@
   prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:crypto-role=protocol
   prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:scope=required
   prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=present
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:crypto-role=support
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:kb-coverage=unmodelled
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:scope=required
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:usage=reachable
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:kb-coverage=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=present
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
 asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
 asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
@@ -300,12 +326,17 @@ asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
 component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1 | purl pkg:cargo/jsonwebtoken@9.3.1
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library pem 3.0.6 | pkg:cargo/pem@3.0.6 | purl pkg:cargo/pem@3.0.6
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
@@ -317,13 +348,18 @@ dep crypto:algorithm:RSA-PKCS1-1.5-SHA-512 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PSS-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
-dep pkg:cargo/a23@0.1.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/a23@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/a23@0.1.0 -> pkg:cargo/jsonwebtoken@9.3.1
+dep pkg:cargo/a23@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/pem@3.0.6
 dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
 dependency crypto:algorithm:Ed25519
@@ -347,12 +383,17 @@ dependency crypto:material:public-key:Ed25519
 dependency crypto:material:public-key:RSA
 dependency crypto:material:secret-key:HMAC
 dependency pkg:cargo/a23@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/jsonwebtoken@9.3.1
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/pem@3.0.6
 dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/subtle@2.6.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

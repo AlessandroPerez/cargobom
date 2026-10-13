@@ -1,0 +1,28 @@
+# lib-basic: what = library, how = basic
+
+[[site]]
+file = "src/lib.rs"
+line = 7
+callee = "encrypt"
+function = "encrypt"
+must = ["AES-256-GCM"]
+may = []
+note = "pub fn seal: Aes256Gcm encrypt (R14)"
+
+[[site]]
+file = "src/lib.rs"
+line = 15
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "private hash_block reached from pub fn content_id (R14)"
+
+[[site]]
+file = "src/lib.rs"
+line = 20
+callee = "digest"
+function = "digest"
+must = []
+may = []
+note = "private legacy_id is never called from any pub function: dead (R14, R1.5)"

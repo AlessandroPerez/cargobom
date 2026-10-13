@@ -1,0 +1,19 @@
+# aead-field: what = AEAD, how = field
+
+[[site]]
+file = "src/main.rs"
+line = 20
+callee = "seal_in_place_append_tag"
+function = "encrypt"
+must = ["AES-256-GCM"]
+may = ["AES-128-GCM"]
+note = "field initialised to AES_128_GCM, always overwritten by upgrade() before use"
+
+[[site]]
+file = "src/main.rs"
+line = 26
+callee = "open_in_place"
+function = "decrypt"
+must = ["AES-256-GCM"]
+may = ["AES-128-GCM"]
+note = "same field, same overwrite"

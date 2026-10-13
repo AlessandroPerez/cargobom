@@ -60,6 +60,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[manifest] locked aws-lc-sys 0.45.0; reached via t8 -> aws-lc-rs -> aws-lc-sys",
+            "line": 17,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-sys"
+          },
+          {
             "additionalContext": "[manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed",
             "line": 19,
             "location": "aws-lc-sys-0.45.0/Cargo.toml",
@@ -73,6 +80,18 @@
         {
           "name": "rcbom:scope",
           "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         },
         {
           "name": "rcbom:native-links",
@@ -208,6 +227,150 @@
       "purl": "pkg:cargo/rustls@0.23.45",
       "type": "library",
       "version": "0.23.45"
+    },
+    {
+      "bom-ref": "pkg:cargo/rustls-pki-types@1.15.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rustls-pki-types 1.15.1; reached via t8 -> rustls -> rustls-pki-types",
+            "line": 167,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rustls-pki-types"
+          }
+        ]
+      },
+      "name": "rustls-pki-types",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/rustls-pki-types@1.15.1",
+      "type": "library",
+      "version": "1.15.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/rustls-webpki@0.103.15",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rustls-webpki 0.103.15; reached via t8 -> rustls -> rustls-webpki",
+            "line": 176,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rustls-webpki"
+          }
+        ]
+      },
+      "name": "rustls-webpki",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/rustls-webpki@0.103.15",
+      "type": "library",
+      "version": "0.103.15"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via t8 -> rustls -> subtle",
+            "line": 194,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/zeroize@1.9.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked zeroize 1.9.1; reached via t8 -> aws-lc-rs -> zeroize",
+            "line": 299,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "zeroize"
+          }
+        ]
+      },
+      "name": "zeroize",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/zeroize@1.9.1",
+      "type": "library",
+      "version": "1.9.1"
     },
     {
       "bom-ref": "crypto:algorithm:AES-128-GCM",
@@ -10331,7 +10494,8 @@
   "dependencies": [
     {
       "dependsOn": [
-        "pkg:cargo/aws-lc-sys@0.45.0"
+        "pkg:cargo/aws-lc-sys@0.45.0",
+        "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
         "crypto:algorithm:AES-128-GCM",
@@ -10430,9 +10594,31 @@
     {
       "dependsOn": [
         "pkg:cargo/aws-lc-rs@1.18.1",
-        "pkg:cargo/ring@0.17.14"
+        "pkg:cargo/ring@0.17.14",
+        "pkg:cargo/rustls-pki-types@1.15.1",
+        "pkg:cargo/rustls-webpki@0.103.15",
+        "pkg:cargo/subtle@2.6.1",
+        "pkg:cargo/zeroize@1.9.1"
       ],
       "ref": "pkg:cargo/rustls@0.23.45"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/zeroize@1.9.1"
+      ],
+      "ref": "pkg:cargo/rustls-pki-types@1.15.1"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aws-lc-rs@1.18.1",
+        "pkg:cargo/ring@0.17.14",
+        "pkg:cargo/rustls-pki-types@1.15.1"
+      ],
+      "ref": "pkg:cargo/rustls-webpki@0.103.15"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
     },
     {
       "dependsOn": [
@@ -10440,6 +10626,10 @@
         "pkg:cargo/rustls@0.23.45"
       ],
       "ref": "pkg:cargo/t8@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/zeroize@1.9.1"
     },
     {
       "dependsOn": [
@@ -10722,7 +10912,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:33dcba8a-17cc-835a-b6c7-569e02979f74",
+  "serialNumber": "urn:uuid:45e9ba10-4b2b-818e-bdca-300653d2dcff",
   "specVersion": "1.7",
   "version": 1
 }

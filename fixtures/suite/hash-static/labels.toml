@@ -1,0 +1,19 @@
+# hash-static: what = hash, how = static
+
+[[site]]
+file = "src/main.rs"
+line = 8
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "algorithm held in static PRIMARY = &SHA256"
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "digest"
+function = "digest"
+must = ["SHA-512"]
+may = []
+note = "algorithm from LazyLock ARCHIVE whose initializer returns &SHA512 (R12.4)"

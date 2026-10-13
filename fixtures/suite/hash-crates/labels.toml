@@ -1,0 +1,19 @@
+# hash-crates: what = hash, how = other crates
+
+[[site]]
+file = "src/main.rs"
+line = 5
+callee = "digest"
+function = "digest"
+must = ["SHA3-256"]
+may = []
+note = "sha3::Sha3_256::digest"
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5::Md5 from package md-5, streaming: new/update are not sites, finalize is (R1.2)"

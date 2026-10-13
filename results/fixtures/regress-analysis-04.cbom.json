@@ -41,6 +41,78 @@
       "version": "1.8.5"
     },
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via inner -> sha2 -> digest -> block-buffer",
+            "line": 32,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/constant_time_eq@0.4.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked constant_time_eq 0.4.2; reached via t4 -> blake3 -> constant_time_eq",
+            "line": 57,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "constant_time_eq"
+          }
+        ]
+      },
+      "name": "constant_time_eq",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/constant_time_eq@0.4.2",
+      "type": "library",
+      "version": "0.4.2"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -285,6 +357,42 @@
       "purl": "pkg:cargo/sha2@0.10.9",
       "type": "library",
       "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via inner -> sha2 -> digest -> subtle",
+            "line": 174,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
     },
     {
       "bom-ref": "crypto:candidate:blake3@1.8.5:BLAKE3",
@@ -554,7 +662,9 @@
   ],
   "dependencies": [
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "pkg:cargo/constant_time_eq@0.4.2"
+      ],
       "provides": [
         "crypto:candidate:blake3@1.8.5:BLAKE3"
       ],
@@ -562,11 +672,21 @@
     },
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/constant_time_eq@0.4.2"
+    },
+    {
+      "dependsOn": [],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -609,6 +729,10 @@
         "crypto:candidate:sha2@0.10.9:SHA-2"
       ],
       "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
     },
     {
       "dependsOn": [
@@ -700,7 +824,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:25c29d7a-39c9-8d6b-933b-af06e96aadcc",
+  "serialNumber": "urn:uuid:9a2c3701-20da-8024-9f1d-01b49976d169",
   "specVersion": "1.7",
   "version": 1
 }

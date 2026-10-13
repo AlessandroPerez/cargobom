@@ -2,6 +2,42 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via v01 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -166,10 +202,15 @@
   "dependencies": [
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
       "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
         "pkg:cargo/crypto-common@0.1.7"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
@@ -252,7 +293,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e5590fa8-9788-8719-9403-98ee928e3c9b",
+  "serialNumber": "urn:uuid:31c2a2f0-f102-8791-b80e-a7919b9a9e95",
   "specVersion": "1.7",
   "version": 1
 }

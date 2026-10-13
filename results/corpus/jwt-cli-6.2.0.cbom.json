@@ -73,6 +73,42 @@
       "version": "9.2.0"
     },
     {
+      "bom-ref": "pkg:cargo/pem@3.0.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked pem 3.0.3; reached via jwt-cli -> jsonwebtoken -> pem",
+            "line": 608,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "pem"
+          }
+        ]
+      },
+      "name": "pem",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/pem@3.0.3",
+      "type": "library",
+      "version": "3.0.3"
+    },
+    {
       "bom-ref": "pkg:cargo/ring@0.17.7",
       "evidence": {
         "occurrences": [
@@ -1958,6 +1994,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/pem@3.0.3",
         "pkg:cargo/ring@0.17.7"
       ],
       "provides": [
@@ -1976,6 +2013,10 @@
         "pkg:cargo/jsonwebtoken@9.2.0"
       ],
       "ref": "pkg:cargo/jwt-cli@6.2.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/pem@3.0.3"
     },
     {
       "dependsOn": [
@@ -2170,7 +2211,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:232af7b0-3a75-85f2-86bb-e4016feac925",
+  "serialNumber": "urn:uuid:66bf4734-96bd-8277-a2b8-d399253b8ace",
   "specVersion": "1.7",
   "version": 1
 }

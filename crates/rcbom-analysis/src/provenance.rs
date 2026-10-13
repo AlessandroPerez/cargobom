@@ -720,6 +720,25 @@ fn direct_data(
     }
 }
 
+/// A standard-library call that stores a value in a container (`Vec::push`, `HashMap::insert`).
+fn container_store(callee: &str) -> bool {
+    const STORES: &[&str] = &[
+        "Vec::push",
+        "Vec::insert",
+        "VecDeque::push_back",
+        "VecDeque::push_front",
+        "VecDeque::insert",
+        "HashMap::insert",
+        "BTreeMap::insert",
+        "HashSet::insert",
+        "BTreeSet::insert",
+        "Extend::extend",
+    ];
+    let bare = strip_generics(callee);
+    (bare.starts_with("alloc::") || bare.starts_with("std::") || bare.starts_with("core::"))
+        && STORES.iter().any(|s| bare.ends_with(s))
+}
+
 /// The static a field read reads from (`TABLE.inner.alg`).
 fn static_root(o: &Origin) -> Option<&DefRef> {
     match crate::links::peel(o) {
@@ -779,6 +798,25 @@ fn receiver_data(
         return;
     }
     match o {
+        // a container built by stores (`v.push(&SHA256); v.push(&SHA512)`, `m.insert(k, key)`):
+        // a read of it is any value stored (flow-insensitive), so every stored value's chain
+        // and the container's earlier stores are followed
+        Origin::Call { args, callee, .. } if container_store(callee) => {
+            for a in args.iter().skip(1) {
+                // a descriptor stored itself (`v.push(&SHA256)`), or a value built from one
+                let mut here = Vec::new();
+                direct_data(kb, links, a, 0, &mut here, seen);
+                for d in here {
+                    if !out.contains(&d) {
+                        out.push(d);
+                    }
+                }
+                receiver_data(kb, links, a, depth + 1, out, seen, lengths);
+            }
+            if let Some(c) = args.first() {
+                receiver_data(kb, links, c, depth + 1, out, seen, lengths);
+            }
+        }
         Origin::Call { args, callee, .. } => {
             let mut here = Vec::new();
             let skip = if lengths {

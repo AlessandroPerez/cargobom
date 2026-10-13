@@ -22,7 +22,9 @@
   occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:9:0 | aes-gcm | [manifest] declared by t16 (dependencies)
   occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.lock:53:0 | blake3 | [manifest] locked blake3 1.8.5; reached via t16 -> blake3
   occ blake3 | pkg:cargo/blake3@1.8.5 | Cargo.toml:12:0 | blake3 | [manifest] declared by t16 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:67:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via t16 -> pbkdf2 -> digest -> block-buffer
   occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:92:0 | cipher | [manifest] locked cipher 0.4.4; reached via t16 -> aes-gcm -> cipher
+  occ constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | Cargo.lock:102:0 | constant_time_eq | [manifest] locked constant_time_eq 0.4.2; reached via t16 -> blake3 -> constant_time_eq
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:126:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t16 -> aes-gcm -> aead -> crypto-common
   occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:137:0 | ctr | [manifest] locked ctr 0.9.2; reached via t16 -> aes-gcm -> ctr
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:146:0 | digest | [manifest] locked digest 0.10.7; reached via t16 -> pbkdf2 -> digest
@@ -32,12 +34,14 @@
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:224:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t16 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:11:0 | pbkdf2 | [manifest] declared by t16 (dependencies); features ["hmac"]; default-features = false
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:234:0 | polyval | [manifest] locked polyval 0.6.2; reached via t16 -> aes-gcm -> ghash -> polyval
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:246:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via t16 -> rand -> rand_chacha -> ppv-lite86
   occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:273:0 | rand | [manifest] locked rand 0.8.8; reached via t16 -> rand
   occ rand | pkg:cargo/rand@0.8.8 | Cargo.toml:13:0 | rand | [manifest] declared by t16 (dependencies)
   occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:284:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via t16 -> rand -> rand_chacha
   occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:294:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t16 -> rand -> rand_core
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:303:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t16 -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:10:0 | sha2 | [manifest] declared by t16 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:320:0 | subtle | [manifest] locked subtle 2.6.1; reached via t16 -> aes-gcm -> subtle
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:360:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t16 -> aes-gcm -> ghash -> polyval -> universal-hash
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
@@ -81,8 +85,16 @@
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:crypto-role=algorithm
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:scope=required
   prop blake3 | pkg:cargo/blake3@1.8.5 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:crypto-role=support
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:kb-coverage=unmodelled
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:usage=reachable
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
@@ -105,6 +117,10 @@
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=present
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=declared-not-used
@@ -117,6 +133,10 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
@@ -127,7 +147,9 @@ component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
 component library blake3 1.8.5 | pkg:cargo/blake3@1.8.5 | purl pkg:cargo/blake3@1.8.5
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library constant_time_eq 0.4.2 | pkg:cargo/constant_time_eq@0.4.2 | purl pkg:cargo/constant_time_eq@0.4.2
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
@@ -136,10 +158,12 @@ component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
 component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
 component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:SHA-256
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
@@ -148,11 +172,15 @@ dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/blake3@1.8.5 -> pkg:cargo/constant_time_eq@0.4.2
 dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
@@ -160,6 +188,7 @@ dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
 dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
@@ -169,6 +198,7 @@ dep pkg:cargo/t16@0.1.0 -> pkg:cargo/pbkdf2@0.12.2
 dep pkg:cargo/t16@0.1.0 -> pkg:cargo/rand@0.8.8
 dep pkg:cargo/t16@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:BLAKE3-256
 dependency crypto:algorithm:PBKDF2-SHA-256-600000-32
@@ -177,7 +207,9 @@ dependency pkg:cargo/aead@0.5.2
 dependency pkg:cargo/aes-gcm@0.10.3
 dependency pkg:cargo/aes@0.8.4
 dependency pkg:cargo/blake3@1.8.5
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/constant_time_eq@0.4.2
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/ctr@0.9.2
 dependency pkg:cargo/digest@0.10.7
@@ -186,10 +218,12 @@ dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/ppv-lite86@0.2.21
 dependency pkg:cargo/rand@0.8.8
 dependency pkg:cargo/rand_chacha@0.3.1
 dependency pkg:cargo/rand_core@0.6.4
 dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
 dependency pkg:cargo/t16@0.1.0
 dependency pkg:cargo/universal-hash@0.5.1
 doc bomFormat="CycloneDX"

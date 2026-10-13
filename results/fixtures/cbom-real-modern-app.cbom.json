@@ -30,6 +30,42 @@
       "version": "0.5.2"
     },
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via cbom-real-modern-app -> sha1 -> digest -> block-buffer",
+            "line": 16,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/chacha20@0.9.1",
       "evidence": {
         "occurrences": [
@@ -374,6 +410,42 @@
       "version": "0.10.6"
     },
     {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via cbom-real-modern-app -> chacha20poly1305 -> poly1305 -> universal-hash -> subtle",
+            "line": 214,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
       "bom-ref": "pkg:cargo/universal-hash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -400,6 +472,42 @@
       "purl": "pkg:cargo/universal-hash@0.5.1",
       "type": "library",
       "version": "0.5.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/zeroize@1.8.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked zeroize 1.8.2; reached via cbom-real-modern-app -> chacha20poly1305 -> zeroize",
+            "line": 327,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "zeroize"
+          }
+        ]
+      },
+      "name": "zeroize",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/zeroize@1.8.2",
+      "type": "library",
+      "version": "1.8.2"
     },
     {
       "bom-ref": "crypto:algorithm:ChaCha20-Poly1305",
@@ -527,6 +635,10 @@
       "ref": "pkg:cargo/aead@0.5.2"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/chacha20poly1305@0.10.1",
         "pkg:cargo/ring@0.17.14",
@@ -548,7 +660,8 @@
         "pkg:cargo/aead@0.5.2",
         "pkg:cargo/chacha20@0.9.1",
         "pkg:cargo/cipher@0.4.4",
-        "pkg:cargo/poly1305@0.8.0"
+        "pkg:cargo/poly1305@0.8.0",
+        "pkg:cargo/zeroize@1.8.2"
       ],
       "provides": [
         "crypto:algorithm:ChaCha20-Poly1305"
@@ -557,7 +670,8 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/zeroize@1.8.2"
       ],
       "ref": "pkg:cargo/cipher@0.4.4"
     },
@@ -569,6 +683,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
         "pkg:cargo/crypto-common@0.1.7"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
@@ -605,10 +720,19 @@
       "ref": "pkg:cargo/sha1@0.10.6"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/universal-hash@0.5.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/zeroize@1.8.2"
     },
     {
       "dependsOn": [],
@@ -677,7 +801,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c23dd4eb-b11a-8523-8e9d-12bab3750479",
+  "serialNumber": "urn:uuid:3ed11aa7-e2a2-854a-98c9-416855807428",
   "specVersion": "1.7",
   "version": 1
 }

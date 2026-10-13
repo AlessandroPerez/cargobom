@@ -1,0 +1,19 @@
+# jwt-field: what = JWT, how = field
+
+[[site]]
+file = "src/main.rs"
+line = 16
+callee = "encode"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "ES256 stored in JwtConfig.alg, read in mint()"
+
+[[site]]
+file = "src/main.rs"
+line = 23
+callee = "decode"
+function = "verify"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "same field read in accept()"

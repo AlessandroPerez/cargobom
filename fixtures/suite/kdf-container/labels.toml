@@ -1,0 +1,21 @@
+# kdf-container: what = KDF, how = container
+
+[[site]]
+file = "src/main.rs"
+line = 11
+callee = "derive"
+function = "keyderive"
+must = ["PBKDF2-SHA-1"]
+may = ["PBKDF2-SHA-256"]
+params = { iterations = "4096", length = "20" }
+note = "prfs[0]; prfs[1] is another element of the same Vec"
+
+[[site]]
+file = "src/main.rs"
+line = 13
+callee = "derive"
+function = "keyderive"
+must = ["PBKDF2-SHA-256"]
+may = ["PBKDF2-SHA-1"]
+params = { iterations = "310000", length = "32" }
+note = "prfs[1]"

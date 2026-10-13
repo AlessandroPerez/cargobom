@@ -1,0 +1,37 @@
+# sig-field: what = signature, how = field
+
+[[site]]
+file = "src/main.rs"
+line = 16
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = []
+note = "message hash before signing (first Sha384::digest)"
+
+[[site]]
+file = "src/main.rs"
+line = 17
+callee = "sign"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-384"]
+may = []
+note = "padding value Pkcs1v15Sign::new::<Sha384>() stored in field scheme, read in sign()"
+
+[[site]]
+file = "src/main.rs"
+line = 22
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = []
+note = "message hash before verifying (second Sha384::digest)"
+
+[[site]]
+file = "src/main.rs"
+line = 23
+callee = "verify"
+function = "verify"
+must = ["RSA-PKCS1-1.5-SHA-384"]
+may = []
+note = "same field read in check()"

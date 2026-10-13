@@ -1,0 +1,19 @@
+# sig-container: what = signature, how = container
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "Ed25519KeyPair read back from a Vec"
+
+[[site]]
+file = "src/main.rs"
+line = 12
+callee = "verify"
+function = "verify"
+must = ["Ed25519"]
+may = ["ECDSA-P-384-SHA-384"]
+note = "verifiers[1] is ED25519; verifiers[0] (ECDSA P-384) is another element of the same Vec"

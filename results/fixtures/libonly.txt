@@ -10,6 +10,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:15:6 | digest::mac::Mac::finalize | [reachable] [component] in libonly::tag::<..>; part of HMAC-SHA-256; instantiated by libonly::tag_sha256 at src/lib.rs:20:4; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:20:4 | libonly::tag | [reachable] [component] in libonly::tag_sha256; part of HMAC-SHA-256; line: `tag::<Hmac<Sha256>>(key, data)`; code: `tag::<Hmac<Sha256>>`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:8:4 | digest::digest::Digest::digest | [reachable] [call] in libonly::fingerprint; use: digest; line: `Sha256::digest(data).into()`; code: `Sha256::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via libonly -> hmac -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via libonly -> hmac -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via libonly -> hmac -> digest
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via libonly -> hmac
@@ -18,6 +19,7 @@
   occ md5 | pkg:cargo/md5@0.7.0 | Cargo.toml:11:0 | md5 | [manifest] declared by libonly (dependencies)
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:91:0 | sha2 | [manifest] locked sha2 0.10.9; reached via libonly -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:10:0 | sha2 | [manifest] declared by libonly (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:102:0 | subtle | [manifest] locked subtle 2.6.1; reached via libonly -> hmac -> digest -> subtle
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
@@ -37,6 +39,10 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -50,16 +56,24 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
 component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/libonly@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/libonly@0.1.0 -> pkg:cargo/md5@0.7.0
@@ -68,12 +82,14 @@ dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:MD5
 dependency crypto:algorithm:SHA-256
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/libonly@0.1.0
 dependency pkg:cargo/md5@0.7.0
 dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

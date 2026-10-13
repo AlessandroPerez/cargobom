@@ -41,6 +41,18 @@ struct Raw {
     produces: Vec<ProducesRaw>,
     #[serde(rename = "operation", default)]
     operations: Vec<OperationRaw>,
+    #[serde(default)]
+    unmodelled: UnmodelledRaw,
+}
+
+/// Layer 1 for packages without `[[crate]]` entries: which are cryptographic anyway.
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct UnmodelledRaw {
+    #[serde(default)]
+    crypto: Vec<String>,
+    #[serde(default)]
+    support: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -54,6 +66,10 @@ struct OperationRaw {
     function: String,
     #[serde(default)]
     algorithm: usize,
+    #[serde(default)]
+    self_type: bool,
+    #[serde(default)]
+    setup: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -134,6 +150,22 @@ pub struct OperationEntry {
     pub function: String,
     /// The value argument that carries the algorithm (the receiver is argument 0).
     pub algorithm: usize,
+    /// The algorithm is the Self type of the call (RustCrypto traits: `Digest::digest` on
+    /// `Sha3_256`), not a value.
+    pub self_type: bool,
+    /// The call sets the algorithm up (`Digest::new`, `KeyInit::new`) without using it: its
+    /// occurrence has no use.
+    pub setup: bool,
+}
+
+/// A package the knowledge base has no `[[crate]]` entry for, recognised as cryptographic from
+/// its metadata or the `[unmodelled]` lists.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Unmodelled {
+    /// It implements, wraps or binds cryptography; its APIs are not in the knowledge base.
+    Crypto,
+    /// Crypto-adjacent: encodings of keys and certificates, buffers, constant-time helpers.
+    Support,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
@@ -381,6 +413,14 @@ pub struct Kb {
     pub seeded: Vec<SourceEntry>,
     pub produces: Vec<ProducesEntry>,
     pub operations: Vec<OperationEntry>,
+    /// Packages without `[[crate]]` entries that are cryptographic although their metadata does
+    /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
+    pub unmodelled_crypto: Vec<String>,
+    pub unmodelled_support: Vec<String>,
+    /// The crates of the build being analysed, by name: the package each one comes from. Set
+    /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
+    /// library is named `md5`, like the package md5's).
+    crate_packages: std::sync::RwLock<std::collections::HashMap<String, String>>,
 }
 
 /// `cryptoFunctions` values CycloneDX 1.7 accepts.
@@ -575,9 +615,14 @@ impl Kb {
                         primitive: o.primitive,
                         function: o.function,
                         algorithm: o.algorithm,
+                        self_type: o.self_type,
+                        setup: o.setup,
                     })
                 })
                 .collect::<Result<_>>()?,
+            unmodelled_crypto: raw.unmodelled.crypto,
+            unmodelled_support: raw.unmodelled.support,
+            crate_packages: Default::default(),
         };
         kb.validate()?;
         Ok(kb)
@@ -648,7 +693,8 @@ impl Kb {
             }
         }
         for o in &self.operations {
-            if !FUNCTIONS.contains(&o.function.as_str()) {
+            // `encrypt or decrypt`: a call that does either (`apply_keystream`)
+            if !o.function.split(" or ").all(|f| FUNCTIONS.contains(&f)) {
                 bail!(
                     "[[operation]] {}: use {:?} is not a CycloneDX cryptoFunction",
                     o.pattern,
@@ -690,22 +736,65 @@ impl Kb {
             .find(|c| c.package == package && c.versions.matches(version))
     }
 
+    /// The `[[crate]]` entry of a crate of the build, any version. Once the build's crates are
+    /// bound (`bind_crates`), by the package the crate comes from; before, by the crate name the
+    /// entry's package would have.
     pub fn crate_by_name(&self, crate_name: &str) -> Option<&CrateEntry> {
-        self.crates.iter().find(|c| c.crate_name() == crate_name)
+        let bound = self
+            .crate_packages
+            .read()
+            .unwrap_or_else(|e| e.into_inner());
+        if bound.is_empty() {
+            return self.crates.iter().find(|c| c.crate_name() == crate_name);
+        }
+        let package = bound.get(crate_name)?;
+        self.crates.iter().find(|c| &c.package == package)
     }
 
-    /// Crates the driver must report sites for.
-    pub fn crate_names(&self) -> Vec<String> {
-        self.crates.iter().map(|c| c.crate_name()).collect()
+    /// Records the package each crate of the build comes from (crate name -> package name).
+    pub fn bind_crates(&self, crates: std::collections::HashMap<String, String>) {
+        *self
+            .crate_packages
+            .write()
+            .unwrap_or_else(|e| e.into_inner()) = crates;
     }
 
-    /// Crates whose bodies the reachability walk does not enter.
-    pub fn stop_crate_names(&self) -> Vec<String> {
-        self.crates
-            .iter()
-            .filter(|c| c.role != Role::Protocol)
-            .map(|c| c.crate_name())
-            .collect()
+    /// Is a package without a `[[crate]]` entry cryptographic, from its `Cargo.toml` metadata:
+    /// a `cryptography` category or a crypto keyword, or the `[unmodelled]` crypto list (for
+    /// packages whose metadata says nothing)? Among those, encodings, parsers, memory wipers
+    /// and the `[unmodelled]` support list are support crates; the list never makes a package
+    /// cryptographic by itself.
+    pub fn unmodelled(
+        &self,
+        package: &str,
+        categories: &[String],
+        keywords: &[String],
+    ) -> Option<Unmodelled> {
+        if self.unmodelled_crypto.iter().any(|p| p == package) {
+            return Some(Unmodelled::Crypto);
+        }
+        let crypto = categories.iter().any(|c| c == "cryptography")
+            || keywords.iter().any(|k| {
+                matches!(
+                    k.as_str(),
+                    "crypto" | "cryptography" | "encryption" | "tls" | "certificate" | "x509"
+                )
+            });
+        if !crypto {
+            return None;
+        }
+        let support = self.unmodelled_support.iter().any(|p| p == package)
+            || categories.iter().any(|c| {
+                matches!(
+                    c.as_str(),
+                    "encoding" | "parser-implementations" | "memory-management"
+                )
+            });
+        Some(if support {
+            Unmodelled::Support
+        } else {
+            Unmodelled::Crypto
+        })
     }
 
     /// The `[[operation]]` entry of a callee: its crate name and its path inside the crate,
@@ -778,6 +867,51 @@ mod tests {
             1,
         );
         assert!(Kb::parse(&bad).is_err());
+    }
+
+    #[test]
+    fn unmodelled_packages_from_metadata() {
+        let kb = Kb::seed().unwrap();
+        let v = |xs: &[&str]| xs.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+        let crypto = Some(Unmodelled::Crypto);
+        let support = Some(Unmodelled::Support);
+        // ml-kem: a cryptography category; der: an encoding too; rustls-platform-verifier:
+        // keywords only; age-core: no metadata, listed; block-buffer: listed as support
+        assert_eq!(
+            kb.unmodelled("ml-kem", &v(&["cryptography", "no-std"]), &v(&[])),
+            crypto
+        );
+        assert_eq!(
+            kb.unmodelled("der", &v(&["cryptography", "encoding"]), &v(&[])),
+            support
+        );
+        assert_eq!(
+            kb.unmodelled("x", &v(&[]), &v(&["tls", "certificate"])),
+            crypto
+        );
+        assert_eq!(kb.unmodelled("age-core", &v(&[]), &v(&[])), crypto);
+        assert_eq!(
+            kb.unmodelled("block-buffer", &v(&["cryptography"]), &v(&[])),
+            support
+        );
+        assert_eq!(
+            kb.unmodelled("serde", &v(&["encoding"]), &v(&["serde"])),
+            None
+        );
+    }
+
+    #[test]
+    fn bound_crates_are_looked_up_by_package() {
+        let kb = Kb::seed().unwrap();
+        // before binding, by name: the package md5 (0.7) has the crate md5
+        assert_eq!(
+            kb.crate_by_name("md5").map(|c| c.package.as_str()),
+            Some("md5")
+        );
+        // in a build whose crate md5 comes from the package md-5, it is not md5's entry
+        kb.bind_crates([("md5".to_string(), "md-5".to_string())].into());
+        assert!(kb.crate_by_name("md5").is_none());
+        assert!(kb.crate_by_name("ring").is_none());
     }
 
     #[test]

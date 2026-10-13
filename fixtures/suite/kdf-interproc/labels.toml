@@ -1,0 +1,11 @@
+# kdf-interproc: what = KDF, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "derive"
+function = "keyderive"
+must = ["PBKDF2-SHA-512"]
+may = []
+params = { iterations = "210000", length = "64" }
+note = "algorithm returned by strong_prf, passed main->enroll->stretch; out is enroll's 64-byte array"

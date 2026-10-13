@@ -1,0 +1,28 @@
+# sig-dyn: what = signature, how = dyn
+
+[[site]]
+file = "src/main.rs"
+line = 24
+callee = "generate_pkcs8"
+function = "keygen"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "algorithm from dyn Suite::signer"
+
+[[site]]
+file = "src/main.rs"
+line = 27
+callee = "sign"
+function = "sign"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "key pair built with suite.signer()"
+
+[[site]]
+file = "src/main.rs"
+line = 29
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "algorithm from dyn Suite::verifier"

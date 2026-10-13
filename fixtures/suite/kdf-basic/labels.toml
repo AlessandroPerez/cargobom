@@ -1,0 +1,30 @@
+# kdf-basic: what = KDF, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "pbkdf2_hmac"
+function = "keyderive"
+must = ["PBKDF2-SHA-256"]
+may = []
+params = { iterations = "600000", length = "32" }
+note = "PRF HMAC-SHA-256; output buffer 32 bytes"
+
+[[site]]
+file = "src/main.rs"
+line = 8
+callee = "new"
+function = "keyderive"
+must = ["HKDF-SHA-256"]
+may = []
+note = "Hkdf::new performs HKDF-Extract (documented as extract)"
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "expand"
+function = "keyderive"
+must = ["HKDF-SHA-256"]
+may = []
+params = { length = "42" }
+note = "HKDF-Expand into a 42-byte buffer"

@@ -1,0 +1,10 @@
+# jwt-config: what = JWT, how = algorithm from configuration
+
+[[site]]
+file = "src/main.rs"
+line = 19
+callee = "encode"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384", "Ed25519", "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512", "RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512", "RSA-PSS-SHA-256", "RSA-PSS-SHA-384", "RSA-PSS-SHA-512"]
+may = []
+note = "alg = Algorithm::from_str(args[1] or \"HS256\") can be any of the 12; key_for picks a key of the matching family (P-384 key for ES384), so every one is signed (R15.1); parse results never in may (R15.2); mixed MAC/signature -> sign (R15.3)"

@@ -3115,12 +3115,17 @@ impl Files<'_> {
                         ));
                     }
                     // the macro's line names the symbol, or the call passes it in
-                    // (`hash_with!(SHA384)` for a body calling `digest(&$alg, ..)`)
+                    // (`hash_with!(SHA384)` for a body calling `digest(&$alg, ..)`): the line
+                    // then uses a metavariable, which a matcher's `$alg:expr` only declares
                     let sym = strip_generics(symbol);
                     let ident = sym.rsplit("::").next().unwrap_or(&sym);
                     let word = Regex::new(&format!(r"\b{}\b", regex::escape(ident))).unwrap();
-                    if !word.is_match(&src.lines[line - 1])
-                        && !call_line.is_some_and(|l| word.is_match(l))
+                    let text = &src.lines[line - 1];
+                    let uses_metavar = re!(r"\$\w+")
+                        .find_iter(text)
+                        .any(|m| !text[m.end()..].trim_start().starts_with(':'));
+                    if !word.is_match(text)
+                        && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l)))
                     {
                         return Err(format!(
                             "`{part}`: line {line} of the macro does not name `{ident}`"

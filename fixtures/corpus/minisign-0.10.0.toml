@@ -1,0 +1,147 @@
+# Ground truth for minisign-0.10.0: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: minisign 0.10.0 (/var/tmp/rcbom-validate/minisign-0.10.0)
+# Library-only package: analysed as its public API (all pub items reachable from lib.rs are roots),
+# default features, host x86_64-unknown-linux-gnu, release profile.
+# minisign's own Ed25519 / Curve25519 / SHA-512 / BLAKE2b code (src/crypto/) is hand-written and
+# out of scope: calls into it are not sites. src/tests.rs is #[cfg(test)] and out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "ct-codecs"
+version = "1.1.7"
+kind = "support"
+why = "constant-time base64/hex codecs for key and signature encoding"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs"
+
+[[package]]
+name = "getrandom"
+version = "0.4.3"
+kind = "rng"
+why = "OS random number source (getrandom::fill) for seeds, key ids, KDF salts and signature noise"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC used by pbkdf2 inside scrypt"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types used only by cipher modes"
+
+[[package]]
+name = "pbkdf2"
+version = "0.12.2"
+kind = "algorithm"
+why = "PBKDF2 used inside scrypt"
+
+[[package]]
+name = "salsa20"
+version = "0.10.2"
+kind = "algorithm"
+why = "Salsa20 stream cipher / Salsa20/8 core used by scrypt"
+
+[[package]]
+name = "scrypt"
+version = "0.11.0"
+kind = "algorithm"
+why = "scrypt password-based KDF"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-256 for scrypt's internal PBKDF2-HMAC-SHA-256"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/keypair.rs"
+line = 31
+callee = "getrandom"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "getrandom::fill (imported as getrandom) fills the 32-byte Ed25519 seed from the OS RNG; reached from pub KeyPair::generate_unencrypted_keypair"
+
+[[site]]
+file = "src/keypair.rs"
+line = 34
+callee = "getrandom"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "getrandom::fill draws the 8-byte key id (keynum) from the OS RNG"
+
+[[site]]
+file = "src/keypair.rs"
+line = 71
+callee = "getrandom"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "getrandom::fill draws the 32-byte scrypt salt from the OS RNG; reached from pub KeyPair::generate_encrypted_keypair"
+
+[[site]]
+file = "src/lib.rs"
+line = 99
+callee = "getrandom"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "getrandom::fill draws 64 bytes of signature noise passed to minisign's own ed25519::signature; reached from pub sign"
+
+[[site]]
+file = "src/lib.rs"
+line = 107
+callee = "getrandom"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "getrandom::fill redraws the noise for the global (trusted-comment) signature; reached from pub sign"
+
+[[site]]
+file = "src/secret_key.rs"
+line = 138
+callee = "scrypt"
+function = "keyderive"
+must = ["scrypt"]
+may = []
+params = { length = "104" }
+note = "scrypt::scrypt derives the keystream XORed over the secret key (encrypt and decrypt); output buffer is CHK_BYTES+SECRETKEY_BYTES+KEYNUM_BYTES = 32+64+8; N/r/p come from the key file on decrypt (N=2^15,r=8,p=1 on generate)"

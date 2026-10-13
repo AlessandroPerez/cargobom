@@ -1,0 +1,19 @@
+# jwt-container: what = JWT, how = container
+
+[[site]]
+file = "src/main.rs"
+line = 13
+callee = "encode"
+function = "tag"
+must = ["HMAC-SHA-512"]
+may = ["HMAC-SHA-256"]
+note = "keyring[\"2024\"] is HS512; \"2023\" (HS256) is another value of the same map"
+
+[[site]]
+file = "src/main.rs"
+line = 18
+callee = "decode"
+function = "verify"
+must = ["HMAC-SHA-512"]
+may = ["HMAC-SHA-256"]
+note = "lookup by kid parsed from the token, always \"2024\" here; key is data-dependent"

@@ -1,0 +1,210 @@
+# Ground truth for xh-0.26.2: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: xh 0.26.2 (/var/tmp/rcbom-validate/xh-0.26.2)
+# Build analysed: default features ["online-tests", "rustls", "network-interface"], host
+# x86_64-unknown-linux-gnu, release build of bin "xh" (src/main.rs). Feature http-message-signatures
+# is off: src/message_signature.rs (mod gated at main.rs:11) is cfg-disabled and its sites carry
+# must = [] and may = [] (R1.5). reqwest 0.13.4 builds the rustls ClientConfig internally with the
+# aws-lc-rs provider (reqwest features __rustls, __rustls-aws-lc-rs). Run-time certificates (--verify,
+# --cert) and TLS version pinning (--ssl) are out of scope. #[cfg(test)] code is out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aws-lc-rs"
+version = "1.17.3"
+kind = "algorithm"
+why = "ring-compatible crypto library (AEAD, digests, HMAC, ECDSA/Ed25519/RSA, key agreement) backed by AWS-LC"
+
+[[package]]
+name = "aws-lc-sys"
+version = "0.43.0"
+kind = "binding"
+why = "-sys FFI binding that builds and links the AWS-LC C crypto library"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.6"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs"
+
+[[package]]
+name = "digest_auth"
+version = "0.3.1"
+kind = "protocol"
+why = "HTTP Digest access authentication (RFC 7616) computing MD5/SHA-256/SHA-512-256 responses"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source seeding rand ThreadRng"
+
+[[package]]
+name = "hyper-rustls"
+version = "0.27.9"
+kind = "protocol"
+why = "hyper connector wrapping rustls TLS (built with the aws-lc-rs provider)"
+
+[[package]]
+name = "md-5"
+version = "0.10.6"
+kind = "algorithm"
+why = "MD5 hash implementation used by digest_auth"
+
+[[package]]
+name = "openssl-probe"
+version = "0.2.1"
+kind = "support"
+why = "locates system trust-anchor (root CA) bundle paths for rustls-native-certs"
+
+[[package]]
+name = "pem"
+version = "3.0.6"
+kind = "support"
+why = "PEM encoding/decoding of keys and certificates"
+
+[[package]]
+name = "ppv-lite86"
+version = "0.2.21"
+kind = "support"
+why = "cryptography-oriented SIMD backend used only by rand_chacha's ChaCha core"
+
+[[package]]
+name = "rand"
+version = "0.8.7"
+kind = "rng"
+why = "random number generation; digest_auth draws the cnonce from thread_rng (ChaCha12)"
+
+[[package]]
+name = "rand_chacha"
+version = "0.3.1"
+kind = "rng"
+why = "ChaCha-based CSPRNG (StdRng)"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits (RngCore/CryptoRng) and OsRng via getrandom"
+
+[[package]]
+name = "rustls"
+version = "0.23.42"
+kind = "protocol"
+why = "TLS 1.2/1.3 implementation used by reqwest (aws-lc-rs provider, tls12)"
+
+[[package]]
+name = "rustls-native-certs"
+version = "0.8.4"
+kind = "pki"
+why = "loads root certificates from the platform trust store"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.15.1"
+kind = "pki"
+why = "shared X.509/PKI types (certificate and private-key DER wrappers, PEM parsing)"
+
+[[package]]
+name = "rustls-platform-verifier"
+version = "0.7.0"
+kind = "pki"
+why = "TLS server certificate verification using the platform verifier/roots"
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.13"
+kind = "pki"
+why = "WebPKI X.509 certificate path validation and signature verification (aws-lc-rs backend)"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-2 implementation used by digest_auth (SHA-256, SHA-512/256)"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "tokio-rustls"
+version = "0.26.4"
+kind = "protocol"
+why = "async TLS streams wrapping rustls (aws-lc-rs provider)"
+
+[[package]]
+name = "zeroize"
+version = "1.9.0"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/auth.rs"
+line = 88
+callee = "respond"
+function = "digest"
+must = ["MD5", "SHA-256", "SHA-512/256"]
+may = []
+note = "digest_auth WwwAuthenticateHeader::respond computes the HTTP Digest response with the hash named by the server challenge: MD5 (default, also -sess), SHA-256, SHA-512-256 (digest_auth enums.rs:36-64); reached for -A digest on a 401"
+
+[[site]]
+file = "src/message_signature.rs"
+line = 45
+callee = "set_message_signature_sync"
+function = "sign"
+must = []
+may = []
+note = "httpsig-hyper MessageSignatureReqSync::set_message_signature_sync (RFC 9421 request signing); module gated on feature http-message-signatures, off by default (R1.5)"
+
+[[site]]
+file = "src/message_signature.rs"
+line = 134
+callee = "digest"
+function = "digest"
+must = []
+may = []
+note = "sha2 Sha256::digest of the request body for Content-Digest; feature http-message-signatures off by default (R1.5)"
+
+[[site]]
+file = "src/message_signature.rs"
+line = 351
+callee = "sign"
+function = "sign"
+must = []
+may = []
+note = "httpsig SecretKey::sign (Ed25519 / ECDSA P-256, P-384 / RSA PKCS#1 v1.5 SHA-256 / RSA-PSS SHA-512); feature http-message-signatures off by default (R1.5)"
+
+[[site]]
+file = "src/message_signature.rs"
+line = 352
+callee = "sign"
+function = "tag"
+must = []
+may = []
+note = "httpsig SharedKey::sign (HMAC-SHA-256); feature http-message-signatures off by default (R1.5)"
+
+[[protocol]]
+file = "src/main.rs"
+line = 157
+what = "reqwest ClientBuilder::use_rustls_tls: rustls ClientConfig built by reqwest with the aws-lc-rs provider (rustls::crypto::aws_lc_rs::default_provider), default cipher suites and kx groups, TLS 1.2 and 1.3 (tls12), server certs verified by rustls-platform-verifier (webpki + native roots on Linux)"

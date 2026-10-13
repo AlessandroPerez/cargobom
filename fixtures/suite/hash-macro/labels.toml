@@ -1,0 +1,19 @@
+# hash-macro: what = hash, how = macro
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "fingerprint! expands to digest::digest($alg, ..); site at the invocation line (R12.1), $alg = &SHA256"
+
+[[site]]
+file = "src/main.rs"
+line = 11
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = []
+note = "second invocation, $alg = &SHA384 (R12.1)"

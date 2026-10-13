@@ -1,0 +1,19 @@
+# mac-container: what = MAC, how = container (HashMap)
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "sign"
+function = "tag"
+must = ["HMAC-SHA-384"]
+may = ["HMAC-SHA-256"]
+note = "keys[\"v2\"] is the HMAC_SHA384 key; \"v1\" (HMAC_SHA256) is another value of the same map"
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "verify"
+function = "verify"
+must = ["HMAC-SHA-384"]
+may = ["HMAC-SHA-256"]
+note = "keys[\"v2\"] again"

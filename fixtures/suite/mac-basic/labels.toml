@@ -1,0 +1,19 @@
+# mac-basic: what = MAC, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "finalize"
+function = "tag"
+must = ["HMAC-SHA-256"]
+may = []
+note = "Hmac<Sha256>: new_from_slice/update are not sites; finalize produces the tag"
+
+[[site]]
+file = "src/main.rs"
+line = 13
+callee = "verify_slice"
+function = "verify"
+must = ["HMAC-SHA-256"]
+may = []
+note = "second Hmac<Sha256> checks the tag"

@@ -277,22 +277,47 @@ fn dead_blocks<'tcx>(tcx: TyCtxt<'tcx>, body: &mir::Body<'tcx>) -> Vec<bool> {
         if let mir::TerminatorKind::SwitchInt { discr, targets } = &term.kind {
             let value = match discr {
                 mir::Operand::Constant(c) => value_of(c),
-                mir::Operand::Copy(p) | mir::Operand::Move(p) if p.projection.is_empty() => block
-                    .statements
-                    .iter()
-                    .rev()
-                    .find_map(|s| match &s.kind {
-                        mir::StatementKind::Assign(a)
-                            if a.0.local == p.local && a.0.projection.is_empty() =>
-                        {
-                            Some(match &a.1 {
-                                mir::Rvalue::Use(mir::Operand::Constant(c), ..) => value_of(c),
+                mir::Operand::Copy(p) | mir::Operand::Move(p) if p.projection.is_empty() => {
+                    // the constant a local of the block was last given
+                    let constant = |local: mir::Local| {
+                        block.statements.iter().rev().find_map(|s| match &s.kind {
+                            mir::StatementKind::Assign(a)
+                                if a.0.local == local && a.0.projection.is_empty() =>
+                            {
+                                Some(match &a.1 {
+                                    mir::Rvalue::Use(mir::Operand::Constant(c), ..) => Some(c),
+                                    _ => None,
+                                })
+                            }
+                            _ => None,
+                        })
+                    };
+                    match constant(p.local) {
+                        Some(Some(c)) => value_of(c),
+                        // `match MODE` with `const MODE: Mode = Mode::Fast`: the discriminant
+                        // of the variant the constant holds
+                        _ => block
+                            .statements
+                            .iter()
+                            .rev()
+                            .find_map(|s| match &s.kind {
+                                mir::StatementKind::Assign(a)
+                                    if a.0.local == p.local && a.0.projection.is_empty() =>
+                                {
+                                    Some(match &a.1 {
+                                        mir::Rvalue::Discriminant(q) if q.projection.is_empty() => {
+                                            constant(q.local)
+                                                .flatten()
+                                                .and_then(|c| enum_discriminant(tcx, &c.const_))
+                                        }
+                                        _ => None,
+                                    })
+                                }
                                 _ => None,
                             })
-                        }
-                        _ => None,
-                    })
-                    .flatten(),
+                            .flatten(),
+                    }
+                }
                 _ => None,
             };
             if let Some(v) = value {
@@ -451,6 +476,33 @@ pub(crate) fn evaluable(tcx: TyCtxt<'_>, def: DefId, promoted: Option<mir::Promo
         },
     };
     !may_fail(tcx, body, &mut HashSet::new(), 0)
+}
+
+/// The discriminant of the enum variant a constant holds (`const MODE: Mode = Mode::Fast` is
+/// `Fast`'s), when it can be evaluated without failing.
+pub(crate) fn enum_discriminant<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    c: &mir::Const<'tcx>,
+) -> Option<rustc_middle::ty::ScalarInt> {
+    let ty = c.ty();
+    let rustc_middle::ty::Adt(adt, _) = ty.kind() else {
+        return None;
+    };
+    if !adt.is_enum() || ty.has_non_region_param() || !evaluable_const(tcx, c, None) {
+        return None;
+    }
+    let value = c
+        .eval(tcx, TypingEnv::fully_monomorphized(), rustc_span::DUMMY_SP)
+        .ok()?;
+    let variant = tcx
+        .try_destructure_mir_constant_for_user_output(value, ty)?
+        .variant?;
+    let d = adt.discriminant_for_variant(tcx, variant);
+    let size = tcx
+        .layout_of(TypingEnv::fully_monomorphized().as_query_input(d.ty))
+        .ok()?
+        .size;
+    rustc_middle::ty::ScalarInt::try_from_uint(d.val, size)
 }
 
 /// `evaluable` for a MIR constant: a named or promoted one resolved to its definition with the

@@ -1,0 +1,28 @@
+# sig-interproc: what = signature, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "generate_pkcs8"
+function = "keygen"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "algorithm from signing_alg(), passed main->issue->new_key"
+
+[[site]]
+file = "src/main.rs"
+line = 16
+callee = "sign"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "key pair returned by new_key carries the same algorithm"
+
+[[site]]
+file = "src/main.rs"
+line = 23
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "ECDSA_P256_SHA256_FIXED verification"

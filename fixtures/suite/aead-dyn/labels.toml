@@ -1,0 +1,10 @@
+# aead-dyn: what = AEAD, how = dyn
+
+[[site]]
+file = "src/main.rs"
+line = 27
+callee = "seal_in_place_append_tag"
+function = "encrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+note = "only Mobile is ever constructed/coerced to dyn Profile; Server is never constructed, so AES-256-GCM is nothing (not may)"

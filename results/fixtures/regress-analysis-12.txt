@@ -686,16 +686,21 @@
   occ TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | rustls-0.23.45/src/crypto/aws_lc_rs/tls12.rs:74:33 | aws_lc_rs::tls_prf::P_SHA384 | [reachable] [static] in rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384; line: `prf_provider: &Tls12Prf(&tls_prf::P_SHA384),`; code: `tls_prf::P_SHA384`
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:15:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via app -> rustls -> aws-lc-rs
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | Cargo.lock:25:0 | aws-lc-sys | [manifest] locked aws-lc-sys 0.45.0; reached via app -> rustls -> aws-lc-rs -> aws-lc-sys
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:38:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via app -> sha2 -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:89:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via app -> sha2 -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:99:0 | digest | [manifest] locked digest 0.10.7; reached via app -> sha2 -> digest
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:161:0 | hmac | [manifest] locked hmac 0.12.1; reached via signature -> hmac
   occ hmac | pkg:cargo/hmac@0.12.1 | signature/Cargo.toml:9:0 | hmac | [manifest] declared by signature (dependencies)
   occ rustls | pkg:cargo/rustls@0.23.45 | Cargo.lock:224:0 | rustls | [manifest] locked rustls 0.23.45; reached via app -> rustls
   occ rustls | pkg:cargo/rustls@0.23.45 | app/Cargo.toml:11:0 | rustls | [manifest] declared by app (dependencies)
+  occ rustls-pki-types | pkg:cargo/rustls-pki-types@1.15.1 | Cargo.lock:239:0 | rustls-pki-types | [manifest] locked rustls-pki-types 1.15.1; reached via app -> rustls -> rustls-pki-types
+  occ rustls-webpki | pkg:cargo/rustls-webpki@0.103.15 | Cargo.lock:248:0 | rustls-webpki | [manifest] locked rustls-webpki 0.103.15; reached via app -> rustls -> rustls-webpki
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:260:0 | sha2 | [manifest] locked sha2 0.10.9; reached via app -> sha2
   occ sha2 | pkg:cargo/sha2@0.10.9 | app/Cargo.toml:8:0 | sha2 | [manifest] declared by app (dependencies)
   occ sha2 | pkg:cargo/sha2@0.10.9 | signature/Cargo.toml:10:0 | sha2 | [manifest] declared by signature (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:285:0 | subtle | [manifest] locked subtle 2.6.1; reached via app -> rustls -> subtle
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/aws_lc_rs/hpke.rs:209:16 | rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 | [present] [via-static] in rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256_AES_128; rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 -> aws_lc_rs::agreement::X25519; line: `dh_kem: DH_KEM_X25519_HKDF_SHA256,`; code: `DH_KEM_X25519_HKDF_SHA256`
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/aws_lc_rs/hpke.rs:225:16 | rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 | [present] [via-static] in rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256_AES_256; rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 -> aws_lc_rs::agreement::X25519; line: `dh_kem: DH_KEM_X25519_HKDF_SHA256,`; code: `DH_KEM_X25519_HKDF_SHA256`
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/aws_lc_rs/hpke.rs:243:12 | rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 | [present] [via-static] in rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256_CHACHA20_POLY1305; rustls::crypto::aws_lc_rs::hpke::DH_KEM_X25519_HKDF_SHA256 -> aws_lc_rs::agreement::X25519; line: `dh_kem: DH_KEM_X25519_HKDF_SHA256,`; code: `DH_KEM_X25519_HKDF_SHA256`
@@ -716,6 +721,7 @@
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/aws_lc_rs/pq/mod.rs:15:15 | rustls::crypto::aws_lc_rs::kx::X25519 | [reachable] [via-static] in rustls::crypto::aws_lc_rs::pq::X25519MLKEM768; rustls::crypto::aws_lc_rs::kx::X25519 -> aws_lc_rs::agreement::X25519; line: `classical: kx_group::X25519,`; code: `kx_group::X25519`
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/ring/kx.rs:45:23 | aws_lc_rs::agreement::ephemeral::EphemeralPrivateKey::generate | [reachable] [call] in <rustls::crypto::aws_lc_rs::kx::KxGroup as rustls::crypto::SupportedKxGroup>::start; use: keygen; algorithm one of 3 that may reach the call from other functions: aws_lc_rs::agreement::X25519; line: `let priv_key = agreement::EphemeralPrivateKey::generate(self.agreement_algorithm, &rng)`; code: `agreement::EphemeralPrivateKey::generate`
   occ x25519 | crypto:algorithm:x25519 | rustls-0.23.45/src/crypto/ring/kx.rs:83:26 | aws_lc_rs::agreement::X25519 | [reachable] [static] in rustls::crypto::aws_lc_rs::kx::X25519; line: `agreement_algorithm: &agreement::X25519,`; code: `agreement::X25519`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:388:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via app -> rustls -> zeroize
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:functions:source=knowledge-base
@@ -1030,9 +1036,16 @@
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:crypto-role=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:kb-coverage=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -1044,16 +1057,32 @@
   prop rustls | pkg:cargo/rustls@0.23.45 | rcbom:crypto-role=protocol
   prop rustls | pkg:cargo/rustls@0.23.45 | rcbom:scope=required
   prop rustls | pkg:cargo/rustls@0.23.45 | rcbom:usage=reachable
+  prop rustls-pki-types | pkg:cargo/rustls-pki-types@1.15.1 | rcbom:crypto-role=unmodelled
+  prop rustls-pki-types | pkg:cargo/rustls-pki-types@1.15.1 | rcbom:kb-coverage=unmodelled
+  prop rustls-pki-types | pkg:cargo/rustls-pki-types@1.15.1 | rcbom:scope=required
+  prop rustls-pki-types | pkg:cargo/rustls-pki-types@1.15.1 | rcbom:usage=reachable
+  prop rustls-webpki | pkg:cargo/rustls-webpki@0.103.15 | rcbom:crypto-role=unmodelled
+  prop rustls-webpki | pkg:cargo/rustls-webpki@0.103.15 | rcbom:kb-coverage=unmodelled
+  prop rustls-webpki | pkg:cargo/rustls-webpki@0.103.15 | rcbom:scope=required
+  prop rustls-webpki | pkg:cargo/rustls-webpki@0.103.15 | rcbom:usage=reachable
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@0.1.0 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
   prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
   prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
   prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=20
   prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
 asset AES-256 | crypto:algorithm:AES-256 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
@@ -1099,12 +1128,17 @@ asset TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | {"algorithmProper
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
 component library rustls 0.23.45 | pkg:cargo/rustls@0.23.45 | purl pkg:cargo/rustls@0.23.45
+component library rustls-pki-types 1.15.1 | pkg:cargo/rustls-pki-types@1.15.1 | purl pkg:cargo/rustls-pki-types@1.15.1
+component library rustls-webpki 0.103.15 | pkg:cargo/rustls-webpki@0.103.15 | purl pkg:cargo/rustls-webpki@0.103.15
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
 component library signature 0.1.0 | pkg:cargo/signature@0.1.0 | purl pkg:cargo/signature@0.1.0
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-256-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:ECDSA-P-256-SHA-512 -> crypto:algorithm:SHA-512
@@ -1131,9 +1165,19 @@ dep pkg:cargo/app@0.1.0 -> pkg:cargo/rustls@0.23.45
 dep pkg:cargo/app@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/app@0.1.0 -> pkg:cargo/signature@0.1.0
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/rustls-pki-types@1.15.1 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/rustls-webpki@0.103.15 -> pkg:cargo/aws-lc-rs@1.18.1
+dep pkg:cargo/rustls-webpki@0.103.15 -> pkg:cargo/rustls-pki-types@1.15.1
 dep pkg:cargo/rustls@0.23.45 -> pkg:cargo/aws-lc-rs@1.18.1
+dep pkg:cargo/rustls@0.23.45 -> pkg:cargo/rustls-pki-types@1.15.1
+dep pkg:cargo/rustls@0.23.45 -> pkg:cargo/rustls-webpki@0.103.15
+dep pkg:cargo/rustls@0.23.45 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/rustls@0.23.45 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/signature@0.1.0 -> pkg:cargo/sha2@0.10.9
@@ -1183,12 +1227,17 @@ dependency crypto:protocol:TLS
 dependency pkg:cargo/app@0.1.0
 dependency pkg:cargo/aws-lc-rs@1.18.1
 dependency pkg:cargo/aws-lc-sys@0.45.0
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/rustls-pki-types@1.15.1
+dependency pkg:cargo/rustls-webpki@0.103.15
 dependency pkg:cargo/rustls@0.23.45
 dependency pkg:cargo/sha2@0.10.9
 dependency pkg:cargo/signature@0.1.0
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

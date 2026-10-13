@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 pub use cargo_metadata::PackageId;
 use cargo_metadata::{Dependency, DependencyKind, Metadata, MetadataCommand, Package};
-use rcbom_kb::{Kb, Role};
+use rcbom_kb::{Kb, Role, Unmodelled};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Scope {
@@ -50,6 +50,10 @@ pub struct Pkg {
     pub links: Option<String>,
     /// Knowledge-base role, if this is a crypto crate (known by name, any version).
     pub role: Option<Role>,
+    /// Without a knowledge-base role: cryptographic all the same, from its metadata.
+    pub unmodelled: Option<Unmodelled>,
+    /// The crate name of its library target (`md5` for the package md-5), if it has one.
+    pub lib_name: Option<String>,
     /// The knowledge base has entries for this version. A crypto crate in another version is
     /// still a crypto crate, but its APIs are not matched (`unsupported-version`).
     pub kb_supported: bool,
@@ -429,8 +433,14 @@ fn build(
                 })
         };
 
+        // a procedural macro runs in the compiler, never in the artifact
+        let unmodelled = entry
+            .is_none()
+            .then(|| kb.unmodelled(&p.name, &p.categories, &p.keywords))
+            .flatten()
+            .filter(|_| foreign && !p.targets.iter().any(|t| t.is_proc_macro()));
         let mut evidence = Vec::new();
-        if entry.is_some() {
+        if entry.is_some() || unmodelled.is_some() {
             // Direct dependency of a member: the declaring line(s).
             for m in &md.workspace_members {
                 let mp = pkgs[m];
@@ -520,6 +530,19 @@ fn build(
             features,
             links: p.links.clone(),
             role: entry.map(|e| e.role),
+            unmodelled,
+            lib_name: p
+                .targets
+                .iter()
+                .find(|t| {
+                    t.kind.iter().any(|k| {
+                        matches!(
+                            k.to_string().as_str(),
+                            "lib" | "rlib" | "dylib" | "proc-macro" | "staticlib" | "cdylib"
+                        )
+                    })
+                })
+                .map(|t| t.name.replace('-', "_")),
             kb_supported: exact.is_some(),
             candidates: exact.map(|e| e.candidates.clone()).unwrap_or_default(),
             backends,

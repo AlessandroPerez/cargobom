@@ -4,11 +4,21 @@
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:15:12 | rsa::key::RsaPrivateKey::new | [reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:12 | ring::digest::digest | [reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:20 | ring::digest::SHA256 | [reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via cbom-real-asymmetric-app -> rsa -> pkcs1 -> der -> pem-rfc7468 -> base64ct
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:18:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via cbom-real-asymmetric-app -> rsa -> digest -> block-buffer
+  occ const-oid | pkg:cargo/const-oid@0.9.6 | Cargo.lock:53:0 | const-oid | [manifest] locked const-oid 0.9.6; reached via cbom-real-asymmetric-app -> rsa -> const-oid
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:68:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via cbom-real-asymmetric-app -> rsa -> digest -> crypto-common
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | Cargo.lock:78:0 | curve25519-dalek | [manifest] locked curve25519-dalek 4.1.3; reached via cbom-real-asymmetric-app -> ed25519-dalek -> curve25519-dalek
+  occ der | pkg:cargo/der@0.7.10 | Cargo.lock:105:0 | der | [manifest] locked der 0.7.10; reached via cbom-real-asymmetric-app -> rsa -> pkcs1 -> der
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:116:0 | digest | [manifest] locked digest 0.10.7; reached via cbom-real-asymmetric-app -> rsa -> digest
+  occ ed25519 | pkg:cargo/ed25519@2.2.3 | Cargo.lock:127:0 | ed25519 | [manifest] locked ed25519 2.2.3; reached via cbom-real-asymmetric-app -> ed25519-dalek -> ed25519
   occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:137:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via cbom-real-asymmetric-app -> ed25519-dalek
   occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:9:0 | ed25519-dalek | [manifest] declared by cbom-real-asymmetric-app (dependencies)
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:173:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via cbom-real-asymmetric-app -> ring -> getrandom
+  occ pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | Cargo.lock:251:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 0.7.0; reached via cbom-real-asymmetric-app -> rsa -> pkcs1 -> der -> pem-rfc7468
+  occ pkcs1 | pkg:cargo/pkcs1@0.7.5 | Cargo.lock:260:0 | pkcs1 | [manifest] locked pkcs1 0.7.5; reached via cbom-real-asymmetric-app -> rsa -> pkcs1
+  occ pkcs8 | pkg:cargo/pkcs8@0.10.2 | Cargo.lock:271:0 | pkcs8 | [manifest] locked pkcs8 0.10.2; reached via cbom-real-asymmetric-app -> rsa -> pkcs8
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:281:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via cbom-real-asymmetric-app -> rand -> rand_chacha -> ppv-lite86
   occ rand | pkg:cargo/rand@0.8.6 | Cargo.lock:308:0 | rand | [manifest] locked rand 0.8.6; reached via cbom-real-asymmetric-app -> rand
   occ rand | pkg:cargo/rand@0.8.6 | Cargo.toml:10:0 | rand | [manifest] declared by cbom-real-asymmetric-app (dependencies)
   occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:319:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via cbom-real-asymmetric-app -> rand -> rand_chacha
@@ -20,6 +30,9 @@
   occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:12:0 | rsa | [manifest] declared by cbom-real-asymmetric-app (dependencies)
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:416:0 | sha2 | [manifest] locked sha2 0.10.9; reached via cbom-real-asymmetric-app -> ed25519-dalek -> sha2
   occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:433:0 | signature | [manifest] locked signature 2.2.0; reached via cbom-real-asymmetric-app -> rsa -> signature
+  occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:455:0 | spki | [manifest] locked spki 0.7.3; reached via cbom-real-asymmetric-app -> rsa -> spki
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:465:0 | subtle | [manifest] locked subtle 2.6.1; reached via cbom-real-asymmetric-app -> ed25519-dalek -> subtle
+  occ zeroize | pkg:cargo/zeroize@1.8.2 | Cargo.lock:605:0 | zeroize | [manifest] locked zeroize 1.8.2; reached via cbom-real-asymmetric-app -> ed25519-dalek -> zeroize
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
@@ -50,16 +63,56 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=reachable
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:usage=reachable
+  prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:crypto-role=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:kb-coverage=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:usage=reachable
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
   prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:kb-coverage=unmodelled
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:scope=required
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=present
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:crypto-role=support
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:kb-coverage=unmodelled
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:scope=required
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=reachable
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
   prop rand | pkg:cargo/rand@0.8.6 | rcbom:crypto-role=algorithm
   prop rand | pkg:cargo/rand@0.8.6 | rcbom:scope=required
   prop rand | pkg:cargo/rand@0.8.6 | rcbom:usage=reachable
@@ -82,14 +135,36 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:usage=reachable
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library curve25519-dalek 4.1.3 | pkg:cargo/curve25519-dalek@4.1.3 | purl pkg:cargo/curve25519-dalek@4.1.3
+component library der 0.7.10 | pkg:cargo/der@0.7.10 | purl pkg:cargo/der@0.7.10
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519 2.2.3 | pkg:cargo/ed25519@2.2.3 | purl pkg:cargo/ed25519@2.2.3
 component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
+component library pkcs1 0.7.5 | pkg:cargo/pkcs1@0.7.5 | purl pkg:cargo/pkcs1@0.7.5
+component library pkcs8 0.10.2 | pkg:cargo/pkcs8@0.10.2 | purl pkg:cargo/pkcs8@0.10.2
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
 component library rand 0.8.6 | pkg:cargo/rand@0.8.6 | purl pkg:cargo/rand@0.8.6
 component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
@@ -97,35 +172,73 @@ component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.
 component library rsa 0.9.10 | pkg:cargo/rsa@0.9.10 | purl pkg:cargo/rsa@0.9.10
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
 component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.8.2 | pkg:cargo/zeroize@1.8.2 | purl pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/rand@0.8.6
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/cbom-real-asymmetric-app@0.1.0 -> pkg:cargo/rsa@0.9.10
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/const-oid@0.9.6
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
-dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/curve25519-dalek@4.1.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/ed25519@2.2.3
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
-dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/pem-rfc7468@0.7.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
 dep pkg:cargo/rand@0.8.6 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.6 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
 dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/const-oid@0.9.6
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/pkcs1@0.7.5
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/pkcs8@0.10.2
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand@0.8.6
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/rsa@0.9.10 -> pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/spki@0.7.3 -> pkg:cargo/der@0.7.10
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:Ed25519
 dependency crypto:algorithm:SHA-256
 dependency crypto:material:private-key:RSA-2048
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/cbom-real-asymmetric-app@0.1.0
+dependency pkg:cargo/const-oid@0.9.6
 dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/curve25519-dalek@4.1.3
+dependency pkg:cargo/der@0.7.10
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/ed25519@2.2.3
 dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/pem-rfc7468@0.7.0
+dependency pkg:cargo/pkcs1@0.7.5
+dependency pkg:cargo/pkcs8@0.10.2
+dependency pkg:cargo/ppv-lite86@0.2.21
 dependency pkg:cargo/rand@0.8.6
 dependency pkg:cargo/rand_chacha@0.3.1
 dependency pkg:cargo/rand_core@0.6.4
@@ -133,6 +246,9 @@ dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/rsa@0.9.10
 dependency pkg:cargo/sha2@0.10.9
 dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/spki@0.7.3
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.8.2
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

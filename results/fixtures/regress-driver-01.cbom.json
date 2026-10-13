@@ -101,6 +101,42 @@
       "version": "0.10.3"
     },
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via t1 -> hmac -> digest -> block-buffer",
+            "line": 41,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/cipher@0.4.4",
       "evidence": {
         "occurrences": [
@@ -477,6 +513,42 @@
       "version": "0.10.9"
     },
     {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via t1 -> aes-gcm -> subtle",
+            "line": 235,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
       "bom-ref": "pkg:cargo/universal-hash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -766,7 +838,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown",
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
@@ -936,12 +1008,17 @@
         "pkg:cargo/aes@0.8.4",
         "pkg:cargo/cipher@0.4.4",
         "pkg:cargo/ctr@0.9.2",
-        "pkg:cargo/ghash@0.5.1"
+        "pkg:cargo/ghash@0.5.1",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "provides": [
         "crypto:candidate:aes-gcm@0.10.3:AES-GCM"
       ],
       "ref": "pkg:cargo/aes-gcm@0.10.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
     },
     {
       "dependsOn": [
@@ -963,7 +1040,9 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -1006,7 +1085,7 @@
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
         "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown"
+        "crypto:algorithm:unknown:hash:ring"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1020,6 +1099,10 @@
       "ref": "pkg:cargo/sha2@0.10.9"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/aes-gcm@0.10.3",
         "pkg:cargo/hmac@0.12.1",
@@ -1030,7 +1113,8 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/universal-hash@0.5.1"
     },
@@ -1048,7 +1132,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown"
+      "ref": "crypto:algorithm:unknown:hash:ring"
     },
     {
       "dependsOn": [],
@@ -1117,7 +1201,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:dced0d3d-f78d-895f-ab54-bb167e8297c8",
+  "serialNumber": "urn:uuid:c1349622-4b95-880e-882a-5aa421390d2a",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,398 @@
+{
+ "jwt-cli-6.2.0": {
+  "layer1": {
+   "crypto_found": 3,
+   "crypto_labelled": 3,
+   "crypto_missed": [],
+   "reported": 3,
+   "reported_correct": 3,
+   "reported_not_crypto": [],
+   "support_agree": 1,
+   "support_labelled": 2,
+   "support_listed": 1
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "encode",
+     "line": "src/translators/encode.rs:126",
+     "may": [],
+     "must": [
+      "ECDSA-P-256-SHA-256",
+      "ECDSA-P-384-SHA-384",
+      "Ed25519",
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512",
+      "RSA-PKCS1-1.5-SHA-256",
+      "RSA-PKCS1-1.5-SHA-384",
+      "RSA-PKCS1-1.5-SHA-512",
+      "RSA-PSS-SHA-256",
+      "RSA-PSS-SHA-384",
+      "RSA-PSS-SHA-512"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "decode",
+     "line": "src/translators/decode.rs:166",
+     "may": [],
+     "must": [
+      "ECDSA-P-256-SHA-256",
+      "ECDSA-P-384-SHA-384",
+      "Ed25519",
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512",
+      "RSA-PKCS1-1.5-SHA-256",
+      "RSA-PKCS1-1.5-SHA-384",
+      "RSA-PKCS1-1.5-SHA-512",
+      "RSA-PSS-SHA-256",
+      "RSA-PSS-SHA-384",
+      "RSA-PSS-SHA-512"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    }
+   ],
+   "sites": 4,
+   "verdicts": {
+    "correct": 2,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 2,
+    "wrong": 0
+   }
+  }
+ },
+ "minisign-0.10.0": {
+  "layer1": {
+   "crypto_found": 9,
+   "crypto_labelled": 9,
+   "crypto_missed": [],
+   "reported": 9,
+   "reported_correct": 9,
+   "reported_not_crypto": [],
+   "support_agree": 3,
+   "support_labelled": 4,
+   "support_listed": 3
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "getrandom",
+     "line": "src/keypair.rs:31",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "getrandom",
+     "line": "src/keypair.rs:34",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "getrandom",
+     "line": "src/keypair.rs:71",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "getrandom",
+     "line": "src/lib.rs:99",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "getrandom",
+     "line": "src/lib.rs:107",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    }
+   ],
+   "sites": 6,
+   "verdicts": {
+    "correct": 1,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 5,
+    "wrong": 0
+   }
+  }
+ },
+ "rage-0.12.1": {
+  "layer1": {
+   "crypto_found": 43,
+   "crypto_labelled": 43,
+   "crypto_missed": [],
+   "reported": 43,
+   "reported_correct": 43,
+   "reported_not_crypto": [],
+   "support_agree": 14,
+   "support_labelled": 16,
+   "support_listed": 14
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "read_or_generate_passphrase",
+     "line": "src/bin/rage/main.rs:147",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "with_user_passphrase",
+     "line": "src/bin/rage/main.rs:148",
+     "may": [],
+     "must": [
+      "ChaCha20-Poly1305",
+      "HKDF-SHA-256",
+      "HMAC-SHA-256",
+      "scrypt"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "with_user_passphrase",
+     "line": "src/bin/rage/main.rs:152",
+     "may": [],
+     "must": [
+      "ChaCha20-Poly1305",
+      "HKDF-SHA-256",
+      "HMAC-SHA-256",
+      "scrypt"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "with_recipients",
+     "line": "src/bin/rage/main.rs:188",
+     "may": [],
+     "must": [
+      "ChaCha20-Poly1305",
+      "HKDF-SHA-256",
+      "HMAC-SHA-256",
+      "HPKE-DHKEM-P-256-HKDF-SHA-256-HKDF-SHA-256-ChaCha20-Poly1305",
+      "HPKE-ML-KEM-768-P-256-HKDF-SHA-256-ChaCha20-Poly1305",
+      "RSA-OAEP-SHA-256",
+      "SHA-256",
+      "x25519"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "finish",
+     "line": "src/bin/rage/main.rs:221",
+     "may": [],
+     "must": [
+      "ChaCha20-Poly1305"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "decrypt",
+     "line": "src/bin/rage/main.rs:326",
+     "may": [],
+     "must": [
+      "ChaCha20-Poly1305",
+      "HKDF-SHA-256",
+      "HMAC-SHA-256",
+      "scrypt"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "decrypt",
+     "line": "src/bin/rage/main.rs:354",
+     "may": [],
+     "must": [
+      "AES-128-CTR",
+      "AES-192-CTR",
+      "AES-256-CBC",
+      "AES-256-CTR",
+      "AES-256-GCM",
+      "ChaCha20-Poly1305",
+      "HKDF-SHA-256",
+      "HMAC-SHA-256",
+      "RSA-OAEP-SHA-256",
+      "SHA-256",
+      "SHA-512",
+      "bcrypt-pbkdf",
+      "scrypt",
+      "x25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "generate",
+     "line": "src/bin/rage-keygen/main.rs:57",
+     "may": [],
+     "must": [
+      "x25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 10,
+   "verdicts": {
+    "correct": 2,
+    "function-mismatch": 0,
+    "honest-unknown": 3,
+    "less-specific": 0,
+    "miss": 5,
+    "wrong": 0
+   }
+  }
+ },
+ "rcgen-0.14.10": {
+  "layer1": {
+   "crypto_found": 3,
+   "crypto_labelled": 3,
+   "crypto_missed": [],
+   "reported": 3,
+   "reported_correct": 3,
+   "reported_not_crypto": [],
+   "support_agree": 2,
+   "support_labelled": 3,
+   "support_listed": 2
+  },
+  "layer2": {
+   "not_correct": [],
+   "sites": 11,
+   "verdicts": {
+    "correct": 11,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "realapp": {
+  "layer1": {
+   "crypto_found": 30,
+   "crypto_labelled": 30,
+   "crypto_missed": [],
+   "reported": 30,
+   "reported_correct": 30,
+   "reported_not_crypto": [],
+   "support_agree": 8,
+   "support_labelled": 10,
+   "support_listed": 8
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "generate",
+     "line": "src/main.rs:3",
+     "may": [],
+     "must": [
+      "x25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "encode",
+     "line": "src/main.rs:5",
+     "may": [],
+     "must": [
+      "HMAC-SHA-256"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    }
+   ],
+   "sites": 2,
+   "verdicts": {
+    "correct": 0,
+    "function-mismatch": 0,
+    "honest-unknown": 1,
+    "less-specific": 0,
+    "miss": 1,
+    "wrong": 0
+   }
+  }
+ },
+ "xh-0.26.2": {
+  "layer1": {
+   "crypto_found": 18,
+   "crypto_labelled": 18,
+   "crypto_missed": [],
+   "reported": 18,
+   "reported_correct": 18,
+   "reported_not_crypto": [],
+   "support_agree": 5,
+   "support_labelled": 6,
+   "support_listed": 5
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "respond",
+     "line": "src/auth.rs:88",
+     "may": [],
+     "must": [
+      "MD5",
+      "SHA-256",
+      "SHA-512/256"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    }
+   ],
+   "sites": 5,
+   "verdicts": {
+    "correct": 4,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 1,
+    "wrong": 0
+   }
+  }
+ }
+}

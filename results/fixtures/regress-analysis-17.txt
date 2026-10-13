@@ -35,7 +35,9 @@
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:13:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via a17 -> aws-lc-rs
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by a17 (dependencies); features ["legacy-des"]
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | Cargo.lock:24:0 | aws-lc-sys | [manifest] locked aws-lc-sys 0.45.0; reached via a17 -> aws-lc-rs -> aws-lc-sys
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:133:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a17 -> aws-lc-rs -> zeroize
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:finding=hard-coded-iv
@@ -124,9 +126,16 @@
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:crypto-role=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:kb-coverage=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
@@ -140,6 +149,7 @@ asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFa
 asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
@@ -147,6 +157,7 @@ dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:HMAC-SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:SHA-256
 dep pkg:cargo/a17@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/zeroize@1.9.1
 dependency crypto:algorithm:AES-128
 dependency crypto:algorithm:AES-128-GCM
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
@@ -161,6 +172,7 @@ dependency crypto:algorithm:SHA-512/256
 dependency pkg:cargo/a17@0.1.0
 dependency pkg:cargo/aws-lc-rs@1.18.1
 dependency pkg:cargo/aws-lc-sys@0.45.0
+dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

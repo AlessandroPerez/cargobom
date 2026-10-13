@@ -2,6 +2,42 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via minisign -> scrypt -> pbkdf2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/cipher@0.4.4",
       "evidence": {
         "occurrences": [
@@ -56,6 +92,49 @@
       "purl": "pkg:cargo/crypto-common@0.1.7",
       "type": "library",
       "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/ct-codecs@1.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by minisign (dependencies)",
+            "line": 44,
+            "location": "Cargo.toml",
+            "offset": 14,
+            "symbol": "ct-codecs"
+          },
+          {
+            "additionalContext": "[manifest] locked ct-codecs 1.1.7; reached via minisign -> ct-codecs",
+            "line": 56,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ct-codecs"
+          }
+        ]
+      },
+      "name": "ct-codecs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ct-codecs@1.1.7",
+      "type": "library",
+      "version": "1.1.7"
     },
     {
       "bom-ref": "pkg:cargo/digest@0.10.7",
@@ -193,6 +272,42 @@
       "version": "0.12.2"
     },
     {
+      "bom-ref": "pkg:cargo/salsa20@0.10.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked salsa20 0.10.2; reached via minisign -> scrypt -> salsa20",
+            "line": 207,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "salsa20"
+          }
+        ]
+      },
+      "name": "salsa20",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/salsa20@0.10.2",
+      "type": "library",
+      "version": "0.10.2"
+    },
+    {
       "bom-ref": "pkg:cargo/scrypt@0.11.0",
       "evidence": {
         "occurrences": [
@@ -262,6 +377,42 @@
       "purl": "pkg:cargo/sha2@0.10.9",
       "type": "library",
       "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via minisign -> scrypt -> pbkdf2 -> digest -> subtle",
+            "line": 238,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
     },
     {
       "bom-ref": "crypto:algorithm:scrypt",
@@ -345,6 +496,10 @@
   ],
   "dependencies": [
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/crypto-common@0.1.7"
       ],
@@ -355,8 +510,14 @@
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/ct-codecs@1.1.7"
+    },
+    {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -372,6 +533,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/ct-codecs@1.1.7",
         "pkg:cargo/getrandom@0.4.3",
         "pkg:cargo/scrypt@0.11.0"
       ],
@@ -386,8 +548,14 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/cipher@0.4.4",
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "ref": "pkg:cargo/salsa20@0.10.2"
+    },
+    {
+      "dependsOn": [
         "pkg:cargo/pbkdf2@0.12.2",
+        "pkg:cargo/salsa20@0.10.2",
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
@@ -400,6 +568,10 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
     },
     {
       "dependsOn": [],
@@ -464,7 +636,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:682dec99-00a5-8dc2-a68f-477866a7682c",
+  "serialNumber": "urn:uuid:e85306a8-1d45-8d67-9b62-d4a28041bc71",
   "specVersion": "1.7",
   "version": 1
 }

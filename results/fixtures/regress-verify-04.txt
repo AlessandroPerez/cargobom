@@ -1,5 +1,6 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:9:12 | digest::digest::Digest::digest | [reachable] [call] [macro pm::hash_it!] in v04::main; use: digest; expanded from src/main.rs:9; line: `let d = pm::hash_it!(b"data");`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:10:12 | digest::digest::Digest::digest | [reachable] [call] [macro hm!] in v04::main; use: digest; expanded from src/main.rs:6; line: `let e = hm!(b"data");`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via v04 -> sha2 -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via v04 -> sha2 -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via v04 -> sha2 -> digest
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:70:0 | sha2 | [manifest] locked sha2 0.10.9; reached via v04 -> sha2
@@ -16,6 +17,10 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
@@ -26,16 +31,19 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library pm 0.1.0 | pkg:cargo/pm@0.1.0 | purl pkg:cargo/pm@0.1.0
 component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/v04@0.1.0 -> pkg:cargo/pm@0.1.0
 dep pkg:cargo/v04@0.1.0 -> pkg:cargo/sha2@0.10.9
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/pm@0.1.0

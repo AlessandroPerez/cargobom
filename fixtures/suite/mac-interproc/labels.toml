@@ -1,0 +1,19 @@
+# mac-interproc: what = MAC, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 8
+callee = "sign"
+function = "tag"
+must = ["HMAC-SHA-512"]
+may = []
+note = "ring hmac::sign; key built in session_key() with HMAC_SHA512, passed main->authenticate"
+
+[[site]]
+file = "src/main.rs"
+line = 14
+callee = "verify"
+function = "verify"
+must = ["HMAC-SHA-512"]
+may = []
+note = "ring hmac::verify with the same key"

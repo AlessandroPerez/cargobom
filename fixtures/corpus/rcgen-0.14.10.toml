@@ -1,0 +1,150 @@
+# Ground truth for rcgen-0.14.10: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: rcgen 0.14.10 (/var/tmp/rcbom-validate/rcgen-0.14.10)
+# Library-only package: analysed as its public API, default features ["crypto", "pem", "ring"],
+# host x86_64-unknown-linux-gnu, release profile. Features aws_lc_rs, fips and x509-parser are off:
+# sites in code gated on them are listed with must = [] and may = [] (R1.5).
+# Callers can pass any public SignatureAlgorithm / KeyIdMethod, so every value the public API
+# accepts counts as reachable. #[cfg(test)] modules and examples/ are out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source used by ring SystemRandom"
+
+[[package]]
+name = "pem"
+version = "4.0.0"
+kind = "support"
+why = "PEM encoding/decoding of keys and certificates"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "crypto backend (feature ring): ECDSA/Ed25519 keygen and signing, RSA signing, SHA-2 digests, SystemRandom"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.14.1"
+kind = "pki"
+why = "shared X.509/PKI types (certificate and private-key DER wrappers, PEM parsing)"
+
+[[package]]
+name = "yasna"
+version = "0.6.0"
+kind = "support"
+why = "ASN.1 DER writer/reader used to encode X.509 certificates, CSRs and CRLs"
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+kind = "support"
+why = "secure zeroing of secrets; enabled through rustls-pki-types (private-key DER wrappers)"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/certificate.rs"
+line = 463
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "ring digest::digest(&digest::SHA256, ..) derives the default serial number from the subject public key when params.serial_number is None"
+
+[[site]]
+file = "src/csr.rs"
+line = 116
+callee = "verify_signature"
+function = "verify"
+must = []
+may = []
+note = "x509-parser X509CertificationRequest::verify_signature in CertificateSigningRequestParams::from_der; gated on feature x509-parser, which is off by default (R1.5)"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 101
+callee = "generate_pkcs8"
+function = "keygen"
+must = ["ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384"]
+may = []
+note = "ring EcdsaKeyPair::generate_pkcs8 in KeyPair::generate_for: sign_alg comes from SignAlgo::EcDsa of PKCS_ECDSA_P256_SHA256 (also KeyPair::generate) or PKCS_ECDSA_P384_SHA384; P-521 statics need aws_lc_rs"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 112
+callee = "generate_pkcs8"
+function = "keygen"
+must = ["Ed25519"]
+may = []
+note = "ring Ed25519KeyPair::generate_pkcs8 in KeyPair::generate_for(&PKCS_ED25519)"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 124
+callee = "generate"
+function = "keygen"
+must = []
+may = []
+note = "aws-lc-rs PqdsaKeyPair::generate (ML-DSA); gated on feature aws_lc_rs, off by default (R1.5)"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 172
+callee = "generate"
+function = "keygen"
+must = []
+may = []
+note = "aws-lc-rs RsaKeyPair::generate in generate_rsa_inner; gated on feature aws_lc_rs, off by default; with ring RSA keygen returns KeyGenerationUnavailable (R1.5)"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 457
+callee = "sign"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384"]
+may = []
+note = "ring EcdsaKeyPair::sign in SigningKey::sign for KeyPairKind::Ec; Ec key pairs are built only for ECDSA_P256_SHA256_ASN1_SIGNING / ECDSA_P384_SHA384_ASN1_SIGNING under ring"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 460
+callee = "sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "ring Ed25519KeyPair::sign in SigningKey::sign for KeyPairKind::Ed"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 464
+callee = "sign"
+function = "sign"
+must = []
+may = []
+note = "aws-lc-rs PqdsaKeyPair::sign for KeyPairKind::Pq; gated on feature aws_lc_rs, off by default (R1.5)"
+
+[[site]]
+file = "src/key_pair.rs"
+line = 470
+callee = "sign"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512"]
+may = []
+note = "ring RsaKeyPair::sign with padding_alg RSA_PKCS1_SHA256/384/512 set by from_pkcs8_der_and_sign_algo (PKCS_RSA_SHA256/384/512) or TryFrom<&PrivateKeyDer> (SHA256)"
+
+[[site]]
+file = "src/lib.rs"
+line = 736
+callee = "digest"
+function = "digest"
+must = ["SHA-256", "SHA-384", "SHA-512"]
+may = []
+note = "ring digest::digest in KeyIdMethod::derive (subject/authority key identifiers, CRL AKI); KeyIdMethod::Sha256/Sha384/Sha512 is a public field the caller chooses"

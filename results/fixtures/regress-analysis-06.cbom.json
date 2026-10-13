@@ -2,6 +2,42 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via t6 -> hmac -> digest -> block-buffer",
+            "line": 18,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -168,6 +204,78 @@
       "version": "9.3.1"
     },
     {
+      "bom-ref": "pkg:cargo/keccak@0.1.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked keccak 0.1.6; reached via t6 -> sha3 -> keccak",
+            "line": 179,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "keccak"
+          }
+        ]
+      },
+      "name": "keccak",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/keccak@0.1.6",
+      "type": "library",
+      "version": "0.1.6"
+    },
+    {
+      "bom-ref": "pkg:cargo/pem@3.0.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked pem 3.0.6; reached via t6 -> jsonwebtoken -> pem",
+            "line": 240,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "pem"
+          }
+        ]
+      },
+      "name": "pem",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/pem@3.0.6",
+      "type": "library",
+      "version": "3.0.6"
+    },
+    {
       "bom-ref": "pkg:cargo/ring@0.17.14",
       "evidence": {
         "occurrences": [
@@ -213,6 +321,85 @@
       "purl": "pkg:cargo/ring@0.17.14",
       "type": "library",
       "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha3@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by t6 (dependencies)",
+            "line": 11,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha3"
+          },
+          {
+            "additionalContext": "[manifest] locked sha3 0.10.9; reached via t6 -> sha3",
+            "line": 343,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha3"
+          }
+        ]
+      },
+      "name": "sha3",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha3@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via t6 -> hmac -> digest -> subtle",
+            "line": 377,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
     },
     {
       "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
@@ -1902,11 +2089,17 @@
   "dependencies": [
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -1925,6 +2118,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/pem@3.0.6",
         "pkg:cargo/ring@0.17.14"
       ],
       "provides": [
@@ -1934,6 +2128,14 @@
         "crypto:material:secret-key:HMAC"
       ],
       "ref": "pkg:cargo/jsonwebtoken@9.3.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/keccak@0.1.6"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/pem@3.0.6"
     },
     {
       "dependsOn": [
@@ -1962,8 +2164,19 @@
     {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7",
+        "pkg:cargo/keccak@0.1.6"
+      ],
+      "ref": "pkg:cargo/sha3@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
+      "dependsOn": [
         "pkg:cargo/hmac@0.12.1",
-        "pkg:cargo/jsonwebtoken@9.3.1"
+        "pkg:cargo/jsonwebtoken@9.3.1",
+        "pkg:cargo/sha3@0.10.9"
       ],
       "ref": "pkg:cargo/t6@0.1.0"
     },
@@ -2132,7 +2345,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9060bd43-b409-8062-bf14-10d9d08e551b",
+  "serialNumber": "urn:uuid:d0b9b3ad-50fa-8354-84ed-0f921fc35236",
   "specVersion": "1.7",
   "version": 1
 }

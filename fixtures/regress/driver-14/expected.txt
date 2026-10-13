@@ -31,11 +31,13 @@
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:6:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via t14 -> aws-lc-rs
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:10:0 | aws-lc-rs | [manifest] declared by t14 (dependencies)
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
+  occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | Cargo.lock:17:0 | aws-lc-sys | [manifest] locked aws-lc-sys 0.45.0; reached via t14 -> aws-lc-rs -> aws-lc-sys
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:75:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t14 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:125:0 | ring | [manifest] locked ring 0.17.14; reached via t14 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t14 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:244:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via t14 -> aws-lc-rs -> zeroize
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
@@ -66,9 +68,12 @@
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:scope=required
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:usage=reachable
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:crypto-role=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:ffi-boundary=true
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:kb-coverage=unmodelled
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
+  prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:usage=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
@@ -77,6 +82,10 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
@@ -85,8 +94,10 @@ component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
+dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t14@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
 dep pkg:cargo/t14@0.1.0 -> pkg:cargo/ring@0.17.14
@@ -99,6 +110,7 @@ dependency pkg:cargo/aws-lc-sys@0.45.0
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/t14@0.1.0
+dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1

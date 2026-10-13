@@ -1,0 +1,37 @@
+# kex-basic: what = key agreement, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 6
+callee = "random"
+function = "keygen"
+must = ["x25519"]
+may = []
+note = "x25519-dalek EphemeralSecret::random (OsRng draw is inside the library, R9.2)"
+
+[[site]]
+file = "src/main.rs"
+line = 10
+callee = "generate"
+function = "keygen"
+must = ["x25519"]
+may = []
+note = "ring EphemeralPrivateKey::generate(&X25519, ..); SystemRandom::new is not a site"
+
+[[site]]
+file = "src/main.rs"
+line = 13
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "x25519-dalek shared secret with ring's public key (R8.1)"
+
+[[site]]
+file = "src/main.rs"
+line = 15
+callee = "agree_ephemeral"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "ring agreement with peer key UnparsedPublicKey::new(&X25519, ..)"

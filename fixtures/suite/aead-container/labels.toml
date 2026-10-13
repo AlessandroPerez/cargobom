@@ -1,0 +1,28 @@
+# aead-container: what = AEAD, how = container
+
+[[site]]
+file = "src/main.rs"
+line = 14
+callee = "seal_in_place_append_tag"
+function = "encrypt"
+must = ["ChaCha20-Poly1305"]
+may = ["AES-256-GCM"]
+note = "reads key \"stream\"; \"archive\" is another value of the same map"
+
+[[site]]
+file = "src/main.rs"
+line = 15
+callee = "open_in_place"
+function = "decrypt"
+must = ["ChaCha20-Poly1305"]
+may = ["AES-256-GCM"]
+note = "reads key \"stream\""
+
+[[site]]
+file = "src/main.rs"
+line = 18
+callee = "seal_in_place_append_tag"
+function = "encrypt"
+must = ["AES-256-GCM"]
+may = ["ChaCha20-Poly1305"]
+note = "reads key \"archive\""

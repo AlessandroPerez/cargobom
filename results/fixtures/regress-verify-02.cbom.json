@@ -2,6 +2,114 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via v02 -> sha1 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.12.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.12.1; reached via v02 -> sha2 -> digest -> block-buffer",
+            "line": 15,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.12.1",
+      "type": "library",
+      "version": "0.12.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/const-oid@0.10.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked const-oid 0.10.2; reached via v02 -> sha2 -> digest -> const-oid",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "const-oid"
+          }
+        ]
+      },
+      "name": "const-oid",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/const-oid@0.10.2",
+      "type": "library",
+      "version": "0.10.2"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
@@ -516,9 +624,76 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in v02::newer::f; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `sha2_11::Sha256::digest(d).len()`; code: `sha2_11::Sha256::digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.12.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/const-oid@0.10.2"
+    },
     {
       "dependsOn": [],
       "ref": "pkg:cargo/crypto-common@0.1.7"
@@ -529,12 +704,15 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
         "pkg:cargo/crypto-common@0.1.7"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
     {
       "dependsOn": [
+        "pkg:cargo/block-buffer@0.12.1",
+        "pkg:cargo/const-oid@0.10.2",
         "pkg:cargo/crypto-common@0.2.2"
       ],
       "ref": "pkg:cargo/digest@0.11.3"
@@ -574,6 +752,9 @@
       "dependsOn": [
         "pkg:cargo/digest@0.11.3"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:hash:sha2"
+      ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
     {
@@ -592,6 +773,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:sha2"
     }
   ],
   "metadata": {
@@ -652,7 +837,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:22e4069d-7ff8-8a5d-b2bd-34dccc2784c2",
+  "serialNumber": "urn:uuid:c022ec69-e721-871c-8b95-99de7b621d14",
   "specVersion": "1.7",
   "version": 1
 }

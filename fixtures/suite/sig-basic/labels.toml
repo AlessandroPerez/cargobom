@@ -1,0 +1,28 @@
+# sig-basic: what = signature, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 5
+callee = "generate"
+function = "keygen"
+must = ["Ed25519"]
+may = []
+note = "fresh Ed25519 key from OsRng"
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "Signer::sign on SigningKey"
+
+[[site]]
+file = "src/main.rs"
+line = 8
+callee = "verify"
+function = "verify"
+must = ["Ed25519"]
+may = []
+note = "Verifier::verify on VerifyingKey; verifying_key() is a getter"

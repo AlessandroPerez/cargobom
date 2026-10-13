@@ -1,0 +1,19 @@
+# kex-interproc: what = key agreement, how = interprocedural
+
+[[site]]
+file = "src/main.rs"
+line = 6
+callee = "random"
+function = "keygen"
+must = ["ECDH-P-256"]
+may = []
+note = "p256::ecdh::EphemeralSecret::random in new_party(), called twice from main; public_key() is a getter"
+
+[[site]]
+file = "src/main.rs"
+line = 12
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["ECDH-P-256"]
+may = []
+note = "secrets from new_party() passed main->agree"

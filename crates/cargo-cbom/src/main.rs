@@ -12,7 +12,7 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use rcbom_analysis::{RunInfo, analyze, load_facts, to_cyclonedx};
-use rcbom_kb::Kb;
+use rcbom_kb::{Kb, Role};
 
 /// The nightly the driver is built with; it must compile the analysed project too.
 const TOOLCHAIN: &str = "nightly-2026-09-25";
@@ -112,7 +112,7 @@ fn generate(a: &GenArgs) -> Result<()> {
     } else {
         let dir = man.target_directory.join("rcbom");
         let facts_dir = dir.join("facts");
-        let units = run_driver(a, &kb, &man, &dir, &facts_dir)?;
+        let units = run_driver(a, &man, &dir, &facts_dir)?;
         load_facts(&facts_dir, Some(&units))?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
@@ -207,7 +207,6 @@ fn find_driver(explicit: Option<&Path>) -> Result<PathBuf> {
 /// consists of, fresh or rebuilt, as cargo reports them.
 fn run_driver(
     a: &GenArgs,
-    kb: &Kb,
     man: &rcbom_manifest::Manifest,
     dir: &Path,
     facts_dir: &Path,
@@ -228,17 +227,38 @@ fn run_driver(
         .arg("-vV")
         .output()?;
     let compiler = String::from_utf8_lossy(&compiler.stdout).to_string();
-    let kb_crates = kb.crate_names().join(",");
-    let stop_crates = kb.stop_crate_names().join(",");
+    // the crates of the build's packages, by their library names (the package md-5's library
+    // is `md5`): those the knowledge base describes, any version, have their sites recorded;
+    // its algorithm and trait crates are not entered by the walk
+    let lib_names = |keep: &dyn Fn(&rcbom_manifest::Pkg) -> bool| -> Vec<String> {
+        let mut v: Vec<String> = man
+            .packages
+            .iter()
+            .filter(|p| !p.local && keep(p))
+            .filter_map(|p| p.lib_name.clone())
+            .collect();
+        v.sort();
+        v.dedup();
+        v
+    };
+    // and those of crypto packages it does not model: their calls are operations of unknown
+    // algorithm (`p256::ecdh::diffie_hellman` from age)
+    let kb_crates =
+        lib_names(&|p| p.role.is_some() || p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
+            .join(",");
+    let stop: std::collections::BTreeSet<String> =
+        lib_names(&|p| matches!(p.role, Some(Role::Algorithm | Role::Trait)))
+            .into_iter()
+            .collect();
+    let stop_crates = stop.iter().cloned().collect::<Vec<_>>().join(",");
     // what the stop crates depend on (curve25519-dalek under ed25519-dalek): their
     // implementation, which the walk does not enter from them
     let impl_crates = {
-        let stop: std::collections::BTreeSet<String> = kb.stop_crate_names().into_iter().collect();
         let mut seen: std::collections::BTreeSet<&rcbom_manifest::PackageId> = Default::default();
         let mut stack: Vec<&rcbom_manifest::PackageId> = man
             .packages
             .iter()
-            .filter(|p| !p.local && stop.contains(&p.name.replace('-', "_")))
+            .filter(|p| !p.local && p.lib_name.as_ref().is_some_and(|n| stop.contains(n)))
             .flat_map(|p| p.runtime_deps.iter())
             .collect();
         while let Some(id) = stack.pop() {
@@ -252,7 +272,7 @@ fn run_driver(
             .into_iter()
             .filter_map(|id| man.by_id(id))
             .filter(|p| !p.local)
-            .map(|p| p.name.replace('-', "_"))
+            .filter_map(|p| p.lib_name.clone())
             .collect();
         names.sort();
         names.dedup();

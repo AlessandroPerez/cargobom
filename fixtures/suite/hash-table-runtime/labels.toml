@@ -1,0 +1,10 @@
+# hash-table-runtime: what = hash, how = run-time table
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "digest"
+function = "digest"
+must = ["SHA-256", "SHA-384"]
+may = ["SHA-512"]
+note = "TABLE[i], i = (args().count() > 1) as usize is 0 or 1; TABLE[2] (SHA512) never read but is an element of the same static array (R4.3, R12.4)"

@@ -736,6 +736,16 @@ impl Match {
     /// BLAKE3 keyed (a MAC) is not BLAKE3 the hash; the HMAC secret of
     /// `EncodingKey::from_secret` (key material) is not the HMAC algorithm.
     pub fn key(&self) -> String {
+        // an unknown algorithm is one per primitive and providing package: ML-KEM's and P-256's
+        // unknown operations are two assets
+        if self.name == crate::UNKNOWN && self.algo.family.is_empty() {
+            let providers: Vec<&str> = self.providers.iter().map(|(n, _)| n.as_str()).collect();
+            return format!(
+                "{}|{}",
+                asset_key(&self.name, &self.algo),
+                providers.join(",")
+            );
+        }
         asset_key(&self.name, &self.algo)
     }
 }

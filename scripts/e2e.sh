@@ -13,6 +13,9 @@
 #   scripts/e2e.sh                       the fixtures
 #   scripts/e2e.sh --realapp             also phase0/realapp
 #   scripts/e2e.sh --realapp --regress   also fixtures/regress/* (the audit probes)
+#   scripts/e2e.sh --suite               also fixtures/suite/* (the ground-truth suite: labels
+#                                        written from source before any tool run; its score must
+#                                        equal the committed fixtures/suite/expected-score.json)
 # Every CBOM is generated with the driver this script builds (debug, passed with --driver), not
 # one $RCBOM_DRIVER names or a stale release build the CLI would otherwise prefer.
 # RCBOM_BLESS=1 rewrites the golden files and committed scores instead of comparing (after a
@@ -32,16 +35,18 @@ mkdir -p "$out"
 out=$(cd "$out" && pwd)
 realapp=0
 regress=0
+suite=0
 for a in "$@"; do
     case "$a" in
         --realapp) realapp=1 ;;
         --regress) regress=1 ;;
+        --suite) suite=1 ;;
         *) echo "unknown option $a" >&2; exit 2 ;;
     esac
 done
 
-# generate, verify (every position, every shift), and compare with the golden file
-run() {
+# generate and verify (every position, every shift)
+generate() {
     local dir=$1 name=$2
     echo "== ${dir#"$root"/}"
     (cd "$dir" && "$cbom" cbom --driver "$driver" -o "$out/$name.cbom.json" 2> "$out/$name.log") || { cat "$out/$name.log"; exit 1; }
@@ -64,6 +69,12 @@ for line in text.splitlines():
         print("  " + line)
 sys.exit(0 if v.group(2) == "0" and caught == total else 1)
 PY
+}
+
+# generate, verify, and compare with the golden file
+run() {
+    local dir=$1 name=$2
+    generate "$dir" "$name"
     python3 "$root/scripts/summary.py" "$out/$name.cbom.json" > "$out/$name.txt"
     if [ -n "${RCBOM_BLESS:-}" ]; then
         cp "$out/$name.txt" "$dir/expected.txt"
@@ -117,5 +128,22 @@ if [ "$regress" = 1 ]; then
     for d in "$root"/fixtures/regress/*/; do
         run "${d%/}" "regress-$(basename "$d")"
     done
+fi
+if [ "$suite" = 1 ]; then
+    mkdir -p "$out/suite"
+    for d in "$root"/fixtures/suite/*/; do
+        generate "${d%/}" "suite/$(basename "$d")"
+    done
+    python3 "$root/scripts/suite.py" "$out/suite" "$root"/fixtures/suite/*/ --json > "$out/suite-score.json"
+    python3 "$root/scripts/suite.py" "$out/suite" "$root"/fixtures/suite/*/ > "$out/suite-score.txt"
+    head -1 "$out/suite-score.txt"
+    if [ -n "${RCBOM_BLESS:-}" ]; then
+        cp "$out/suite-score.json" "$root/fixtures/suite/expected-score.json"
+        echo "suite score: written"
+    else
+        diff -u "$root/fixtures/suite/expected-score.json" "$out/suite-score.json" || {
+            echo "suite score differs: fixtures/suite/expected-score.json"; exit 1; }
+        echo "suite score: identical"
+    fi
 fi
 echo "e2e: ok ($out)"

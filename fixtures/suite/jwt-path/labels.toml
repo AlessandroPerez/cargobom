@@ -1,0 +1,19 @@
+# jwt-path: what = JWT, how = path
+
+[[site]]
+file = "src/main.rs"
+line = 15
+callee = "encode"
+function = "tag"
+must = ["HMAC-SHA-384", "HMAC-SHA-512"]
+may = []
+note = "runtime branch selects HS512 or HS384; INTEROP const false -> HS256 nothing"
+
+[[site]]
+file = "src/main.rs"
+line = 17
+callee = "decode"
+function = "verify"
+must = ["HMAC-SHA-384", "HMAC-SHA-512"]
+may = []
+note = "Validation::new(alg), same branch"

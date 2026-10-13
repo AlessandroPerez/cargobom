@@ -1,0 +1,31 @@
+# hash-multibin: what = hash, how = multi-binary
+
+[[site]]
+file = "src/bin/alpha.rs"
+line = 8
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+artifacts = ["alpha"]
+note = "Sha256::digest in alpha's main"
+
+[[site]]
+file = "src/bin/beta.rs"
+line = 7
+callee = "digest"
+function = "digest"
+must = ["SHA-512"]
+may = []
+artifacts = ["beta"]
+note = "Sha512::digest in beta's main"
+
+[[site]]
+file = "src/common.rs"
+line = 6
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = []
+artifacts = ["beta"]
+note = "manifest_digest is called only by beta; alpha includes common.rs via #[path] but uses only LABEL (R13)"

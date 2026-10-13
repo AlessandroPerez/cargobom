@@ -1,0 +1,37 @@
+# rng-basic: what = RNG, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "fill"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "ring SystemRandom::fill (SecureRandom); SystemRandom::new is not a site"
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand::rngs::OsRng (rand_core OsRng)"
+
+[[site]]
+file = "src/main.rs"
+line = 11
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand 0.8 thread_rng() is ThreadRng (ChaCha12); thread_rng() itself is not a site"
+
+[[site]]
+file = "src/main.rs"
+line = 12
+callee = "gen_range"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "Rng::gen_range on ThreadRng"

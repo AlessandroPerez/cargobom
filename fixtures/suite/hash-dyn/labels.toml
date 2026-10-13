@@ -1,0 +1,10 @@
+# hash-dyn: what = hash, how = dyn
+
+[[site]]
+file = "src/main.rs"
+line = 22
+callee = "digest"
+function = "digest"
+must = ["SHA-384"]
+may = ["SHA-1"]
+note = "only Blob reaches fingerprint(); Manifest is also coerced to Box<dyn Source> (used for label()), so its alg() (SHA1_FOR_LEGACY_USE_ONLY) is a possible dyn target (R4.6)"

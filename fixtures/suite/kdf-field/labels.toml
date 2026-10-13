@@ -1,0 +1,11 @@
+# kdf-field: what = KDF, how = field
+
+[[site]]
+file = "src/main.rs"
+line = 20
+callee = "derive"
+function = "keyderive"
+must = ["PBKDF2-SHA-384"]
+may = []
+params = { iterations = "100000", length = "48" }
+note = "algorithm, iterations and output length all read from struct fields set in policy()"

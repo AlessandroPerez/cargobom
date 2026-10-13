@@ -1,0 +1,481 @@
+# Ground truth for rage-0.12.1: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: rage 0.12.1 (/var/tmp/rcbom-validate/rage-0.12.1)
+# Build analysed: default features ["ssh"] (=> age features ssh, armor, cli-common, plugin), host
+# x86_64-unknown-linux-gnu, release build of the default binaries: rage (src/bin/rage) and rage-keygen
+# (src/bin/rage-keygen). rage-mount (src/bin/rage-mount) has required-features = ["mount"] and is not
+# built by default: its sites are listed with must = [] and may = []. build.rs and tests are out of scope.
+#
+# age algorithm sets follow age 0.12.1's own code per recipient/identity type reachable from rage:
+#   header MAC: HKDF-SHA-256 + HMAC-SHA-256; payload: HKDF-SHA-256 + ChaCha20-Poly1305 (STREAM)
+#   scrypt (passphrase): scrypt + ChaCha20-Poly1305
+#   X25519 (age1...): x25519 + HKDF-SHA-256 + ChaCha20-Poly1305
+#   ssh-ed25519: SHA-256 tag + x25519 + HKDF-SHA-256 + ChaCha20-Poly1305 (+ SHA-512 seed->X25519 on decrypt)
+#   ssh-rsa: SHA-256 tag + RSA-OAEP-SHA-256
+#   p256tag (age1tag1...): HPKE DHKEM(P-256, HKDF-SHA256)/HKDF-SHA256/ChaCha20Poly1305 + SHA-256 + HKDF-SHA-256 tag
+#   mlkem768p256tag (age1tagpq1...): HPKE MLKEM768-P256/HKDF-SHA256/ChaCha20Poly1305 + SHA-256 + HKDF-SHA-256 tag
+#   passphrase-protected identity files: decrypted as an scrypt age file
+#   passphrase-protected OpenSSH keys: bcrypt-pbkdf + AES-256-CBC / AES-128/192/256-CTR / AES-256-GCM
+#   plugin recipients/identities: crypto runs in the external age-plugin-* process, nothing in-process
+# RNG draws inside age (file key, nonce, salts, ephemeral keys) are internal, not listed.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aead"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto traits for AEAD ciphers (Aead/AeadInPlace) implemented by chacha20poly1305/aes-gcm"
+
+[[package]]
+name = "aes"
+version = "0.8.4"
+kind = "algorithm"
+why = "AES block cipher used to decrypt passphrase-protected OpenSSH keys"
+
+[[package]]
+name = "aes-gcm"
+version = "0.10.3"
+kind = "algorithm"
+why = "AES-256-GCM used to decrypt aes256-gcm@openssh.com protected SSH keys"
+
+[[package]]
+name = "age"
+version = "0.12.1"
+kind = "protocol"
+why = "age file-encryption format: X25519/scrypt/ssh/tag recipients, header MAC, STREAM payload (features ssh, plugin, armor, cli-common)"
+
+[[package]]
+name = "age-core"
+version = "0.12.0"
+kind = "protocol"
+why = "age format primitives: ChaCha20-Poly1305 wrap, HKDF-SHA-256, stanza format, HPKE seal/open helpers"
+
+[[package]]
+name = "base16ct"
+version = "0.2.0"
+kind = "support"
+why = "constant-time (side-channel resistant) hex encoding used by SEC1/elliptic-curve key encoding"
+
+[[package]]
+name = "bcrypt-pbkdf"
+version = "0.10.0"
+kind = "algorithm"
+why = "bcrypt-pbkdf password-based KDF for passphrase-protected OpenSSH keys"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "block-padding"
+version = "0.3.3"
+kind = "support"
+why = "RustCrypto block-cipher padding/unpadding helpers"
+
+[[package]]
+name = "blowfish"
+version = "0.9.1"
+kind = "algorithm"
+why = "Blowfish block cipher (bcrypt variant used by bcrypt-pbkdf)"
+
+[[package]]
+name = "cbc"
+version = "0.1.2"
+kind = "algorithm"
+why = "CBC mode used to decrypt aes256-cbc protected OpenSSH keys"
+
+[[package]]
+name = "chacha20"
+version = "0.9.1"
+kind = "algorithm"
+why = "ChaCha20 stream cipher implementation"
+
+[[package]]
+name = "chacha20poly1305"
+version = "0.10.1"
+kind = "algorithm"
+why = "ChaCha20-Poly1305 AEAD implementation"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits"
+
+[[package]]
+name = "const-oid"
+version = "0.9.6"
+kind = "support"
+why = "ASN.1 object identifiers (algorithm OIDs) for DER/X.509/PKCS encodings"
+
+[[package]]
+name = "crypto-bigint"
+version = "0.5.5"
+kind = "support"
+why = "constant-time big-integer arithmetic designed for cryptographic use (elliptic-curve backend)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "ctr"
+version = "0.9.2"
+kind = "algorithm"
+why = "CTR mode used to decrypt aesNNN-ctr protected OpenSSH keys"
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+kind = "algorithm"
+why = "Curve25519/Edwards25519 group arithmetic (used by x25519-dalek and age ssh-ed25519)"
+
+[[package]]
+name = "der"
+version = "0.7.10"
+kind = "support"
+why = "ASN.1 DER encoder/decoder for PKCS/SEC1/SPKI key formats"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs"
+
+[[package]]
+name = "elliptic-curve"
+version = "0.13.8"
+kind = "trait"
+why = "RustCrypto elliptic-curve traits and types (ECDH, SEC1 points, scalars)"
+
+[[package]]
+name = "ff"
+version = "0.13.1"
+kind = "trait"
+why = "finite-field traits underlying elliptic-curve arithmetic"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source behind rand_core OsRng (age file keys, nonces, salts, ephemeral keys)"
+
+[[package]]
+name = "getrandom"
+version = "0.3.3"
+kind = "rng"
+why = "OS random number source (used by tempfile for age-core plugin temp files)"
+
+[[package]]
+name = "ghash"
+version = "0.5.1"
+kind = "algorithm"
+why = "GHASH universal hash used by AES-GCM"
+
+[[package]]
+name = "group"
+version = "0.13.0"
+kind = "trait"
+why = "elliptic-curve group traits"
+
+[[package]]
+name = "hkdf"
+version = "0.12.4"
+kind = "algorithm"
+why = "HKDF (RFC 5869) implementation"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC implementation"
+
+[[package]]
+name = "hpke"
+version = "0.12.0"
+kind = "protocol"
+why = "HPKE (RFC 9180) used by age p256tag/mlkem768p256tag recipients"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types used only by cipher modes"
+
+[[package]]
+name = "keccak"
+version = "0.1.6"
+kind = "algorithm"
+why = "Keccak-f permutation (backs SHA-3/SHAKE)"
+
+[[package]]
+name = "kem"
+version = "0.3.0-pre.0"
+kind = "trait"
+why = "key-encapsulation mechanism traits (used by ml-kem)"
+
+[[package]]
+name = "ml-kem"
+version = "0.2.3"
+kind = "algorithm"
+why = "ML-KEM-768 (FIPS 203) used by age mlkem768p256tag hybrid recipients"
+
+[[package]]
+name = "num-bigint-dig"
+version = "0.8.6"
+kind = "support"
+why = "big integers with prime generation/modular inverse (features prime, zeroize) used by the rsa crate"
+
+[[package]]
+name = "p256"
+version = "0.13.2"
+kind = "algorithm"
+why = "NIST P-256 curve arithmetic and ECDH (age p256tag/mlkem768p256tag recipients via HPKE)"
+
+[[package]]
+name = "pbkdf2"
+version = "0.12.2"
+kind = "algorithm"
+why = "PBKDF2 implementation (used by scrypt / bcrypt-pbkdf)"
+
+[[package]]
+name = "pkcs1"
+version = "0.7.5"
+kind = "support"
+why = "PKCS#1 RSA key encoding (DER)"
+
+[[package]]
+name = "pkcs8"
+version = "0.10.2"
+kind = "support"
+why = "PKCS#8 private-key encoding (DER)"
+
+[[package]]
+name = "poly1305"
+version = "0.8.0"
+kind = "algorithm"
+why = "Poly1305 universal hash / one-time MAC"
+
+[[package]]
+name = "polyval"
+version = "0.6.2"
+kind = "algorithm"
+why = "POLYVAL universal hash (backs GHASH)"
+
+[[package]]
+name = "ppv-lite86"
+version = "0.2.21"
+kind = "support"
+why = "cryptography-oriented SIMD backend used only by rand_chacha's ChaCha core"
+
+[[package]]
+name = "primeorder"
+version = "0.13.6"
+kind = "algorithm"
+why = "complete addition formulas for prime-order curves (P-256 arithmetic)"
+
+[[package]]
+name = "rand"
+version = "0.8.7"
+kind = "rng"
+why = "random number generation (OsRng, ThreadRng/StdRng ChaCha12)"
+
+[[package]]
+name = "rand_chacha"
+version = "0.3.1"
+kind = "rng"
+why = "ChaCha-based CSPRNG (StdRng)"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits (RngCore/CryptoRng) and OsRng via getrandom"
+
+[[package]]
+name = "rsa"
+version = "0.9.10"
+kind = "algorithm"
+why = "RSA implementation; age ssh-rsa recipients use RSA-OAEP with SHA-256"
+
+[[package]]
+name = "salsa20"
+version = "0.10.2"
+kind = "algorithm"
+why = "Salsa20 stream cipher / Salsa20/8 core used by scrypt"
+
+[[package]]
+name = "scrypt"
+version = "0.11.0"
+kind = "algorithm"
+why = "scrypt password-based KDF"
+
+[[package]]
+name = "sec1"
+version = "0.7.3"
+kind = "support"
+why = "SEC1 elliptic-curve point and private-key encodings"
+
+[[package]]
+name = "secrecy"
+version = "0.10.3"
+kind = "support"
+why = "secret-wrapper types that zeroize and avoid exposing key/passphrase material"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-2 hash family implementation"
+
+[[package]]
+name = "sha3"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-3/SHAKE used by the age MLKEM768-P256 hybrid KEM and ml-kem"
+
+[[package]]
+name = "signature"
+version = "2.2.0"
+kind = "trait"
+why = "RustCrypto digital-signature traits (Signer/Verifier)"
+
+[[package]]
+name = "spki"
+version = "0.7.3"
+kind = "support"
+why = "X.509 SubjectPublicKeyInfo / AlgorithmIdentifier encoding for public keys"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "universal-hash"
+version = "0.5.1"
+kind = "trait"
+why = "universal hash function traits (Poly1305, GHASH, POLYVAL)"
+
+[[package]]
+name = "x25519-dalek"
+version = "2.0.1"
+kind = "algorithm"
+why = "X25519 Diffie-Hellman key agreement"
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 147
+callee = "read_or_generate_passphrase"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+artifacts = ["rage"]
+note = "age::cli_common::read_or_generate_passphrase: when the typed passphrase is empty it generates a 10-word passphrase with Passphrase::random(OsRng) (cli_common.rs:207-218)"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 148
+callee = "with_user_passphrase"
+function = "encrypt"
+must = ["ChaCha20-Poly1305", "HKDF-SHA-256", "HMAC-SHA-256", "scrypt"]
+may = []
+artifacts = ["rage"]
+note = "age::Encryptor::with_user_passphrase (typed passphrase): age 0.12 wraps the file key here with an scrypt recipient (scrypt + ChaCha20-Poly1305), MACs the header (HKDF-SHA-256 + HMAC-SHA-256) and derives the payload key (HKDF-SHA-256)"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 152
+callee = "with_user_passphrase"
+function = "encrypt"
+must = ["ChaCha20-Poly1305", "HKDF-SHA-256", "HMAC-SHA-256", "scrypt"]
+may = []
+artifacts = ["rage"]
+note = "age::Encryptor::with_user_passphrase with the generated passphrase; same work as line 148"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 188
+callee = "with_recipients"
+function = "encrypt"
+must = ["ChaCha20-Poly1305", "HKDF-SHA-256", "HMAC-SHA-256", "HPKE-DHKEM-P-256-HKDF-SHA-256-HKDF-SHA-256-ChaCha20-Poly1305", "HPKE-ML-KEM-768-P-256-HKDF-SHA-256-ChaCha20-Poly1305", "RSA-OAEP-SHA-256", "SHA-256", "x25519"]
+may = []
+artifacts = ["rage"]
+note = "age::Encryptor::with_recipients wraps the file key for every recipient from read_recipients (-r/-R/-i): X25519, p256tag, mlkem768p256tag, ssh-rsa, ssh-ed25519 (plugins run out of process), then header MAC and payload key"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 221
+callee = "finish"
+function = "encrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+artifacts = ["rage"]
+note = "age StreamWriter::finish encrypts the final STREAM chunk with ChaCha20-Poly1305 (stream.rs:237-241); wrap_output (line 191) only writes the header and creates the writer, full chunks are encrypted inside std io::copy"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 326
+callee = "decrypt"
+function = "decrypt"
+must = ["ChaCha20-Poly1305", "HKDF-SHA-256", "HMAC-SHA-256", "scrypt"]
+may = []
+artifacts = ["rage"]
+note = "age::Decryptor::decrypt with an scrypt::Identity: scrypt + ChaCha20-Poly1305 unwrap, header MAC check (HKDF-SHA-256 + HMAC-SHA-256), payload key (HKDF-SHA-256) and ChaCha20-Poly1305 STREAM reader"
+
+[[site]]
+file = "src/bin/rage/main.rs"
+line = 354
+callee = "decrypt"
+function = "decrypt"
+must = ["AES-128-CTR", "AES-192-CTR", "AES-256-CBC", "AES-256-CTR", "AES-256-GCM", "ChaCha20-Poly1305", "HKDF-SHA-256", "HMAC-SHA-256", "RSA-OAEP-SHA-256", "SHA-256", "SHA-512", "bcrypt-pbkdf", "scrypt", "x25519"]
+may = []
+artifacts = ["rage"]
+note = "age::Decryptor::decrypt with identities from read_identities: X25519, ssh-ed25519, ssh-rsa, lazily decrypted passphrase-protected identity files (scrypt) and OpenSSH keys (bcrypt-pbkdf + AES), plugins out of process; plus header MAC and payload"
+
+[[site]]
+file = "src/bin/rage-keygen/main.rs"
+line = 57
+callee = "generate"
+function = "keygen"
+must = ["x25519"]
+may = []
+artifacts = ["rage-keygen"]
+note = "age::x25519::Identity::generate draws an X25519 StaticSecret from OsRng (age x25519.rs:69-72); to_public on line 58 is a getter"
+
+[[site]]
+file = "src/bin/rage-mount/main.rs"
+line = 224
+callee = "decrypt"
+function = "decrypt"
+must = []
+may = []
+artifacts = ["rage-mount"]
+note = "age::Decryptor::decrypt with scrypt::Identity; rage-mount needs feature mount, not built by default (R1.5)"
+
+[[site]]
+file = "src/bin/rage-mount/main.rs"
+line = 238
+callee = "decrypt"
+function = "decrypt"
+must = []
+may = []
+artifacts = ["rage-mount"]
+note = "age::Decryptor::decrypt with read_identities identities; rage-mount needs feature mount, not built by default (R1.5)"

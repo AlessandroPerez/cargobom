@@ -34,6 +34,49 @@
       "version": "0.2.17"
     },
     {
+      "bom-ref": "pkg:cargo/pem@4.0.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by rcgen (dependencies)",
+            "line": 117,
+            "location": "Cargo.toml",
+            "offset": 14,
+            "symbol": "pem"
+          },
+          {
+            "additionalContext": "[manifest] locked pem 4.0.0; reached via rcgen -> pem",
+            "line": 451,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "pem"
+          }
+        ]
+      },
+      "name": "pem",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/pem@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
       "bom-ref": "pkg:cargo/ring@0.17.14",
       "evidence": {
         "occurrences": [
@@ -86,6 +129,85 @@
       "purl": "pkg:cargo/ring@0.17.14",
       "type": "library",
       "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/rustls-pki-types@1.14.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by rcgen (dependencies)",
+            "line": 121,
+            "location": "Cargo.toml",
+            "offset": 14,
+            "symbol": "pki-types"
+          },
+          {
+            "additionalContext": "[manifest] locked rustls-pki-types 1.14.1; reached via rcgen -> rustls-pki-types",
+            "line": 580,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rustls-pki-types"
+          }
+        ]
+      },
+      "name": "rustls-pki-types",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/rustls-pki-types@1.14.1",
+      "type": "library",
+      "version": "1.14.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/zeroize@1.8.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked zeroize 1.8.2; reached via rcgen -> rustls-pki-types -> zeroize",
+            "line": 857,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "zeroize"
+          }
+        ]
+      },
+      "name": "zeroize",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/zeroize@1.8.2",
+      "type": "library",
+      "version": "1.8.2"
     },
     {
       "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
@@ -873,14 +995,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::digest`",
             "line": 463,
             "location": "src/certificate.rs",
             "offset": 16,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::SHA256`",
             "line": 463,
             "location": "src/certificate.rs",
             "offset": 32,
@@ -1301,8 +1423,14 @@
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/pem@4.0.0"
+    },
+    {
       "dependsOn": [
-        "pkg:cargo/ring@0.17.14"
+        "pkg:cargo/pem@4.0.0",
+        "pkg:cargo/ring@0.17.14",
+        "pkg:cargo/rustls-pki-types@1.14.1"
       ],
       "ref": "pkg:cargo/rcgen@0.14.10"
     },
@@ -1323,6 +1451,16 @@
         "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/zeroize@1.8.2"
+      ],
+      "ref": "pkg:cargo/rustls-pki-types@1.14.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/zeroize@1.8.2"
     },
     {
       "dependsOn": [
@@ -1433,7 +1571,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:beb6f3ad-1744-806e-a42b-e96ce4c8650a",
+  "serialNumber": "urn:uuid:20183c22-d031-8854-8a86-abff8364d779",
   "specVersion": "1.7",
   "version": 1
 }

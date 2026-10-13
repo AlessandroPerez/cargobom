@@ -1257,6 +1257,23 @@ fn switch_value(
             })?;
             match rv {
                 Rvalue::Use(Operand::Constant(c), _) => c.clone(),
+                // `match MODE` with `const MODE: Mode = Mode::Fast`: the discriminant of the
+                // variant the constant the block gave the matched local holds
+                Rvalue::Discriminant(q) if q.projection.is_empty() => {
+                    let c = block.statements.iter().rev().find_map(|s| match &s.kind {
+                        rustc_public::mir::StatementKind::Assign(r, rv)
+                            if r.local == q.local && r.projection.is_empty() =>
+                        {
+                            Some(rv)
+                        }
+                        _ => None,
+                    })?;
+                    let Rvalue::Use(Operand::Constant(c), _) = c else {
+                        return None;
+                    };
+                    let k = rustc_internal::internal(tcx, &c.const_);
+                    return statics::enum_discriminant(tcx, &k).map(|v| v.to_bits_unchecked());
+                }
                 _ => return None,
             }
         }

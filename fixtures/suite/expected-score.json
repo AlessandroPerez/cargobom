@@ -1,0 +1,627 @@
+{
+ "by_how": {
+  "argon2": {
+   "correct": 1,
+   "less-specific": 1
+  },
+  "async": {
+   "correct": 1
+  },
+  "basic": {
+   "correct": 22,
+   "honest-unknown": 3,
+   "miss": 6
+  },
+  "bcryptpbkdf": {
+   "miss": 1
+  },
+  "cfg": {
+   "correct": 2
+  },
+  "closure": {
+   "honest-unknown": 1
+  },
+  "config": {
+   "miss": 1
+  },
+  "const-enum": {
+   "correct": 3
+  },
+  "container": {
+   "correct": 11,
+   "miss": 2
+  },
+  "crates": {
+   "honest-unknown": 2
+  },
+  "dyn": {
+   "honest-unknown": 6,
+   "miss": 2
+  },
+  "field": {
+   "correct": 5,
+   "less-specific": 2,
+   "miss": 2
+  },
+  "fnptr": {
+   "miss": 1
+  },
+  "generic": {
+   "correct": 1
+  },
+  "interproc": {
+   "correct": 8,
+   "honest-unknown": 2,
+   "miss": 2
+  },
+  "macro": {
+   "correct": 2
+  },
+  "multibin": {
+   "correct": 3
+  },
+  "path": {
+   "correct": 6,
+   "miss": 2
+  },
+  "scrypt": {
+   "correct": 1
+  },
+  "static": {
+   "correct": 2
+  },
+  "table-const": {
+   "honest-unknown": 1
+  },
+  "table-runtime": {
+   "honest-unknown": 1
+  },
+  "thread": {
+   "correct": 1
+  }
+ },
+ "by_what": {
+  "aead": {
+   "correct": 11,
+   "honest-unknown": 1
+  },
+  "cipher": {
+   "correct": 3
+  },
+  "hash": {
+   "correct": 19,
+   "honest-unknown": 6,
+   "miss": 1
+  },
+  "jwt": {
+   "miss": 13
+  },
+  "kdf": {
+   "correct": 9,
+   "honest-unknown": 1
+  },
+  "kem": {
+   "honest-unknown": 3
+  },
+  "kex": {
+   "correct": 4,
+   "honest-unknown": 2
+  },
+  "lib": {
+   "correct": 3
+  },
+  "mac": {
+   "correct": 6
+  },
+  "pwhash": {
+   "correct": 2,
+   "less-specific": 1,
+   "miss": 1
+  },
+  "rng": {
+   "miss": 4
+  },
+  "sig": {
+   "correct": 12,
+   "honest-unknown": 3,
+   "less-specific": 2
+  }
+ },
+ "function_mismatches": [],
+ "not_correct": [
+  {
+   "callee": "seal_in_place_append_tag",
+   "line": 27,
+   "may": [],
+   "must": [
+    "ChaCha20-Poly1305"
+   ],
+   "program": "aead-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "digest",
+   "line": 6,
+   "may": [],
+   "must": [
+    "SHA-1",
+    "SHA-256"
+   ],
+   "program": "hash-closure",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "digest",
+   "line": 5,
+   "may": [],
+   "must": [
+    "SHA3-256"
+   ],
+   "program": "hash-crates",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "finalize",
+   "line": 9,
+   "may": [],
+   "must": [
+    "MD5"
+   ],
+   "program": "hash-crates",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "digest",
+   "line": 22,
+   "may": [
+    "SHA-1"
+   ],
+   "must": [
+    "SHA-384"
+   ],
+   "program": "hash-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "hash_fn",
+   "line": 7,
+   "may": [],
+   "must": [
+    "SHA-512"
+   ],
+   "program": "hash-fnptr",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "digest",
+   "line": 6,
+   "may": [
+    "SHA-1"
+   ],
+   "must": [
+    "SHA-512/256"
+   ],
+   "program": "hash-table-const",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "digest",
+   "line": 7,
+   "may": [
+    "SHA-512"
+   ],
+   "must": [
+    "SHA-256",
+    "SHA-384"
+   ],
+   "program": "hash-table-runtime",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "encode",
+   "line": 7,
+   "may": [],
+   "must": [
+    "HMAC-SHA-256"
+   ],
+   "program": "jwt-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 9,
+   "may": [],
+   "must": [
+    "HMAC-SHA-256"
+   ],
+   "program": "jwt-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 19,
+   "may": [],
+   "must": [
+    "ECDSA-P-256-SHA-256",
+    "ECDSA-P-384-SHA-384",
+    "Ed25519",
+    "HMAC-SHA-256",
+    "HMAC-SHA-384",
+    "HMAC-SHA-512",
+    "RSA-PKCS1-1.5-SHA-256",
+    "RSA-PKCS1-1.5-SHA-384",
+    "RSA-PKCS1-1.5-SHA-512",
+    "RSA-PSS-SHA-256",
+    "RSA-PSS-SHA-384",
+    "RSA-PSS-SHA-512"
+   ],
+   "program": "jwt-config",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 13,
+   "may": [
+    "HMAC-SHA-256"
+   ],
+   "must": [
+    "HMAC-SHA-512"
+   ],
+   "program": "jwt-container",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 18,
+   "may": [
+    "HMAC-SHA-256"
+   ],
+   "must": [
+    "HMAC-SHA-512"
+   ],
+   "program": "jwt-container",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 22,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-256",
+    "RSA-PSS-SHA-256"
+   ],
+   "program": "jwt-dyn",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 24,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-256",
+    "RSA-PSS-SHA-256"
+   ],
+   "program": "jwt-dyn",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 16,
+   "may": [],
+   "must": [
+    "ECDSA-P-256-SHA-256"
+   ],
+   "program": "jwt-field",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 23,
+   "may": [],
+   "must": [
+    "ECDSA-P-256-SHA-256"
+   ],
+   "program": "jwt-field",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 12,
+   "may": [],
+   "must": [
+    "Ed25519"
+   ],
+   "program": "jwt-interproc",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 22,
+   "may": [],
+   "must": [
+    "Ed25519"
+   ],
+   "program": "jwt-interproc",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "encode",
+   "line": 15,
+   "may": [],
+   "must": [
+    "HMAC-SHA-384",
+    "HMAC-SHA-512"
+   ],
+   "program": "jwt-path",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "decode",
+   "line": 17,
+   "may": [],
+   "must": [
+    "HMAC-SHA-384",
+    "HMAC-SHA-512"
+   ],
+   "program": "jwt-path",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "derive",
+   "line": 24,
+   "may": [
+    "PBKDF2-SHA-512"
+   ],
+   "must": [
+    "PBKDF2-SHA-256"
+   ],
+   "program": "kdf-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "generate",
+   "line": 6,
+   "may": [],
+   "must": [
+    "ML-KEM-768"
+   ],
+   "program": "kem-basic",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "encapsulate",
+   "line": 7,
+   "may": [],
+   "must": [
+    "ML-KEM-768"
+   ],
+   "program": "kem-basic",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "decapsulate",
+   "line": 8,
+   "may": [],
+   "must": [
+    "ML-KEM-768"
+   ],
+   "program": "kem-basic",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "random",
+   "line": 6,
+   "may": [],
+   "must": [
+    "ECDH-P-256"
+   ],
+   "program": "kex-interproc",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "diffie_hellman",
+   "line": 12,
+   "may": [],
+   "must": [
+    "ECDH-P-256"
+   ],
+   "program": "kex-interproc",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "verify_password",
+   "line": 8,
+   "may": [],
+   "must": [
+    "Argon2id"
+   ],
+   "program": "pwhash-argon2",
+   "reported": [
+    "Argon2"
+   ],
+   "verdict": "less-specific"
+  },
+  {
+   "callee": "bcrypt_pbkdf",
+   "line": 5,
+   "may": [],
+   "must": [
+    "bcrypt-pbkdf"
+   ],
+   "program": "pwhash-bcryptpbkdf",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "fill",
+   "line": 7,
+   "may": [],
+   "must": [
+    "OS-RNG"
+   ],
+   "program": "rng-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "fill_bytes",
+   "line": 9,
+   "may": [],
+   "must": [
+    "OS-RNG"
+   ],
+   "program": "rng-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "fill_bytes",
+   "line": 11,
+   "may": [],
+   "must": [
+    "ChaCha12-RNG"
+   ],
+   "program": "rng-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "gen_range",
+   "line": 12,
+   "may": [],
+   "must": [
+    "ChaCha12-RNG"
+   ],
+   "program": "rng-basic",
+   "reported": [],
+   "verdict": "miss"
+  },
+  {
+   "callee": "generate_pkcs8",
+   "line": 24,
+   "may": [],
+   "must": [
+    "ECDSA-P-384-SHA-384"
+   ],
+   "program": "sig-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "sign",
+   "line": 27,
+   "may": [],
+   "must": [
+    "ECDSA-P-384-SHA-384"
+   ],
+   "program": "sig-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "verify",
+   "line": 29,
+   "may": [],
+   "must": [
+    "ECDSA-P-384-SHA-384"
+   ],
+   "program": "sig-dyn",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "sign",
+   "line": 17,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-384"
+   ],
+   "program": "sig-field",
+   "reported": [
+    "RSA-PKCS1-1.5"
+   ],
+   "verdict": "less-specific"
+  },
+  {
+   "callee": "verify",
+   "line": 23,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-384"
+   ],
+   "program": "sig-field",
+   "reported": [
+    "RSA-PKCS1-1.5"
+   ],
+   "verdict": "less-specific"
+  }
+ ],
+ "sites": 107,
+ "unlabelled_uses": 5,
+ "verdicts": {
+  "correct": 69,
+  "honest-unknown": 16,
+  "less-specific": 3,
+  "miss": 19,
+  "wrong": 0
+ }
+}

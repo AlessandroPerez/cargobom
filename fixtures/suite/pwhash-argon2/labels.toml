@@ -1,0 +1,19 @@
+# pwhash-argon2: what = password hashing, how = argon2
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "hash_password"
+function = "keyderive"
+must = ["Argon2id"]
+may = []
+note = "Argon2::default() is Argon2id v0x13 with library default costs (not labelled, R11)"
+
+[[site]]
+file = "src/main.rs"
+line = 8
+callee = "verify_password"
+function = "verify"
+must = ["Argon2id"]
+may = []
+note = "algorithm taken from the PHC hash produced on line 7 (argon2id); fixed data the program produces itself (R3)"

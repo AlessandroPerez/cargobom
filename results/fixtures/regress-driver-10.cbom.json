@@ -317,6 +317,42 @@
       "version": "0.6.4"
     },
     {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via t10 -> aes-gcm -> subtle",
+            "line": 218,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
       "bom-ref": "pkg:cargo/universal-hash@0.5.1",
       "evidence": {
         "occurrences": [
@@ -434,7 +470,8 @@
         "pkg:cargo/aes@0.8.4",
         "pkg:cargo/cipher@0.4.4",
         "pkg:cargo/ctr@0.9.2",
-        "pkg:cargo/ghash@0.5.1"
+        "pkg:cargo/ghash@0.5.1",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "provides": [
         "crypto:algorithm:AES-256-GCM"
@@ -482,6 +519,10 @@
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/aes-gcm@0.10.3"
       ],
@@ -489,7 +530,8 @@
     },
     {
       "dependsOn": [
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/universal-hash@0.5.1"
     },
@@ -556,7 +598,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b1e8e26b-3f8d-82cd-a288-dded4ca12881",
+  "serialNumber": "urn:uuid:330a996f-1d68-8f38-aaee-bea853e96b61",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,11 @@
+# kdf-dyn: what = KDF, how = dyn
+
+[[site]]
+file = "src/main.rs"
+line = 24
+callee = "derive"
+function = "keyderive"
+must = ["PBKDF2-SHA-256"]
+may = ["PBKDF2-SHA-512"]
+params = { iterations = "600000", length = "32" }
+note = "only Interactive reaches derive_key; Archival is also coerced to dyn KdfProfile (used for name()), so its prf is a possible dyn target"

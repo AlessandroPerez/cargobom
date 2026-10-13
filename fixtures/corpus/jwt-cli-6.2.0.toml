@@ -1,0 +1,80 @@
+# Ground truth for jwt-cli-6.2.0: Layer 1 crypto packages and Layer 2 operation sites in the
+# project's own source, written from source by two independent labellers (agents, blind
+# to each other and to any tool output), differences adjudicated by the rules
+# (13 October 2026).
+
+# Ground-truth labels: jwt-cli 6.2.0 (/var/tmp/rcbom-validate/jwt-cli-6.2.0)
+# Build analysed: default features, host x86_64-unknown-linux-gnu, release build of bin "jwt"
+# (src/main.rs). jsonwebtoken is 9.2.0 here (crypto backend ring 0.17.7), not the 9.3.1 named in RULES.md.
+# --alg accepts all 12 SupportedAlgorithms (cli_config.rs:184-197); decode falls back to the token
+# header's alg or HS256 (decode.rs:118-122). #[cfg(test)] modules are out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "getrandom"
+version = "0.2.12"
+kind = "rng"
+why = "OS random number source used by ring SystemRandom"
+
+[[package]]
+name = "jsonwebtoken"
+version = "9.2.0"
+kind = "protocol"
+why = "JWT/JWS encode (sign/MAC) and decode (verify) over ring"
+
+[[package]]
+name = "pem"
+version = "3.0.3"
+kind = "support"
+why = "PEM encoding/decoding of keys and certificates"
+
+[[package]]
+name = "ring"
+version = "0.17.7"
+kind = "algorithm"
+why = "crypto library backing jsonwebtoken: HMAC, RSA PKCS#1/PSS, ECDSA, Ed25519, SystemRandom"
+
+[[package]]
+name = "simple_asn1"
+version = "0.6.2"
+kind = "support"
+why = "ASN.1 DER encoding/decoding used for key formats"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/translators/encode.rs"
+line = 126
+callee = "encode"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384", "Ed25519", "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512", "RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512", "RSA-PSS-SHA-256", "RSA-PSS-SHA-384", "RSA-PSS-SHA-512"]
+may = []
+note = "jsonwebtoken::encode with Header::new(translate_algorithm(--alg)) (encode.rs:11-12,71-72); every JOSE alg is selectable and has a matching EncodingKey constructor; HS* perform an HMAC tag, the rest a signature (one site, function sign, see DECISIONS)"
+
+[[site]]
+file = "src/translators/decode.rs"
+line = 152
+callee = "decode"
+function = "verify"
+must = []
+may = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
+note = "jsonwebtoken::decode with insecure_validator after insecure_disable_signature_validation(): validate_signature is false, so no signature/MAC is checked (decoding.rs:216-232); may = Validation.algorithms because the field-based analysis also sees validate_signature = true"
+
+[[site]]
+file = "src/translators/decode.rs"
+line = 166
+callee = "decode"
+function = "verify"
+must = ["ECDSA-P-256-SHA-256", "ECDSA-P-384-SHA-384", "Ed25519", "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512", "RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-384", "RSA-PKCS1-1.5-SHA-512", "RSA-PSS-SHA-256", "RSA-PSS-SHA-384", "RSA-PSS-SHA-512"]
+may = []
+note = "jsonwebtoken::decode with secret_validator = Validation::new(algorithm), algorithm from --alg or the token header (fallback HS256), key from --secret (plain/b64/PEM/DER/JWKS); verifies HS* MACs and all signature algs"
+
+[[site]]
+file = "src/translators/decode.rs"
+line = 169
+callee = "decode"
+function = "verify"
+must = []
+may = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
+note = "jsonwebtoken::decode with insecure_validator (signature validation disabled) when no --secret is given: no verification runs; may as for line 152"

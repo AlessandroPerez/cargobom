@@ -1,0 +1,97 @@
+  occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.lock:6:0 | blake2 | [manifest] locked blake2 0.10.6; reached via xofmac -> blake2
+  occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.toml:10:0 | blake2 | [manifest] declared by xofmac (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:15:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via xofmac -> blake2 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:33:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via xofmac -> blake2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:43:0 | digest | [manifest] locked digest 0.10.7; reached via xofmac -> blake2 -> digest
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:64:0 | keccak | [manifest] locked keccak 0.1.6; reached via xofmac -> sha3 -> keccak
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:79:0 | sha3 | [manifest] locked sha3 0.10.9; reached via xofmac -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:9:0 | sha3 | [manifest] declared by xofmac (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:89:0 | subtle | [manifest] locked subtle 2.6.1; reached via xofmac -> blake2 -> digest -> subtle
+  occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:12:6 | digest::Update::update | [reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `x.update(&d);`; code: `update`
+  occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:13:18 | digest::ExtendableOutput::finalize_xof | [reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let mut r = x.finalize_xof();`; code: `finalize_xof`
+  occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:15:6 | digest::XofReader::read | [reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `r.read(&mut out);`; code: `read`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:16:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in xofmac::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (3 bytes, literal at line 16); line: `let mut m = <Blake2bMac512 as Mac>::new_from_slice(b"key").unwrap();`; code: `<Blake2bMac512 as Mac>::new_from_slice`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:17:4 | digest::mac::Mac::update | [reachable] [call] in xofmac::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Mac::update(&mut m, &d);`; code: `Mac::update`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:18:14 | digest::mac::Mac::finalize | [reachable] [call] in xofmac::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let t = m.finalize().into_bytes();`; code: `finalize`
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:scope=required
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:kb-coverage=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:reachability=reachable
+asset unknown | crypto:algorithm:unknown:hash:sha3 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:mac:blake2 | {"algorithmProperties": {"cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+component library blake2 0.10.6 | pkg:cargo/blake2@0.10.6 | purl pkg:cargo/blake2@0.10.6
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep pkg:cargo/blake2@0.10.6 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dep pkg:cargo/xofmac@0.1.0 -> pkg:cargo/blake2@0.10.6
+dep pkg:cargo/xofmac@0.1.0 -> pkg:cargo/sha3@0.10.9
+dependency crypto:algorithm:unknown:hash:sha3
+dependency crypto:algorithm:unknown:mac:blake2
+dependency pkg:cargo/blake2@0.10.6
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/xofmac@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:mac:blake2
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:unknown:hash:sha3
+root {"bom-ref": "pkg:cargo/xofmac@0.1.0", "name": "xofmac", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/xofmac@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=11
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=379
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

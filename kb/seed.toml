@@ -1740,6 +1740,18 @@ function = "decapsulate"
 primitives = ["kem"]
 methods = ["decapsulate"]
 
+# --- Layer 1: packages without [[crate]] entries -------------------------------------------
+# A package the knowledge base does not model is still reported as cryptographic when its
+# Cargo.toml says so (category `cryptography`, or a keyword crypto, cryptography, encryption,
+# tls, certificate, x509), as `support` when it is an encoding or parser of crypto data among
+# those (categories encoding, parser-implementations, memory-management). `crypto` lists
+# cryptographic packages whose metadata says nothing (bindings to C crypto libraries, the
+# zkcrypto field and group traits); `support` lists helpers whose metadata
+# says cryptography but which compute none (it never makes a package cryptographic by itself).
+[unmodelled]
+crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group"]
+support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "ppv-lite86", "pem", "crypto-bigint"]
+
 # --- Operations whose algorithm is a run-time value -----------------------------------------
 # A call matched here is always reported: with the algorithms that reach it, or, when none
 # does, with an unknown algorithm and the reason, never dropped. `path` is a regex over the
@@ -1830,6 +1842,157 @@ crate = ["ring", "aws_lc_rs"]
 path = "^agreement::(.+::)?agree(_ephemeral)?$"
 primitive = "key-agree"
 use = "keyderive"
+algorithm = 0
+
+# Operations of the RustCrypto traits: the algorithm is the Self type (`self_type = true`).
+# Types the knowledge base names are matched by their [[type]] entries; a type of a crypto
+# package it does not model (sha3, md-5) or of an unsupported version gives an unknown
+# algorithm naming that type. `path` is inside the trait crate.
+[[operation]]
+crate = "digest"
+path = "^(digest::(Digest::(digest|finalize|finalize_reset|finalize_into|finalize_into_reset|update|chain_update|new_with_prefix)|DynDigest::(update|finalize|finalize_reset|finalize_into|finalize_into_reset))|Update::(update|chain)|FixedOutput(Reset)?::finalize_(fixed|into)(_reset)?|ExtendableOutput(Reset)?::finalize_xof(_reset|_into)?|XofReader::read(_boxed)?)$"
+primitive = "hash"
+use = "digest"
+self_type = true
+
+[[operation]]
+crate = "digest"
+path = "^mac::Mac::(finalize|finalize_reset|update|chain_update)$"
+primitive = "mac"
+use = "tag"
+self_type = true
+
+[[operation]]
+crate = "digest"
+path = "^mac::Mac::verify(_slice|_truncated_left|_truncated_right|_reset|_slice_reset)?$"
+primitive = "mac"
+use = "verify"
+self_type = true
+
+[[operation]]
+crate = "aead"
+path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace)::encrypt(_in_place|_in_place_detached)?$|^stream::Encryptor::encrypt_(next|last)(_in_place)?$"
+primitive = "ae"
+use = "encrypt"
+self_type = true
+
+[[operation]]
+crate = "aead"
+path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace)::decrypt(_in_place|_in_place_detached)?$|^stream::Decryptor::decrypt_(next|last)(_in_place)?$"
+primitive = "ae"
+use = "decrypt"
+self_type = true
+
+[[operation]]
+crate = "cipher"
+path = "^stream::AsyncStreamCipher::encrypt"
+primitive = "stream-cipher"
+use = "encrypt"
+self_type = true
+
+[[operation]]
+crate = "cipher"
+path = "^stream::AsyncStreamCipher::decrypt"
+primitive = "stream-cipher"
+use = "decrypt"
+self_type = true
+
+[[operation]]
+crate = "crypto_common"
+path = "^KeyInit::generate_key$"
+primitive = "unknown"
+use = "keygen"
+self_type = true
+
+[[operation]]
+crate = "cipher"
+path = "^stream::StreamCipher::(try_)?apply_keystream(_b2b|_inout)?$"
+primitive = "stream-cipher"
+use = "encrypt or decrypt"
+self_type = true
+
+[[operation]]
+crate = "cipher"
+path = "^block::Block(Encrypt|EncryptMut)::encrypt_"
+primitive = "block-cipher"
+use = "encrypt"
+self_type = true
+
+[[operation]]
+crate = "cipher"
+path = "^block::Block(Decrypt|DecryptMut)::decrypt_"
+primitive = "block-cipher"
+use = "decrypt"
+self_type = true
+
+[[operation]]
+crate = "signature"
+path = "^(signer|hazmat)::\\w*Signer::(try_)?sign\\w*$"
+primitive = "signature"
+use = "sign"
+self_type = true
+
+[[operation]]
+crate = "signature"
+path = "^(verifier|hazmat)::\\w*Verifier::verify\\w*$"
+primitive = "signature"
+use = "verify"
+self_type = true
+
+[[operation]]
+crate = "password_hash"
+path = "^traits::PasswordHasher::hash_password(_customized)?$"
+primitive = "kdf"
+use = "keyderive"
+self_type = true
+
+[[operation]]
+crate = "password_hash"
+path = "^traits::PasswordVerifier::verify_password$"
+primitive = "kdf"
+use = "verify"
+self_type = true
+
+# Constructors of the RustCrypto traits: they set an algorithm up (no use); a type the
+# knowledge base does not model gives an unknown algorithm naming it, as a modelled one gives
+# its asset
+[[operation]]
+crate = "digest"
+path = "^digest::Digest::new$"
+primitive = "hash"
+use = "digest"
+self_type = true
+setup = true
+
+[[operation]]
+crate = "digest"
+path = "^mac::Mac::new(_from_slice)?$"
+primitive = "mac"
+use = "tag"
+self_type = true
+setup = true
+
+[[operation]]
+crate = "crypto_common"
+path = "^(KeyInit|KeyIvInit)::new(_from_slice|_from_slices)?$"
+primitive = "unknown"
+use = "encrypt"
+self_type = true
+setup = true
+
+# Key generation whose algorithm is a run-time value
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^ec::.*EcdsaKeyPair::generate(_pkcs8)?$"
+primitive = "signature"
+use = "keygen"
+algorithm = 0
+
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^agreement::(.+::)?(EphemeralPrivateKey|PrivateKey)::generate$"
+primitive = "key-agree"
+use = "keygen"
 algorithm = 0
 
 # --- Provenance -------------------------------------------------------------------------------

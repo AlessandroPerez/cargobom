@@ -234,6 +234,9 @@ struct Ctx<'a> {
     links: std::cell::RefCell<HashMap<CallKey<'a>, Vec<Match>>>,
     /// Values across functions (`links`): fields, results, parameters, mutable statics.
     flow: links::LinkIndex,
+    /// Crates of cryptographic packages the knowledge base does not model (Layer 1's
+    /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`).
+    unmodelled: HashSet<String>,
 }
 
 type CallKey<'a> = (&'a str, &'a str, usize, usize);
@@ -273,6 +276,14 @@ impl<'a> Ctx<'a> {
 }
 
 pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
+    // knowledge-base lookups by crate name go through the package each crate of this build
+    // comes from (the package md-5's library is named `md5`, like the package md5's)
+    kb.bind_crates(
+        facts
+            .iter()
+            .map(|f| (f.krate.name.clone(), f.krate.package.clone()))
+            .collect(),
+    );
     let ctx = Ctx {
         kb,
         crates: facts
@@ -298,6 +309,12 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .collect(),
         consumers: Default::default(),
         links: Default::default(),
+        unmodelled: man
+            .packages
+            .iter()
+            .filter(|p| p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
+            .filter_map(|p| p.lib_name.clone())
+            .collect(),
         flow: {
             let t = std::time::Instant::now();
             let ix = links::LinkIndex::new(facts);
@@ -458,6 +475,12 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 OwnerKind::Static if reachable_statics.contains(&site.owner.id) => Tier::Reachable,
                 OwnerKind::Static => Tier::Present,
                 OwnerKind::Fn if reached_fns.contains(site.owner.id.as_str()) => Tier::Reachable,
+                // a closure or `async` body is reached with the function that writes it: in a
+                // library's generic public function, which no instance walks, the per-item
+                // scan sees it alone (`serialize_der_with_signer::{closure#1}`)
+                OwnerKind::Fn if enclosing_fn(&site.owner.path).is_some_and(&reached_path) => {
+                    Tier::Reachable
+                }
                 OwnerKind::Fn => site.tier,
             };
             let Some(owner_pkg) = man.owner_of(&path) else {
@@ -481,6 +504,14 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
             // Inside an algorithm or trait crate the code *is* the implementation: not evidence.
             if matches!(owner_pkg.role, Some(Role::Algorithm | Role::Trait)) {
+                continue;
+            }
+            // nor is a crate the knowledge base does not model calling itself (hpke's own
+            // generic functions, instantiated with a hash)
+            if let Target::Call { callee, .. } = &site.target
+                && ctx.unmodelled.contains(&callee.krate.name)
+                && callee.krate == site.owner.krate
+            {
                 continue;
             }
             if let Target::Call { callee, .. } = &site.target
@@ -877,6 +908,31 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
         }
     }
+    // a crypto package the knowledge base does not model: reachable when the walk entered its
+    // code, present when it was compiled into the build
+    let walked: HashSet<&str> = facts
+        .iter()
+        .filter_map(|f| f.reach.as_ref())
+        .flat_map(|r| r.paths.iter())
+        .filter_map(|p| first_crate(p))
+        .collect();
+    let compiled: HashSet<(&str, &str)> = facts
+        .iter()
+        .map(|f| (f.krate.package.as_str(), f.krate.version.as_str()))
+        .collect();
+    for p in man.packages.iter().filter(|p| p.unmodelled.is_some()) {
+        let version = p.version.to_string();
+        let u = if p.lib_name.as_deref().is_some_and(|n| walked.contains(n)) {
+            Usage::Reachable
+        } else if compiled.contains(&(p.name.as_str(), version.as_str())) {
+            Usage::Present
+        } else {
+            Usage::DeclaredNotUsed
+        };
+        // at least what its occurrences gave it (a provider of a reachable occurrence)
+        let e = usage.entry((p.name.clone(), version)).or_insert(u);
+        *e = (*e).max(u);
+    }
     // An interface crate passes no usage on: its traits are implemented by the algorithm
     // crates, so aes-gcm using `aead`, or the program calling `KeyInit::new_from_slice`, does not
     // run `aead`'s `getrandom` (through crypto-common and rand_core); `OsRng` called directly
@@ -884,7 +940,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     loop {
         let mut changed = false;
         for p in &man.packages {
-            if matches!(p.role, Some(Role::Protocol | Role::Trait)) {
+            // only modelled algorithm crates run their dependencies' code for sure: a package
+            // the knowledge base does not model (age) may use a dependency for anything
+            if p.role != Some(Role::Algorithm) {
                 continue;
             }
             let key = (p.name.clone(), p.version.to_string());
@@ -893,7 +951,8 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             };
             for d in &p.runtime_deps {
                 let Some(dp) = man.by_id(d) else { continue };
-                if dp.role.is_none() {
+                // into crypto crates, modelled or not (salsa20 under scrypt)
+                if dp.role.is_none() && dp.unmodelled.is_none() {
                     continue;
                 }
                 let e = usage
@@ -1552,33 +1611,24 @@ fn site_matches(
                     }
                 }
             }
-            // an operation whose algorithm is a run-time value is never dropped: when no
-            // algorithm reaches it, it is reported with an unknown one, and why
+            // an operation is never dropped: when no algorithm reaches it, it is reported with
+            // an unknown one, and why
             if out.is_empty()
-                && supported(&callee.krate)
-                && let Some(op) = kb.operation(
-                    &callee.krate.name,
-                    &matcher::strip_generics(
-                        callee
-                            .path
-                            .strip_prefix(&format!("{}::", callee.krate.name))
-                            .unwrap_or(&callee.path),
-                    ),
-                )
+                && let Some((primitive, function, reason, provider)) =
+                    unresolved_operation(ctx, site)
             {
-                // a function named as a value (`let f = digest;`) is no call: it has no
-                // arguments, and the call through the pointer is a site of its own
-                let reason = match &site.target {
-                    Target::Call { arg_origins, .. } => arg_origins.get(op.algorithm),
-                    _ => None,
-                }
-                .map(unresolved_reason);
+                // a set-up call (`Md5::new()`): the algorithm is there, not used yet
+                let setup = function.is_empty();
                 let mut m = Match {
                     name: UNKNOWN.to_string(),
                     algo: Algo {
                         asset: UNKNOWN.to_string(),
-                        primitive: op.primitive.clone(),
-                        functions: vec![op.function.clone()],
+                        primitive,
+                        functions: function
+                            .split(" or ")
+                            .filter(|f| !f.is_empty())
+                            .map(str::to_string)
+                            .collect(),
                         ..Algo::default()
                     },
                     params: BTreeMap::new(),
@@ -1587,19 +1637,13 @@ fn site_matches(
                     providers: BTreeSet::new(),
                     provider_crates: Vec::new(),
                 };
-                m.providers
-                    .extend(ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id));
-                if let Some(reason) = reason {
-                    let d = vec![format!("algorithm unresolved: {reason}")];
-                    out.push((
-                        m,
-                        Kind::Call,
-                        Some(op.function.clone()),
-                        symbol.clone(),
-                        d,
-                        false,
-                    ));
+                m.providers.extend(provider);
+                let mut d = vec![format!("algorithm unresolved: {reason}")];
+                if setup {
+                    d.insert(0, format!("{method}: setup, not a use"));
                 }
+                let function = (!setup).then_some(function);
+                out.push((m, Kind::Call, function, symbol.clone(), d, false));
             }
             if let (Some(n), Some(first)) = (&fn_name, out.first_mut()) {
                 first.0.components.extend(
@@ -1614,10 +1658,275 @@ fn site_matches(
     out
 }
 
+/// The function a closure or `async` body is written in (`f` for `f::{closure#1}::{closure#0}`),
+/// or `None` for a function.
+fn enclosing_fn(path: &str) -> Option<&str> {
+    let i = path.find("::{")?;
+    Some(&path[..i])
+}
+
+/// The crate a defining path starts with (`age` for `<age::Encryptor as Debug>::fmt`).
+fn first_crate(path: &str) -> Option<&str> {
+    let mut p = path.trim_start_matches(['<', '&', '*', ' ']);
+    for prefix in ["mut ", "const ", "dyn "] {
+        p = p.strip_prefix(prefix).unwrap_or(p);
+    }
+    let p = p.trim_start_matches(['<', '&', ' ']);
+    let end = p.find("::")?;
+    let k = &p[..end];
+    (!k.is_empty() && k.chars().all(|c| c.is_alphanumeric() || c == '_')).then_some(k)
+}
+
 /// An owner id that is a def-path hash (32 hex digits), as the driver gives a generic function
 /// it scans without an instance; an instance's id is its mangled name.
 fn is_def_hash(id: &str) -> bool {
     id.len() == 32 && id.bytes().all(|b| b.is_ascii_hexdigit())
+}
+
+/// (primitive, use, reason, providing packages) of an operation whose algorithm is not named.
+type Unresolved = (String, String, String, Vec<(String, String)>);
+
+/// A call that performs an operation whose algorithm the knowledge base cannot name. Three
+/// kinds:
+/// - an `[[operation]]` whose algorithm is a run-time value no algorithm reaches;
+/// - an `[[operation]]` of a RustCrypto trait whose Self type is of a crypto package the
+///   knowledge base does not model, or of a version it does not cover (`Sha3_256::digest`);
+/// - a call from another crate into a crypto package the knowledge base does not model, with a
+///   method that is a use (`p256::ecdh::diffie_hellman`).
+fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
+    let Target::Call {
+        callee,
+        method,
+        self_ty,
+        args,
+        arg_origins,
+        ..
+    } = &site.target
+    else {
+        return None;
+    };
+    let in_crate = callee
+        .path
+        .strip_prefix(&format!("{}::", callee.krate.name))
+        .unwrap_or(&callee.path);
+    // any version of the crate: a trait crate of an unsupported version (digest 0.11 under sha2
+    // 0.11) still names the operation
+    let op = ctx.kb.crate_by_name(&callee.krate.name).and_then(|_| {
+        ctx.kb
+            .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
+    });
+    match op {
+        Some(op) if op.self_type => {
+            let t = self_ty.as_ref()?;
+            // a trait object (`Box<dyn DynDigest>`): the type is chosen at run time
+            let (reason, provider) = match dyn_trait(t) {
+                Some(d) => (
+                    format!(
+                        "a trait object (`dyn {}`): its type is chosen at run time",
+                        short(d)
+                    ),
+                    ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
+                        .into_iter()
+                        .collect(),
+                ),
+                None => unmodelled_type(ctx, site, t)?,
+            };
+            let function = if op.setup {
+                String::new()
+            } else {
+                op.function.clone()
+            };
+            // a keystream of a mode over a block cipher (`ctr::Ctr64BE<Blowfish>`) is the block
+            // cipher's operation, as the knowledge base names AES-CTR
+            let primitive = match t {
+                rcbom_facts::TyTree::Adt { krate, .. }
+                    if op.primitive == "stream-cipher"
+                        && matches!(krate.name.as_str(), "ctr" | "cfb_mode" | "cfb8" | "ofb") =>
+                {
+                    "block-cipher".to_string()
+                }
+                _ => op.primitive.clone(),
+            };
+            Some((primitive, function, reason, provider))
+        }
+        Some(op) => {
+            // a function named as a value (`let f = digest;`) is no call: it has no arguments,
+            // and the call through the pointer is a site of its own
+            let reason = unresolved_reason(arg_origins.get(op.algorithm)?);
+            let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
+            Some((
+                op.primitive.clone(),
+                op.function.clone(),
+                reason,
+                provider.into_iter().collect(),
+            ))
+        }
+        None => {
+            // a crypto package the knowledge base does not model, called from another crate
+            if !ctx.unmodelled.contains(&callee.krate.name)
+                || site.owner.krate.name == callee.krate.name
+                || GENERIC_METHODS.contains(&method.as_str())
+            {
+                return None;
+            }
+            let mut uses: Vec<&str> = ctx
+                .kb
+                .uses
+                .iter()
+                .filter(|u| u.methods.iter().any(|m| m == method))
+                .map(|u| u.function.as_str())
+                .collect();
+            uses.sort();
+            uses.dedup();
+            if uses.is_empty() {
+                return None;
+            }
+            let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
+            let reason = match &provider {
+                Some((n, v)) => format!(
+                    "`{}` of {n} {v}, a crypto package the knowledge base does not model",
+                    short(&callee.path)
+                ),
+                None => format!("`{}` is not modelled", short(&callee.path)),
+            };
+            // the algorithm's packages are those of the types the call is made on or for
+            // (`kem::Encapsulate::encapsulate` on an ml-kem key, `diffie_hellman::<NistP256>`),
+            // the called crate's when it names none
+            let typed: Vec<(String, String)> = self_ty
+                .iter()
+                .chain(args.iter())
+                .flat_map(|t| crypto_packages(ctx, t))
+                .collect();
+            // with the called crate, which the call's path names (`kem::Encapsulate`)
+            let mut provider: Vec<(String, String)> = typed.into_iter().chain(provider).collect();
+            provider.sort();
+            provider.dedup();
+            Some(("unknown".into(), uses.join(" or "), reason, provider))
+        }
+    }
+}
+
+/// Method names that say nothing about cryptography without a modelled type to scope them: a
+/// `write` is a hash update on a `Sha256` but plain output on age's `ArmoredWriter`.
+const GENERIC_METHODS: &[&str] = &[
+    "write",
+    "write_all",
+    "copy",
+    "update",
+    "chain_update",
+    "finish",
+    "finalize",
+    "hash",
+    "consume",
+    "compute",
+    "fill",
+    "new_with_prefix",
+];
+
+/// The principal trait of a trait object type (`dyn digest::DynDigest`), behind references.
+fn dyn_trait(t: &rcbom_facts::TyTree) -> Option<&str> {
+    use rcbom_facts::TyTree;
+    match t {
+        TyTree::Dyn(traits) => traits.first().map(String::as_str),
+        TyTree::Ref(t) => dyn_trait(t),
+        TyTree::Adt { path, args, .. } if path.ends_with("::Box") => {
+            args.first().and_then(dyn_trait)
+        }
+        _ => None,
+    }
+}
+
+/// The packages of the algorithm crates a type names (modelled or not), outside the program.
+fn crypto_packages(ctx: &Ctx<'_>, t: &rcbom_facts::TyTree) -> Vec<(String, String)> {
+    use rcbom_facts::TyTree;
+    let mut out = Vec::new();
+    let mut stack = vec![t];
+    while let Some(t) = stack.pop() {
+        match t {
+            TyTree::Adt { krate, args, .. } => {
+                if let Some(p) = ctx.package_of_crate(&krate.name, &krate.stable_id)
+                    && !ctx.local.contains(&p)
+                    && (ctx.unmodelled.contains(&krate.name)
+                        || ctx
+                            .kb
+                            .crate_by_name(&krate.name)
+                            .is_some_and(|e| e.role == Role::Algorithm))
+                {
+                    out.push(p);
+                }
+                stack.extend(args.iter());
+            }
+            TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => stack.push(t),
+            TyTree::Tuple(ts) => stack.extend(ts.iter()),
+            _ => {}
+        }
+    }
+    out
+}
+
+/// The type in a call's Self type that names its algorithm and is not modelled: the innermost
+/// type of a crypto package the knowledge base does not model (`sha3::Sha3_256Core` in
+/// `CoreWrapper<..>`), or of a version it does not cover; with the reason and its package. A
+/// type of the program's own crates is its own code (out of scope), and a type of the crate
+/// making the call is that crate's implementation: neither gives an occurrence.
+fn unmodelled_type(
+    ctx: &Ctx<'_>,
+    site: &Site,
+    t: &rcbom_facts::TyTree,
+) -> Option<(String, Vec<(String, String)>)> {
+    use rcbom_facts::TyTree;
+    let mut found: Option<(&rcbom_facts::CrateRef, &str, bool)> = None;
+    // the algorithm crates in the type provide the algorithm together: the unmodelled cipher
+    // and the modelled mode crate of `cbc::Encryptor<blowfish::Blowfish>`
+    let mut providers: Vec<(String, String)> = Vec::new();
+    let mut stack = vec![t];
+    while let Some(t) = stack.pop() {
+        match t {
+            TyTree::Adt { krate, path, args } => {
+                let package = ctx.package_of_crate(&krate.name, &krate.stable_id);
+                let local = package.as_ref().is_some_and(|p| ctx.local.contains(p));
+                let kb_entry = ctx.kb.crate_by_name(&krate.name);
+                let unsupported = kb_entry.is_some() && !ctx.supported(krate);
+                if !local && (unsupported || ctx.unmodelled.contains(&krate.name)) {
+                    found = Some((krate, path, unsupported));
+                }
+                if let Some(p) = package
+                    && !local
+                    && (ctx.unmodelled.contains(&krate.name)
+                        || kb_entry.is_some_and(|e| e.role == Role::Algorithm))
+                    && !providers.contains(&p)
+                {
+                    providers.push(p);
+                }
+                stack.extend(args.iter());
+            }
+            TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => stack.push(t),
+            TyTree::Tuple(ts) => stack.extend(ts.iter()),
+            _ => {}
+        }
+    }
+    let (krate, path, unsupported) = found?;
+    if krate.name == site.owner.krate.name {
+        return None;
+    }
+    let of = ctx
+        .package_of_crate(&krate.name, &krate.stable_id)
+        .as_ref()
+        .map(|(n, v)| format!(" of {n} {v}"))
+        .unwrap_or_default();
+    let reason = if unsupported {
+        format!(
+            "the type `{}`{of}, a version the knowledge base does not cover",
+            short(path)
+        )
+    } else {
+        format!(
+            "the type `{}`{of}, a crypto package the knowledge base does not model",
+            short(path)
+        )
+    };
+    providers.sort();
+    Some((reason, providers))
 }
 
 /// The name of the asset of operations whose algorithm the analysis does not find; its family

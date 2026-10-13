@@ -1,0 +1,19 @@
+# jwt-basic: what = JWT, how = basic
+
+[[site]]
+file = "src/main.rs"
+line = 7
+callee = "encode"
+function = "tag"
+must = ["HMAC-SHA-256"]
+may = []
+note = "HS256 header; JWS HMAC -> tag"
+
+[[site]]
+file = "src/main.rs"
+line = 9
+callee = "decode"
+function = "verify"
+must = ["HMAC-SHA-256"]
+may = []
+note = "Validation::new(HS256)"

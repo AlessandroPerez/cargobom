@@ -60,6 +60,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[manifest] locked aws-lc-sys 0.45.0; reached via t14 -> aws-lc-rs -> aws-lc-sys",
+            "line": 17,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aws-lc-sys"
+          },
+          {
             "additionalContext": "[manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed",
             "line": 19,
             "location": "aws-lc-sys-0.45.0/Cargo.toml",
@@ -73,6 +80,18 @@
         {
           "name": "rcbom:scope",
           "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         },
         {
           "name": "rcbom:native-links",
@@ -172,6 +191,42 @@
       "purl": "pkg:cargo/ring@0.17.14",
       "type": "library",
       "version": "0.17.14"
+    },
+    {
+      "bom-ref": "pkg:cargo/zeroize@1.9.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked zeroize 1.9.1; reached via t14 -> aws-lc-rs -> zeroize",
+            "line": 244,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "zeroize"
+          }
+        ]
+      },
+      "name": "zeroize",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/zeroize@1.9.1",
+      "type": "library",
+      "version": "1.9.1"
     },
     {
       "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
@@ -572,7 +627,8 @@
   "dependencies": [
     {
       "dependsOn": [
-        "pkg:cargo/aws-lc-sys@0.45.0"
+        "pkg:cargo/aws-lc-sys@0.45.0",
+        "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
         "crypto:algorithm:ECDSA-P-256-SHA-256",
@@ -605,6 +661,10 @@
         "pkg:cargo/ring@0.17.14"
       ],
       "ref": "pkg:cargo/t14@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/zeroize@1.9.1"
     },
     {
       "dependsOn": [
@@ -683,7 +743,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b7f7c554-7756-884e-b413-ecd94e51b549",
+  "serialNumber": "urn:uuid:d6b48a72-ccb8-8590-a1cf-0589810b9e53",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,19 @@
+# sig-path: what = signature, how = path
+
+[[site]]
+file = "src/main.rs"
+line = 18
+callee = "sign"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-256", "RSA-PSS-SHA-256"]
+may = []
+note = "runtime branch selects PSS-SHA256 or PKCS1-SHA256 padding; COMPAT const false -> RSA-PKCS1-1.5-SHA-512 nothing"
+
+[[site]]
+file = "src/main.rs"
+line = 20
+callee = "verify"
+function = "verify"
+must = ["RSA-PKCS1-1.5-SHA-256", "RSA-PSS-SHA-256"]
+may = []
+note = "verification algorithm chosen by the same branch"
