@@ -1,0 +1,91 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:12:30 | rand::rng::Rng::sample_iter | [reachable] [call] in probe34::main; use: generate; line: `let v: Vec<u8> = (&mut t).sample_iter(rand::distributions::Standard).take(4).collect();`; code: `sample_iter`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:9:14 | rand::rng::Rng::gen_ratio | [reachable] [call] in probe34::main; use: generate; line: `let r = t.gen_ratio(1, 3);`; code: `gen_ratio`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:11:4 | getrandom::getrandom | [reachable] [call] in probe34::main; use: generate; line: `getrandom::getrandom(&mut buf).unwrap();`; code: `getrandom::getrandom`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:7:22 | ring::rand::generate | [reachable] [call] in probe34::main; use: generate; line: `let k: [u8; 32] = ring::rand::generate(&rng).unwrap().expose();`; code: `ring::rand::generate`
+  occ getrandom | pkg:cargo/getrandom@0.2.15 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.15; reached via probe34 -> getrandom
+  occ getrandom | pkg:cargo/getrandom@0.2.15 | Cargo.toml:9:0 | getrandom | [manifest] declared by probe34 (dependencies)
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:45:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via probe34 -> rand -> rand_chacha -> ppv-lite86
+  occ rand | pkg:cargo/rand@0.8.5 | Cargo.lock:81:0 | rand | [manifest] locked rand 0.8.5; reached via probe34 -> rand
+  occ rand | pkg:cargo/rand@0.8.5 | Cargo.toml:8:0 | rand | [manifest] declared by probe34 (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:92:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via probe34 -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:102:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via probe34 -> rand -> rand_core
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:111:0 | ring | [manifest] locked ring 0.17.14; reached via probe34 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:7:0 | ring | [manifest] declared by probe34 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=2
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=2
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop getrandom | pkg:cargo/getrandom@0.2.15 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.15 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.15 | rcbom:usage=reachable
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+component library getrandom 0.2.15 | pkg:cargo/getrandom@0.2.15 | purl pkg:cargo/getrandom@0.2.15
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
+component library rand 0.8.5 | pkg:cargo/rand@0.8.5 | purl pkg:cargo/rand@0.8.5
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/probe34@0.1.0 -> pkg:cargo/getrandom@0.2.15
+dep pkg:cargo/probe34@0.1.0 -> pkg:cargo/rand@0.8.5
+dep pkg:cargo/probe34@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.15
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.15
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:OS-RNG
+dependency pkg:cargo/getrandom@0.2.15
+dependency pkg:cargo/ppv-lite86@0.2.21
+dependency pkg:cargo/probe34@0.1.0
+dependency pkg:cargo/rand@0.8.5
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/getrandom@0.2.15 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/rand@0.8.5 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:OS-RNG
+root {"bom-ref": "pkg:cargo/probe34@0.1.0", "name": "probe34", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe34@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=14
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=108
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

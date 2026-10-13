@@ -6292,6 +6292,82 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in <rustls::crypto::ring::Ring as rustls::crypto::SecureRandom>::fill; use: generate; line: `.fill(buf)`; code: `fill`",
+            "line": 51,
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key)`; code: `fill`",
+            "line": 65,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key_name)`; code: `fill`",
+            "line": 72,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::encrypt; use: generate; line: `.fill(&mut nonce_buf)`; code: `fill`",
+            "line": 99,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -10452,6 +10528,7 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:HMAC-SHA-384",
         "crypto:algorithm:HMAC-SHA-512",
+        "crypto:algorithm:OS-RNG",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
@@ -10692,6 +10769,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:material:private-key:RSA"
     },
     {
@@ -10781,7 +10862,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:17b06de1-9ffb-829b-b739-0c42e439e7a4",
+  "serialNumber": "urn:uuid:6af2cf4b-9372-83a5-a172-46b0e7539a13",
   "specVersion": "1.7",
   "version": 1
 }

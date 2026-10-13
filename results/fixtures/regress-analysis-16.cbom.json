@@ -879,6 +879,61 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a16::seal_chacha; use: generate; line: `SystemRandom::new().fill(&mut n).unwrap();`; code: `fill`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::rand::SecureRandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:PBKDF2-SHA-512",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1506,6 +1561,7 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:HMAC-SHA-384",
         "crypto:algorithm:HMAC-SHA-512",
+        "crypto:algorithm:OS-RNG",
         "crypto:algorithm:PBKDF2-SHA-512",
         "crypto:algorithm:RSA-PSS-SHA-512",
         "crypto:algorithm:SHA-1",
@@ -1582,6 +1638,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -1666,7 +1726,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f2c087d0-19cc-8d9a-98d0-8cbf36904af8",
+  "serialNumber": "urn:uuid:668b3c3a-e019-8a40-bb42-edd44d8439bb",
   "specVersion": "1.7",
   "version": 1
 }

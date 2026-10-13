@@ -131,7 +131,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/getrandom@0.2.17",
@@ -221,7 +221,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/zeroize@1.9.1",
@@ -370,10 +370,10 @@
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t14::f1 at src/main.rs:60:12; line: `let f = digest;`; code: `digest`",
-            "line": 59,
+            "additionalContext": "[reachable] [call] in t14::f1::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:59:12; instantiated by t14::f1 at src/main.rs:60:12; line: `let g = |x: &[u8]| f(&SHA256, x).as_ref().len();`; code: `f`",
+            "line": 60,
             "location": "src/main.rs",
-            "offset": 12,
+            "offset": 23,
             "symbol": "ring::digest::digest"
           },
           {
@@ -384,10 +384,10 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> Digest = digest::digest;`; code: `digest::digest`",
-            "line": 77,
+            "additionalContext": "[reachable] [call] in t14::f3; use: digest; algorithm from ring::digest::SHA256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:77:53; line: `let x = h(&SHA256, d);`; code: `h`",
+            "line": 78,
             "location": "src/main.rs",
-            "offset": 53,
+            "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
@@ -478,10 +478,10 @@
             "symbol": "<t14::S384 as t14::Scheme>::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let h = Holder { f: digest };`; code: `digest`",
-            "line": 69,
+            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA384 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:69:24; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `(h.f)`",
+            "line": 71,
             "location": "src/main.rs",
-            "offset": 24,
+            "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
@@ -579,10 +579,10 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let t = (digest, 1u8);`; code: `digest`",
-            "line": 70,
+            "additionalContext": "[reachable] [call] in t14::f2; use: digest; algorithm from ring::digest::SHA512 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:70:13; line: `(h.f)(&SHA384, d).as_ref().len() + (t.0)(&SHA512, d).as_ref().len() + t.1 as usize`; code: `(t.0)`",
+            "line": 71,
             "location": "src/main.rs",
-            "offset": 13,
+            "offset": 39,
             "symbol": "ring::digest::digest"
           },
           {
@@ -743,7 +743,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d6b48a72-ccb8-8590-a1cf-0589810b9e53",
+  "serialNumber": "urn:uuid:f8979c57-4353-860e-ab86-8d3ba8a89c81",
   "specVersion": "1.7",
   "version": 1
 }

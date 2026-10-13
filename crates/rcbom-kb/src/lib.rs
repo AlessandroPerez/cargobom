@@ -53,6 +53,8 @@ struct UnmodelledRaw {
     crypto: Vec<String>,
     #[serde(default)]
     support: Vec<String>,
+    #[serde(default)]
+    not_crypto: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -241,6 +243,11 @@ pub struct Algo {
     /// variant (`{ variant = "id" }` for argon2), not the receiver's.
     #[serde(default)]
     pub own_defaults: BTreeMap<String, String>,
+    /// Packages implementing the algorithm under the one whose API is matched (rand_chacha
+    /// under rand's `ThreadRng`, getrandom under rand_core's `OsRng`): providers too, where the
+    /// build has them as that package's dependencies.
+    #[serde(default)]
+    pub implemented_by: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -417,6 +424,8 @@ pub struct Kb {
     /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
     pub unmodelled_crypto: Vec<String>,
     pub unmodelled_support: Vec<String>,
+    /// Types of modelled crates that compute no cryptography (rand's `SmallRng`), by name.
+    pub not_crypto: Vec<String>,
     /// The crates of the build being analysed, by name: the package each one comes from. Set
     /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
     /// library is named `md5`, like the package md5's).
@@ -622,6 +631,7 @@ impl Kb {
                 .collect::<Result<_>>()?,
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
+            not_crypto: raw.unmodelled.not_crypto,
             crate_packages: Default::default(),
         };
         kb.validate()?;
@@ -644,7 +654,13 @@ impl Kb {
         for a in algos {
             // a family of the 1.7 enum, or one the registry has added since (written as a
             // property); key material has no algorithmProperties, its family is a property
-            if a.material.is_none() && !in_family_enum(&a.family) && !registry::family(&a.family) {
+            // a random generator the registry has no family for (`OS-RNG`) names none
+            let unnamed_drbg = a.primitive == "drbg" && a.family.is_empty();
+            if a.material.is_none()
+                && !unnamed_drbg
+                && !in_family_enum(&a.family)
+                && !registry::family(&a.family)
+            {
                 bail!(
                     "{}: algorithm family {:?} is neither a CycloneDX 1.7 algorithmFamily nor \
                      a Cryptography Registry family",
@@ -908,9 +924,12 @@ mod tests {
             kb.crate_by_name("md5").map(|c| c.package.as_str()),
             Some("md5")
         );
-        // in a build whose crate md5 comes from the package md-5, it is not md5's entry
+        // in a build whose crate md5 comes from the package md-5, it is md-5's entry
         kb.bind_crates([("md5".to_string(), "md-5".to_string())].into());
-        assert!(kb.crate_by_name("md5").is_none());
+        assert_eq!(
+            kb.crate_by_name("md5").map(|c| c.package.as_str()),
+            Some("md-5")
+        );
         assert!(kb.crate_by_name("ring").is_none());
     }
 

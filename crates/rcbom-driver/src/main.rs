@@ -9,14 +9,15 @@
 //! Environment (set by `cargo cbom`):
 //!   RCBOM_OUT          directory for `<crate><unit>.json` (`<crate>-<stable id>.json`
 //!                      without a unit)
-//!   RCBOM_KB_CRATES    comma-separated crate names the knowledge base covers; only sites
-//!                      naming items of these crates are recorded
+//!   RCBOM_KB_CRATES    crates the knowledge base covers, one `name=dir` per line (the package's
+//!                      source directory); only sites naming items of these crates are recorded
 //!   RCBOM_LOCAL_DIRS   directories of the program's own packages (workspace members, path
 //!                      dependencies), one per line: their crates are never KB or stop crates
-//!   RCBOM_IMPL_CRATES  the stop crates' dependencies: from a stop crate, the walk does not
-//!                      follow calls into them (their implementation, not callbacks)
-//!   RCBOM_STOP_CRATES  crates whose bodies the reachability walk does not enter (algorithm
-//!                      implementations: the call into them is the fact, not their internals)
+//!   RCBOM_IMPL_CRATES  the stop crates' dependencies: from a stop crate, calls into them are
+//!                      their implementation, not callbacks (walked for usage only)
+//!   RCBOM_STOP_CRATES  crates whose bodies the reachability walk records no sites in (algorithm
+//!                      implementations: the call into them is the fact, not their internals);
+//!                      their code is followed only to learn which crates run
 //!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
 //!   RCBOM_SYSROOT      sysroot of the pinned toolchain (else asked from the wrapped rustc)
 //!   RCBOM_DEBUG        if set, print each panic the analysis catches (message and location),
@@ -177,22 +178,58 @@ fn sysroot(rustc: Option<&str>) -> String {
     String::from_utf8(out.stdout).unwrap().trim().to_string()
 }
 
-fn env_set(name: &str) -> HashSet<String> {
-    std::env::var(name)
-        .unwrap_or_default()
-        .split(',')
-        .filter(|s| !s.is_empty())
-        .map(|s| s.replace('-', "_"))
-        .collect()
+/// Crates by name, each with the source directories of the packages it may come from
+/// (`name=dir` entries, one per line; a bare name stands for any package): two packages can
+/// name their library alike (md5 0.7 and md-5's `md5`), and only the directory tells them apart.
+struct CrateSet(HashMap<String, Vec<std::path::PathBuf>>);
+
+impl CrateSet {
+    fn from_env(name: &str) -> CrateSet {
+        let mut m: HashMap<String, Vec<std::path::PathBuf>> = HashMap::new();
+        for e in std::env::var(name).unwrap_or_default().split('\n') {
+            if e.is_empty() {
+                continue;
+            }
+            let (n, dir) = match e.split_once('=') {
+                Some((n, d)) => (n, Some(std::path::PathBuf::from(d))),
+                None => (e, None),
+            };
+            let dirs = m.entry(n.replace('-', "_")).or_default();
+            dirs.extend(dir);
+        }
+        CrateSet(m)
+    }
+
+    /// Does crate `name`, whose root source file is `root`, belong to the set? Under
+    /// `--remap-path-prefix` a dependency's root is its remapped name (`/registry/md-5-0.10.6/
+    /// src/lib.rs`): the package directory's own name (`md-5-0.10.6`) still tells it apart.
+    fn contains(&self, name: &str, root: impl FnOnce() -> Option<std::path::PathBuf>) -> bool {
+        match self.0.get(name) {
+            None => false,
+            Some(dirs) if dirs.is_empty() => true,
+            Some(dirs) => root().is_some_and(|r| {
+                dirs.iter().any(|d| {
+                    r.starts_with(d)
+                        || d.file_name()
+                            .is_some_and(|n| r.components().any(|c| c.as_os_str() == n))
+                })
+            }),
+        }
+    }
 }
 
 /// Shared state for one crate's analysis.
 pub(crate) struct Cx<'tcx> {
     pub tcx: TyCtxt<'tcx>,
-    kb_crates: HashSet<String>,
-    stop_crates: HashSet<String>,
+    kb_crates: CrateSet,
+    stop_crates: CrateSet,
     /// The stop crates' dependencies (`RCBOM_IMPL_CRATES`).
-    impl_crates: HashSet<String>,
+    impl_crates: CrateSet,
+    /// Memo: the root source file of each crate (where its package's sources are).
+    crate_roots:
+        std::cell::RefCell<HashMap<rustc_span::def_id::CrateNum, Option<std::path::PathBuf>>>,
+    /// Memo: crates by stable id, for crates the facts name.
+    by_stable_id: std::cell::OnceCell<HashMap<String, rustc_span::def_id::CrateNum>>,
     /// The program's own crates (workspace members, path dependencies), by crate number and
     /// stable id: never the crates the knowledge base describes, whatever their names (a member
     /// called `signature`).
@@ -212,9 +249,11 @@ fn analyze(tcx: TyCtxt<'_>) {
     let (local, local_ids) = local_crates(tcx);
     let mut cx = Cx {
         tcx,
-        kb_crates: env_set("RCBOM_KB_CRATES"),
-        stop_crates: env_set("RCBOM_STOP_CRATES"),
-        impl_crates: env_set("RCBOM_IMPL_CRATES"),
+        kb_crates: CrateSet::from_env("RCBOM_KB_CRATES"),
+        stop_crates: CrateSet::from_env("RCBOM_STOP_CRATES"),
+        impl_crates: CrateSet::from_env("RCBOM_IMPL_CRATES"),
+        crate_roots: Default::default(),
+        by_stable_id: Default::default(),
         local,
         local_ids,
         interesting_statics: HashMap::new(),
@@ -524,6 +563,31 @@ fn local_crate_name(tcx: TyCtxt<'_>, p: String) -> String {
         rest = &rest[i + "crate::".len()..];
     }
     out.push_str(rest);
+    unraw(&out)
+}
+
+/// A path without raw-identifier prefixes: rustc prints rand's `gen` as `r#gen` when compiling
+/// a crate of edition 2024, where it is a keyword, and as `gen` from rand's own crate; one
+/// function, one path.
+fn unraw(p: &str) -> String {
+    let b = p.as_bytes();
+    let mut out = String::with_capacity(p.len());
+    let mut i = 0;
+    while i < b.len() {
+        let starts = i == 0 || !(b[i - 1].is_ascii_alphanumeric() || b[i - 1] == b'_');
+        if starts
+            && b[i] == b'r'
+            && b.get(i + 1) == Some(&b'#')
+            && b.get(i + 2)
+                .is_some_and(|c| c.is_ascii_alphabetic() || *c == b'_')
+        {
+            i += 2;
+            continue;
+        }
+        let c = p[i..].chars().next().unwrap_or_default();
+        out.push(c);
+        i += c.len_utf8();
+    }
     out
 }
 
@@ -839,25 +903,60 @@ fn local_crates(tcx: TyCtxt<'_>) -> (HashSet<rustc_span::def_id::CrateNum>, Hash
 }
 
 impl Cx<'_> {
+    /// The root source file of a crate (`…/md-5-0.10.6/src/lib.rs`), or its remapped name.
+    fn crate_root(&self, c: rustc_span::def_id::CrateNum) -> Option<std::path::PathBuf> {
+        self.crate_roots
+            .borrow_mut()
+            .entry(c)
+            .or_insert_with(|| {
+                let span = self.tcx.def_span(c.as_def_id());
+                let name = self.tcx.sess.source_map().span_to_filename(span);
+                matches!(name, rustc_span::FileName::Real(_)).then(|| {
+                    let cwd = std::env::current_dir().unwrap_or_default();
+                    cwd.join(name.prefer_local_unconditionally().to_string())
+                })
+            })
+            .clone()
+    }
+
+    fn in_set(&self, set: &CrateSet, c: rustc_span::def_id::CrateNum) -> bool {
+        !self.local.contains(&c)
+            && set.contains(self.tcx.crate_name(c).as_str(), || self.crate_root(c))
+    }
+
     /// Is this crate one the knowledge base describes?
     pub(crate) fn kb_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
-        !self.local.contains(&c) && self.kb_crates.contains(self.tcx.crate_name(c).as_str())
+        self.in_set(&self.kb_crates, c)
     }
 
     /// The same for a crate as the facts name it.
     fn kb_ref(&self, k: &rcbom_facts::CrateRef) -> bool {
-        !self.local_ids.contains(&k.stable_id) && self.kb_crates.contains(&k.name)
+        if self.local_ids.contains(&k.stable_id) {
+            return false;
+        }
+        let by_id = self.by_stable_id.get_or_init(|| {
+            self.tcx
+                .crates(())
+                .iter()
+                .chain(std::iter::once(&rustc_span::def_id::LOCAL_CRATE))
+                .map(|&c| (format!("{:016x}", self.tcx.stable_crate_id(c).as_u64()), c))
+                .collect()
+        });
+        match by_id.get(&k.stable_id) {
+            Some(&c) => self.kb_crate(c),
+            None => self.kb_crates.contains(&k.name, || None),
+        }
     }
 
     /// Is this crate one whose code the walk does not enter (an algorithm implementation)?
     pub(crate) fn stop_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
-        !self.local.contains(&c) && self.stop_crates.contains(self.tcx.crate_name(c).as_str())
+        self.in_set(&self.stop_crates, c)
     }
 
     /// Is this crate a dependency of a stop crate (`RCBOM_IMPL_CRATES`): part of how an
     /// algorithm is implemented, when a stop crate calls into it?
     fn impl_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
-        !self.local.contains(&c) && self.impl_crates.contains(self.tcx.crate_name(c).as_str())
+        self.in_set(&self.impl_crates, c)
     }
 
     /// A static is worth recording if it belongs to a KB crate, or its value points (through
@@ -1032,8 +1131,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         }
     }
 
-    fn push(&mut self, span: Span, target: Target) {
-        let mut internal = rustc_internal::internal(self.cx.tcx, span);
+    fn push_internal(&mut self, mut internal: rustc_span::Span, target: Target) {
         // code a derive generates with an input token's span (`quote_spanned!` at a field's
         // name): the derive's, not the field's
         if !internal.from_expansion()
@@ -1123,6 +1221,20 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         span: Span,
         call: Option<(&[Operand], &Terminator)>,
     ) {
+        let internal = rustc_internal::internal(self.cx.tcx, span);
+        self.record_call_at(def, args, internal, call, None);
+    }
+
+    /// `record_call` at a compiler span; `through`: where the function a pointer call calls was
+    /// named.
+    fn record_call_at(
+        &mut self,
+        def: &rustc_public::ty::FnDef,
+        args: &GenericArgs,
+        span: rustc_span::Span,
+        call: Option<(&[Operand], &Terminator)>,
+        through: Option<Loc>,
+    ) {
         let tcx = self.cx.tcx;
         let did = rustc_internal::internal(tcx, def.def_id());
         let callee = def_ref_internal(tcx, did);
@@ -1149,32 +1261,10 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             self_ty = Some(own.remove(1));
         }
         let (const_args, arg_origins, arg_lens) = match call {
-            Some((call_args, term)) => {
-                let origins: Vec<Origin> = call_args
-                    .iter()
-                    .map(|a| self.origins.of_arg(a, term))
-                    .collect();
-                let consts = call_args
-                    .iter()
-                    .zip(&origins)
-                    .map(|(a, o)| {
-                        const_int(a).or(match o {
-                            Origin::Const { value, .. }
-                            | Origin::Data { value, .. }
-                            | Origin::Unit { value, .. } => *value,
-                            _ => None,
-                        })
-                    })
-                    .collect();
-                let lens = call_args
-                    .iter()
-                    .map(|a| self.origins.array_len(a, term))
-                    .collect();
-                (consts, origins, lens)
-            }
+            Some((call_args, term)) => self.call_values(call_args, term),
             None => (Vec::new(), Vec::new(), Vec::new()),
         };
-        self.push(
+        self.push_internal(
             span,
             Target::Call {
                 callee,
@@ -1184,12 +1274,67 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                 const_args,
                 arg_origins,
                 arg_lens,
+                through,
+                value: call.is_none(),
             },
         );
     }
 
+    /// The value arguments of a call: integer constants, origins, array lengths.
+    #[allow(clippy::type_complexity)]
+    fn call_values(
+        &self,
+        call_args: &[Operand],
+        term: &Terminator,
+    ) -> (Vec<Option<i128>>, Vec<Origin>, Vec<Option<u64>>) {
+        let origins: Vec<Origin> = call_args
+            .iter()
+            .map(|a| self.origins.of_arg(a, term))
+            .collect();
+        let consts = call_args
+            .iter()
+            .zip(&origins)
+            .map(|(a, o)| {
+                const_int(a).or(match o {
+                    Origin::Const { value, .. }
+                    | Origin::Data { value, .. }
+                    | Origin::Unit { value, .. } => *value,
+                    _ => None,
+                })
+            })
+            .collect();
+        let lens = call_args
+            .iter()
+            .map(|a| self.origins.array_len(a, term))
+            .collect();
+        (consts, origins, lens)
+    }
+
+    /// A call of function `def` held in a pointer or a place, named at `named`: the operation
+    /// runs at the call (cited at its callee expression); the function was named where it was
+    /// made the value. At the naming when the call has no callee expression in source.
+    fn record_through(
+        &mut self,
+        def: &rustc_public::ty::FnDef,
+        args: &GenericArgs,
+        named: Span,
+        call_args: &[Operand],
+        term: &Terminator,
+    ) {
+        let tcx = self.cx.tcx;
+        let named = rustc_internal::internal(tcx, named);
+        let call = callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span));
+        let through = Some(locate(tcx, named).0).filter(|l| l.line != 0);
+        match (call, through) {
+            (Some(call), Some(t)) => {
+                self.record_call_at(def, args, call, Some((call_args, term)), Some(t))
+            }
+            _ => self.record_call_at(def, args, named, Some((call_args, term)), None),
+        }
+    }
+
     /// A KB function used as a value (`iter.map(Sha256::digest)`, `let h: fn(..) = digest`):
-    /// recorded where it is named, like a call.
+    /// recorded where it is named (`Call::value`).
     fn function_value(&mut self, op: &Operand) {
         if let Operand::Constant(c) = op
             && let Some(RigidTy::FnDef(def, args)) = c.const_.ty().kind().rigid()
@@ -1198,6 +1343,65 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             self.record_call(def, args, c.span, None);
         }
     }
+}
+
+/// The callee expression of a call written in source (`h` of `h(x)`, `(h.f)` of `(h.f)(x)`,
+/// `get()` of `get()(x)`, `fs[0]` of `fs[0](x)`): what precedes the argument list, the last
+/// parenthesised group of the call's text; `None` when the call is not written as one (a
+/// macro's, an operator's).
+fn callee_span(tcx: TyCtxt<'_>, call: rustc_span::Span) -> Option<rustc_span::Span> {
+    if call.from_expansion() {
+        return None;
+    }
+    let text = tcx.sess.source_map().span_to_snippet(call).ok()?;
+    let len = args_start(&text)?;
+    let callee = text[..len].trim_end();
+    if callee.is_empty() {
+        return None;
+    }
+    Some(call.with_hi(call.lo() + rustc_span::BytePos(callee.len() as u32)))
+}
+
+/// Where the last top-level parenthesised group of `text` starts, when it ends the text:
+/// brackets inside string and character literals do not count.
+fn args_start(text: &str) -> Option<usize> {
+    let b = text.as_bytes();
+    let (mut depth, mut i, mut last, mut closed_at) = (0usize, 0usize, None, None);
+    while i < b.len() {
+        match b[i] {
+            b'"' => {
+                i += 1;
+                while i < b.len() && b[i] != b'"' {
+                    i += if b[i] == b'\\' { 2 } else { 1 };
+                }
+            }
+            // a character literal (`'('`, `'\''`), not a lifetime (`'a`)
+            b'\'' if b.get(i + 2) == Some(&b'\'') => i += 2,
+            b'\'' if b.get(i + 1) == Some(&b'\\') => {
+                // past the backslash and the escaped character
+                i += 3;
+                while i < b.len() && b[i] != b'\'' {
+                    i += 1;
+                }
+            }
+            b'(' | b'[' | b'{' => {
+                if depth == 0 && b[i] == b'(' {
+                    last = Some(i);
+                }
+                depth += 1;
+            }
+            b')' | b']' | b'}' => {
+                depth = depth.checked_sub(1)?;
+                if depth == 0 {
+                    closed_at = Some(i);
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    let end = text.trim_end().len().checked_sub(1)?;
+    (depth == 0 && closed_at == Some(end) && b[end] == b')').then_some(last?)
 }
 
 /// The body without the blocks no execution reaches: those behind a branch on a constant
@@ -1396,27 +1600,57 @@ impl Scanner<'_, '_> {
                 && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
                 && self.interesting(def, args)
             {
-                // the callee path's own span (`UnboundKey::new`, `.encrypt`), not the whole
-                // call expression; for a callee held in a local, where it was named
-                let span = match func {
-                    Operand::Constant(c) => Some(c.span),
-                    _ => self.origins.callee_name_span(func, term),
-                };
-                if span.is_none() && std::env::var_os("RCBOM_DEBUG").is_some() {
-                    eprintln!(
-                        "rcbom-driver: call of {} without a position for its callee dropped in {}",
-                        def.name(),
-                        self.owner.name
-                    );
+                match func {
+                    // the callee path's own span (`UnboundKey::new`, `.encrypt`), not the whole
+                    // call expression
+                    Operand::Constant(c) => {
+                        self.record_call(def, args, c.span, Some((call_args, term)))
+                    }
+                    // a function item held in a place (`let f = Sha256::digest; f(d)`): the call
+                    // runs at its callee expression; the function was named where the place got
+                    // it
+                    _ => match self.origins.callee_name_span(func, term) {
+                        Some(named) => self.record_through(def, args, named, call_args, term),
+                        None => {
+                            if std::env::var_os("RCBOM_DEBUG").is_some() {
+                                eprintln!(
+                                    "rcbom-driver: call of {} without a position for its callee \
+                                     dropped in {}",
+                                    def.name(),
+                                    self.owner.name
+                                );
+                            }
+                        }
+                    },
                 }
-                if let Some(span) = span {
-                    self.record_call(def, args, span, Some((call_args, term)));
-                }
-            } else if let Some((def, args, span)) = self.origins.callee_through_pointer(func)
+            } else if let Some((def, args, named)) = self.origins.callee_through_pointer(func)
                 && self.interesting(&def, &args)
             {
-                // a call through a pointer to a KB function reified here
-                self.record_call(&def, &args, span, Some((call_args, term)));
+                // a call through a pointer to a KB function reified here (`h(&SHA256, d)`)
+                self.record_through(&def, &args, named, call_args, term);
+            } else if let Ok(ty) = func.ty(self.body.locals())
+                && matches!(ty.kind().rigid(), Some(RigidTy::FnPtr(..)))
+            {
+                // a pointer whose function is named elsewhere (`(h.f)(..)`, a parameter, a
+                // returned pointer): where it comes from, for the analysis to follow to the
+                // functions named as values
+                let origin = self.origins.of_arg(func, term);
+                let tcx = self.cx.tcx;
+                if !matches!(origin, Origin::Unknown | Origin::Truncated)
+                    && let Some(call) =
+                        callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span))
+                {
+                    let (const_args, arg_origins, arg_lens) = self.call_values(call_args, term);
+                    self.push_internal(
+                        call,
+                        Target::Pointer {
+                            origin,
+                            const_args,
+                            arg_origins,
+                            arg_lens,
+                        },
+                    );
+                }
             }
             for a in call_args {
                 self.function_value(a);
@@ -1545,10 +1779,19 @@ fn roots(
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
 /// to instances, drop glue, function pointers, closures, and for every unsizing to `dyn Trait`
 /// all methods of the vtable (sound and over-approximate for dynamic dispatch).
+///
+/// Inside the stop crates the walk records no sites: it follows their code only to learn which
+/// crates run (`Reach::crates`), as the usage of the packages the program does not call itself
+/// (block-buffer under sha2's `Digest` impl, not ecdsa under p256 used for ECDH only).
 struct Walker<'a, 'tcx> {
     cx: &'a mut Cx<'tcx>,
-    queue: VecDeque<Instance>,
+    /// Instances to visit; `true`: walked for usage only.
+    queue: VecDeque<(Instance, bool)>,
     seen: HashSet<Instance>,
+    usage_seen: HashSet<Instance>,
+    usage_statics: HashSet<rustc_span::def_id::DefId>,
+    /// Crates whose code the walk reached.
+    crates: BTreeSet<rustc_span::def_id::CrateNum>,
     parent: HashMap<Instance, (Instance, Loc)>,
     statics: BTreeSet<String>,
     static_refs: Vec<DefRef>,
@@ -1571,6 +1814,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             cx,
             queue: VecDeque::new(),
             seen: HashSet::new(),
+            usage_seen: HashSet::new(),
+            usage_statics: HashSet::new(),
+            crates: BTreeSet::new(),
             parent: HashMap::new(),
             statics: BTreeSet::new(),
             static_refs: Vec::new(),
@@ -1596,12 +1842,17 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             self.reach_static(s);
         }
         let mut truncated = false;
-        while let Some(inst) = self.queue.pop_front() {
+        let mut usage_complete = true;
+        while let Some((inst, usage)) = self.queue.pop_front() {
             if self.seen.len() > self.limit {
                 truncated = true;
                 break;
             }
-            if catch_unwind(AssertUnwindSafe(|| self.visit(inst))).is_err() {
+            if usage && self.usage_seen.len() > self.limit {
+                usage_complete = false;
+                continue;
+            }
+            if catch_unwind(AssertUnwindSafe(|| self.visit(inst, usage))).is_err() {
                 self.cx.errors += 1;
             }
         }
@@ -1614,6 +1865,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut paths = std::mem::take(&mut self.paths);
         paths.sort();
         paths.dedup();
+        let tcx = self.cx.tcx;
+        let crates = self
+            .crates
+            .iter()
+            .filter(|c| !self.cx.local.contains(c))
+            .map(|c| crate_ref(tcx, c.as_def_id()))
+            .collect();
         Reach {
             roots: names,
             instances: self.seen.len(),
@@ -1621,6 +1879,8 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             statics,
             fns,
             paths,
+            crates,
+            crates_complete: !truncated && usage_complete,
         }
     }
 
@@ -1635,7 +1895,70 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             if let Some(f) = from {
                 self.parent.insert(inst, f);
             }
-            self.queue.push_back(inst);
+            self.queue.push_back((inst, false));
+        }
+    }
+
+    /// Enqueues an instance a stop crate's code calls, walked for usage only: standard-library
+    /// code only when instantiated with other crates' types (`Iterator::map` over its closure).
+    fn enqueue_usage(&mut self, inst: Instance) {
+        if matches!(
+            inst.kind,
+            InstanceKind::Virtual { .. } | InstanceKind::Intrinsic | InstanceKind::LlvmIntrinsic
+        ) || self.seen.contains(&inst)
+        {
+            return;
+        }
+        let tcx = self.cx.tcx;
+        let i = rustc_internal::internal(tcx, inst);
+        let std_crate =
+            |did: rustc_span::def_id::DefId| self.cx.is_std(tcx.crate_name(did.krate).as_str());
+        if std_crate(i.def_id())
+            && !i.args.iter().any(|a| {
+                a.walk().any(|g| {
+                    g.as_type().is_some_and(|t| match t.kind() {
+                        rustc_middle::ty::Adt(adt, _) => !std_crate(adt.did()),
+                        rustc_middle::ty::Closure(d, _)
+                        | rustc_middle::ty::Coroutine(d, _)
+                        | rustc_middle::ty::FnDef(d, _) => !std_crate(*d),
+                        _ => false,
+                    })
+                })
+            })
+        {
+            return;
+        }
+        if self.usage_seen.insert(inst) {
+            self.queue.push_back((inst, true));
+        }
+    }
+
+    /// A static a stop crate's code refers to: the functions its value points at run too.
+    fn usage_static(&mut self, did: rustc_span::def_id::DefId) {
+        let tcx = self.cx.tcx;
+        if !self.usage_statics.insert(did) || tcx.is_foreign_item(did) {
+            return;
+        }
+        self.crates.insert(did.krate);
+        let Ok(s) = rustc_public::mir::mono::StaticDef::try_from(rustc_public::CrateItem(
+            rustc_internal::stable(did),
+        )) else {
+            return;
+        };
+        let Some(a) = catch_unwind(AssertUnwindSafe(|| s.eval_initializer().ok()))
+            .ok()
+            .flatten()
+        else {
+            return;
+        };
+        let mut found = Vec::new();
+        let mut nested = Vec::new();
+        alloc_callees(tcx, &a, &mut found, &mut nested, 0);
+        for i in found {
+            self.enqueue_usage(i);
+        }
+        for n in nested {
+            self.usage_static(rustc_internal::internal(tcx, n.def_id()));
         }
     }
 
@@ -1686,8 +2009,10 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         })
     }
 
-    fn visit(&mut self, inst: Instance) {
+    /// `usage`: walked only to learn which crates run (code a stop crate calls).
+    fn visit(&mut self, inst: Instance, usage: bool) {
         let did = rustc_internal::internal(self.cx.tcx, inst.def.def_id());
+        self.crates.insert(did.krate);
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
@@ -1716,7 +2041,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // `<closure as FnOnce>::call_once`): what it calls is walked, but none of it is code
         // written at the span it carries (the trait method's declaration)
         let shim = matches!(inst.kind, InstanceKind::Shim);
-        if !stop && !shim {
+        if usage {
+            let mut v = AllocStatics(Vec::new());
+            v.visit_body(&body);
+            for s in v.0 {
+                self.usage_static(rustc_internal::internal(self.cx.tcx, s.def_id()));
+            }
+        } else if !stop && !shim {
             let owner = fn_owner(self.cx, &inst);
             self.fns.push(owner.id.clone());
             self.paths.push(path_of(self.cx.tcx, did));
@@ -1777,12 +2108,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             }
         }
         for (callee, span) in edges.found {
-            // inside an algorithm implementation, only what it calls back into
-            if stop && !self.calls_back(&callee) {
-                continue;
-            }
             if debug.is_some() {
                 eprintln!("rcbom-walk:   -> {} ({:?})", callee.name(), callee.kind);
+            }
+            // inside an algorithm implementation, only what it calls back into is walked; the
+            // rest for usage only
+            if (usage || stop) && !(stop && self.calls_back(&callee)) {
+                self.enqueue_usage(callee);
+                continue;
             }
             let loc = locate_stable(self.cx.tcx, span).0;
             self.enqueue(callee, Some((inst, loc)));
@@ -2054,4 +2387,32 @@ fn vtable_methods_internal<'tcx>(
             _ => None,
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::args_start;
+
+    #[test]
+    fn the_argument_list_is_the_last_group() {
+        let callee = |t: &str| args_start(t).map(|n| t[..n].trim_end().to_string());
+        assert_eq!(callee("h(&SHA256, d)").as_deref(), Some("h"));
+        assert_eq!(callee("(h.f)(&SHA384, &d)").as_deref(), Some("(h.f)"));
+        assert_eq!(callee("get()(&SHA256, &d)").as_deref(), Some("get()"));
+        assert_eq!(callee("fs[0](&SHA512, &d)").as_deref(), Some("fs[0]"));
+        assert_eq!(callee("p(\n    &a,\n    &d,\n)").as_deref(), Some("p"));
+        assert_eq!(callee("f(\")\", ')', '\\'')").as_deref(), Some("f"));
+        assert_eq!(callee("a + b"), None);
+        assert_eq!(callee("f(x)?"), None);
+    }
+
+    #[test]
+    fn raw_identifiers_are_plain() {
+        assert_eq!(
+            super::unraw("rand::rng::Rng::r#gen::<[u8; 16]>"),
+            "rand::rng::Rng::gen::<[u8; 16]>"
+        );
+        assert_eq!(super::unraw("<r#gen as r#try>::bar"), "<gen as try>::bar");
+        assert_eq!(super::unraw("ber#x::car#y"), "ber#x::car#y");
+    }
 }

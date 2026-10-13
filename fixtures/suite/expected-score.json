@@ -8,12 +8,11 @@
    "correct": 1
   },
   "basic": {
-   "correct": 22,
-   "honest-unknown": 3,
-   "miss": 6
+   "correct": 29,
+   "miss": 2
   },
   "bcryptpbkdf": {
-   "miss": 1
+   "correct": 1
   },
   "cfg": {
    "correct": 2
@@ -32,7 +31,7 @@
    "miss": 2
   },
   "crates": {
-   "honest-unknown": 2
+   "correct": 2
   },
   "dyn": {
    "honest-unknown": 6,
@@ -44,14 +43,13 @@
    "miss": 2
   },
   "fnptr": {
-   "miss": 1
+   "correct": 1
   },
   "generic": {
    "correct": 1
   },
   "interproc": {
-   "correct": 8,
-   "honest-unknown": 2,
+   "correct": 10,
    "miss": 2
   },
   "macro": {
@@ -89,9 +87,8 @@
    "correct": 3
   },
   "hash": {
-   "correct": 19,
-   "honest-unknown": 6,
-   "miss": 1
+   "correct": 22,
+   "honest-unknown": 4
   },
   "jwt": {
    "miss": 13
@@ -101,11 +98,10 @@
    "honest-unknown": 1
   },
   "kem": {
-   "honest-unknown": 3
+   "correct": 3
   },
   "kex": {
-   "correct": 4,
-   "honest-unknown": 2
+   "correct": 6
   },
   "lib": {
    "correct": 3
@@ -114,12 +110,11 @@
    "correct": 6
   },
   "pwhash": {
-   "correct": 2,
-   "less-specific": 1,
-   "miss": 1
+   "correct": 3,
+   "less-specific": 1
   },
   "rng": {
-   "miss": 4
+   "correct": 4
   },
   "sig": {
    "correct": 12,
@@ -158,32 +153,6 @@
   },
   {
    "callee": "digest",
-   "line": 5,
-   "may": [],
-   "must": [
-    "SHA3-256"
-   ],
-   "program": "hash-crates",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "finalize",
-   "line": 9,
-   "may": [],
-   "must": [
-    "MD5"
-   ],
-   "program": "hash-crates",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "digest",
    "line": 22,
    "may": [
     "SHA-1"
@@ -196,17 +165,6 @@
     "unknown"
    ],
    "verdict": "honest-unknown"
-  },
-  {
-   "callee": "hash_fn",
-   "line": 7,
-   "may": [],
-   "must": [
-    "SHA-512"
-   ],
-   "program": "hash-fnptr",
-   "reported": [],
-   "verdict": "miss"
   },
   {
    "callee": "digest",
@@ -417,71 +375,6 @@
    "verdict": "honest-unknown"
   },
   {
-   "callee": "generate",
-   "line": 6,
-   "may": [],
-   "must": [
-    "ML-KEM-768"
-   ],
-   "program": "kem-basic",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "encapsulate",
-   "line": 7,
-   "may": [],
-   "must": [
-    "ML-KEM-768"
-   ],
-   "program": "kem-basic",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "decapsulate",
-   "line": 8,
-   "may": [],
-   "must": [
-    "ML-KEM-768"
-   ],
-   "program": "kem-basic",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "random",
-   "line": 6,
-   "may": [],
-   "must": [
-    "ECDH-P-256"
-   ],
-   "program": "kex-interproc",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "diffie_hellman",
-   "line": 12,
-   "may": [],
-   "must": [
-    "ECDH-P-256"
-   ],
-   "program": "kex-interproc",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
    "callee": "verify_password",
    "line": 8,
    "may": [],
@@ -493,61 +386,6 @@
     "Argon2"
    ],
    "verdict": "less-specific"
-  },
-  {
-   "callee": "bcrypt_pbkdf",
-   "line": 5,
-   "may": [],
-   "must": [
-    "bcrypt-pbkdf"
-   ],
-   "program": "pwhash-bcryptpbkdf",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "fill",
-   "line": 7,
-   "may": [],
-   "must": [
-    "OS-RNG"
-   ],
-   "program": "rng-basic",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "fill_bytes",
-   "line": 9,
-   "may": [],
-   "must": [
-    "OS-RNG"
-   ],
-   "program": "rng-basic",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "fill_bytes",
-   "line": 11,
-   "may": [],
-   "must": [
-    "ChaCha12-RNG"
-   ],
-   "program": "rng-basic",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "gen_range",
-   "line": 12,
-   "may": [],
-   "must": [
-    "ChaCha12-RNG"
-   ],
-   "program": "rng-basic",
-   "reported": [],
-   "verdict": "miss"
   },
   {
    "callee": "generate_pkcs8",
@@ -616,12 +454,12 @@
   }
  ],
  "sites": 107,
- "unlabelled_uses": 5,
+ "unlabelled_uses": 4,
  "verdicts": {
-  "correct": 69,
-  "honest-unknown": 16,
+  "correct": 82,
+  "honest-unknown": 9,
   "less-specific": 3,
-  "miss": 19,
+  "miss": 13,
   "wrong": 0
  }
 }

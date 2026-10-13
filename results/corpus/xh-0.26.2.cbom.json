@@ -323,11 +323,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -541,11 +537,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1707,6 +1699,61 @@
         {
           "name": "rcbom:occurrences",
           "value": "11"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::digest::AuthorizationHeader::digest; use: generate; line: `let nonce_bytes: [u8; 16] = rng.gen();`; code: `gen`",
+            "line": 509,
+            "location": "digest_auth-0.3.1/src/digest.rs",
+            "offset": 52,
+            "symbol": "rand::rng::Rng::gen"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -4681,6 +4728,58 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; new: setup, not a use; line: `AlgorithmType::MD5 => Box::new(Md5::new()),`; code: `Md5::new`",
+            "line": 38,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 43,
+            "symbol": "digest::digest::Digest::new"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:ML-KEM-1024",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -7465,14 +7564,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn digest::DynDigest`): its type is chosen at run time; algorithm unresolved: a trait object (`dyn digest::digest::DynDigest`): its type is chosen at run time; line: `hash.update(bytes);`; code: `update`",
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `hash.update(bytes);`; code: `update`",
             "line": 43,
             "location": "digest_auth-0.3.1/src/enums.rs",
             "offset": 13,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn digest::DynDigest`): its type is chosen at run time; algorithm unresolved: a trait object (`dyn digest::digest::DynDigest`): its type is chosen at run time; line: `hex::encode(hash.finalize())`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `hex::encode(hash.finalize())`; code: `finalize`",
             "line": 44,
             "location": "digest_auth-0.3.1/src/enums.rs",
             "offset": 25,
@@ -7509,59 +7608,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:md-5",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; new: setup, not a use; algorithm unresolved: the type `md5::Md5Core` of md-5 0.10.6, a crypto package the knowledge base does not model; line: `AlgorithmType::MD5 => Box::new(Md5::new()),`; code: `Md5::new`",
-            "line": 38,
-            "location": "digest_auth-0.3.1/src/enums.rs",
-            "offset": 43,
-            "symbol": "digest::digest::Digest::new"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -7941,7 +7987,7 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:md-5"
+        "crypto:algorithm:MD5"
       ],
       "ref": "pkg:cargo/md-5@0.10.6"
     },
@@ -7962,12 +8008,18 @@
         "pkg:cargo/rand_chacha@0.3.1",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand@0.8.7"
     },
     {
       "dependsOn": [
         "pkg:cargo/ppv-lite86@0.2.21",
         "pkg:cargo/rand_core@0.6.4"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/rand_chacha@0.3.1"
     },
@@ -8194,6 +8246,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha20-Poly1305"
     },
     {
@@ -8215,6 +8271,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
     },
     {
       "dependsOn": [],
@@ -8255,10 +8315,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:hash:digest"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:md-5"
     },
     {
       "dependsOn": [],
@@ -8314,7 +8370,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "56406"
+        "value": "56321"
       }
     ],
     "tools": {
@@ -8327,7 +8383,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:413edb42-beb3-863c-a23d-f099ac6d40a5",
+  "serialNumber": "urn:uuid:5cb4ec64-7514-802b-b0d3-8b6fee5f701b",
   "specVersion": "1.7",
   "version": 1
 }

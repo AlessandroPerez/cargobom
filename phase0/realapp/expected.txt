@@ -56,6 +56,9 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | rustls-0.23.45/src/crypto/ring/tls13.rs:250:13 | ring::aead::less_safe_key::LessSafeKey::open_in_place | [reachable] [call] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | rustls-0.23.45/src/crypto/ring/tls13.rs:51:48 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384; line: `aead_alg: &Aes256GcmAead(AeadAlgorithm(&aead::AES_256_GCM)),`; code: `aead::AES_256_GCM`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | rustls-0.23.45/src/crypto/ring/tls13.rs:53:25 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384; line: `packet_alg: &aead::AES_256_GCM,`; code: `aead::AES_256_GCM`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | age-core-0.11.0/src/format.rs:140:39 | rand::distributions::distribution::Distribution::sample | [present] [call] in age_core::format::grease_the_joint; use: generate; line: `let args = (0..Uniform::from(0..5).sample(&mut rng))`; code: `sample`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | age-core-0.11.0/src/format.rs:151:49 | rand::distributions::distribution::Distribution::sample | [present] [call] in age_core::format::grease_the_joint; use: generate; line: `let mut body = vec![0; Uniform::from(0..100).sample(&mut rng)];`; code: `sample`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | age-core-0.11.0/src/format.rs:152:8 | rand_core::RngCore::fill_bytes | [present] [call] in age_core::format::grease_the_joint; use: generate; line: `rng.fill_bytes(&mut body);`; code: `fill_bytes`
   occ ChaCha20 | crypto:algorithm:ChaCha20 | rustls-0.23.45/src/crypto/ring/mod.rs:34:23 | rustls::crypto::ring::DEFAULT_CIPHER_SUITES | [reachable] [via-static] in rustls::crypto::ring::default_provider; rustls::crypto::ring::DEFAULT_CIPHER_SUITES -> ring::aead::quic::CHACHA20; line: `cipher_suites: DEFAULT_CIPHER_SUITES.to_vec(),`; code: `DEFAULT_CIPHER_SUITES`
   occ ChaCha20 | crypto:algorithm:ChaCha20 | rustls-0.23.45/src/crypto/ring/mod.rs:69:60 | rustls::crypto::ring::ALL_CIPHER_SUITES | [reachable] [via-static] in rustls::crypto::ring::DEFAULT_CIPHER_SUITES; rustls::crypto::ring::ALL_CIPHER_SUITES -> ring::aead::quic::CHACHA20; line: `pub static DEFAULT_CIPHER_SUITES: &[SupportedCipherSuite] = ALL_CIPHER_SUITES;`; code: `ALL_CIPHER_SUITES`
   occ ChaCha20 | crypto:algorithm:ChaCha20 | rustls-0.23.45/src/crypto/ring/mod.rs:76:4 | rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256 | [reachable] [via-static] in rustls::crypto::ring::ALL_CIPHER_SUITES; rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256 -> ring::aead::quic::CHACHA20; line: `tls13::TLS13_CHACHA20_POLY1305_SHA256,`; code: `tls13::TLS13_CHACHA20_POLY1305_SHA256`
@@ -268,6 +271,14 @@
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rustls-0.23.45/src/crypto/ring/hmac.rs:36:16 | ring::hmac::Context::update | [reachable] [call] in <rustls::crypto::ring::hmac::Key as rustls::crypto::hmac::Key>::sign_concat; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `ctx.update(d);`; code: `update`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rustls-0.23.45/src/crypto/ring/hmac.rs:38:12 | ring::hmac::Context::update | [reachable] [call] in <rustls::crypto::ring::hmac::Key as rustls::crypto::hmac::Key>::sign_concat; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `ctx.update(last);`; code: `update`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rustls-0.23.45/src/crypto/ring/hmac.rs:39:35 | ring::hmac::Context::sign | [reachable] [call] in <rustls::crypto::ring::hmac::Key as rustls::crypto::hmac::Key>::sign_concat; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `crypto::hmac::Tag::new(ctx.sign().as_ref())`; code: `sign`
+  occ OS-RNG | crypto:algorithm:OS-RNG | age-0.11.5/src/keys.rs:21:44 | rand_core::RngCore::fill_bytes | [present] [call] in age::keys::new_file_key::{closure#0}; use: generate; line: `FileKey::init_with_mut(|file_key| OsRng.fill_bytes(file_key))`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | age-0.11.5/src/protocol.rs:31:14 | rand_core::RngCore::fill_bytes | [present] [call] in age::protocol::Nonce::random; use: generate; line: `OsRng.fill_bytes(&mut nonce);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | age-0.11.5/src/scrypt.rs:145:12 | rand_core::RngCore::fill_bytes | [present] [call] in <age::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | age-0.11.5/src/scrypt.rs:157:33 | rand::distributions::distribution::DistString::sample_string | [present] [call] in <age::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `let label = Alphanumeric.sample_string(&mut rng, 32);`; code: `sample_string`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/mod.rs:51:13 | ring::rand::SecureRandom::fill | [reachable] [call] in <rustls::crypto::ring::Ring as rustls::crypto::SecureRandom>::fill; use: generate; line: `.fill(buf)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:65:13 | ring::rand::SecureRandom::fill | [present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:72:13 | ring::rand::SecureRandom::fill | [present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key_name)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:99:13 | ring::rand::SecureRandom::fill | [present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::encrypt; use: generate; line: `.fill(&mut nonce_buf)`; code: `fill`
   occ RSA | crypto:material:private-key:RSA | jsonwebtoken-9.3.1/src/crypto/rsa.rs:41:19 | ring::rsa::keypair::KeyPair::from_der | [reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`
   occ RSA | crypto:material:private-key:RSA | rustls-0.23.45/src/crypto/ring/sign.rs:104:43 | ring::rsa::keypair::KeyPair::from_der | [reachable] [call] in rustls::crypto::ring::sign::RsaSigningKey::new; from_der: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs1KeyDer::secret_pkcs1_der); line: `PrivateKeyDer::Pkcs1(pkcs1) => RsaKeyPair::from_der(pkcs1.secret_pkcs1_der()),`; code: `RsaKeyPair::from_der`
   occ RSA | crypto:material:private-key:RSA | rustls-0.23.45/src/crypto/ring/sign.rs:105:43 | ring::rsa::keypair::KeyPair::from_pkcs8 | [reachable] [call] in rustls::crypto::ring::sign::RsaSigningKey::new; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `PrivateKeyDer::Pkcs8(pkcs8) => RsaKeyPair::from_pkcs8(pkcs8.secret_pkcs8_der()),`; code: `RsaKeyPair::from_pkcs8`
@@ -616,6 +627,13 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=3
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=present
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
   prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:confidence=high
   prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:detection:method=type-resolved
   prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:functions:source=knowledge-base
@@ -752,6 +770,13 @@
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=9
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=parameter
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=8
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
   prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
   prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
@@ -880,7 +905,6 @@
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
-  prop digest | pkg:cargo/digest@0.11.3 | rcbom:usage=unknown
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
@@ -913,9 +937,8 @@
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=present
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
@@ -962,11 +985,11 @@
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:kb-coverage=unsupported-version
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
-  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=unknown
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=present
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
-  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
   prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:algorithm=unresolved
@@ -1001,6 +1024,7 @@ asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFa
 asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
 asset AES-256 | crypto:algorithm:AES-256 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset ChaCha20 | crypto:algorithm:ChaCha20 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "nist/P-256", "primitive": "key-agree"}, "assetType": "algorithm"}
@@ -1018,6 +1042,7 @@ asset HMAC | crypto:material:secret-key:HMAC | {"assetType": "related-crypto-mat
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
 asset RSA | crypto:material:public-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
@@ -1161,6 +1186,7 @@ dependency crypto:algorithm:AES-128
 dependency crypto:algorithm:AES-128-GCM
 dependency crypto:algorithm:AES-256
 dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ChaCha12-RNG
 dependency crypto:algorithm:ChaCha20
 dependency crypto:algorithm:ChaCha20-Poly1305
 dependency crypto:algorithm:ECDH-P-256
@@ -1175,6 +1201,7 @@ dependency crypto:algorithm:HKDF-SHA-384
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:HMAC-SHA-384
 dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-512
@@ -1239,12 +1266,16 @@ doc version=1
 provides pkg:cargo/age@0.11.5 -> crypto:algorithm:unknown:unknown:age
 provides pkg:cargo/chacha20@0.9.1 -> crypto:algorithm:ChaCha20-Poly1305
 provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/hkdf@0.12.4 -> crypto:algorithm:HKDF-SHA-256
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:Ed25519
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:RSA
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:secret-key:HMAC
+provides pkg:cargo/rand@0.8.8 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-128
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-128-GCM
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256
@@ -1263,6 +1294,7 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-512

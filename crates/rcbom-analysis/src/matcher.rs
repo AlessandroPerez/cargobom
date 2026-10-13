@@ -268,14 +268,20 @@ pub fn match_fn_with(
     let bare = strip_generics(path);
     let full_bare = strip_generics(&callee.path);
     let mut provider = None;
+    // an entry for the methods of a type: its parameters may be the type's own arguments
+    // (`parent_arg`: the curve of `SigningKey<NistP256>`)
+    let mut parent = None;
     let e = kb.fns.iter().find(|e| match &e.self_type {
         Some(st) => match self_ty {
             Some(TyTree::Adt {
-                krate, path: tp, ..
+                krate,
+                path: tp,
+                args: targs,
             }) if e.krates.contains(&krate.name) && last(tp) == st && supported(krate) => {
                 let ok = e.pattern.is_match(&callee.path) || e.pattern.is_match(&full_bare);
                 if ok {
                     provider = Some(krate.clone());
+                    parent = Some(targs.as_slice());
                 }
                 ok
             }
@@ -291,8 +297,8 @@ pub fn match_fn_with(
             ok
         }
     })?;
-    Some(fn_entry_match(
-        kb, e, args, const_args, arg_lens, provider, supported, overrides,
+    Some(fn_entry_match_in(
+        kb, e, args, parent, const_args, arg_lens, provider, supported, overrides,
     ))
 }
 
@@ -317,6 +323,24 @@ fn fn_entry_match(
     supported: Supported,
     overrides: &BTreeMap<String, String>,
 ) -> Match {
+    fn_entry_match_in(
+        kb, e, args, None, const_args, arg_lens, provider, supported, overrides,
+    )
+}
+
+/// [`fn_entry_match`] for a method of a type whose arguments are `parent`.
+#[allow(clippy::too_many_arguments)]
+fn fn_entry_match_in(
+    kb: &Kb,
+    e: &rcbom_kb::PatternEntry,
+    args: &[TyTree],
+    parent: Option<&[TyTree]>,
+    const_args: &[Option<i128>],
+    arg_lens: &[Option<u64>],
+    provider: Option<CrateRef>,
+    supported: Supported,
+    overrides: &BTreeMap<String, String>,
+) -> Match {
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
         let v = match (p.const_arg, p.arg_len) {
@@ -330,7 +354,7 @@ fn fn_entry_match(
             _ => p
                 .value
                 .clone()
-                .or_else(|| eval_param(kb, p, args, None, supported)),
+                .or_else(|| eval_param(kb, p, args, parent, supported)),
         };
         if let Some(v) = v {
             params.insert(k.clone(), v);

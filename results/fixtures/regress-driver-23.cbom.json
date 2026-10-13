@@ -129,7 +129,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-buffer@0.10.4",
@@ -217,7 +217,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/ctr@0.9.2",
@@ -476,11 +476,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -652,7 +648,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/subtle@2.6.1",
@@ -839,6 +835,75 @@
         {
           "name": "rcbom:occurrences",
           "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(&mut *key);`; code: `fill_bytes`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(&mut key2);`; code: `fill_bytes`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -1096,6 +1161,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -1131,6 +1199,9 @@
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -1188,6 +1259,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:AES-256-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -1260,7 +1335,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:27641c9f-a514-8655-bb15-2f03618feac8",
+  "serialNumber": "urn:uuid:c5e6309f-f9a5-8775-9941-10df67663d12",
   "specVersion": "1.7",
   "version": 1
 }

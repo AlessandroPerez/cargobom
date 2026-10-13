@@ -17,8 +17,6 @@
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
   occ Ed25519 | crypto:material:public-key:Ed25519 | jsonwebtoken-9.3.1/src/decoding.rs:185:57 | jsonwebtoken::decoding::DecodingKey::from_ed_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`
-  occ HMAC | crypto:algorithm:HMAC | src/main.rs:4:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t6::main; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 4); line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b"k").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`
-  occ HMAC | crypto:algorithm:HMAC | src/main.rs:5:6 | digest::mac::Mac::update | [reachable] [call] in t6::main; use: tag; line: `m.update(b"x");`; code: `update`
   occ HMAC | crypto:material:secret-key:HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
   occ HMAC | crypto:material:secret-key:HMAC | src/main.rs:6:13 | jsonwebtoken::encoding::EncodingKey::from_secret | [reachable] [call] in t6::main; from_secret: setup, not a use; key: hard-coded (6 bytes, literal at line 6); line: `let _k = jsonwebtoken::EncodingKey::from_secret(b"secret");`; code: `jsonwebtoken::EncodingKey::from_secret`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
@@ -30,6 +28,8 @@
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [present] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | src/main.rs:4:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t6::main; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 4); line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b"k").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`
+  occ HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | src/main.rs:5:6 | digest::mac::Mac::update | [reachable] [call] in t6::main; use: tag; line: `m.update(b"x");`; code: `update`
   occ RSA | crypto:material:private-key:RSA | jsonwebtoken-9.3.1/src/crypto/rsa.rs:41:19 | ring::rsa::keypair::KeyPair::from_der | [present] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`
   occ RSA | crypto:material:public-key:RSA | jsonwebtoken-9.3.1/src/decoding.rs:180:16 | jsonwebtoken::decoding::DecodingKey::from_rsa_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`
   occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
@@ -87,6 +87,8 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:4:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in t6::main; part of HMAC-SHA3-256; line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b"k").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:5:6 | digest::mac::Mac::update | [reachable] [component] in t6::main; part of HMAC-SHA3-256; line: `m.update(b"x");`; code: `update`
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:18:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via t6 -> hmac -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:58:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via t6 -> hmac -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:74:0 | digest | [manifest] locked digest 0.10.7; reached via t6 -> hmac -> digest
@@ -141,14 +143,6 @@
   prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:occurrences=1
   prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:reachability=present
-  prop HMAC | crypto:algorithm:HMAC | rcbom:confidence=high
-  prop HMAC | crypto:algorithm:HMAC | rcbom:detection:method=type-resolved
-  prop HMAC | crypto:algorithm:HMAC | rcbom:finding=hard-coded-key
-  prop HMAC | crypto:algorithm:HMAC | rcbom:functions:source=observed
-  prop HMAC | crypto:algorithm:HMAC | rcbom:kb:version=0.2.0
-  prop HMAC | crypto:algorithm:HMAC | rcbom:occurrences=2
-  prop HMAC | crypto:algorithm:HMAC | rcbom:provenance:key=hard-coded
-  prop HMAC | crypto:algorithm:HMAC | rcbom:reachability=reachable
   prop HMAC | crypto:material:secret-key:HMAC | rcbom:algorithm-family=HMAC
   prop HMAC | crypto:material:secret-key:HMAC | rcbom:confidence=high
   prop HMAC | crypto:material:secret-key:HMAC | rcbom:detection:method=type-resolved
@@ -180,6 +174,14 @@
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=3
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=parameter
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=present
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:confidence=high
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:functions:source=observed
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:occurrences=2
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | rcbom:reachability=reachable
   prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
   prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
   prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
@@ -259,6 +261,13 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=knowledge-base
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=2
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:only-as-component=true
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
@@ -289,8 +298,7 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=present
-  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=unmodelled
-  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:kb-coverage=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
   prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
   prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
@@ -302,11 +310,11 @@ asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmPr
 asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset Ed25519 | crypto:material:public-key:Ed25519 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
-asset HMAC | crypto:algorithm:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC | crypto:material:secret-key:HMAC | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "secret-key"}}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA3-256 | crypto:algorithm:HMAC-SHA3-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
 asset RSA | crypto:material:public-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
@@ -318,6 +326,7 @@ asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
@@ -334,6 +343,7 @@ dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:HMAC-SHA3-256 -> crypto:algorithm:SHA3-256
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-512 -> crypto:algorithm:SHA-512
@@ -355,10 +365,10 @@ dep pkg:cargo/t6@0.1.0 -> pkg:cargo/sha3@0.10.9
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
 dependency crypto:algorithm:Ed25519
-dependency crypto:algorithm:HMAC
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:HMAC-SHA-384
 dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:HMAC-SHA3-256
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-512
@@ -368,6 +378,7 @@ dependency crypto:algorithm:RSA-PSS-SHA-512
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:SHA3-256
 dependency crypto:material:private-key:RSA
 dependency crypto:material:public-key:ECDSA
 dependency crypto:material:public-key:Ed25519
@@ -388,7 +399,7 @@ dependency pkg:cargo/t6@0.1.0
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
-provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA3-256
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:Ed25519
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:RSA
@@ -409,12 +420,13 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
 root {"bom-ref": "pkg:cargo/t6@0.1.0", "name": "t6", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t6@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=46
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=169
+run rcbom:run:reachable-instances=41
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

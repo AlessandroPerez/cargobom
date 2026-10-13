@@ -1,0 +1,190 @@
+  occ HMAC-MD5 | crypto:algorithm:HMAC-MD5 | src/main.rs:22:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in probe29::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 22); line: `let mut m = hmac::Hmac::<md5rc::Md5>::new_from_slice(b"key").unwrap();`; code: `hmac::Hmac::<md5rc::Md5>::new_from_slice`
+  occ HMAC-MD5 | crypto:algorithm:HMAC-MD5 | src/main.rs:23:4 | digest::mac::Mac::update | [reachable] [call] in probe29::main; use: tag; line: `Mac::update(&mut m, b"abc");`; code: `Mac::update`
+  occ HMAC-MD5 | crypto:algorithm:HMAC-MD5 | src/main.rs:24:14 | digest::mac::Mac::finalize | [reachable] [call] in probe29::main; use: tag; line: `let t = m.finalize().into_bytes();`; code: `finalize`
+  occ HMAC-MD5 | crypto:algorithm:HMAC-MD5 | src/main.rs:24:25 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in probe29::main; into_bytes: setup, not a use; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:10:12 | md5::compute | [reachable] [call] in probe29::main; use: digest; line: `let a = md5::compute(b"abc");`; code: `md5::compute`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:12:12 | digest::digest::Digest::digest | [reachable] [call] in probe29::main; use: digest; line: `let b = md5rc::Md5::digest(b"abc");`; code: `md5rc::Md5::digest`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:22:16 | digest::mac::Mac::new_from_slice | [reachable] [component] in probe29::main; part of HMAC-MD5; line: `let mut m = hmac::Hmac::<md5rc::Md5>::new_from_slice(b"key").unwrap();`; code: `hmac::Hmac::<md5rc::Md5>::new_from_slice`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:23:4 | digest::mac::Mac::update | [reachable] [component] in probe29::main; part of HMAC-MD5; line: `Mac::update(&mut m, b"abc");`; code: `Mac::update`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:24:14 | digest::mac::Mac::finalize | [reachable] [component] in probe29::main; part of HMAC-MD5; line: `let t = m.finalize().into_bytes();`; code: `finalize`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:24:25 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in probe29::main; part of HMAC-MD5; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:27:12 | digest::digest::Digest::digest | [reachable] [call] in probe29::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:26:12; line: `let d = f(b"abc");`; code: `f`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:16:16 | core::default::Default::default | [reachable] [call] in probe29::main; default: setup, not a use; line: `let mut h = sha3::Shake256::default();`; code: `sha3::Shake256::default`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:17:4 | digest::Update::update | [reachable] [call] in probe29::main; use: digest; line: `Update::update(&mut h, b"abc");`; code: `Update::update`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:18:18 | digest::ExtendableOutput::finalize_xof | [reachable] [call] in probe29::main; use: digest; line: `let mut r = h.finalize_xof();`; code: `finalize_xof`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:20:6 | digest::XofReader::read | [reachable] [call] in probe29::main; use: digest; line: `r.read(&mut out);`; code: `read`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via probe29 -> hmac -> digest -> block-buffer
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:15:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via probe29 -> sha2 -> digest -> block-buffer
+  occ const-oid | pkg:cargo/const-oid@0.10.2 | Cargo.lock:30:0 | const-oid | [manifest] locked const-oid 0.10.2; reached via probe29 -> sha2 -> digest -> const-oid
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:54:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via probe29 -> hmac -> digest -> crypto-common
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:64:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via probe29 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:73:0 | digest | [manifest] locked digest 0.10.7; reached via probe29 -> hmac -> digest
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:84:0 | digest | [manifest] locked digest 0.11.3; reached via probe29 -> sha2 -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:105:0 | hmac | [manifest] locked hmac 0.12.1; reached via probe29 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:13:0 | hmac | [manifest] declared by probe29 (dependencies)
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:123:0 | keccak | [manifest] locked keccak 0.1.6; reached via probe29 -> sha3 -> keccak
+  occ md-5 | pkg:cargo/md-5@0.10.6 | Cargo.lock:138:0 | md-5 | [manifest] locked md-5 0.10.6; reached via probe29 -> md-5
+  occ md-5 | pkg:cargo/md-5@0.10.6 | Cargo.toml:10:0 | md5rc | [manifest] declared by probe29 (dependencies)
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.lock:148:0 | md5 | [manifest] locked md5 0.7.0; reached via probe29 -> md5
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.toml:9:0 | md5 | [manifest] declared by probe29 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.lock:165:0 | sha2 | [manifest] locked sha2 0.11.0; reached via probe29 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.toml:11:0 | sha2 | [manifest] declared by probe29 (dependencies)
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:176:0 | sha3 | [manifest] locked sha3 0.10.9; reached via probe29 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:12:0 | sha3 | [manifest] declared by probe29 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:186:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe29 -> hmac -> digest -> subtle
+  occ unknown | crypto:algorithm:unknown:hash:sha2 | src/main.rs:14:12 | digest::digest::Digest::digest | [reachable] [call] in probe29::main; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let c = <sha2::Sha256 as sha2::Digest>::digest(b"abc");`; code: `<sha2::Sha256 as sha2::Digest>::digest`
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:confidence=high
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:detection:method=type-resolved
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:finding=hard-coded-key
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:functions:source=observed
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:kb:version=0.2.0
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:occurrences=4
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:provenance:key=hard-coded
+  prop HMAC-MD5 | crypto:algorithm:HMAC-MD5 | rcbom:reachability=reachable
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=6
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:confidence=high
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:detection:method=type-resolved
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:functions:source=observed
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:kb:version=0.2.0
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:occurrences=4
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:kb-coverage=unsupported-version
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:usage=unknown
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:crypto-role=algorithm
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:scope=required
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:usage=reachable
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:crypto-role=algorithm
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:scope=required
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:kb-coverage=unsupported-version
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:reachability=reachable
+asset HMAC-MD5 | crypto:algorithm:HMAC-MD5 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "xof"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:sha2 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library md-5 0.10.6 | pkg:cargo/md-5@0.10.6 | purl pkg:cargo/md-5@0.10.6
+component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
+component library sha2 0.11.0 | pkg:cargo/sha2@0.11.0 | purl pkg:cargo/sha2@0.11.0
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep crypto:algorithm:HMAC-MD5 -> crypto:algorithm:MD5
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/md-5@0.10.6 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/probe29@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/probe29@0.1.0 -> pkg:cargo/md-5@0.10.6
+dep pkg:cargo/probe29@0.1.0 -> pkg:cargo/md5@0.7.0
+dep pkg:cargo/probe29@0.1.0 -> pkg:cargo/sha2@0.11.0
+dep pkg:cargo/probe29@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/sha2@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dependency crypto:algorithm:HMAC-MD5
+dependency crypto:algorithm:MD5
+dependency crypto:algorithm:SHA3-256
+dependency crypto:algorithm:SHAKE256
+dependency crypto:algorithm:unknown:hash:sha2
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/const-oid@0.10.2
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/md-5@0.10.6
+dependency pkg:cargo/md5@0.7.0
+dependency pkg:cargo/probe29@0.1.0
+dependency pkg:cargo/sha2@0.11.0
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-MD5
+provides pkg:cargo/md-5@0.10.6 -> crypto:algorithm:MD5
+provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:MD5
+provides pkg:cargo/sha2@0.11.0 -> crypto:algorithm:unknown:hash:sha2
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHAKE256
+root {"bom-ref": "pkg:cargo/probe29@0.1.0", "name": "probe29", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe29@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=21
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=172
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

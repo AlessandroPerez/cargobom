@@ -30,7 +30,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-buffer@0.10.4",
@@ -195,12 +195,8 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
-          "value": "unknown"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/getrandom@0.4.3",
@@ -415,6 +411,89 @@
       "version": "2.6.1"
     },
     {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; line: `getrandom(&mut seed)?;`; code: `getrandom`",
+            "line": 31,
+            "location": "src/keypair.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; line: `getrandom(&mut keynum)?;`; code: `getrandom`",
+            "line": 34,
+            "location": "src/keypair.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_encrypted_keypair; use: generate; line: `getrandom(&mut kdf_salt)?;`; code: `getrandom`",
+            "line": 71,
+            "location": "src/keypair.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; line: `getrandom(&mut z)?;`; code: `getrandom`",
+            "line": 99,
+            "location": "src/lib.rs",
+            "offset": 4,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; line: `getrandom(&mut z)?;`; code: `getrandom`",
+            "line": 107,
+            "location": "src/lib.rs",
+            "offset": 4,
+            "symbol": "getrandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:scrypt",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -523,6 +602,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.4.3"
     },
     {
@@ -572,6 +654,10 @@
     {
       "dependsOn": [],
       "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -636,7 +722,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e85306a8-1d45-8d67-9b62-d4a28041bc71",
+  "serialNumber": "urn:uuid:a034d59b-a88f-8322-8409-3128c05400fa",
   "specVersion": "1.7",
   "version": 1
 }

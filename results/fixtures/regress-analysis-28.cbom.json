@@ -200,11 +200,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -252,34 +248,42 @@
       "version": "2.6.1"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha3",
+      "bom-ref": "crypto:algorithm:SHAKE256",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
           "cryptoFunctions": [
             "digest"
           ],
-          "primitive": "hash"
+          "primitive": "xof"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `x.update(&d);`; code: `update`",
+            "additionalContext": "[reachable] [call] in xofmac::main; default: setup, not a use; line: `let mut x = Shake256::default();`; code: `Shake256::default`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; line: `x.update(&d);`; code: `update`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::Update::update"
           },
           {
-            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let mut r = x.finalize_xof();`; code: `finalize_xof`",
+            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; line: `let mut r = x.finalize_xof();`; code: `finalize_xof`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::ExtendableOutput::finalize_xof"
           },
           {
-            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `r.read(&mut out);`; code: `read`",
+            "additionalContext": "[reachable] [call] in xofmac::main; use: digest; line: `r.read(&mut out);`; code: `read`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 6,
@@ -287,7 +291,7 @@
           }
         ]
       },
-      "name": "unknown",
+      "name": "SHAKE256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -310,12 +314,8 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -434,7 +434,7 @@
         "pkg:cargo/keccak@0.1.6"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha3"
+        "crypto:algorithm:SHAKE256"
       ],
       "ref": "pkg:cargo/sha3@0.10.9"
     },
@@ -451,7 +451,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha3"
+      "ref": "crypto:algorithm:SHAKE256"
     },
     {
       "dependsOn": [],
@@ -503,7 +503,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "379"
+        "value": "279"
       }
     ],
     "tools": {
@@ -516,7 +516,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e8a2eddd-9792-8327-8659-3ffc6a779954",
+  "serialNumber": "urn:uuid:db0913ef-dd16-8ac7-9868-91eaa4b832cf",
   "specVersion": "1.7",
   "version": 1
 }

@@ -286,7 +286,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-buffer@0.10.4",
@@ -539,7 +539,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/constant_time_eq@0.4.2",
@@ -678,7 +678,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/der@0.7.10",
@@ -1065,7 +1065,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/pem-rfc7468@0.7.0",
@@ -1336,11 +1336,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -2272,6 +2268,68 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t19::buffers; use: generate; line: `rand::thread_rng().try_fill_bytes(nonce).unwrap();`; code: `try_fill_bytes`",
+            "line": 81,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "rand_core::RngCore::try_fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t19::own_rng; use: generate; line: `let _: u8 = rand::thread_rng().r#gen();`; code: `r#gen`",
+            "line": 164,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "rand::rng::Rng::gen"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:Ed25519ph",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -2429,6 +2487,75 @@
         {
           "name": "rcbom:occurrences",
           "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t19::fill_out; use: generate; line: `OsRng.fill_bytes(o.buf);`; code: `fill_bytes`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t19::indirect; use: generate; line: `OsRng.fill_bytes(&mut fresh);`; code: `fill_bytes`",
+            "line": 53,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t19::indirect::{closure#0}; use: generate; instantiated by t19::indirect at src/main.rs:58:19; line: `let mut fill = || OsRng.fill_bytes(&mut k1);`; code: `fill_bytes`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -3404,6 +3531,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -3496,6 +3626,9 @@
         "pkg:cargo/rand_chacha@0.3.1",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand@0.8.8"
     },
     {
@@ -3503,11 +3636,17 @@
         "pkg:cargo/ppv-lite86@0.2.21",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand_chacha@0.3.1"
     },
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -3646,6 +3785,18 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
+      "ref": "crypto:material:private-key:RSA-2048"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
+      "ref": "crypto:material:private-key:RSA-3072"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
@@ -3676,15 +3827,15 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:material:private-key:RSA-2048"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:material:private-key:RSA-3072"
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -3768,7 +3919,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "368"
+        "value": "375"
       }
     ],
     "tools": {
@@ -3781,7 +3932,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:60e6255d-8588-8f20-a0f7-6de4ba898b0a",
+  "serialNumber": "urn:uuid:7cb3d2a8-8b13-88b0-bcdc-d854315b2c49",
   "specVersion": "1.7",
   "version": 1
 }

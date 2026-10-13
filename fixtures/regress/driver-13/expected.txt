@@ -13,6 +13,9 @@
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:60 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:32:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o3; use: generate; line: `OsRng.fill_bytes(&mut key);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:72:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o7; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:80:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o8; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
   occ PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | src/main.rs:95:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, 100_000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | src/main.rs:94:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, n, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:92:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, ITERATIONS, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
@@ -87,6 +90,13 @@
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=3
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:detection:method=type-resolved
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:functions:source=observed
@@ -148,18 +158,18 @@
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
-  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
   prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:crypto-role=support
   prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:kb-coverage=unmodelled
   prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:scope=required
-  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
-  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=present
   prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
   prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
   prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
@@ -187,27 +197,26 @@
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:crypto-role=support
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:kb-coverage=unmodelled
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:scope=required
-  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:usage=reachable
+  prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:usage=present
   prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:crypto-role=support
   prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:kb-coverage=unmodelled
   prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:scope=required
-  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=present
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
   prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
   prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
   prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
-  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=present
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
   prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
-  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=present
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=reachable
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
-  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=present
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
@@ -219,11 +228,11 @@
   prop spki | pkg:cargo/spki@0.7.3 | rcbom:crypto-role=support
   prop spki | pkg:cargo/spki@0.7.3 | rcbom:kb-coverage=unmodelled
   prop spki | pkg:cargo/spki@0.7.3 | rcbom:scope=required
-  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=reachable
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=present
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
-  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
@@ -233,6 +242,7 @@
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
@@ -274,6 +284,7 @@ component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroi
 dep crypto:algorithm:PBKDF2-SHA-256-100000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-210000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:SHA-256
+dep crypto:material:private-key:RSA-3072 -> crypto:algorithm:OS-RNG
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
@@ -340,6 +351,7 @@ dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:Argon2d-19456-2-1
 dependency crypto:algorithm:Argon2i-19456-2-1
+dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:PBKDF2-SHA-256-100000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-210000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-600000-32
@@ -386,9 +398,11 @@ provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2d-19456-2-1
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i-19456-2-1
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-100000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-210000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-600000-32
+provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-3072
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t13@0.1.0", "name": "t13", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t13@0.1.0", "type": "application", "version": "0.1.0"}
@@ -396,7 +410,7 @@ run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=52
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=168
+run rcbom:run:reachable-instances=175
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

@@ -1,6 +1,11 @@
-  occ HKDF | crypto:candidate:hkdf@0.12.4:HKDF | Cargo.lock:171:0 | hkdf | [manifest] locked hkdf 0.12.4; reached via unmodelled -> p256 -> elliptic-curve -> hkdf
-  occ HMAC | crypto:candidate:hmac@0.12.1:HMAC | Cargo.lock:180:0 | hmac | [manifest] locked hmac 0.12.1; reached via unmodelled -> p256 -> ecdsa -> rfc6979 -> hmac
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:28:16 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:29:14 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:23 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in unmodelled::main; use: keyderive; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:43 | elliptic_curve::ecdh::EphemeralSecret::<C>::public_key | [reachable] [call] in unmodelled::main; public_key: setup, not a use; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:16:26 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `"md5" => Box::new(Md5::new()),`; code: `Md5::new`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:25:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; line: `let a = Md5::digest(&d);`; code: `Md5::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:22 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `_ => Box::new(sha2::Sha256::new()),`; code: `sha2::Sha256::new`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:26:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`
   occ base16ct | pkg:cargo/base16ct@0.2.0 | Cargo.lock:6:0 | base16ct | [manifest] locked base16ct 0.2.0; reached via unmodelled -> p256 -> elliptic-curve -> base16ct
   occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via unmodelled -> p256 -> elliptic-curve -> pem-rfc7468 -> base64ct
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:18:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via unmodelled -> md-5 -> digest -> block-buffer
@@ -35,30 +40,33 @@
   occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:308:0 | signature | [manifest] locked signature 2.2.0; reached via unmodelled -> p256 -> ecdsa -> signature
   occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:318:0 | spki | [manifest] locked spki 0.7.3; reached via unmodelled -> p256 -> ecdsa -> spki
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:328:0 | subtle | [manifest] locked subtle 2.6.1; reached via unmodelled -> md-5 -> digest -> subtle
-  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:19:6 | digest::digest::DynDigest::update | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn md5::digest::DynDigest`): its type is chosen at run time; line: `h.update(data);`; code: `update`
-  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:20:6 | digest::digest::DynDigest::finalize | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn md5::digest::DynDigest`): its type is chosen at run time; line: `h.finalize().to_vec()`; code: `finalize`
-  occ unknown | crypto:algorithm:unknown:hash:md-5 | src/main.rs:16:26 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; algorithm unresolved: the type `md5::Md5Core` of md-5 0.10.6, a crypto package the knowledge base does not model; line: `"md5" => Box::new(Md5::new()),`; code: `Md5::new`
-  occ unknown | crypto:algorithm:unknown:hash:md-5 | src/main.rs:25:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; algorithm unresolved: the type `md5::Md5Core` of md-5 0.10.6, a crypto package the knowledge base does not model; line: `let a = Md5::digest(&d);`; code: `Md5::digest`
-  occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:26:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | src/main.rs:30:23 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in unmodelled::main; use: keyderive; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | src/main.rs:28:16 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::random` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | src/main.rs:29:14 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::random` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
-  occ unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | elliptic-curve-0.13.8/src/scalar/nonzero.rs:50:44 | ff::Field::random | [reachable] [call] in elliptic_curve::scalar::nonzero::NonZeroScalar::<..>::random::<..>; use: keygen; algorithm unresolved: `ff::Field::random` of ff 0.13.1, a crypto package the knowledge base does not model; instantiated by elliptic_curve::ecdh::EphemeralSecret::<..>::random::<..> at elliptic-curve-0.13.8/src/ecdh.rs:107:20; instantiated by unmodelled::main at src/main.rs:28:16; line: `if let Some(result) = Self::new(Field::random(&mut rng)).into() {`; code: `Field::random`
+  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:19:6 | digest::digest::DynDigest::update | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.update(data);`; code: `update`
+  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:20:6 | digest::digest::DynDigest::finalize | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.finalize().to_vec()`; code: `finalize`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:363:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via unmodelled -> p256 -> elliptic-curve -> zeroize
-  prop HKDF | crypto:candidate:hkdf@0.12.4:HKDF | rcbom:confidence=low
-  prop HKDF | crypto:candidate:hkdf@0.12.4:HKDF | rcbom:detection:method=manifest
-  prop HKDF | crypto:candidate:hkdf@0.12.4:HKDF | rcbom:kb:version=0.2.0
-  prop HKDF | crypto:candidate:hkdf@0.12.4:HKDF | rcbom:usage=declared-not-used
-  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:confidence=low
-  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:detection:method=manifest
-  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:kb:version=0.2.0
-  prop HMAC | crypto:candidate:hmac@0.12.1:HMAC | rcbom:usage=declared-not-used
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=4
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=2
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:scope=required
@@ -87,12 +95,10 @@
   prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
-  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:crypto-role=unmodelled
-  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:kb-coverage=unmodelled
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:crypto-role=algorithm
   prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:scope=required
   prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:usage=present
-  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:crypto-role=unmodelled
-  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:kb-coverage=unmodelled
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:crypto-role=algorithm
   prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:scope=required
   prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:usage=reachable
   prop ff | pkg:cargo/ff@0.13.1 | rcbom:crypto-role=unmodelled
@@ -108,20 +114,18 @@
   prop group | pkg:cargo/group@0.13.0 | rcbom:usage=present
   prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:crypto-role=algorithm
   prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:scope=required
-  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:usage=declared-not-used
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:usage=present
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
-  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=declared-not-used
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=present
   prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
   prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
   prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
   prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
-  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:crypto-role=unmodelled
-  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:crypto-role=algorithm
   prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:scope=required
   prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:usage=reachable
-  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:crypto-role=unmodelled
-  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:kb-coverage=unmodelled
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:crypto-role=algorithm
   prop p256 | pkg:cargo/p256@0.13.2 | rcbom:scope=required
   prop p256 | pkg:cargo/p256@0.13.2 | rcbom:usage=reachable
   prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
@@ -136,9 +140,8 @@
   prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:kb-coverage=unmodelled
   prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:scope=required
   prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:usage=reachable
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:crypto-role=unmodelled
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:kb-coverage=unmodelled
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:scope=required
@@ -150,8 +153,7 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
-  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=unmodelled
-  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:kb-coverage=unmodelled
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
   prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
   prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
   prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
@@ -171,54 +173,15 @@
   prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:occurrences=2
   prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:occurrences=2
-  prop unknown | crypto:algorithm:unknown:hash:md-5 | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:occurrences=2
-  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | rcbom:reachability=reachable
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset HKDF | crypto:candidate:hkdf@0.12.4:HKDF | {"algorithmProperties": {"algorithmFamily": "HKDF", "primitive": "kdf"}, "assetType": "algorithm"}
-asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:hash:digest | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:md-5 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:sha3 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | {"algorithmProperties": {"cryptoFunctions": ["keyderive"], "primitive": "unknown"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core | {"algorithmProperties": {"cryptoFunctions": ["keygen"], "primitive": "unknown"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:unknown:ff+p256+rand_core | {"algorithmProperties": {"cryptoFunctions": ["keygen"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
@@ -314,15 +277,11 @@ dep pkg:cargo/unmodelled@0.1.0 -> pkg:cargo/p256@0.13.2
 dep pkg:cargo/unmodelled@0.1.0 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/unmodelled@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/unmodelled@0.1.0 -> pkg:cargo/sha3@0.10.9
+dependency crypto:algorithm:ECDH-P-256
+dependency crypto:algorithm:MD5
 dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA3-256
 dependency crypto:algorithm:unknown:hash:digest
-dependency crypto:algorithm:unknown:hash:md-5
-dependency crypto:algorithm:unknown:hash:sha3
-dependency crypto:algorithm:unknown:unknown:elliptic-curve+p256
-dependency crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core
-dependency crypto:algorithm:unknown:unknown:ff+p256+rand_core
-dependency crypto:candidate:hkdf@0.12.4:HKDF
-dependency crypto:candidate:hmac@0.12.1:HMAC
 dependency pkg:cargo/base16ct@0.2.0
 dependency pkg:cargo/base64ct@1.8.3
 dependency pkg:cargo/block-buffer@0.10.4
@@ -358,25 +317,17 @@ doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:unknown:hash:digest
-provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
-provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core
-provides pkg:cargo/ff@0.13.1 -> crypto:algorithm:unknown:unknown:ff+p256+rand_core
-provides pkg:cargo/hkdf@0.12.4 -> crypto:candidate:hkdf@0.12.4:HKDF
-provides pkg:cargo/hmac@0.12.1 -> crypto:candidate:hmac@0.12.1:HMAC
-provides pkg:cargo/md-5@0.10.6 -> crypto:algorithm:unknown:hash:md-5
-provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
-provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core
-provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:unknown:unknown:ff+p256+rand_core
-provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core
-provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:unknown:unknown:ff+p256+rand_core
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/md-5@0.10.6 -> crypto:algorithm:MD5
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:unknown:hash:sha3
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
 root {"bom-ref": "pkg:cargo/unmodelled@0.1.0", "name": "unmodelled", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/unmodelled@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=37
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=564
+run rcbom:run:reachable-instances=147
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

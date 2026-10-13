@@ -1488,6 +1488,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     path: path_of(self.tcx, did),
                     krate: self.tcx.crate_name(did.krate).to_string(),
                     value,
+                    span: None,
                 }
             }
             AggregateKind::Tuple if ops.is_empty() => Origin::Unknown,
@@ -1704,6 +1705,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     path: path_of(self.tcx, did),
                     krate: self.tcx.crate_name(did.krate).to_string(),
                     value: None,
+                    span: Some(self.loc(c.span)),
                 };
             }
             Some(RigidTy::Tuple(ts)) if ts.is_empty() => return Origin::Unknown,
@@ -1916,6 +1918,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             path: path_of(self.tcx, did),
             krate: self.tcx.crate_name(did.krate).to_string(),
             value: None,
+            span: None,
         })
     }
 
@@ -2502,6 +2505,7 @@ impl Origins<'_, '_> {
             path: path_of(tcx, adt.variant(v).def_id),
             krate: tcx.crate_name(adt.did().krate).to_string(),
             value: discriminant(tcx, *adt, v),
+            span: None,
         })
     }
 }

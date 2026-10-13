@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 10;
+pub const FACTS_VERSION: u32 = 12;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -288,6 +288,25 @@ pub enum Target {
         /// For each value argument, the length of the array behind it when its type says so
         /// (`&mut [0u8; 32]` passed as `&mut [u8]`).
         arg_lens: Vec<Option<u64>>,
+        /// A call through a function pointer or a function held in a place (`let h = digest;
+        /// h(&SHA256, d)`): the site is the call's callee expression, and this is where the
+        /// function was named.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        through: Option<Loc>,
+        /// The function is named here as a value (made a pointer, stored, passed:
+        /// `iter.map(Sha256::digest)`), not called: it runs wherever the value is called.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        value: bool,
+    },
+    /// A call through a function pointer whose function is not named in this body (`(h.f)(..)`,
+    /// a parameter, a returned pointer): the site is the call's callee expression; `origin` is
+    /// where the pointer comes from, leading to the functions named as values (`Call::value`,
+    /// `Origin::Unit::span`). The value arguments as for `Call`.
+    Pointer {
+        origin: Origin,
+        const_args: Vec<Option<i128>>,
+        arg_origins: Vec<Origin>,
+        arg_lens: Vec<Option<u64>>,
     },
     /// A reference to a named `const` item, e.g. `&aws_lc_rs::aead::AES_256_GCM`: aws-lc-rs
     /// defines its algorithms as consts, which are copied by value and have no allocation.
@@ -344,6 +363,9 @@ pub enum Origin {
         /// For an enum variant, its discriminant (`argon2::Algorithm::Argon2i` is 1).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         value: Option<i128>,
+        /// For a function item used as a value, where it is named (as its `Call::value` site).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        span: Option<Loc>,
     },
     /// A buffer written through a borrow that `callee` returned (`for c in key.chunks_mut(16) {
     /// rng.fill_bytes(c) }`, a lock guard): what was written is not followed.
@@ -501,4 +523,11 @@ pub struct Reach {
     /// one of them reaches a call at run time.
     #[serde(default)]
     pub paths: Vec<String>,
+    /// The crates whose code the walk reached, inside the algorithm crates too (followed there
+    /// for this only): the packages that run.
+    #[serde(default)]
+    pub crates: Vec<CrateRef>,
+    /// `crates` is complete (no walk limit was hit).
+    #[serde(default)]
+    pub crates_complete: bool,
 }

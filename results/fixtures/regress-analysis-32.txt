@@ -1,0 +1,550 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:51:21 | rand::rng::Rng::gen_bool | [reachable] [call] in probe32::main; use: generate; line: `let b: bool = tr.gen_bool(0.5);`; code: `gen_bool`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:52:20 | rand::rng::Rng::gen | [reachable] [call] in probe32::main; use: generate; line: `let g: u64 = tr.r#gen();`; code: `r#gen`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:54:7 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `sr.fill_bytes(&mut out);`; code: `fill_bytes`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:56:11 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `seeded.fill_bytes(&mut out);`; code: `fill_bytes`
+  occ ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | src/main.rs:60:7 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `cc.fill_bytes(&mut out);`; code: `fill_bytes`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:26:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:27:19 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe32::main; use: keyderive; line: `let shared = e.diffie_hellman(&sk.public_key());`; code: `diffie_hellman`
+  occ ECDH-P-384 | crypto:algorithm:ECDH-P-384 | src/main.rs:31:15 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let e384 = p384::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p384::ecdh::EphemeralSecret::random`
+  occ ECDH-P-384 | crypto:algorithm:ECDH-P-384 | src/main.rs:33:21 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe32::main; use: keyderive; line: `let _s384 = e384.diffie_hellman(&pk384);`; code: `diffie_hellman`
+  occ ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | src/main.rs:38:28 | signature::hazmat::PrehashSigner::sign_prehash | [reachable] [call] in probe32::main; use: sign; line: `let sig3: Signature = s.sign_prehash(&[7u8; 32]).unwrap();`; code: `sign_prehash`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:35:12 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let s = SigningKey::random(&mut OsRng);`; code: `SigningKey::random`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:36:28 | signature::signer::Signer::sign | [reachable] [call] in probe32::main; use: sign; line: `let sig1: Signature = s.sign(&d);`; code: `sign`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:39:12 | core::convert::From::from | [reachable] [call] in probe32::main; from: setup, not a use; line: `let v = VerifyingKey::from(&s);`; code: `VerifyingKey::from`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:40:6 | signature::verifier::Verifier::verify | [reachable] [call] in probe32::main; use: verify; line: `v.verify(&d, &sig1).unwrap();`; code: `verify`
+  occ ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | src/main.rs:37:28 | signature::signer::DigestSigner::sign_digest | [reachable] [call] in probe32::main; use: sign; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `sign_digest`
+  occ ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | src/main.rs:41:6 | signature::verifier::DigestVerifier::verify_digest | [reachable] [call] in probe32::main; use: verify; line: `v.verify_digest(Sha3_256::new_with_prefix(&d), &sig2).unwrap();`; code: `verify_digest`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:42:15 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let s384 = p384::ecdsa::SigningKey::random(&mut OsRng);`; code: `p384::ecdsa::SigningKey::random`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:43:44 | signature::signer::Signer::sign | [reachable] [call] in probe32::main; use: sign; line: `let sig4: p384::ecdsa::Signature = s384.sign(&d);`; code: `sign`
+  occ HKDF | crypto:algorithm:HKDF | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [call] in probe32::main; use: keyderive; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
+  occ HKDF | crypto:algorithm:HKDF | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in probe32::main; use: keyderive; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:45:19 | ml_kem::KemCore::generate_deterministic | [reachable] [call] in probe32::main; use: keygen; line: `let (dk, ek) = MlKem768::generate_deterministic(&B32::default(), &B32::default());`; code: `MlKem768::generate_deterministic`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:46:22 | kem::Encapsulate::encapsulate | [reachable] [call] in probe32::main; use: encapsulate; line: `let (ct, ss) = ek.encapsulate(&mut OsRng).unwrap();`; code: `encapsulate`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:47:17 | kem::Decapsulate::decapsulate | [reachable] [call] in probe32::main; use: decapsulate; line: `let ss2 = dk.decapsulate(&ct).unwrap();`; code: `decapsulate`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:48:23 | ml_kem::KemCore::generate | [reachable] [call] in probe32::main; use: keygen; line: `let (_dk2, _ek2) = MlKem768::generate(&mut OsRng);`; code: `MlKem768::generate`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:61:26 | rand::distributions::distribution::DistString::sample_string | [reachable] [call] in probe32::main; use: generate; line: `let pw = Alphanumeric.sample_string(&mut OsRng, 16);`; code: `sample_string`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:63:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `OsRng.fill_bytes(&mut os);`; code: `fill_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [component] in probe32::main; part of HKDF; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:18:12 | digest::digest::Digest::digest | [reachable] [call] in probe32::main; use: digest; line: `let a = Sha3_256::digest(&d);`; code: `Sha3_256::digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:37:28 | signature::signer::DigestSigner::sign_digest | [reachable] [component] in probe32::main; part of ECDSA-P-256-SHA3-256; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `sign_digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:37:40 | digest::digest::Digest::new_with_prefix | [reachable] [call] in probe32::main; use: digest; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `Sha3_256::new_with_prefix`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:41:20 | digest::digest::Digest::new_with_prefix | [reachable] [call] in probe32::main; use: digest; line: `v.verify_digest(Sha3_256::new_with_prefix(&d), &sig2).unwrap();`; code: `Sha3_256::new_with_prefix`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:41:6 | signature::verifier::DigestVerifier::verify_digest | [reachable] [component] in probe32::main; part of ECDSA-P-256-SHA3-256; line: `v.verify_digest(Sha3_256::new_with_prefix(&d), &sig2).unwrap();`; code: `verify_digest`
+  occ SHAKE128 | crypto:algorithm:SHAKE128 | src/main.rs:19:16 | core::default::Default::default | [reachable] [call] in probe32::main; default: setup, not a use; line: `let mut x = Shake128::default();`; code: `Shake128::default`
+  occ SHAKE128 | crypto:algorithm:SHAKE128 | src/main.rs:20:6 | digest::Update::update | [reachable] [call] in probe32::main; use: digest; line: `x.update(&d);`; code: `update`
+  occ SHAKE128 | crypto:algorithm:SHAKE128 | src/main.rs:21:18 | digest::ExtendableOutput::finalize_xof | [reachable] [call] in probe32::main; use: digest; line: `let mut r = x.finalize_xof();`; code: `finalize_xof`
+  occ SHAKE128 | crypto:algorithm:SHAKE128 | src/main.rs:23:6 | digest::XofReader::read | [reachable] [call] in probe32::main; use: digest; line: `r.read(&mut out);`; code: `read`
+  occ base16ct | pkg:cargo/base16ct@0.2.0 | Cargo.lock:6:0 | base16ct | [manifest] locked base16ct 0.2.0; reached via probe32 -> p256 -> elliptic-curve -> base16ct
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via probe32 -> p256 -> elliptic-curve -> pem-rfc7468 -> base64ct
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:18:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via probe32 -> sha2 -> digest -> block-buffer
+  occ const-oid | pkg:cargo/const-oid@0.9.6 | Cargo.lock:33:0 | const-oid | [manifest] locked const-oid 0.9.6; reached via probe32 -> sha2 -> digest -> const-oid
+  occ crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | Cargo.lock:48:0 | crypto-bigint | [manifest] locked crypto-bigint 0.5.5; reached via probe32 -> p256 -> elliptic-curve -> crypto-bigint
+  occ crypto-common | pkg:cargo/crypto-common@0.1.6 | Cargo.lock:60:0 | crypto-common | [manifest] locked crypto-common 0.1.6; reached via probe32 -> sha2 -> digest -> crypto-common
+  occ der | pkg:cargo/der@0.7.10 | Cargo.lock:70:0 | der | [manifest] locked der 0.7.10; reached via probe32 -> p256 -> ecdsa -> der
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:81:0 | digest | [manifest] locked digest 0.10.7; reached via probe32 -> sha2 -> digest
+  occ ecdsa | pkg:cargo/ecdsa@0.16.9 | Cargo.lock:93:0 | ecdsa | [manifest] locked ecdsa 0.16.9; reached via probe32 -> p256 -> ecdsa
+  occ elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | Cargo.lock:107:0 | elliptic-curve | [manifest] locked elliptic-curve 0.13.8; reached via probe32 -> p256 -> elliptic-curve
+  occ ff | pkg:cargo/ff@0.13.1 | Cargo.lock:128:0 | ff | [manifest] locked ff 0.13.1; reached via probe32 -> p256 -> elliptic-curve -> ff
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:149:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via probe32 -> rand_core -> getrandom
+  occ group | pkg:cargo/group@0.13.0 | Cargo.lock:160:0 | group | [manifest] locked group 0.13.0; reached via probe32 -> p256 -> elliptic-curve -> group
+  occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.lock:171:0 | hkdf | [manifest] locked hkdf 0.12.4; reached via probe32 -> hkdf
+  occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.toml:15:0 | hkdf | [manifest] declared by probe32 (dependencies)
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:180:0 | hmac | [manifest] locked hmac 0.12.1; reached via probe32 -> hkdf -> hmac
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:198:0 | keccak | [manifest] locked keccak 0.1.6; reached via probe32 -> sha3 -> keccak
+  occ kem | pkg:cargo/kem@0.3.0-pre.0 | Cargo.lock:207:0 | kem | [manifest] locked kem 0.3.0-pre.0; reached via probe32 -> ml-kem -> kem
+  occ ml-kem | pkg:cargo/ml-kem@0.2.3 | Cargo.lock:223:0 | ml-kem | [manifest] locked ml-kem 0.2.3; reached via probe32 -> ml-kem
+  occ ml-kem | pkg:cargo/ml-kem@0.2.3 | Cargo.toml:14:0 | ml-kem | [manifest] declared by probe32 (dependencies); features ["deterministic"]
+  occ p256 | pkg:cargo/p256@0.13.2 | Cargo.lock:235:0 | p256 | [manifest] locked p256 0.13.2; reached via probe32 -> p256
+  occ p256 | pkg:cargo/p256@0.13.2 | Cargo.toml:7:0 | p256 | [manifest] declared by probe32 (dependencies); features ["ecdh", "ecdsa", "sha256"]
+  occ p384 | pkg:cargo/p384@0.13.1 | Cargo.lock:247:0 | p384 | [manifest] locked p384 0.13.1; reached via probe32 -> p384
+  occ p384 | pkg:cargo/p384@0.13.1 | Cargo.toml:8:0 | p384 | [manifest] declared by probe32 (dependencies); features ["ecdh", "ecdsa", "sha384"]
+  occ pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | Cargo.lock:259:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 0.7.0; reached via probe32 -> p256 -> elliptic-curve -> pem-rfc7468
+  occ pkcs8 | pkg:cargo/pkcs8@0.10.2 | Cargo.lock:268:0 | pkcs8 | [manifest] locked pkcs8 0.10.2; reached via probe32 -> p256 -> elliptic-curve -> pkcs8
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:278:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via probe32 -> rand_chacha -> ppv-lite86
+  occ primeorder | pkg:cargo/primeorder@0.13.6 | Cargo.lock:287:0 | primeorder | [manifest] locked primeorder 0.13.6; reached via probe32 -> p256 -> primeorder
+  occ rand | pkg:cargo/rand@0.8.5 | Cargo.lock:329:0 | rand | [manifest] locked rand 0.8.5; reached via probe32 -> rand
+  occ rand | pkg:cargo/rand@0.8.5 | Cargo.toml:11:0 | rand | [manifest] declared by probe32 (dependencies); features ["small_rng"]
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:340:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via probe32 -> rand_chacha
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.toml:13:0 | rand_chacha | [manifest] declared by probe32 (dependencies)
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:350:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via probe32 -> rand_core
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.toml:12:0 | rand_core | [manifest] declared by probe32 (dependencies); features ["getrandom"]
+  occ rfc6979 | pkg:cargo/rfc6979@0.4.0 | Cargo.lock:359:0 | rfc6979 | [manifest] locked rfc6979 0.4.0; reached via probe32 -> p256 -> ecdsa -> rfc6979
+  occ sec1 | pkg:cargo/sec1@0.7.3 | Cargo.lock:369:0 | sec1 | [manifest] locked sec1 0.7.3; reached via probe32 -> p256 -> elliptic-curve -> sec1
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:383:0 | sha2 | [manifest] locked sha2 0.10.9; reached via probe32 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:10:0 | sha2 | [manifest] declared by probe32 (dependencies)
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:394:0 | sha3 | [manifest] locked sha3 0.10.9; reached via probe32 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:9:0 | sha3 | [manifest] declared by probe32 (dependencies)
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:404:0 | signature | [manifest] locked signature 2.2.0; reached via probe32 -> p256 -> ecdsa -> signature
+  occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:414:0 | spki | [manifest] locked spki 0.7.3; reached via probe32 -> p256 -> ecdsa -> spki
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:424:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe32 -> p256 -> elliptic-curve -> subtle
+  occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe32::main; use: digest; algorithm unresolved: the type `sha3::Keccak256Core` of sha3 0.10.9, which the knowledge base does not name; line: `let k = Keccak256::digest(&d);`; code: `Keccak256::digest`
+  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | src/main.rs:25:13 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; line: `let sk = p256::SecretKey::random(&mut OsRng);`; code: `p256::SecretKey::random`
+  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | src/main.rs:32:16 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:485:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via probe32 -> ml-kem -> kem -> zeroize
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=4
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:confidence=high
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:functions:source=observed
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:occurrences=1
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:reachability=reachable
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:registry-name=unmatched
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=2
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:confidence=high
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:detection:method=type-resolved
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:functions:source=observed
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:kb:version=0.2.0
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:occurrences=2
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:reachability=reachable
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:confidence=high
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:occurrences=1
+  prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:reachability=reachable
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=4
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:reachability=reachable
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:confidence=high
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:functions:source=observed
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=2
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=reachable
+  prop HKDF | crypto:algorithm:HKDF | rcbom:confidence=high
+  prop HKDF | crypto:algorithm:HKDF | rcbom:detection:method=type-resolved
+  prop HKDF | crypto:algorithm:HKDF | rcbom:functions:source=observed
+  prop HKDF | crypto:algorithm:HKDF | rcbom:kb:version=0.2.0
+  prop HKDF | crypto:algorithm:HKDF | rcbom:occurrences=2
+  prop HKDF | crypto:algorithm:HKDF | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=1
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:confidence=high
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:detection:method=type-resolved
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:functions:source=observed
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=4
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=2
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=5
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:confidence=high
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:detection:method=type-resolved
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:functions:source=observed
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:kb:version=0.2.0
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:occurrences=4
+  prop SHAKE128 | crypto:algorithm:SHAKE128 | rcbom:reachability=reachable
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:scope=required
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:usage=present
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=present
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:crypto-role=support
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:kb-coverage=unmodelled
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:scope=required
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.6 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.6 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:crypto-role=algorithm
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:scope=required
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:usage=reachable
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:crypto-role=algorithm
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:scope=required
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:usage=reachable
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:crypto-role=unmodelled
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:kb-coverage=unmodelled
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:scope=required
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop group | pkg:cargo/group@0.13.0 | rcbom:crypto-role=unmodelled
+  prop group | pkg:cargo/group@0.13.0 | rcbom:kb-coverage=unmodelled
+  prop group | pkg:cargo/group@0.13.0 | rcbom:scope=required
+  prop group | pkg:cargo/group@0.13.0 | rcbom:usage=present
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:crypto-role=algorithm
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:scope=required
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop kem | pkg:cargo/kem@0.3.0-pre.0 | rcbom:crypto-role=trait
+  prop kem | pkg:cargo/kem@0.3.0-pre.0 | rcbom:scope=required
+  prop ml-kem | pkg:cargo/ml-kem@0.2.3 | rcbom:crypto-role=algorithm
+  prop ml-kem | pkg:cargo/ml-kem@0.2.3 | rcbom:scope=required
+  prop ml-kem | pkg:cargo/ml-kem@0.2.3 | rcbom:usage=reachable
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:crypto-role=algorithm
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:scope=required
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:usage=reachable
+  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:crypto-role=unmodelled
+  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:kb-coverage=unmodelled
+  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:scope=required
+  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:usage=reachable
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:kb-coverage=unmodelled
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:scope=required
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=present
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=present
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:crypto-role=unmodelled
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:kb-coverage=unmodelled
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:scope=required
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.5 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:crypto-role=unmodelled
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:kb-coverage=unmodelled
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:scope=required
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:usage=reachable
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:crypto-role=support
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:scope=required
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:usage=present
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=present
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:sha3 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDH-P-384 | crypto:algorithm:ECDH-P-384 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset HKDF | crypto:algorithm:HKDF | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHAKE128 | crypto:algorithm:SHAKE128 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "xof"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:sha3 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | {"algorithmProperties": {"cryptoFunctions": ["keygen"], "primitive": "unknown"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | {"algorithmProperties": {"cryptoFunctions": ["keygen"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6
+component library crypto-bigint 0.5.5 | pkg:cargo/crypto-bigint@0.5.5 | purl pkg:cargo/crypto-bigint@0.5.5
+component library crypto-common 0.1.6 | pkg:cargo/crypto-common@0.1.6 | purl pkg:cargo/crypto-common@0.1.6
+component library der 0.7.10 | pkg:cargo/der@0.7.10 | purl pkg:cargo/der@0.7.10
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ecdsa 0.16.9 | pkg:cargo/ecdsa@0.16.9 | purl pkg:cargo/ecdsa@0.16.9
+component library elliptic-curve 0.13.8 | pkg:cargo/elliptic-curve@0.13.8 | purl pkg:cargo/elliptic-curve@0.13.8
+component library ff 0.13.1 | pkg:cargo/ff@0.13.1 | purl pkg:cargo/ff@0.13.1
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library group 0.13.0 | pkg:cargo/group@0.13.0 | purl pkg:cargo/group@0.13.0
+component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4 | purl pkg:cargo/hkdf@0.12.4
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library kem 0.3.0-pre.0 | pkg:cargo/kem@0.3.0-pre.0 | purl pkg:cargo/kem@0.3.0-pre.0
+component library ml-kem 0.2.3 | pkg:cargo/ml-kem@0.2.3 | purl pkg:cargo/ml-kem@0.2.3
+component library p256 0.13.2 | pkg:cargo/p256@0.13.2 | purl pkg:cargo/p256@0.13.2
+component library p384 0.13.1 | pkg:cargo/p384@0.13.1 | purl pkg:cargo/p384@0.13.1
+component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
+component library pkcs8 0.10.2 | pkg:cargo/pkcs8@0.10.2 | purl pkg:cargo/pkcs8@0.10.2
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
+component library primeorder 0.13.6 | pkg:cargo/primeorder@0.13.6 | purl pkg:cargo/primeorder@0.13.6
+component library rand 0.8.5 | pkg:cargo/rand@0.8.5 | purl pkg:cargo/rand@0.8.5
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library rfc6979 0.4.0 | pkg:cargo/rfc6979@0.4.0 | purl pkg:cargo/rfc6979@0.4.0
+component library sec1 0.7.3 | pkg:cargo/sec1@0.7.3 | purl pkg:cargo/sec1@0.7.3
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:ECDSA-P-256-SHA3-256 -> crypto:algorithm:SHA3-256
+dep crypto:algorithm:HKDF -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/block-buffer@0.10.4 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-common@0.1.6 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.6
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/rfc6979@0.4.0
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/base16ct@0.2.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/crypto-bigint@0.5.5
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/ff@0.13.1
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/group@0.13.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/hkdf@0.12.4
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/sec1@0.7.3
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ff@0.13.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ff@0.13.1 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/ff@0.13.1
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hkdf@0.12.4 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/kem@0.3.0-pre.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/kem@0.3.0-pre.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ml-kem@0.2.3 -> pkg:cargo/kem@0.3.0-pre.0
+dep pkg:cargo/ml-kem@0.2.3 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ml-kem@0.2.3 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/ecdsa@0.16.9
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/primeorder@0.13.6
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/p384@0.13.1 -> pkg:cargo/ecdsa@0.16.9
+dep pkg:cargo/p384@0.13.1 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/p384@0.13.1 -> pkg:cargo/primeorder@0.13.6
+dep pkg:cargo/p384@0.13.1 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/pem-rfc7468@0.7.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/primeorder@0.13.6 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/hkdf@0.12.4
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/ml-kem@0.2.3
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/p256@0.13.2
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/p384@0.13.1
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/rand@0.8.5
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/probe32@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rfc6979@0.4.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/rfc6979@0.4.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/base16ct@0.2.0
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/spki@0.7.3 -> pkg:cargo/der@0.7.10
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:ChaCha20-RNG
+dependency crypto:algorithm:ECDH-P-256
+dependency crypto:algorithm:ECDH-P-384
+dependency crypto:algorithm:ECDSA-P-256
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:ECDSA-P-256-SHA3-256
+dependency crypto:algorithm:ECDSA-P-384-SHA-384
+dependency crypto:algorithm:HKDF
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:ML-KEM-768
+dependency crypto:algorithm:OS-RNG
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA3-256
+dependency crypto:algorithm:SHAKE128
+dependency crypto:algorithm:unknown:hash:sha3
+dependency crypto:algorithm:unknown:unknown:elliptic-curve+p256
+dependency crypto:algorithm:unknown:unknown:elliptic-curve+p384
+dependency pkg:cargo/base16ct@0.2.0
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/const-oid@0.9.6
+dependency pkg:cargo/crypto-bigint@0.5.5
+dependency pkg:cargo/crypto-common@0.1.6
+dependency pkg:cargo/der@0.7.10
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ecdsa@0.16.9
+dependency pkg:cargo/elliptic-curve@0.13.8
+dependency pkg:cargo/ff@0.13.1
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/group@0.13.0
+dependency pkg:cargo/hkdf@0.12.4
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/kem@0.3.0-pre.0
+dependency pkg:cargo/ml-kem@0.2.3
+dependency pkg:cargo/p256@0.13.2
+dependency pkg:cargo/p384@0.13.1
+dependency pkg:cargo/pem-rfc7468@0.7.0
+dependency pkg:cargo/pkcs8@0.10.2
+dependency pkg:cargo/ppv-lite86@0.2.21
+dependency pkg:cargo/primeorder@0.13.6
+dependency pkg:cargo/probe32@0.1.0
+dependency pkg:cargo/rand@0.8.5
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/rfc6979@0.4.0
+dependency pkg:cargo/sec1@0.7.3
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/spki@0.7.3
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256
+provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256-SHA3-256
+provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-384-SHA-384
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-384
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:HKDF
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p384
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/hkdf@0.12.4 -> crypto:algorithm:HKDF
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ml-kem@0.2.3 -> crypto:algorithm:ML-KEM-768
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
+provides pkg:cargo/p384@0.13.1 -> crypto:algorithm:unknown:unknown:elliptic-curve+p384
+provides pkg:cargo/rand@0.8.5 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha20-RNG
+provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHAKE128
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:unknown:hash:sha3
+root {"bom-ref": "pkg:cargo/probe32@0.1.0", "name": "probe32", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe32@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=44
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=554
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

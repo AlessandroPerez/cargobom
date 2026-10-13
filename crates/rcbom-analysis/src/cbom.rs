@@ -220,7 +220,11 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
         props.push(prop("rcbom:registry-name", "unmatched"));
     }
     props.push(prop("rcbom:occurrences", a.occurrences.len()));
-    if a.algo.material.is_none() && !a.unresolved() && !rcbom_kb::in_family_enum(&a.algo.family) {
+    if a.algo.material.is_none()
+        && !a.unresolved()
+        && !a.algo.family.is_empty()
+        && !rcbom_kb::in_family_enum(&a.algo.family)
+    {
         props.push(prop("rcbom:algorithm-family", &a.algo.family));
     }
     let crypto = match &a.algo.material {
@@ -375,9 +379,11 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
         props.push(prop("rcbom:ffi-boundary", "true"));
     }
     if let (Some(u), Some(r)) = (usage, p.role) {
-        if !p.kb_supported || !layer2 || (p.scope == Scope::Build && u == Usage::DeclaredNotUsed) {
+        if !layer2 || (u == Usage::DeclaredNotUsed && (!p.kb_supported || p.scope == Scope::Build))
+        {
             // without Layer 2 (`--manifest-only`) no use was looked for; its APIs are not in
-            // the knowledge base: no use could have been seen; only build scripts and proc
+            // the knowledge base (a version it does not cover): no use could have been seen,
+            // only what the walk and its unknown occurrences say; only build scripts and proc
             // macros use it, and they are not analysed
             props.push(prop("rcbom:usage", "unknown"));
         } else if r != Role::Trait {

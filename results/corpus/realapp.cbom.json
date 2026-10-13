@@ -462,10 +462,6 @@
         {
           "name": "rcbom:kb-coverage",
           "value": "unsupported-version"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "unknown"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -828,11 +824,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1166,7 +1158,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "unknown"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/sha2@0.11.0",
@@ -1202,7 +1194,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/subtle@2.6.1",
@@ -1927,6 +1919,75 @@
         {
           "name": "rcbom:occurrences",
           "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in age_core::format::grease_the_joint; use: generate; line: `let args = (0..Uniform::from(0..5).sample(&mut rng))`; code: `sample`",
+            "line": 140,
+            "location": "age-core-0.11.0/src/format.rs",
+            "offset": 39,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[present] [call] in age_core::format::grease_the_joint; use: generate; line: `let mut body = vec![0; Uniform::from(0..100).sample(&mut rng)];`; code: `sample`",
+            "line": 151,
+            "location": "age-core-0.11.0/src/format.rs",
+            "offset": 49,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[present] [call] in age_core::format::grease_the_joint; use: generate; line: `rng.fill_bytes(&mut body);`; code: `fill_bytes`",
+            "line": 152,
+            "location": "age-core-0.11.0/src/format.rs",
+            "offset": 8,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -4313,6 +4374,110 @@
         {
           "name": "rcbom:algorithm-family",
           "value": "HMAC"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in age::keys::new_file_key::{closure#0}; use: generate; line: `FileKey::init_with_mut(|file_key| OsRng.fill_bytes(file_key))`; code: `fill_bytes`",
+            "line": 21,
+            "location": "age-0.11.5/src/keys.rs",
+            "offset": 44,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[present] [call] in age::protocol::Nonce::random; use: generate; line: `OsRng.fill_bytes(&mut nonce);`; code: `fill_bytes`",
+            "line": 31,
+            "location": "age-0.11.5/src/protocol.rs",
+            "offset": 14,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[present] [call] in <age::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "line": 145,
+            "location": "age-0.11.5/src/scrypt.rs",
+            "offset": 12,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[present] [call] in <age::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `let label = Alphanumeric.sample_string(&mut rng, 32);`; code: `sample_string`",
+            "line": 157,
+            "location": "age-0.11.5/src/scrypt.rs",
+            "offset": 33,
+            "symbol": "rand::distributions::distribution::DistString::sample_string"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::Ring as rustls::crypto::SecureRandom>::fill; use: generate; line: `.fill(buf)`; code: `fill`",
+            "line": 51,
+            "location": "rustls-0.23.45/src/crypto/ring/mod.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key)`; code: `fill`",
+            "line": 65,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key_name)`; code: `fill`",
+            "line": 72,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::encrypt; use: generate; line: `.fill(&mut nonce_buf)`; code: `fill`",
+            "line": 99,
+            "location": "rustls-0.23.45/src/crypto/ring/ticketer.rs",
+            "offset": 13,
+            "symbol": "ring::rand::SecureRandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
         }
       ],
       "type": "cryptographic-asset"
@@ -7168,6 +7333,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -7227,6 +7395,9 @@
         "pkg:cargo/rand_chacha@0.3.1",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand@0.8.8"
     },
     {
@@ -7234,11 +7405,17 @@
         "pkg:cargo/ppv-lite86@0.2.21",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand_chacha@0.3.1"
     },
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -7273,6 +7450,7 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:HMAC-SHA-384",
         "crypto:algorithm:HMAC-SHA-512",
+        "crypto:algorithm:OS-RNG",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-384",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
@@ -7490,6 +7668,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha20-Poly1305"
     },
     {
@@ -7519,6 +7701,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:material:secret-key:HMAC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -7619,7 +7805,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:91fb6b25-3356-8cdd-b19e-839053b19ce9",
+  "serialNumber": "urn:uuid:a71142f1-6003-8f1f-8606-7b8200025ce7",
   "specVersion": "1.7",
   "version": 1
 }

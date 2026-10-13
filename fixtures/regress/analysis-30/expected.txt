@@ -1,0 +1,399 @@
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:32:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe30::main; use: keygen; line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:33:13 | core::convert::From::from | [reachable] [call] in probe30::main; from: setup, not a use; line: `let pk = p256::PublicKey::from(&e);`; code: `p256::PublicKey::from`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:34:19 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe30::main; use: keyderive; line: `let shared = e.diffie_hellman(&pk);`; code: `diffie_hellman`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:29:13 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe30::main; use: keygen; line: `let sk = p256::ecdsa::SigningKey::random(&mut OsRng);`; code: `p256::ecdsa::SigningKey::random`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:30:41 | signature::signer::Signer::sign | [reachable] [call] in probe30::main; use: sign; line: `let sig: p256::ecdsa::Signature = sk.sign(b"msg");`; code: `sign`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:14:12 | digest::digest::Digest::digest | [reachable] [call] in probe30::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:13:12; line: `let a = f(b"abc");`; code: `f`
+  occ base16ct | pkg:cargo/base16ct@0.2.0 | Cargo.lock:6:0 | base16ct | [manifest] locked base16ct 0.2.0; reached via probe30 -> p256 -> elliptic-curve -> base16ct
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via probe30 -> p256 -> elliptic-curve -> pem-rfc7468 -> base64ct
+  occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.lock:18:0 | blake2 | [manifest] locked blake2 0.10.6; reached via probe30 -> blake2
+  occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.toml:10:0 | blake2 | [manifest] declared by probe30 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:27:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via probe30 -> blake2 -> digest -> block-buffer
+  occ blowfish | pkg:cargo/blowfish@0.9.1 | Cargo.lock:36:0 | blowfish | [manifest] locked blowfish 0.9.1; reached via probe30 -> blowfish
+  occ blowfish | pkg:cargo/blowfish@0.9.1 | Cargo.toml:11:0 | blowfish | [manifest] declared by probe30 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:58:0 | cipher | [manifest] locked cipher 0.4.4; reached via probe30 -> blowfish -> cipher
+  occ const-oid | pkg:cargo/const-oid@0.9.6 | Cargo.lock:68:0 | const-oid | [manifest] locked const-oid 0.9.6; reached via probe30 -> blake2 -> digest -> const-oid
+  occ crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | Cargo.lock:83:0 | crypto-bigint | [manifest] locked crypto-bigint 0.5.5; reached via probe30 -> p256 -> elliptic-curve -> crypto-bigint
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:95:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via probe30 -> blake2 -> digest -> crypto-common
+  occ der | pkg:cargo/der@0.7.10 | Cargo.lock:105:0 | der | [manifest] locked der 0.7.10; reached via probe30 -> p256 -> ecdsa -> der
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:116:0 | digest | [manifest] locked digest 0.10.7; reached via probe30 -> blake2 -> digest
+  occ ecdsa | pkg:cargo/ecdsa@0.16.9 | Cargo.lock:128:0 | ecdsa | [manifest] locked ecdsa 0.16.9; reached via probe30 -> p256 -> ecdsa
+  occ elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | Cargo.lock:142:0 | elliptic-curve | [manifest] locked elliptic-curve 0.13.8; reached via probe30 -> p256 -> elliptic-curve
+  occ ff | pkg:cargo/ff@0.13.1 | Cargo.lock:163:0 | ff | [manifest] locked ff 0.13.1; reached via probe30 -> p256 -> elliptic-curve -> ff
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:184:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via probe30 -> rand_core -> getrandom
+  occ group | pkg:cargo/group@0.13.0 | Cargo.lock:195:0 | group | [manifest] locked group 0.13.0; reached via probe30 -> p256 -> elliptic-curve -> group
+  occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.lock:206:0 | hkdf | [manifest] locked hkdf 0.12.4; reached via probe30 -> p256 -> elliptic-curve -> hkdf
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:215:0 | hmac | [manifest] locked hmac 0.12.1; reached via probe30 -> p256 -> ecdsa -> rfc6979 -> hmac
+  occ p256 | pkg:cargo/p256@0.13.2 | Cargo.lock:239:0 | p256 | [manifest] locked p256 0.13.2; reached via probe30 -> p256
+  occ p256 | pkg:cargo/p256@0.13.2 | Cargo.toml:13:0 | p256 | [manifest] declared by probe30 (dependencies); features ["ecdsa", "ecdh"]
+  occ pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | Cargo.lock:251:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 0.7.0; reached via probe30 -> p256 -> elliptic-curve -> pem-rfc7468
+  occ pkcs8 | pkg:cargo/pkcs8@0.10.2 | Cargo.lock:260:0 | pkcs8 | [manifest] locked pkcs8 0.10.2; reached via probe30 -> p256 -> elliptic-curve -> pkcs8
+  occ primeorder | pkg:cargo/primeorder@0.13.6 | Cargo.lock:270:0 | primeorder | [manifest] locked primeorder 0.13.6; reached via probe30 -> p256 -> primeorder
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:292:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via probe30 -> rand_core
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.toml:14:0 | rand_core | [manifest] declared by probe30 (dependencies); features ["getrandom"]
+  occ rfc6979 | pkg:cargo/rfc6979@0.4.0 | Cargo.lock:301:0 | rfc6979 | [manifest] locked rfc6979 0.4.0; reached via probe30 -> p256 -> ecdsa -> rfc6979
+  occ salsa20 | pkg:cargo/salsa20@0.10.2 | Cargo.lock:311:0 | salsa20 | [manifest] locked salsa20 0.10.2; reached via probe30 -> salsa20
+  occ salsa20 | pkg:cargo/salsa20@0.10.2 | Cargo.toml:12:0 | salsa20 | [manifest] declared by probe30 (dependencies)
+  occ sec1 | pkg:cargo/sec1@0.7.3 | Cargo.lock:320:0 | sec1 | [manifest] locked sec1 0.7.3; reached via probe30 -> p256 -> elliptic-curve -> sec1
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:334:0 | sha2 | [manifest] locked sha2 0.10.9; reached via probe30 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:9:0 | sha2 | [manifest] declared by probe30 (dependencies)
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:345:0 | signature | [manifest] locked signature 2.2.0; reached via probe30 -> p256 -> ecdsa -> signature
+  occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:355:0 | spki | [manifest] locked spki 0.7.3; reached via probe30 -> p256 -> ecdsa -> spki
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:365:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe30 -> blake2 -> digest -> subtle
+  occ unknown | crypto:algorithm:unknown:block-cipher:blowfish | src/main.rs:23:7 | cipher::block::BlockEncrypt::encrypt_block | [reachable] [call] in probe30::main; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `bf.encrypt_block(&mut blk);`; code: `encrypt_block`
+  occ unknown | crypto:algorithm:unknown:hash:blake2 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe30::main; use: digest; algorithm unresolved: the type `blake2::Blake2bVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let b = blake2::Blake2b512::digest(b"abc");`; code: `blake2::Blake2b512::digest`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:17:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b"key").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:18:4 | digest::mac::Mac::update | [reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Mac::update(&mut m, b"abc");`; code: `Mac::update`
+  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:19:14 | digest::mac::Mac::finalize | [reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let t = m.finalize().into_bytes();`; code: `finalize`
+  occ unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | src/main.rs:27:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in probe30::main; use: encrypt or decrypt; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; line: `s.apply_keystream(&mut buf);`; code: `apply_keystream`
+  occ unknown | crypto:algorithm:unknown:unknown:blowfish | src/main.rs:21:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 21); line: `let bf = blowfish::Blowfish::<byteorder::BE>::new_from_slice(b"0123456789abcdef").unwrap();`; code: `blowfish::Blowfish::<byteorder::BE>::new_from_slice`
+  occ unknown | crypto:algorithm:unknown:unknown:salsa20 | src/main.rs:25:16 | crypto_common::KeyIvInit::new | [reachable] [call] in probe30::main; new: setup, not a use; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 25); iv: hard-coded (8 bytes, literal at line 25); line: `let mut s = salsa20::Salsa20::new(&[1u8; 32].into(), &[2u8; 8].into());`; code: `salsa20::Salsa20::new`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:389:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via probe30 -> p256 -> elliptic-curve -> zeroize
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=3
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:scope=required
+  prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:usage=present
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=present
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:scope=required
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:crypto-role=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:kb-coverage=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:scope=required
+  prop blowfish | pkg:cargo/blowfish@0.9.1 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.9.6 | rcbom:usage=present
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:crypto-role=support
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:kb-coverage=unmodelled
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:scope=required
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.5.5 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:crypto-role=algorithm
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:scope=required
+  prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:usage=reachable
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:crypto-role=algorithm
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:scope=required
+  prop elliptic-curve | pkg:cargo/elliptic-curve@0.13.8 | rcbom:usage=reachable
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:crypto-role=unmodelled
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:kb-coverage=unmodelled
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:scope=required
+  prop ff | pkg:cargo/ff@0.13.1 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop group | pkg:cargo/group@0.13.0 | rcbom:crypto-role=unmodelled
+  prop group | pkg:cargo/group@0.13.0 | rcbom:kb-coverage=unmodelled
+  prop group | pkg:cargo/group@0.13.0 | rcbom:scope=required
+  prop group | pkg:cargo/group@0.13.0 | rcbom:usage=present
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:crypto-role=algorithm
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:scope=required
+  prop hkdf | pkg:cargo/hkdf@0.12.4 | rcbom:usage=present
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:crypto-role=algorithm
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:scope=required
+  prop p256 | pkg:cargo/p256@0.13.2 | rcbom:usage=reachable
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:kb-coverage=unmodelled
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:scope=required
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=present
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.10.2 | rcbom:usage=present
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:crypto-role=unmodelled
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:kb-coverage=unmodelled
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:scope=required
+  prop primeorder | pkg:cargo/primeorder@0.13.6 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:crypto-role=unmodelled
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:kb-coverage=unmodelled
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:scope=required
+  prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:usage=reachable
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:crypto-role=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:scope=required
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:usage=reachable
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:crypto-role=support
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:scope=required
+  prop sec1 | pkg:cargo/sec1@0.7.3 | rcbom:usage=present
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.7.3 | rcbom:usage=present
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:finding=hard-coded-iv
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:provenance:iv=hard-coded
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:unknown:salsa20 | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:block-cipher:blowfish | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:blake2 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:mac:blake2 | {"algorithmProperties": {"cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | {"algorithmProperties": {"cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:blowfish | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:salsa20 | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
+component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library blake2 0.10.6 | pkg:cargo/blake2@0.10.6 | purl pkg:cargo/blake2@0.10.6
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library blowfish 0.9.1 | pkg:cargo/blowfish@0.9.1 | purl pkg:cargo/blowfish@0.9.1
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6
+component library crypto-bigint 0.5.5 | pkg:cargo/crypto-bigint@0.5.5 | purl pkg:cargo/crypto-bigint@0.5.5
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library der 0.7.10 | pkg:cargo/der@0.7.10 | purl pkg:cargo/der@0.7.10
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ecdsa 0.16.9 | pkg:cargo/ecdsa@0.16.9 | purl pkg:cargo/ecdsa@0.16.9
+component library elliptic-curve 0.13.8 | pkg:cargo/elliptic-curve@0.13.8 | purl pkg:cargo/elliptic-curve@0.13.8
+component library ff 0.13.1 | pkg:cargo/ff@0.13.1 | purl pkg:cargo/ff@0.13.1
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library group 0.13.0 | pkg:cargo/group@0.13.0 | purl pkg:cargo/group@0.13.0
+component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4 | purl pkg:cargo/hkdf@0.12.4
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library p256 0.13.2 | pkg:cargo/p256@0.13.2 | purl pkg:cargo/p256@0.13.2
+component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
+component library pkcs8 0.10.2 | pkg:cargo/pkcs8@0.10.2 | purl pkg:cargo/pkcs8@0.10.2
+component library primeorder 0.13.6 | pkg:cargo/primeorder@0.13.6 | purl pkg:cargo/primeorder@0.13.6
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library rfc6979 0.4.0 | pkg:cargo/rfc6979@0.4.0 | purl pkg:cargo/rfc6979@0.4.0
+component library salsa20 0.10.2 | pkg:cargo/salsa20@0.10.2 | purl pkg:cargo/salsa20@0.10.2
+component library sec1 0.7.3 | pkg:cargo/sec1@0.7.3 | purl pkg:cargo/sec1@0.7.3
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/blake2@0.10.6 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/block-buffer@0.10.4 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/blowfish@0.9.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/der@0.7.10 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/const-oid@0.9.6
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/rfc6979@0.4.0
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ecdsa@0.16.9 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/base16ct@0.2.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/crypto-bigint@0.5.5
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/ff@0.13.1
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/group@0.13.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/hkdf@0.12.4
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/pem-rfc7468@0.7.0
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/sec1@0.7.3
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/elliptic-curve@0.13.8 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ff@0.13.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ff@0.13.1 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/ff@0.13.1
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/group@0.13.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hkdf@0.12.4 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/ecdsa@0.16.9
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/primeorder@0.13.6
+dep pkg:cargo/p256@0.13.2 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/pem-rfc7468@0.7.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/primeorder@0.13.6 -> pkg:cargo/elliptic-curve@0.13.8
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/blake2@0.10.6
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/blowfish@0.9.1
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/p256@0.13.2
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/salsa20@0.10.2
+dep pkg:cargo/probe30@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/rfc6979@0.4.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/rfc6979@0.4.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/salsa20@0.10.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/base16ct@0.2.0
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/der@0.7.10
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/pkcs8@0.10.2
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/sec1@0.7.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/spki@0.7.3 -> pkg:cargo/der@0.7.10
+dependency crypto:algorithm:ECDH-P-256
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:unknown:block-cipher:blowfish
+dependency crypto:algorithm:unknown:hash:blake2
+dependency crypto:algorithm:unknown:mac:blake2
+dependency crypto:algorithm:unknown:stream-cipher:salsa20
+dependency crypto:algorithm:unknown:unknown:blowfish
+dependency crypto:algorithm:unknown:unknown:salsa20
+dependency pkg:cargo/base16ct@0.2.0
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/blake2@0.10.6
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/blowfish@0.9.1
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/const-oid@0.9.6
+dependency pkg:cargo/crypto-bigint@0.5.5
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/der@0.7.10
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ecdsa@0.16.9
+dependency pkg:cargo/elliptic-curve@0.13.8
+dependency pkg:cargo/ff@0.13.1
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/group@0.13.0
+dependency pkg:cargo/hkdf@0.12.4
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/p256@0.13.2
+dependency pkg:cargo/pem-rfc7468@0.7.0
+dependency pkg:cargo/pkcs8@0.10.2
+dependency pkg:cargo/primeorder@0.13.6
+dependency pkg:cargo/probe30@0.1.0
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/rfc6979@0.4.0
+dependency pkg:cargo/salsa20@0.10.2
+dependency pkg:cargo/sec1@0.7.3
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/spki@0.7.3
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:hash:blake2
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:mac:blake2
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:block-cipher:blowfish
+provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:unknown:blowfish
+provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256
+provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/salsa20@0.10.2 -> crypto:algorithm:unknown:stream-cipher:salsa20
+provides pkg:cargo/salsa20@0.10.2 -> crypto:algorithm:unknown:unknown:salsa20
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/probe30@0.1.0", "name": "probe30", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe30@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=40
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=462
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

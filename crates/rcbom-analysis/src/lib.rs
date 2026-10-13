@@ -6,6 +6,7 @@
 mod cbom;
 mod links;
 mod matcher;
+mod pointers;
 mod provenance;
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -78,6 +79,9 @@ pub struct Occurrence {
     /// Found only by the per-item scan of a generic function's body, not in an instance of it:
     /// what its type parameters choose is not known there.
     pub generic_body: bool,
+    /// The calls that created the generic instance it is in, innermost first (location, line,
+    /// 0-based column), as the `instantiated by` details cite them.
+    pub via: Vec<(String, usize, usize)>,
 }
 
 #[derive(Clone, Debug)]
@@ -235,8 +239,9 @@ struct Ctx<'a> {
     /// Values across functions (`links`): fields, results, parameters, mutable statics.
     flow: links::LinkIndex,
     /// Crates of cryptographic packages the knowledge base does not model (Layer 1's
-    /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`).
-    unmodelled: HashSet<String>,
+    /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`), by (crate name, stable id): two
+    /// packages may name their library alike.
+    unmodelled: HashSet<(String, String)>,
 }
 
 type CallKey<'a> = (&'a str, &'a str, usize, usize);
@@ -258,6 +263,18 @@ impl<'a> Ctx<'a> {
             .entry(call_key(at))
             .or_default()
             .push(m.clone());
+    }
+
+    /// A crate of a crypto package the knowledge base does not model.
+    fn is_unmodelled(&self, k: &rcbom_facts::CrateRef) -> bool {
+        self.unmodelled
+            .contains(&(k.name.clone(), k.stable_id.clone()))
+    }
+
+    /// The `[[crate]]` entry of exactly this crate's package, any version.
+    fn kb_entry(&self, k: &rcbom_facts::CrateRef) -> Option<&rcbom_kb::CrateEntry> {
+        let (package, _) = self.package_of_crate(&k.name, &k.stable_id)?;
+        self.kb.crates.iter().find(|c| c.package == package)
     }
 
     fn package_of_crate(&self, name: &str, stable_id: &str) -> Option<(String, String)> {
@@ -284,6 +301,24 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .map(|f| (f.krate.name.clone(), f.krate.package.clone()))
             .collect(),
     );
+    let flow = {
+        let t = std::time::Instant::now();
+        let ix = links::LinkIndex::new(facts);
+        if std::env::var_os("RCBOM_DEBUG").is_some() {
+            eprintln!("analysis: link index in {:.1?}", t.elapsed());
+        }
+        ix
+    };
+    // calls through function pointers, as calls of the functions they hold; the namings they
+    // account for are no occurrences of their own
+    let (pointer_calls, named_for_pointers) = pointers::resolve(facts, &flow);
+    let sites_of = |i: usize| {
+        facts[i]
+            .sites
+            .iter()
+            .chain(&pointer_calls[i])
+            .filter(|s| !pointers::accounted(s, &named_for_pointers))
+    };
     let ctx = Ctx {
         kb,
         crates: facts
@@ -301,28 +336,27 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .filter(|p| p.local)
             .map(|p| (p.name.clone(), p.version.to_string()))
             .collect(),
-        calls: facts
-            .iter()
-            .flat_map(|f| &f.sites)
+        calls: (0..facts.len())
+            .flat_map(sites_of)
             .filter(|s| matches!(s.target, Target::Call { .. }))
             .map(|s| (call_key(s), s))
             .collect(),
         consumers: Default::default(),
         links: Default::default(),
-        unmodelled: man
-            .packages
-            .iter()
-            .filter(|p| p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
-            .filter_map(|p| p.lib_name.clone())
-            .collect(),
-        flow: {
-            let t = std::time::Instant::now();
-            let ix = links::LinkIndex::new(facts);
-            if std::env::var_os("RCBOM_DEBUG").is_some() {
-                eprintln!("analysis: link index in {:.1?}", t.elapsed());
-            }
-            ix
+        unmodelled: {
+            let pkgs: HashSet<(&str, String)> = man
+                .packages
+                .iter()
+                .filter(|p| p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
+                .map(|p| (p.name.as_str(), p.version.to_string()))
+                .collect();
+            facts
+                .iter()
+                .filter(|f| pkgs.contains(&(f.krate.package.as_str(), f.krate.version.clone())))
+                .map(|f| (f.krate.name.clone(), f.krate.stable_id.clone()))
+                .collect()
         },
+        flow,
     };
     let mut notes = Vec::new();
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
@@ -464,9 +498,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     // outer asset -> components, from descriptor statics; applied to assets with evidence only
     let mut composition: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
 
-    for f in facts {
+    for (fi, f) in facts.iter().enumerate() {
         let cwd = PathBuf::from(&f.krate.cwd);
-        for site in &f.sites {
+        for site in sites_of(fi) {
             let path = {
                 let p = PathBuf::from(&site.span.file);
                 if p.is_absolute() { p } else { cwd.join(p) }
@@ -509,7 +543,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             // nor is a crate the knowledge base does not model calling itself (hpke's own
             // generic functions, instantiated with a hash)
             if let Target::Call { callee, .. } = &site.target
-                && ctx.unmodelled.contains(&callee.krate.name)
+                && ctx.is_unmodelled(&callee.krate)
                 && callee.krate == site.owner.krate
             {
                 continue;
@@ -614,6 +648,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     provenance: Vec::new(),
                     note: None,
                     generic_body: false,
+                    via: Vec::new(),
                 });
             }
             // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age); so
@@ -698,6 +733,24 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         e.def_site.line
                     ));
                 }
+                // a call through a function pointer: the operation is at the call, the function
+                // was named elsewhere (`let h = digest;`)
+                if let Target::Call {
+                    through: Some(t),
+                    callee,
+                    ..
+                } = &site.target
+                {
+                    let tp = PathBuf::from(&t.file);
+                    let tp = if tp.is_absolute() { tp } else { cwd.join(tp) };
+                    detail.push(format!(
+                        "called through a function pointer to `{}` named at {}:{}:{}",
+                        short(&callee.path),
+                        man.location(&tp),
+                        t.line,
+                        t.col.saturating_sub(1)
+                    ));
+                }
                 for v in &site.via {
                     // a call without a position (in the standard library's optimized MIR)
                     if v.span.line == 0 {
@@ -740,6 +793,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .collect(),
                     note: m.algo.note.clone(),
                     generic_body: site.owner.kind == OwnerKind::Fn && is_def_hash(&site.owner.id),
+                    via: site
+                        .via
+                        .iter()
+                        .filter(|v| v.span.line != 0)
+                        .map(|v| {
+                            let vp = PathBuf::from(&v.span.file);
+                            let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
+                            (man.location(&vp), v.span.line, v.span.col.saturating_sub(1))
+                        })
+                        .collect(),
                 };
                 let a = assets.entry(m.key()).or_insert_with(|| Asset {
                     key: m.key(),
@@ -819,6 +882,21 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
     }
     merge_less_specific(&mut assets);
+    // the packages implementing an algorithm under the matched one provide it too
+    for a in assets.values_mut() {
+        let mut more = Vec::new();
+        for (n, v) in &a.providers {
+            let Some(p) = man.by_name_version(n, v) else {
+                continue;
+            };
+            for d in p.runtime_deps.iter().filter_map(|d| man.by_id(d)) {
+                if a.algo.implemented_by.contains(&d.name) {
+                    more.push((d.name.clone(), d.version.to_string()));
+                }
+            }
+        }
+        a.providers.extend(more);
+    }
     // the per-item scan of a generic function cannot resolve what its type parameters choose
     // (`digest(T::A, x)` in `h<T: Pick>`): an instance of it that does at the same position
     // (`h::<P>`, SHA-1) says what the call uses. An instance that does not stays unknown.
@@ -835,7 +913,25 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 && resolved.contains(&(o.location.clone(), o.line, o.offset, o.symbol.clone())))
         });
     }
-    assets.retain(|_, a| !(a.unresolved() && a.occurrences.is_empty()));
+    // an unknown operation inside a crypto library's generic code that an operation of a known
+    // algorithm instantiated is part of that operation (`NonZeroScalar::random` in ecdsa's
+    // `SigningKey::random`, which `main` calls): the call that runs it says what runs. So is a
+    // draw from the generator the operation was handed (`rng.fill_bytes(..)` in p384's
+    // `Scalar::random` under `EphemeralSecret::random(&mut OsRng)`). An unknown operation says
+    // no more than what it instantiates, which is kept.
+    let operations: HashSet<(String, usize, usize)> = assets
+        .values()
+        .filter(|a| !a.unresolved())
+        .flat_map(|a| &a.occurrences)
+        .filter(|o| o.kind == Kind::Call && o.function.is_some())
+        .map(|o| (o.location.clone(), o.line, o.offset))
+        .collect();
+    let inner = |a: &Asset| a.unresolved() || a.algo.primitive == "drbg";
+    for a in assets.values_mut().filter(|a| inner(a)) {
+        a.occurrences
+            .retain(|o| !o.via.iter().any(|v| operations.contains(v)));
+    }
+    assets.retain(|_, a| !(inner(a) && a.occurrences.is_empty()));
     // entries with different notes behind one asset: each note goes with its occurrences
     for a in assets.values_mut() {
         if a.entry_notes.len() > 1 {
@@ -908,37 +1004,47 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
         }
     }
-    // a crypto package the knowledge base does not model: reachable when the walk entered its
-    // code, present when it was compiled into the build
-    let walked: HashSet<&str> = facts
+    // A package whose code the walk reached runs: the walk follows the algorithm crates' code
+    // for this only (block-buffer under sha2's `Digest` impl, not ecdsa under p256 used for
+    // ECDH only). Not reached: a crypto package the knowledge base does not model is present
+    // when it was compiled into the build.
+    let walks: Vec<&rcbom_facts::Reach> = facts.iter().filter_map(|f| f.reach.as_ref()).collect();
+    let ran: HashSet<(String, String)> = walks
         .iter()
-        .filter_map(|f| f.reach.as_ref())
-        .flat_map(|r| r.paths.iter())
-        .filter_map(|p| first_crate(p))
+        .flat_map(|r| &r.crates)
+        .filter_map(|k| ctx.package_of_crate(&k.name, &k.stable_id))
         .collect();
     let compiled: HashSet<(&str, &str)> = facts
         .iter()
         .map(|f| (f.krate.package.as_str(), f.krate.version.as_str()))
         .collect();
-    for p in man.packages.iter().filter(|p| p.unmodelled.is_some()) {
-        let version = p.version.to_string();
-        let u = if p.lib_name.as_deref().is_some_and(|n| walked.contains(n)) {
+    for p in man
+        .packages
+        .iter()
+        .filter(|p| p.role.is_some() || p.unmodelled.is_some())
+    {
+        let key = (p.name.clone(), p.version.to_string());
+        let u = if ran.contains(&key) {
             Usage::Reachable
-        } else if compiled.contains(&(p.name.as_str(), version.as_str())) {
+        } else if p.unmodelled.is_some() && compiled.contains(&(key.0.as_str(), key.1.as_str())) {
             Usage::Present
         } else {
-            Usage::DeclaredNotUsed
+            continue;
         };
         // at least what its occurrences gave it (a provider of a reachable occurrence)
-        let e = usage.entry((p.name.clone(), version)).or_insert(u);
+        let e = usage.entry(key).or_insert(u);
         *e = (*e).max(u);
     }
-    // An interface crate passes no usage on: its traits are implemented by the algorithm
-    // crates, so aes-gcm using `aead`, or the program calling `KeyInit::new_from_slice`, does not
-    // run `aead`'s `getrandom` (through crypto-common and rand_core); `OsRng` called directly
-    // does (rand_core is an algorithm crate).
-    loop {
-        let mut changed = false;
+    // An algorithm crate's dependencies are present with it (compiled in with the code that
+    // uses them); what runs is what the walk reached, and only without a complete walk (none,
+    // or one cut at its limit) is that taken from the dependencies too. An interface crate
+    // passes nothing on: its traits are implemented by the algorithm crates, so aes-gcm using
+    // `aead`, or the program calling `KeyInit::new_from_slice`, does not run `aead`'s
+    // `getrandom` (through crypto-common and rand_core).
+    let complete = !walks.is_empty() && walks.iter().all(|r| r.crates_complete);
+    let mut changed = true;
+    while changed {
+        changed = false;
         for p in &man.packages {
             // only modelled algorithm crates run their dependencies' code for sure: a package
             // the knowledge base does not model (age) may use a dependency for anything
@@ -949,6 +1055,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let Some(&u) = usage.get(&key) else {
                 continue;
             };
+            let u = if complete { u.min(Usage::Present) } else { u };
             for d in &p.runtime_deps {
                 let Some(dp) = man.by_id(d) else { continue };
                 // into crypto crates, modelled or not (salsa20 under scrypt)
@@ -963,9 +1070,6 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     changed = true;
                 }
             }
-        }
-        if !changed {
-            break;
         }
     }
     for p in &man.packages {
@@ -1334,11 +1438,14 @@ fn site_matches(
                     m.providers
                         .extend(ctx.package_of_crate(&k.name, &k.stable_id));
                 }
-                // a listed use of the method, or what the entry says the call does
-                // (`RsaPrivateKey::new` generates a key); else the call sets the asset up
-                let f = kb
-                    .use_of(method, &m.algo.primitive)
-                    .or_else(|| m.algo.implied_use.clone());
+                // what the entry says the call does (`RsaPrivateKey::new` generates a key,
+                // ring's `rand::generate` draws), or a listed use of the method; else the call
+                // sets the asset up
+                let f = m
+                    .algo
+                    .implied_use
+                    .clone()
+                    .or_else(|| kb.use_of(method, &m.algo.primitive));
                 let d = if f.is_none() {
                     vec![format!("{method}: setup, not a use")]
                 } else {
@@ -1366,7 +1473,23 @@ fn site_matches(
             // a type's asset the constructor of the value renamed (`SigningKey::<Sha1>::
             // new_unprefixed` is `RSA-PKCS1-1.5`): its components are parts of the new name
             let mut renamed: HashMap<String, String> = HashMap::new();
+            // a random generator is used where the code draws from it (`rng.fill_bytes(..)`):
+            // one among the call's type arguments (`SaltString::generate(&mut OsRng)`,
+            // `StaticSecret::new(OsRng)`) is handed to the call, which draws from it
+            let receiver_types: Vec<String> = self_ty
+                .iter()
+                .filter(|_| !skip_self)
+                .flat_map(|t| match_types(kb, std::slice::from_ref(t), &supported))
+                .map(|(m, _)| m.key())
+                .collect();
             for (mut m, outer) in match_types(kb, &trees, &supported) {
+                // ..except by rand's own APIs, which draw from the generator they are given
+                // (`Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`)
+                let drawn_by_rand = callee.krate.name == "rand";
+                let handed = m.algo.primitive == "drbg" && !receiver_types.contains(&m.key());
+                if handed && !drawn_by_rand {
+                    continue;
+                }
                 let outer = outer.map(|p| renamed.get(&p).cloned().unwrap_or(p));
                 // the fn entry already names this algorithm, with what its arguments add:
                 // `Oaep::new_with_label::<Sha256, _>` is RSA-OAEP-SHA-256, not also an `Oaep`
@@ -1461,7 +1584,11 @@ fn site_matches(
                 });
                 match outer {
                     None if into_kb => {
-                        let f = kb.use_of(method, &m.algo.primitive);
+                        let f = if handed {
+                            Some("generate".to_string())
+                        } else {
+                            kb.use_of(method, &m.algo.primitive)
+                        };
                         let mut setup = if f.is_none() {
                             vec![format!("{method}: setup, not a use")]
                         } else {
@@ -1645,6 +1772,20 @@ fn site_matches(
                 let function = (!setup).then_some(function);
                 out.push((m, Kind::Call, function, symbol.clone(), d, false));
             }
+            // a random generator is reported where the code draws from it (`rng.fill_bytes(..)`):
+            // not where it is built (`SystemRandom::new()`, `StdRng::seed_from_u64(n)`; `OsRng`
+            // needs no constructor), nor where it is handed to another operation
+            // (`RsaPrivateKey::new(&mut rng, 2048)` draws from it, and the key's provenance says
+            // so: `rng: csprng`)
+            out.retain(|(m, k, f, ..)| {
+                m.algo.primitive != "drbg" || (*k == Kind::Call && f.is_some())
+            });
+            if out
+                .iter()
+                .any(|(m, k, ..)| *k == Kind::Call && m.algo.primitive != "drbg")
+            {
+                out.retain(|(m, k, ..)| !(*k == Kind::Call && m.algo.primitive == "drbg"));
+            }
             if let (Some(n), Some(first)) = (&fn_name, out.first_mut()) {
                 first.0.components.extend(
                     match_types(kb, args, &supported)
@@ -1654,6 +1795,8 @@ fn site_matches(
                 );
             }
         }
+        // a pointer call whose function is not followed: nothing says it is cryptography
+        Target::Pointer { .. } => {}
     }
     out
 }
@@ -1663,18 +1806,6 @@ fn site_matches(
 fn enclosing_fn(path: &str) -> Option<&str> {
     let i = path.find("::{")?;
     Some(&path[..i])
-}
-
-/// The crate a defining path starts with (`age` for `<age::Encryptor as Debug>::fmt`).
-fn first_crate(path: &str) -> Option<&str> {
-    let mut p = path.trim_start_matches(['<', '&', '*', ' ']);
-    for prefix in ["mut ", "const ", "dyn "] {
-        p = p.strip_prefix(prefix).unwrap_or(p);
-    }
-    let p = p.trim_start_matches(['<', '&', ' ']);
-    let end = p.find("::")?;
-    let k = &p[..end];
-    (!k.is_empty() && k.chars().all(|c| c.is_alphanumeric() || c == '_')).then_some(k)
 }
 
 /// An owner id that is a def-path hash (32 hex digits), as the driver gives a generic function
@@ -1700,6 +1831,7 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
         self_ty,
         args,
         arg_origins,
+        value,
         ..
     } = &site.target
     else {
@@ -1721,9 +1853,11 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
             // a trait object (`Box<dyn DynDigest>`): the type is chosen at run time
             let (reason, provider) = match dyn_trait(t) {
                 Some(d) => (
+                    // by the trait's name: one trait reached by two paths
+                    // (`digest::DynDigest`, `sha2::digest::DynDigest`) gives one reason
                     format!(
                         "a trait object (`dyn {}`): its type is chosen at run time",
-                        short(d)
+                        d.rsplit("::").next().unwrap_or(d)
                     ),
                     ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
                         .into_iter()
@@ -1750,9 +1884,13 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
             Some((primitive, function, reason, provider))
         }
         Some(op) => {
-            // a function named as a value (`let f = digest;`) is no call: it has no arguments,
-            // and the call through the pointer is a site of its own
-            let reason = unresolved_reason(arg_origins.get(op.algorithm)?);
+            // a function named as a value whose calls no pointer call accounts for (handed to
+            // code that is not followed): the algorithm is in the calls' arguments
+            let reason = if *value {
+                "named as a function value; the calls through it are not followed".to_string()
+            } else {
+                unresolved_reason(arg_origins.get(op.algorithm)?)
+            };
             let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
             Some((
                 op.primitive.clone(),
@@ -1761,10 +1899,45 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
                 provider.into_iter().collect(),
             ))
         }
+        // an API the knowledge base names, of a version it does not cover (`getrandom::fill`
+        // of getrandom 0.5): the call is the operation the entry says, of an unknown algorithm
+        None if ctx.kb_entry(&callee.krate).is_some() && !ctx.supported(&callee.krate) => {
+            let bare = matcher::strip_generics(in_crate);
+            let e = ctx.kb.fns.iter().find(|e| {
+                e.self_type.is_none()
+                    && e.krates.contains(&callee.krate.name)
+                    && (e.pattern.is_match(in_crate) || e.pattern.is_match(&bare))
+            })?;
+            let function = e
+                .algo
+                .implied_use
+                .clone()
+                .or_else(|| ctx.kb.use_of(method, &e.algo.primitive))?;
+            let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
+            let reason = match &provider {
+                Some((n, v)) => format!(
+                    "`{}` of {n} {v}, a version the knowledge base does not cover",
+                    short(&callee.path)
+                ),
+                None => format!("`{}` is not covered", short(&callee.path)),
+            };
+            Some((
+                e.algo.primitive.clone(),
+                function,
+                reason,
+                provider.into_iter().collect(),
+            ))
+        }
         None => {
-            // a crypto package the knowledge base does not model, called from another crate
-            if !ctx.unmodelled.contains(&callee.krate.name)
-                || site.owner.krate.name == callee.krate.name
+            // a crypto package the knowledge base does not model, or an API of an algorithm
+            // crate it models that it does not name (`p256::SecretKey::random`), called from
+            // another crate
+            let unnamed_api = ctx
+                .kb_entry(&callee.krate)
+                .is_some_and(|e| e.role == Role::Algorithm)
+                && ctx.supported(&callee.krate);
+            if !(ctx.is_unmodelled(&callee.krate) || unnamed_api)
+                || site.owner.krate == callee.krate
                 || GENERIC_METHODS.contains(&method.as_str())
             {
                 return None;
@@ -1783,6 +1956,10 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
             }
             let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
             let reason = match &provider {
+                Some((n, v)) if unnamed_api => format!(
+                    "`{}` of {n} {v}, an API the knowledge base does not name",
+                    short(&callee.path)
+                ),
                 Some((n, v)) => format!(
                     "`{}` of {n} {v}, a crypto package the knowledge base does not model",
                     short(&callee.path)
@@ -1846,10 +2023,9 @@ fn crypto_packages(ctx: &Ctx<'_>, t: &rcbom_facts::TyTree) -> Vec<(String, Strin
             TyTree::Adt { krate, args, .. } => {
                 if let Some(p) = ctx.package_of_crate(&krate.name, &krate.stable_id)
                     && !ctx.local.contains(&p)
-                    && (ctx.unmodelled.contains(&krate.name)
+                    && (ctx.is_unmodelled(krate)
                         || ctx
-                            .kb
-                            .crate_by_name(&krate.name)
+                            .kb_entry(krate)
                             .is_some_and(|e| e.role == Role::Algorithm))
                 {
                     out.push(p);
@@ -1876,6 +2052,9 @@ fn unmodelled_type(
 ) -> Option<(String, Vec<(String, String)>)> {
     use rcbom_facts::TyTree;
     let mut found: Option<(&rcbom_facts::CrateRef, &str, bool)> = None;
+    // else the outermost type of a modelled algorithm crate the knowledge base names no entry
+    // for (sha3's `Keccak256Core`, elliptic-curve's `SecretKey`)
+    let mut unnamed: Option<(&rcbom_facts::CrateRef, &str)> = None;
     // the algorithm crates in the type provide the algorithm together: the unmodelled cipher
     // and the modelled mode crate of `cbc::Encryptor<blowfish::Blowfish>`
     let mut providers: Vec<(String, String)> = Vec::new();
@@ -1885,14 +2064,31 @@ fn unmodelled_type(
             TyTree::Adt { krate, path, args } => {
                 let package = ctx.package_of_crate(&krate.name, &krate.stable_id);
                 let local = package.as_ref().is_some_and(|p| ctx.local.contains(p));
-                let kb_entry = ctx.kb.crate_by_name(&krate.name);
+                let kb_entry = ctx.kb_entry(krate);
                 let unsupported = kb_entry.is_some() && !ctx.supported(krate);
-                if !local && (unsupported || ctx.unmodelled.contains(&krate.name)) {
+                if !local && (unsupported || ctx.is_unmodelled(krate)) {
                     found = Some((krate, path, unsupported));
+                }
+                let name = path.rsplit("::").next().unwrap_or(path);
+                // no cryptography at all (rand's `SmallRng`)
+                if ctx.kb.not_crypto.iter().any(|n| n == name) && kb_entry.is_some() {
+                    return None;
+                }
+                if !local
+                    && unnamed.is_none()
+                    && kb_entry.is_some_and(|e| e.role == Role::Algorithm)
+                    && !unsupported
+                    && !ctx
+                        .kb
+                        .types
+                        .iter()
+                        .any(|e| e.krate == krate.name && e.name == name)
+                {
+                    unnamed = Some((krate, path));
                 }
                 if let Some(p) = package
                     && !local
-                    && (ctx.unmodelled.contains(&krate.name)
+                    && (ctx.is_unmodelled(krate)
                         || kb_entry.is_some_and(|e| e.role == Role::Algorithm))
                     && !providers.contains(&p)
                 {
@@ -1905,7 +2101,11 @@ fn unmodelled_type(
             _ => {}
         }
     }
-    let (krate, path, unsupported) = found?;
+    let (krate, path, unsupported, named) = match (found, unnamed) {
+        (Some((k, p, u)), _) => (k, p, u, true),
+        (None, Some((k, p))) => (k, p, false, false),
+        (None, None) => return None,
+    };
     if krate.name == site.owner.krate.name {
         return None;
     }
@@ -1914,7 +2114,12 @@ fn unmodelled_type(
         .as_ref()
         .map(|(n, v)| format!(" of {n} {v}"))
         .unwrap_or_default();
-    let reason = if unsupported {
+    let reason = if !named {
+        format!(
+            "the type `{}`{of}, which the knowledge base does not name",
+            short(path)
+        )
+    } else if unsupported {
         format!(
             "the type `{}`{of}, a version the knowledge base does not cover",
             short(path)

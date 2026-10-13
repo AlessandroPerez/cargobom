@@ -5,6 +5,9 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:34:10 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t23::o2; new_from_slice: setup, not a use; key: environment (std::env::var); line: `+ Aes256Gcm::new_from_slice(&e).is_ok() as usize`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:35:10 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t23::o2; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 32); line: `+ Aes256Gcm::new_from_slice(s.expose_secret()).is_ok() as usize`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:40:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t23::o3; new_from_slice: setup, not a use; key: hard-coded (32 bytes) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&k.unwrap_or_default()).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:17:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(&mut *key);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:19:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(&mut key2);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:22:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t23::o1; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:62:15 | ring::digest::SHA256 | [present] [static] in t23::choose; line: `if fast { &SHA256 } else { &SHA384 }`; code: `SHA256`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:62:32 | ring::digest::SHA384 | [present] [static] in t23::choose; line: `if fast { &SHA256 } else { &SHA384 }`; code: `SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:72:11 | <t23::Picked as t23::Scheme>::ALG | [reachable] [via-static] in t23::o5; <t23::Picked as t23::Scheme>::ALG -> ring::digest::SHA384; line: `digest(Picked::ALG, d).as_ref().len()`; code: `Picked::ALG`
@@ -51,6 +54,13 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,hard-coded,parameter,rng
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=3
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
@@ -80,14 +90,14 @@
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
-  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
-  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=present
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
@@ -109,9 +119,8 @@
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=declared-not-used
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
@@ -127,7 +136,7 @@
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
-  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
@@ -135,6 +144,7 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
@@ -191,6 +201,7 @@ dep pkg:cargo/t23@0.1.0 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
 dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
@@ -221,6 +232,8 @@ doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512

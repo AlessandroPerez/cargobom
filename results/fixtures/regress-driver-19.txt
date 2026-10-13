@@ -25,6 +25,8 @@
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:137:16 | blake3::Hasher::new | [reachable] [call] in t19::password_hashing; new: setup, not a use; line: `let mut h = blake3::Hasher::new();`; code: `blake3::Hasher::new`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:138:14 | blake3::Hasher::update_reader | [reachable] [call] in t19::password_hashing; use: digest; line: `let _ = h.update_reader(std::io::stdin());`; code: `update_reader`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:139:14 | blake3::Hasher::finalize | [reachable] [call] in t19::password_hashing; use: digest; line: `let _ = h.finalize();`; code: `finalize`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:164:35 | rand::rng::Rng::gen | [reachable] [call] in t19::own_rng; use: generate; line: `let _: u8 = rand::thread_rng().r#gen();`; code: `r#gen`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:81:23 | rand_core::RngCore::try_fill_bytes | [reachable] [call] in t19::buffers; use: generate; line: `rand::thread_rng().try_fill_bytes(nonce).unwrap();`; code: `try_fill_bytes`
   occ ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | Cargo.lock:160:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via t19 -> chacha20poly1305
   occ ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | Cargo.toml:12:0 | chacha20poly1305 | [manifest] declared by t19 (dependencies); features ["reduced-round"]
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:106:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [call] in t19::ed25519ph; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`
@@ -39,6 +41,9 @@
   occ HKDF | crypto:candidate:hkdf@0.12.4:HKDF | Cargo.toml:17:0 | hkdf | [manifest] declared by t19 (dependencies)
   occ MD5 | crypto:candidate:md5@0.7.0:MD5 | Cargo.lock:402:0 | md5 | [manifest] locked md5 0.7.0; reached via t19 -> md5
   occ MD5 | crypto:candidate:md5@0.7.0:MD5 | Cargo.toml:26:0 | md5 | [manifest] declared by t19 (dependencies)
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:46:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::fill_out; use: generate; line: `OsRng.fill_bytes(o.buf);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:53:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::indirect; use: generate; line: `OsRng.fill_bytes(&mut fresh);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:58:28 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::indirect::{closure#0}; use: generate; instantiated by t19::indirect at src/main.rs:58:19; line: `let mut fill = || OsRng.fill_bytes(&mut k1);`; code: `fill_bytes`
   occ PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | src/main.rs:24:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t19::appended; use: keyderive; password: hard-coded (2 bytes, literal at line 24); salt: environment (std::env::var); line: `pbkdf2::pbkdf2_hmac::<sha2::Sha256>(b"pw", salt.as_bytes(), 1000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<sha2::Sha256>`
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:101:12 | rsa::pkcs1v15::signing_key::SigningKey::<D>::random | [reachable] [call] in t19::rsa_keys; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = rsa::pkcs1v15::SigningKey::<sha2::Sha256>::random(&mut rng, 2048);`; code: `rsa::pkcs1v15::SigningKey::<sha2::Sha256>::random`
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:95:13 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t19::rsa_keys; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let sk = rsa::RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `rsa::RsaPrivateKey::new`
@@ -185,6 +190,13 @@
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:kb:version=0.2.0
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:occurrences=3
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=2
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
   prop ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | rcbom:confidence=low
   prop ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | rcbom:detection:method=manifest
   prop ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | rcbom:kb:version=0.2.0
@@ -212,6 +224,13 @@
   prop MD5 | crypto:candidate:md5@0.7.0:MD5 | rcbom:detection:method=manifest
   prop MD5 | crypto:candidate:md5@0.7.0:MD5 | rcbom:kb:version=0.2.0
   prop MD5 | crypto:candidate:md5@0.7.0:MD5 | rcbom:usage=declared-not-used
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=3
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:detection:method=type-resolved
   prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:finding=hard-coded-password
@@ -293,7 +312,7 @@
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
-  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
   prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:crypto-role=support
   prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:kb-coverage=unmodelled
   prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:scope=required
@@ -316,7 +335,7 @@
   prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:crypto-role=support
   prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:kb-coverage=unmodelled
   prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:scope=required
-  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:usage=reachable
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:usage=present
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
@@ -329,7 +348,7 @@
   prop der | pkg:cargo/der@0.7.10 | rcbom:crypto-role=support
   prop der | pkg:cargo/der@0.7.10 | rcbom:kb-coverage=unmodelled
   prop der | pkg:cargo/der@0.7.10 | rcbom:scope=required
-  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
+  prop der | pkg:cargo/der@0.7.10 | rcbom:usage=reachable
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
   prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:crypto-role=unmodelled
@@ -362,7 +381,7 @@
   prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
   prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:kb-coverage=unmodelled
   prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:scope=required
-  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=present
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:usage=reachable
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:crypto-role=support
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:kb-coverage=unmodelled
   prop pkcs1 | pkg:cargo/pkcs1@0.7.5 | rcbom:scope=required
@@ -387,9 +406,8 @@
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable
@@ -443,11 +461,13 @@ asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProper
 asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:algorithm:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "primitive": "ae"}, "assetType": "algorithm"}
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset Ed25519ph | crypto:algorithm:Ed25519ph | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset HKDF | crypto:candidate:hkdf@0.12.4:HKDF | {"algorithmProperties": {"algorithmFamily": "HKDF", "primitive": "kdf"}, "assetType": "algorithm"}
 asset MD5 | crypto:candidate:md5@0.7.0:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "primitive": "hash"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
 asset RSA-3072 | crypto:material:private-key:RSA-3072 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 3072, "type": "private-key"}}
@@ -510,6 +530,8 @@ component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroi
 dep crypto:algorithm:Ed25519ph -> crypto:algorithm:SHA-512
 dep crypto:algorithm:PBKDF2-SHA-256-1000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:material:private-key:RSA-2048 -> crypto:algorithm:ChaCha12-RNG
+dep crypto:material:private-key:RSA-3072 -> crypto:algorithm:ChaCha12-RNG
 dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
 dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
@@ -626,8 +648,10 @@ dependency crypto:algorithm:Argon2i-19456-2-1
 dependency crypto:algorithm:Argon2id-19456-2-1
 dependency crypto:algorithm:Argon2id-65536-3-4
 dependency crypto:algorithm:BLAKE3
+dependency crypto:algorithm:ChaCha12-RNG
 dependency crypto:algorithm:Ed25519
 dependency crypto:algorithm:Ed25519ph
+dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:PBKDF2-SHA-256-1000-32
 dependency crypto:algorithm:RSA-PKCS1-1.5
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
@@ -705,9 +729,13 @@ provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3
 provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
 provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519ph
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/hkdf@0.12.4 -> crypto:candidate:hkdf@0.12.4:HKDF
 provides pkg:cargo/md5@0.7.0 -> crypto:candidate:md5@0.7.0:MD5
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-1000-32
+provides pkg:cargo/rand@0.8.8 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-PKCS1-1.5
 provides pkg:cargo/rsa@0.9.10 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 provides pkg:cargo/rsa@0.9.10 -> crypto:material:private-key:RSA-2048
@@ -722,7 +750,7 @@ run rcbom:kb:version=0.2.0
 run rcbom:run:features=
 run rcbom:run:packages=83
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=368
+run rcbom:run:reachable-instances=375
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

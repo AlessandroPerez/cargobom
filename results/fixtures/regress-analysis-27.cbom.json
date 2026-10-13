@@ -294,11 +294,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -330,11 +326,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -474,7 +466,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/hkdf@0.12.4",
@@ -506,7 +498,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/hmac@0.12.1",
@@ -577,11 +569,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -620,11 +608,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -771,11 +755,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -921,11 +901,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1073,6 +1049,139 @@
       "version": "1.9.1"
     },
     {
+      "bom-ref": "crypto:algorithm:ECDH-P-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keyderive",
+            "keygen"
+          ],
+          "primitive": "key-agree"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keyderive; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman"
+          },
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; public_key: setup, not a use; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::public_key"
+          }
+        ]
+      },
+      "name": "ECDH-P-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `\"md5\" => Box::new(Md5::new()),`; code: `Md5::new`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; line: `let a = Md5::digest(&d);`; code: `Md5::digest`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1125,6 +1234,58 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:SHA3-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA3-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:unknown:hash:digest",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1138,14 +1299,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn md5::digest::DynDigest`): its type is chosen at run time; line: `h.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.update(data);`; code: `update`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn md5::digest::DynDigest`): its type is chosen at run time; line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 6,
@@ -1182,377 +1343,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:md-5",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; algorithm unresolved: the type `md5::Md5Core` of md-5 0.10.6, a crypto package the knowledge base does not model; line: `\"md5\" => Box::new(Md5::new()),`; code: `Md5::new`",
-            "line": 16,
-            "location": "src/main.rs",
-            "offset": 26,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; algorithm unresolved: the type `md5::Md5Core` of md-5 0.10.6, a crypto package the knowledge base does not model; line: `let a = Md5::digest(&d);`; code: `Md5::digest`",
-            "line": 25,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "digest::digest::Digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha3",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`",
-            "line": 26,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "digest::digest::Digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keyderive"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keyderive; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`",
-            "line": 30,
-            "location": "src/main.rs",
-            "offset": 23,
-            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keygen"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::random` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
-            "line": 28,
-            "location": "src/main.rs",
-            "offset": 16,
-            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
-          },
-          {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::random` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
-            "line": 29,
-            "location": "src/main.rs",
-            "offset": 14,
-            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ff+p256+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keygen"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in elliptic_curve::scalar::nonzero::NonZeroScalar::<..>::random::<..>; use: keygen; algorithm unresolved: `ff::Field::random` of ff 0.13.1, a crypto package the knowledge base does not model; instantiated by elliptic_curve::ecdh::EphemeralSecret::<..>::random::<..> at elliptic-curve-0.13.8/src/ecdh.rs:107:20; instantiated by unmodelled::main at src/main.rs:28:16; line: `if let Some(result) = Self::new(Field::random(&mut rng)).into() {`; code: `Field::random`",
-            "line": 50,
-            "location": "elliptic-curve-0.13.8/src/scalar/nonzero.rs",
-            "offset": 44,
-            "symbol": "ff::Field::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:candidate:hkdf@0.12.4:HKDF",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "HKDF",
-          "primitive": "kdf"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[manifest] locked hkdf 0.12.4; reached via unmodelled -> p256 -> elliptic-curve -> hkdf",
-            "line": 171,
-            "location": "Cargo.lock",
-            "offset": 0,
-            "symbol": "hkdf"
-          }
-        ]
-      },
-      "name": "HKDF",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "manifest"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "low"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "declared-not-used"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:candidate:hmac@0.12.1:HMAC",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "HMAC",
-          "primitive": "mac"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[manifest] locked hmac 0.12.1; reached via unmodelled -> p256 -> ecdsa -> rfc6979 -> hmac",
-            "line": 180,
-            "location": "Cargo.lock",
-            "offset": 0,
-            "symbol": "hmac"
-          }
-        ]
-      },
-      "name": "HMAC",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "manifest"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "low"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "declared-not-used"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
         }
       ],
       "type": "cryptographic-asset"
@@ -1638,8 +1428,7 @@
         "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core"
+        "crypto:algorithm:ECDH-P-256"
       ],
       "ref": "pkg:cargo/elliptic-curve@0.13.8"
     },
@@ -1647,9 +1436,6 @@
       "dependsOn": [
         "pkg:cargo/rand_core@0.6.4",
         "pkg:cargo/subtle@2.6.1"
-      ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
       ],
       "ref": "pkg:cargo/ff@0.13.1"
     },
@@ -1669,17 +1455,11 @@
       "dependsOn": [
         "pkg:cargo/hmac@0.12.1"
       ],
-      "provides": [
-        "crypto:candidate:hkdf@0.12.4:HKDF"
-      ],
       "ref": "pkg:cargo/hkdf@0.12.4"
     },
     {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
-      ],
-      "provides": [
-        "crypto:candidate:hmac@0.12.1:HMAC"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
     },
@@ -1692,7 +1472,7 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:md-5"
+        "crypto:algorithm:MD5"
       ],
       "ref": "pkg:cargo/md-5@0.10.6"
     },
@@ -1704,9 +1484,7 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
+        "crypto:algorithm:ECDH-P-256"
       ],
       "ref": "pkg:cargo/p256@0.13.2"
     },
@@ -1732,10 +1510,6 @@
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
-      ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -1771,7 +1545,7 @@
         "pkg:cargo/keccak@0.1.6"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha3"
+        "crypto:algorithm:SHA3-256"
       ],
       "ref": "pkg:cargo/sha3@0.10.9"
     },
@@ -1808,39 +1582,23 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ECDH-P-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:SHA-256"
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:SHA3-256"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:hash:digest"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:md-5"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha3"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:candidate:hkdf@0.12.4:HKDF"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:candidate:hmac@0.12.1:HMAC"
     }
   ],
   "metadata": {
@@ -1888,7 +1646,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "564"
+        "value": "147"
       }
     ],
     "tools": {
@@ -1901,7 +1659,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6a8f8c00-4839-8faa-8f11-047e3beca8c2",
+  "serialNumber": "urn:uuid:5c819296-6aec-8c8d-a791-b7e243e5b1fb",
   "specVersion": "1.7",
   "version": 1
 }

@@ -129,7 +129,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-buffer@0.10.4",
@@ -277,7 +277,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/getrandom@0.2.17",
@@ -408,11 +408,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -605,10 +601,10 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t1::r1; use: digest; line: `let f = Sha256::digest;`; code: `Sha256::digest`",
-            "line": 8,
+            "additionalContext": "[reachable] [call] in t1::r1; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:8:12; line: `f(d).len()`; code: `f`",
+            "line": 9,
             "location": "src/main.rs",
-            "offset": 12,
+            "offset": 4,
             "symbol": "digest::digest::Digest::digest"
           },
           {
@@ -786,10 +782,10 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t1::r3; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let h: fn(&'static Algorithm, &[u8]) -> digest::Digest = digest::digest;`; code: `digest::digest`",
-            "line": 19,
+            "additionalContext": "[reachable] [call] in t1::r3; use: digest; algorithm from ring::digest::SHA512 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:19:61; line: `h(&SHA512, d).as_ref().len()`; code: `h`",
+            "line": 20,
             "location": "src/main.rs",
-            "offset": 61,
+            "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
@@ -1201,7 +1197,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c1349622-4b95-880e-882a-5aa421390d2a",
+  "serialNumber": "urn:uuid:27a70cfe-a9d0-8999-adec-a21238f697a2",
   "specVersion": "1.7",
   "version": 1
 }

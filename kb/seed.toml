@@ -212,13 +212,56 @@ role = "algorithm"
 [[crate]]
 package = "rand_core"
 versions = ">=0.6, <0.10"
-# not only the RngCore traits: rand_core's OsRng is the operating-system generator itself, and
-# calls getrandom
-role = "algorithm"
+# the RngCore traits, which rand and others implement, and OsRng, a thin type over getrandom
+# (its [[type]] entry below)
+role = "trait"
 
 [[crate]]
 package = "getrandom"
-versions = ">=0.2, <0.4"
+versions = ">=0.2, <0.5"
+role = "algorithm"
+
+# SHA-3 and SHAKE, MD5 (the package md-5, whose library is named `md5`), ML-KEM (FIPS 203) and
+# its KEM traits, P-256 and the generic elliptic-curve, ECDSA and ECDH crates, bcrypt-pbkdf
+# (OpenSSH's key derivation)
+[[crate]]
+package = "sha3"
+versions = ">=0.10, <0.11"
+role = "algorithm"
+
+[[crate]]
+package = "md-5"
+versions = ">=0.10, <0.11"
+role = "algorithm"
+
+[[crate]]
+package = "ml-kem"
+versions = ">=0.2, <0.3"
+role = "algorithm"
+
+[[crate]]
+package = "kem"
+versions = ">=0.3.0-pre.0, <0.4"
+role = "trait"
+
+[[crate]]
+package = "p256"
+versions = ">=0.13, <0.14"
+role = "algorithm"
+
+[[crate]]
+package = "elliptic-curve"
+versions = ">=0.13, <0.14"
+role = "algorithm"
+
+[[crate]]
+package = "ecdsa"
+versions = ">=0.16, <0.17"
+role = "algorithm"
+
+[[crate]]
+package = "bcrypt-pbkdf"
+versions = ">=0.10, <0.11"
 role = "algorithm"
 
 # --- Layer 2: types (RustCrypto) -----------------------------------------------------------
@@ -728,6 +771,235 @@ asset = "RSA-OAEP"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+
+# SHA-3 (FIPS 202): the fixed-length hashes and the extendable-output functions
+[[type]]
+crate = "sha3"
+name = "Sha3_224Core"
+asset = "SHA3-224"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_256Core"
+asset = "SHA3-256"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_384Core"
+asset = "SHA3-384"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_512Core"
+asset = "SHA3-512"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake128Core"
+asset = "SHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake128ReaderCore"
+asset = "SHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake256Core"
+asset = "SHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake256ReaderCore"
+asset = "SHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+# cSHAKE (SP 800-185), customised SHAKE; sha3's Keccak (pre-standard padding) and TurboSHAKE
+# have no registry name: their calls are unknown, naming the type
+[[type]]
+crate = "sha3"
+name = "CShake128Core"
+asset = "cSHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "CShake128ReaderCore"
+asset = "cSHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "CShake256Core"
+asset = "cSHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "CShake256ReaderCore"
+asset = "cSHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+# MD5 of the package md-5 (its library is `md5`; the package md5 0.7 has `Context`, above)
+[[type]]
+crate = "md5"
+name = "Md5Core"
+asset = "MD5"
+family = "MD5"
+primitive = "hash"
+functions = ["digest"]
+
+# ML-KEM: the parameter set is the type argument (`Kem<MlKem768Params>`, `EncapsulationKey<..>`)
+[[type]]
+crate = "ml_kem"
+name = "Kem"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+
+[[type]]
+crate = "ml_kem"
+name = "EncapsulationKey"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["encapsulate"]
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+
+[[type]]
+crate = "ml_kem"
+name = "DecapsulationKey"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["decapsulate"]
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+
+# Elliptic curves of the RustCrypto elliptic-curve crates: the curve is the type argument
+# (`EphemeralSecret<NistP256>`, `SigningKey<NistP256>`); ECDSA's hash is the curve's
+# (`DigestPrimitive`: SHA-256 for P-256, SHA-384 for P-384, SHA-512 for P-521)
+[[type]]
+crate = "elliptic_curve"
+name = "EphemeralSecret"
+asset = "ECDH-{curve}"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keygen", "keyderive"]
+params = { curve = { arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" }, required = true } }
+
+[[type]]
+crate = "ecdsa"
+name = "SigningKey"
+asset = "ECDSA-{curve}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["keygen", "sign"]
+params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" }, required = true } }
+
+[[type]]
+crate = "ecdsa"
+name = "VerifyingKey"
+asset = "ECDSA-{curve}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" }, required = true } }
+
+# Random generators: a draw (`fill_bytes`, `fill`, `gen`) is a `generate` use. The registry names
+# only DRBG families, so the OS generator and rand's ChaCha12 generator carry no
+# algorithmFamily (`family = ""`).
+[[type]]
+crate = "rand_core"
+name = "OsRng"
+asset = "OS-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+implemented_by = ["getrandom"]
+
+[[type]]
+crate = "rand"
+name = "ThreadRng"
+asset = "ChaCha12-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+implemented_by = ["rand_chacha"]
+
+[[type]]
+crate = "rand"
+name = "StdRng"
+asset = "ChaCha12-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+implemented_by = ["rand_chacha"]
+
+[[type]]
+crate = "ring"
+name = "SystemRandom"
+asset = "OS-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+# rand_chacha's generators, by their round count
+[[type]]
+crate = "rand_chacha"
+name = "ChaCha20Rng"
+asset = "ChaCha20-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+[[type]]
+crate = "rand_chacha"
+name = "ChaCha12Rng"
+asset = "ChaCha12-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+[[type]]
+crate = "rand_chacha"
+name = "ChaCha8Rng"
+asset = "ChaCha8-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
 
 # --- Layer 2: statics (ring and aws-lc-rs style) --------------------------------------------
 # `name` is a regex over the item's own name; {1}, {2} are its groups. `module` restricts the
@@ -1660,6 +1932,114 @@ primitive = "signature"
 material = "public-key"
 curve = "other/Ed25519"
 
+# getrandom's functions draw from the operating system's generator
+[[fn]]
+crate = "getrandom"
+path = "^(getrandom|getrandom_uninit|fill|fill_uninit|u32|u64)$"
+asset = "OS-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+use = "generate"
+
+# rand's `random()` draws from the thread generator
+[[fn]]
+crate = "rand"
+path = "^random$"
+asset = "ChaCha12-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+use = "generate"
+implemented_by = ["rand_chacha"]
+
+# ECDH as a function over a curve type argument (`diffie_hellman::<NistP256>(..)`)
+[[fn]]
+crate = "elliptic_curve"
+path = "^ecdh::diffie_hellman$"
+asset = "ECDH-{curve}"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keyderive"]
+use = "keyderive"
+params = { curve = { arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } } }
+
+# HKDF-Extract over an ECDH shared secret (`shared.extract::<Sha256>(salt)`): an `Hkdf` whose
+# `expand` derives the keys
+[[fn]]
+crate = "elliptic_curve"
+self_type = "SharedSecret"
+path = "SharedSecret::extract$"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, asset = true } }
+
+# ECDSA over a digest the caller computes (`sign_digest(Sha3_256::new_with_prefix(m))`): the
+# hash is the digest's type `D`, not the curve's own; over a prehash (`sign_prehash(&h)`) the
+# hash is the caller's, not named here
+[[fn]]
+crate = "ecdsa"
+self_type = "SigningKey"
+path = "DigestSigner::(try_)?sign_digest$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$"
+asset = "ECDSA-{curve}-{hash}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
+params = { curve = { parent_arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } }, hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "ecdsa"
+self_type = "VerifyingKey"
+path = "DigestVerifier::verify_digest$"
+asset = "ECDSA-{curve}-{hash}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+params = { curve = { parent_arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } }, hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "ecdsa"
+self_type = "SigningKey"
+path = "PrehashSigner::sign_prehash$|RandomizedPrehashSigner::sign_prehash_with_rng$"
+asset = "ECDSA-{curve}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign"]
+params = { curve = { parent_arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } } }
+
+[[fn]]
+crate = "ecdsa"
+self_type = "VerifyingKey"
+path = "PrehashVerifier::verify_prehash$"
+asset = "ECDSA-{curve}"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+params = { curve = { parent_arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } } }
+
+# ring's `rand::generate::<T>(&rng)` draws from its only generator, the operating system's
+[[fn]]
+crate = "ring"
+path = "^rand::generate$"
+asset = "OS-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+use = "generate"
+
+# bcrypt-pbkdf (OpenSSH's key derivation: PBKDF2 over the bcrypt hash): rounds and output length
+[[fn]]
+crate = "bcrypt_pbkdf"
+path = "^bcrypt_pbkdf(_with_memory)?$"
+asset = "bcrypt-pbkdf"
+family = "bcrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+use = "keyderive"
+params = { rounds = { const_arg = 2 }, length = { arg_len = 3 } }
+
 # --- Protocols ---------------------------------------------------------------------------------
 # A call that configures a protocol stack. Suites and groups are the protocol crate's statics
 # reachable from it; versions come from the crate's enabled features.
@@ -1693,18 +2073,18 @@ methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place",
 
 [[use]]
 function = "digest"
-primitives = ["hash"]
-methods = ["digest", "update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy"]
+primitives = ["hash", "xof"]
+methods = ["digest", "update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "finalize_xof_into", "finalize_xof_reset_into", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy", "read", "read_boxed"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "update_reader", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy"]
+methods = ["update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy"]
 
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed"]
+methods = ["verify", "verify_slice", "verify_reset", "verify_slice_reset", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed"]
 
 [[use]]
 function = "keyderive"
@@ -1720,7 +2100,13 @@ methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_diges
 
 [[use]]
 function = "keygen"
-methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8"]
+methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
+
+# a draw from a random generator
+[[use]]
+function = "generate"
+primitives = ["drbg"]
+methods = ["fill_bytes", "try_fill_bytes", "next_u32", "next_u64", "fill", "try_fill", "gen", "gen_range", "gen_bool", "gen_ratio", "random", "random_range", "random_bool", "random_ratio", "random_iter", "sample", "sample_iter", "sample_string"]
 
 # x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom);
 # rsa's `pkcs1v15::SigningKey::random(rng, bits)`
@@ -1751,6 +2137,9 @@ methods = ["decapsulate"]
 [unmodelled]
 crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group"]
 support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "ppv-lite86", "pem", "crypto-bigint"]
+# Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
+# (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
+not_crypto = ["SmallRng", "StepRng"]
 
 # --- Operations whose algorithm is a run-time value -----------------------------------------
 # A call matched here is always reported: with the algorithms that reach it, or, when none
@@ -1951,6 +2340,31 @@ crate = "password_hash"
 path = "^traits::PasswordVerifier::verify_password$"
 primitive = "kdf"
 use = "verify"
+self_type = true
+
+# Draws through rand's traits on a generator the knowledge base does not name (a version it
+# does not cover: rand 0.4's `OsRng`): unknown, naming the type
+[[operation]]
+crate = "rand_core"
+path = "^RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$"
+primitive = "drbg"
+use = "generate"
+self_type = true
+
+[[operation]]
+crate = "rand"
+path = "^(rng::)?Rng::(gen|gen_range|gen_bool|gen_ratio|gen_iter|fill|try_fill|fill_bytes|try_fill_bytes|next_u32|next_u64|sample|sample_iter|random|random_range|random_bool|random_ratio|random_iter)$"
+primitive = "drbg"
+use = "generate"
+self_type = true
+
+# a private key on a curve of the elliptic-curve crates (`SecretKey::<NistP256>::random(rng)`),
+# for ECDH or ECDSA alike: the key is made here, the scheme chosen where it is used
+[[operation]]
+crate = "elliptic_curve"
+path = "^secret_key::SecretKey::random$"
+primitive = "unknown"
+use = "keygen"
 self_type = true
 
 # Constructors of the RustCrypto traits: they set an algorithm up (no use); a type the

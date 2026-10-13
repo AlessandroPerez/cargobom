@@ -455,7 +455,8 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 shifted.len()
             );
         }
-        // the positions the details cite (`instantiated by X at F:L:C`, `expanded from F:L`)
+        // the positions the details cite (`instantiated by X at F:L:C`, `expanded from F:L`,
+        // `named at F:L:C` of a function pointer)
         for (dl, dc, what) in [
             (1i64, 0i64, "detail line +1"),
             (-1, 0, "detail line -1"),
@@ -465,7 +466,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             let (mut caught, mut total) = (0, 0);
             for (i, o) in occs.iter().enumerate().filter(|&(i, _)| verified[i]) {
                 for m in re!(
-                    r"(?:instantiated by .*? at|expanded from) [^\s;]+?:(\d+)(?::(\d+))?(?:;|$)"
+                    r"(?:instantiated by .*? at|expanded from|named at) [^\s;]+?:(\d+)(?::(\d+))?(?:;|$)"
                 )
                 .captures_iter(&o.context)
                 {
@@ -2537,15 +2538,120 @@ impl Files<'_> {
             {
                 return Err(format!("position after `{w}`: a definition, in {text:?}"));
             }
-            // code: the callee or static, by name or by an import alias of it
+            // code: the callee or static, by name or by an import alias of it (a raw
+            // identifier's name without `r#`: `rand::Rng::r#gen` is written `.r#gen()`)
             let ident = sym
                 .trim_end_matches(':')
                 .rsplit("::")
                 .next()
                 .unwrap_or("")
+                .trim_start_matches("r#")
                 .to_string();
             if ident.is_empty() {
                 return Err("no identifier in symbol".into());
+            }
+            // a call through a function pointer (`h(&SHA256, d)`): the position is the call's
+            // callee expression, a name, a field or a parenthesised expression followed by its
+            // arguments; the position the detail gives for where the function was made the
+            // pointer names it (or an import alias of it)
+            let pointer = re!(
+                r"called through a function pointer to `[^`]+` named at ([^\s;]+?):(\d+):(\d+)(?:;|$)"
+            )
+            .captures(ctx.details)
+            .map(|m| {
+                (
+                    m[1].to_string(),
+                    m[2].parse::<usize>().unwrap_or(0),
+                    m[3].parse::<usize>().unwrap_or(0),
+                )
+            });
+            if let Some((file, l2, c2)) = &pointer {
+                let (l2, c2) = (*l2, *c2);
+                // the callee expression: a parenthesised expression (`(h.f)`), or a name with
+                // fields, indexes and calls after it (`h`, `fs[0]`, `get()`), then the
+                // arguments
+                let callee = re!(
+                    r"^(?:\(([^()]*(?:\([^()]*\)[^()]*)*)\)|([A-Za-z_]\w*)(?:\s*\.\s*\w+|\s*\[[^\[\]]*\]|\s*\([^()]*\))*)\s*\("
+                )
+                .captures(&at);
+                // not a method (`.next(`) or a path (`ring::digest::digest(`): those name a
+                // function, not a pointer
+                let before = chars[..offset].iter().rev().find(|c| !c.is_whitespace());
+                let method = matches!(before, Some('.' | ':'));
+                let Some(callee) = callee.filter(|_| starts_token && !method) else {
+                    return Err(format!(
+                        "expected a call through a function pointer in {text:?}"
+                    ));
+                };
+                // the root of the callee: a variable, not a function of the file (`run(`)
+                let root = callee
+                    .get(2)
+                    .map(|m| m.as_str().to_string())
+                    .or_else(|| {
+                        callee.get(1).and_then(|m| {
+                            re!(r"^\s*([A-Za-z_]\w*)")
+                                .captures(m.as_str())
+                                .map(|r| r[1].to_string())
+                        })
+                    })
+                    .unwrap_or_default();
+                let plain = callee.get(2).is_some_and(|m| {
+                    callee[0][m.end()..].trim_start().starts_with('(')
+                        && callee[0][m.end()..].trim() == "("
+                });
+                if plain
+                    && src
+                        .items
+                        .iter()
+                        .any(|i| i.kind == ItemKind::Fn && i.name == root)
+                {
+                    return Err(format!(
+                        "`{root}` is a function of the file, not a pointer, in {text:?}"
+                    ));
+                }
+                // a variable the function binds to what calls nothing (`let h = Holder { f:
+                // digest::digest };`, `let p: HashFn = digest::digest;`) holds the function
+                // named in that statement
+                if !root.is_empty()
+                    && let Some((first, last, init)) = let_binding(&src, line, &root)
+                    && !re!(r"\w\s*\(|\w!").is_match(&init)
+                    && self.resolve(file).ok().as_deref() == Some(path.as_path())
+                    && !(first..=last).contains(&l2)
+                {
+                    return Err(format!(
+                        "`{root}` is bound at lines {first}-{last}, not where the function is \
+                         named ({file}:{l2}:{c2})"
+                    ));
+                }
+                let p2 = self.resolve(file)?;
+                let src2 = self
+                    .source(&p2)
+                    .ok_or_else(|| format!("cannot read {file}, named in the context"))?;
+                let named = src2.lines.get(l2.wrapping_sub(1)).and_then(|t| {
+                    let chars: Vec<char> = t.chars().collect();
+                    let (rs, rc) = rest(&src2, l2, c2);
+                    (c2 < chars.len() && token_start(&src2, l2, c2))
+                        .then(|| path_and_generics(&rs, &rc))
+                        .flatten()
+                });
+                let names = named.is_some_and(|(_, last, _)| {
+                    last == ident
+                        || src2.binds.iter().any(|b| {
+                            b.name == last
+                                && self.alias_of(
+                                    b,
+                                    &ident,
+                                    &sym_crate,
+                                    owner_id.as_deref(),
+                                    &src2.binds,
+                                )
+                        })
+                });
+                if !names {
+                    return Err(format!(
+                        "the function pointer's position {file}:{l2}:{c2} does not name `{ident}`"
+                    ));
+                }
             }
             // the path, from the position on over the next lines (rustfmt breaks long paths);
             // generic arguments balanced, so it cannot run on into the next expression
@@ -2593,7 +2699,7 @@ impl Files<'_> {
                     }
                 }
             }
-            if !(ok && starts_token) {
+            if pointer.is_none() && !(ok && starts_token) {
                 return Err(format!("expected `{ident}` in {text:?}"));
             }
         }
@@ -2915,6 +3021,21 @@ impl Files<'_> {
                 continue;
             }
             match &caller {
+                // an instantiation in the items a macro invocation outside any item makes,
+                // cited at the invocation (hpke's `impl_dhkem!(..)` makes `encap`)
+                Some(c)
+                    if {
+                        let c0 = col.unwrap_or(cols[0]);
+                        src.enclosing((line, c0), &[ItemKind::Fn, ItemKind::Static])
+                            .is_none()
+                            && macro_call_at(&src, (line, c0))
+                    } =>
+                {
+                    if let Some(n) = in_item(c) {
+                        earlier.push(n.name);
+                    }
+                    callee = Some(c.clone());
+                }
                 Some(c) => {
                     let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
                     // where the line names what it instantiates, as a use (not `fn seal(..)`
@@ -3104,9 +3225,13 @@ impl Files<'_> {
                         }
                         continue;
                     };
+                    // the tagged macro's body, or that of a macro of the same file it invokes
+                    // (primeorder's `impl_mont_field_element!` writes its arithmetic through
+                    // `impl_mont_field_element_arithmetic!`)
+                    let invoked = macros_invoked(&src, &t[1]);
                     let inside = cols.iter().any(|&col| {
                         src.enclosing((line, col), &[ItemKind::Macro])
-                            .is_some_and(|m| m.name == t[1])
+                            .is_some_and(|m| invoked.contains(&m.name))
                     });
                     if !inside {
                         return Err(format!(
@@ -3136,6 +3261,82 @@ impl Files<'_> {
         }
         Ok(())
     }
+}
+
+/// The nearest `let` binding `name` above line `line` in the function around it: (its first
+/// line, its last line, the initializer's text).
+fn let_binding(src: &Source, line: usize, name: &str) -> Option<(usize, usize, String)> {
+    let fn_start = src
+        .enclosing((line, 0), &[ItemKind::Fn])
+        .map(|f| f.start.0)
+        .unwrap_or(1);
+    let pat = Regex::new(&format!(r"\blet\s+(?:mut\s+)?{}\b", regex::escape(name))).ok()?;
+    for l in (fn_start..=line).rev() {
+        let text = src.lines.get(l - 1)?;
+        let Some(m) = pat.find(text) else { continue };
+        // the statement, to its `;`
+        let mut stmt = text[m.end()..].to_string();
+        let mut last = l;
+        while !stmt.contains(';') && last < src.lines.len() && last < l + 20 {
+            last += 1;
+            stmt.push('\n');
+            stmt.push_str(&src.lines[last - 1]);
+        }
+        let init = stmt.split_once('=').map(|(_, i)| i).unwrap_or("");
+        let init = init.split(';').next().unwrap_or("").to_string();
+        return Some((l, last, init));
+    }
+    None
+}
+
+/// Does a macro invocation's path start exactly at `at` (`impl_dhkem!(`,
+/// `primeorder::impl_mont_field_element!(`)?
+fn macro_call_at(src: &Source, at: (usize, usize)) -> bool {
+    let Some(text) = src.lines.get(at.0.wrapping_sub(1)) else {
+        return false;
+    };
+    let chars: Vec<char> = text.chars().collect();
+    let c = at.1;
+    c < chars.len()
+        && (c == 0 || !is_ident(chars[c - 1]))
+        && src
+            .class
+            .get(at.0 - 1)
+            .and_then(|k| k.get(c))
+            .is_some_and(|k| *k == Class::Code)
+        && re!(r"^(?:\w+::)*\w+!\s*[(\[{]").is_match(&chars[c..].iter().collect::<String>())
+}
+
+/// The `macro_rules!` of a file whose expansion a macro of it writes: the macro itself and
+/// those its body invokes, in turn.
+fn macros_invoked(src: &Source, name: &str) -> Vec<String> {
+    let mut out = vec![name.to_string()];
+    let mut i = 0;
+    while i < out.len() {
+        let body: Vec<&Item> = src
+            .items
+            .iter()
+            .filter(|m| m.kind == ItemKind::Macro && m.name == out[i])
+            .collect();
+        for m in body {
+            let text = src
+                .lines
+                .get(m.start.0.saturating_sub(1)..m.end.0.min(src.lines.len()))
+                .unwrap_or_default()
+                .join("\n");
+            for other in src.items.iter().filter(|o| o.kind == ItemKind::Macro) {
+                if !out.contains(&other.name)
+                    && Regex::new(&format!(r"\b{}!", regex::escape(&other.name)))
+                        .unwrap()
+                        .is_match(&text)
+                {
+                    out.push(other.name.clone());
+                }
+            }
+        }
+        i += 1;
+    }
+    out
 }
 
 /// The first line of the attribute (`#[derive(..)]`, `#[hashed]`) or the macro invocation
@@ -3470,8 +3671,9 @@ fn check_item(
         return Err("no enclosing item in the context".into());
     };
     let Some(item) = src.enclosing(at, &[ItemKind::Fn, ItemKind::Static]) else {
-        // an item a macro invocation outside any item makes (`hash_fn!(..)` at module level)
-        if src.enclosing(at, &[ItemKind::MacroCall]).is_some() {
+        // an item a macro invocation outside any item makes (`hash_fn!(..)` at module level),
+        // cited inside the invocation or at its start (hpke's `nistp_dhkex!(..)`)
+        if src.enclosing(at, &[ItemKind::MacroCall]).is_some() || macro_call_at(src, at) {
             return Ok(());
         }
         return Err(format!("position outside any item, not in `{}`", want.name));

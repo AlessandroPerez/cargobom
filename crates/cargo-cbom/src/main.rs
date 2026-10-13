@@ -228,37 +228,44 @@ fn run_driver(
         .output()?;
     let compiler = String::from_utf8_lossy(&compiler.stdout).to_string();
     // the crates of the build's packages, by their library names (the package md-5's library
-    // is `md5`): those the knowledge base describes, any version, have their sites recorded;
-    // its algorithm and trait crates are not entered by the walk
-    let lib_names = |keep: &dyn Fn(&rcbom_manifest::Pkg) -> bool| -> Vec<String> {
-        let mut v: Vec<String> = man
-            .packages
-            .iter()
-            .filter(|p| !p.local && keep(p))
-            .filter_map(|p| p.lib_name.clone())
+    // is `md5`), each with its package's source directory: two packages may name their library
+    // alike (md5 0.7 and md-5), and the driver tells their crates apart by where the sources
+    // are. Those the knowledge base describes, any version, have their sites recorded; its
+    // algorithm and trait crates are not entered by the walk.
+    let entries = |pkgs: &mut dyn Iterator<Item = &rcbom_manifest::Pkg>| -> String {
+        let mut v: Vec<String> = pkgs
+            .filter(|p| !p.local)
+            .filter_map(|p| {
+                p.lib_name
+                    .as_ref()
+                    .map(|n| format!("{n}={}", p.manifest_dir.display()))
+            })
             .collect();
         v.sort();
         v.dedup();
-        v
+        v.join("\n")
     };
     // and those of crypto packages it does not model: their calls are operations of unknown
     // algorithm (`p256::ecdh::diffie_hellman` from age)
-    let kb_crates =
-        lib_names(&|p| p.role.is_some() || p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
-            .join(",");
-    let stop: std::collections::BTreeSet<String> =
-        lib_names(&|p| matches!(p.role, Some(Role::Algorithm | Role::Trait)))
-            .into_iter()
-            .collect();
-    let stop_crates = stop.iter().cloned().collect::<Vec<_>>().join(",");
+    let kb_crates = entries(
+        &mut man
+            .packages
+            .iter()
+            .filter(|p| p.role.is_some() || p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)),
+    );
+    let stop: Vec<&rcbom_manifest::Pkg> = man
+        .packages
+        .iter()
+        .filter(|p| matches!(p.role, Some(Role::Algorithm | Role::Trait)))
+        .collect();
+    let stop_crates = entries(&mut stop.iter().copied());
     // what the stop crates depend on (curve25519-dalek under ed25519-dalek): their
     // implementation, which the walk does not enter from them
     let impl_crates = {
         let mut seen: std::collections::BTreeSet<&rcbom_manifest::PackageId> = Default::default();
-        let mut stack: Vec<&rcbom_manifest::PackageId> = man
-            .packages
+        let mut stack: Vec<&rcbom_manifest::PackageId> = stop
             .iter()
-            .filter(|p| !p.local && p.lib_name.as_ref().is_some_and(|n| stop.contains(n)))
+            .filter(|p| !p.local)
             .flat_map(|p| p.runtime_deps.iter())
             .collect();
         while let Some(id) = stack.pop() {
@@ -268,15 +275,7 @@ fn run_driver(
                 stack.extend(p.runtime_deps.iter());
             }
         }
-        let mut names: Vec<String> = seen
-            .into_iter()
-            .filter_map(|id| man.by_id(id))
-            .filter(|p| !p.local)
-            .filter_map(|p| p.lib_name.clone())
-            .collect();
-        names.sort();
-        names.dedup();
-        names.join(",")
+        entries(&mut seen.into_iter().filter_map(|id| man.by_id(id)))
     };
 
     // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any

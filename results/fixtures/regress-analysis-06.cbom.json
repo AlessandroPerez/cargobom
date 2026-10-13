@@ -350,11 +350,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1004,7 +1000,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:HMAC",
+      "bom-ref": "crypto:algorithm:HMAC-SHA3-256",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "HMAC",
@@ -1033,7 +1029,7 @@
           }
         ]
       },
-      "name": "HMAC",
+      "name": "HMAC-SHA3-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -2084,6 +2080,69 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA3-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t6::main; part of HMAC-SHA3-256; line: `let mut m = <Hmac<sha3::Sha3_256> as Mac>::new_from_slice(b\"k\").unwrap();`; code: `<Hmac<sha3::Sha3_256> as Mac>::new_from_slice`",
+            "line": 4,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "digest::mac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t6::main; part of HMAC-SHA3-256; line: `m.update(b\"x\");`; code: `update`",
+            "line": 5,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "digest::mac::Mac::update"
+          }
+        ]
+      },
+      "name": "SHA3-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -2112,7 +2171,7 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:HMAC"
+        "crypto:algorithm:HMAC-SHA3-256"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
     },
@@ -2166,6 +2225,9 @@
         "pkg:cargo/digest@0.10.7",
         "pkg:cargo/keccak@0.1.6"
       ],
+      "provides": [
+        "crypto:algorithm:SHA3-256"
+      ],
       "ref": "pkg:cargo/sha3@0.10.9"
     },
     {
@@ -2209,6 +2271,12 @@
         "crypto:algorithm:SHA-512"
       ],
       "ref": "crypto:algorithm:HMAC-SHA-512"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA3-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA3-256"
     },
     {
       "dependsOn": [
@@ -2260,10 +2328,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:HMAC"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:material:secret-key:HMAC"
     },
     {
@@ -2285,6 +2349,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA3-256"
     }
   ],
   "metadata": {
@@ -2332,7 +2400,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "169"
+        "value": "41"
       }
     ],
     "tools": {
@@ -2345,7 +2413,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d0b9b3ad-50fa-8354-84ed-0f921fc35236",
+  "serialNumber": "urn:uuid:dfb2a9de-01dd-88ff-a0a1-614df332110d",
   "specVersion": "1.7",
   "version": 1
 }

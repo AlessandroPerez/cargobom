@@ -168,7 +168,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-buffer@0.10.4",
@@ -232,7 +232,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/constant_time_eq@0.4.2",
@@ -292,7 +292,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/ctr@0.9.2",
@@ -622,11 +622,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -701,7 +697,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "present"
         }
       ],
       "purl": "pkg:cargo/subtle@2.6.1",
@@ -951,6 +947,89 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t16::d2::{closure#0}; use: generate; instantiated by t16::main at src/main.rs:177:33; line: `rand::rngs::OsRng.fill_bytes(&mut key);`; code: `fill_bytes`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t16::d3::{closure#0}; use: generate; instantiated by t16::d3 at src/main.rs:38:19; line: `rand::rngs::OsRng.fill_bytes(&mut key);`; code: `fill_bytes`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t16::d4; use: generate; line: `rand::rngs::OsRng.fill_bytes(&mut cfg.key);`; code: `fill_bytes`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t16::d5; use: generate; line: `rand::rngs::OsRng.fill_bytes(chunk);`; code: `fill_bytes`",
+            "line": 64,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t16::d6; use: generate; line: `rand::rngs::OsRng.fill_bytes(&mut *key.lock().unwrap());`; code: `fill_bytes`",
+            "line": 72,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:PBKDF2-SHA-256-600000-32",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1149,6 +1228,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -1201,6 +1283,9 @@
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
       ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
     {
@@ -1246,6 +1331,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:BLAKE3-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -1310,7 +1399,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e0e5aa4f-1bb8-8fe7-8ca2-2c6de962bde9",
+  "serialNumber": "urn:uuid:483f641e-6b0b-87eb-843c-c0135b8ea527",
   "specVersion": "1.7",
   "version": 1
 }

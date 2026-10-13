@@ -229,11 +229,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -309,7 +305,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-padding@0.3.3",
@@ -729,11 +725,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1069,15 +1061,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/kem@0.3.0-pre.0",
@@ -1105,11 +1089,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1141,11 +1121,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1481,11 +1457,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "algorithm"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
+          "value": "trait"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1717,11 +1689,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -2285,6 +2253,96 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in age_core::format::grease_the_joint::gen_arbitrary_string::<..>; use: generate; instantiated by age_core::format::grease_the_joint at age-core-0.12.0/src/format.rs:136:35; line: `let length = Uniform::from(1..9).sample(rng);`; code: `sample`",
+            "line": 125,
+            "location": "age-core-0.12.0/src/format.rs",
+            "offset": 41,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age_core::format::grease_the_joint::gen_arbitrary_string::<..>; use: generate; instantiated by age_core::format::grease_the_joint at age-core-0.12.0/src/format.rs:136:35; line: `.sample_iter(rng)`; code: `sample_iter`",
+            "line": 127,
+            "location": "age-core-0.12.0/src/format.rs",
+            "offset": 13,
+            "symbol": "rand::distributions::distribution::Distribution::sample_iter"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age_core::format::grease_the_joint; use: generate; line: `let args = (0..Uniform::from(0..5).sample(&mut rng))`; code: `sample`",
+            "line": 140,
+            "location": "age-core-0.12.0/src/format.rs",
+            "offset": 39,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age_core::format::grease_the_joint; use: generate; line: `let mut body = vec![0; Uniform::from(0..100).sample(&mut rng)];`; code: `sample`",
+            "line": 151,
+            "location": "age-core-0.12.0/src/format.rs",
+            "offset": 49,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age_core::format::grease_the_joint; use: generate; line: `rng.fill_bytes(&mut body);`; code: `fill_bytes`",
+            "line": 152,
+            "location": "age-core-0.12.0/src/format.rs",
+            "offset": 8,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age_core::plugin::Connection::<..>::grease_gun::{closure#0}; use: generate; instantiated by age_core::plugin::Connection::<..>::grease_gun at age-core-0.12.0/src/plugin.rs:180:26; instantiated by age_core::plugin::UnidirSend::<..>::send at age-core-0.12.0/src/plugin.rs:319:29; instantiated by age::plugin::IdentityPluginV1::<..>::unwrap_stanzas::<..>::{closure#0} at age-0.12.1/src/plugin.rs:643:22; instantiated by age::plugin::IdentityPluginV1::<..>::unwrap_stanzas::<..> at age-0.12.1/src/plugin.rs:641:41; line: `if rng.gen_range(0..100) < 5 {`; code: `gen_range`",
+            "line": 181,
+            "location": "age-core-0.12.0/src/plugin.rs",
+            "offset": 19,
+            "symbol": "rand::rng::Rng::gen_range"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:ChaCha20-Poly1305",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -2405,6 +2463,87 @@
         {
           "name": "rcbom:occurrences",
           "value": "9"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDH-P-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keyderive",
+            "keygen"
+          ],
+          "primitive": "key-agree"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::decap; use: keyderive; line: `let ss_t = p256::ecdh::diffie_hellman(sk_recip.dk_t.to_nonzero_scalar(), ct_t.as_affine());`; code: `p256::ecdh::diffie_hellman`",
+            "line": 180,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 19,
+            "symbol": "elliptic_curve::ecdh::diffie_hellman"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: keygen; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `let sk_e = p256::ecdh::EphemeralSecret::random(csprng);`; code: `p256::ecdh::EphemeralSecret::random`",
+            "line": 209,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 19,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap; public_key: setup, not a use; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `let ct_t = sk_e.public_key().to_encoded_point(false);`; code: `public_key`",
+            "line": 210,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 24,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::public_key"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap; use: keyderive; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `let ss_t = sk_e.diffie_hellman(&pk_recip.ek_t);`; code: `diffie_hellman`",
+            "line": 211,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 24,
+            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro nistp_dhkex!] in <hpke::dhkex::ecdh_nistp::p256::DhP256 as hpke::dhkex::DhKeyExchange>::dh; use: keyderive; expanded from hpke-0.12.0/src/dhkex/ecdh_nistp.rs:161; line: `nistp_dhkex!(`",
+            "line": 241,
+            "location": "hpke-0.12.0/src/dhkex/ecdh_nistp.rs",
+            "offset": 0,
+            "symbol": "elliptic_curve::ecdh::diffie_hellman"
+          }
+        ]
+      },
+      "name": "ECDH-P-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -2688,29 +2827,64 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:PBKDF2",
+      "bom-ref": "crypto:algorithm:ML-KEM-768",
       "cryptoProperties": {
         "algorithmProperties": {
-          "algorithmFamily": "PBKDF2",
+          "algorithmFamily": "ML-KEM",
           "cryptoFunctions": [
-            "keyderive"
+            "encapsulate"
           ],
-          "primitive": "kdf"
+          "primitive": "kem"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in bcrypt_pbkdf::bcrypt_pbkdf_with_memory; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); instantiated by bcrypt_pbkdf::bcrypt_pbkdf::<&str> at bcrypt-pbkdf-0.10.0/src/lib.rs:149:4; instantiated by age::ssh::OpenSshKdf::derive at age-0.12.1/src/ssh.rs:99:16; line: `pbkdf2::pbkdf2::<Bhash>(&Sha512::digest(passphrase), salt, rounds, memory)`; code: `pbkdf2::pbkdf2::<Bhash>`",
-            "line": 190,
-            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
-            "offset": 4,
-            "symbol": "pbkdf2::pbkdf2"
+            "additionalContext": "[present] [call] in age::native::tagpq::expand_pq_key; use: keygen; line: `let (dk_pq, ek_pq) = MlKem768::generate_deterministic(&d.into(), &z.into());`; code: `MlKem768::generate_deterministic`",
+            "line": 39,
+            "location": "age-0.12.1/src/native/tagpq.rs",
+            "offset": 25,
+            "symbol": "ml_kem::KemCore::generate_deterministic"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::PublicKey as hpke::Deserializable>::from_bytes; from_bytes: setup, not a use; line: `let ek_pq = <MlKem768 as KemCore>::EncapsulationKey::from_bytes(`; code: `<MlKem768 as KemCore>::EncapsulationKey::from_bytes`",
+            "line": 74,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 20,
+            "symbol": "ml_kem::EncodedSizeUser::from_bytes"
+          },
+          {
+            "additionalContext": "[present] [call] in <age::native::tagpq::kem::PublicKey as hpke::Serializable>::write_exact; as_bytes: setup, not a use; line: `buf[..kem_neq].copy_from_slice(&self.ek_pq.as_bytes());`; code: `as_bytes`",
+            "line": 96,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 51,
+            "symbol": "ml_kem::EncodedSizeUser::as_bytes"
+          },
+          {
+            "additionalContext": "[present] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::sk_to_pk; encapsulation_key: setup, not a use; line: `ek_pq: sk.dk_pq.encapsulation_key().clone(),`; code: `encapsulation_key`",
+            "line": 149,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 28,
+            "symbol": "ml_kem::kem::DecapsulationKey::<P>::encapsulation_key"
+          },
+          {
+            "additionalContext": "[present] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::decap; use: decapsulate; line: `.decapsulate(&encapped_key.ct_pq)`; code: `decapsulate`",
+            "line": 178,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 13,
+            "symbol": "kem::Decapsulate::decapsulate"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: encapsulate; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `.encapsulate(csprng)`; code: `encapsulate`",
+            "line": 206,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 13,
+            "symbol": "kem::Encapsulate::encapsulate"
           }
         ]
       },
-      "name": "PBKDF2",
+      "name": "ML-KEM-768",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -2733,16 +2907,105 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in age::cli_common::Passphrase::random::<..>::{closure#0}; use: generate; instantiated by age::cli_common::Passphrase::random::<rand_core::os::OsRng> at age-0.12.1/src/cli_common.rs:189:17; instantiated by age::cli_common::read_or_generate_passphrase at age-0.12.1/src/cli_common.rs:215:11; line: `.nth(between.sample(&mut rng))`; code: `sample`",
+            "line": 192,
+            "location": "age-0.12.1/src/cli_common.rs",
+            "offset": 33,
+            "symbol": "rand::distributions::distribution::Distribution::sample"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::keys::new_file_key::{closure#0}; use: generate; instantiated by age::keys::new_file_key at age-0.12.1/src/keys.rs:21:27; line: `FileKey::init_with_mut(|file_key| OsRng.fill_bytes(file_key))`; code: `fill_bytes`",
+            "line": 21,
+            "location": "age-0.12.1/src/keys.rs",
+            "offset": 44,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "line": 145,
+            "location": "age-0.12.1/src/native/scrypt.rs",
+            "offset": 12,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <age::native::scrypt::Recipient as age::Recipient>::wrap_file_key; use: generate; line: `let label = Alphanumeric.sample_string(&mut rng, 32);`; code: `sample_string`",
+            "line": 157,
+            "location": "age-0.12.1/src/native/scrypt.rs",
+            "offset": 33,
+            "symbol": "rand::distributions::distribution::DistString::sample_string"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::protocol::Nonce::random; use: generate; line: `OsRng.fill_bytes(&mut nonce);`; code: `fill_bytes`",
+            "line": 31,
+            "location": "age-0.12.1/src/protocol.rs",
+            "offset": 14,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <hpke::kem::dhkem::dhp256_hkdfsha256::DhP256HkdfSha256 as hpke::kem::Kem>::gen_keypair::<..>; use: generate; instantiated by <hpke::kem::dhkem::dhp256_hkdfsha256::DhP256HkdfSha256 as hpke::kem::Kem>::encap::<..> at hpke-0.12.0/src/kem/dhkem.rs:364:0; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; line: `csprng.fill_bytes(&mut ikm);`; code: `fill_bytes`",
+            "line": 52,
+            "location": "hpke-0.12.0/src/kem.rs",
+            "offset": 15,
+            "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in tempfile::util::create_helper::<..>; use: generate; instantiated by tempfile::Builder::<..>::tempdir_in::<..> at tempfile-3.27.0/src/lib.rs:622:8; instantiated by tempfile::Builder::<'_, '_>::tempdir at tempfile-3.27.0/src/lib.rs:596:13; instantiated by tempfile::dir::TempDir::new at tempfile-3.27.0/src/dir/mod.rs:219:23; line: `if let Ok(seed) = getrandom::u64() {`; code: `getrandom::u64`",
+            "line": 61,
+            "location": "tempfile-3.27.0/src/util.rs",
+            "offset": 30,
+            "symbol": "getrandom::u64"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
         },
         {
-          "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -3104,34 +3367,6 @@
             "location": "age-0.12.1/src/ssh/identity.rs",
             "offset": 40,
             "symbol": "digest::digest::Digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <bcrypt_pbkdf::Bhash as crypto_common::KeyInit>::new; default: setup, not a use; line: `salt: Sha512::default(),`; code: `Sha512::default`",
-            "line": 86,
-            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
-            "offset": 18,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <bcrypt_pbkdf::Bhash as digest::Update>::update; use: digest; line: `Update::update(&mut self.salt, data);`; code: `Update::update`",
-            "line": 93,
-            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
-            "offset": 8,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <bcrypt_pbkdf::Bhash as digest::FixedOutput>::finalize_into; use: digest; line: `*out = bhash(&self.sha2_pass, &self.salt.finalize_reset());`; code: `finalize_reset`",
-            "line": 103,
-            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
-            "offset": 49,
-            "symbol": "digest::digest::Digest::finalize_reset"
-          },
-          {
-            "additionalContext": "[reachable] [call] in bcrypt_pbkdf::bcrypt_pbkdf_with_memory; use: digest; instantiated by bcrypt_pbkdf::bcrypt_pbkdf::<&str> at bcrypt-pbkdf-0.10.0/src/lib.rs:149:4; instantiated by age::ssh::OpenSshKdf::derive at age-0.12.1/src/ssh.rs:99:16; line: `pbkdf2::pbkdf2::<Bhash>(&Sha512::digest(passphrase), salt, rounds, memory)`; code: `Sha512::digest`",
-            "line": 190,
-            "location": "bcrypt-pbkdf-0.10.0/src/lib.rs",
-            "offset": 29,
-            "symbol": "digest::digest::Digest::digest"
           }
         ]
       },
@@ -3159,7 +3394,307 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA3-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; default: setup, not a use; line: `let mut h = Sha3_256::default();`; code: `Sha3_256::default`",
+            "line": 287,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 16,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.update(ss_pq);`; code: `update`",
+            "line": 288,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.update(ss_t);`; code: `update`",
+            "line": 289,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.update(ct_t);`; code: `update`",
+            "line": 290,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.update(ek_t);`; code: `update`",
+            "line": 291,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.update(LABEL);`; code: `update`",
+            "line": 292,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; line: `h.finalize_fixed()`; code: `finalize_fixed`",
+            "line": 293,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 6,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          }
+        ]
+      },
+      "name": "SHA3-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHAKE256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "xof"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; default: setup, not a use; line: `let mut xof = Shake256::default().chain(seed).finalize_xof();`; code: `Shake256::default`",
+            "line": 234,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 18,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; line: `let mut xof = Shake256::default().chain(seed).finalize_xof();`; code: `chain`",
+            "line": 234,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 38,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; line: `let mut xof = Shake256::default().chain(seed).finalize_xof();`; code: `finalize_xof`",
+            "line": 234,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 50,
+            "symbol": "digest::ExtendableOutput::finalize_xof"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; line: `xof.read(&mut seed_pq);`; code: `read`",
+            "line": 235,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 8,
+            "symbol": "digest::XofReader::read"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; line: `xof.read(&mut seed_t);`; code: `read`",
+            "line": 236,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 8,
+            "symbol": "digest::XofReader::read"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; default: setup, not a use; line: `Shake256::default()`; code: `Shake256::default`",
+            "line": 267,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 4,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(ikm)`; code: `chain`",
+            "line": 268,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(b\"HPKE-v1\")`; code: `chain`",
+            "line": 269,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(b\"KEM\")`; code: `chain`",
+            "line": 271,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(kem_id.to_be_bytes())`; code: `chain`",
+            "line": 272,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(`; code: `chain`",
+            "line": 274,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(label)`; code: `chain`",
+            "line": 279,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(u16::try_from(L).expect(\"short enough\").to_be_bytes())`; code: `chain`",
+            "line": 280,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.chain(context)`; code: `chain`",
+            "line": 281,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::Update::chain"
+          },
+          {
+            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; line: `.finalize_xof_into(&mut out);`; code: `finalize_xof_into`",
+            "line": 282,
+            "location": "age-0.12.1/src/native/tagpq/kem.rs",
+            "offset": 9,
+            "symbol": "digest::ExtendableOutput::finalize_xof_into"
+          }
+        ]
+      },
+      "name": "SHAKE256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "15"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:bcrypt-pbkdf",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "bcrypt",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in age::ssh::OpenSshKdf::derive; use: keyderive; line: `bcrypt_pbkdf(passphrase.expose_secret(), salt, *rounds, &mut output)`; code: `bcrypt_pbkdf`",
+            "line": 99,
+            "location": "age-0.12.1/src/ssh.rs",
+            "offset": 16,
+            "symbol": "bcrypt_pbkdf::bcrypt_pbkdf"
+          }
+        ]
+      },
+      "name": "bcrypt-pbkdf",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -3248,361 +3783,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:digest",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::algebra::FieldElementReader::<'a>::new; use: digest; algorithm unresolved: a trait object (`dyn sha3::digest::XofReader`): its type is chosen at run time; algorithm unresolved: a trait object (`dyn digest::XofReader`): its type is chosen at run time; instantiated by ml_kem::algebra::NttPolynomial::sample_uniform::<..> at ml-kem-0.2.3/src/algebra.rs:269:25; instantiated by ml_kem::algebra::NttVector::<..>::sample_uniform::{closure#0} at ml-kem-0.2.3/src/algebra.rs:427:12; instantiated by ml_kem::algebra::NttVector::<..>::sample_uniform at ml-kem-0.2.3/src/algebra.rs:424:28; instantiated by ml_kem::algebra::NttMatrix::<..>::sample_uniform::{closure#0} at ml-kem-0.2.3/src/algebra.rs:498:12; line: `out.xof.read(&mut out.data);`; code: `read`",
-            "line": 228,
-            "location": "ml-kem-0.2.3/src/algebra.rs",
-            "offset": 16,
-            "symbol": "digest::XofReader::read"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::algebra::FieldElementReader::<'_>::next; use: digest; algorithm unresolved: a trait object (`dyn sha3::digest::XofReader`): its type is chosen at run time; algorithm unresolved: a trait object (`dyn digest::XofReader`): its type is chosen at run time; instantiated by ml_kem::algebra::NttPolynomial::sample_uniform::<..>::{closure#0} at ml-kem-0.2.3/src/algebra.rs:270:39; instantiated by ml_kem::algebra::NttPolynomial::sample_uniform::<..> at ml-kem-0.2.3/src/algebra.rs:270:28; instantiated by ml_kem::algebra::NttVector::<..>::sample_uniform::{closure#0} at ml-kem-0.2.3/src/algebra.rs:427:12; instantiated by ml_kem::algebra::NttVector::<..>::sample_uniform at ml-kem-0.2.3/src/algebra.rs:424:28; line: `self.xof.read(&mut self.data);`; code: `read`",
-            "line": 241,
-            "location": "ml-kem-0.2.3/src/algebra.rs",
-            "offset": 25,
-            "symbol": "digest::XofReader::read"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha3",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let mut xof = Shake256::default().chain(seed).finalize_xof();`; code: `chain`",
-            "line": 234,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 38,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let mut xof = Shake256::default().chain(seed).finalize_xof();`; code: `finalize_xof`",
-            "line": 234,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 50,
-            "symbol": "digest::ExtendableOutput::finalize_xof"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `xof.read(&mut seed_pq);`; code: `read`",
-            "line": 235,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 8,
-            "symbol": "digest::XofReader::read"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::expand_key; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `xof.read(&mut seed_t);`; code: `read`",
-            "line": 236,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 8,
-            "symbol": "digest::XofReader::read"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(ikm)`; code: `chain`",
-            "line": 268,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(b\"HPKE-v1\")`; code: `chain`",
-            "line": 269,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(b\"KEM\")`; code: `chain`",
-            "line": 271,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(kem_id.to_be_bytes())`; code: `chain`",
-            "line": 272,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(`; code: `chain`",
-            "line": 274,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(label)`; code: `chain`",
-            "line": 279,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(u16::try_from(L).expect(\"short enough\").to_be_bytes())`; code: `chain`",
-            "line": 280,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.chain(context)`; code: `chain`",
-            "line": 281,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::Update::chain"
-          },
-          {
-            "additionalContext": "[present] [call] in age::native::tagpq::kem::shake256_labeled_derive; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `.finalize_xof_into(&mut out);`; code: `finalize_xof_into`",
-            "line": 282,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 9,
-            "symbol": "digest::ExtendableOutput::finalize_xof_into"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(ss_pq);`; code: `update`",
-            "line": 288,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(ss_t);`; code: `update`",
-            "line": 289,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(ct_t);`; code: `update`",
-            "line": 290,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(ek_t);`; code: `update`",
-            "line": 291,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(LABEL);`; code: `update`",
-            "line": 292,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in age::native::tagpq::kem::ss; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.finalize_fixed()`; code: `finalize_fixed`",
-            "line": 293,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 6,
-            "symbol": "digest::FixedOutput::finalize_fixed"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::G; new: setup, not a use; algorithm unresolved: the type `sha3::Sha3_512Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:165:21; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; line: `let mut h = Sha3_512::new();`; code: `Sha3_512::new`",
-            "line": 20,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 16,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::G::<..>; use: digest; algorithm unresolved: the type `sha3::Sha3_512Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:165:21; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; line: `Digest::update(&mut h, x);`; code: `Digest::update`",
-            "line": 22,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 8,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::G; use: digest; algorithm unresolved: the type `sha3::Sha3_512Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:165:21; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; line: `let out = h.finalize();`; code: `finalize`",
-            "line": 24,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 16,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::H; new: setup, not a use; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<ml_kem::MlKem768Params>::new at ml-kem-0.2.3/src/kem.rs:160:16; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as ml_kem::EncodedSizeUser>::from_bytes at ml-kem-0.2.3/src/kem.rs:178:8; instantiated by <age::native::tagpq::kem::PublicKey as hpke::Deserializable>::from_bytes at age-0.12.1/src/native/tagpq/kem.rs:74:20; line: `let mut h = Sha3_256::new();`; code: `Sha3_256::new`",
-            "line": 35,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 16,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::H::<..>; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<ml_kem::MlKem768Params>::new at ml-kem-0.2.3/src/kem.rs:160:16; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as ml_kem::EncodedSizeUser>::from_bytes at ml-kem-0.2.3/src/kem.rs:178:8; instantiated by <age::native::tagpq::kem::PublicKey as hpke::Deserializable>::from_bytes at age-0.12.1/src/native/tagpq/kem.rs:74:20; line: `Digest::update(&mut h, x);`; code: `Digest::update`",
-            "line": 36,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 4,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::H; use: digest; algorithm unresolved: the type `sha3::Sha3_256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::kem::EncapsulationKey::<ml_kem::MlKem768Params>::new at ml-kem-0.2.3/src/kem.rs:160:16; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as ml_kem::EncodedSizeUser>::from_bytes at ml-kem-0.2.3/src/kem.rs:178:8; instantiated by <age::native::tagpq::kem::PublicKey as hpke::Deserializable>::from_bytes at age-0.12.1/src/native/tagpq/kem.rs:74:20; line: `h.finalize_into(out.as_mut_slice().into());`; code: `finalize_into`",
-            "line": 42,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::digest::Digest::finalize_into"
-          },
-          {
-            "additionalContext": "[present] [call] in ml_kem::crypto::J; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(x.as_ref());`; code: `update`",
-            "line": 49,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 10,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[present] [call] in ml_kem::crypto::J; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `let mut r = h.finalize_xof();`; code: `finalize_xof`",
-            "line": 51,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 18,
-            "symbol": "digest::ExtendableOutput::finalize_xof"
-          },
-          {
-            "additionalContext": "[present] [call] in ml_kem::crypto::J; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `r.read(&mut out);`; code: `read`",
-            "line": 54,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::XofReader::read"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::PRF; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::pke::EncryptionKey::<..>::encrypt at ml-kem-0.2.3/src/pke.rs:112:25; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:166:28; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; line: `h.update(s.as_ref());`; code: `update`",
-            "line": 65,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::PRF; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::pke::EncryptionKey::<..>::encrypt at ml-kem-0.2.3/src/pke.rs:112:25; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:166:28; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; line: `h.update(&[b]);`; code: `update`",
-            "line": 66,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::PRF; use: digest; algorithm unresolved: the type `sha3::Shake256Core` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::pke::EncryptionKey::<..>::encrypt at ml-kem-0.2.3/src/pke.rs:112:25; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:166:28; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; line: `let mut r = h.finalize_xof();`; code: `finalize_xof`",
-            "line": 67,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 18,
-            "symbol": "digest::ExtendableOutput::finalize_xof"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::PRF; use: digest; algorithm unresolved: the type `sha3::Shake256ReaderCore` of sha3 0.10.9, a crypto package the knowledge base does not model; instantiated by ml_kem::pke::EncryptionKey::<..>::encrypt at ml-kem-0.2.3/src/pke.rs:112:25; instantiated by ml_kem::kem::EncapsulationKey::<..>::encapsulate_deterministic_inner at ml-kem-0.2.3/src/kem.rs:166:28; instantiated by <ml_kem::kem::EncapsulationKey<ml_kem::MlKem768Params> as kem::Encapsulate<hybrid_array::Array<u8, <ml_kem::MlKem768Params as ml_kem::param::PkeParams>::CiphertextSize>, hybrid_array::Array<u8, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>>>>::encapsulate::<..> at ml-kem-0.2.3/src/kem.rs:199:16; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:206:13; line: `r.read(&mut out);`; code: `read`",
-            "line": 70,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::XofReader::read"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::XOF; use: digest; algorithm unresolved: the type `sha3::Shake128Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(rho);`; code: `update`",
-            "line": 76,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::XOF; use: digest; algorithm unresolved: the type `sha3::Shake128Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.update(&[i, j]);`; code: `update`",
-            "line": 77,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ml_kem::crypto::XOF; use: digest; algorithm unresolved: the type `sha3::Shake128Core` of sha3 0.10.9, a crypto package the knowledge base does not model; line: `h.finalize_xof()`; code: `finalize_xof`",
-            "line": 78,
-            "location": "ml-kem-0.2.3/src/crypto.rs",
-            "offset": 6,
-            "symbol": "digest::ExtendableOutput::finalize_xof"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "35"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:unknown:age",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -3668,343 +3848,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keyderive"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap; use: keyderive; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `let ss_t = sk_e.diffie_hellman(&pk_recip.ek_t);`; code: `diffie_hellman`",
-            "line": 211,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 24,
-            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+primeorder",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keyderive"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::decap; use: keyderive; algorithm unresolved: `elliptic_curve::ecdh::diffie_hellman` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; line: `let ss_t = p256::ecdh::diffie_hellman(sk_recip.dk_t.to_nonzero_scalar(), ct_t.as_affine());`; code: `p256::ecdh::diffie_hellman`",
-            "line": 180,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 19,
-            "symbol": "elliptic_curve::ecdh::diffie_hellman"
-          },
-          {
-            "additionalContext": "[reachable] [call] [macro nistp_dhkex!] in <hpke::dhkex::ecdh_nistp::p256::DhP256 as hpke::dhkex::DhKeyExchange>::dh; use: keyderive; algorithm unresolved: `elliptic_curve::ecdh::diffie_hellman` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; expanded from hpke-0.12.0/src/dhkex/ecdh_nistp.rs:161; line: `nistp_dhkex!(`",
-            "line": 241,
-            "location": "hpke-0.12.0/src/dhkex/ecdh_nistp.rs",
-            "offset": 0,
-            "symbol": "elliptic_curve::ecdh::diffie_hellman"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keygen"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: keygen; algorithm unresolved: `elliptic_curve::ecdh::EphemeralSecret::<C>::random` of elliptic-curve 0.13.8, a crypto package the knowledge base does not model; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `let sk_e = p256::ecdh::EphemeralSecret::random(csprng);`; code: `p256::ecdh::EphemeralSecret::random`",
-            "line": 209,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 19,
-            "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ff+p256+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keygen"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in elliptic_curve::scalar::nonzero::NonZeroScalar::<..>::random::<..>; use: keygen; algorithm unresolved: `ff::Field::random` of ff 0.13.1, a crypto package the knowledge base does not model; instantiated by elliptic_curve::ecdh::EphemeralSecret::<..>::random::<..> at elliptic-curve-0.13.8/src/ecdh.rs:107:20; instantiated by <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..> at age-0.12.1/src/native/tagpq/kem.rs:209:19; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; line: `if let Some(result) = Self::new(Field::random(&mut rng)).into() {`; code: `Field::random`",
-            "line": 50,
-            "location": "elliptic-curve-0.13.8/src/scalar/nonzero.rs",
-            "offset": 44,
-            "symbol": "ff::Field::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:kem+ml-kem",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "decapsulate"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::decap; use: decapsulate; algorithm unresolved: `kem::Decapsulate::decapsulate` of kem 0.3.0-pre.0, a crypto package the knowledge base does not model; line: `.decapsulate(&encapped_key.ct_pq)`; code: `decapsulate`",
-            "line": 178,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 13,
-            "symbol": "kem::Decapsulate::decapsulate"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "present"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:kem+ml-kem+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "encapsulate"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: encapsulate; algorithm unresolved: `kem::Encapsulate::encapsulate` of kem 0.3.0-pre.0, a crypto package the knowledge base does not model; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24; line: `.encapsulate(csprng)`; code: `encapsulate`",
-            "line": 206,
-            "location": "age-0.12.1/src/native/tagpq/kem.rs",
-            "offset": 13,
-            "symbol": "kem::Encapsulate::encapsulate"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -4405,6 +4248,9 @@
         "pkg:cargo/pbkdf2@0.12.2",
         "pkg:cargo/sha2@0.10.9"
       ],
+      "provides": [
+        "crypto:algorithm:bcrypt-pbkdf"
+      ],
       "ref": "pkg:cargo/bcrypt-pbkdf@0.10.0"
     },
     {
@@ -4515,9 +4361,6 @@
         "pkg:cargo/crypto-common@0.1.7",
         "pkg:cargo/subtle@2.6.1"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:hash:digest"
-      ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
     {
@@ -4534,9 +4377,7 @@
         "pkg:cargo/zeroize@1.8.2"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+primeorder",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core"
+        "crypto:algorithm:ECDH-P-256"
       ],
       "ref": "pkg:cargo/elliptic-curve@0.13.8"
     },
@@ -4545,17 +4386,20 @@
         "pkg:cargo/rand_core@0.6.4",
         "pkg:cargo/subtle@2.6.1"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
-      ],
       "ref": "pkg:cargo/ff@0.13.1"
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.3.3"
     },
     {
@@ -4615,10 +4459,6 @@
         "pkg:cargo/rand_core@0.6.4",
         "pkg:cargo/zeroize@1.8.2"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:kem+ml-kem",
-        "crypto:algorithm:unknown:unknown:kem+ml-kem+rand_core"
-      ],
       "ref": "pkg:cargo/kem@0.3.0-pre.0"
     },
     {
@@ -4628,8 +4468,7 @@
         "pkg:cargo/sha3@0.10.9"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:kem+ml-kem",
-        "crypto:algorithm:unknown:unknown:kem+ml-kem+rand_core"
+        "crypto:algorithm:ML-KEM-768"
       ],
       "ref": "pkg:cargo/ml-kem@0.2.3"
     },
@@ -4639,10 +4478,7 @@
         "pkg:cargo/primeorder@0.13.6"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+primeorder",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
+        "crypto:algorithm:ECDH-P-256"
       ],
       "ref": "pkg:cargo/p256@0.13.2"
     },
@@ -4650,9 +4486,6 @@
       "dependsOn": [
         "pkg:cargo/digest@0.10.7",
         "pkg:cargo/hmac@0.12.1"
-      ],
-      "provides": [
-        "crypto:algorithm:PBKDF2"
       ],
       "ref": "pkg:cargo/pbkdf2@0.12.2"
     },
@@ -4691,9 +4524,6 @@
       "dependsOn": [
         "pkg:cargo/elliptic-curve@0.13.8"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+primeorder"
-      ],
       "ref": "pkg:cargo/primeorder@0.13.6"
     },
     {
@@ -4710,12 +4540,18 @@
         "pkg:cargo/rand_chacha@0.3.1",
         "pkg:cargo/rand_core@0.6.4"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/rand@0.8.7"
     },
     {
       "dependsOn": [
         "pkg:cargo/ppv-lite86@0.2.21",
         "pkg:cargo/rand_core@0.6.4"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/rand_chacha@0.3.1"
     },
@@ -4724,9 +4560,7 @@
         "pkg:cargo/getrandom@0.2.17"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core",
-        "crypto:algorithm:unknown:unknown:ff+p256+rand_core",
-        "crypto:algorithm:unknown:unknown:kem+ml-kem+rand_core"
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -4797,7 +4631,8 @@
         "pkg:cargo/keccak@0.1.6"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha3"
+        "crypto:algorithm:SHA3-256",
+        "crypto:algorithm:SHAKE256"
       ],
       "ref": "pkg:cargo/sha3@0.10.9"
     },
@@ -4881,11 +4716,23 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha20-Poly1305"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:PBKDF2"
+      "ref": "crypto:algorithm:ECDH-P-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ML-KEM-768"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -4901,43 +4748,23 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:SHA3-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHAKE256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:bcrypt-pbkdf"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:scrypt"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:digest"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha3"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:age"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+primeorder"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256+rand_core"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ff+p256+rand_core"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:kem+ml-kem"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:kem+ml-kem+rand_core"
     },
     {
       "dependsOn": [],
@@ -4989,7 +4816,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "45099"
+        "value": "43890"
       }
     ],
     "tools": {
@@ -5002,7 +4829,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:391b2a15-b4a0-8bd7-a4b4-5174c53cb90c",
+  "serialNumber": "urn:uuid:87ebac15-811a-89e1-a67a-7f299d023977",
   "specVersion": "1.7",
   "version": 1
 }

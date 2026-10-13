@@ -1,0 +1,204 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/rand@0.4.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by probe33 (dependencies)",
+            "line": 7,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "rand"
+          },
+          {
+            "additionalContext": "[manifest] locked rand 0.4.6; reached via probe33 -> rand",
+            "line": 25,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand"
+          }
+        ]
+      },
+      "name": "rand",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unsupported-version"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/rand@0.4.6",
+      "type": "library",
+      "version": "0.4.6"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:drbg:rand",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: generate; algorithm unresolved: `rand::random` of rand 0.4.6, a version the knowledge base does not cover; line: `let a: u64 = rand::random();`; code: `rand::random`",
+            "line": 5,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: generate; algorithm unresolved: the type `rand::ThreadRng` of rand 0.4.6, a version the knowledge base does not cover; line: `let b: u32 = r.gen();`; code: `gen`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "rand::Rng::gen"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: generate; algorithm unresolved: the type `rand::ThreadRng` of rand 0.4.6, a version the knowledge base does not cover; line: `r.fill_bytes(&mut buf);`; code: `fill_bytes`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "rand::Rng::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: generate; algorithm unresolved: the type `rand::os::OsRng` of rand 0.4.6, a version the knowledge base does not cover; line: `o.fill_bytes(&mut buf);`; code: `fill_bytes`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "rand::Rng::fill_bytes"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/rand@0.4.6"
+      ],
+      "ref": "pkg:cargo/probe33@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:unknown:drbg:rand"
+      ],
+      "ref": "pkg:cargo/rand@0.4.6"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:drbg:rand"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/probe33@0.1.0",
+      "name": "probe33",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/probe33@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "3"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "96"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:6a26a004-6c74-8b68-89f5-4b45ebf4b62d",
+  "specVersion": "1.7",
+  "version": 1
+}

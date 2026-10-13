@@ -12,7 +12,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:108:12 | digest::digest::Digest::digest | [reachable] [call] in v03::strings; use: digest; line: `let h = Sha256::digest(d); // } fn other() {`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:118:8 | digest::digest::Digest::digest | [reachable] [call] in v03::Gen::<T>::run; use: digest; instantiated by v03::main at src/main.rs:149:23; line: `Sha256::digest(self.0.as_ref()).len()`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:10 | digest::digest::Digest::digest | [reachable] [call] in <v03::K as core::convert::From<alloc::vec::Vec<u8>>>::from; use: digest; line: `K(Sha256::digest(&b).len())`; code: `Sha256::digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:4 | digest::digest::Digest::digest | [reachable] [call] in v03::r#type; use: digest; line: `Sha256::digest(d).len()`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:4 | digest::digest::Digest::digest | [reachable] [call] in v03::type; use: digest; line: `Sha256::digest(d).len()`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:9 | digest::digest::Digest::digest | [reachable] [call] in v03::tabs; use: digest; line: `let x =	Sha256::digest(d);`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:31 | digest::digest::Digest::digest | [reachable] [call] in v03::unicode; use: digest; line: `let s = "héllo→ü"; let h = Sha256::digest(s.as_bytes()); h.len() + d.len()`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:48:12 | digest::digest::Digest::digest | [reachable] [call] in v03::multiline; use: digest; line: `let h = sha2::Sha256`
@@ -104,7 +104,7 @@
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
-  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
   prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
@@ -126,16 +126,15 @@
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=algorithm
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
-  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=declared-not-used
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
-  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}

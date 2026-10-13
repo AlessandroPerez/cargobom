@@ -637,6 +637,10 @@
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rustls-0.23.45/src/crypto/aws_lc_rs/pq/mod.rs:16:18 | rustls::crypto::aws_lc_rs::pq::MLKEM768 | [present] [via-static] in rustls::crypto::aws_lc_rs::pq::X25519MLKEM768; rustls::crypto::aws_lc_rs::pq::MLKEM768 -> aws_lc_rs::kem::ML_KEM_768; line: `post_quantum: MLKEM768,`; code: `MLKEM768`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rustls-0.23.45/src/crypto/aws_lc_rs/pq/mod.rs:31:18 | rustls::crypto::aws_lc_rs::pq::MLKEM768 | [present] [via-static] in rustls::crypto::aws_lc_rs::pq::SECP256R1MLKEM768; rustls::crypto::aws_lc_rs::pq::MLKEM768 -> aws_lc_rs::kem::ML_KEM_768; line: `post_quantum: MLKEM768,`; code: `MLKEM768`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rustls-0.23.45/src/crypto/aws_lc_rs/pq/mod.rs:45:10 | aws_lc_rs::kem::ML_KEM_768 | [present] [static] in rustls::crypto::aws_lc_rs::pq::MLKEM768; line: `alg: &kem::ML_KEM_768,`; code: `kem::ML_KEM_768`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/mod.rs:51:13 | ring::rand::SecureRandom::fill | [present] [call] in <rustls::crypto::ring::Ring as rustls::crypto::SecureRandom>::fill; use: generate; line: `.fill(buf)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:65:13 | ring::rand::SecureRandom::fill | [present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:72:13 | ring::rand::SecureRandom::fill | [present] [call] in rustls::crypto::ring::ticketer::AeadTicketer::new; use: generate; line: `.fill(&mut key_name)`; code: `fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | rustls-0.23.45/src/crypto/ring/ticketer.rs:99:13 | ring::rand::SecureRandom::fill | [present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::encrypt; use: generate; line: `.fill(&mut nonce_buf)`; code: `fill`
   occ RSA | crypto:material:private-key:RSA | rustls-0.23.45/src/crypto/aws_lc_rs/sign.rs:118:43 | aws_lc_rs::rsa::key::KeyPair::from_der | [present] [call] in rustls::crypto::aws_lc_rs::sign::RsaSigningKey::new; from_der: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs1KeyDer::secret_pkcs1_der); line: `PrivateKeyDer::Pkcs1(pkcs1) => RsaKeyPair::from_der(pkcs1.secret_pkcs1_der()),`; code: `RsaKeyPair::from_der`
   occ RSA | crypto:material:private-key:RSA | rustls-0.23.45/src/crypto/aws_lc_rs/sign.rs:119:43 | aws_lc_rs::rsa::key::KeyPair::from_pkcs8 | [present] [call] in rustls::crypto::aws_lc_rs::sign::RsaSigningKey::new; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `PrivateKeyDer::Pkcs8(pkcs8) => RsaKeyPair::from_pkcs8(pkcs8.secret_pkcs8_der()),`; code: `RsaKeyPair::from_pkcs8`
   occ RSA | crypto:material:private-key:RSA | rustls-0.23.45/src/crypto/ring/sign.rs:104:43 | ring::rsa::keypair::KeyPair::from_der | [present] [call] in rustls::crypto::ring::sign::RsaSigningKey::new; from_der: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs1KeyDer::secret_pkcs1_der); line: `PrivateKeyDer::Pkcs1(pkcs1) => RsaKeyPair::from_der(pkcs1.secret_pkcs1_der()),`; code: `RsaKeyPair::from_der`
@@ -1364,6 +1368,13 @@
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=11
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=4
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
   prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
   prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
@@ -1528,6 +1539,7 @@ asset ML-DSA-65 | crypto:algorithm:ML-DSA-65 | {"algorithmProperties": {"algorit
 asset ML-DSA-87 | crypto:algorithm:ML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["sign", "verify"], "parameterSetIdentifier": "87", "primitive": "signature"}, "assetType": "algorithm"}
 asset ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "parameterSetIdentifier": "1024", "primitive": "kem"}, "assetType": "algorithm"}
 asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "parameterSetIdentifier": "768", "primitive": "kem"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
 asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
@@ -1619,6 +1631,7 @@ dependency crypto:algorithm:ML-DSA-65
 dependency crypto:algorithm:ML-DSA-87
 dependency crypto:algorithm:ML-KEM-1024
 dependency crypto:algorithm:ML-KEM-768
+dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
 dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-512
@@ -1708,6 +1721,7 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-512
