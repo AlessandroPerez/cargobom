@@ -1,0 +1,824 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a80 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a80 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a80 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a80::take_val; line: `fn take_val(slot: &mut &'static Digest) -> &'static Digest { std::mem::replace(slot, &SHA1) }`; code: `SHA1`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 86,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `a80::take_val`; line: `let _ = digest(x4, &d);`; code: `digest`",
+            "line": 76,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let old6 = std::mem::replace(&mut x6, &SHA1);`; code: `SHA1`",
+            "line": 82,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(x6, &d);`; code: `digest`",
+            "line": 84,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut a0 = A { alg: &SHA256 };`; code: `SHA256`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut a1 = A { alg: &SHA256 };`; code: `SHA256`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a1.alg, &d);`; code: `digest`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut a2 = A { alg: &SHA256 };`; code: `SHA256`",
+            "line": 52,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a80::put`; line: `let _ = digest(a2.alg, &d);`; code: `digest`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut a3 = A { alg: &SHA256 };`; code: `SHA256`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(a3.alg, &d);`; code: `digest`",
+            "line": 57,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x1: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a80::pick_slot`; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "line": 61,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x2: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a80::tuple_copy`; line: `let _ = digest(x2, &d);`; code: `digest`",
+            "line": 66,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x3: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a80::replace_ref`; line: `let _ = digest(x3, &d);`; code: `digest`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x4: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 73,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(t4, &d);`; code: `digest`",
+            "line": 75,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x5: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 77,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut x6: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 81,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(old6, &d);`; code: `digest`",
+            "line": 83,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "18"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a80::put; line: `fn put(a: &mut A) { *a.slot() = &SHA384; }`; code: `SHA384`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 33,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut o = Outer { b: B { alg: &SHA384 } };`; code: `SHA384`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(o.b.alg, &d);`; code: `digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut bx = Box::new(B { alg: &SHA384 });`; code: `SHA384`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(bx.alg, &d);`; code: `digest`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut b1 = B { alg: &SHA384 };`; code: `SHA384`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut b2 = B { alg: &SHA384 };`; code: `SHA384`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b2.alg, &d);`; code: `digest`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut b3 = B { alg: &SHA384 };`; code: `SHA384`",
+            "line": 48,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(b3.alg, &d);`; code: `digest`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `*a3.slot() = &SHA384;`; code: `SHA384`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `let _ = digest(a3.alg, &d);`; code: `digest`",
+            "line": 57,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut y1: &'static Digest = &SHA384;`; code: `SHA384`",
+            "line": 59,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `a80::pick_slot`; line: `let _ = digest(y1, &d);`; code: `digest`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut y2: &'static Digest = &SHA384;`; code: `SHA384`",
+            "line": 64,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `a80::tuple_copy`; line: `let _ = digest(y2, &d);`; code: `digest`",
+            "line": 67,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut y3: &'static Digest = &SHA384;`; code: `SHA384`",
+            "line": 69,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `a80::replace_ref`; line: `let _ = digest(y3, &d);`; code: `digest`",
+            "line": 72,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `let mut y5: &'static Digest = &SHA384;`; code: `SHA384`",
+            "line": 78,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`",
+            "line": 80,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "21"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in <a80::A as a80::Up>::up; line: `impl Up for A { fn up(&mut self) { self.alg = &SHA512; } }`; code: `SHA512`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::tuple_copy; line: `*s = &SHA512;`; code: `SHA512`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::replace_ref; line: `*slot = &SHA512;`; code: `SHA512`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a80::A as a80::Up>::up`; line: `let _ = digest(a1.alg, &d);`; code: `digest`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `<a80::A as a80::Up>::up` stores in the field); line: `let _ = digest(a2.alg, &d);`; code: `digest`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a80::main; line: `*pick_slot(&mut x1, &mut y1) = &SHA512;`; code: `SHA512`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "line": 61,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(y1, &d);`; code: `digest`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a80::A::slot` is not followed; line: `let _ = digest(a2.alg, &d);`; code: `digest`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a80::A::slot` is not followed; line: `let _ = digest(a3.alg, &d);`; code: `digest`",
+            "line": 57,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x2, &d);`; code: `digest`",
+            "line": 66,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(y2, &d);`; code: `digest`",
+            "line": 67,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x3, &d);`; code: `digest`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(y3, &d);`; code: `digest`",
+            "line": 72,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a80@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a80@0.1.0",
+      "name": "a80",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a80@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "92"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:9cd6b8c2-5c90-8cf6-81ed-9033ebfd771d",
+  "specVersion": "1.7",
+  "version": 1
+}

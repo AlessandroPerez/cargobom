@@ -514,6 +514,32 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     // outer asset -> components, from descriptor statics; applied to assets with evidence only
     let mut composition: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
 
+    // the calls the walk found in instances (`pick::<Fast>`'s `t.alg()`): the per-item scan's
+    // site at the same position, in the generic item's body, stands for no other instance of
+    // this build, and its arguments are not resolved for the types it runs with
+    let abs = |f: &CrateFacts, file: &str| {
+        let p = PathBuf::from(file);
+        if p.is_absolute() {
+            p
+        } else {
+            PathBuf::from(&f.krate.cwd).join(p)
+        }
+    };
+    let walked: HashSet<(PathBuf, usize, usize, String)> = facts
+        .iter()
+        .enumerate()
+        .flat_map(|(fi, f)| {
+            sites_of(fi).filter_map(move |s| match &s.target {
+                Target::Call { callee, .. } if s.tier == Tier::Reachable => Some((
+                    abs(f, &s.span.file),
+                    s.span.line,
+                    s.span.col,
+                    callee.path.clone(),
+                )),
+                _ => None,
+            })
+        })
+        .collect();
     for (fi, f) in facts.iter().enumerate() {
         let cwd = PathBuf::from(&f.krate.cwd);
         for site in sites_of(fi) {
@@ -521,6 +547,21 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 let p = PathBuf::from(&site.span.file);
                 if p.is_absolute() { p } else { cwd.join(p) }
             };
+            if let Target::Call { callee, .. } = &site.target
+                && site.tier == Tier::Present
+                && is_def_hash(&site.owner.id)
+                // (a closure's or `async` body's per-item site: its own arguments, as precise
+                // as an instance's, under the closure's name)
+                && !site.owner.path.contains("{closure")
+                && walked.contains(&(
+                    path.clone(),
+                    site.span.line,
+                    site.span.col,
+                    callee.path.clone(),
+                ))
+            {
+                continue;
+            }
             let tier = match site.owner.kind {
                 OwnerKind::Static if reachable_statics.contains(&site.owner.id) => Tier::Reachable,
                 OwnerKind::Static => Tier::Present,
@@ -1924,12 +1965,20 @@ fn site_matches(
             // hit its bound (what was found is not all)
             let unresolved = if out.is_empty() {
                 unresolved_operation(ctx, site)
-            } else if let Some(reason) = algorithm_cut(ctx, site) {
+            } else if let Some(reason) = algorithm_cut(ctx, site, reachable, reached_path) {
                 unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason, pr))
             } else {
                 None
             };
             if let Some((primitive, function, reason, provider)) = unresolved {
+                // the members found beside it are not all that may reach the call: none is
+                // the only one
+                let n = out.iter().filter(|o| !o.5).count();
+                for o in out.iter_mut().filter(|o| !o.5) {
+                    if let Some(s) = o.4.iter_mut().find(|s| s.starts_with("algorithm ")) {
+                        *s = beside_unknown(s, n);
+                    }
+                }
                 // a set-up call (`Md5::new()`): the algorithm is there, not used yet
                 let setup = function.is_empty();
                 let mut m = Match {
@@ -2198,7 +2247,12 @@ fn cut(o: &rcbom_facts::Origin) -> bool {
 /// Why the algorithms found for a value-selected operation are not all: the search was cut at
 /// its bound (a choice among more alternatives than the driver keeps), or a value it met is
 /// not followed.
-fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> Option<String> {
+fn algorithm_cut(
+    ctx: &Ctx<'_>,
+    site: &Site,
+    reachable: &dyn Fn(&str) -> bool,
+    reached_path: &dyn Fn(&str) -> bool,
+) -> Option<String> {
     let Target::Call {
         callee,
         arg_origins,
@@ -2231,11 +2285,48 @@ fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> Option<String> {
                         .to_string(),
                 )
             } else {
-                unfollowed(ctx, site, o).map(|r| {
+                unfollowed(ctx, site, o, &|v| {
+                    boundary::reached(v, reachable, reached_path)
+                })
+                .map(|r| {
                     format!("other algorithms than these may reach the call: {r} is not followed")
                 })
             }
         })
+}
+
+/// A member's algorithm sentence when the set found has an unknown beside it (others may reach
+/// the call): never "the only one" (`from X`), always one of those found.
+fn beside_unknown(s: &str, n: usize) -> String {
+    const BESIDE: &str = ", beside others not followed";
+    if s.contains(BESIDE) {
+        return s.to_string();
+    }
+    let local = s.ends_with(" in the arguments");
+    if let Some(rest) = s.strip_prefix("algorithm one of ")
+        && let Some((head, member)) = rest.split_once(": ")
+        && !head.starts_with("the ")
+    {
+        return format!("algorithm one of {head}{BESIDE}: {member}");
+    }
+    let member = s
+        .strip_prefix("algorithm from ")
+        .or_else(|| s.strip_prefix("algorithm possibly from "))
+        .map(|r| {
+            r.trim_end_matches(" in the arguments")
+                .split(", ")
+                .next()
+                .unwrap_or(r)
+        });
+    match member {
+        Some(m) if local => {
+            format!("algorithm one of {n} that may reach the call{BESIDE}: {m} in the arguments")
+        }
+        Some(m) => format!(
+            "algorithm one of {n} that may reach the call from other functions{BESIDE}: {m}"
+        ),
+        None => s.to_string(),
+    }
 }
 
 /// An alternative of the algorithm argument `o` (read at `site`), once the values from
@@ -2244,7 +2335,12 @@ fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> Option<String> {
 /// closure's that writes the variable, a function writing through an `Option<&mut>`, a trait
 /// method on a type whose implementation records nothing). What it is, if any: the algorithms
 /// found beside it are not all.
-fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<String> {
+fn unfollowed(
+    ctx: &Ctx<'_>,
+    site: &Site,
+    o: &rcbom_facts::Origin,
+    live: &dyn Fn(&links::Via) -> bool,
+) -> Option<String> {
     use rcbom_facts::Origin;
     type Seen = HashSet<(Origin, String)>;
     fn leaf(
@@ -2253,6 +2349,7 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
         owner: &str,
         depth: usize,
         seen: &mut Seen,
+        live: &dyn Fn(&links::Via) -> bool,
     ) -> Option<String> {
         if depth > 10 {
             return None;
@@ -2263,15 +2360,15 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
             | Origin::Unit { .. }
             | Origin::Const { .. }
             | Origin::Truncated => None,
-            Origin::Any(v) | Origin::All(v) => {
-                v.iter().find_map(|a| leaf(ctx, a, owner, depth + 1, seen))
-            }
-            Origin::Set { value, .. } => leaf(ctx, value, owner, depth + 1, seen),
+            Origin::Any(v) | Origin::All(v) => v
+                .iter()
+                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live)),
+            Origin::Set { value, .. } => leaf(ctx, value, owner, depth + 1, seen, live),
             // the error a `?` returns: no value
             Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => None,
             Origin::Call { callee, args, .. } if callee == "<closure>" => args
                 .iter()
-                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen)),
+                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live)),
             // a crypto crate's getter for the algorithm a value was made with is followed to
             // the value (`ctx.algorithm()`); another of its calls returning an algorithm
             // (`algorithm().digest_algorithm()`) is not
@@ -2315,20 +2412,26 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
                 .iter()
                 .any(|m| bare.ends_with(m));
                 let map_store = bare.ends_with("Map::insert");
+                // what a closure makes of an `Option`'s value: not the value itself; the value
+                // a place held before a call replaced it: not the new value
+                let mapped = provenance::std_map(callee);
+                let old = provenance::std_old_value(callee);
                 args.iter()
                     .enumerate()
                     .filter(|(i, _)| {
                         if read {
                             *i == 0
                         } else {
-                            !(map_store && *i == 1)
+                            !(map_store && *i == 1) && !(mapped && *i == 0) && !(old && *i > 0)
                         }
                     })
-                    .find_map(|(_, a)| leaf(ctx, a, owner, depth + 1, seen))
+                    .find_map(|(_, a)| leaf(ctx, a, owner, depth + 1, seen, live))
             }
             // an iterator advanced by `next` (`for a in DIGESTS.iter()`): its elements are the
             // container's, followed beside it
             Origin::Through { callee } if callee.ends_with("Iterator::next") => None,
+            // the marker of a value written into an element (the value is beside it, followed)
+            Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE => None,
             Origin::Unknown | Origin::Loop | Origin::Through { .. } => Some(unresolved_kind(o)),
             // a value from elsewhere: what reaches it, followed; the value itself among them is
             // one the links could not follow (a trait object's type whose method records
@@ -2337,20 +2440,22 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
                 if !seen.insert((o.clone(), owner.to_string())) {
                     return None;
                 }
-                match ctx.flow.values(o, owner) {
+                // (only the values that reach the call: not a caller no entry point reaches)
+                match ctx.flow.values_via(o, owner) {
                     Some(vs) => {
-                        if vs.iter().any(|(v, w)| v == o && w == owner) {
+                        let vs: Vec<_> = vs.into_iter().filter(|(_, _, by)| live(by)).collect();
+                        if vs.iter().any(|(v, w, _)| v == o && w == owner) {
                             return Some(unresolved_kind(o));
                         }
                         vs.iter()
-                            .find_map(|(v, w)| leaf(ctx, v, w, depth + 1, seen))
+                            .find_map(|(v, w, _)| leaf(ctx, v, w, depth + 1, seen, live))
                     }
                     None => Some(unresolved_kind(o)),
                 }
             }
         }
     }
-    leaf(ctx, o, &site.owner.path, 0, &mut HashSet::new())
+    leaf(ctx, o, &site.owner.path, 0, &mut HashSet::new(), live)
 }
 
 /// Do the values that reach `o` from elsewhere (read at `site`) include a cut (`Truncated`: in
@@ -2575,6 +2680,9 @@ fn unresolved_kind(o: &rcbom_facts::Origin) -> String {
         Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
         Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
         Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),
+        Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE => {
+            "a value written into an element of a list".into()
+        }
         Origin::Through { callee } => format!("a value written through `{}`", short(callee)),
         Origin::Data { def, .. } => {
             format!("`{}`, which leads to no single algorithm", short(&def.path))

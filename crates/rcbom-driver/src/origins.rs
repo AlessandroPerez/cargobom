@@ -445,8 +445,11 @@ impl Flow {
             // the writes come later, through that value; not a store into a standard-library
             // container, whose result is the value it replaced (`map.insert(k, (alg, &key[..]))`
             // returns an `Option<(Algorithm, &[u8])>`, no borrow of the map)
+            // (a function of this crate writes through its `&mut` parameter as its summary
+            // says, whatever it returns: `take_val(&mut x)` doing `mem::replace(slot, v)`)
             let through = !returns_mut_ref(body, place)
                 && holds_borrow(body, place)
+                && !local_fn(func)
                 && !callee_name(body, func).is_some_and(|c| std_store(&c));
             // a call that writes the whole buffer it is given (`rng.fill_bytes(nonce)`,
             // `read_exact(buf)`): what was there before is gone
@@ -802,7 +805,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                         variant = None;
                     }
                     rustc_middle::ty::Tuple(ts) => match ts.get(*f) {
-                        Some(t) => ty = *t,
+                        Some(t) => {
+                            // an element of a tuple held by a static or a constant
+                            // (`PAIRS[i].0`): what its initializer puts there
+                            if matches!(o, Origin::Data { .. }) {
+                                o = Origin::Field {
+                                    adt: rcbom_facts::TUPLE.to_string(),
+                                    field: *f,
+                                    base: Box::new(o),
+                                    args: None,
+                                };
+                            }
+                            ty = *t
+                        }
                         None => break,
                     },
                     _ => break,
@@ -1152,6 +1167,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 (&mut alts, path[d.path.len()..].to_vec())
             } else if is_prefix(&path, &d.path) {
                 (&mut parts, Vec::new())
+            } else if let Some(f) = part_overlap(&d.path, &path) {
+                // a write through a borrow a function returned (`*a.slot() = v`) where the read
+                // is of a part (`a.alg`): it may be the part written, or not
+                let o = self.def_origin(d, &[], depth, seen);
+                let o = Origin::Any(vec![o, Origin::Through { callee: f }]);
+                if !alts.contains(&o) {
+                    alts.push(o);
+                }
+                continue;
             } else {
                 continue;
             };
@@ -1185,6 +1209,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     path: fields,
                     value: Box::new(o),
                     strong,
+                };
+            } else if part && let Some(fields) = fields_to_element(&d.path[path.len()..]) {
+                // a write to an element of a field (`v.algorithms[0] = RS512`): one of the
+                // values the field holds, beside the others
+                o = Origin::Set {
+                    path: fields,
+                    value: Box::new(Origin::Any(vec![
+                        o,
+                        Origin::Through {
+                            callee: rcbom_facts::ELEMENT_WRITE.to_string(),
+                        },
+                    ])),
+                    strong: false,
                 };
             }
             if !list.contains(&o) {
@@ -1247,22 +1284,45 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         if depth >= MAX_DEPTH {
             return Some(Origin::Truncated);
         }
-        let args = args
+        let mut args: Vec<Origin> = args
             .iter()
             .take(MAX_WIDTH)
             .map(|a| self.operand(a, d.at, depth + 1, seen))
             .collect();
+        // the value before is the place's own (`u.up()` with `u` pointing to `a1` or `b3`: for
+        // `a1`, `a1`'s value, not the pointer's either), when the pointer may point to several
+        if !d.sole
+            && let Some(a) = args.get_mut(*index)
+        {
+            *a = self.place(d.local, d.path.clone(), d.at, depth + 1, seen);
+        }
         let gargs = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
             Some(TyKind::RigidTy(RigidTy::FnDef(_, g))) => rustc_internal::internal(self.tcx, g),
             _ => return None,
         };
         let place = walk_ty(self.tcx, self.local_ty(d.local), &d.path);
         let (callee, self_ty) = write_callee(self.tcx, did, gargs, Some(place));
+        // a function taking the place as a trait object (`fn up_dyn(u: &mut dyn Up)` on a
+        // `B`): the object's type, which its trait-object calls dispatch on
+        let takes_dyn = self_ty.is_none()
+            && self
+                .tcx
+                .fn_sig(did)
+                .instantiate(self.tcx, gargs)
+                .skip_binder()
+                .inputs()
+                .get(*index)
+                .and_then(|t| t.builtin_deref(true))
+                .is_some_and(|t| matches!(t.kind(), rustc_middle::ty::Dynamic(..)));
+        let place_ty = takes_dyn
+            .then(|| crate::type_name(self.tcx, place))
+            .flatten();
         Some(Origin::Written {
             callee,
             index: *index,
             args,
             self_ty,
+            place_ty,
         })
     }
 
@@ -1425,6 +1485,16 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 Some((def, gargs, _)) => {
                     let did = rustc_internal::internal(self.tcx, def.def_id());
                     let gargs = rustc_internal::internal(self.tcx, gargs);
+                    // a generic function made a pointer (`let f = pick::<Fast>; f(..)`): its
+                    // instance
+                    runs = runs_of(self.tcx, did, gargs).or_else(|| {
+                        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+                        rustc_middle::ty::Instance::try_resolve(self.tcx, env, did, gargs)
+                            .ok()
+                            .flatten()
+                            .and_then(|i| body_name(self.tcx, i))
+                            .filter(|n| *n != path_of(self.tcx, did))
+                    });
                     (
                         path_of(self.tcx, did),
                         self.tcx.crate_name(did.krate).to_string(),
@@ -1527,6 +1597,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 p.extend_from_slice(rest.strip_prefix(&[Step::Deref]).unwrap_or(&[]));
                 self.place(q.local, p, at, depth, seen)
             }
+            // an element of `[E { .. }; 2]`, or a part of it
+            Rvalue::Repeat(Operand::Copy(q) | Operand::Move(q), _)
+                if matches!(rest.first(), Some(Step::Elem | Step::Index(_))) =>
+            {
+                let mut p = path_of_place(q);
+                p.extend_from_slice(&rest[1..]);
+                self.place(q.local, p, at, depth, seen)
+            }
             // `[0u8; 12]`
             Rvalue::Repeat(op, n) => match op {
                 Operand::Constant(c) => Origin::Const {
@@ -1589,6 +1667,27 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             (_, [Step::Field(f), ..]) => Some((*f, &rest[1..])),
             // one element of an array literal at a known index (`let [a, _b] = [x, lit];`)
             (AggregateKind::Array(_), [Step::Index(i), ..]) => Some((*i, &rest[1..])),
+            // at an index not known (`arr[i].h`): that part of one of them
+            (AggregateKind::Array(_), [Step::Elem, tail @ ..]) if !tail.is_empty() => {
+                let mut alts = Vec::new();
+                for op in ops.iter().take(MAX_WIDTH) {
+                    let o = match op {
+                        Operand::Copy(q) | Operand::Move(q) => {
+                            let mut p = path_of_place(q);
+                            p.extend_from_slice(tail);
+                            self.place(q.local, p, at, depth + 1, seen)
+                        }
+                        _ => self.operand(op, at, depth + 1, seen),
+                    };
+                    if !alts.contains(&o) {
+                        alts.push(o);
+                    }
+                }
+                return match alts.len() {
+                    1 => alts.pop().unwrap_or(Origin::Unknown),
+                    _ => Origin::Any(alts),
+                };
+            }
             _ => None,
         };
         if let Some((f, tail)) = field
@@ -1962,6 +2061,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     rustc_internal::internal(self.tcx, &u.args),
                     u.promoted.map(rustc_middle::mir::Promoted::from_u32),
                 );
+                // a named constant array or slice of an enum's variants (`const RSA_ALGS:
+                // &[Algorithm] = &[RS256, RS384]`): those variants
+                if let Some(v) = self.evaluate(uneval) {
+                    let c: rustc_public::ty::MirConst = rustc_internal::stable(
+                        rustc_middle::mir::Const::Val(v, rustc_internal::internal(self.tcx, ty)),
+                    );
+                    if let ConstantKind::Allocated(a) = c.kind()
+                        && let Some(o) = self.enum_elements(a, &ty)
+                    {
+                        return o;
+                    }
+                }
                 self.unevaluated(uneval, &ty, None, int_ty)
                     .unwrap_or_else(|| {
                         // a promoted literal (`&[0; 32]` in an item body): its data, as an
@@ -2369,6 +2480,16 @@ fn walk_ty<'tcx>(
     ty
 }
 
+/// Does a write to `def` (a place with an unknown part, `Step::Part`) overlap the read of
+/// `read` beyond their common prefix: the function whose borrow points there.
+fn part_overlap(def: &[Step], read: &[Step]) -> Option<String> {
+    let j = def.iter().zip(read).take_while(|(a, b)| a.same(b)).count();
+    match (def.get(j), read.get(j)) {
+        (Some(Step::Part(f)), Some(_)) => Some(f.clone()),
+        _ => None,
+    }
+}
+
 fn is_prefix(a: &[Step], b: &[Step]) -> bool {
     b.len() >= a.len() && a.iter().zip(b).all(|(x, y)| x.same(y))
 }
@@ -2489,7 +2610,7 @@ impl Pointees<'_> {
     /// box read through a reference (`_28 = copy (*_4)`), the box the reference points to.
     fn same_box(&self, local: Local, path: Path, depth: usize) -> Vec<(Local, Path)> {
         let mut out = vec![(local, path.clone())];
-        if depth > 6 || !path.is_empty() {
+        if depth > MAX_PATH || !path.is_empty() {
             return out;
         }
         for k in self.direct.get(&local).into_iter().flatten() {
@@ -2517,7 +2638,7 @@ impl Pointees<'_> {
 
     /// Places that `local.path` (a reference or raw pointer) points to.
     fn targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<Target> {
-        if depth > 6 || !path.is_empty() {
+        if depth > MAX_PATH || !path.is_empty() {
             return Vec::new();
         }
         let mut out = Vec::new();
@@ -3030,11 +3151,20 @@ pub(crate) fn self_adt_path<'tcx>(
 }
 
 thread_local! {
-    /// The instances of this crate's generic functions (a trait's default body among them)
-    /// that a summary names (`body_name`), by name: the driver records their summaries under
-    /// that name (`links::instance_links`).
+    /// The instances of the program's generic functions (a trait's default body, a closure
+    /// inside a generic function among them) that a summary names (`body_name`), by name: the
+    /// driver records their summaries under that name (`links::instance_links`).
     static INSTANCES: RefCell<Vec<(String, rustc_public::mir::mono::Instance)>> =
         const { RefCell::new(Vec::new()) };
+    /// The crates whose generic items are named per instance: the program's, not the standard
+    /// library's nor the stop crates' (set once per compilation).
+    static SUMMARISED: RefCell<HashSet<rustc_span::def_id::CrateNum>> =
+        RefCell::new(HashSet::new());
+}
+
+/// Sets the crates whose generic items' instances are summarised (`SUMMARISED`).
+pub(crate) fn set_summarised(crates: HashSet<rustc_span::def_id::CrateNum>) {
+    SUMMARISED.with(|s| *s.borrow_mut() = crates);
 }
 
 /// The instances `body_name` named since the last call.
@@ -3043,10 +3173,12 @@ pub(crate) fn take_instances() -> Vec<(String, rustc_public::mir::mono::Instance
 }
 
 /// The name of the body a call runs as the links name it: an item's defining path
-/// (`<app::Fast as app::Pick>::alg`), or, for an item of this crate with generic parameters (a
-/// generic function, a trait's default body, a generic impl's method), the instance's
+/// (`<app::Fast as app::Pick>::alg`), or, for an item of the program with generic parameters (a
+/// generic function, a trait's default body, a generic impl's method, a closure inside one), of
+/// this crate or another of the program's (`SUMMARISED`), the instance's
 /// (`app::pick::<app::Fast>`, `<app::Legacy as app::Pick>::alg`), whose summaries the driver
-/// records; `None` for another crate's generic item, and for an instance still generic.
+/// records; `None` for a standard-library or stop crate's generic item, and for an instance
+/// still generic.
 pub(crate) fn body_name<'tcx>(
     tcx: TyCtxt<'tcx>,
     inst: rustc_middle::ty::Instance<'tcx>,
@@ -3062,8 +3194,18 @@ pub(crate) fn body_name<'tcx>(
     if !tcx.generics_of(def).requires_monomorphization(tcx) {
         return Some(path_of(tcx, def));
     }
-    if !def.is_local() || inst.args.has_non_region_param() || tcx.is_closure_like(def) {
+    let summarised = SUMMARISED.with(|s| s.borrow().contains(&def.krate));
+    if !(def.is_local() || summarised) || inst.args.has_non_region_param() {
         return None;
+    }
+    // a closure: only inside a generic function, whose instance it depends on (one of a
+    // monomorphic function is its item, as the per-item links have it)
+    if tcx.is_closure_like(def)
+        && !tcx
+            .generics_of(tcx.typeck_root_def_id(def))
+            .requires_monomorphization(tcx)
+    {
+        return Some(path_of(tcx, def));
     }
     let args = tcx.erase_and_anonymize_regions(inst.args);
     let p = with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(
@@ -3222,6 +3364,22 @@ fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option<u64>, bool
 }
 
 /// The field indices of a path made of fields only (`.alg`, `.0.key`).
+/// The fields leading to an element written (`.algorithms` of `v.algorithms[0]`: fields, then
+/// a dereference or an element step, with an element step among the rest).
+fn fields_to_element(steps: &[Step]) -> Option<Vec<usize>> {
+    let n = steps
+        .iter()
+        .take_while(|s| matches!(s, Step::Field(_)))
+        .count();
+    let (fields, rest) = steps.split_at(n);
+    (n > 0
+        && rest
+            .iter()
+            .any(|s| matches!(s, Step::Elem | Step::Index(_))))
+    .then(|| field_steps(fields))
+    .flatten()
+}
+
 fn field_steps(steps: &[Step]) -> Option<Vec<usize>> {
     steps
         .iter()

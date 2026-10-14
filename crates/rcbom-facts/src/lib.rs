@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 20;
+pub const FACTS_VERSION: u32 = 21;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -16,9 +16,28 @@ pub fn static_owner(path: &str, id: &str) -> String {
     format!("static {path} {id}")
 }
 
-/// The path and id of the static an owner names (`static_owner`).
+/// The `Origin::Through::callee` of a write into an element of a field holding a list
+/// (`v.algorithms[0] = RS512`, `*v.algorithms.first_mut().unwrap() = ..`): the value written is
+/// one of the list's, beside the others.
+pub const ELEMENT_WRITE: &str = "<element write>";
+
+/// The `FieldStore::adt` and `Origin::Field::adt` of a tuple's element, recorded only in a
+/// static's or a constant's initializer and read only from that static (`PAIRS[i].0`).
+pub const TUPLE: &str = "(tuple)";
+
+/// How the links name a named constant's initializer as the owner of what it stores, as
+/// `static_owner` does a static's.
+pub fn const_owner(path: &str, id: &str) -> String {
+    format!("const {path} {id}")
+}
+
+/// The path and id of the static (or named constant) an owner names (`static_owner`,
+/// `const_owner`).
 pub fn owner_static(owner: &str) -> Option<(&str, &str)> {
-    owner.strip_prefix("static ")?.rsplit_once(' ')
+    owner
+        .strip_prefix("static ")
+        .or_else(|| owner.strip_prefix("const "))?
+        .rsplit_once(' ')
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -79,6 +98,10 @@ pub struct Links {
     /// `dyn Source` (an `Origin::Call` whose `self_ty` is `dyn <trait>`) may run.
     #[serde(default)]
     pub coercions: Vec<Coercion>,
+    /// Instances (`origins::body_name`) whose summaries the instance bound left unrecorded: a
+    /// call or a write through one of them is cut, not "returns or writes nothing".
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub truncated: Vec<String>,
 }
 
 /// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn <trait>`
@@ -140,8 +163,18 @@ impl Links {
                             x.values.push(v);
                         }
                     }
+                    for w in s.writers {
+                        if !x.writers.contains(&w) {
+                            x.writers.push(w);
+                        }
+                    }
                 }
                 None => self.statics.push(s),
+            }
+        }
+        for t in other.truncated {
+            if !self.truncated.contains(&t) {
+                self.truncated.push(t);
             }
         }
     }
@@ -202,6 +235,10 @@ pub struct StaticValue {
     /// atomic): it is not data compiled in.
     pub mutable: bool,
     pub values: Vec<Origin>,
+    /// Of `values`, those a function of the program puts there at run time, with the function
+    /// (by defining path): a value only dead code stores is none the static holds.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub writers: Vec<(String, Origin)>,
 }
 
 /// `owner` (a static) holds a pointer to `target` in its evaluated value.
@@ -453,6 +490,11 @@ pub enum Origin {
         args: Vec<Origin>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         self_ty: Option<String>,
+        /// The type of the place written, when the function takes it as a trait object (`fn
+        /// up_dyn(u: &mut dyn Up)` called with `&mut b`, a `B`: `app::B`): the trait-object
+        /// calls inside write with that type's implementation.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        place_ty: Option<String>,
     },
     /// A write of `value` into field `path` of the value it is a part of (`h.alg =
     /// Algorithm::HS384` after `let mut h = Header::default()`), as a part of an `All`. `strong`:
@@ -518,11 +560,13 @@ impl Origin {
                 index,
                 args,
                 self_ty,
+                place_ty,
             } => Origin::Written {
                 callee,
                 index,
                 args: args.into_iter().map(|a| a.params_of(owner)).collect(),
                 self_ty,
+                place_ty,
             },
             Origin::Any(v) => Origin::Any(v.into_iter().map(|a| a.params_of(owner)).collect()),
             Origin::All(v) => Origin::All(v.into_iter().map(|a| a.params_of(owner)).collect()),
@@ -579,11 +623,13 @@ impl Origin {
                 index,
                 args,
                 self_ty,
+                place_ty,
             } => Origin::Written {
                 callee,
                 index,
                 args: cap(args),
                 self_ty,
+                place_ty,
             },
             Origin::Any(v) => Origin::Any(cap(v)),
             Origin::All(v) => Origin::All(cap(v)),

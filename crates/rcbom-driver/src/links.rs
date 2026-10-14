@@ -13,7 +13,7 @@ use std::collections::{HashMap, HashSet};
 use rcbom_facts::{FieldStore, Links, LocalCall, Origin, ParamWrite, Returned, StaticValue};
 use rustc_middle::ty::{Ty, TypeVisitableExt};
 use rustc_public::mir::{
-    AggregateKind, Body, ProjectionElem, Rvalue, StatementKind, TerminatorKind,
+    AggregateKind, Body, Operand, ProjectionElem, Rvalue, StatementKind, TerminatorKind,
 };
 use rustc_public::{CrateDef, rustc_internal};
 use rustc_span::def_id::DefId;
@@ -155,6 +155,11 @@ pub(crate) fn body_links(
     // a fill through `&mut` can only reach a mutable static the body names
     let fills_static = names_mutable_static(cx, body);
     let static_init = !func && matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. });
+    let const_init = !func
+        && matches!(
+            tcx.def_kind(did),
+            rustc_hir::def::DefKind::Const | rustc_hir::def::DefKind::AssocConst
+        );
     // whose parameters the values recorded name; a static's initializer names its static (a
     // value stored there reaches a call only if the static is reachable)
     let here = if let Some(name) = instance {
@@ -163,6 +168,8 @@ pub(crate) fn body_links(
         path_of(tcx, did)
     } else if static_init {
         rcbom_facts::static_owner(&path_of(tcx, did), &def_ref_internal(tcx, did).id)
+    } else if const_init {
+        rcbom_facts::const_owner(&path_of(tcx, did), &def_ref_internal(tcx, did).id)
     } else {
         String::new()
     };
@@ -196,6 +203,26 @@ pub(crate) fn body_links(
             // `S { f: v }`, `E::V(v)`: what each part of `v` that can carry an algorithm or a key
             // is, in the struct or in the enum's variant (`KeyPairKind::Ec(kp)`), as
             // `Origin::Field` names them
+            // `(&SHA256, &SHA1)` in a static's or a constant's initializer: what each element
+            // is, as a field of the tuple (read as such from that static only)
+            if let Rvalue::Aggregate(AggregateKind::Tuple, ops) = rv
+                && (static_init || const_init)
+            {
+                for (f, op) in ops.iter().enumerate() {
+                    let value = origins.operand_part_at(op, &[], bb, idx);
+                    if !empty(&value) {
+                        out.fields.push(FieldStore {
+                            adt: rcbom_facts::TUPLE.to_string(),
+                            path: vec![f],
+                            value,
+                            func: here.clone(),
+                            via_ref: false,
+                            args: None,
+                        });
+                    }
+                }
+                continue;
+            }
             if let Rvalue::Aggregate(AggregateKind::Adt(def, variant, args, ..), ops) = rv {
                 let adt_did = rustc_internal::internal(tcx, def.def_id());
                 let adt = tcx.adt_def(adt_did);
@@ -238,8 +265,27 @@ pub(crate) fn body_links(
                 };
                 let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
                 if let Some(def) = static_behind(&ptr) {
-                    let value = origins.rvalue_part_at(rv, stmt.source_info.span, &[], bb, idx);
-                    push_static(out, def, value);
+                    let mut value = origins.rvalue_part_at(rv, stmt.source_info.span, &[], bb, idx);
+                    // into a field of it (`CFG.lock().unwrap().h = v`): that field
+                    let fields: Option<Vec<usize>> = place.projection[1..]
+                        .iter()
+                        .map(|e| match e {
+                            ProjectionElem::Field(f, _) => Some(*f),
+                            _ => None,
+                        })
+                        .collect();
+                    match fields {
+                        Some(f) if !f.is_empty() => {
+                            value = Origin::Set {
+                                path: f,
+                                value: Box::new(value),
+                                strong: false,
+                            }
+                        }
+                        Some(_) => {}
+                        None => value = Origin::Unknown,
+                    }
+                    push_static(out, def, value, &here);
                 }
             }
             let span = stmt.source_info.span;
@@ -342,7 +388,7 @@ pub(crate) fn body_links(
                 && let Origin::Data { def, .. } = origins.operand_at(s, bb, idx)
             {
                 let value = origins.closure_value(v, bb, idx);
-                push_static(out, def, value);
+                push_static(out, def, value, &here);
             }
         }
         if static_init
@@ -351,7 +397,7 @@ pub(crate) fn body_links(
             && let Some(f) = args.first()
         {
             let value = origins.closure_value(f, bb, idx);
-            push_static(out, def_ref_internal(tcx, did), value);
+            push_static(out, def_ref_internal(tcx, did), value, "");
         }
         // a call that fills a static through `&mut` (`rng.fill_bytes(&mut SK)` on a
         // `static mut`): kept for the statics marked mutable (`mutable_statics`)
@@ -373,7 +419,7 @@ pub(crate) fn body_links(
                         span: None,
                         runs: None,
                     };
-                    push_static(out, def, call);
+                    push_static(out, def, call, &here);
                 }
             }
         }
@@ -407,6 +453,7 @@ pub(crate) fn body_links(
                         .map(|a| origins.operand_at(a, bb, idx))
                         .collect(),
                     self_ty,
+                    place_ty: None,
                 })
             } else {
                 None
@@ -431,7 +478,7 @@ pub(crate) fn body_links(
             if (program || (std_call && i == 0))
                 && let Some(def) = static_behind(&origins.operand_at(a, bb, idx))
             {
-                push_static(out, def, w.clone());
+                push_static(out, def, w.clone(), &here);
             }
         }
         // `lazy_static!`: its `Lazy::get(&LAZY, __static_ref_initialize)` puts what the
@@ -441,7 +488,7 @@ pub(crate) fn body_links(
             && let (Some(s), Some(f)) = (args.first(), args.get(1))
             && let Origin::Data { def, .. } = origins.operand_at(s, bb, idx)
         {
-            push_static(out, def, origins.closure_value(f, bb, idx));
+            push_static(out, def, origins.closure_value(f, bb, idx), "");
         }
         // a call of a closure of this crate (`f(&SHA512, d)` is `Fn::call(&f, (&SHA512, d))`):
         // its parameters receive the tuple's elements, numbered from its first declared one
@@ -524,17 +571,25 @@ pub(crate) fn body_links(
         // the initializer itself, not one of its promoted constants
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
         if !lazy && tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty) {
-            push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
+            push_static(
+                out,
+                def_ref_internal(tcx, did),
+                origins.returned_part(&[]),
+                "",
+            );
         }
     } else if static_init {
         // a static holding a function pointer (`static MY: HashFn = my`, `static B: &HashFn =
         // &A`): its value, for the calls through it
         let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
-        if holds_fn_ptr(tcx, ty, 0)
-            && tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty)
-        {
-            push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
+        if tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty) {
+            let value = origins.returned_part(&[]);
+            // or a reference to another static (`static REF: &Cfg = &FIX`): a field read of
+            // it is that static's
+            if holds_fn_ptr(tcx, ty, 0) || matches!(value, Origin::Data { .. }) {
+                push_static(out, def_ref_internal(tcx, did), value, "");
+            }
         }
     }
     // what a `&mut` parameter points to at the returns (`set_slot(slot)`: `*slot = &SHA512`;
@@ -546,15 +601,40 @@ pub(crate) fn body_links(
     // (or lends the parameter itself as `&mut`: `mem::swap(&mut slot, &mut other)`)
     let redirected =
         mut_params.iter().any(|&index| {
-            body.blocks.iter().flat_map(|b| &b.statements).any(|st| match &st.kind {
-            StatementKind::Assign(p, rv) => {
-                (p.local == index + 1 && p.projection.is_empty())
-                    || matches!(rv, Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
-                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q)
-                        if q.local == index + 1 && q.projection.is_empty())
+            let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
+            // the locals holding a copy of the parameter's pointer (`let s = slot;`), its own first
+            let mut copies: HashSet<rustc_public::mir::Local> = HashSet::from([index + 1]);
+            loop {
+                let before = copies.len();
+                for st in stmts() {
+                    if let StatementKind::Assign(
+                        p,
+                        Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _),
+                    ) = &st.kind
+                        && p.projection.is_empty()
+                        && q.projection.is_empty()
+                        && copies.contains(&q.local)
+                    {
+                        copies.insert(p.local);
+                    }
+                }
+                if copies.len() == before {
+                    break;
+                }
             }
-            _ => false,
-        })
+            let copy =
+                |q: &rustc_public::mir::Place| q.projection.is_empty() && copies.contains(&q.local);
+            stmts().any(|st| match &st.kind {
+                StatementKind::Assign(p, rv) => {
+                    (p.local == index + 1 && p.projection.is_empty())
+                    || matches!(rv, Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q) if copy(q))
+                    // or moved into an aggregate (`let (s, _o) = (slot, other)`)
+                    || matches!(rv, Rvalue::Aggregate(_, ops) if ops.iter().any(|o| matches!(o,
+                        Operand::Copy(q) | Operand::Move(q) if copy(q))))
+                }
+                _ => false,
+            })
         });
     for &index in &mut_params {
         let entry = Origin::Param { index, owner: None };
@@ -622,15 +702,27 @@ pub(crate) fn body_links(
 pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
     const MAX_INSTANCES: usize = 4096;
     let mut done = HashSet::new();
+    // the instances named but not summarised (past the bound, or whose analysis panicked):
+    // a summary that is missing is a cut
+    let cut = |name: String, out: &mut Links| {
+        if !out.truncated.contains(&name) {
+            out.truncated.push(name);
+        }
+    };
     loop {
         let todo = crate::origins::take_instances();
-        if todo.is_empty() || done.len() >= MAX_INSTANCES {
+        if todo.is_empty() {
             break;
         }
         for (name, inst) in todo {
-            if done.len() >= MAX_INSTANCES || !done.insert(name.clone()) {
+            if done.contains(&name) {
                 continue;
             }
+            if done.len() >= MAX_INSTANCES {
+                cut(name, out);
+                continue;
+            }
+            done.insert(name.clone());
             let did = rustc_internal::internal(cx.tcx, inst.def.def_id());
             if cx.stop_crate(did.krate) {
                 continue;
@@ -644,8 +736,9 @@ pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
                 l.statics.clear();
                 l
             }));
-            if let Ok(l) = r {
-                out.merge(l);
+            match r {
+                Ok(l) => out.merge(l),
+                Err(_) => cut(name, out),
             }
         }
     }
@@ -859,11 +952,13 @@ fn unrecurse(o: Origin, here: &str) -> Origin {
             index,
             args,
             self_ty,
+            place_ty,
         } => Origin::Written {
             callee,
             index,
             args: go(args),
             self_ty,
+            place_ty,
         },
         Origin::Any(v) => Origin::Any(go(v)),
         Origin::All(v) => Origin::All(go(v)),
@@ -1091,21 +1186,30 @@ fn holds_fn_ptr<'tcx>(tcx: rustc_middle::ty::TyCtxt<'tcx>, ty: Ty<'tcx>, depth: 
     }
 }
 
-fn push_static(out: &mut Links, def: rcbom_facts::DefRef, value: Origin) {
+/// A value static `def` holds: its initializer's (`writer` empty), or one function `writer`
+/// puts there at run time.
+fn push_static(out: &mut Links, def: rcbom_facts::DefRef, value: Origin, writer: &str) {
     if empty(&value) {
         return;
     }
-    match out.statics.iter_mut().find(|s| s.def.id == def.id) {
-        Some(s) => {
-            if !s.values.contains(&value) {
-                s.values.push(value);
-            }
+    let i = match out.statics.iter().position(|s| s.def.id == def.id) {
+        Some(i) => i,
+        None => {
+            out.statics.push(StaticValue {
+                def,
+                mutable: false,
+                values: Vec::new(),
+                writers: Vec::new(),
+            });
+            out.statics.len() - 1
         }
-        None => out.statics.push(StaticValue {
-            def,
-            mutable: false,
-            values: vec![value],
-        }),
+    };
+    let s = &mut out.statics[i];
+    if !writer.is_empty() && !s.writers.contains(&(writer.to_string(), value.clone())) {
+        s.writers.push((writer.to_string(), value.clone()));
+    }
+    if !s.values.contains(&value) {
+        s.values.push(value);
     }
 }
 
@@ -1124,6 +1228,7 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
                 def: def.clone(),
                 mutable: true,
                 values: Vec::new(),
+                writers: Vec::new(),
             }),
         }
         // a `thread_local!` key starts with what its initializer function returns (`static TA:
@@ -1146,6 +1251,7 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
                             span: None,
                             runs: None,
                         },
+                        "",
                     );
                 }
             }
@@ -1237,8 +1343,13 @@ fn names_mutable_static(cx: &Cx<'_>, body: &Body) -> bool {
 /// A static that can hold key material: a knowledge-base type, or bytes (`[u8; 32]`,
 /// `Vec<u8>`, `String`) behind any wrapper (`LazyLock<Vec<u8>>`, `Mutex<[u8; 32]>`), or an
 /// integer (a nonce counter).
-fn carries_or_bytes(cx: &Cx<'_>, ty: Ty<'_>) -> bool {
+fn carries_or_bytes<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> bool {
     carries(cx, ty)
+        // a struct of the program held in a lock (`Mutex<Cfg>` with `Cfg { h: &Digest }`)
+        || ty.walk().any(|g| {
+            g.as_type()
+                .is_some_and(|t| t != ty && !carrying_parts(cx, t).is_empty())
+        })
         || ty.walk().any(|g| {
             g.as_type().is_some_and(|t| {
                 matches!(

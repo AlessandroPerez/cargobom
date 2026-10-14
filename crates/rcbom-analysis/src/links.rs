@@ -31,6 +31,14 @@ pub struct LinkIndex {
     /// By trait: the types coerced to a trait object of it, with where, and the body each
     /// method runs for them.
     coerced: HashMap<String, Vec<Coerced>>,
+    /// The instances whose summaries the driver's bound left unrecorded (`Links::truncated`).
+    truncated: HashSet<String>,
+    /// By static def id: the values functions put there at run time, with the function.
+    static_writers: HashMap<String, Vec<(String, Origin)>>,
+    /// The trait methods some type of the program implements (`<A as app::Pick>::alg` returns
+    /// or writes recorded): for them a call whose body is not known is no call of the default
+    /// body.
+    implemented: HashSet<String>,
     /// Lookups left for the current `values` call.
     budget: Cell<usize>,
     /// The reads being resolved (value, path, function), outermost first: one met again is a
@@ -84,8 +92,11 @@ pub enum Via {
     /// a table's element or a field read from it.
     Table(String),
     /// Held by a static whose contents change at run time (`rcbom_facts::static_owner`): its
-    /// initializer's value or one the program puts there.
+    /// initializer's value.
     Static(String),
+    /// Put in a static that changes at run time (`statik`, as `Static` names it) by function
+    /// `writer`.
+    Store { writer: String, statik: String },
 }
 
 impl Via {
@@ -93,7 +104,12 @@ impl Via {
         match self {
             Via::Fixed => 0,
             Via::Caller(_) | Via::Object(_) | Via::Dyn { only: true, .. } | Via::Table(_) => 1,
-            Via::Dyn { .. } | Via::Container(_) | Via::Impl(_) | Via::Join(_) | Via::Static(_) => 2,
+            Via::Dyn { .. }
+            | Via::Container(_)
+            | Via::Impl(_)
+            | Via::Join(_)
+            | Via::Static(_)
+            | Via::Store { .. } => 2,
         }
     }
 
@@ -177,6 +193,7 @@ impl LinkIndex {
                     v.push(call);
                 }
             }
+            ix.truncated.extend(f.links.truncated.iter().cloned());
             for w in &f.links.writes {
                 let v = ix.writes.entry((w.func.clone(), w.index)).or_default();
                 if !v.contains(&w.value) {
@@ -190,6 +207,12 @@ impl LinkIndex {
                 }
             }
             for s in &f.links.statics {
+                let w = ix.static_writers.entry(s.def.id.clone()).or_default();
+                for x in &s.writers {
+                    if !w.contains(x) {
+                        w.push(x.clone());
+                    }
+                }
                 let e = ix.statics.entry(s.def.id.clone()).or_default();
                 e.0 |= s.mutable;
                 for v in &s.values {
@@ -201,6 +224,17 @@ impl LinkIndex {
         }
         // a trait object made from another (`&dyn Sub` upcast to `&dyn Super`): the types
         // coerced to that one, transitively
+        // the trait methods types implement: `<A as app::Pick>::alg`, `app::Pick::alg for A`
+        let bodies: Vec<String> = ix
+            .returns
+            .keys()
+            .map(|(f, _)| f.clone())
+            .chain(ix.writes.keys().map(|(f, _)| f.clone()))
+            .collect();
+        ix.implemented = bodies
+            .iter()
+            .filter_map(|f| implemented_method(f))
+            .collect();
         for _ in 0..MAX_DEPTH {
             let mut changed = false;
             let traits: Vec<String> = ix.coerced.keys().cloned().collect();
@@ -379,6 +413,7 @@ impl LinkIndex {
             index,
             args,
             self_ty,
+            ..
         } = w
         else {
             // a field of a field (`o.inner.key`): the inner field's parts, each projected
@@ -427,10 +462,64 @@ impl LinkIndex {
     /// Does the initializer of static `id` store values in fields (a table of structs, a
     /// struct): a field read of it is what it stores there.
     pub fn static_fields(&self, id: &str) -> bool {
-        self.fields
-            .values()
-            .flatten()
-            .any(|s| rcbom_facts::owner_static(&s.func).is_some_and(|(_, sid)| sid == id))
+        let mut id = id.to_string();
+        // (through statics that refer to another: `static REF: &Cfg = &FIX`)
+        for _ in 0..MAX_DEPTH {
+            if self
+                .fields
+                .values()
+                .flatten()
+                .any(|s| rcbom_facts::owner_static(&s.func).is_some_and(|(_, sid)| sid == id))
+            {
+                return true;
+            }
+            match self.static_alias(&id) {
+                Some(Origin::Data { def, .. }) => id = def.id,
+                _ => return false,
+            }
+        }
+        false
+    }
+
+    /// The static a static that never changes refers to (`static REF: &Cfg = &FIX`: `FIX`).
+    fn static_alias(&self, id: &str) -> Option<Origin> {
+        match self.statics.get(id) {
+            Some((false, v)) => match v.as_slice() {
+                [d @ Origin::Data { def, .. }] if def.id != id => Some(d.clone()),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// The values a static whose contents change at run time holds, each with how: its
+    /// initializer's (`Via::Static`), or what a function puts there (`Via::Store`, once per
+    /// function).
+    pub fn static_value_vias(&self, def: &rcbom_facts::DefRef) -> Vec<(Origin, Via)> {
+        let owner = rcbom_facts::static_owner(&def.path, &def.id);
+        let writers = self.static_writers.get(&def.id);
+        let mut out = Vec::new();
+        for v in self.mutable_static(&def.id).unwrap_or_default() {
+            let by: Vec<&String> = writers
+                .into_iter()
+                .flatten()
+                .filter(|(_, x)| x == v)
+                .map(|(w, _)| w)
+                .collect();
+            if by.is_empty() {
+                out.push((v.clone(), Via::Static(owner.clone())));
+            }
+            for w in by {
+                out.push((
+                    v.clone(),
+                    Via::Store {
+                        writer: w.clone(),
+                        statik: owner.clone(),
+                    },
+                ));
+            }
+        }
+        out
     }
 
     /// A static whose contents change at run time, with the values recorded for it.
@@ -549,6 +638,20 @@ impl LinkIndex {
             } => {
                 let mut p = vec![(adt.clone(), *field, args.clone())];
                 p.extend_from_slice(path);
+                // a field of a static that changes at run time (`CFG.lock().unwrap().h`): that
+                // field of each value it holds (its initializer's, what functions put there)
+                if let Origin::Data { def, .. } = peel(base)
+                    && self.mutable_static(&def.id).is_some()
+                {
+                    for (v, by) in self.static_value_vias(def) {
+                        let mut parts = Vec::new();
+                        project(&v, adt, *field, &mut parts);
+                        for part in parts {
+                            self.resolve(&part, path, "", depth + 1, &via.then(by.clone()), out);
+                        }
+                    }
+                    return;
+                }
                 if let Origin::Data { def, .. } = peel(base)
                     && self.mutable_static(&def.id).is_none()
                 {
@@ -569,6 +672,17 @@ impl LinkIndex {
                         }
                         return;
                     }
+                    // a static holding a reference to another (`static REF: &Cfg = &FIX`):
+                    // that one's field
+                    if let Some(other) = self.static_alias(&def.id) {
+                        let o = Origin::Field {
+                            adt: adt.clone(),
+                            field: *field,
+                            base: Box::new(other),
+                            args: args.clone(),
+                        };
+                        return self.resolve(&o, path, owner, depth + 1, via, out);
+                    }
                 }
                 return self.resolve(base, &p, owner, depth, via, out);
             }
@@ -582,6 +696,7 @@ impl LinkIndex {
                 index,
                 args,
                 self_ty,
+                place_ty,
             } => {
                 let mut found = Vec::new();
                 let before = |found: &mut Found, via: &Via| {
@@ -599,12 +714,23 @@ impl LinkIndex {
                 match bodies {
                     Some(bodies) => {
                         for (f, by) in bodies {
-                            match self.writes.get(&(f, *index)) {
+                            match self.writes.get(&(f.clone(), *index)) {
                                 Some(ws) => {
                                     for w in ws {
-                                        let v = substitute(w, args);
+                                        // the object written is of a known type: the
+                                        // trait-object calls on it inside run that type's
+                                        // implementation
+                                        let w = match place_ty {
+                                            Some(t) => self.specialize(w, *index, t),
+                                            None => w.clone(),
+                                        };
+                                        let v = substitute(&w, args);
                                         self.resolve(&v, path, owner, depth + 1, &by, &mut found);
                                     }
+                                }
+                                // a summary the driver's bound cut: not known
+                                None if self.truncated.contains(&f) => {
+                                    push(&mut found, (Origin::Truncated, owner.to_string(), by))
                                 }
                                 None => before(&mut found, &by),
                             }
@@ -631,6 +757,23 @@ impl LinkIndex {
                         continue;
                     }
                     self.resolve(a, path, owner, depth, via, out);
+                }
+                return;
+            }
+            // a value written into an element of a list (`v.algorithms[0] = HS256`): one of the
+            // values the list holds, beside the others
+            Origin::Any(alts)
+                if alts.iter().any(|a| {
+                    matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
+                }) =>
+            {
+                let by = via.then(Via::Container("an element write".to_string()));
+                for a in alts {
+                    // (the marker itself is no value)
+                    if !matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
+                    {
+                        self.resolve(a, path, owner, depth, &by, out);
+                    }
                 }
                 return;
             }
@@ -706,12 +849,24 @@ impl LinkIndex {
                 // type, the trait's default body, a generic function's instance) and only it;
                 // else the implementation by the `Self` type's path before the trait's default
                 // body
+                // (a trait's default body only when the call's `Self` is that of no
+                // implementation the program has: on a type parameter, or a type that may
+                // override it, which implementation runs is not known)
+                // a body the driver's bound left without a summary: a cut
+                if let Some(r) = runs
+                    && self.truncated.contains(r)
+                {
+                    push(out, (Origin::Truncated, owner.to_string(), via.clone()));
+                    return;
+                }
                 let names: Vec<String> = match runs {
                     Some(r) => vec![r.clone()],
                     None => self_ty
                         .iter()
                         .map(|t| rcbom_facts::impl_key(callee, t))
-                        .chain(std::iter::once(callee.clone()))
+                        .chain(
+                            (!self.implemented.contains(callee)).then(|| callee.clone()),
+                        )
                         .collect(),
                 };
                 if let Some((name, k)) = names
@@ -748,6 +903,85 @@ impl LinkIndex {
                 push(out, (o.clone(), owner.to_string(), via.clone()));
             }
             self.stored(path, depth, via, out);
+        }
+    }
+
+    /// A write summary of a function whose parameter `param` points to an object of type `ty`
+    /// (`fn up_dyn(u: &mut dyn Up)` called on a `B`): the trait-object calls it makes on that
+    /// parameter run `ty`'s implementation, and the functions it passes the parameter to write
+    /// an object of that type.
+    fn specialize(&self, o: &Origin, param: usize, ty: &str) -> Origin {
+        let on_param = |args: &[Origin], i: usize| matches!(args.get(i), Some(Origin::Param { index, owner: None }) if *index == param);
+        match o {
+            Origin::Written {
+                callee,
+                index,
+                args,
+                self_ty,
+                place_ty,
+            } => {
+                let args: Vec<Origin> =
+                    args.iter().map(|a| self.specialize(a, param, ty)).collect();
+                if !on_param(&args, *index) {
+                    return Origin::Written {
+                        callee: callee.clone(),
+                        index: *index,
+                        args,
+                        self_ty: self_ty.clone(),
+                        place_ty: place_ty.clone(),
+                    };
+                }
+                match self_ty.as_deref().and_then(|t| t.strip_prefix("dyn ")) {
+                    // the type's own body for the method
+                    Some(tr) => {
+                        let body = self
+                            .coerced
+                            .get(tr)
+                            .and_then(|v| v.iter().find(|(t, ..)| t == ty))
+                            .and_then(|(.., methods)| {
+                                methods
+                                    .iter()
+                                    .find(|(m, _)| m == callee)
+                                    .map(|(_, b)| b.clone())
+                            })
+                            .unwrap_or_else(|| {
+                                let (t, m) = callee.rsplit_once("::").unwrap_or(("", callee));
+                                format!("<{ty} as {t}>::{m}")
+                            });
+                        Origin::Written {
+                            callee: body,
+                            index: *index,
+                            args,
+                            self_ty: None,
+                            place_ty: None,
+                        }
+                    }
+                    // a function the object is passed on to
+                    _ => Origin::Written {
+                        callee: callee.clone(),
+                        index: *index,
+                        args,
+                        self_ty: self_ty.clone(),
+                        place_ty: Some(ty.to_string()),
+                    },
+                }
+            }
+            Origin::Any(v) => {
+                Origin::Any(v.iter().map(|a| self.specialize(a, param, ty)).collect())
+            }
+            Origin::All(v) => {
+                Origin::All(v.iter().map(|a| self.specialize(a, param, ty)).collect())
+            }
+            Origin::Set {
+                path,
+                value,
+                strong,
+            } => Origin::Set {
+                path: path.clone(),
+                value: Box::new(self.specialize(value, param, ty)),
+                strong: *strong,
+            },
+            other => other.clone(),
         }
     }
 
@@ -923,6 +1157,34 @@ fn project(o: &Origin, adt: &str, field: usize, out: &mut Vec<Origin>) {
     }
 }
 
+/// The trait method a body of a type implements (or runs as the trait's default body for the
+/// type), by its defining path: `app::Pick::alg` for `<app::A as app::Pick>::alg` (generic
+/// arguments of the trait dropped) and for `app::Pick::alg for app::A`.
+fn implemented_method(f: &str) -> Option<String> {
+    if let Some((m, _)) = f.split_once(" for ") {
+        return Some(m.to_string());
+    }
+    let rest = f.strip_prefix('<')?;
+    let mut depth = 1usize;
+    let mut as_at = None;
+    for (i, c) in rest.char_indices() {
+        match c {
+            '<' => depth += 1,
+            '>' => {
+                depth -= 1;
+                if depth == 0 {
+                    let tr = &rest[as_at? + 4..i];
+                    let method = rest[i + 1..].strip_prefix("::")?;
+                    return Some(format!("{}::{method}", crate::matcher::strip_generics(tr)));
+                }
+            }
+            ' ' if depth == 1 && rest[i..].starts_with(" as ") => as_at = Some(i),
+            _ => {}
+        }
+    }
+    None
+}
+
 fn fields(path: &FieldPath) -> Vec<usize> {
     path.iter().map(|(_, f, _)| *f).collect()
 }
@@ -1043,11 +1305,13 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             index,
             args: inner,
             self_ty,
+            place_ty,
         } => Origin::Written {
             callee: callee.clone(),
             index: *index,
             args: inner.iter().map(|a| substitute(a, args)).collect(),
             self_ty: self_ty.clone(),
+            place_ty: place_ty.clone(),
         },
         Origin::Call {
             callee,

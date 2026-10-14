@@ -857,12 +857,18 @@ fn direct_data(
             zero: false,
         };
         if seen.insert((false, key, String::new())) {
-            let by = crate::links::Via::Static(rcbom_facts::static_owner(&def.path, &def.id));
-            ix.with_via(ix.current_via().then(by), || {
-                for v in &values {
-                    direct_data(kb, Some((ix, "")), v, depth + 1, out, seen);
-                }
-            });
+            let _ = values;
+            for (v, by) in ix.static_value_vias(def) {
+                // read in the function that put it there (whose reachability decides whether
+                // it does), or in the initializer
+                let w = match &by {
+                    crate::links::Via::Store { writer, .. } => writer.clone(),
+                    _ => String::new(),
+                };
+                ix.with_via(ix.current_via().then(by), || {
+                    direct_data(kb, Some((ix, &w)), &v, depth + 1, out, seen)
+                });
+            }
         }
         return;
     }
@@ -945,14 +951,32 @@ pub(crate) fn std_choice(callee: &str) -> bool {
         "::or",
         "::or_else",
         "::xor",
-        "::map_or",
-        "::map_or_else",
         "::get_or_insert",
         "::get_or_insert_with",
     ];
     let bare = strip_generics(callee);
     (bare.starts_with("core::option::") || bare.starts_with("core::result::"))
         && CHOICES.iter().any(|c| bare.ends_with(c))
+}
+
+/// A standard-library call whose value is what a closure makes of an `Option`'s or a
+/// `Result`'s value (`map`, `and_then`), or a default (`map_or`, `map_or_else`): the receiver's
+/// value is not it.
+pub(crate) fn std_map(callee: &str) -> bool {
+    const MAPS: &[&str] = &["::map", "::and_then", "::map_or", "::map_or_else"];
+    let bare = strip_generics(callee);
+    (bare.starts_with("core::option::") || bare.starts_with("core::result::"))
+        && MAPS.iter().any(|c| bare.ends_with(c))
+}
+
+/// A standard-library call whose result is the value its first argument held before
+/// (`mem::replace(slot, v)`, `mem::take(slot)`, `opt.take()`, `opt.replace(v)`): not the
+/// value it puts there.
+pub(crate) fn std_old_value(callee: &str) -> bool {
+    let bare = strip_generics(callee);
+    (bare.starts_with("core::mem::") && (bare.ends_with("::replace") || bare.ends_with("::take")))
+        || (bare.starts_with("core::option::")
+            && (bare.ends_with("::replace") || bare.ends_with("::take")))
 }
 
 /// A crypto crate's getter for the algorithm a value was made with (`ctx.algorithm()`,
@@ -1021,8 +1045,15 @@ fn receiver_data(
             zero: false,
         };
         if seen.insert((true, key, String::new())) {
-            for v in &values {
-                receiver_data(kb, Some((ix, "")), v, depth + 1, out, seen, lengths);
+            let _ = values;
+            for (v, by) in ix.static_value_vias(def) {
+                let w = match &by {
+                    crate::links::Via::Store { writer, .. } => writer.clone(),
+                    _ => String::new(),
+                };
+                ix.with_via(ix.current_via().then(by), || {
+                    receiver_data(kb, Some((ix, &w)), &v, depth + 1, out, seen, lengths)
+                });
             }
         }
         return;
@@ -1042,6 +1073,32 @@ fn receiver_data(
         return;
     }
     match o {
+        // the value a place held before a call replaced it (`mem::replace(slot, &SHA1)`)
+        Origin::Call { args, callee, .. } if std_old_value(callee) => {
+            if let Some(a) = args.first() {
+                let mut here = Vec::new();
+                direct_data(kb, links, a, 0, &mut here, seen);
+                for d in here {
+                    if !out.contains(&d) {
+                        out.push(d);
+                    }
+                }
+                receiver_data(kb, links, a, depth + 1, out, seen, lengths);
+            }
+        }
+        // what a closure makes of the value (`opt.map(|x| x.h)`, `map_or(&SHA512, |_| &SHA1)`):
+        // the closure's result, or the default; never the receiver's own value
+        Origin::Call { args, callee, .. } if std_map(callee) => {
+            for a in args.iter().skip(1) {
+                let mut here = Vec::new();
+                direct_data(kb, links, a, 0, &mut here, seen);
+                for d in here {
+                    if !out.contains(&d) {
+                        out.push(d);
+                    }
+                }
+            }
+        }
         // a choice between an `Option`'s or a `Result`'s value and a fallback
         // (`v.first().copied().unwrap_or(&SHA512)`): either, each followed
         Origin::Call { args, callee, .. } if std_choice(callee) => {

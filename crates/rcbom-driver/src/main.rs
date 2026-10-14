@@ -264,6 +264,18 @@ fn analyze(tcx: TyCtxt<'_>) {
         mutable_statics: std::cell::OnceCell::new(),
         errors: 0,
     };
+    // the crates whose generic items' instances the links may summarise: not the standard
+    // library's, nor the stop crates' (`origins::body_name`)
+    origins::set_summarised(
+        tcx.crates(())
+            .iter()
+            .copied()
+            .chain(std::iter::once(rustc_span::def_id::LOCAL_CRATE))
+            .filter(|&c| {
+                !cx.stop_crate(c) && !matches!(tcx.crate_name(c).as_str(), "core" | "std" | "alloc")
+            })
+            .collect(),
+    );
     let local = rustc_public::local_crate();
     let env = |k: &str| std::env::var(k).unwrap_or_default();
     let krate = CrateInfo {
@@ -2590,6 +2602,21 @@ type Coerced = (String, String, Vec<(String, String)>);
 /// methods run.
 type CoercedAt = (Option<Loc>, bool, Vec<(String, String)>);
 
+/// An ADT as coercions name it: its defining path with its type arguments (`app::W<app::A>`);
+/// `None` for another type, or one still generic.
+pub(crate) fn type_name<'tcx>(tcx: TyCtxt<'tcx>, ty: rustc_middle::ty::Ty<'tcx>) -> Option<String> {
+    use rustc_middle::ty::TypeVisitableExt;
+    match ty.kind() {
+        rustc_middle::ty::Adt(adt, args) if !args.has_non_region_param() => {
+            Some(match adt_args(tcx, args) {
+                Some(a) => format!("{}<{a}>", path_of(tcx, adt.did())),
+                None => path_of(tcx, adt.did()),
+            })
+        }
+        _ => None,
+    }
+}
+
 /// A coercion of `concrete` to a trait object with predicates `preds`: the trait's path, the
 /// type's (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn` and the
 /// trait of another trait object; any other type as rustc prints it), and for each method of
@@ -2601,10 +2628,9 @@ fn coercion<'tcx>(
 ) -> Option<Coerced> {
     let t = path_of(tcx, preds.principal_def_id()?);
     let ty = match concrete.kind() {
-        rustc_middle::ty::Adt(adt, args) => match adt_args(tcx, args) {
-            Some(a) => format!("{}<{a}>", path_of(tcx, adt.did())),
-            None => path_of(tcx, adt.did()),
-        },
+        rustc_middle::ty::Adt(adt, _) => {
+            type_name(tcx, concrete).unwrap_or_else(|| path_of(tcx, adt.did()))
+        }
         // an upcast (`&dyn Sub` to `&dyn Super`): the types coerced to `Sub`; none for the
         // same trait (a reborrow)
         rustc_middle::ty::Dynamic(p, ..) => {

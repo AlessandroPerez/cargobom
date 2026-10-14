@@ -1,0 +1,93 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:29:52 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in <a75::A2 as a75::Assoc>::make; line: `impl Assoc for A2 { fn make() -> &'static Digest { &SHA1 } }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:34:50 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a75::Base::base; instantiated by <a75::E2 as a75::Ext>::ext at src/main.rs:35:58 as `base`; instantiated by a75::main at src/main.rs:62:22 as `ext`; line: `trait Base { fn base(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:59:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::A2 as a75::Assoc>::make`; line: `let _ = digest(assoc::<A2>(), &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:62:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::E2 as a75::Base>::base`; line: `let _ = digest(E2.ext(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:47:45 | ring::digest::digest | [reachable] [call] in a75::gsite::<a75::Legacy>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; instantiated by a75::main at src/main.rs:70:28 as `gsite`; line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:52:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(Legacy.via(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(outer(&Legacy), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(W(Legacy).alg(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:65:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(g.alg(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:40 | ring::digest::SHA256 | [reachable] [static] in a75::Pick::alg; instantiated by <a75::Legacy as a75::Pick>::via at src/main.rs:8:44 as `alg`; instantiated by a75::main at src/main.rs:52:26 as `via`; line: `fn alg(&self) -> &'static Digest { &SHA256 }`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:12:57 | ring::digest::SHA384 | [reachable] [static] in <a75::Fast as a75::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:47:45 | ring::digest::digest | [reachable] [call] in a75::gsite::<a75::Fast>; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; instantiated by a75::main at src/main.rs:69:4 as `gsite`; line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:51:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(Fast.via(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:53:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(outer(&Fast), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:55:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(W(Fast).alg(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:57:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(Holder.pick(&Fast), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:60:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(clos(&Fast), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:63:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:66:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(by_ref(&Fast), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:68:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: dyn (dyn: `a75::Fast`, the only type coerced to `dyn a75::Pick` at src/main.rs:67); line: `let _ = digest(by_ref(p), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:28:52 | ring::digest::SHA512 | [reachable] [static] in <a75::A1 as a75::Assoc>::make; line: `impl Assoc for A1 { fn make() -> &'static Digest { &SHA512 } }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:38:56 | ring::digest::SHA512 | [reachable] [static] in <a75::E1 as a75::Base>::base; line: `impl Base for E1 { fn base(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::A1 as a75::Assoc>::make`; line: `let _ = digest(assoc::<A1>(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:61:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::E1 as a75::Base>::base`; line: `let _ = digest(E1.ext(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:63:12 | ring::digest::digest | [reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a75::A1 as a75::Assoc>::make`; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a75 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a75 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a75 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=4
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=10
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a75@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/a75@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/a75@0.1.0", "name": "a75", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a75@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=93
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

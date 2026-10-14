@@ -13,7 +13,7 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:22:58 | ring::digest::SHA512 | [reachable] [static] in <a73::Leaf as a73::Chain>::alg; line: `impl Chain for Leaf { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:29:50 | ring::digest::SHA512 | [reachable] [static] in a73::main; line: `let p: Box<dyn Pick> = Box::new(Ignores { a: &SHA512 });`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:31:24 | ring::digest::SHA512 | [reachable] [static] in a73::main; line: `let q = Plain { a: &SHA512 };`; code: `SHA512`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:38:12 | ring::digest::digest | [reachable] [call] in a73::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: dyn, possible (dyn: `a73::Leaf` is coerced to `dyn a73::Chain` at src/main.rs:37); line: `let _ = digest(w.alg(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:38:12 | ring::digest::digest | [reachable] [call] in a73::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: dyn, possible (dyn: `a73::Leaf` is coerced to `dyn a73::Chain` at src/main.rs:37); line: `let _ = digest(w.alg(), &d);`; code: `digest`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a73 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a73 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a73 (dependencies)

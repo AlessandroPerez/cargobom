@@ -44,7 +44,7 @@ impl Found {
 
 /// Does a member found this way reach the call at run time: not only through a function no
 /// entry point reaches, or a static no reachable code or data names?
-fn reached(
+pub(crate) fn reached(
     via: &Via,
     reachable: &dyn Fn(&str) -> bool,
     reached_path: &dyn Fn(&str) -> bool,
@@ -57,6 +57,12 @@ fn reached(
                 Some((_, id)) => reachable(id),
                 None => w.is_empty() || w.contains(" for ") || reached_path(w),
             }
+        }
+        // put in a static at run time: by a function an entry point reaches, into a static
+        // reachable code names
+        Via::Store { writer, statik } => {
+            reached_path(writer)
+                && rcbom_facts::owner_static(statik).is_none_or(|(_, id)| reachable(id))
         }
         _ => true,
     }
@@ -192,6 +198,8 @@ pub(crate) fn site_matches(
         }
     }
     let n = found.names.keys().filter(|n| live(n)).count();
+    // an unknown beside the members (values not followed): none of them is the only one
+    let beside = !found.unresolved.is_empty() && n < possible;
     // a function of the program called here with constants only (`alg_for(0)`): the program
     // fixes its choice, no input selects it
     let fixed_by_program = constant_calls(arg_origins);
@@ -237,10 +245,17 @@ pub(crate) fn site_matches(
             ),
             // a call through a trait object of which several types are made: each type's
             // value may reach it
-            (Via::Dyn { only: false, .. } | Via::Impl(_) | Via::Static(_), _) => {
+            (
+                Via::Dyn { only: false, .. } | Via::Impl(_) | Via::Static(_) | Via::Store { .. },
+                _,
+            ) => {
                 format!("algorithm {one_of}from {what}: possible{}", witness(via))
             }
             // one of the values a container holds, read from it
+            (Via::Container(f), _) if f.starts_with('+') => format!(
+                "algorithm {one_of}from {what}: possible (container: in the list `{}` adds to)",
+                short_fn(&f[1..])
+            ),
             (Via::Container(f), _) => format!(
                 "algorithm {one_of}from {what}: possible (container: a value `{}` puts in it)",
                 short_fn(f)
@@ -260,6 +275,11 @@ pub(crate) fn site_matches(
             // may reach the call
             (_, true) => format!(
                 "algorithm one of {n} that may reach the call from {what}{}",
+                witness(via)
+            ),
+            (_, false) if beside => format!(
+                "algorithm one of 1 that may reach the call from {what}, beside others not \
+                 followed{}",
                 witness(via)
             ),
             (_, false) => format!("algorithm from {what}{}", witness(via)),
@@ -310,7 +330,29 @@ fn constant_calls(origins: &[Origin]) -> BTreeSet<String> {
     fn constant(o: &Origin) -> bool {
         match o {
             Origin::Const { .. } | Origin::Unit { .. } | Origin::Data { .. } => true,
-            Origin::All(v) => v.iter().all(constant),
+            Origin::All(v) | Origin::Any(v) => v.iter().all(constant),
+            // an element of a literal the program iterates (`for i in [0u8, 1]`)
+            Origin::Call {
+                callee,
+                krate,
+                args,
+                ..
+            } if matches!(krate.as_str(), "core" | "std" | "alloc")
+                && [
+                    "Iterator::next",
+                    "::into_iter",
+                    "::iter",
+                    "::copied",
+                    "::cloned",
+                ]
+                .iter()
+                .any(|m| strip_generics(callee).ends_with(m)) =>
+            {
+                !args.is_empty() && args.iter().all(constant)
+            }
+            // (the iterator advanced by the loop)
+            Origin::Through { callee } => callee.ends_with("Iterator::next"),
+            Origin::Loop => true,
             _ => false,
         }
     }
@@ -353,6 +395,11 @@ pub(crate) fn member_label(via: &Via) -> String {
             "member: type-join, possible (a value `{}` stores in the field)",
             short_fn(w)
         ),
+        // (a value already in a list a call adds to: `+` and the call)
+        Via::Container(f) if f.starts_with('+') => format!(
+            "member: container, possible (in the list `{}` adds to)",
+            short_fn(&f[1..])
+        ),
         Via::Container(f) => format!(
             "member: container, possible (a value `{}` puts in it)",
             short_fn(f)
@@ -365,9 +412,13 @@ pub(crate) fn member_label(via: &Via) -> String {
         Via::Impl(f) => format!("member: impl, possible (what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!("member: table, stored by `{}`", short_fn(w)),
         Via::Static(w) => format!(
-            "member: static, possible (a value `{}` holds: its initializer's, or one the program \
-             puts there)",
+            "member: static, possible (the value `{}` starts with, which the program may replace)",
             short_fn(w)
+        ),
+        Via::Store { writer, statik } => format!(
+            "member: static, possible (a value `{}` puts in `{}`)",
+            short_fn(writer),
+            short_fn(statik)
         ),
     }
 }
@@ -378,6 +429,7 @@ fn witness_unreached(via: &Via) -> String {
     match via {
         Via::Caller(w) => format!(" (passed by `{}`)", short_fn(w)),
         Via::Join(w) | Via::Table(w) | Via::Static(w) => format!(" (stored by `{}`)", short_fn(w)),
+        Via::Store { writer, .. } => format!(" (stored by `{}`)", short_fn(writer)),
         _ => String::new(),
     }
 }
@@ -419,7 +471,12 @@ fn witness(via: &Via) -> String {
         }
         Via::Impl(f) => format!(" (impl: what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!(" (table: stored by `{}`)", short_fn(w)),
-        Via::Static(w) => format!(" (static: a value `{}` holds)", short_fn(w)),
+        Via::Static(w) => format!(" (static: the value `{}` starts with)", short_fn(w)),
+        Via::Store { writer, statik } => format!(
+            " (static: a value `{}` puts in `{}`)",
+            short_fn(writer),
+            short_fn(statik)
+        ),
         Via::Fixed | Via::Join(_) | Via::Container(_) => String::new(),
     }
 }
@@ -429,8 +486,9 @@ fn witness(via: &Via) -> String {
 /// app::Up>::up`), or `static X` for a static's initializer.
 pub(crate) fn short_fn(f: &str) -> String {
     match rcbom_facts::owner_static(f) {
+        Some((path, _)) if f.starts_with("const ") => format!("const {path}"),
         Some((path, _)) => format!("static {path}"),
-        None if f.is_empty() => "a static's initializer".to_string(),
+        None if f.is_empty() => "a constant expression".to_string(),
         None => fn_name(f),
     }
 }
@@ -438,6 +496,8 @@ pub(crate) fn short_fn(f: &str) -> String {
 /// `f` without the generic arguments of its path, the qualified self type of an
 /// implementation's item kept whole (`<app::W<app::A> as app::Gen>::alg`).
 fn fn_name(f: &str) -> String {
+    // (an instance's turbofish with its `::`: `app::pick::<app::Fast>` is `app::pick`)
+    let f = &f.replace("::<", "<");
     if f.starts_with('<') {
         let mut depth = 0usize;
         for (i, c) in f.char_indices() {
@@ -711,6 +771,20 @@ fn collect(
         }
         // another value (`Option::None`, a length): not one of the variants
         Origin::Unit { .. } | Origin::Const { .. } => {}
+        // a value written into an element of the list (`v.algorithms[0] = HS256`): in the list
+        // beside the others
+        Origin::Any(xs)
+            if xs.iter().any(
+                |x| matches!(x, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE),
+            ) =>
+        {
+            let by = via.then(Via::Container("an element write".to_string()));
+            for x in xs {
+                if !matches!(x, Origin::Through { .. }) {
+                    collect(ctx, x, owner, krate, accept, depth, in_std, &by, out);
+                }
+            }
+        }
         Origin::Any(xs) | Origin::All(xs) => {
             for x in xs {
                 collect(ctx, x, owner, krate, accept, depth, in_std, via, out);
@@ -742,9 +816,30 @@ fn collect(
             // list extended (`v.push(x)`, `extend_from_slice(&[x])`, `append`) holds the values
             // it held beside the new ones
             let bare = strip_generics(callee);
-            let extend = ["::extend_from_slice", "::append", "Extend::extend"]
-                .iter()
-                .any(|m| bare.ends_with(m));
+            // a list replaced by another's values (`algorithms.clone_from(&other)`): those
+            if bare.ends_with("Clone::clone_from") && args.len() == 2 {
+                let by = via.then(Via::Container(bare.clone()));
+                collect(
+                    ctx,
+                    &args[1],
+                    owner,
+                    krate,
+                    accept,
+                    depth + 1,
+                    true,
+                    &by,
+                    out,
+                );
+                return;
+            }
+            let extend = [
+                "::extend_from_slice",
+                "::append",
+                "Extend::extend",
+                "::resize",
+            ]
+            .iter()
+            .any(|m| bare.ends_with(m));
             let store = crate::provenance::container_store(callee) || extend;
             let map = store && bare.ends_with("Map::insert");
             let list = store && !map && !bare.ends_with("Set::insert");
@@ -757,10 +852,30 @@ fn collect(
                 || bare.ends_with("::to_vec")
                 || bare.ends_with("::collect")
                 || extend;
-            if let Some(xs) = args.iter().find_map(|a| match a {
-                Origin::All(xs) if builds_list && !read => Some(xs),
-                _ => None,
-            }) {
+            // (an array literal through iterator adaptors: `[a, b].into_iter().collect()`)
+            fn literal(o: &Origin, depth: usize) -> Option<&Vec<Origin>> {
+                match o {
+                    Origin::All(xs) => Some(xs),
+                    Origin::Call {
+                        callee,
+                        krate,
+                        args,
+                        ..
+                    } if depth < 4
+                        && matches!(krate.as_str(), "core" | "std" | "alloc")
+                        && ["::into_iter", "::iter", "::copied", "::cloned", "::into"]
+                            .iter()
+                            .any(|m| strip_generics(callee).ends_with(m)) =>
+                    {
+                        literal(args.first()?, depth + 1)
+                    }
+                    _ => None,
+                }
+            }
+            if let Some(xs) = args
+                .iter()
+                .find_map(|a| (builds_list && !read).then(|| literal(a, 0)).flatten())
+            {
                 // (the elements, nested in the box's parts: `All[new_uninit(), All[a, b]]`)
                 fn elements<'o>(xs: &'o [Origin], out: &mut Vec<&'o Origin>) {
                     for x in xs {
@@ -796,15 +911,17 @@ fn collect(
                 }
                 // a list extended with values the facts give as data (`extend_from_slice(&[
                 // Algorithm::HS256])`, a constant slice): which ones is not known
-                if list && i > 0 && matches!(a, Origin::Const { .. }) {
+                if list && i > 0 && matches!(a, Origin::Const { value: None, .. }) {
                     out.unresolved.push((
                         "values added to the list the analysis does not follow".into(),
                         via.clone(),
                     ));
                     continue;
                 }
-                let by = if store && (i > 0 || list) {
+                let by = if store && i > 0 {
                     via.then(Via::Container(bare.clone()))
+                } else if store && list {
+                    via.then(Via::Container(format!("+{bare}")))
                 } else {
                     via.clone()
                 };

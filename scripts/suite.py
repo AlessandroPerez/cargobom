@@ -97,18 +97,30 @@ def verdict(site, occ):
 
 
 def exact_among_several(occ):
-    """The reachable algorithms labelled as the only one at a site reporting several (an
-    occurrence of one instance of a generic function, `instantiated by ..`, is that instance's)."""
-    reachable = [o for o in occ if o[3] and o[0] != "unknown" and "; instantiated by " not in o[6]]
-    if len({o[0] for o in reachable}) < 2:
-        return []
-    out = []
-    for o in reachable:
-        m = re.search(r"; (algorithm [^;]*)", o[6])
-        sentence = m.group(1) if m else ""
-        if not re.search(r"one of|possibl|selector", sentence):
-            out.append(o[0])
-    return sorted(set(out))
+    """The reachable algorithms labelled as the only one where the call may use several: several
+    algorithms reported for one instance of the call (occurrences grouped by their `instantiated
+    by` chain), or one beside an `unknown` (others may reach it). Only occurrences with a use
+    count (a constructor on the same line is no site)."""
+    groups = collections.defaultdict(list)
+    for o in occ:
+        if not (o[3] and o[2]):
+            continue
+        chain = re.findall(r"; instantiated by [^;]*", o[6])
+        groups[tuple(chain)].append(o)
+    out = set()
+    for group in groups.values():
+        names = {o[0] for o in group if o[0] != "unknown"}
+        unknown = any(o[0] == "unknown" for o in group)
+        if len(names) < 2 and not (names and unknown):
+            continue
+        for o in group:
+            if o[0] == "unknown":
+                continue
+            m = re.search(r"; (algorithm [^;]*)", o[6])
+            sentence = m.group(1) if m else ""
+            if not re.search(r"one of|possibl|selector", sentence):
+                out.add(o[0])
+    return sorted(out)
 
 
 def function_matches(site, occ):
