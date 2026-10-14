@@ -60,10 +60,6 @@ struct GenArgs {
     /// Layer 1 only: no compilation, nothing from the project is executed by rcbom.
     #[arg(long)]
     manifest_only: bool,
-    /// No reachability walk: every finding comes from the per-item scan of each crate, and
-    /// generic code is not monomorphized (the ablation of the type-resolved walk).
-    #[arg(long)]
-    no_walk: bool,
     /// The cargo profile whose code is analysed. The default is what ships: `release`, where
     /// `cfg(debug_assertions)` code is not compiled.
     #[arg(long, default_value = "release")]
@@ -113,7 +109,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         let dir = man.target_directory.join("rcbom");
         let facts_dir = dir.join("facts");
         let units = run_driver(a, &man, &dir, &facts_dir)?;
-        load_facts(&facts_dir, Some(&units))?
+        load_facts(&facts_dir, &units)?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &facts);
@@ -158,13 +154,6 @@ fn generate(a: &GenArgs) -> Result<()> {
 fn summary(an: &rcbom_analysis::Analysis) {
     eprintln!("cbom: {} assets (valid CycloneDX 1.7)", an.assets.len());
     for a in an.assets.values() {
-        let mut files: Vec<_> = a
-            .occurrences
-            .iter()
-            .map(|o| o.location.split('/').next().unwrap_or("").to_string())
-            .collect();
-        files.sort();
-        files.dedup();
         eprintln!(
             "  {:<24} {:<9} {:>3} occurrences  {}",
             a.name,
@@ -280,9 +269,9 @@ fn run_driver(
 
     // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any
     // input of the driver other than the sources (the driver itself, the compiler, the crate
-    // lists, features, walk) invalidates both.
+    // lists, features, profile) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nno-walk={}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -293,7 +282,6 @@ fn run_driver(
         stop_crates,
         impl_crates,
         a.features,
-        a.no_walk,
         a.profile,
         local_dirs,
         std::env::var("RCBOM_MAX_INSTANCES").ok()
@@ -331,12 +319,6 @@ fn run_driver(
         .env("RCBOM_LOCAL_DIRS", local_dirs.join("\n"))
         .env("RCBOM_SYSROOT", &sysroot)
         .env("LD_LIBRARY_PATH", ld);
-    // the walk is on unless asked off, whatever the caller's environment says
-    if a.no_walk {
-        cmd.env("RCBOM_NO_WALK", "1");
-    } else {
-        cmd.env_remove("RCBOM_NO_WALK");
-    }
     if !a.features.is_empty() {
         cmd.arg("--features").arg(a.features.join(","));
     }

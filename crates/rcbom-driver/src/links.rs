@@ -537,10 +537,6 @@ pub(crate) fn body_links(
             push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
         }
     }
-    // what a function returns, and each part of it that can carry an algorithm or a key; a
-    // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
-    // have (`ExternalError::_err` on a `Result`: `rcgen::error::ExternalError::_err for
-    // core::result::Result`)
     // what a `&mut` parameter points to at the returns (`set_slot(slot)`: `*slot = &SHA512`;
     // `upgrade(&mut self)`: the value on entry with `alg` set), when the function writes it:
     // a caller's `Written` resolves to it, the entry value standing for the caller's own
@@ -581,6 +577,10 @@ pub(crate) fn body_links(
             }
         }
     }
+    // what a function returns, and each part of it that can carry an algorithm or a key; a
+    // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
+    // have (`ExternalError::_err` on a `Result`: `rcgen::error::ExternalError::_err for
+    // core::result::Result`)
     if func {
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
         let mut names = vec![here.clone()];

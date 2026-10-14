@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 19;
+pub const FACTS_VERSION: u32 = 20;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -81,11 +81,13 @@ pub struct Links {
     pub coercions: Vec<Coercion>,
 }
 
-/// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`, or the type as
-/// rustc prints it) is coerced to `dyn trait_path` at `at` (a constant's or a static's: its
-/// item). `methods`: for each method of the trait object (the trait's, its supertraits'), by
-/// defining path, the body a call through it runs for `ty`, as the links name it (the type's
-/// implementation, or the trait's default body: `Origin::Call::runs`).
+/// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn <trait>`
+/// for an upcast from another trait object; any other type as rustc prints it) is coerced to
+/// `dyn trait_path` at `at`: the cast in a function's body, or the item of the constant or
+/// static whose value holds the vtable (none for a span without a position). `methods`: for
+/// each method of the trait object (the trait's, its supertraits'), by defining path, the body a
+/// call through it runs for `ty`, as the links name it (the type's implementation, or the
+/// trait's default body: `Origin::Call::runs`).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Coercion {
     pub trait_path: String,
@@ -154,8 +156,8 @@ pub struct FieldStore {
     /// The field, then the fields inside it (`c.aead.alg`: `aead`'s index, then `alg`'s).
     pub path: Vec<usize>,
     pub value: Origin,
-    /// Defining path of the function storing it, whose parameters `value` names; empty in a
-    /// static's initializer.
+    /// Defining path of the function storing it, whose parameters `value` names; in a static's
+    /// initializer the static (`static_owner`); empty in a constant's or a promoted constant's.
     pub func: String,
     /// Stored through a reference (`self.alg = v` in a `&mut self` method): the struct written
     /// may be a part of another one.
@@ -218,12 +220,8 @@ pub struct CrateInfo {
     /// Cargo package name and version (`age-core`, `0.11.0`), from the env cargo sets for rustc.
     pub package: String,
     pub version: String,
-    pub manifest_dir: String,
     /// rustc's working directory; relative span paths are relative to it.
     pub cwd: String,
-    /// `CARGO_PRIMARY_PACKAGE`: a workspace member the user asked to build.
-    pub primary: bool,
-    pub crate_types: Vec<String>,
     /// Cargo's unit id for this compilation (`-C extra-filename`, e.g. `-1a2b3c4d5e6f7a8b`):
     /// the facts file is `<name><unit>.json`, and `cargo cbom` keeps only the units of the
     /// current build.
@@ -664,7 +662,6 @@ pub struct ViaStep {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Reach {
-    pub roots: Vec<String>,
     pub instances: usize,
     /// The walk stopped at the instance limit; the reachable tier is incomplete.
     pub truncated: bool,

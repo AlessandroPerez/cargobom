@@ -772,7 +772,6 @@ fn mapped(p: &Param, v: String) -> Option<String> {
     }
 }
 
-/// `UInt<UInt<UTerm, B1>, B0>` = 2; a const generic argument as is.
 impl Match {
     /// What tells assets apart: the name, the primitive, and whether this is key material.
     /// BLAKE3 keyed (a MAC) is not BLAKE3 the hash; the HMAC secret of
@@ -804,6 +803,7 @@ pub fn asset_key(name: &str, algo: &Algo) -> String {
     }
 }
 
+/// `UInt<UInt<UTerm, B1>, B0>` = 2; a const generic argument as is.
 pub fn typenum(t: &TyTree) -> Option<u64> {
     match t {
         TyTree::Const(n) => *n,
@@ -1054,10 +1054,7 @@ mod tests {
         assert_eq!(fill(t, &same, &d), "RSA-OAEP-SHA-256");
         let other = map(&[("hash", "SHA-256"), ("mgf_hash", "SHA-1")]);
         assert_eq!(fill(t, &other, &d), "RSA-OAEP-SHA-256-MGF1-SHA-1");
-        assert!(rcbom_kb::registry::valid(
-            "RSA-OAEP-SHA-256-MGF1-SHA-1",
-            "RSAES-OAEP"
-        ));
+        assert!(rcbom_kb::registry::valid("RSA-OAEP-SHA-256-MGF1-SHA-1"));
     }
 }
 

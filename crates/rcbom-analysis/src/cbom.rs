@@ -211,12 +211,12 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     if let Some(n) = &a.algo.note {
         props.push(prop("rcbom:note", n));
     }
-    // a name the Cryptography Registry has no pattern for (a family name for a variant the
-    // code does not determine, a variant the registry does not list)
     // the operations whose algorithm the analysis does not find: no name, no family
     if a.unresolved() {
         props.push(prop("rcbom:algorithm", "unresolved"));
-    } else if a.algo.material.is_none() && !rcbom_kb::registry::valid(&a.name, &a.algo.family) {
+    // a name the Cryptography Registry has no pattern for (a family name for a variant the
+    // code does not determine, a variant the registry does not list)
+    } else if a.algo.material.is_none() && !rcbom_kb::registry::valid(&a.name) {
         props.push(prop("rcbom:registry-name", "unmatched"));
     }
     props.push(prop("rcbom:occurrences", a.occurrences.len()));
@@ -487,7 +487,7 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
             ];
             // as for the assets found: a name the registry has no pattern for is flagged
             // (`SHA-2`, the family name of the sha2 crate)
-            if template.is_some_and(|t| !rcbom_kb::registry::valid(name, &t.family)) {
+            if template.is_some() && !rcbom_kb::registry::valid(name) {
                 props.push(prop("rcbom:registry-name", "unmatched"));
             }
             out.push(json!({

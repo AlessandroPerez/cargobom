@@ -3175,7 +3175,6 @@ fn byte_len(elem: &Ty, n: Option<u64>) -> Option<u64> {
     .flatten()
 }
 
-/// `[u8; N]`, `&[u8; N]`, `&mut [u8; N]`: N bytes.
 /// Literal data in an allocated constant: its length in bytes (an array in place, or the
 /// array, slice or `&str` a reference points to: `b"salt"`, `""`) and whether all its bytes are
 /// zero (`&[0u8; 32]`). Not an integer (its value says that).
@@ -3234,6 +3233,7 @@ fn field_steps(steps: &[Step]) -> Option<Vec<usize>> {
         .filter(|v| !v.is_empty())
 }
 
+/// `[u8; N]`, `&[u8; N]`, `&mut [u8; N]`: N bytes.
 fn bytes_of_ty(ty: &Ty) -> Option<u64> {
     match ty.kind().rigid()? {
         RigidTy::Array(t, n) => byte_len(t, n.eval_target_usize().ok()),

@@ -88,7 +88,11 @@ pub(crate) fn site_matches(
     let b = ctx
         .kb
         .boundary(&callee.krate.name, &strip_generics(in_crate))?;
-    let e = ctx.kb.enums.iter().find(|e| e.name == b.enumeration)?;
+    let e = ctx
+        .kb
+        .enums
+        .iter()
+        .find(|e| e.krate == b.krate && e.name == b.enumeration)?;
     let all: BTreeSet<&str> = e.variants.keys().map(String::as_str).collect();
     // the variants the call can use: those the key's family allows
     let mut possible = all.len();

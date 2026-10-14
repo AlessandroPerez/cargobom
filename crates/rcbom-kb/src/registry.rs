@@ -208,13 +208,8 @@ pub fn family(family: &str) -> bool {
 /// Does some registry pattern produce this name? A parameter is a number, an elliptic curve of
 /// the registry's list, a word (a mode, a padding, a group), or, for an algorithm
 /// (`{hashAlgorithm}`), a name the registry produces in turn (`RSA-OAEP-SHA-256-MGF1-SHA-1`).
-pub fn valid(name: &str, _family: &str) -> bool {
+pub fn valid(name: &str) -> bool {
     named(name, 3)
-}
-
-/// Number of patterns loaded (for tests).
-pub fn patterns() -> usize {
-    REGISTRY.patterns.len()
 }
 
 #[cfg(test)]
@@ -223,7 +218,7 @@ mod tests {
 
     #[test]
     fn registry_names() {
-        assert!(patterns() > 100);
+        assert!(REGISTRY.patterns.len() > 100);
         for ok in [
             "AES-256-GCM",
             "AES-GCM",
@@ -243,7 +238,7 @@ mod tests {
             "ML-KEM-768",
             "RSA-PKCS1-1.5-SHA-256",
         ] {
-            assert!(valid(ok, ""), "{ok}");
+            assert!(valid(ok), "{ok}");
         }
         for bad in [
             "Argon2",
@@ -254,9 +249,9 @@ mod tests {
             "HMAC-banana",
             "AES-256-GCM-x-y",
         ] {
-            assert!(!valid(bad, ""), "{bad}");
+            assert!(!valid(bad), "{bad}");
         }
-        assert!(valid("TLS12-PRF-SHA-256", ""));
+        assert!(valid("TLS12-PRF-SHA-256"));
         assert!(family("TLS-PRF") && family("HMAC") && !family("NOT-A-FAMILY"));
     }
 }

@@ -22,6 +22,8 @@
 //!   RCBOM_SYSROOT      sysroot of the pinned toolchain (else asked from the wrapped rustc)
 //!   RCBOM_DEBUG        if set, print each panic the analysis catches (message and location),
 //!                      and each site dropped for having no source position
+//!   RCBOM_DEBUG_WALK   a substring of instance names: print the walk's edges out of the
+//!                      matching instances
 
 #![feature(rustc_private)]
 
@@ -273,10 +275,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         ),
         package: env("CARGO_PKG_NAME"),
         version: env("CARGO_PKG_VERSION"),
-        manifest_dir: env("CARGO_MANIFEST_DIR"),
         cwd: std::env::current_dir().unwrap().display().to_string(),
-        primary: std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some(),
-        crate_types: tcx.crate_types().iter().map(|t| t.to_string()).collect(),
         unit: codegen_opt(&std::env::args().collect::<Vec<_>>(), "extra-filename")
             .unwrap_or_default(),
     };
@@ -417,10 +416,9 @@ fn analyze(tcx: TyCtxt<'_>) {
     // Roots: `main` of a binary; for a library the user asked to analyse (a workspace member),
     // its public monomorphic API and public statics; in both, what the linker keeps whatever
     // calls it (`#[no_mangle]`, `#[export_name]`, `#[used]` statics such as constructors in
-    // `.init_array`). RCBOM_NO_WALK turns the walk off (ablation).
+    // `.init_array`).
     let primary = std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some();
-    let (roots, static_roots, generic) = if std::env::var_os("RCBOM_NO_WALK").is_some() || !primary
-    {
+    let (roots, static_roots, generic) = if !primary {
         (Vec::new(), Vec::new(), Vec::new())
     } else {
         roots(&cx)
@@ -711,8 +709,6 @@ pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
     (!line.is_empty()).then(|| line.to_string())
 }
 
-/// Source position of a span; code from a macro is attributed to the outermost call site in
-/// the user's source, with the position inside the macro kept as `Expansion`.
 /// For a function a derive generated (its definition is in the derive's expansion), a span of
 /// that expansion to cite its code at: the derive's (`locate` then tags it `[derive ..]`).
 pub(crate) fn derive_site(
@@ -731,6 +727,8 @@ pub(crate) fn derive_site(
     matches!(expn.kind, ExpnKind::Macro(K::Derive, _)).then_some(ds)
 }
 
+/// Source position of a span; code from a macro is attributed to the outermost call site in
+/// the user's source, with the position inside the macro kept as `Expansion`.
 pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Expansion>) {
     if span.from_expansion() {
         let call = span.source_callsite();
@@ -1865,7 +1863,7 @@ impl Scanner<'_, '_> {
 fn roots(
     cx: &Cx<'_>,
 ) -> (
-    Vec<(Instance, String)>,
+    Vec<Instance>,
     Vec<rustc_span::def_id::DefId>,
     Vec<rustc_span::def_id::DefId>,
 ) {
@@ -1877,7 +1875,7 @@ fn roots(
     if let Some(entry) = rustc_public::entry_fn()
         && let Ok(i) = Instance::try_from(entry)
     {
-        fns.push((i, instance_name(tcx, &i)));
+        fns.push(i);
     }
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn)
@@ -1890,10 +1888,9 @@ fn roots(
         let exported = !is_bin && did.as_local().is_some_and(|l| vis.is_exported(l));
         if (exported || tcx.codegen_fn_attrs(did).contains_extern_indicator())
             && let Ok(i) = Instance::try_from(item)
-            && !fns.iter().any(|(r, _)| *r == i)
+            && !fns.contains(&i)
         {
-            let n = format!("pub {}", instance_name(tcx, &i));
-            fns.push((i, n));
+            fns.push(i);
         }
     }
     // a library: the non-generic functions its exported generic or inline functions call
@@ -1923,10 +1920,9 @@ fn roots(
             if item.requires_monomorphization() {
                 generic.push(did);
             } else if let Ok(i) = Instance::try_from(item)
-                && !fns.iter().any(|(r, _)| *r == i)
+                && !fns.contains(&i)
             {
-                let n = format!("pub {}", instance_name(tcx, &i));
-                fns.push((i, n));
+                fns.push(i);
             }
         }
     }
@@ -2005,17 +2001,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
     }
 
-    fn run(
-        &mut self,
-        roots: Vec<(Instance, String)>,
-        static_roots: Vec<rustc_span::def_id::DefId>,
-    ) -> Reach {
-        let mut names: Vec<String> = roots.iter().map(|(_, n)| n.clone()).collect();
-        for (root, _) in roots {
+    fn run(&mut self, roots: Vec<Instance>, static_roots: Vec<rustc_span::def_id::DefId>) -> Reach {
+        for root in roots {
             self.enqueue(root, None);
         }
         for s in static_roots {
-            names.push(format!("static {}", path_of(self.cx.tcx, s)));
             self.reach_static(s);
         }
         let mut truncated = false;
@@ -2050,7 +2040,6 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             .map(|c| crate_ref(tcx, c.as_def_id()))
             .collect();
         Reach {
-            roots: names,
             instances: self.seen.len(),
             truncated,
             statics,
@@ -2593,8 +2582,8 @@ fn unsize_tails(src: &Ty, dst: &Ty) -> Option<(Ty, Ty)> {
     }
 }
 
-/// A type coerced to a trait object: the trait's path, the type's, and the trait methods for
-/// which the type's vtable holds the trait's default body.
+/// A type coerced to a trait object: the trait's path, the type's, and for each trait method
+/// the body the type's vtable holds (`origins::body_name`).
 type Coerced = (String, String, Vec<(String, String)>);
 
 /// Where a type was first seen coerced (in a static's value or not), and the bodies its

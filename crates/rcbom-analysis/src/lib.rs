@@ -177,18 +177,17 @@ pub struct Analysis {
     pub usage: HashMap<(String, String), Usage>,
     pub notes: Vec<String>,
     pub instances: usize,
-    pub truncated: bool,
     /// Layer 2 ran: without it (`--manifest-only`) nothing is known about use.
     pub layer2: bool,
 }
 
-/// The facts files in `dir`, sorted by crate, so that the result never depends on the order
-/// the file system lists them in. With `units`, only the files of those cargo units (file
-/// stems `<crate><unit>`): a crate compiled by an earlier build, with other dependencies or
-/// features, leaves a file under another unit id that must not be read.
+/// The facts files in `dir` of the cargo units `units` (file stems `<crate><unit>`), sorted by
+/// crate, so that the result never depends on the order the file system lists them in: a crate
+/// compiled by an earlier build, with other dependencies or features, leaves a file under
+/// another unit id that must not be read.
 pub fn load_facts(
     dir: &Path,
-    units: Option<&std::collections::BTreeSet<String>>,
+    units: &std::collections::BTreeSet<String>,
 ) -> Result<Vec<CrateFacts>> {
     let mut paths: Vec<PathBuf> = std::fs::read_dir(dir)?
         .map(|e| e.map(|e| e.path()))
@@ -197,7 +196,7 @@ pub fn load_facts(
     let mut out = Vec::new();
     for p in paths {
         let stem = p.file_stem().map(|s| s.to_string_lossy().to_string());
-        if units.is_some_and(|u| !stem.as_ref().is_some_and(|s| u.contains(s))) {
+        if !stem.as_ref().is_some_and(|s| units.contains(s)) {
             continue;
         }
         if p.extension().is_some_and(|x| x == "json") {
@@ -1117,7 +1116,6 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         usage,
         notes,
         instances,
-        truncated,
         layer2: true,
     }
 }
@@ -1129,7 +1127,6 @@ type SiteMatch = (Match, Kind, Option<String>, String, Vec<String>, bool);
 /// not merged into the receiver's constructor on the same line.
 const OWN_PARAMS: &str = ": its own parameters, not its receiver's";
 
-/// `None` (`Option::None` passed for an optional argument).
 /// The variant a value names by a unit variant of the family's enum (`Some(Algorithm::Argon2d
 /// .ident())`): `d`, its name after the family's.
 fn named_variant(o: &rcbom_facts::Origin, family: &str) -> Option<String> {
@@ -1153,6 +1150,7 @@ fn named_variant(o: &rcbom_facts::Origin, family: &str) -> Option<String> {
     }
 }
 
+/// `None` (`Option::None` passed for an optional argument).
 fn is_none_origin(o: &rcbom_facts::Origin) -> bool {
     matches!(o, rcbom_facts::Origin::Unit { path, .. } if path.ends_with("Option::None"))
 }

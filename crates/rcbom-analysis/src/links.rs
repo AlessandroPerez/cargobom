@@ -469,6 +469,7 @@ impl LinkIndex {
         let mut out = Vec::new();
         self.budget.set(MAX_STEPS);
         self.resolve(o, &[], owner, 0, &Via::Fixed, &mut out);
+        // RCBOM_DEBUG_LINKS: print every lookup and what it found
         if std::env::var("RCBOM_DEBUG_LINKS").is_ok() {
             eprintln!("links: {owner}: {o:?}\n  -> {out:?}");
         }
@@ -762,15 +763,9 @@ impl LinkIndex {
             for (ty, at, in_static, methods) in types {
                 let name = match methods.iter().find(|(m, _)| m == callee) {
                     Some((_, body)) => body.clone(),
-                    None => {
-                        let own = format!("<{ty} as {tr}>::{method}");
-                        let key = rcbom_facts::impl_key(callee, ty);
-                        if self.writes.keys().any(|(f, _)| *f == key) {
-                            key
-                        } else {
-                            own
-                        }
-                    }
+                    // a body the driver could not name (another crate's generic impl): the
+                    // type's own method, as an impl's item
+                    None => format!("<{ty} as {tr}>::{method}"),
                 };
                 let via = Via::Dyn {
                     trait_path: t.to_string(),

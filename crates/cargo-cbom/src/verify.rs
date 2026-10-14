@@ -7,9 +7,9 @@
 //! identifiers read without `r#`) whose last segment is the symbol's name or an import alias of
 //! it: from the file's `use` items, or from those of any file of its package or of the crate the
 //! path goes through (`pub use ring::digest::digest as hash_it;` in `src/algs.rs`). Besides:
-//! - the source line, and the text at the position, are those the context records
-//!   (`line: `..``, `code: `..``), when it records them; only the leading `[..]` tags of the
-//!   context are read as tags, never the recorded source text;
+//! - the source line the context records (`line: `..``) is the line's, and the text at the
+//!   position is the one it records (`code: `..``) when it records one; only the leading `[..]`
+//!   tags of the context are read as tags, never the recorded source text;
 //! - one asset has one occurrence per (position, symbol), as the generator writes them;
 //! - a `[component] .. part of X` occurrence is where X is, or on the line where X was merged
 //!   into a more specific name;
@@ -300,7 +300,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             continue;
         };
         match c["type"].as_str() {
-            Some("library" | "application" | "framework") => {
+            Some("library" | "application") => {
                 graph.packages.insert(r.to_string());
             }
             Some("cryptographic-asset") => {
@@ -454,7 +454,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         RANGED.with(|r| r.set(false));
         match files.check(i, o.line, o.offset) {
             Ok(()) if RANGED.with(|r| r.get()) => {
-                // C6: identical candidates the context cannot tell apart; not exact
+                // identical candidates the context cannot tell apart: a range, not exact
                 verified[i] = true;
                 ranged += 1;
                 println!(
@@ -506,7 +506,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 RANGED.with(|r| r.set(false));
                 let ok = files.check(i, l, c).is_ok();
                 if ok && RANGED.with(|r| r.get()) {
-                    // not confirmed: one of identical candidates (C6)
+                    // not confirmed: one of identical candidates (a range)
                     caught += 1;
                     in_range += 1;
                 } else if !ok {
@@ -3125,8 +3125,6 @@ impl Files<'_> {
             .collect()
     }
 
-    /// A package that provides no asset by being named: the program's own, or an interface
-    /// crate (`digest`, `aead`, `signature`: their traits are implemented by others).
     /// "algorithm from X in the arguments" (or one of several such `members`) at the call at
     /// `at`: X is named in the code the call reads (its arguments and receiver, the variables
     /// they read and what the function stores in them, the statics, consts and `const fn`s
@@ -3462,6 +3460,8 @@ impl Files<'_> {
         })
     }
 
+    /// A package that provides no asset by being named: the program's own, or an interface
+    /// crate (`digest`, `aead`, `signature`: their traits are implemented by others).
     fn neutral(&self, r: &str) -> bool {
         r.strip_prefix("pkg:cargo/")
             .and_then(|nv| nv.split_once('@'))
@@ -6757,8 +6757,8 @@ fn expansion(src: &Source, at: (usize, usize)) -> Option<String> {
 }
 
 thread_local! {
-    /// Set by a check that could tell its position only within a range of identical candidates
-    /// (C6): invocations of one macro that make the same item as far as the context says.
+    /// Set by a check that could tell its position only within a range of identical candidates:
+    /// invocations of one macro that make the same item as far as the context says.
     static RANGED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 

@@ -62,8 +62,6 @@ pub struct Pkg {
     /// one means the features alone do not decide; the code does (`crypto::ring::default_provider`).
     pub backends: Vec<String>,
     pub evidence: Vec<Evidence>,
-    /// Shortest dependency chain from a workspace member, member first.
-    pub chain: Vec<String>,
     /// Packages this one depends on (normal and build edges in the resolved graph).
     pub deps: Vec<PackageId>,
     /// The subset whose code ships with this package's: normal edges, unless this package is a
@@ -547,7 +545,6 @@ fn build(
             candidates: exact.map(|e| e.candidates.clone()).unwrap_or_default(),
             backends,
             evidence,
-            chain,
             deps: node
                 .deps
                 .iter()

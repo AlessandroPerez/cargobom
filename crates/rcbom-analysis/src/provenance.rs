@@ -38,7 +38,6 @@ pub fn call_paths(target: &Target) -> Vec<String> {
     out
 }
 
-/// Key material arguments of a call, with the classes of their origins: (role, classes).
 /// The role of an argument that only gives an output length: neither key material nor the
 /// algorithm.
 const LENGTH: &str = "length";
@@ -57,7 +56,7 @@ fn length_args(kb: &Kb, paths: &[String]) -> HashSet<usize> {
         .collect()
 }
 
-///
+/// Key material arguments of a call, with the classes of their origins: (role, classes).
 /// `protocol`: the call is a protocol crate's (rustls's key schedule), where an all-zero salt
 /// or input key is the protocol's own "none".
 pub fn of_call(
@@ -1171,10 +1170,10 @@ const ERROR_ARGS: &[&str] = &[
     "::inspect_err",
 ];
 
-/// Calls whose result is part of their receiver.
 /// Lookups: the value found is the receiver's (`JwkSet::find(&kid)`, `HashMap::get(&k)`).
 const LOOKUPS: &[&str] = &["::find", "::get", "::get_mut", "::get_key_value"];
 
+/// Calls whose result is part of their receiver.
 const INDEXING: &[&str] = &[
     "Index::index",
     "IndexMut::index_mut",
