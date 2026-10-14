@@ -343,7 +343,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 );
                 sc.visit_body(&body);
                 let mut l = rcbom_facts::Links::default();
-                links::body_links(&cx, &body, did, false, &mut l);
+                links::body_links(&cx, &body, did, false, None, &mut l);
                 links::promoted_links(&cx, did, &mut l);
                 cx.links.merge(l);
             }
@@ -389,7 +389,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 sc.visit_body(&body);
                 sc.promoted_values(did);
                 let mut l = rcbom_facts::Links::default();
-                links::body_links(&cx, &body, did, true, &mut l);
+                links::body_links(&cx, &body, did, true, None, &mut l);
                 links::promoted_links(&cx, did, &mut l);
                 cx.links.merge(l);
             }
@@ -436,12 +436,15 @@ fn analyze(tcx: TyCtxt<'_>) {
         let coercions = std::mem::take(&mut w.coercions);
         w.cx.links.coercions = coercions
             .into_iter()
-            .map(|((trait_path, ty), (at, defaults))| rcbom_facts::Coercion {
-                trait_path,
-                ty,
-                at,
-                defaults,
-            })
+            .map(
+                |((trait_path, ty), (at, in_static, methods))| rcbom_facts::Coercion {
+                    trait_path,
+                    ty,
+                    at,
+                    in_static,
+                    methods,
+                },
+            )
             .collect();
         sites.extend(w.sites);
         r.fns.extend(generic);
@@ -459,6 +462,7 @@ fn analyze(tcx: TyCtxt<'_>) {
     sites.retain(|s| seen.insert(s.clone()));
 
     let mut crate_links = std::mem::take(&mut cx.links);
+    links::instance_links(&cx, &mut crate_links);
     if catch_unwind(AssertUnwindSafe(|| {
         links::mutable_statics(&cx, &mut crate_links)
     }))
@@ -607,7 +611,7 @@ pub(crate) fn adt_args<'tcx>(
 
 /// `crate::` (how rustc prints the local crate under `with_crate_prefix!`) as the crate's name:
 /// `<crate::AesSealer as crate::Sealer>::seal` is `<micro::AesSealer as micro::Sealer>::seal`.
-fn local_crate_name(tcx: TyCtxt<'_>, p: String) -> String {
+pub(crate) fn local_crate_name(tcx: TyCtxt<'_>, p: String) -> String {
     let name = tcx.crate_name(rustc_span::def_id::LOCAL_CRATE);
     let mut out = String::with_capacity(p.len());
     let mut rest = p.as_str();
@@ -1970,9 +1974,9 @@ struct Walker<'a, 'tcx> {
     fns: Vec<String>,
     /// Defining paths of the walked functions.
     paths: Vec<String>,
-    /// Types coerced to trait objects in the walked code: first position seen, and the
-    /// methods for which the type runs the trait's default body.
-    coercions: BTreeMap<(String, String), (Option<Loc>, Vec<String>)>,
+    /// Types coerced to trait objects in the walked code: first position seen (in a static's
+    /// value or not), and the body each method of the object runs for the type.
+    coercions: BTreeMap<(String, String), CoercedAt>,
     limit: usize,
 }
 
@@ -2204,9 +2208,18 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
-        for (c, span) in std::mem::take(&mut edges.coerced) {
-            let at = locate_stable(self.cx.tcx, span).0;
-            self.coerced(c, (at.line > 0).then_some(at));
+        for (c, span, in_const) in std::mem::take(&mut edges.coerced) {
+            // a vtable in a named constant's value (`KP.alg()` with `const KP: &dyn Konst =
+            // &K1`): the coercion is written at the constant's item
+            let tcx = self.cx.tcx;
+            let item = in_const
+                .then(|| const_item_at(tcx, did, rustc_internal::internal(tcx, span)))
+                .flatten();
+            let at = match item {
+                Some(k) => locate(tcx, tcx.def_span(k)).0,
+                None => locate_stable(tcx, span).0,
+            };
+            self.coerced(c, (at.line > 0).then_some(at), false);
         }
         // RCBOM_DEBUG_WALK=<substring>: print the edges out of matching instances
         let debug = std::env::var("RCBOM_DEBUG_WALK")
@@ -2230,6 +2243,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             let owner = fn_owner(self.cx, &inst);
             self.fns.push(owner.id.clone());
             self.paths.push(path_of(self.cx.tcx, did));
+            // an instance whose summaries the links record under its own name (a trait's
+            // default body for a type, `<app::Legacy as app::Pick>::alg`)
+            if let Some(n) =
+                origins::body_name(self.cx.tcx, rustc_internal::internal(self.cx.tcx, inst))
+                && n != path_of(self.cx.tcx, did)
+            {
+                self.paths.push(n);
+            }
             let item = matches!(inst.kind, InstanceKind::Item);
             if item {
                 // a generic fn's per-item sites are owned by its def-path hash
@@ -2308,11 +2329,12 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
     }
 
-    /// A type is coerced to a trait object (at `at`, when in a function's body).
-    fn coerced(&mut self, (trait_path, ty, defaults): Coerced, at: Option<Loc>) {
+    /// A type is coerced to a trait object at `at` (in a function's body, a constant's or a
+    /// static's item; `in_static`: the static's value).
+    fn coerced(&mut self, (trait_path, ty, methods): Coerced, at: Option<Loc>, in_static: bool) {
         self.coercions
             .entry((trait_path, ty))
-            .or_insert((at, defaults));
+            .or_insert((at, in_static, methods));
     }
 
     /// A static is reached: remember it, and walk the function pointers and vtables in its
@@ -2346,8 +2368,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut nested = Vec::new();
         let mut coerced = Vec::new();
         alloc_callees(tcx, &a, &mut found, &mut nested, &mut coerced, 0);
+        let at = locate(tcx, tcx.def_span(did)).0;
         for c in coerced {
-            self.coerced(c, None);
+            self.coerced(c, (at.line > 0).then(|| at.clone()), true);
         }
         for i in found {
             self.enqueue(i, None);
@@ -2375,8 +2398,8 @@ struct Edges<'a, 'tcx> {
     tcx: TyCtxt<'tcx>,
     body: &'a Body,
     found: Vec<(Instance, Span)>,
-    /// Types coerced to a trait object, and where.
-    coerced: Vec<(Coerced, Span)>,
+    /// Types coerced to a trait object, where, and whether in a constant's value.
+    coerced: Vec<(Coerced, Span, bool)>,
     /// Span of the statement being visited, for casts.
     cur: Option<Span>,
     /// As in `Scanner`: the body holds an `async` closure; panics that are bugs.
@@ -2488,7 +2511,7 @@ impl Edges<'_, '_> {
                                 rustc_internal::internal(self.tcx, dynamic).kind()
                                 && let Some(c) = coercion(self.tcx, c, preds)
                             {
-                                self.coerced.push((c, span));
+                                self.coerced.push((c, span, false));
                             }
                             for i in vtable_methods(self.tcx, concrete, dynamic) {
                                 self.found.push((i, span));
@@ -2509,7 +2532,7 @@ impl Edges<'_, '_> {
             alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), &mut coerced, 0);
             self.found.extend(found.into_iter().map(|i| (i, c.span)));
             self.coerced
-                .extend(coerced.into_iter().map(|x| (x, c.span)));
+                .extend(coerced.into_iter().map(|x| (x, c.span, true)));
         }
         self.super_const_operand(c, loc);
     }
@@ -2572,12 +2595,16 @@ fn unsize_tails(src: &Ty, dst: &Ty) -> Option<(Ty, Ty)> {
 
 /// A type coerced to a trait object: the trait's path, the type's, and the trait methods for
 /// which the type's vtable holds the trait's default body.
-type Coerced = (String, String, Vec<String>);
+type Coerced = (String, String, Vec<(String, String)>);
+
+/// Where a type was first seen coerced (in a static's value or not), and the bodies its
+/// methods run.
+type CoercedAt = (Option<Loc>, bool, Vec<(String, String)>);
 
 /// A coercion of `concrete` to a trait object with predicates `preds`: the trait's path, the
-/// type's (an ADT's defining path, as `Links` names a method's `Self` type; `dyn` and the
-/// trait of another trait object; any other type as rustc prints it), and the methods it does
-/// not override.
+/// type's (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn` and the
+/// trait of another trait object; any other type as rustc prints it), and for each method of
+/// the object the body it runs for the type (`origins::body_name`).
 fn coercion<'tcx>(
     tcx: TyCtxt<'tcx>,
     concrete: rustc_middle::ty::Ty<'tcx>,
@@ -2585,7 +2612,10 @@ fn coercion<'tcx>(
 ) -> Option<Coerced> {
     let t = path_of(tcx, preds.principal_def_id()?);
     let ty = match concrete.kind() {
-        rustc_middle::ty::Adt(adt, _) => path_of(tcx, adt.did()),
+        rustc_middle::ty::Adt(adt, args) => match adt_args(tcx, args) {
+            Some(a) => format!("{}<{a}>", path_of(tcx, adt.did())),
+            None => path_of(tcx, adt.did()),
+        },
         // an upcast (`&dyn Sub` to `&dyn Super`): the types coerced to `Sub`; none for the
         // same trait (a reborrow)
         rustc_middle::ty::Dynamic(p, ..) => {
@@ -2597,8 +2627,8 @@ fn coercion<'tcx>(
         }
         _ => concrete.to_string(),
     };
-    // the vtable's methods that are the trait's own items (default bodies), not an impl's
-    let defaults = if concrete.is_trait() {
+    // each method of the vtable: the trait's item it is, and the body it runs
+    let methods = if concrete.is_trait() {
         Vec::new()
     } else {
         let principal = preds.principal()?;
@@ -2607,14 +2637,55 @@ fn coercion<'tcx>(
         tcx.vtable_entries(trait_ref)
             .iter()
             .filter_map(|e| match e {
-                rustc_middle::ty::VtblEntry::Method(i) => Some(i.def_id()),
+                rustc_middle::ty::VtblEntry::Method(i) => Some(*i),
                 _ => None,
             })
-            .filter(|&d| tcx.trait_of_assoc(d).is_some())
-            .map(|d| path_of(tcx, d))
+            .filter_map(|i| {
+                let d = i.def_id();
+                let item = if tcx.trait_of_assoc(d).is_some() {
+                    d
+                } else {
+                    tcx.trait_item_of(d)?
+                };
+                Some((path_of(tcx, item), crate::origins::body_name(tcx, i)?))
+            })
             .collect()
     };
-    Some((t, ty, defaults))
+    Some((t, ty, methods))
+}
+
+/// The named constant a body's constant operand at `span` is (`KP` in `KP.alg()`), read from
+/// the item's MIR, where it is not evaluated away.
+fn const_item_at(
+    tcx: TyCtxt<'_>,
+    did: rustc_span::def_id::DefId,
+    span: rustc_span::Span,
+) -> Option<rustc_span::def_id::DefId> {
+    use rustc_middle::mir::visit::Visitor;
+    struct V {
+        span: rustc_span::Span,
+        out: Option<rustc_span::def_id::DefId>,
+    }
+    impl<'tcx> Visitor<'tcx> for V {
+        fn visit_const_operand(
+            &mut self,
+            c: &rustc_middle::mir::ConstOperand<'tcx>,
+            _: rustc_middle::mir::Location,
+        ) {
+            if c.span == self.span
+                && let rustc_middle::mir::Const::Unevaluated(uv, _) = c.const_
+                && uv.promoted.is_none()
+            {
+                self.out = Some(uv.def);
+            }
+        }
+    }
+    if !tcx.is_mir_available(did) || tcx.is_closure_like(did) && !did.is_local() {
+        return None;
+    }
+    let mut v = V { span, out: None };
+    v.visit_body(tcx.optimized_mir(did));
+    v.out
 }
 
 fn vtable_methods(tcx: TyCtxt<'_>, concrete: Ty, dynamic: Ty) -> Vec<Instance> {

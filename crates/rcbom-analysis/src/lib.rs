@@ -1690,7 +1690,12 @@ fn site_matches(
                 // alternatives come from elsewhere (`if c { &SHA256 } else { pick() }`): then
                 // the values from other functions are looked up too, those named here kept as
                 // named here
-                let incomplete = provenance::incomplete(kb, &site.target);
+                // a field read of a static that stores values in fields (`TABLE[i].h`, a table of
+                // structs) is what its initializer stores in that field: looked up with the links
+                let static_field = local
+                    .iter()
+                    .any(|(_, others)| others.iter().any(|d| ctx.flow.static_fields(&d.id)));
+                let incomplete = provenance::incomplete(kb, &site.target) || static_field;
                 let named_here: HashSet<String> = if incomplete {
                     local
                         .iter()
@@ -1783,6 +1788,19 @@ fn site_matches(
                     };
                     // the members counted are those that reach the call
                     let n = descriptors.iter().filter(|d| !unreached_by(d)).count();
+                    // all of them read from one static's initializer (`TABLE[i].h`)
+                    let all_in_static = {
+                        let vias = named_via.borrow();
+                        let owners: HashSet<Option<&String>> = descriptors
+                            .iter()
+                            .filter(|d| !unreached_by(d))
+                            .map(|d| match vias.get(&d.id) {
+                                Some(crate::links::Via::Table(w)) => Some(w),
+                                _ => None,
+                            })
+                            .collect();
+                        owners.len() == 1 && !owners.contains(&None)
+                    };
                     for def in descriptors {
                         if let Some(mut m) =
                             matcher::match_static_called(kb, &def, Some(method), &supported)
@@ -1800,7 +1818,23 @@ fn site_matches(
                             let from_elsewhere = from_elsewhere && !here;
                             let unreached = unreached_by(&def);
                             let table = tables.get(&def.id);
+                            // read from a static's initializer (`TABLE[i].h`): from there
+                            let in_static = match named_via.borrow().get(&def.id) {
+                                Some(crate::links::Via::Table(w)) => Some(boundary::short_fn(w)),
+                                _ => None,
+                            };
                             let mut d = vec![match (from_elsewhere, n) {
+                                (true, 1) if !unreached && in_static.is_some() => format!(
+                                    "algorithm from {}, stored in `{}`",
+                                    short(&def.path),
+                                    in_static.clone().unwrap_or_default()
+                                ),
+                                (true, n) if !unreached && all_in_static => format!(
+                                    "algorithm one of the {n} in `{}` that may reach the call: \
+                                     {}",
+                                    in_static.clone().unwrap_or_default(),
+                                    short(&def.path)
+                                ),
                                 _ if !unreached && table.is_some() => {
                                     let (t, k) = table.cloned().unwrap_or_default();
                                     format!(
@@ -1816,12 +1850,26 @@ fn site_matches(
                                     short(&def.path),
                                     static_witness(&named.borrow(), &def.id)
                                 ),
-                                (false, n) if here && n > 1 => format!(
+                                (false, n) if n > 1 => format!(
                                     "algorithm one of {n} that may reach the call: {} in the arguments",
                                     short(&def.path)
                                 ),
                                 (false, _) => {
                                     format!("algorithm from {} in the arguments", short(&def.path))
+                                }
+                                // the only value found, but one that may not reach the call
+                                // (a store into the field anywhere, a trait object's type)
+                                (true, 1)
+                                    if named_via
+                                        .borrow()
+                                        .get(&def.id)
+                                        .is_some_and(|v| v.rank() > 1) =>
+                                {
+                                    format!(
+                                        "algorithm possibly from {}, the only one found reaching \
+                                         the call from another function",
+                                        short(&def.path)
+                                    )
                                 }
                                 (true, 1) => format!(
                                     "algorithm from {}, reaching the call from another function",
@@ -1836,6 +1884,23 @@ fn site_matches(
                             // (`UnboundKey::new(&AES_256_GCM, k)`, `hmac::Key::new(..)`)
                             if f.is_none() {
                                 d.insert(0, format!("{method}: setup, not a use"));
+                            }
+                            // an element of a container the call reads, named here: one of
+                            // the values it holds
+                            if !from_elsewhere
+                                && n > 1
+                                && provenance::container_member(&site.target, &def.id)
+                            {
+                                let at = d
+                                    .iter()
+                                    .position(|x| x.starts_with("algorithm"))
+                                    .map_or(d.len(), |i| i + 1);
+                                d.insert(
+                                    at,
+                                    "member: container, possible (an element of the container \
+                                     the call reads)"
+                                        .to_string(),
+                                );
                             }
                             // how the member reaches the call (its set label and witness)
                             if from_elsewhere
@@ -2209,8 +2274,14 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
             Origin::Call { callee, args, .. } if callee == "<closure>" => args
                 .iter()
                 .find_map(|a| leaf(ctx, a, owner, depth + 1, seen)),
-            // a crypto crate's call names its algorithm itself (matched at its own site)
-            Origin::Call { krate, .. } if ctx.kb.crate_by_name(krate).is_some() => None,
+            // a crypto crate's getter for the algorithm a value was made with is followed to
+            // the value (`ctx.algorithm()`); another of its calls returning an algorithm
+            // (`algorithm().digest_algorithm()`) is not
+            Origin::Call { krate, callee, .. } if ctx.kb.crate_by_name(krate).is_some() => {
+                let bare = matcher::strip_generics(callee);
+                (bare.ends_with("_algorithm") && !bare.ends_with("::algorithm"))
+                    .then(|| unresolved_kind(o))
+            }
             // a call of a closure runs the closure's code, not followed
             Origin::Call { callee, krate, .. }
                 if matches!(krate.as_str(), "core" | "std" | "alloc")
@@ -2257,6 +2328,9 @@ fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<Str
                     })
                     .find_map(|(_, a)| leaf(ctx, a, owner, depth + 1, seen))
             }
+            // an iterator advanced by `next` (`for a in DIGESTS.iter()`): its elements are the
+            // container's, followed beside it
+            Origin::Through { callee } if callee.ends_with("Iterator::next") => None,
             Origin::Unknown | Origin::Loop | Origin::Through { .. } => Some(unresolved_kind(o)),
             // a value from elsewhere: what reaches it, followed; the value itself among them is
             // one the links could not follow (a trait object's type whose method records
@@ -2496,7 +2570,10 @@ fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
 fn unresolved_kind(o: &rcbom_facts::Origin) -> String {
     use rcbom_facts::Origin;
     match o {
-        Origin::Param { .. } => "a parameter, whose arguments name no algorithm".into(),
+        Origin::Param { .. } => {
+            "a parameter, whose arguments (where a recorded call passes one) name no algorithm"
+                .into()
+        }
         Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
         Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
         Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),

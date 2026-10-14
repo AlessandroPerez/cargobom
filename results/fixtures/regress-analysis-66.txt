@@ -1,0 +1,121 @@
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:28:12 | ring::hmac::Key::new | [reachable] [call] in a66::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA512 in the arguments; key: hard-coded (21 bytes, literal at line 28); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, b"placeholder-not-a-key");`; code: `hmac::Key::new`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:28:27 | ring::hmac::HMAC_SHA512 | [reachable] [static] in a66::main; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, b"placeholder-not-a-key");`; code: `hmac::HMAC_SHA512`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:12 | ring::digest::digest | [reachable] [call] in a66::run; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `a66::pick`; line: `let _ = digest(a, d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:14:52 | ring::digest::digest | [reachable] [call] in a66::by_param; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a66::main`; line: `fn by_param(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:35 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let mut x1: &'static Digest = &SHA256;`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:54 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let a3: &'static Digest = if arg(3).is_empty() { &SHA256 } else { ctx.algorithm() };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a3, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:35 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let mut x5: &'static Digest = &SHA256;`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a66::pick`; line: `let _ = digest(a7, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:50 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let h = Holder { alg: if arg(8).is_empty() { &SHA256 } else { &SHA512 } };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:42:15 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `for a in [&SHA256, &SHA384] { let _ = digest(a, &d); }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:42:42 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in [&SHA256, &SHA384] { let _ = digest(a, &d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:16 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let a10 = [&SHA256, &SHA384].get(i).copied().unwrap_or(&SHA512);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(a10, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:16 | ring::digest::SHA256 | [reachable] [static] in a66::main; line: `let a11 = [&SHA256, &SHA384].into_iter().find(|a| a.output_len() == 48).unwrap();`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(a11, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:69 | ring::digest::SHA256 | [reachable] [static] in a66::pick; line: `fn pick(s: &str) -> Option<&'static Digest> { match s { "a" => Some(&SHA256), _ => None } }`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:36 | ring::digest::SHA384 | [reachable] [static] in a66::main; line: `let ctx = digest::Context::new(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(a2, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(a3, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:33:25 | ring::digest::SHA384 | [reachable] [static] in a66::main::{closure#1}; instantiated by a66::main at src/main.rs:33:16 as `|| x5 = &SHA384`; line: `let mut f = || x5 = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:38:38 | ring::digest::SHA384 | [reachable] [static] in a66::main; line: `let a7 = pick(&arg(7)).unwrap_or(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(a7, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:42:24 | ring::digest::SHA384 | [reachable] [static] in a66::main; line: `for a in [&SHA256, &SHA384] { let _ = digest(a, &d); }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:42:42 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in [&SHA256, &SHA384] { let _ = digest(a, &d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:44:25 | ring::digest::SHA384 | [reachable] [static] in a66::main; line: `let a10 = [&SHA256, &SHA384].get(i).copied().unwrap_or(&SHA512);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(a10, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:46:25 | ring::digest::SHA384 | [reachable] [static] in a66::main; line: `let a11 = [&SHA256, &SHA384].into_iter().find(|a| a.output_len() == 48).unwrap();`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(a11, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:52 | ring::digest::digest | [reachable] [call] in a66::by_param; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `a66::main`; line: `fn by_param(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:20:40 | ring::digest::SHA512 | [reachable] [static] in a66::main::{closure#0}; instantiated by a66::main at src/main.rs:20:30 as `|_| x1 = &SHA512`; line: `[1, 2, 3].iter().for_each(|_| x1 = &SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:28:27 | ring::hmac::HMAC_SHA512 | [reachable] [component] in a66::main; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, b"placeholder-not-a-key");`; code: `hmac::HMAC_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:40:67 | ring::digest::SHA512 | [reachable] [static] in a66::main; line: `let h = Holder { alg: if arg(8).is_empty() { &SHA256 } else { &SHA512 } };`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:44:60 | ring::digest::SHA512 | [reachable] [static] in a66::main; line: `let a10 = [&SHA256, &SHA384].get(i).copied().unwrap_or(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(a10, &d);`; code: `digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a66 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a66 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a66 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x1, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: the result of `ring::hmac::Algorithm::digest_algorithm`; line: `let _ = digest(a4, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::ops::function::FnMut::call_mut` is not followed; line: `let _ = digest(x5, &d);`; code: `digest`
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=2
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=17
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=12
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=6
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep pkg:cargo/a66@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
+dependency pkg:cargo/a66@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
+root {"bom-ref": "pkg:cargo/a66@0.1.0", "name": "a66", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a66@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=105
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -21,9 +21,36 @@
 //!   comment or a string) in the table the context names, in the manifest of the package it
 //!   names; a `Cargo.lock` position is the `name` line of the locked version the context names;
 //!   lines are compared without the `\r` of a CRLF file;
-//! - a standard-library location (`/rustc/<commit>/..`) names the pinned toolchain's commit.
+//! - a standard-library location (`/rustc/<commit>/..`) names the pinned toolchain's commit;
+//! - "algorithm from X in the arguments": X is named in the code the call reads (its arguments
+//!   and receiver; the variables they read, through bindings in scope, the stores into them that
+//!   may reach the call, a store or a call of the file's function that replaces the place read
+//!   on every way to it; the statics, consts and `const fn`s named), and no other descriptor of
+//!   the asset's primitive (nor a type the knowledge base gives one) is read instead;
+//! - a static table's member ("one of the N in `T`", "stored in `static T`") is held by the
+//!   static or const `T` of the package (the field read, where the context reads one); a
+//!   coercion ("`T` is coerced to `dyn Tr` at F:L") is a pointer made of a `T` (or of a
+//!   variable or parameter bound to one) on that line, in a static's item exactly when the
+//!   detail says "in a static";
+//! - a pointer's `named at` is where the variable called is bound, the binding in scope (blocks,
+//!   closures, nested functions, shadowing, `let f = f;`, a macro's `let`);
+//! - a closure's instantiation detail cites a closure, or an `async` closure's body, whose
+//!   extent holds the next position inward; an instantiation detail citing an
+//!   `[instantiation]` occurrence's position is of one of that position's assets, and an
+//!   `[instantiation]` occurrence cited by details is cited by its own asset's;
+//! - a macro's body line cited is in the rule the invocation matches (rustc's first, for rules
+//!   without repetitions), and uses the metavariable that rule binds to the symbol.
+//!
+//! Verdicts: a position is verified exactly, or, where the context cannot tell identical
+//! candidates apart (invocations of one macro that make the same item as far as its path says),
+//! within a range of them (counted apart, never as exact; the self-test counts a shift that
+//! lands only within such a range as rejected).
 //!
 //! Known limits:
+//! - The check of "in the arguments" follows stores by the file's functions and inherent
+//!   methods named in the function, not trait methods dispatched on the receiver's type
+//!   (`a.up2()` through a default body, `u.up()` on a `&mut dyn`): a value such a call
+//!   replaces is still read as the variable's binding.
 //! - `#[cfg(..)]` is not evaluated. A shifted position that lands on an identical line that the
 //!   configuration removes (`#[cfg(any())] let d = Sha256::digest(data);` just above the same
 //!   statement) is accepted by the self-test. The generator never cites such code (rustc does not
@@ -80,6 +107,8 @@ struct Graph {
     providers: HashMap<String, HashSet<String>>,
     /// asset bom-ref -> its algorithm family
     family: HashMap<String, String>,
+    /// asset bom-ref -> its primitive (`hash`, `ae`, `signature`, ..)
+    primitive: HashMap<String, String>,
     /// asset bom-ref -> its `cryptoFunctions`, and whether it is reachable (its functions are
     /// then those of its reachable occurrences or entries)
     functions: HashMap<String, (Vec<String>, bool)>,
@@ -256,6 +285,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         depends_on: HashMap::new(),
         providers: HashMap::new(),
         family: HashMap::new(),
+        primitive: HashMap::new(),
         functions: HashMap::new(),
     };
     // the components, and the root package (`metadata.component`)
@@ -289,6 +319,10 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     .or(prop)
                 {
                     graph.family.insert(r.to_string(), f.to_string());
+                }
+                if let Some(p) = c["cryptoProperties"]["algorithmProperties"]["primitive"].as_str()
+                {
+                    graph.primitive.insert(r.to_string(), p.to_string());
                 }
                 let prop = |n: &str| {
                     c["properties"]
@@ -380,6 +414,21 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             .or_default()
             .push(i);
     }
+    let mut cited: HashMap<(String, usize, usize), HashSet<String>> = HashMap::new();
+    for o in &occs {
+        for m in re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?:;|$)")
+            .captures_iter(&o.context)
+        {
+            cited
+                .entry((
+                    m[1].to_string(),
+                    m[2].parse().unwrap_or(0),
+                    m[3].parse().unwrap_or(0),
+                ))
+                .or_default()
+                .insert(o.component_ref.clone());
+        }
+    }
     let mut files = Files {
         man: &man,
         kb: &kb,
@@ -395,12 +444,24 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         occs: &occs,
         at_pos,
         at_line,
+        cited,
         graph,
     };
     let mut bad = 0;
+    let mut ranged = 0;
     let mut verified = vec![false; occs.len()];
     for (i, o) in occs.iter().enumerate() {
+        RANGED.with(|r| r.set(false));
         match files.check(i, o.line, o.offset) {
+            Ok(()) if RANGED.with(|r| r.get()) => {
+                // C6: identical candidates the context cannot tell apart; not exact
+                verified[i] = true;
+                ranged += 1;
+                println!(
+                    "RANGE {} {}:{}:{}: one of identical candidates",
+                    o.component, o.location, o.line, o.offset
+                );
+            }
             Ok(()) => verified[i] = true,
             Err(e) => {
                 bad += 1;
@@ -412,11 +473,13 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         }
     }
     println!(
-        "{}: {} positions verified, {} mismatched, {} occurrences without a line",
+        "{}: {} positions verified, {} mismatched, {} occurrences without a line, {} within a range \
+         of identical candidates",
         cbom.display(),
-        occs.len() - bad,
+        occs.len() - bad - ranged,
         bad,
-        without_line
+        without_line,
+        ranged
     );
     let bad = bad + without_line;
     if self_test {
@@ -438,9 +501,15 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     Some((i, l, c))
                 })
                 .collect();
-            let mut caught = 0;
+            let (mut caught, mut in_range) = (0, 0);
             for &(i, l, c) in &shifted {
-                if files.check(i, l, c).is_err() {
+                RANGED.with(|r| r.set(false));
+                let ok = files.check(i, l, c).is_ok();
+                if ok && RANGED.with(|r| r.get()) {
+                    // not confirmed: one of identical candidates (C6)
+                    caught += 1;
+                    in_range += 1;
+                } else if !ok {
                     caught += 1;
                 } else {
                     let o = &occs[i];
@@ -451,7 +520,8 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 }
             }
             println!(
-                "self-test {what}: {caught}/{} shifted positions rejected",
+                "self-test {what}: {caught}/{} shifted positions rejected ({in_range} of them \
+                 only placed within a range of identical candidates)",
                 shifted.len()
             );
         }
@@ -465,11 +535,15 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         ] {
             let (mut caught, mut total) = (0, 0);
             for (i, o) in occs.iter().enumerate().filter(|&(i, _)| verified[i]) {
-                for m in re!(
+                let details = re!(
                     r"(?:instantiated by .*? at|expanded from|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?(?:;|$)"
                 )
                 .captures_iter(&o.context)
-                {
+                .chain(
+                    re!(r"coerced to `[^`]+` (?:in a static )?at [^\s;)]+?:(\d+)\)")
+                        .captures_iter(&o.context),
+                );
+                for m in details {
                     let (Some(lg), cg) = (m.get(1), m.get(2)) else {
                         continue;
                     };
@@ -507,10 +581,11 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                         continue;
                     }
                     total += 1;
-                    if files
+                    RANGED.with(|r| r.set(false));
+                    let ok = files
                         .check_with(i, o.line, o.offset, Some(&shifted))
-                        .is_err()
-                    {
+                        .is_ok();
+                    if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
                     } else {
                         println!(
@@ -568,6 +643,12 @@ struct Source {
     /// Rust: the items with a body (functions, statics, consts, impl blocks, traits, modules,
     /// `macro_rules!`), where a position's enclosing item is looked up
     items: Vec<Item>,
+    /// Rust: the file's chars with comments and literals blanked (line breaks kept), and the
+    /// index of each line's first char in it
+    code: Vec<char>,
+    line_start: Vec<usize>,
+    /// Rust: the bindings of each function read so far (`fn_scope`), by its start
+    scopes: std::cell::RefCell<HashMap<usize, Rc<FnScope>>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -622,6 +703,9 @@ impl Source {
                 toml: if toml { toml_keys(text) } else { Vec::new() },
                 use_spans: Vec::new(),
                 items: Vec::new(),
+                code: Vec::new(),
+                line_start: Vec::new(),
+                scopes: Default::default(),
             };
         }
         let (mut class, code_text) = lex(text);
@@ -663,7 +747,56 @@ impl Source {
             toml: Vec::new(),
             use_spans,
             items,
+            code: chars,
+            line_start: starts,
+            scopes: Default::default(),
         }
+    }
+
+    /// The index in `code` of (line, col) (1-based line, 0-based char column).
+    fn idx(&self, at: (usize, usize)) -> usize {
+        self.line_start
+            .get(at.0.wrapping_sub(1))
+            .map_or(self.code.len(), |s| s + at.1)
+            .min(self.code.len())
+    }
+
+    /// The (line, col) of an index in `code`.
+    fn pos(&self, i: usize) -> (usize, usize) {
+        let l = self.line_start.partition_point(|&s| s <= i).max(1) - 1;
+        (l + 1, i - self.line_start[l])
+    }
+
+    /// The code from `a` to `b` (indexes in `code`).
+    fn text(&self, a: usize, b: usize) -> String {
+        self.code[a.min(self.code.len())..b.min(self.code.len())]
+            .iter()
+            .collect()
+    }
+
+    /// An item's extent in `code`.
+    fn span(&self, i: &Item) -> (usize, usize) {
+        (self.idx(i.start), self.idx(i.end))
+    }
+
+    /// The source text (comments and literals kept) from `a` to `b`, indexes in `code`.
+    fn orig(&self, a: usize, b: usize) -> String {
+        let ((la, ca), (lb, cb)) = (self.pos(a), self.pos(b));
+        let mut out = String::new();
+        for l in la..=lb.min(self.lines.len()) {
+            let chars: Vec<char> = self.lines[l - 1].chars().collect();
+            let from = if l == la { ca } else { 0 };
+            let to = if l == lb {
+                cb.min(chars.len())
+            } else {
+                chars.len()
+            };
+            out.extend(&chars[from.min(to)..to]);
+            if l != lb {
+                out.push('\n');
+            }
+        }
+        out
     }
 
     /// The innermost item of one of `kinds` that contains the position.
@@ -968,6 +1101,9 @@ struct Files<'a> {
     occs: &'a [Occ],
     at_pos: HashMap<(String, usize, usize), Vec<usize>>,
     at_line: HashMap<(String, usize), Vec<usize>>,
+    /// (location, line, column) -> the assets whose details cite it (`instantiated by X at
+    /// F:L:C`)
+    cited: HashMap<(String, usize, usize), HashSet<String>>,
     graph: Graph,
 }
 
@@ -2423,7 +2559,16 @@ impl Files<'_> {
         }
         // the positions the details name: where a generic instance was instantiated, where a
         // macro's code was written
-        self.check_details(ctx.details, ctx.tags, &o.symbol, ctx.line, (&path, line))?;
+        self.check_details(
+            ctx.details,
+            ctx.tags,
+            &o.symbol,
+            ctx.line,
+            (&path, line, offset),
+            &o.component_ref,
+        )?;
+        // where a type was made a trait object
+        self.check_coercions(ctx.details)?;
         // the macro tags are among the leading tags, never in the recorded source text; a tagged
         // position is the macro's, derive's or attribute's name, not the symbol's
         let mut tagged = false;
@@ -2627,7 +2772,14 @@ impl Files<'_> {
                 // binding of the variable it copies (`if let Some(f) = o`: `o`'s), in the body
                 // of the file's function it calls (`let g = get();`: `get`'s)
                 if !root.is_empty() && self.resolve(file).ok().as_deref() == Some(path.as_path()) {
-                    pointer_bound(&src, line, &root, l2).map_err(|e| {
+                    // (the root as read at the call: `self` in `(self.f)(..)`)
+                    let rest: String = chars[offset..].iter().collect();
+                    let k = Regex::new(&format!(r"\b{}\b", regex::escape(&root)))
+                        .ok()
+                        .and_then(|r| r.find(&rest))
+                        .map_or(0, |m| rest[..m.start()].chars().count());
+                    let root_at = src.idx((line, offset + k));
+                    pointer_bound(&src, root_at, &root, l2).map_err(|e| {
                         format!("{e}, not where the function is named ({file}:{l2}:{c2})")
                     })?;
                 }
@@ -2655,7 +2807,21 @@ impl Files<'_> {
                                 )
                         })
                 });
-                if !names {
+                // or a macro of the file whose expansion binds it is invoked there (`bind!(m)`
+                // with `let $n: HashFn = digest::digest;`): its body names it
+                let by_macro = !names
+                    && macro_call_at(&src2, (l2, c2))
+                    && invocation_text(&src2, (l2, c2)).is_some_and(|(m, _)| {
+                        src2.items
+                            .iter()
+                            .filter(|i| i.kind == ItemKind::Macro && i.name == m)
+                            .any(|i| {
+                                let (a, b) = src2.span(i);
+                                Regex::new(&format!(r"\b{}\b", regex::escape(&ident)))
+                                    .is_ok_and(|r| r.is_match(&src2.text(a, b)))
+                            })
+                    });
+                if !names && !by_macro {
                     return Err(format!(
                         "the function pointer's position {file}:{l2}:{c2} does not name `{ident}`"
                     ));
@@ -2710,6 +2876,17 @@ impl Files<'_> {
             if pointer.is_none() && !(ok && starts_token) {
                 return Err(format!("expected `{ident}` in {text:?}"));
             }
+        }
+        // an instantiation's position that details cite (`instantiated by X at F:L:C`) is cited
+        // by one of this asset's
+        if kind == "instantiation"
+            && let Some(by) = self.cited.get(&(o.location.clone(), line, offset))
+            && !by.contains(&o.component_ref)
+        {
+            return Err(format!(
+                "the instantiation here is cited by {} occurrences of other assets only",
+                by.len()
+            ));
         }
         // a component is used where the asset it is part of is used
         if kind == "component" {
@@ -2770,84 +2947,69 @@ impl Files<'_> {
             _ => None,
         };
         // the descriptor a call's algorithm comes from names the asset too
+        let mut descriptors: Vec<String> = Vec::new();
         for p in parts(ctx.details) {
-            let named: Vec<&str> = if let Some(m) =
-                re!(r"^algorithm from ([\w:]+)(?: in the arguments|, reaching .*)?$").captures(p)
+            // a static a member is stored by holds it (`member: table, stored by `static T``);
+            // one a member is a value of exists (`member: static, possible (a value `static T`
+            // holds ..)`)
+            if let Some(m) = re!(r"^member: table, stored by `static ([^`]+)`").captures(p) {
+                for d in &descriptors {
+                    self.check_table(&src, &path, &m[1], d)?;
+                }
+                continue;
+            }
+            if let Some(m) =
+                re!(r"^member: static, possible \(a value `static ([^`]+)` holds").captures(p)
+            {
+                self.check_table(&src, &path, &m[1], "")?;
+                continue;
+            }
+            let named: Vec<&str> = if let Some(m) = re!(
+                r"^algorithm (?:possibly )?from ([\w:]+)(?: in the arguments|, reaching .*|, the only one found reaching .*)?$"
+            )
+            .captures(p)
             {
                 vec![m.get(1).map_or("", |g| g.as_str())]
+            } else if let Some(m) = re!(
+                r"^algorithm (?:from ([\w:]+), stored in `static ([^`]+)`|one of the \d+ in `(?:static )?([^`]+)`(?:,| that) .*?: ([\w:]+))$"
+            )
+            .captures(p)
+            {
+                // a member of a static (a table): it holds it
+                let d = m.get(1).or(m.get(4)).map_or("", |g| g.as_str());
+                let table = m.get(2).or(m.get(3)).map_or("", |g| g.as_str());
+                self.check_table(&src, &path, table, d)?;
+                vec![d]
             } else if let Some(m) = re!(r"^algorithm one of \d+ that .*?: (.+)$").captures(p) {
-                m.get(1).map_or("", |g| g.as_str()).split(", ").collect()
+                m.get(1)
+                    .map_or("", |g| g.as_str())
+                    .split(", ")
+                    .map(|d| d.trim_end_matches(" in the arguments"))
+                    .collect()
             } else {
                 continue;
             };
-            let family = self.graph.family.get(&o.component_ref).map(String::as_str);
-            // named in the call's own arguments: when they name a descriptor of the same
-            // module, it is that one (`Salt::new(hkdf::HKDF_SHA256, ..)` is no `HKDF_SHA384`)
-            if p.ends_with(" in the arguments")
-                && let Some(open) = chars[offset..].iter().position(|&c| c == '(')
-                && let Some((args, _)) = code_until(&src, (line, offset + open + 1), |_| false)
-            {
-                let lasts: Vec<&str> = named
-                    .iter()
-                    .map(|d| d.rsplit("::").next().unwrap_or(d))
+            let family = self.graph.family.get(&o.component_ref).cloned();
+            let family = family.as_deref();
+            // the code the call reads names it (`Salt::new(hkdf::HKDF_SHA256, ..)` is no
+            // `HKDF_SHA384`; `prk.expand(.., HKDF_SHA256)` with `prk` from `Salt::new(HKDF_SHA384,
+            // ..)` may be either)
+            if p.ends_with(" in the arguments") {
+                let members = named.clone();
+                let expanded: Vec<usize> = re!(r"expanded from ([^\s;]+?):(\d+)(?:;|$)")
+                    .captures_iter(ctx.details)
+                    .filter(|m| self.resolve(&m[1]).ok().as_deref() == Some(path.as_path()))
+                    .filter_map(|m| m[2].parse().ok())
                     .collect();
-                let others: Vec<String> = re!(r"\b[A-Z][A-Z0-9_]*\b")
-                    .find_iter(&args)
-                    .map(|m| {
-                        // an import alias (`SHA1_FOR_LEGACY_USE_ONLY as SHA1`): its item
-                        src.binds
-                            .iter()
-                            .find(|b| b.name == m.as_str())
-                            .and_then(|b| b.path.last().cloned())
-                            .unwrap_or_else(|| m.as_str().to_string())
-                    })
-                    // a descriptor of the same kind as the asset (another hash at a hash's
-                    // call), not one the call takes for another role (`expand(info,
-                    // &AES_256_GCM)`'s output length)
-                    .filter(|w| {
-                        let kind = |n: &str| n.split('-').next().unwrap_or(n).to_string();
-                        named.iter().any(|d| {
-                            let module = d.rsplit_once("::").map_or("", |(m, _)| m);
-                            let k = d.split("::").next().unwrap_or("");
-                            rcbom_analysis::static_names(self.kb, k, &format!("{module}::{w}"))
-                                .iter()
-                                .any(|n| kind(n) == kind(&o.component))
-                        })
-                    })
-                    .collect();
-                // or named where the receiver was made (`prk.expand(.., HKDF_SHA256)` with `prk`
-                // from `Salt::new(HKDF_SHA384, ..)`: the length is not the algorithm)
-                let before: String = chars[..offset].iter().collect();
-                let receiver_names = re!(r"([A-Za-z_]\w*)\s*\.\s*$")
-                    .captures(&before)
-                    .is_some_and(|r| {
-                        let mut var = (line, r[1].to_string());
-                        for _ in 0..4 {
-                            let Some(Bound::Let { first, init, .. }) = binding(&src, var.0, &var.1)
-                            else {
-                                return false;
-                            };
-                            if lasts.iter().any(|l| init.contains(l)) {
-                                return true;
-                            }
-                            match re!(r"^\s*&?\s*([A-Za-z_]\w*)\b").captures(&init) {
-                                Some(v) => var = (first, v[1].to_string()),
-                                None => return false,
-                            }
-                        }
-                        false
-                    });
-                if !others.is_empty()
-                    && !receiver_names
-                    && !others.iter().any(|w| lasts.contains(&w.as_str()))
-                {
-                    return Err(format!(
-                        "the call's arguments name {}, not {}",
-                        others.join(", "),
-                        lasts.join(", ")
-                    ));
-                }
+                self.check_args(
+                    &src,
+                    (line, offset),
+                    &members,
+                    &o.component_ref,
+                    ctx.tags.contains("[macro ").then_some(expanded.as_slice()),
+                )?;
             }
+            descriptors.extend(named.iter().map(|d| d.to_string()));
             for d in named {
                 let names =
                     rcbom_analysis::static_names(self.kb, d.split("::").next().unwrap_or(""), d);
@@ -2965,6 +3127,341 @@ impl Files<'_> {
 
     /// A package that provides no asset by being named: the program's own, or an interface
     /// crate (`digest`, `aead`, `signature`: their traits are implemented by others).
+    /// "algorithm from X in the arguments" (or one of several such `members`) at the call at
+    /// `at`: X is named in the code the call reads (its arguments and receiver, the variables
+    /// they read and what the function stores in them, the statics, consts and `const fn`s
+    /// those name), and the call reads no other descriptor of the asset's primitive instead.
+    /// Where that code reads values from elsewhere (a parameter), X is named in the function.
+    /// A macro's call (`expanded` gives the lines of its body cited) reads the invocation and
+    /// those lines.
+    fn check_args(
+        &self,
+        src: &Source,
+        at: (usize, usize),
+        members: &[&str],
+        component_ref: &str,
+        expanded: Option<&[usize]>,
+    ) -> Result<(), String> {
+        let s = &src.code;
+        let lasts: Vec<String> = members
+            .iter()
+            .map(|d| d.rsplit("::").next().unwrap_or(d).to_string())
+            .collect();
+        let has = |r: &Reads| lasts.iter().any(|l| r.names.contains(l));
+        let p = src.idx(at);
+        let mut seen = HashSet::new();
+        let mut call = Reads::default();
+        if let Some(lines) = expanded {
+            // the invocation's arguments and the macro's lines
+            let open = scan_to(s, p, s.len(), |i| matches!(s[i], '(' | '[' | '{' | ';'));
+            if let Some(close) = close_of_at(s, open) {
+                names_read(src, self.kb, open + 1, close, 3, &mut seen, &mut call, true);
+            }
+            for &l in lines {
+                let (a, b) = (src.idx((l, 0)), src.idx((l + 1, 0)));
+                names_read(src, self.kb, a, b, 1, &mut seen, &mut call, false);
+            }
+            if has(&call) || call.open || lines.is_empty() {
+                return Ok(());
+            }
+            return Err(format!(
+                "neither the invocation nor the macro's line names {}",
+                lasts.join(", ")
+            ));
+        }
+        // the call: its callee (a path, or an expression through a pointer: `(h.f)`, `FNS[i]`,
+        // `get()`), then its arguments; the receiver of a method
+        let mut j = p;
+        let mut groups = Vec::new();
+        loop {
+            j = skip_blank(s, j);
+            if word_start(s, j) {
+                j += word_of(s, j).len();
+            } else if s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+                j += 2;
+            } else if s.get(j) == Some(&'<') && groups.is_empty() {
+                let cls = vec![Class::Code; s.len() - j];
+                match skip_angle(&s[j..], &cls, 0) {
+                    Some(e) => j += e,
+                    None => break,
+                }
+            } else if matches!(s.get(j), Some('(' | '[')) || (s.get(j) == Some(&'*') && j == p) {
+                if s[j] == '*' {
+                    j += 1;
+                    continue;
+                }
+                let Some(c) = close_of_at(s, j) else { break };
+                groups.push((j, c));
+                j = c + 1;
+            } else {
+                break;
+            }
+        }
+        if !groups.iter().any(|&(o, _)| s[o] == '(') {
+            return Ok(());
+        }
+        for &(o, c) in &groups {
+            names_read(src, self.kb, o + 1, c, 4, &mut seen, &mut call, true);
+        }
+        if let Some(dot) = before_blank(s, p).filter(|&d| s[d] == '.')
+            && let Some((r, _, _)) = receiver_at(s, dot)
+        {
+            names_read(src, self.kb, r, dot, 4, &mut seen, &mut call, true);
+        }
+        if has(&call) {
+            return Ok(());
+        }
+        // other descriptors of its primitive, or a type of the build's crates that the knowledge
+        // base gives one (`kp.sign(..)` with `kp` an `Ed25519KeyPair`)
+        let prim = self.graph.primitive.get(component_ref);
+        let others: Vec<&String> = call
+            .names
+            .iter()
+            .filter(|w| {
+                self.kb
+                    .statics
+                    .iter()
+                    .any(|e| e.pattern.is_match(w) && Some(&e.algo.primitive) == prim)
+            })
+            .chain(call.types.iter().filter(|w| {
+                self.kb.types.iter().any(|e| {
+                    e.name == **w
+                        && Some(&e.algo.primitive) == prim
+                        && self.libs.as_ref().is_some_and(|l| l.contains_key(&e.krate))
+                })
+            }))
+            .collect();
+        if !(call.open || call.foreign) || (!others.is_empty() && !call.replaced) {
+            let read = if others.is_empty() {
+                "no descriptor of its kind".to_string()
+            } else {
+                others
+                    .iter()
+                    .map(|w| w.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            };
+            return Err(format!(
+                "the code the call reads names {read}, not {}",
+                lasts.join(", ")
+            ));
+        }
+        // values from elsewhere: X named in the function at least
+        if let Some(f) = src.enclosing(at, &[ItemKind::Fn]) {
+            let (a, b) = src.span(f);
+            let mut whole = Reads::default();
+            names_read(src, self.kb, a, b, 2, &mut HashSet::new(), &mut whole, true);
+            if !has(&whole) && !whole.foreign {
+                return Err(format!(
+                    "the function names no {} (the call reads values from elsewhere)",
+                    lasts.join(", ")
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// "dyn: `T` is coerced to `dyn Tr` at F:L" (or "in a static at F:L"): line L of F makes a
+    /// `T` a pointer there: it names the type (`Box::new(Fast)`, `&Legacy`, `W::<A>(..)` with its
+    /// type arguments, `3u8`), or a variable or parameter whose binding does (`&mut c4` with
+    /// `let mut c4 = Ctx { .. }`), beside a pointer made (`&`, `Box::new`) or a `dyn` type.
+    fn check_coercions(&mut self, details: &str) -> Result<(), String> {
+        for m in re!(
+            r"dyn: `([^`]+)`(?:, the only type)? (?:is )?coerced to `([^`]+)` (in a static )?at ([^\s;)]+?):(\d+)\)"
+        )
+        .captures_iter(details)
+        {
+            let (ty, file, line) = (&m[1], &m[4], m[5].parse::<usize>().unwrap_or(0));
+            let what = m[0].trim_end_matches(')');
+            let path = self.resolve(file)?;
+            let src = self
+                .source(&path)
+                .ok_or_else(|| format!("cannot read {file}, named in `{what}`"))?;
+            let Some(text) = src.lines.get(line.wrapping_sub(1)) else {
+                return Err(format!("`{what}`: no line {line} in {file}"));
+            };
+            // a static's value is "in a static", a function's or a const's not
+            let in_static = src
+                .enclosing((line, text.chars().count()), &[ItemKind::Static])
+                .or_else(|| src.enclosing((line, 0), &[ItemKind::Static]))
+                .is_some_and(|i| kw(&src.code, src.span(i).0, "static"));
+            if in_static != m.get(3).is_some() {
+                return Err(format!(
+                    "`{what}`: line {line} of {file} is {}in a static",
+                    if in_static { "" } else { "not " }
+                ));
+            }
+            let code: String = text
+                .chars()
+                .zip(&src.class[line - 1])
+                .map(|(c, k)| if *k == Class::Code { c } else { ' ' })
+                .collect();
+            let base = type_name(ty);
+            // the type's arguments (`d3::W<d3::A>`: `A`)
+            let args: Vec<String> = ty
+                .find('<')
+                .map(|i| {
+                    let inner = &ty[i + 1..ty.len().saturating_sub(1)];
+                    inner
+                        .split(',')
+                        .map(type_name)
+                        .filter(|a| !a.is_empty() && a.chars().all(is_ident))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let word = |w: &str| {
+                Regex::new(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&code))
+            };
+            const PRIMS: &[&str] = &[
+                "u8", "u16", "u32", "u64", "u128", "usize", "i8", "i16", "i32", "i64", "i128",
+                "isize", "f32", "f64",
+            ];
+            let s = &src.code;
+            let (l0, l1) = (src.idx((line, 0)), src.idx((line + 1, 0)));
+            let dyn_here = word("dyn");
+            // a value made a pointer at `i`: `&x`, `&mut x`, `Box::new(x`, `Rc::new(x`, or the
+            // value of a statement with a `dyn` type (`let d: Box<dyn Tr> = b;`)
+            let made_pointer = |i: usize| -> bool {
+                let Some(p) = before_blank(s, i) else {
+                    return false;
+                };
+                match s[p] {
+                    '&' => true,
+                    '=' => dyn_here,
+                    '(' => {
+                        let w = word_before_at(s, p);
+                        let start = before_blank(s, p).map_or(p, |e| e + 1 - w.len().min(e + 1));
+                        let head = src.text(l0.min(start), start);
+                        matches!(w.as_str(), "new" | "pin")
+                            && re!(r"\b(?:Box|Rc|Arc)\s*::\s*$").is_match(head.trim_end())
+                    }
+                    c if is_ident(c) => {
+                        word_before_at(s, i) == "mut"
+                            && p >= 2
+                            && before_blank(s, p - 2).is_some_and(|q| s[q] == '&')
+                    }
+                    _ => false,
+                }
+            };
+            // the type, with its arguments, made a pointer
+            let names_type = (args.iter().all(|a| word(a))
+                && (l0..l1).any(|i| kw(s, i, &base) && made_pointer(i)))
+                || (PRIMS.contains(&base.as_str())
+                    && (l0..l1).any(|i| {
+                        s[i].is_ascii_digit()
+                            && (i == 0 || !is_ident(s[i - 1]))
+                            && word_of(s, i).ends_with(base.as_str())
+                            && made_pointer(i)
+                    }));
+            if names_type {
+                continue;
+            }
+            // a variable or parameter of the type, made a pointer there
+            let ty_word = Regex::new(&format!(r"\b{}\b", regex::escape(&base))).ok();
+            let via_var = (l0..l1).any(|i| {
+                    if !word_start(s, i)
+                        || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
+                        || !made_pointer(i)
+                    {
+                        return false;
+                    }
+                    let w = word_of(s, i);
+                    if !w.chars().next().is_some_and(|c| c.is_lowercase() || c == '_')
+                        || is_keyword(&w)
+                    {
+                        return false;
+                    }
+                    match binding(&src, i, &w) {
+                        // (not one that is a trait object already: `let up: &dyn Super = s;`
+                        // with `let s: &dyn Sub = &S1;` coerces no `S1`)
+                        Some(Bound::Let {
+                            init, first, last, ..
+                        }) => {
+                            let stmt: Vec<&str> =
+                                (first..=last).map(|l| src.lines[l - 1].as_str()).collect();
+                            ty_word.as_ref().is_some_and(|r| {
+                                r.is_match(&init) || stmt.iter().any(|l| r.is_match(l))
+                            }) && !stmt.iter().any(|l| re!(r"\bdyn\b").is_match(l))
+                        }
+                        Some(Bound::Param { .. }) => true,
+                        _ => false,
+                    }
+                });
+            if !via_var {
+                return Err(format!(
+                    "`{what}`: line {line} of {file} makes no `{ty}` a pointer to a trait object"
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// "one of the N in `TABLE`, ..: X": a static or const `TABLE` of the package holds X (in
+    /// its initializer, or in a static or const it names).
+    fn check_table(
+        &mut self,
+        src: &Source,
+        path: &Path,
+        table: &str,
+        d: &str,
+    ) -> Result<(), String> {
+        let name = table.rsplit("::").next().unwrap_or(table);
+        let last = d.rsplit("::").next().unwrap_or(d).to_string();
+        let mut files: Vec<PathBuf> = vec![path.to_path_buf()];
+        let own = self.man.owner_of(path);
+        if let Some(p) = own {
+            files.extend(package_files(&p.manifest_dir));
+        }
+        // a static of another package of the build (`dep::N1`): that package's files; of a
+        // crate whose sources are not at hand, not checked
+        let krate = table.split("::").next().unwrap_or("");
+        if table.contains("::") && own.is_none_or(|p| p.name.replace('-', "_") != krate) {
+            match self
+                .man
+                .packages
+                .iter()
+                .find(|p| p.name.replace('-', "_") == krate)
+            {
+                Some(p) => files.extend(package_files(&p.manifest_dir)),
+                None => return Ok(()),
+            }
+        }
+        let mut found = false;
+        files.dedup();
+        for f in files {
+            let owned;
+            let src2: &Source = if f == path {
+                src
+            } else {
+                match self.source(&f) {
+                    Some(s) => {
+                        owned = s;
+                        &owned
+                    }
+                    None => continue,
+                }
+            };
+            for it in src2
+                .items
+                .iter()
+                .filter(|i| i.kind == ItemKind::Static && i.name == name)
+            {
+                found = true;
+                let (a, b) = src2.span(it);
+                let mut r = Reads::default();
+                names_read(src2, self.kb, a, b, 3, &mut HashSet::new(), &mut r, false);
+                if last.is_empty() || r.names.contains(&last) {
+                    return Ok(());
+                }
+            }
+        }
+        Err(if found {
+            format!("`{table}` holds no `{last}`")
+        } else {
+            format!("no static or const `{name}` in the package")
+        })
+    }
+
     fn neutral(&self, r: &str) -> bool {
         r.strip_prefix("pkg:cargo/")
             .and_then(|nv| nv.split_once('@'))
@@ -3023,7 +3520,8 @@ impl Files<'_> {
         tags: &str,
         symbol: &str,
         call_line: Option<&str>,
-        at: (&Path, usize),
+        at: (&Path, usize, usize),
+        component_ref: &str,
     ) -> Result<(), String> {
         let mut callee = details
             .strip_prefix(tags)
@@ -3038,9 +3536,9 @@ impl Files<'_> {
             .map(|n| n.name)
             .into_iter()
             .collect();
-        // the position the next detail's code holds: the occurrence's line, then each cited
-        // caller's
-        let mut inner: (PathBuf, usize) = (at.0.to_path_buf(), at.1);
+        // the position the next detail's code holds: the occurrence's, then each cited
+        // caller's (line, and column where the detail gives one)
+        let mut inner: (PathBuf, usize, Option<usize>) = (at.0.to_path_buf(), at.1, Some(at.2));
         for part in parts(details) {
             let Some(m) =
                 re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?(?: as `([^`]*)`)?$")
@@ -3080,6 +3578,30 @@ impl Files<'_> {
                     return Err(format!("`{part}`: line {line} has no `{t}` at column {c0}"));
                 }
             }
+            // where the CBOM records what an instantiation chooses there (`[instantiation]`
+            // occurrences: `h::<sha2::Sha384>` is SHA-384's), this asset is among it
+            if let (Some(_), Some(c0)) = (&caller, col) {
+                let here: Vec<usize> = self
+                    .at_pos
+                    .get(&(file.clone(), line, c0))
+                    .cloned()
+                    .unwrap_or_default();
+                let chosen: Vec<&str> = here
+                    .iter()
+                    .filter(|&&j| self.occs[j].context.contains("] [instantiation]"))
+                    .map(|&j| self.occs[j].component.as_str())
+                    .collect();
+                if !chosen.is_empty()
+                    && !here
+                        .iter()
+                        .any(|&j| self.occs[j].component_ref == component_ref)
+                {
+                    return Err(format!(
+                        "`{part}`: the instantiation at {file}:{line}:{c0} chooses {}",
+                        chosen.join(", ")
+                    ));
+                }
+            }
             // in the standard library, the line names the caller: a closure's `call_once` shim
             // is cited at the trait's declaration of it
             if file.starts_with("/rustc/") {
@@ -3105,7 +3627,7 @@ impl Files<'_> {
                     earlier.push(n.name);
                 }
                 callee = caller;
-                inner = (path.clone(), line);
+                inner = (path.clone(), line, col);
                 continue;
             }
             match &caller {
@@ -3117,14 +3639,21 @@ impl Files<'_> {
                         src.enclosing((line, c0), &[ItemKind::Fn, ItemKind::Static])
                             .is_none()
                             && macro_call_at(&src, (line, c0))
-                            && invocation_names(&src, (line, c0), c)
+                            && match invocation_names(&src, (line, c0), c) {
+                                Pick::Exact => true,
+                                Pick::Range => {
+                                    RANGED.with(|r| r.set(true));
+                                    true
+                                }
+                                Pick::No => false,
+                            }
                     } =>
                 {
                     if let Some(n) = in_item(c) {
                         earlier.push(n.name);
                     }
                     callee = Some(c.clone());
-                    inner = (path.clone(), line);
+                    inner = (path.clone(), line, col);
                 }
                 Some(c) => {
                     let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
@@ -3157,7 +3686,7 @@ impl Files<'_> {
                         let body = col.filter(|&c0| {
                             closure_caller
                                 && cols.contains(&c0)
-                                && (c0 == 0 || !is_ident(chars[c0 - 1]))
+                                && async_body_at(&src.code, src.idx((line, c0))).is_some()
                         });
                         starts.chain(body).collect()
                     } else if unnamed {
@@ -3228,9 +3757,15 @@ impl Files<'_> {
                                     let start =
                                         chars.get(c0).is_some_and(|ch| is_ident(*ch) || *ch == '<')
                                             && (c0 == 0 || !is_ident(chars[c0 - 1]));
-                                    (start
+                                    // (a coercion's expression may start with `&` or `(`:
+                                    // `&Legacy` made a `&dyn Pick`)
+                                    let coercion = j == c0
+                                        && names_owner
+                                        && chars.get(c0).is_some_and(|ch| matches!(ch, '&' | '('));
+                                    ((start
                                         && ((j >= c0 && j < c0 + path_len(&chars, c0))
                                             || (j == c0 && names_owner)))
+                                        || coercion)
                                         .then_some(c0)
                                 }
                             })
@@ -3251,14 +3786,28 @@ impl Files<'_> {
                     if own_closure
                         && let Some(c0) = col
                         && inner.0 == path
-                        && let Some(end) = closure_end(&src, (line, c0))
-                        && !(line..=end).contains(&inner.1)
                     {
-                        return Err(format!(
-                            "`{part}`: the closure at line {line} (to line {end}) does not hold \
-                             line {}",
-                            inner.1
-                        ));
+                        let ci = src.idx((line, c0));
+                        let Some((a, b)) =
+                            closure_span(&src.code, ci).or_else(|| async_body_at(&src.code, ci))
+                        else {
+                            return Err(format!(
+                                "`{part}`: no closure or `async` body starts at column {c0}"
+                            ));
+                        };
+                        let holds = match inner.2 {
+                            Some(ic) => (a..b).contains(&src.idx((inner.1, ic))),
+                            None => a <= src.idx((inner.1 + 1, 0)) && src.idx((inner.1, 0)) < b,
+                        };
+                        if !holds {
+                            let (el, ec) = src.pos(b);
+                            return Err(format!(
+                                "`{part}`: the closure at {line}:{c0} (to {el}:{ec}) does not hold \
+                                 {}:{}",
+                                inner.1,
+                                inner.2.unwrap_or(0)
+                            ));
+                        }
                     }
                     if named.is_empty() {
                         return Err(format!(
@@ -3308,7 +3857,7 @@ impl Files<'_> {
                     }
                     earlier.push(want.name);
                     callee = Some(c.clone());
-                    inner = (path.clone(), line);
+                    inner = (path.clone(), line, col);
                 }
                 None => {
                     // a procedural macro's code (a derive's, an attribute's, a function-like
@@ -3363,16 +3912,50 @@ impl Files<'_> {
                         })
                         .filter_map(|m| m.get(1).map(|g| g.as_str()))
                         .collect();
-                    let binding = cols
+                    // the rule the occurrence's invocation matches (rustc's first), where it can
+                    // be read: the line is in its transcriber, and its metavariables are bound
+                    let occ = self.source(at.0);
+                    let rule = src
+                        .items
                         .iter()
-                        .find_map(|&col| src.enclosing((line, col), &[ItemKind::Macro]))
+                        .find(|i| {
+                            i.kind == ItemKind::Macro
+                                && i.name == t[1]
+                                && (i.start.0..=i.end.0).contains(&line)
+                        })
                         .and_then(|m| {
-                            let body: String = (m.start.0..=m.end.0.min(src.lines.len()))
-                                .map(|l| src.lines[l - 1].as_str())
-                                .collect::<Vec<_>>()
-                                .join("\n");
-                            call_line.and_then(|l| metavars_of(&body, l, &word))
+                            let (_, args) = invocation_args(occ.as_deref()?, (at.1, at.2))?;
+                            rule_for(&src, m, &args)
                         });
+                    if let Some((r, _)) = &rule {
+                        let (l0, l1) = (src.pos(r.body.0).0, src.pos(r.body.1).0);
+                        if !(l0..=l1).contains(&line) {
+                            return Err(format!(
+                                "`{part}`: line {line} is not in the rule of `macro_rules! {}` the \
+                                 invocation matches (lines {l0}-{l1})",
+                                &t[1]
+                            ));
+                        }
+                    }
+                    let binding = match &rule {
+                        Some((_, binds)) => Some(
+                            binds
+                                .iter()
+                                .filter(|(_, toks)| word.is_match(&toks_text(toks)))
+                                .map(|(n, _)| n.clone())
+                                .collect::<Vec<_>>(),
+                        ),
+                        None => cols
+                            .iter()
+                            .find_map(|&col| src.enclosing((line, col), &[ItemKind::Macro]))
+                            .and_then(|m| {
+                                let body: String = (m.start.0..=m.end.0.min(src.lines.len()))
+                                    .map(|l| src.lines[l - 1].as_str())
+                                    .collect::<Vec<_>>()
+                                    .join("\n");
+                                call_line.and_then(|l| metavars_of(&body, l, &word))
+                            }),
+                    };
                     let uses_metavar = match &binding {
                         Some(vars) => used.iter().any(|u| vars.iter().any(|v| v == u)),
                         None => !used.is_empty(),
@@ -3391,124 +3974,16 @@ impl Files<'_> {
     }
 }
 
-/// The last line of the closure (or `async` block) starting at `at` (`|k| k.len()`, `move
-/// || { .. }`, `async move |d| expr`): its block's, or its expression's to the `,`, `;` or
-/// bracket that ends it.
-fn closure_end(src: &Source, at: (usize, usize)) -> Option<usize> {
-    let line: Vec<char> = src.lines.get(at.0.wrapping_sub(1))?.chars().collect();
-    let mut i = at.1;
-    let skip_ws = |mut i: usize| {
-        while i < line.len() && line[i].is_whitespace() {
-            i += 1;
-        }
-        i
-    };
-    loop {
-        i = skip_ws(i);
-        let rest: String = line[i.min(line.len())..].iter().collect();
-        match ["async", "move", "static"]
-            .iter()
-            .find(|k| rest.starts_with(*k) && !rest[k.len()..].starts_with(|c: char| is_ident(c)))
-        {
-            Some(k) => i += k.len(),
-            None => break,
-        }
-    }
-    let after_params = match line.get(i)? {
-        '|' => {
-            let close = line[i + 1..].iter().position(|&c| c == '|')? + i + 1;
-            close + 1
-        }
-        '{' => i,
-        _ => return None,
-    };
-    let j = skip_ws(after_params);
-    if line.get(j) == Some(&'{') || line.get(j) == Some(&'-') {
-        let open = line[j..].iter().position(|&c| c == '{')? + j;
-        let (_, end) = code_until(src, (at.0, open + 1), |_| false)?;
-        return Some(end);
-    }
-    let (_, end) = code_until(src, (at.0, j), |c| c == ',' || c == ';')?;
-    Some(end)
-}
-
-/// The code of `src` from `from` until `stop` holds for a character outside all brackets
-/// opened after `from` (comments and literals skipped): the text and the line it ends on.
-fn code_until(
-    src: &Source,
-    from: (usize, usize),
-    stop: impl Fn(char) -> bool,
-) -> Option<(String, usize)> {
-    let (mut text, mut depth) = (String::new(), 0i32);
-    for l in from.0..=src.lines.len().min(from.0 + 3000) {
-        let chars: Vec<char> = src.lines[l - 1].chars().collect();
-        let start = if l == from.0 { from.1 } else { 0 };
-        for (ci, &ch) in chars.iter().enumerate().skip(start) {
-            let code = src
-                .class
-                .get(l - 1)
-                .and_then(|k| k.get(ci))
-                .is_some_and(|k| *k == Class::Code);
-            if code {
-                if depth == 0 && stop(ch) {
-                    return Some((text, l));
-                }
-                match ch {
-                    '(' | '[' | '{' => depth += 1,
-                    ')' | ']' | '}' => {
-                        depth -= 1;
-                        if depth < 0 {
-                            return Some((text, l));
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            text.push(ch);
-        }
-        text.push('\n');
-    }
-    None
-}
-
-/// The pattern of the `let` at byte `from` of `text` (with its type, `a: [HashFn; 1]`) and the
-/// byte of its `=`: the first `=` outside brackets that is no `==`, `=>`, `<=`, `>=` or `!=`.
-fn let_pattern(text: &str, from: usize) -> Option<(String, usize)> {
-    let start = from + text[from..].find("let")? + 3;
-    let b = text.as_bytes();
-    let mut depth = 0i32;
-    for i in start..b.len() {
-        match b[i] {
-            b'(' | b'[' | b'{' | b'<' => depth += 1,
-            // (not the `>` of `->` or `=>`)
-            b')' | b']' | b'}' | b'>'
-                if !(b[i] == b'>' && matches!(b.get(i.wrapping_sub(1)), Some(b'=' | b'-'))) =>
-            {
-                depth -= 1
-            }
-            b'=' if depth == 0
-                && b.get(i + 1) != Some(&b'=')
-                && b.get(i + 1) != Some(&b'>')
-                && !matches!(b.get(i.wrapping_sub(1)), Some(b'!' | b'<' | b'>' | b'=')) =>
-            {
-                return Some((text[start..i].to_string(), i));
-            }
-            b';' if depth == 0 => return None,
-            _ => {}
-        }
-    }
-    None
-}
-
-/// How the variable `name`, used at line `line`, is bound.
+/// How a variable, read at an index of `code`, is bound.
 enum Bound {
     /// By a statement or pattern of the function at lines `first..=last`, from `init` (a
     /// `let`'s initializer, an `if let`'s or `while let`'s scrutinee, a `for`'s iterator, a
-    /// `match`'s scrutinee for an arm's pattern).
+    /// `match`'s scrutinee for an arm's pattern, a macro's invocation), which starts at `at`.
     Let {
         first: usize,
         last: usize,
         init: String,
+        at: usize,
     },
     /// A parameter of the function `fun`.
     Param { fun: String },
@@ -3518,150 +3993,69 @@ enum Bound {
     Item { start: usize, end: usize },
 }
 
-/// Where variable `name`, used at line `line`, is bound: the nearest binding above the use in
-/// its function, its parameters, then the file's statics and consts.
-fn binding(src: &Source, line: usize, name: &str) -> Option<Bound> {
-    let f = src.enclosing((line, 0), &[ItemKind::Fn]);
-    let fn_start = f.map(|f| f.start.0).unwrap_or(1);
-    let n = regex::escape(name);
-    let let_pat = Regex::new(r"\b(?:(if|while)\s+)?let\s").ok()?;
-    let word = Regex::new(&format!(r"\b{n}\b")).ok()?;
-    let for_pat = Regex::new(r"\bfor\s+(.*?)\s+in\s").ok()?;
-    let arm = Regex::new(r"^\s*(.*?)\s*(?:\bif\b.*)?=>").ok()?;
-    let closure = Regex::new(&format!(r"\|[^|]*\b{n}\b[^|]*\|")).ok()?;
-    let code_col = |l: usize, byte: usize| -> usize { src.lines[l - 1][..byte].chars().count() };
-    for l in (fn_start..=line).rev() {
-        let text = src.lines.get(l - 1)?;
-        if let Some(m) = let_pat.captures(text)
-            && let Some((pattern, eq)) = let_pattern(text, m.get(0)?.start())
-            && word.is_match(&pattern)
-        {
-            let cond = m.get(1).is_some();
-            let (init, last) = code_until(src, (l, code_col(l, eq + 1)), |c| {
-                if cond { c == '{' } else { c == ';' }
-            })?;
-            return Some(Bound::Let {
-                first: l,
-                last,
-                init,
-            });
-        }
-        if let Some(m) = for_pat.captures(text).filter(|m| word.is_match(&m[1])) {
-            let from = m.get(0)?.end();
-            let (init, last) = code_until(src, (l, code_col(l, from)), |c| c == '{')?;
-            return Some(Bound::Let {
-                first: l,
-                last,
-                init,
-            });
-        }
-        if closure.is_match(text) {
-            return Some(Bound::ClosureParam);
-        }
-        // a `match` arm's pattern: the scrutinee of the nearest `match` above
-        if let Some(m) = arm.captures(text).filter(|m| word.is_match(&m[1])) {
-            let _ = m;
-            for k in (fn_start..l).rev() {
-                let t = &src.lines[k - 1];
-                if let Some(i) = t.find("match ") {
-                    let from = code_col(k, i + "match ".len());
-                    let (init, last) = code_until(src, (k, from), |c| c == '{')?;
-                    return Some(Bound::Let {
-                        first: k,
-                        last: last.max(l),
-                        init,
-                    });
-                }
+/// Where the variable `name`, read at `at`, is bound (`lookup`): the nearest binding in scope
+/// in its function, its parameters, then the statics and consts.
+fn binding(src: &Source, at: usize, name: &str) -> Option<Bound> {
+    Some(match lookup(src, at, name)? {
+        Found::Bind(b) if b.kind == BindKind::Closure => Bound::ClosureParam,
+        Found::Bind(b) => {
+            let (i0, i1) = b.init.unwrap_or(b.stmt);
+            Bound::Let {
+                first: src.pos(b.stmt.0).0,
+                last: src.pos(b.stmt.1.saturating_sub(1).max(b.stmt.0)).0,
+                // (a macro's binding holds what the invocation's line names)
+                init: if b.kind == BindKind::Macro {
+                    String::new()
+                } else {
+                    src.text(i0, i1)
+                },
+                at: i0,
             }
         }
-    }
-    if let Some(f) = f {
-        let (sig, _) = code_until(src, f.start, |c| c == '{')?;
-        if Regex::new(&format!(r"\b{n}\s*:|\bself\b"))
-            .ok()?
-            .is_match(&sig)
-            && (name == "self" || Regex::new(&format!(r"\b{n}\s*:")).ok()?.is_match(&sig))
-        {
-            return Some(Bound::Param {
-                fun: f.name.clone(),
-            });
-        }
-    }
-    src.items
-        .iter()
-        .find(|i| i.kind == ItemKind::Static && i.name == name)
-        .map(|i| Bound::Item {
-            start: i.start.0,
-            end: i.end.0,
-        })
+        Found::Param(fun) => Bound::Param { fun },
+        Found::Item(k) => Bound::Item {
+            start: src.items[k].start.0,
+            end: src.items[k].end.0,
+        },
+    })
 }
 
-/// Is a function pointer held by variable `name` at line `line` the one named at line `named`:
+/// Is a function pointer held by variable `name`, read at `at`, the one named at line `named`:
 /// the variable bound where the function is named (a `let`, a pattern of `if let`, `while let`,
-/// `for` or a `match` arm, over lines), or copied from one that is, or from the result of the
-/// file's function whose body names it, or of a closure that does; a parameter of a function
-/// called where it is named; a static or const whose value (or another static it refers to)
-/// names it? A variable bound by a closure's parameter is not checked.
-fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<(), String> {
-    let mut at = (line, name.to_string());
-    for _ in 0..8 {
-        // the file's function (`get()(..)`): named in its body
-        if let Some(f) = src
-            .items
+/// `for` or a `match` arm, over lines; the binding in scope, so a block's or a closure's own
+/// `let` of the name is another variable), or copied from one that is (`let f = f;`: the one
+/// before), or from the result of the file's function or method whose body names it, or of a
+/// closure that does; a parameter of a function called where it is named (in the call's
+/// arguments or its receiver's binding); a static or const whose value (or another static it
+/// refers to) names it? A variable bound by a closure's parameter is not checked.
+fn pointer_bound(src: &Source, at: usize, name: &str, named: usize) -> Result<(), String> {
+    let mut cur = (at, name.to_string());
+    let file_fns = |n: &str| -> Vec<&Item> {
+        src.items
             .iter()
-            .find(|i| i.kind == ItemKind::Fn && i.name == at.1)
-            && binding(src, at.0, &at.1).is_none()
+            .filter(|i| i.kind == ItemKind::Fn && i.name == n)
+            .collect()
+    };
+    for _ in 0..8 {
+        let bound = binding(src, cur.0, &cur.1);
+        // the file's function (`get()(..)`): named in its body
+        if bound.is_none()
+            && let Some(f) = file_fns(&cur.1).first()
         {
             return if (f.start.0..=f.end.0).contains(&named) {
                 Ok(())
             } else {
                 Err(format!(
                     "`{}` is the function at lines {}-{}",
-                    at.1, f.start.0, f.end.0
+                    cur.1, f.start.0, f.end.0
                 ))
             };
         }
-        let bound = binding(src, at.0, &at.1)
-            .ok_or_else(|| format!("`{}` is not bound in its function or its file", at.1))?;
-        let (first, last, init) = match bound {
+        let bound =
+            bound.ok_or_else(|| format!("`{}` is not bound in its function or its file", cur.1))?;
+        let (first, last, init, init_at) = match bound {
             Bound::ClosureParam => return Ok(()),
-            Bound::Param { fun } => {
-                // a call of the function passes it: the naming is in the call's arguments
-                // (`run2(&Holder { f: digest::digest }, d)`), or in the binding of a variable
-                // they pass (`let h = Holder { .. }; run2(&h, d)`)
-                let call = Regex::new(&format!(
-                    r"\b{}\b\s*(?:::\s*<[^>]*>\s*)?\(",
-                    regex::escape(&fun)
-                ))
-                .map_err(|e| e.to_string())?;
-                let caller = src.enclosing((named, 0), &[ItemKind::Fn]);
-                let (from, to) = caller
-                    .map(|c| (c.start.0, c.end.0))
-                    .unwrap_or((named, named));
-                for l in from..=to.min(src.lines.len()) {
-                    let text = &src.lines[l - 1];
-                    for m in call.find_iter(text) {
-                        let open = text[..m.end()].chars().count();
-                        let Some((args, end)) = code_until(src, (l, open), |_| false) else {
-                            continue;
-                        };
-                        if (l..=end).contains(&named) {
-                            return Ok(());
-                        }
-                        for v in re!(r"\b([a-z_]\w*)\b").captures_iter(&args) {
-                            if let Some(Bound::Let { first, last, .. }) = binding(src, l, &v[1])
-                                && (first..=last).contains(&named)
-                            {
-                                return Ok(());
-                            }
-                        }
-                    }
-                }
-                return Err(format!(
-                    "`{}` is a parameter of `{fun}`, whose calls do not pass it",
-                    at.1
-                ));
-            }
+            Bound::Param { fun } => return param_passes(src, &fun, &cur.1, named),
             Bound::Item { start, end } => {
                 if (start..=end).contains(&named) {
                     return Ok(());
@@ -3673,7 +4067,7 @@ fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<
                     .join("\n");
                 let refers = src.items.iter().any(|i| {
                     i.kind == ItemKind::Static
-                        && i.name != at.1
+                        && i.name != cur.1
                         && (i.start.0..=i.end.0).contains(&named)
                         && Regex::new(&format!(r"\b{}\b", regex::escape(&i.name)))
                             .is_ok_and(|r| r.is_match(&text))
@@ -3681,74 +4075,65 @@ fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<
                 return if refers {
                     Ok(())
                 } else {
-                    Err(format!("`{}` is the item at lines {start}-{end}", at.1))
+                    Err(format!("`{}` is the item at lines {start}-{end}", cur.1))
                 };
             }
-            Bound::Let { first, last, init } => (first, last, init),
+            Bound::Let {
+                first,
+                last,
+                init,
+                at,
+            } => (first, last, init, at),
         };
+        // the statement names it
+        if (first..=last).contains(&named) {
+            return Ok(());
+        }
         let init = init.trim();
-        // a copy of another variable (`if let Some(f) = o`, `let h = p;`): where that one is
-        // bound; a method of another one (`while let Some(q) = it.next()`, `fs.iter()`):
-        // that one's
-        if let Some(v) =
-            re!(r"^&?\s*(?:mut\s+)?([A-Za-z_]\w*)(?:\s*\.\s*\w+\s*\([^()]*\))*$").captures(init)
+        // a call of the file's function or method (`get()`, `pk.pick()`): named in its body
+        let calls: Vec<String> = re!(r"([a-z_]\w*)\s*(?:::\s*<[^>]*>\s*)?\(")
+            .captures_iter(init)
+            .map(|c| c[1].to_string())
+            .collect();
+        let fns: Vec<&Item> = calls.iter().flat_map(|c| file_fns(c)).collect();
+        if fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
+            return Ok(());
+        }
+        // a copy of another variable (`if let Some(f) = o`, `let h = p;`, `let f = f;`: the
+        // one before), or a method of it (`it.next()`, `fs.iter()`): where that one is bound
+        if let Some(v) = re!(
+            r"^&?\s*(?:mut\s+)?\*?\s*([A-Za-z_]\w*)(?:\s*\.\s*\w+\s*(?:\([^()]*\))?|\s*\[[^\[\]]*\])*\s*\??$"
+        )
+        .captures(init)
         {
-            if first == at.0 && v[1] == at.1 {
-                return Ok(());
+            let v = v[1].to_string();
+            if binding(src, init_at, &v).is_none() && file_fns(&v).is_empty() {
+                // an imported function item (`let f = digest;`): this statement names it
+                return Err(format!("`{}` is bound at lines {first}-{last}", cur.1));
             }
-            // a function item (`let f = digest;`, imported or the file's): this statement names it
-            if binding(src, first, &v[1]).is_none()
-                && !src
-                    .items
-                    .iter()
-                    .any(|i| i.kind == ItemKind::Fn && i.name == v[1])
-            {
-                return if (first..=last).contains(&named) {
-                    Ok(())
-                } else {
-                    Err(format!("`{}` is bound at lines {first}-{last}", at.1))
-                };
-            }
-            at = (first, v[1].to_string());
+            cur = (init_at, v);
             continue;
         }
-        // the result of a call of the file's function (`get()`, `pick(n)`): named in its body;
-        // of a closure bound in the function (`let k = mk();`): in the closure; a tuple
-        // struct's or variant's constructor (`Some(digest::digest)`) holds what it is given,
-        // named in the statement
+        // the result of a call of a closure of the function (`let k = mk();`): named in the
+        // closure's statement; a tuple struct's or variant's constructor (`Some(digest::
+        // digest)`) holds what it is given, named in the statement
         if let Some(c) = re!(r"^(?:\w+::)*([a-z_]\w*)\s*\(").captures(init) {
-            let fns: Vec<&Item> = src
-                .items
-                .iter()
-                .filter(|i| i.kind == ItemKind::Fn && i.name == c[1])
-                .collect();
-            if fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
-                return Ok(());
+            if !file_fns(&c[1]).is_empty() {
+                return Err(format!(
+                    "`{}` holds what `{}` returns (lines {first}-{last})",
+                    cur.1, &c[1]
+                ));
             }
-            if fns.is_empty() {
-                match binding(src, first, &c[1]) {
-                    // a closure of the function (`let mk = || digest::digest as HashFn`): its
-                    // own statement holds the naming
-                    Some(Bound::Let {
-                        first: f, last: l, ..
-                    }) => {
-                        return if (f..=l).contains(&named) {
-                            Ok(())
-                        } else {
-                            Err(format!(
-                                "`{}` holds what `{}` returns (lines {f}-{l})",
-                                at.1, &c[1]
-                            ))
-                        };
-                    }
-                    // a function of another file or crate: not followed
-                    _ => return Ok(()),
-                }
-            }
-            return Err(format!(
-                "`{}` holds what `{}` returns (lines {first}-{last})",
-                at.1, &c[1]
-            ));
+            return match binding(src, init_at, &c[1]) {
+                Some(Bound::Let {
+                    first: f, last: l, ..
+                }) if !(f..=l).contains(&named) => Err(format!(
+                    "`{}` holds what `{}` returns (lines {f}-{l})",
+                    cur.1, &c[1]
+                )),
+                // a function of another file or crate: not followed
+                _ => Ok(()),
+            };
         }
         // anything else that calls something (but a constructor, a `vec!`): not followed
         if re!(r"\w\s*\(|\w!").is_match(init)
@@ -3756,22 +4141,62 @@ fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<
         {
             return Ok(());
         }
-        return if (first..=last).contains(&named) {
-            Ok(())
-        } else {
-            Err(format!("`{}` is bound at lines {first}-{last}", at.1))
-        };
+        return Err(format!("`{}` is bound at lines {first}-{last}", cur.1));
     }
     Ok(())
+}
+
+/// Is a parameter `var` of the function `fun` given the pointer named at line `named`: by a
+/// call of `fun` in the function around the naming whose arguments name it (over lines), or
+/// pass a variable bound where it is named, or whose receiver is (`ho.run(&d)` with `let ho =
+/// Holder { f: digest::digest };` for `self`)?
+fn param_passes(src: &Source, fun: &str, var: &str, named: usize) -> Result<(), String> {
+    let call = Regex::new(&format!(
+        r"\b{}\b\s*(?:::\s*<[^>]*>\s*)?\(",
+        regex::escape(fun)
+    ))
+    .map_err(|e| e.to_string())?;
+    let caller = src.enclosing((named, 0), &[ItemKind::Fn]);
+    let (from, to) = caller
+        .map(|c| (c.start.0, c.end.0))
+        .unwrap_or((named, named));
+    let s = &src.code;
+    let bound_here = |at: usize, v: &str| matches!(binding(src, at, v), Some(Bound::Let { first, last, .. }) if (first..=last).contains(&named));
+    for l in from..=to.min(src.lines.len()) {
+        let text = &src.lines[l - 1];
+        for m in call.find_iter(text) {
+            let open = src.idx((l, text[..m.end()].chars().count() - 1));
+            let Some(close) = close_of_at(s, open) else {
+                continue;
+            };
+            if (l..=src.pos(close).0).contains(&named) {
+                return Ok(());
+            }
+            let args = src.text(open, close);
+            for v in re!(r"\b([a-z_]\w*)\b").captures_iter(&args) {
+                if bound_here(open, &v[1]) {
+                    return Ok(());
+                }
+            }
+            // a method's receiver
+            let name_at = src.idx((l, text[..m.start()].chars().count()));
+            if let Some(dot) = before_blank(s, name_at).filter(|&d| s[d] == '.')
+                && let Some((r, root, _)) = receiver_at(s, dot)
+                && bound_here(r, &root)
+            {
+                return Ok(());
+            }
+        }
+    }
+    Err(format!(
+        "`{var}` is a parameter of `{fun}`, whose calls do not pass it"
+    ))
 }
 
 /// The macro an invocation at or around `at` calls, and the invocation's text from its path to
 /// its closing bracket.
 fn invocation_text(src: &Source, at: (usize, usize)) -> Option<(String, String)> {
-    let start = src
-        .enclosing(at, &[ItemKind::MacroCall])
-        .map(|i| i.start)
-        .or_else(|| macro_call_at(src, at).then_some(at))?;
+    let start = invocation_start(src, at)?;
     let (mut text, mut depth, mut opened) = (String::new(), 0i32, false);
     for l in start.0..=src.lines.len().min(start.0 + 400) {
         let chars: Vec<char> = src.lines[l - 1].chars().collect();
@@ -3807,13 +4232,35 @@ fn invocation_text(src: &Source, at: (usize, usize)) -> Option<(String, String)>
     None
 }
 
+/// Where the macro invocation at or around `at` starts: its path (`sel!(..)`, `a::m!(..)`).
+fn invocation_start(src: &Source, at: (usize, usize)) -> Option<(usize, usize)> {
+    if macro_call_at(src, at) {
+        return Some(at);
+    }
+    let s = &src.code;
+    let b = src.idx(src.enclosing(at, &[ItemKind::MacroCall])?.start);
+    let bang = before_blank(s, b).filter(|&k| s[k] == '!')?;
+    let mut w = bang;
+    while w > 0 && (is_ident(s[w - 1]) || s[w - 1] == ':') {
+        w -= 1;
+    }
+    Some(src.pos(w))
+}
+
 /// Does the macro invocation at `at` make the item `path` names rather than another invocation
-/// of the same macro in the file: the macro is invoked once, or no other invocation names more
-/// of the path's words in its code (`nistp_dhkex!("P-256", DhP256, p256, ..)` for
-/// `<..::p256::DhP256 as DhKeyExchange>::dh`, not the P-384 invocation)?
-fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
-    let Some((name, mine)) = invocation_text(src, at) else {
-        return true;
+/// of the same macro in the file: the macro is invoked once, or no other invocation names as
+/// many of the path's words in what it expands to (the transcriber of the rule it matches, its
+/// arguments put in; its own code when that is not known: `nistp_dhkex!("P-256", DhP256, p256,
+/// ..)` for `<..::p256::DhP256 as DhKeyExchange>::dh`, not the P-384 invocation), with the
+/// modules it declares in the path's order (`sel!(gamma, delta, 256)` makes
+/// `gamma::delta::run`, `sel!(delta, gamma, 384)` `delta::gamma::run`)? Another that does as
+/// well: a range.
+fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> Pick {
+    let Some(start) = invocation_start(src, at) else {
+        return Pick::Exact;
+    };
+    let Some((name, mine)) = invocation_text(src, start) else {
+        return Pick::Exact;
     };
     let call = Regex::new(&format!(r"\b{}\s*!\s*[(\[{{]", regex::escape(&name))).ok();
     let mut others = Vec::new();
@@ -3829,12 +4276,12 @@ fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
                 && let Some((_, t)) = invocation_text(src, (l + 1, c))
                 && t != mine
             {
-                others.push(t);
+                others.push(((l + 1, c), t));
             }
         }
     }
     if others.is_empty() {
-        return true;
+        return Pick::Exact;
     }
     // the words of the code (not of comments inside the invocation)
     let words = |t: &str| -> HashSet<String> {
@@ -3844,11 +4291,62 @@ fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
             .map(|m| m.as_str().to_string())
             .collect()
     };
-    let wanted: Vec<String> = words(path).into_iter().filter(|w| w.len() > 1).collect();
-    let score = |t: &HashSet<String>| wanted.iter().filter(|w| t.contains(*w)).count();
+    // (a one-letter word only as a type's name: `<A as Tr>::f`)
+    let wanted: Vec<String> = words(path)
+        .into_iter()
+        .filter(|w| w.len() > 1 || w.chars().all(|c| c.is_ascii_uppercase()))
+        .collect();
+    // the path's segments, after its crate, as `mod` declarations in order
+    let segs: Vec<String> = strip_generics(path)
+        .split("::")
+        .skip(1)
+        .map(|g| g.trim().to_string())
+        .filter(|g| !g.is_empty() && g.chars().all(is_ident))
+        .collect();
+    let order = |t: &str| -> usize {
+        let at: Vec<Option<usize>> = segs
+            .iter()
+            .map(|g| {
+                Regex::new(&format!(r"\bmod\s+{}\b", regex::escape(g)))
+                    .ok()
+                    .and_then(|r| r.find(t))
+                    .map(|m| m.start())
+            })
+            .collect();
+        at.windows(2)
+            .filter(|w| matches!((w[0], w[1]), (Some(a), Some(b)) if a < b))
+            .count()
+    };
+    let score = |p: (usize, usize), inv: &str| {
+        // in the modules around the invocation (`mod alpha { h!(run); }` makes `alpha::run`)
+        let mut mods: Vec<&Item> = src
+            .items
+            .iter()
+            .filter(|i| i.kind == ItemKind::Mod && i.contains(p))
+            .collect();
+        mods.sort_by_key(|i| i.start);
+        let mut t = mods
+            .iter()
+            .map(|m| format!("mod {} {{ ", m.name))
+            .collect::<String>();
+        t.push_str(&expansion(src, p).unwrap_or_else(|| inv.to_string()));
+        let w = words(&t);
+        (wanted.iter().filter(|x| w.contains(*x)).count(), order(&t))
+    };
     // the invocation naming most of the path's words (others naming as many: the range)
-    let mine = score(&words(&mine));
-    mine > 0 && others.iter().all(|t| score(&words(t)) <= mine)
+    let mine = score(start, &mine);
+    if mine.0 == 0 {
+        return Pick::No;
+    }
+    let mut tie = false;
+    for (p, t) in &others {
+        let o = score(*p, t);
+        if o > mine {
+            return Pick::No;
+        }
+        tie |= o == mine;
+    }
+    if tie { Pick::Range } else { Pick::Exact }
 }
 
 /// The metavariables of a `macro_rules!` (`body`) that the invocation on `call` binds to a
@@ -4280,8 +4778,13 @@ fn check_item(
                 .strip_prefix("in ")
                 .and_then(|d| parts(d).into_iter().next())
                 .unwrap_or_default();
-            if invocation_names(src, at, path) {
-                return Ok(());
+            match invocation_names(src, at, path) {
+                Pick::Exact => return Ok(()),
+                Pick::Range => {
+                    RANGED.with(|r| r.set(true));
+                    return Ok(());
+                }
+                Pick::No => {}
             }
             return Err(format!(
                 "the macro invocation does not make `{}`: another invocation of the same \
@@ -4598,6 +5101,1674 @@ fn rest(src: &Source, line: usize, offset: usize) -> (Vec<char>, Vec<Class>) {
         }
     }
     (s, k)
+}
+
+/// How a name is bound in a function's body: by a `let` (or a macro whose expansion lets it),
+/// an `if let` / `while let`, a `for`, a `match` arm, a closure's parameters.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum BindKind {
+    Let,
+    Cond,
+    For,
+    Arm,
+    Closure,
+    Macro,
+}
+
+/// A binding of a name in a function's body (indexes in `Source::code`).
+#[derive(Clone, Debug)]
+struct Bind {
+    name: String,
+    kind: BindKind,
+    /// the statement or header that binds it (a `let` to its `;`, a `match` to the arm's `=>`)
+    stmt: (usize, usize),
+    /// its pattern (a closure's parameters)
+    pat: (usize, usize),
+    /// its initializer, scrutinee or iterator
+    init: Option<(usize, usize)>,
+    /// where the name is visible: after the `let`'s `;` to the end of its block, the block of an
+    /// `if let` or `for`, an arm's expression, a closure's body
+    scope: (usize, usize),
+}
+
+/// A function's bindings, its parameters' names (`self` for a method's receiver) and its body.
+#[derive(Debug, Default)]
+struct FnScope {
+    binds: Vec<Bind>,
+    params: Vec<String>,
+    body: (usize, usize),
+    /// its blocks, and the bodies of its loops (`for`, `while`, `loop`)
+    blocks: Vec<(usize, usize)>,
+    loops: Vec<(usize, usize)>,
+}
+
+impl FnScope {
+    /// The innermost block around `i`.
+    fn block_of(&self, i: usize) -> (usize, usize) {
+        self.blocks
+            .iter()
+            .filter(|&&(o, c)| o < i && i < c)
+            .max()
+            .copied()
+            .unwrap_or(self.body)
+    }
+}
+
+fn word_of(s: &[char], i: usize) -> String {
+    s.get(i..)
+        .unwrap_or_default()
+        .iter()
+        .take_while(|c| is_ident(**c))
+        .collect()
+}
+
+/// Whether an identifier (not a number) starts at `i`.
+fn word_start(s: &[char], i: usize) -> bool {
+    i < s.len() && is_ident(s[i]) && !s[i].is_ascii_digit() && (i == 0 || !is_ident(s[i - 1]))
+}
+
+/// Whether the keyword `k` is at `i`.
+fn kw(s: &[char], i: usize, k: &str) -> bool {
+    word_start(s, i)
+        && s[i..].iter().take(k.len()).copied().eq(k.chars())
+        && !s.get(i + k.len()).is_some_and(|c| is_ident(*c))
+}
+
+fn skip_blank(s: &[char], mut i: usize) -> usize {
+    while i < s.len() && s[i].is_whitespace() {
+        i += 1;
+    }
+    i
+}
+
+/// The last non-blank char before `i`.
+fn before_blank(s: &[char], i: usize) -> Option<usize> {
+    (0..i.min(s.len())).rev().find(|&k| !s[k].is_whitespace())
+}
+
+/// The word that ends before `i`, blanks skipped (empty when a symbol does).
+fn word_before_at(s: &[char], i: usize) -> String {
+    let Some(e) = before_blank(s, i).filter(|&e| is_ident(s[e])) else {
+        return String::new();
+    };
+    let mut b = e + 1;
+    while b > 0 && is_ident(s[b - 1]) {
+        b -= 1;
+    }
+    s[b..=e].iter().collect()
+}
+
+/// The matching close of the bracket at `open` (`(`, `[`, `{`).
+fn close_of_at(s: &[char], open: usize) -> Option<usize> {
+    if !matches!(s.get(open), Some('(' | '[' | '{')) {
+        return None;
+    }
+    let mut depth = 0i32;
+    for (j, &c) in s.iter().enumerate().skip(open) {
+        match c {
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(j);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The matching open of the bracket at `close` (`)`, `]`, `}`).
+fn open_of_at(s: &[char], close: usize) -> Option<usize> {
+    if !matches!(s.get(close), Some(')' | ']' | '}')) {
+        return None;
+    }
+    let mut depth = 0i32;
+    for j in (0..=close).rev() {
+        match s[j] {
+            ')' | ']' | '}' => depth += 1,
+            '(' | '[' | '{' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(j);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// From `from`, the first index outside the brackets opened after `from` where `stop` holds,
+/// or where a bracket opened before `from` closes; `to` when none does before it.
+fn scan_to(s: &[char], from: usize, to: usize, stop: impl Fn(usize) -> bool) -> usize {
+    let to = to.min(s.len());
+    let mut depth = 0i32;
+    let mut i = from;
+    while i < to {
+        if depth == 0 && stop(i) {
+            return i;
+        }
+        match s[i] {
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => {
+                depth -= 1;
+                if depth < 0 {
+                    return i;
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    to
+}
+
+/// The `=` of a `let` whose pattern starts at `from`: the first outside brackets that is no
+/// `==`, `=>`, `<=`, `>=`, `!=` or compound assignment; None at a `;` first (`let x;`).
+fn let_eq_at(s: &[char], from: usize, to: usize) -> Option<usize> {
+    let i = scan_to(s, from, to, |i| {
+        s[i] == ';'
+            || (s[i] == '='
+                && !matches!(s.get(i + 1), Some('=' | '>'))
+                && !matches!(
+                    i.checked_sub(1).map(|p| s[p]),
+                    Some('=' | '!' | '<' | '>' | '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|')
+                ))
+    });
+    (s.get(i) == Some(&'=')).then_some(i)
+}
+
+/// The names a pattern binds (`(a, b)`, `Some(f)`, `S { f, g: h }`, `ref mut x`, `x @ ..`),
+/// its type annotation left out.
+fn pattern_names(s: &[char], a: usize, b: usize) -> Vec<String> {
+    let end = scan_to(s, a, b, |i| {
+        s[i] == ':' && s.get(i + 1) != Some(&':') && (i == 0 || s[i - 1] != ':')
+    });
+    let mut out = Vec::new();
+    let mut i = a;
+    while i < end {
+        if !word_start(s, i) {
+            i += 1;
+            continue;
+        }
+        let w = word_of(s, i);
+        let e = i + w.len();
+        let first = w.chars().next().unwrap_or('_');
+        // (the type annotation's `:` is not the pattern's)
+        let next = Some(skip_blank(s, e))
+            .filter(|&n| n < end)
+            .and_then(|n| s.get(n))
+            .copied();
+        let path_seg = before_blank(s, i).is_some_and(|p| {
+            s[p] == '.' || (s[p] == ':' && p > 0 && s[p - 1] == ':') || s[p] == '\''
+        });
+        let keyword = matches!(
+            w.as_str(),
+            "mut" | "ref" | "box" | "true" | "false" | "_" | "if" | "in" | "dyn" | "impl"
+        );
+        let follows = matches!(next, Some('(' | '{' | '!' | ':' | '<'));
+        if !keyword
+            && !path_seg
+            && !follows
+            && (first.is_lowercase() || (first == '_' && w.len() > 1))
+        {
+            out.push(w);
+        }
+        i = e;
+    }
+    out
+}
+
+/// The names a parameter list binds (`a: u8, (b, c): (T, T)`, `&mut self`): each parameter's
+/// pattern, before its type.
+fn params_names(s: &[char], a: usize, b: usize) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut p = a;
+    while p < b {
+        let e = scan_to(s, p, b, |i| s[i] == ',');
+        let colon = scan_to(s, p, e, |i| {
+            s[i] == ':' && s.get(i + 1) != Some(&':') && (i == 0 || s[i - 1] != ':')
+        });
+        if (p..colon).any(|i| kw(s, i, "self")) {
+            out.push("self".to_string());
+        } else {
+            out.extend(pattern_names(s, p, colon));
+        }
+        p = e + 1;
+    }
+    out
+}
+
+/// Whether a `|` at `k` starts a closure (`|x| ..`, `|| ..`, `move |x|`), not an or-pattern or
+/// an operator.
+fn closure_at(s: &[char], k: usize) -> bool {
+    if s.get(k) != Some(&'|') || s.get(k + 1) == Some(&'=') {
+        return false;
+    }
+    match before_blank(s, k) {
+        None => true,
+        Some(p) => match s[p] {
+            '(' | ',' | '{' | ';' | '[' => true,
+            '=' => !matches!(p.checked_sub(1).map(|q| s[q]), Some('=' | '!' | '<' | '>')),
+            '>' => p > 0 && s[p - 1] == '=',
+            ':' => !(p > 0 && s[p - 1] == ':'),
+            c if is_ident(c) => matches!(
+                word_before_at(s, k).as_str(),
+                "move" | "async" | "return" | "static" | "else"
+            ),
+            _ => false,
+        },
+    }
+}
+
+/// A closure starting at the `|` at `k` (`closure_at`): its parameters' extent (none for `||`)
+/// and its body's.
+#[allow(clippy::type_complexity)]
+fn closure_parts(
+    s: &[char],
+    k: usize,
+    limit: usize,
+) -> Option<(Option<(usize, usize)>, (usize, usize))> {
+    let (params, after) = if s.get(k + 1) == Some(&'|') {
+        (None, k + 2)
+    } else {
+        let c = scan_to(s, k + 1, limit, |i| s[i] == '|');
+        if s.get(c) != Some(&'|') {
+            return None;
+        }
+        (Some((k + 1, c)), c + 1)
+    };
+    let mut j = skip_blank(s, after);
+    if s.get(j) == Some(&'-') && s.get(j + 1) == Some(&'>') {
+        j = scan_to(s, j + 2, limit, |i| s[i] == '{');
+    }
+    let end = scan_to(s, j, limit, |i| s[i] == ',' || s[i] == ';');
+    Some((params, (j, end)))
+}
+
+/// Where `k` starts the body of an `async` closure (`async move |d| expr`: at `expr`): that
+/// body's extent.
+fn async_body_at(s: &[char], k: usize) -> Option<(usize, usize)> {
+    let p = before_blank(s, k).filter(|&p| s[p] == '|')?;
+    let open = if p > 0 && s[p - 1] == '|' {
+        p - 1
+    } else {
+        (0..p).rev().find(|&o| s[o] == '|')?
+    };
+    let asynch = match word_before_at(s, open).as_str() {
+        "async" => true,
+        "move" => {
+            let m = before_blank(s, open)?;
+            word_before_at(s, m + 1 - 4) == "async"
+        }
+        _ => false,
+    };
+    if !asynch || !closure_at(s, open) {
+        return None;
+    }
+    let (_, (j, end)) = closure_parts(s, open, s.len())?;
+    (j == k).then_some((k, end))
+}
+
+/// The extent of the closure or `async` block starting at `k` (`|x| ..`, `move || ..`, `async
+/// move { .. }`, an `async fn`'s body `{ .. }`): from its first token to its body's end.
+fn closure_span(s: &[char], k: usize) -> Option<(usize, usize)> {
+    let mut i = k;
+    while ["async", "move", "static"].iter().any(|w| kw(s, i, w)) {
+        i = skip_blank(s, i + word_of(s, i).len());
+    }
+    match s.get(i)? {
+        '|' => {
+            let (_, (_, end)) = closure_parts(s, i, s.len())?;
+            Some((k, end))
+        }
+        '{' => Some((k, close_of_at(s, i)? + 1)),
+        _ => None,
+    }
+}
+
+impl Source {
+    /// The bindings and parameters of the function `f`, an item of this file.
+    fn fn_scope(&self, f: &Item) -> Rc<FnScope> {
+        let (a, b) = self.span(f);
+        if let Some(sc) = self.scopes.borrow().get(&a) {
+            return sc.clone();
+        }
+        let sc = Rc::new(scan_fn(self, a, b));
+        self.scopes.borrow_mut().insert(a, sc.clone());
+        sc
+    }
+}
+
+/// Reads the bindings of the function at `a..b` of `src.code` (its `fn` keyword to its body's
+/// end): those of its body, not of the functions nested in it, which see none of them.
+fn scan_fn(src: &Source, a: usize, b: usize) -> FnScope {
+    let s = &src.code;
+    let mut out = FnScope::default();
+    // the signature: `fn name<..>(params) -> T where .. {`
+    let name_at = skip_blank(s, a + 2);
+    let mut i = skip_blank(s, name_at + word_of(s, name_at).len());
+    if s.get(i) == Some(&'<') {
+        let mut depth = 0;
+        while i < b {
+            match s[i] {
+                '<' => depth += 1,
+                '>' if s[i - 1] != '-' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        i += 1;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        i = skip_blank(s, i);
+    }
+    if s.get(i) == Some(&'(')
+        && let Some(close) = close_of_at(s, i)
+    {
+        out.params = params_names(s, i + 1, close);
+        i = close + 1;
+    }
+    let open = scan_to(s, i, b, |k| s[k] == '{');
+    let Some(close) = close_of_at(s, open) else {
+        return out;
+    };
+    out.body = (open, close + 1);
+    // the blocks, for a `let`'s scope
+    let mut blocks = Vec::new();
+    let mut stack = Vec::new();
+    for (k, &c) in s.iter().enumerate().take(close + 1).skip(open) {
+        match c {
+            '{' => stack.push(k),
+            '}' => {
+                if let Some(o) = stack.pop() {
+                    blocks.push((o, k + 1));
+                }
+            }
+            _ => {}
+        }
+    }
+    let block_end = |k: usize| {
+        blocks
+            .iter()
+            .filter(|&&(o, c)| o < k && k < c)
+            .max()
+            .map_or(close + 1, |&(_, c)| c)
+    };
+    let nested: Vec<(usize, usize)> = src
+        .items
+        .iter()
+        .filter(|it| it.kind == ItemKind::Fn)
+        .map(|it| src.span(it))
+        .filter(|&(x, _)| x > open && x < close)
+        .collect();
+    // the file's macros whose expansion binds a name the invocation gives (`bind!(m)`)
+    let letting: Vec<&str> = src
+        .items
+        .iter()
+        .filter(|it| {
+            it.kind == ItemKind::Macro && {
+                let (x, y) = src.span(it);
+                re!(r"\blet\s+(?:mut\s+)?\$").is_match(&src.text(x, y))
+            }
+        })
+        .map(|it| it.name.as_str())
+        .collect();
+    let binds = &mut out.binds;
+    let mut loops = Vec::new();
+    let mut push = |pat: (usize, usize), kind, stmt, init, scope| {
+        let names = if kind == BindKind::Closure {
+            params_names(s, pat.0, pat.1)
+        } else {
+            pattern_names(s, pat.0, pat.1)
+        };
+        for name in names {
+            binds.push(Bind {
+                name,
+                kind,
+                stmt,
+                pat,
+                init,
+                scope,
+            });
+        }
+    };
+    let mut k = open + 1;
+    while k < close {
+        if let Some(&(_, e)) = nested.iter().find(|&&(x, _)| x == k) {
+            k = e;
+            continue;
+        }
+        if closure_at(s, k)
+            && let Some((params, body)) = closure_parts(s, k, close)
+        {
+            let pat = params.unwrap_or((k + 1, k + 1));
+            push(pat, BindKind::Closure, (k, body.0), None, body);
+            k = body.0.max(k + 1);
+            continue;
+        }
+        if !word_start(s, k) {
+            k += 1;
+            continue;
+        }
+        let w = word_of(s, k);
+        match w.as_str() {
+            "let" => {
+                let cond = matches!(word_before_at(s, k).as_str(), "if" | "while")
+                    || before_blank(s, k).is_some_and(|p| s[p] == '&' && p > 0 && s[p - 1] == '&');
+                let pat = k + 3;
+                match let_eq_at(s, pat, close) {
+                    None => {
+                        // `let x;`: assigned later
+                        let semi = scan_to(s, pat, close, |i| s[i] == ';');
+                        push(
+                            (pat, semi),
+                            BindKind::Let,
+                            (k, semi + 1),
+                            None,
+                            (semi + 1, block_end(k)),
+                        );
+                    }
+                    Some(eq) if cond => {
+                        let init_end = scan_to(s, eq + 1, close, |i| {
+                            s[i] == '{' || (s[i] == '&' && s.get(i + 1) == Some(&'&'))
+                        });
+                        let blk = scan_to(s, init_end, close, |i| s[i] == '{');
+                        let blk_end = close_of_at(s, blk).map_or(close, |c| c + 1);
+                        if word_before_at(s, k) == "while" {
+                            loops.push((blk, blk_end));
+                        }
+                        push(
+                            (pat, eq),
+                            BindKind::Cond,
+                            (k, blk),
+                            Some((eq + 1, init_end)),
+                            (blk, blk_end),
+                        );
+                    }
+                    Some(eq) => {
+                        let init_end = scan_to(s, eq + 1, close, |i| {
+                            s[i] == ';'
+                                || (kw(s, i, "else")
+                                    && before_blank(s, i).is_some_and(|p| s[p] != '}'))
+                        });
+                        let semi = scan_to(s, eq + 1, close, |i| s[i] == ';');
+                        push(
+                            (pat, eq),
+                            BindKind::Let,
+                            (k, semi + 1),
+                            Some((eq + 1, init_end)),
+                            (semi + 1, block_end(k)),
+                        );
+                    }
+                }
+            }
+            "for" if s.get(skip_blank(s, k + 3)) != Some(&'<') => {
+                let p = k + 3;
+                let pin = scan_to(s, p, close, |i| {
+                    kw(s, i, "in") || s[i] == '{' || s[i] == ';'
+                });
+                if kw(s, pin, "in") {
+                    let blk = scan_to(s, pin + 2, close, |i| s[i] == '{');
+                    if let Some(bc) = close_of_at(s, blk) {
+                        loops.push((blk, bc + 1));
+                        push(
+                            (p, pin),
+                            BindKind::For,
+                            (k, blk),
+                            Some((pin + 2, blk)),
+                            (blk, bc + 1),
+                        );
+                    }
+                }
+            }
+            "match" if before_blank(s, k).is_none_or(|p| s[p] != '.') => {
+                let blk = scan_to(s, k + 5, close, |i| s[i] == '{');
+                if let Some(mc) = close_of_at(s, blk) {
+                    let scrut = (k + 5, blk);
+                    let mut arm = blk + 1;
+                    loop {
+                        arm = skip_blank(s, arm);
+                        if arm >= mc {
+                            break;
+                        }
+                        let arrow =
+                            scan_to(s, arm, mc, |i| s[i] == '=' && s.get(i + 1) == Some(&'>'));
+                        if arrow >= mc {
+                            break;
+                        }
+                        let pend = scan_to(s, arm, arrow, |i| kw(s, i, "if"));
+                        let b0 = skip_blank(s, arrow + 2);
+                        let (arm_end, next) = if s.get(b0) == Some(&'{') {
+                            let e = close_of_at(s, b0).map_or(mc, |c| c + 1);
+                            let n2 = skip_blank(s, e);
+                            match s.get(n2) {
+                                Some('.' | '?') => {
+                                    let e = scan_to(s, b0, mc, |i| s[i] == ',');
+                                    (e, e + 1)
+                                }
+                                Some(',') => (e, n2 + 1),
+                                _ => (e, e),
+                            }
+                        } else {
+                            let e = scan_to(s, b0, mc, |i| s[i] == ',');
+                            (e, e + 1)
+                        };
+                        push(
+                            (arm, pend),
+                            BindKind::Arm,
+                            (k, arrow + 2),
+                            Some(scrut),
+                            (arrow + 2, arm_end),
+                        );
+                        arm = next.max(arm + 1);
+                    }
+                }
+            }
+            _ if letting.contains(&w.as_str())
+                && s.get(skip_blank(s, k + w.len())) == Some(&'!') =>
+            {
+                let ob = skip_blank(s, skip_blank(s, k + w.len()) + 1);
+                if let Some(cb) = close_of_at(s, ob) {
+                    let n2 = skip_blank(s, cb + 1);
+                    let end = if s.get(n2) == Some(&';') {
+                        n2 + 1
+                    } else {
+                        cb + 1
+                    };
+                    push(
+                        (ob + 1, cb),
+                        BindKind::Macro,
+                        (k, end),
+                        Some((k, cb + 1)),
+                        (end, block_end(k)),
+                    );
+                }
+            }
+            "while" | "loop" if s.get(skip_blank(s, k + w.len())) != Some(&'!') => {
+                // (a `while let`'s block is pushed with its binding)
+                let n = skip_blank(s, k + w.len());
+                if !kw(s, n, "let") {
+                    let blk = scan_to(s, n, close, |i| s[i] == '{');
+                    if let Some(bc) = close_of_at(s, blk) {
+                        loops.push((blk, bc + 1));
+                    }
+                }
+            }
+            _ => {}
+        }
+        k += w.len();
+    }
+    out.blocks = blocks;
+    out.loops = loops;
+    out
+}
+
+/// What a name read at `at` (an index in `code`) is.
+enum Found {
+    /// bound in the function around it (the nearest binding whose scope holds it)
+    Bind(Bind),
+    /// a parameter of the function around it, by the function's name
+    Param(String),
+    /// a static or const (by its index in `items`): the function's own first
+    Item(usize),
+}
+
+fn lookup(src: &Source, at: usize, name: &str) -> Option<Found> {
+    let p = src.pos(at);
+    let f = src.enclosing(p, &[ItemKind::Fn]);
+    if let Some(f) = f {
+        let sc = src.fn_scope(f);
+        if let Some(b) = sc
+            .binds
+            .iter()
+            .filter(|b| b.name == name && b.scope.0 <= at && at < b.scope.1)
+            .max_by_key(|b| (b.scope.0, b.stmt.0))
+        {
+            return Some(Found::Bind(b.clone()));
+        }
+        if sc.params.iter().any(|n| n == name) && at >= sc.body.0 {
+            return Some(Found::Param(f.name.clone()));
+        }
+    }
+    src.items
+        .iter()
+        .enumerate()
+        .filter(|(_, i)| i.kind == ItemKind::Static && i.name == name)
+        .min_by_key(|(_, i)| !f.is_some_and(|f| f.contains(i.start)))
+        .map(|(k, _)| Found::Item(k))
+}
+
+/// The receiver of a method called after the `.` at `dot`: the variable (or path) its
+/// expression starts with (`ho` of `ho.run(..)`, `keys` of `keys["a"].seal(..)`), and the
+/// expression's extent.
+fn receiver_at(s: &[char], dot: usize) -> Option<(usize, String, usize)> {
+    let mut j = dot;
+    let mut root = None;
+    while let Some(p) = before_blank(s, j) {
+        match s[p] {
+            ')' | ']' => j = open_of_at(s, p)?,
+            '?' => j = p,
+            c if is_ident(c) => {
+                let mut b = p + 1;
+                while b > 0 && is_ident(s[b - 1]) {
+                    b -= 1;
+                }
+                root = Some(b);
+                match before_blank(s, b) {
+                    Some(q) if s[q] == '.' => j = q,
+                    Some(q) if s[q] == ':' && q > 0 && s[q - 1] == ':' => j = q - 1,
+                    _ => break,
+                }
+            }
+            _ => break,
+        }
+    }
+    let r = root?;
+    Some((r, word_of(s, r), dot))
+}
+
+/// What `names_read` has followed: spans, and bindings with the field read of them.
+type Seen = HashSet<(usize, usize, String)>;
+
+/// What some code reads, followed (`names_read`).
+#[derive(Default, Debug)]
+struct Reads {
+    /// the upper-case names written (an import alias as its item's), in the code and in what
+    /// it reads
+    names: BTreeSet<String>,
+    /// it reads a value from elsewhere: a parameter of the function, a closure's
+    open: bool,
+    /// it reads a constant of another file or crate, which is no descriptor of the knowledge
+    /// base: what it holds is not read
+    foreign: bool,
+    /// the type names written (`Ed25519KeyPair`)
+    types: BTreeSet<String>,
+    /// a variable it reads was lent whole as `&mut` to a call whose stores are not read
+    /// (`mem::swap`): what its binding names may have been replaced
+    replaced: bool,
+}
+
+fn is_keyword(w: &str) -> bool {
+    matches!(
+        w,
+        "let"
+            | "mut"
+            | "ref"
+            | "if"
+            | "else"
+            | "match"
+            | "for"
+            | "in"
+            | "while"
+            | "loop"
+            | "return"
+            | "as"
+            | "move"
+            | "async"
+            | "await"
+            | "unsafe"
+            | "true"
+            | "false"
+            | "break"
+            | "continue"
+            | "where"
+            | "fn"
+            | "const"
+            | "static"
+            | "dyn"
+            | "impl"
+            | "crate"
+            | "super"
+            | "box"
+    )
+}
+
+/// Follows what the code at `a..b` reads (`depth` steps): the upper-case names it writes, the
+/// statics and consts it names (their initializers), the file's functions it calls (their
+/// bodies: a `const fn`'s value), the variables it reads (their initializers, scrutinees or
+/// iterators, and the statements of the function that store into them: `v = ..`, `v.f = ..`,
+/// `m.insert(..)`). With `own`, the code is the function's own: a parameter it reads is a value
+/// from elsewhere (`open`).
+#[allow(clippy::too_many_arguments)]
+fn names_read(
+    src: &Source,
+    kb: &Kb,
+    a: usize,
+    b: usize,
+    depth: usize,
+    seen: &mut Seen,
+    r: &mut Reads,
+    own: bool,
+) {
+    let s = &src.code;
+    let mut i = a;
+    while i < b.min(s.len()) {
+        if !word_start(s, i) {
+            i += 1;
+            continue;
+        }
+        let start = i;
+        let w = word_of(s, i);
+        i += w.len();
+        let prev = before_blank(s, start);
+        let after_dot = prev.is_some_and(|p| s[p] == '.');
+        let after_colons = prev.is_some_and(|p| s[p] == ':' && p > 0 && s[p - 1] == ':');
+        let n = skip_blank(s, i);
+        let path_head = s.get(n) == Some(&':') && s.get(n + 1) == Some(&':');
+        let call =
+            s.get(n) == Some(&'(') || (path_head && s.get(skip_blank(s, n + 2)) == Some(&'<'));
+        if after_dot || s.get(n) == Some(&'!') {
+            // a field or a method, a macro
+            continue;
+        }
+        let first = w.chars().next().unwrap_or('_');
+        let upper = first.is_uppercase()
+            && w.chars()
+                .all(|c| c.is_uppercase() || c.is_ascii_digit() || c == '_');
+        if first.is_uppercase() && !upper {
+            r.types.insert(w);
+            continue;
+        }
+        if upper {
+            // (`D::digest`: a type parameter's path)
+            if path_head {
+                continue;
+            }
+            // an import alias: its item
+            let item = src
+                .binds
+                .iter()
+                .find(|bd| bd.name == w)
+                .and_then(|bd| bd.path.last().cloned())
+                .unwrap_or(w);
+            let statics: Vec<&Item> = src
+                .items
+                .iter()
+                .filter(|it| it.kind == ItemKind::Static && it.name == item)
+                .collect();
+            if !statics.is_empty() {
+                // a field of its elements (`TABLE[i].h`): the values its literals give it
+                let field = field_read(s, i);
+                for it in statics {
+                    let sp = src.span(it);
+                    let key = (sp.0, sp.1, field.clone().unwrap_or_default());
+                    if depth > 0 && seen.insert(key) {
+                        let parts = field
+                            .as_deref()
+                            .map(|f| field_values(s, sp.0, sp.1, f))
+                            .filter(|v| !v.is_empty())
+                            .unwrap_or(vec![sp]);
+                        for (x, y) in parts {
+                            names_read(src, kb, x, y, depth - 1, seen, r, false);
+                        }
+                    }
+                }
+            } else if item.len() == 1 || src.locals.contains(&item) {
+                // a type parameter (`h::<T>`), a type of the file (`struct S1;`)
+                r.types.insert(item);
+                continue;
+            } else if !kb.statics.iter().any(|e| e.pattern.is_match(&item)) {
+                r.foreign = true;
+            }
+            r.names.insert(item);
+            continue;
+        }
+        if after_colons || path_head || is_keyword(&w) || !(first.is_lowercase() || first == '_') {
+            continue;
+        }
+        let found = lookup(src, start, &w);
+        if call && !matches!(found, Some(Found::Bind(_))) {
+            // the file's function: what its body names
+            for f in src
+                .items
+                .iter()
+                .filter(|it| it.kind == ItemKind::Fn && it.name == w)
+            {
+                let sp = src.span(f);
+                if depth > 0 && seen.insert((sp.0, sp.1, String::new())) {
+                    names_read(src, kb, sp.0, sp.1, depth - 1, seen, r, false);
+                }
+            }
+            continue;
+        }
+        match found {
+            Some(Found::Bind(bd)) if bd.kind == BindKind::Closure => r.open |= own,
+            Some(Found::Bind(bd)) => {
+                if depth == 0 {
+                    continue;
+                }
+                // the stores that may reach the read: before it, or in a loop around both; one
+                // into the place read, in a block around the read, replaces what was there
+                let sc = src
+                    .enclosing(src.pos(start), &[ItemKind::Fn])
+                    .map(|f| src.fn_scope(f));
+                let place = read_place(s, start).0;
+                let field = field_read(s, i);
+                let in_loop = |w: usize| {
+                    sc.as_ref().is_some_and(|sc| {
+                        sc.loops
+                            .iter()
+                            .any(|&(o, c)| o <= w && w < c && o <= start && start < c)
+                    })
+                };
+                let writes: Vec<(usize, usize, usize)> = writes_to(src, &bd)
+                    .into_iter()
+                    .filter(|w| w.0 < start || in_loop(w.0))
+                    .collect();
+                let dom = writes
+                    .iter()
+                    .filter(|w| {
+                        w.0 < start
+                            && assigned_place(s, (w.0, w.2))
+                                .is_some_and(|a| place == a || place.starts_with(&format!("{a}.")))
+                            && sc.as_ref().is_some_and(|sc| {
+                                let (o, c) = sc.block_of(w.0);
+                                o < start && start < c
+                            })
+                    })
+                    .map(|w| (w.0, (w.1, w.2)))
+                    .max();
+                // or a call of the file's function that replaces it on every way through it
+                let dom = match sc
+                    .as_ref()
+                    .and_then(|sc| call_kills(src, &bd, start, &place, sc))
+                {
+                    Some(k) if dom.is_none_or(|d| k.0 > d.0) => Some(k),
+                    _ => dom,
+                };
+                // lent whole as `&mut` to a call whose stores are not read (`mem::swap(&mut a,
+                // &mut b)`): its value may come from elsewhere in the function
+                if dom.is_none() && lent_mut(src, &bd, start) {
+                    r.open |= own;
+                    r.replaced |= own;
+                }
+                if !seen.insert((
+                    bd.stmt.0,
+                    dom.map_or(bd.stmt.1, |d| d.0),
+                    field.clone().unwrap_or_default(),
+                )) {
+                    continue;
+                }
+                if dom.is_none()
+                    && let Some((x, y)) = bd.init
+                {
+                    // a `match` arm's variant: what that variant is made with; a field read:
+                    // what the literals give that field (`v11[0].h` of `vec![E { h: .. }]`)
+                    let parts = variant_parts(src, &bd)
+                        .or_else(|| {
+                            field
+                                .as_deref()
+                                .map(|f| field_values(s, x, y, f))
+                                .filter(|v| !v.is_empty())
+                        })
+                        .unwrap_or(vec![(x, y)]);
+                    for (x, y) in parts {
+                        names_read(src, kb, x, y, depth - 1, seen, r, own);
+                    }
+                }
+                if let Some((_, (x, y))) = dom {
+                    names_read(src, kb, x, y, depth - 1, seen, r, own);
+                }
+                // (not a store into another field of it)
+                let other_field = |w: &(usize, usize, usize)| {
+                    assigned_place(s, (w.0, w.2)).is_some_and(|a| {
+                        a.contains('.') && !place.starts_with(&a) && !a.starts_with(&place)
+                    })
+                };
+                for (_, x, y) in writes
+                    .into_iter()
+                    .filter(|w| dom.is_none_or(|d| w.0 > d.0) && !other_field(w))
+                {
+                    names_read(src, kb, x, y, depth - 1, seen, r, own);
+                }
+            }
+            Some(Found::Param(_)) => r.open |= own,
+            Some(Found::Item(k)) => {
+                let sp = src.span(&src.items[k]);
+                if depth > 0 && seen.insert((sp.0, sp.1, String::new())) {
+                    names_read(src, kb, sp.0, sp.1, depth - 1, seen, r, false);
+                }
+            }
+            None => {}
+        }
+    }
+}
+
+/// Is the variable bound by `bd` lent whole as `&mut` (`&mut v`, not `&mut v.f`) before the
+/// read at `start` to a standard call that swaps or replaces values (`mem::swap(&mut a, &mut
+/// b)`, `mem::take`, `mem::replace`), not the file's own function of that name?
+fn lent_mut(src: &Source, bd: &Bind, start: usize) -> bool {
+    let s = &src.code;
+    (bd.scope.0..start).any(|i| {
+        kw(s, i, &bd.name)
+            && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
+            && word_before_at(s, i) == "mut"
+            && before_blank(s, i)
+                .and_then(|m| before_blank(s, m + 1 - 3))
+                .is_some_and(|a| s[a] == '&')
+            && !matches!(
+                s.get(skip_blank(s, i + bd.name.chars().count())),
+                Some('.' | '[')
+            )
+            && swapping_call(src, i)
+    })
+}
+
+/// Is the argument at `i` passed to `swap`, `take` or `replace` that is not the file's own
+/// function (`mem::swap(&mut a, &mut b)`)?
+fn swapping_call(src: &Source, i: usize) -> bool {
+    let s = &src.code;
+    let mut depth = 0;
+    let mut j = i;
+    let open = loop {
+        if j == 0 {
+            return false;
+        }
+        j -= 1;
+        match s[j] {
+            ')' | ']' | '}' => depth += 1,
+            '(' if depth == 0 => break j,
+            '(' | '[' | '{' => {
+                if depth == 0 {
+                    return false;
+                }
+                depth -= 1;
+            }
+            ';' if depth == 0 => return false,
+            _ => {}
+        }
+    };
+    let f = word_before_at(s, open);
+    let fb = open - f.chars().count();
+    let own = before_blank(s, fb).is_none_or(|p| s[p] != ':' && s[p] != '.')
+        && src
+            .items
+            .iter()
+            .any(|x| x.kind == ItemKind::Fn && x.name == f);
+    matches!(f.as_str(), "swap" | "take" | "replace") && !own
+}
+
+/// A call before the read at `start`, in a block around it, that replaces the place read on
+/// every way through it: of the file's function the variable is passed to by `&mut`
+/// (`outer(&mut a7)`), or the file's method called on it (`c4.upgrade()`), whose body assigns
+/// that place at its top level (`*slot = ..`, `self.alg = ..`), itself or through such a call,
+/// with no `return` or `?` before: where the call is, and the value assigned.
+fn call_kills(
+    src: &Source,
+    bd: &Bind,
+    start: usize,
+    place: &str,
+    sc: &FnScope,
+) -> Option<(usize, (usize, usize))> {
+    let s = &src.code;
+    let mut best = None;
+    let mut i = bd.scope.0;
+    while i < start {
+        if !kw(s, i, &bd.name)
+            || !matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
+        {
+            i += 1;
+            continue;
+        }
+        let arg = read_place(s, i).0;
+        // `f(.., &mut v.x, ..)`
+        let by_mut = word_before_at(s, i) == "mut"
+            && before_blank(s, i)
+                .and_then(|m| before_blank(s, m + 1 - 3))
+                .is_some_and(|a| s[a] == '&');
+        let mut kills: Vec<(String, (usize, usize))> = Vec::new();
+        let mut at = i;
+        if by_mut {
+            // the call it is an argument of
+            let mut depth = 0;
+            let mut j = i;
+            let open = loop {
+                if j == 0 {
+                    break None;
+                }
+                j -= 1;
+                match s[j] {
+                    ')' | ']' | '}' => depth += 1,
+                    '(' if depth == 0 => break Some(j),
+                    '(' | '[' | '{' => {
+                        if depth == 0 {
+                            break None;
+                        }
+                        depth -= 1;
+                    }
+                    ';' if depth == 0 => break None,
+                    _ => {}
+                }
+            };
+            if let Some(open) = open {
+                let f = word_before_at(s, open);
+                let fb = open - f.len();
+                let free = before_blank(s, fb).is_none_or(|p| s[p] != '.');
+                let idx = (open + 1..i)
+                    .filter(|&k| s[k] == ',' && scan_to(s, open + 1, k + 1, |m| m == k) == k)
+                    .count();
+                if free
+                    && let Some(fi) = src
+                        .items
+                        .iter()
+                        .find(|x| x.kind == ItemKind::Fn && x.name == f)
+                {
+                    let fs = src.fn_scope(fi);
+                    if let Some(pn) = fs.params.get(idx) {
+                        kills = body_assigns(src, fi, pn, 3)
+                            .into_iter()
+                            .map(|(sub, v)| (format!("{arg}{sub}"), v))
+                            .collect();
+                        at = open;
+                    }
+                }
+            }
+        } else {
+            // `v.m(..)`, a method of the file's taking `self`
+            let d = skip_blank(s, i + arg.chars().count());
+            let m = skip_blank(s, d + 1);
+            let name = word_of(s, m);
+            if s.get(d) == Some(&'.')
+                && s.get(skip_blank(s, m + name.len())) == Some(&'(')
+                && let Some(fi) = src.items.iter().find(|x| {
+                    x.kind == ItemKind::Fn
+                        && x.name == name
+                        && src.fn_scope(x).params.first().is_some_and(|p| p == "self")
+                })
+            {
+                kills = body_assigns(src, fi, "self", 3)
+                    .into_iter()
+                    .map(|(sub, v)| (format!("{arg}{sub}"), v))
+                    .collect();
+                at = m;
+            }
+        }
+        let (o, c) = sc.block_of(at);
+        if o < start && start < c {
+            for (k, v) in kills {
+                if place == k || place.starts_with(&format!("{k}.")) {
+                    best = Some((at, v));
+                }
+            }
+        }
+        i += bd.name.len();
+    }
+    best
+}
+
+/// What the body of the function `f` assigns through its parameter `param` at its top level,
+/// before any `return` or `?`: the place under the parameter (`""` for `*slot = ..`, `.alg` for
+/// `self.alg = ..`) and the value, also through the file's functions it passes the parameter
+/// to there (`inner(slot)`, `self.set()`).
+fn body_assigns(
+    src: &Source,
+    f: &Item,
+    param: &str,
+    depth: usize,
+) -> Vec<(String, (usize, usize))> {
+    let s = &src.code;
+    let sc = src.fn_scope(f);
+    let (b0, b1) = sc.body;
+    // a way out before the end
+    let exit = (b0..b1)
+        .find(|&k| kw(s, k, "return") || (s[k] == '?' && k > 0 && !s[k - 1].is_whitespace()));
+    let mut out = Vec::new();
+    // the places under the parameter a local reborrows (`let r = &mut self.alg;`)
+    let mut aliases: HashMap<String, String> = HashMap::new();
+    let under = |x: &str, aliases: &HashMap<String, String>| -> Option<String> {
+        let x = x
+            .trim()
+            .trim_start_matches("&mut")
+            .trim()
+            .trim_start_matches('*')
+            .trim();
+        let (head, rest) = x.split_once('.').map_or((x, ""), |(h, r)| (h, r));
+        let rest = if rest.is_empty() {
+            String::new()
+        } else {
+            format!(".{rest}")
+        };
+        if head == param {
+            Some(rest)
+        } else {
+            aliases.get(head).map(|a| format!("{a}{rest}"))
+        }
+    };
+    let mut k = b0 + 1;
+    while k < b1.saturating_sub(1) && exit.is_none_or(|e| k < e) {
+        let e = scan_to(s, k, b1 - 1, |m| s[m] == ';');
+        let st = skip_blank(s, k);
+        let st = if s.get(st) == Some(&'*') {
+            skip_blank(s, st + 1)
+        } else {
+            st
+        };
+        if exit.is_some_and(|x| x < e) {
+            break;
+        }
+        let stmt = src.text(st, e);
+        // `std::mem::replace(slot, v)`
+        let replace = re!(r"\bmem\s*::\s*replace\s*\(").find(&stmt).and_then(|m| {
+            let open = st + stmt[..m.end()].chars().count() - 1;
+            let c = close_of_at(s, open)?;
+            let comma = scan_to(s, open + 1, c, |x| s[x] == ',');
+            Some((under(&src.text(open + 1, comma), &aliases)?, (comma + 1, c)))
+        });
+        if let Some(r) = replace {
+            out.push(r);
+        } else if kw(s, st, "let")
+            && let Some(m) = re!(r"^let\s+(?:mut\s+)?(\w+)\s*(?::[^=]*)?=\s*&\s*mut\s+([\w.]+)\s*$")
+                .captures(stmt.trim())
+            && let Some(sub) = under(&m[2], &aliases)
+        {
+            aliases.insert(m[1].to_string(), sub);
+        } else if let Some(pl) = assigned_place(s, (st, e))
+            && let Some(sub) = under(&pl, &aliases)
+        {
+            let v = scan_to(s, st, e, |m| s[m] == '=') + 1;
+            out.push((sub, (v, e)));
+        } else if depth > 0 {
+            // `g(.., param, ..)`, `self.m(..)`
+            let w = word_of(s, st);
+            let n = skip_blank(s, st + w.len());
+            if kw(s, st, param) && s.get(n) == Some(&'.') {
+                let m = skip_blank(s, n + 1);
+                let name = word_of(s, m);
+                if let Some(g) = src.items.iter().find(|x| {
+                    x.kind == ItemKind::Fn
+                        && x.name == name
+                        && src.fn_scope(x).params.first().is_some_and(|p| p == "self")
+                }) {
+                    out.extend(body_assigns(src, g, "self", depth - 1));
+                }
+            } else if !w.is_empty()
+                && s.get(n) == Some(&'(')
+                && let Some(c) = close_of_at(s, n)
+                && let Some(g) = src
+                    .items
+                    .iter()
+                    .find(|x| x.kind == ItemKind::Fn && x.name == w)
+            {
+                let mut a = n + 1;
+                let mut idx = 0;
+                while a < c {
+                    let e2 = scan_to(s, a, c, |m| s[m] == ',');
+                    let arg = src.text(a, e2);
+                    let arg = arg
+                        .trim()
+                        .trim_start_matches("&mut")
+                        .trim()
+                        .trim_start_matches('*')
+                        .trim();
+                    if arg == param
+                        && let Some(pn) = src.fn_scope(g).params.get(idx)
+                    {
+                        out.extend(body_assigns(src, g, pn, depth - 1));
+                    }
+                    idx += 1;
+                    a = e2 + 1;
+                }
+            }
+        }
+        k = e + 1;
+    }
+    out
+}
+
+/// The place a read at `start` reads: the variable and the fields and literal indexes after it
+/// (`c9.alg`, `t.0`, `v10[0]`), and where it ends.
+fn read_place(s: &[char], start: usize) -> (String, usize) {
+    let mut out = word_of(s, start);
+    let mut j = start + out.len();
+    loop {
+        let d = skip_blank(s, j);
+        match s.get(d) {
+            Some('.') => {
+                let f = skip_blank(s, d + 1);
+                let w = word_of(s, f);
+                if w.is_empty() || s.get(skip_blank(s, f + w.len())) == Some(&'(') {
+                    break;
+                }
+                out.push('.');
+                out.push_str(&w);
+                j = f + w.len();
+            }
+            Some('[') => {
+                let Some(c) = close_of_at(s, d) else { break };
+                let k: String = s[d + 1..c].iter().filter(|c| !c.is_whitespace()).collect();
+                if k.is_empty() || !k.chars().all(|c| c.is_ascii_digit()) {
+                    break;
+                }
+                out.push_str(&format!("[{k}]"));
+                j = c + 1;
+            }
+            _ => break,
+        }
+    }
+    (out, j)
+}
+
+/// The first field read after a variable or static ending at `end`, past its indexes
+/// (`TABLE[i].h`: `h`).
+fn field_read(s: &[char], end: usize) -> Option<String> {
+    let mut j = skip_blank(s, end);
+    while s.get(j) == Some(&'[') {
+        j = skip_blank(s, close_of_at(s, j)? + 1);
+    }
+    if s.get(j) != Some(&'.') {
+        return None;
+    }
+    let f = skip_blank(s, j + 1);
+    let w = word_of(s, f);
+    (!w.is_empty() && s.get(skip_blank(s, f + w.len())) != Some(&'(')).then_some(w)
+}
+
+/// The values the struct literals in `a..b` give the field `f` (`E { h: &SHA256, .. }`:
+/// `&SHA256`).
+fn field_values(s: &[char], a: usize, b: usize, f: &str) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    let mut i = a;
+    while i < b {
+        if kw(s, i, f) && before_blank(s, i).is_some_and(|p| matches!(s[p], '{' | ',')) {
+            let n = skip_blank(s, i + f.len());
+            if s.get(n) == Some(&':') && s.get(n + 1) != Some(&':') {
+                let e = scan_to(s, n + 1, b, |k| s[k] == ',');
+                out.push((n + 1, e));
+                i = e.max(i + 1);
+                continue;
+            }
+        }
+        i += 1;
+    }
+    out
+}
+
+/// The place a statement (`writes_to`) assigns (`c9.alg = ..`, `v10[0] = ..`), if it is an
+/// assignment.
+fn assigned_place(s: &[char], w: (usize, usize)) -> Option<String> {
+    let (place, end) = read_place(s, w.0);
+    let j = skip_blank(s, end);
+    (j < w.1 && s.get(j) == Some(&'=') && !matches!(s.get(j + 1), Some('=' | '>'))).then_some(place)
+}
+
+/// For a `match` arm binding a field of a variant (`Pick::A(x) => ..`) of a variable (`match
+/// p`): the arguments of that variant's constructions in what the variable holds (`Pick::A(&
+/// SHA384)`), where it has some.
+fn variant_parts(src: &Source, bd: &Bind) -> Option<Vec<(usize, usize)>> {
+    if bd.kind != BindKind::Arm {
+        return None;
+    }
+    let s = &src.code;
+    let (a, b) = bd.pat;
+    let at = (a..b).find(|&i| kw(s, i, &bd.name))?;
+    let mut depth = 0;
+    let mut j = at;
+    let open = loop {
+        if j <= a {
+            return None;
+        }
+        j -= 1;
+        match s[j] {
+            ')' => depth += 1,
+            '(' if depth == 0 => break j,
+            '(' => depth -= 1,
+            _ => {}
+        }
+    };
+    let v = word_before_at(s, open);
+    if !v.chars().next()?.is_uppercase() {
+        return None;
+    }
+    let (x, y) = bd.init?;
+    let var = src.text(x, y).trim().to_string();
+    if var.is_empty() || !var.chars().all(is_ident) {
+        return None;
+    }
+    let k = (x..y).find(|&i| kw(s, i, &var))?;
+    let Some(Found::Bind(vb)) = lookup(src, k, &var) else {
+        return None;
+    };
+    let mut texts: Vec<(usize, usize)> = vb.init.into_iter().collect();
+    texts.extend(writes_to(src, &vb).into_iter().map(|w| (w.1, w.2)));
+    let mut out = Vec::new();
+    for (p, q) in texts {
+        for i in p..q {
+            if kw(s, i, &v) {
+                let o = skip_blank(s, i + v.len());
+                if s.get(o) == Some(&'(')
+                    && let Some(c) = close_of_at(s, o)
+                {
+                    out.push((o + 1, c));
+                }
+            }
+        }
+    }
+    (!out.is_empty()).then_some(out)
+}
+
+/// The statements of its scope that store into a variable: those that start with it
+/// (`v = ..;`, `v.f = ..;`, `*v = ..;`, `m.insert(k, ..);`, `m.entry(k).or_insert(..);`), the
+/// variable read there being this binding: where each starts, where what it stores starts
+/// (the value assigned, the method's arguments), and its end.
+fn writes_to(src: &Source, bd: &Bind) -> Vec<(usize, usize, usize)> {
+    let s = &src.code;
+    let mut out = Vec::new();
+    let (from, to) = bd.scope;
+    let mut i = from;
+    while i < to.min(s.len()) {
+        if !kw(s, i, &bd.name) {
+            i += 1;
+            continue;
+        }
+        let mut p = before_blank(s, i);
+        if p.is_some_and(|p| s[p] == '*') {
+            p = before_blank(s, p.unwrap_or(0));
+        }
+        let starts = p.is_none_or(|p| matches!(s[p], ';' | '{' | '}'));
+        if starts && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt) {
+            let e = scan_to(s, i, to, |k| s[k] == ';');
+            // what it stores: an assignment's value, a method's arguments
+            let from = match assigned_place(s, (i, e)) {
+                Some(_) => scan_to(s, i, e, |k| s[k] == '=') + 1,
+                None => i + bd.name.len(),
+            };
+            out.push((i, from, e));
+            i = e.max(i + 1);
+            continue;
+        }
+        i += bd.name.len();
+    }
+    out
+}
+
+/// A token of a macro's matcher or invocation.
+#[derive(Clone, Debug, PartialEq)]
+enum Tok {
+    Word(String),
+    Punct(char),
+    Lit(String),
+    Group(char, Vec<Tok>),
+}
+
+impl Tok {
+    fn text(&self) -> String {
+        match self {
+            Tok::Word(w) | Tok::Lit(w) => w.clone(),
+            Tok::Punct(c) => c.to_string(),
+            Tok::Group(d, inner) => {
+                let close = match d {
+                    '(' => ')',
+                    '[' => ']',
+                    _ => '}',
+                };
+                format!("{d}{}{close}", toks_text(inner))
+            }
+        }
+    }
+}
+
+fn toks_text(t: &[Tok]) -> String {
+    t.iter().map(Tok::text).collect::<Vec<_>>().join(" ")
+}
+
+/// The tokens of `text`: comments skipped, literals whole, brackets as groups.
+fn tokens(text: &str) -> Vec<Tok> {
+    fn go(chars: &[char], cls: &[Class], i: &mut usize, close: Option<char>) -> Vec<Tok> {
+        let mut out = Vec::new();
+        while *i < chars.len() {
+            let c = chars[*i];
+            match cls[*i] {
+                Class::Comment => {
+                    *i += 1;
+                    continue;
+                }
+                Class::Literal => {
+                    let s = *i;
+                    while *i < chars.len() && cls[*i] == Class::Literal {
+                        *i += 1;
+                    }
+                    out.push(Tok::Lit(chars[s..*i].iter().collect()));
+                    continue;
+                }
+                Class::Code => {}
+            }
+            if c.is_whitespace() {
+                *i += 1;
+                continue;
+            }
+            if Some(c) == close {
+                *i += 1;
+                return out;
+            }
+            let s = *i;
+            match c {
+                '(' | '[' | '{' => {
+                    let cl = match c {
+                        '(' => ')',
+                        '[' => ']',
+                        _ => '}',
+                    };
+                    *i += 1;
+                    let inner = go(chars, cls, i, Some(cl));
+                    out.push(Tok::Group(c, inner));
+                }
+                _ if is_ident(c) => {
+                    while *i < chars.len() && is_ident(chars[*i]) && cls[*i] == Class::Code {
+                        *i += 1;
+                    }
+                    let w: String = chars[s..*i].iter().collect();
+                    out.push(if c.is_ascii_digit() {
+                        Tok::Lit(w)
+                    } else {
+                        Tok::Word(w)
+                    });
+                }
+                _ => {
+                    out.push(Tok::Punct(c));
+                    *i += 1;
+                }
+            }
+        }
+        out
+    }
+    let chars: Vec<char> = text.chars().collect();
+    let cls = classify(text);
+    let mut i = 0;
+    go(&chars, &cls, &mut i, None)
+}
+
+/// The metavariables a rule's matcher binds, and the tokens each binds.
+type Metavars = Vec<(String, Vec<Tok>)>;
+
+/// An element of a macro rule's matcher.
+#[derive(Clone, Debug)]
+enum El {
+    Lit(Tok),
+    /// `$name:fragment`
+    Var(String, String),
+    Group(char, Vec<El>),
+}
+
+/// A matcher's elements; None for one with a repetition (`$(..)*`), which is not read.
+fn matcher_els(toks: &[Tok]) -> Option<Vec<El>> {
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < toks.len() {
+        match &toks[i] {
+            Tok::Punct('$') => match (toks.get(i + 1), toks.get(i + 2), toks.get(i + 3)) {
+                (Some(Tok::Word(n)), Some(Tok::Punct(':')), Some(Tok::Word(f))) => {
+                    out.push(El::Var(n.clone(), f.clone()));
+                    i += 4;
+                    continue;
+                }
+                _ => return None,
+            },
+            Tok::Group(d, inner) => out.push(El::Group(*d, matcher_els(inner)?)),
+            t => out.push(El::Lit(t.clone())),
+        }
+        i += 1;
+    }
+    Some(out)
+}
+
+/// Whether tokens `t` are a fragment of kind `frag` (`ident`, `literal`, `expr`, ..): an
+/// expression, type or path runs to the next `,`, `;` or `=>`.
+fn frag_ok(frag: &str, t: &[Tok]) -> bool {
+    match frag {
+        "ident" => matches!(t, [Tok::Word(w)] if w != "_"),
+        "literal" => {
+            matches!(t, [Tok::Lit(_)] | [Tok::Punct('-'), Tok::Lit(_)])
+                || matches!(t, [Tok::Word(w)] if w == "true" || w == "false")
+        }
+        "lifetime" => matches!(t, [Tok::Punct('\''), Tok::Word(_)]),
+        "tt" => t.len() == 1,
+        "block" => matches!(t, [Tok::Group('{', _)]),
+        _ => {
+            !t.is_empty()
+                && !t.iter().enumerate().any(|(k, x)| {
+                    matches!(x, Tok::Punct(';' | ','))
+                        || (matches!(x, Tok::Punct('='))
+                            && matches!(t.get(k + 1), Some(Tok::Punct('>'))))
+                })
+        }
+    }
+}
+
+/// Matches an invocation's tokens against a matcher, binding its metavariables.
+fn match_els(p: &[El], t: &[Tok], out: &mut Metavars) -> bool {
+    let Some(first) = p.first() else {
+        return t.is_empty();
+    };
+    match first {
+        El::Lit(x) => t.first() == Some(x) && match_els(&p[1..], &t[1..], out),
+        El::Group(d, inner) => {
+            let n = out.len();
+            let ok = matches!(t.first(), Some(Tok::Group(d2, sub)) if d2 == d && match_els(inner, sub, out))
+                && match_els(&p[1..], &t[1..], out);
+            if !ok {
+                out.truncate(n);
+            }
+            ok
+        }
+        El::Var(name, frag) => {
+            let max = if matches!(frag.as_str(), "ident" | "tt" | "block") {
+                t.len().min(1)
+            } else {
+                t.len()
+            };
+            for k in (1..=max).rev() {
+                if !frag_ok(frag, &t[..k]) {
+                    continue;
+                }
+                let n = out.len();
+                out.push((name.clone(), t[..k].to_vec()));
+                if match_els(&p[1..], &t[k..], out) {
+                    return true;
+                }
+                out.truncate(n);
+            }
+            frag == "vis" && match_els(&p[1..], t, out)
+        }
+    }
+}
+
+/// A rule of a `macro_rules!`: its matcher (None when not read) and its transcriber's extent in
+/// `code`, inside its brackets.
+struct Rule {
+    matcher: Option<Vec<El>>,
+    body: (usize, usize),
+}
+
+fn rules_of(src: &Source, m: &Item) -> Vec<Rule> {
+    let s = &src.code;
+    let (b, e) = src.span(m);
+    let mut out = Vec::new();
+    let mut k = b + 1;
+    while k < e {
+        k = skip_blank(s, k);
+        if !matches!(s.get(k), Some('(' | '[' | '{')) {
+            break;
+        }
+        let Some(mc) = close_of_at(s, k) else { break };
+        let arrow = skip_blank(s, mc + 1);
+        if !(s.get(arrow) == Some(&'=') && s.get(arrow + 1) == Some(&'>')) {
+            break;
+        }
+        let t = skip_blank(s, arrow + 2);
+        let Some(tc) = close_of_at(s, t) else { break };
+        out.push(Rule {
+            matcher: matcher_els(&tokens(&src.orig(k + 1, mc))),
+            body: (t + 1, tc),
+        });
+        k = skip_blank(s, tc + 1);
+        if s.get(k) == Some(&';') {
+            k += 1;
+        }
+    }
+    out
+}
+
+/// The arguments of the macro invocation at `at`: its name and the tokens inside its brackets.
+fn invocation_args(src: &Source, at: (usize, usize)) -> Option<(String, Vec<Tok>)> {
+    let (name, text) = invocation_text(src, at)?;
+    let toks = tokens(&text);
+    let k = toks.iter().position(|t| *t == Tok::Punct('!'))?;
+    match toks.get(k + 1)? {
+        Tok::Group(_, inner) => Some((name, inner.clone())),
+        _ => None,
+    }
+}
+
+/// The rule of `macro_rules! m` the invocation `args` matches (the first that does, as rustc
+/// picks it), with the metavariables it binds; None when a rule before it is not read.
+fn rule_for(src: &Source, m: &Item, args: &[Tok]) -> Option<(Rule, Metavars)> {
+    for r in rules_of(src, m) {
+        let mut out = Vec::new();
+        if match_els(r.matcher.as_ref()?, args, &mut out) {
+            return Some((r, out));
+        }
+    }
+    None
+}
+
+/// What the invocation at `at` of the file's `macro_rules!` expands to: the transcriber of the
+/// rule it matches with its metavariables replaced; None when that is not known.
+fn expansion(src: &Source, at: (usize, usize)) -> Option<String> {
+    let (name, args) = invocation_args(src, at)?;
+    let m = src
+        .items
+        .iter()
+        .find(|i| i.kind == ItemKind::Macro && i.name == name)?;
+    let (r, binds) = rule_for(src, m, &args)?;
+    let mut text = src.orig(r.body.0, r.body.1);
+    // longer names first (`$alg` before `$a`)
+    let mut binds = binds;
+    binds.sort_by_key(|(n, _)| std::cmp::Reverse(n.len()));
+    for (n, t) in binds {
+        text = text.replace(&format!("${n}"), &toks_text(&t));
+    }
+    Some(text)
+}
+
+thread_local! {
+    /// Set by a check that could tell its position only within a range of identical candidates
+    /// (C6): invocations of one macro that make the same item as far as the context says.
+    static RANGED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Which macro invocation makes an item: this one only, this one among others the context
+/// cannot tell apart (a range), or another one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Pick {
+    Exact,
+    Range,
+    No,
 }
 
 #[cfg(test)]
@@ -5055,5 +7226,93 @@ ring = "0.17"
             assert!(src.locals.contains(local), "{local}");
         }
         assert!(!src.locals.contains("Hasher"));
+    }
+
+    /// The first line of the binding of `name` read where `at` is written (0 for a parameter).
+    fn bound_line(src: &Source, at: &str, name: &str) -> Option<usize> {
+        let l = src.lines.iter().position(|l| l.contains(at))? + 1;
+        let c = src.lines[l - 1].find(at)?;
+        match binding(src, src.idx((l, c)), name)? {
+            Bound::Let { first, .. } => Some(first),
+            Bound::Param { .. } => Some(0),
+            _ => None,
+        }
+    }
+
+    #[test]
+    fn bindings_are_read_in_their_scope() {
+        let src = Source::new(
+            "fn main() {\n    let h = a;\n    {\n        let h = b;\n        h(1); // in\n    }\n    h(2); // out\n    fn inner() {\n        let g = c;\n        g(3); // inner\n    }\n    let g = d;\n    g(4); // outer g\n    let f = e;\n    let f = f;\n    f(5); // copy\n    let k = |x: u8| x;\n    k(6); // closure\n}\n",
+            true,
+            false,
+        );
+        assert_eq!(bound_line(&src, "h(1)", "h"), Some(4));
+        assert_eq!(bound_line(&src, "h(2)", "h"), Some(2));
+        assert_eq!(bound_line(&src, "g(3)", "g"), Some(9));
+        assert_eq!(bound_line(&src, "g(4)", "g"), Some(12));
+        assert_eq!(bound_line(&src, "f(5)", "f"), Some(15));
+        // the self-copy's own value: the `f` before it
+        let l15 = src.lines[14].find("= f").unwrap() + 2;
+        assert_eq!(
+            match binding(&src, src.idx((15, l15)), "f") {
+                Some(Bound::Let { first, .. }) => Some(first),
+                _ => None,
+            },
+            Some(14)
+        );
+        // a closure's parameter is visible in its body only
+        let x = src.lines[16].rfind('x').unwrap();
+        assert!(matches!(
+            binding(&src, src.idx((17, x)), "x"),
+            Some(Bound::ClosureParam)
+        ));
+        assert!(binding(&src, src.idx((18, 4)), "x").is_none());
+    }
+
+    #[test]
+    fn a_macro_invocation_matches_its_first_rule() {
+        let src = Source::new(
+            "macro_rules! sel {\n    ($m:ident, 256) => { mod $m { fn a() {} } };\n    ($m:ident, 384) => { mod $m { fn b() {} } };\n}\nmacro_rules! semi {\n    ($f:ident; $alg:ident) => { fn $f() { x::$alg } };\n}\nsel!(gamma, 384);\nsemi!(s1; SHA512);\n",
+            true,
+            false,
+        );
+        let m = src.items.iter().find(|i| i.name == "sel").unwrap();
+        let (_, args) = invocation_args(&src, (8, 0)).unwrap();
+        let (r, binds) = rule_for(&src, m, &args).unwrap();
+        assert_eq!(src.pos(r.body.0).0, 3);
+        assert_eq!(binds[0].0, "m");
+        let m = src.items.iter().find(|i| i.name == "semi").unwrap();
+        let (_, args) = invocation_args(&src, (9, 0)).unwrap();
+        let (_, binds) = rule_for(&src, m, &args).unwrap();
+        assert_eq!(
+            binds
+                .iter()
+                .map(|(n, t)| format!("{n}={}", toks_text(t)))
+                .collect::<Vec<_>>(),
+            ["f=s1", "alg=SHA512"]
+        );
+        assert!(
+            expansion(&src, (9, 0))
+                .unwrap()
+                .contains("fn s1() { x::SHA512 }")
+        );
+    }
+
+    #[test]
+    fn closures_have_extents() {
+        let s: Vec<char> = "run2(|x| a(x).len(), move |y| { b(y) }, async move |z| c(z));"
+            .chars()
+            .collect();
+        let text: String = s.iter().collect();
+        let first = text.find('|').unwrap();
+        let (a, b) = closure_span(&s, first).unwrap();
+        assert_eq!(&text[a..b], "|x| a(x).len()");
+        let mv = text.find("move |y|").unwrap();
+        let (a, b) = closure_span(&s, mv).unwrap();
+        assert_eq!(&text[a..b], "move |y| { b(y) }");
+        let body = text.find("c(z)").unwrap();
+        let (a, b) = async_body_at(&s, body).unwrap();
+        assert_eq!(&text[a..b], "c(z)");
+        assert!(async_body_at(&s, text.find("a(x)").unwrap()).is_none());
     }
 }

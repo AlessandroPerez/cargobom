@@ -54,6 +54,9 @@ pub(crate) enum Step {
     Elem,
     /// Element `n` of an array, counted from the start (`let [a, b] = arr;`): a part of it.
     Index(usize),
+    /// Some part of a value, which one not known: what a borrow function `.0` returned into
+    /// its argument points to (`*self.slot() = v`, `fn slot(&mut self) -> &mut &Digest`).
+    Part(String),
 }
 
 impl Step {
@@ -92,15 +95,10 @@ fn path_of_place(p: &Place) -> Path {
                 offset,
                 from_end: false,
                 ..
-            } => {
-                out.push(Step::Index(*offset as usize));
-                break;
-            }
-            // `a[i]`, `a[2..]`, slice patterns: some part of the array, whichever it is
-            _ => {
-                out.push(Step::Elem);
-                break;
-            }
+            } => out.push(Step::Index(*offset as usize)),
+            // `a[i]`, `a[2..]`, slice patterns: some part of the array, whichever it is (and a
+            // field of that element: `TABLE[i].h`)
+            _ => out.push(Step::Elem),
         }
     }
     out
@@ -736,6 +734,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 self_ty: None,
                 args: Vec::new(),
                 span: None,
+                runs: None,
             };
         }
         match self.operand_at(op, bb, idx) {
@@ -751,6 +750,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     self_ty: None,
                     args: Vec::new(),
                     span: None,
+                    runs: None,
                 }
             }
             o => o,
@@ -811,6 +811,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     Some(t) => ty = t,
                     None => break,
                 },
+                Step::Part(_) => break,
             }
         }
         o
@@ -1168,6 +1169,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 ty = walk_ty(self.tcx, ty, &d.path);
                 o = self.read_fields(ty, &rest, o);
             }
+            // a write to a part not known (through a borrow a function returned): that value
+            // somewhere in it, or not where it is read
+            if part
+                && let Some(Step::Part(f)) = d.path[path.len()..]
+                    .iter()
+                    .find(|s| matches!(s, Step::Part(_)))
+            {
+                o = Origin::Any(vec![o, Origin::Through { callee: f.clone() }]);
+            }
             // a write to a field of it (`h.alg = ..`, `set_slot(&mut c.alg)`): which field
             if part && let Some(fields) = field_steps(&d.path[path.len()..]) {
                 let strong = d.strong && self.part_always_after(&defs, i, &path, at);
@@ -1246,7 +1256,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             Some(TyKind::RigidTy(RigidTy::FnDef(_, g))) => rustc_internal::internal(self.tcx, g),
             _ => return None,
         };
-        let (callee, self_ty) = write_callee(self.tcx, did, gargs);
+        let place = walk_ty(self.tcx, self.local_ty(d.local), &d.path);
+        let (callee, self_ty) = write_callee(self.tcx, did, gargs, Some(place));
         Some(Origin::Written {
             callee,
             index: *index,
@@ -1397,10 +1408,12 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         {
             return o;
         }
+        let mut runs = None;
         let (callee, krate, self_ty) = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
             Some(TyKind::RigidTy(RigidTy::FnDef(def, gargs))) => {
                 let did = rustc_internal::internal(self.tcx, def.def_id());
                 let gargs = rustc_internal::internal(self.tcx, gargs);
+                runs = runs_of(self.tcx, did, gargs);
                 (
                     path_of(self.tcx, did),
                     self.tcx.crate_name(did.krate).to_string(),
@@ -1466,6 +1479,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             self_ty,
             args: out,
             span,
+            runs,
         }
     }
 
@@ -1734,6 +1748,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             self_ty: None,
             args: vec![ret],
             span: None,
+            runs: None,
         }
     }
 
@@ -1928,6 +1943,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     1 => return statics.pop().unwrap(),
                     _ => return Origin::Any(statics),
                 }
+                if let Some(o) = self.enum_elements(a, &ty) {
+                    return o;
+                }
                 let (len, zero) = literal_data(a, &ty);
                 Origin::Const {
                     value,
@@ -1948,19 +1966,25 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     .unwrap_or_else(|| {
                         // a promoted literal (`&[0; 32]` in an item body): its data, as an
                         // instance body has it evaluated
-                        let (len, zero) = uneval
-                            .2
-                            .and_then(|_| self.evaluate(uneval))
-                            .and_then(|v| {
-                                let c: rustc_public::ty::MirConst =
-                                    rustc_internal::stable(rustc_middle::mir::Const::Val(
-                                        v,
-                                        rustc_internal::internal(self.tcx, ty),
-                                    ));
-                                match c.kind() {
-                                    ConstantKind::Allocated(a) => Some(literal_data(a, &ty)),
-                                    _ => None,
-                                }
+                        let evaluated = uneval.2.and_then(|_| self.evaluate(uneval)).map(|v| {
+                            let c: rustc_public::ty::MirConst =
+                                rustc_internal::stable(rustc_middle::mir::Const::Val(
+                                    v,
+                                    rustc_internal::internal(self.tcx, ty),
+                                ));
+                            c
+                        });
+                        // an array of an enum's variants (`&[Algorithm::HS256]`)
+                        if let Some(c) = &evaluated
+                            && let ConstantKind::Allocated(a) = c.kind()
+                            && let Some(o) = self.enum_elements(a, &ty)
+                        {
+                            return o;
+                        }
+                        let (len, zero) = evaluated
+                            .and_then(|c| match c.kind() {
+                                ConstantKind::Allocated(a) => Some(literal_data(a, &ty)),
+                                _ => None,
                             })
                             .unwrap_or((bytes_of_ty(&ty), false));
                         Origin::Const {
@@ -2197,6 +2221,68 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         adt.is_enum() && adt.all_fields().next().is_none()
     }
 
+    /// The variants a constant array (or a reference to one, a slice) of a field-less enum
+    /// holds (`&[Algorithm::HS256]`), each a `Unit` with its discriminant.
+    fn enum_elements(&self, a: &rustc_public::ty::Allocation, ty: &Ty) -> Option<Origin> {
+        let tcx = self.tcx;
+        let (elem, bytes, len) = match ty.kind().rigid() {
+            Some(RigidTy::Array(e, _)) => (*e, a.bytes.clone(), None),
+            Some(RigidTy::Ref(_, t, _)) => {
+                let m =
+                    a.provenance
+                        .ptrs
+                        .first()
+                        .and_then(|(_, p)| match GlobalAlloc::from(p.0) {
+                            GlobalAlloc::Memory(m) => Some(m),
+                            _ => None,
+                        })?;
+                match t.kind().rigid() {
+                    Some(RigidTy::Array(e, _)) => (*e, m.bytes.clone(), None),
+                    Some(RigidTy::Slice(e)) if a.bytes.len() == 16 => {
+                        let n = a.bytes[8..16]
+                            .iter()
+                            .rev()
+                            .try_fold(0u64, |acc, b| b.map(|b| (acc << 8) | b as u64))?;
+                        (*e, m.bytes.clone(), Some(n as usize))
+                    }
+                    _ => return None,
+                }
+            }
+            _ => return None,
+        };
+        if !self.fieldless_enum(&elem) {
+            return None;
+        }
+        let kind = elem.kind();
+        let Some(RigidTy::Adt(def, _)) = kind.rigid() else {
+            return None;
+        };
+        let adt = tcx.adt_def(rustc_internal::internal(tcx, def.def_id()));
+        let size = elem.layout().ok()?.shape().size.bytes();
+        if size == 0 || size > 8 {
+            return None;
+        }
+        let n = len.unwrap_or(bytes.len() / size);
+        if n == 0 || n > MAX_WIDTH || bytes.len() < n * size {
+            return None;
+        }
+        let mut out = Vec::new();
+        for k in 0..n {
+            let raw = bytes[k * size..(k + 1) * size]
+                .iter()
+                .rev()
+                .try_fold(0u128, |acc, b| b.map(|b| (acc << 8) | b as u128))?;
+            let (idx, d) = adt.discriminants(tcx).find(|(_, d)| d.val == raw)?;
+            out.push(Origin::Unit {
+                path: path_of(tcx, adt.variant(idx).def_id),
+                krate: tcx.crate_name(adt.did().krate).to_string(),
+                value: i128::try_from(d.val).ok(),
+                span: None,
+            });
+        }
+        Some(Origin::All(out))
+    }
+
     /// A value of a struct without fields (`OsRng`): it names its type.
     fn unit_value(&self, ty: &Ty) -> Option<Origin> {
         let kind = ty.kind();
@@ -2277,6 +2363,7 @@ fn walk_ty<'tcx>(
                 Some(t) => t,
                 None => return ty,
             },
+            Step::Part(_) => return ty,
         };
     }
     ty
@@ -2324,7 +2411,7 @@ fn other_variant(d: &DefKind, rest: &[Step]) -> bool {
 /// A part of the place, not all of it: an element.
 fn partial(path: &[Step]) -> bool {
     path.iter()
-        .any(|s| matches!(s, Step::Elem | Step::Index(_)))
+        .any(|s| matches!(s, Step::Elem | Step::Index(_) | Step::Part(_)))
 }
 
 /// Does `d` end `e`? An assignment overwrites the place and its parts; a call that fills the
@@ -2459,6 +2546,18 @@ impl Pointees<'_> {
                 | DefKind::Assign(Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _), _)
                     if q.projection.is_empty() =>
                 {
+                    // a copy of a pointer the function was given (`let s = if c { slot } else
+                    // { other }`): what it points to on entry
+                    if (1..=self.body.arg_locals().len()).contains(&q.local)
+                        && !self.direct.contains_key(&q.local)
+                        && is_ptr(self.body, q)
+                    {
+                        out.push(Target {
+                            local: q.local,
+                            path: vec![Step::Deref],
+                            alias: false,
+                        });
+                    }
                     out.extend(self.targets(q.local, &[], depth + 1))
                 }
                 // a box's pointer (`(_1.0).0 as *const T`, how `&mut *key` reaches a
@@ -2502,6 +2601,15 @@ impl Pointees<'_> {
                 // `get_mut(i)`)
                 DefKind::Call { func, args } => {
                     let part = borrows_part(self.body, func, args);
+                    let inside =
+                        (!part && borrows_inside(self.body, func, args, local)).then(|| match func
+                            .ty(self.body.locals())
+                            .ok()
+                            .map(|t| t.kind())
+                        {
+                            Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) => def.name(),
+                            _ => String::new(),
+                        });
                     for a in args {
                         if let Operand::Copy(q) | Operand::Move(q) = a
                             && is_mut_ptr(self.body, q)
@@ -2509,6 +2617,11 @@ impl Pointees<'_> {
                             for mut t in self.targets(q.local, &path_of_place(q), depth + 1) {
                                 if part && !partial(&t.path) {
                                     t.path.push(Step::Elem);
+                                }
+                                if let Some(f) = &inside
+                                    && !partial(&t.path)
+                                {
+                                    t.path.push(Step::Part(f.clone()));
                                 }
                                 out.push(t);
                             }
@@ -2593,6 +2706,39 @@ fn borrows_part(body: &Body, func: &Operand, args: &[Operand]) -> bool {
         matches!(t.kind().rigid(), Some(RigidTy::Adt(d, _)) if d.name().ends_with("RangeFull"))
     });
     elementwise && of_sequence && !full
+}
+
+/// Does a call of a function outside the standard library return a borrow of something inside
+/// its argument (`fn slot(&mut self) -> &mut &Digest { &mut self.alg }`): a part of it, not the
+/// whole, when what it points to is of another type than the argument's?
+fn borrows_inside(body: &Body, func: &Operand, args: &[Operand], result: Local) -> bool {
+    let std = match func.ty(body.locals()).ok().map(|t| t.kind()) {
+        Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) => {
+            matches!(def.krate().name.as_str(), "core" | "std" | "alloc")
+        }
+        _ => true,
+    };
+    let pointee = |t: Ty| match t.kind().rigid() {
+        Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => Some(*i),
+        _ => None,
+    };
+    let Some(out) = pointee(body.locals()[result].ty) else {
+        return false;
+    };
+    !std && args
+        .first()
+        .and_then(|a| a.ty(body.locals()).ok())
+        .and_then(pointee)
+        .is_some_and(|inp| inp != out)
+}
+
+fn is_ptr(body: &Body, p: &Place) -> bool {
+    matches!(
+        p.ty(body.locals())
+            .ok()
+            .and_then(|t| t.kind().rigid().cloned()),
+        Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
+    )
 }
 
 fn is_mut_ptr(body: &Body, p: &Place) -> bool {
@@ -2883,28 +3029,118 @@ pub(crate) fn self_adt_path<'tcx>(
     }
 }
 
+thread_local! {
+    /// The instances of this crate's generic functions (a trait's default body among them)
+    /// that a summary names (`body_name`), by name: the driver records their summaries under
+    /// that name (`links::instance_links`).
+    static INSTANCES: RefCell<Vec<(String, rustc_public::mir::mono::Instance)>> =
+        const { RefCell::new(Vec::new()) };
+}
+
+/// The instances `body_name` named since the last call.
+pub(crate) fn take_instances() -> Vec<(String, rustc_public::mir::mono::Instance)> {
+    INSTANCES.with(|v| std::mem::take(&mut *v.borrow_mut()))
+}
+
+/// The name of the body a call runs as the links name it: an item's defining path
+/// (`<app::Fast as app::Pick>::alg`), or, for an item of this crate with generic parameters (a
+/// generic function, a trait's default body, a generic impl's method), the instance's
+/// (`app::pick::<app::Fast>`, `<app::Legacy as app::Pick>::alg`), whose summaries the driver
+/// records; `None` for another crate's generic item, and for an instance still generic.
+pub(crate) fn body_name<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    inst: rustc_middle::ty::Instance<'tcx>,
+) -> Option<String> {
+    use rustc_middle::ty::TypeVisitableExt;
+    use rustc_middle::ty::print::{
+        with_crate_prefix, with_no_trimmed_paths, with_no_visible_paths,
+    };
+    if !matches!(inst.def, rustc_middle::ty::InstanceKind::Item(_)) {
+        return None;
+    }
+    let def = inst.def_id();
+    if !tcx.generics_of(def).requires_monomorphization(tcx) {
+        return Some(path_of(tcx, def));
+    }
+    if !def.is_local() || inst.args.has_non_region_param() || tcx.is_closure_like(def) {
+        return None;
+    }
+    let args = tcx.erase_and_anonymize_regions(inst.args);
+    let p = with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(
+        tcx.def_path_str_with_args(def, args)
+    )));
+    let name = crate::local_crate_name(tcx, p);
+    let inst = rustc_middle::ty::Instance::new_raw(def, args);
+    INSTANCES.with(|v| {
+        let mut v = v.borrow_mut();
+        if !v.iter().any(|(n, _)| *n == name) {
+            v.push((name.clone(), rustc_internal::stable(inst)));
+        }
+    });
+    Some(name)
+}
+
+/// The body a call of `did` with `args` runs, when it is another than `did`'s item as the
+/// links name it (`Origin::Call::runs`): a trait method's implementation for a known `Self` or
+/// the default body, an instance of a generic function of this crate.
+pub(crate) fn runs_of<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Option<String> {
+    use rustc_middle::ty::TypeVisitableExt;
+    if args.has_non_region_param() || dyn_self(tcx, did, args).is_some() {
+        return None;
+    }
+    if tcx.trait_of_assoc(did).is_none() && !tcx.generics_of(did).requires_monomorphization(tcx) {
+        return None;
+    }
+    let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+    let inst = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args).ok()??;
+    body_name(tcx, inst).filter(|n| *n != path_of(tcx, did))
+}
+
 /// The function a call of `did` with `args` writes through, as `Links::writes` names it: a
 /// trait method's call with a known `Self` type is its implementation's (`<Ctx as Up>::up`, or
-/// the trait's default body); one on a trait object or a type parameter stays the trait
-/// method's, with `dyn <trait>` or `impl <trait>` (see `Origin::Written`).
+/// the trait's default body for it), a generic function's of this crate its instance's
+/// (`body_name`); one on a trait object or a type parameter stays the trait method's, with
+/// `dyn <trait>` or `impl <trait>` (see `Origin::Written`), unless the place written is of a
+/// known type (`let u: &mut dyn Up = &mut b; u.up()` writes `b`, a `B`: `<B as Up>::up`).
 pub(crate) fn write_callee<'tcx>(
     tcx: TyCtxt<'tcx>,
     did: DefId,
     args: rustc_middle::ty::GenericArgsRef<'tcx>,
+    place: Option<rustc_middle::ty::Ty<'tcx>>,
 ) -> (String, Option<String>) {
+    use rustc_middle::ty::TypeVisitableExt;
+    let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+    let resolved = |args: rustc_middle::ty::GenericArgsRef<'tcx>| {
+        if args.has_non_region_param() {
+            return None;
+        }
+        let i = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args).ok()??;
+        body_name(tcx, i)
+    };
     let Some(tr) = tcx.trait_of_assoc(did) else {
-        return (path_of(tcx, did), None);
+        return (resolved(args).unwrap_or_else(|| path_of(tcx, did)), None);
     };
     if let Some(d) = dyn_self(tcx, did, args) {
+        // the object is a place of a known type: its implementation
+        if let Some(t) = place
+            && matches!(t.kind(), rustc_middle::ty::Adt(..))
+            && !t.has_non_region_param()
+        {
+            let args = tcx.mk_args_from_iter(
+                std::iter::once(rustc_middle::ty::GenericArg::from(t)).chain(args.iter().skip(1)),
+            );
+            if let Some(n) = resolved(args) {
+                return (n, None);
+            }
+        }
         return (path_of(tcx, did), Some(d));
     }
-    if !rustc_middle::ty::TypeVisitableExt::has_non_region_param(&args) {
-        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
-        if let Ok(Some(i)) = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args)
-            && matches!(i.def, rustc_middle::ty::InstanceKind::Item(_))
-        {
-            return (path_of(tcx, i.def_id()), None);
-        }
+    if let Some(n) = resolved(args) {
+        return (n, None);
     }
     (
         path_of(tcx, did),

@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 18;
+pub const FACTS_VERSION: u32 = 19;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -81,16 +81,21 @@ pub struct Links {
     pub coercions: Vec<Coercion>,
 }
 
-/// Type `ty` (an ADT's defining path, or the type as rustc prints it) is coerced to `dyn
-/// trait_path` at `at` (none: inside a constant or a static's value). `defaults`: the trait
-/// methods (defining paths) for which it runs the trait's default body.
+/// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`, or the type as
+/// rustc prints it) is coerced to `dyn trait_path` at `at` (a constant's or a static's: its
+/// item). `methods`: for each method of the trait object (the trait's, its supertraits'), by
+/// defining path, the body a call through it runs for `ty`, as the links name it (the type's
+/// implementation, or the trait's default body: `Origin::Call::runs`).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Coercion {
     pub trait_path: String,
     pub ty: String,
     pub at: Option<Loc>,
+    /// The coercion is written in a static's value (not a constant's, nor a function's).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub in_static: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub defaults: Vec<String>,
+    pub methods: Vec<(String, String)>,
 }
 
 /// Function `func` writes `value` through its parameter `index`; `value` names its parameters.
@@ -401,6 +406,13 @@ pub enum Origin {
         /// matched.
         #[serde(default)]
         span: Option<Loc>,
+        /// The body the call runs, when the driver resolves it to another than `callee`'s
+        /// item: a trait method's implementation for a known `Self` (`<app::Fast as
+        /// app::Pick>::alg`) or the trait's default body for it, an instance of a generic
+        /// function of the program (`app::pick::<app::Fast>`), whose summaries `Links` records
+        /// under that name.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        runs: Option<String>,
     },
     /// A value of a type without fields (`rand::rngs::OsRng`, `Option::None`): no data, but the
     /// type itself may say where values come from.
@@ -483,12 +495,14 @@ impl Origin {
                 self_ty,
                 args,
                 span,
+                runs,
             } => Origin::Call {
                 callee,
                 krate,
                 self_ty,
                 args: args.into_iter().map(|a| a.params_of(owner)).collect(),
                 span,
+                runs,
             },
             Origin::Field {
                 adt,
@@ -542,12 +556,14 @@ impl Origin {
                 self_ty,
                 args,
                 span,
+                runs,
             } => Origin::Call {
                 callee,
                 krate,
                 self_ty,
                 args: cap(args),
                 span,
+                runs,
             },
             Origin::Field {
                 adt,

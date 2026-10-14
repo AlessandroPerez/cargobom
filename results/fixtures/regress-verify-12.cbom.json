@@ -1,0 +1,844 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via vp5 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by vp5 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via vp5 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HKDF-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: environment (std::env::args); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::Salt::new`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "ring::hkdf::Salt::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: environment (std::env::args); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `extract`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 55,
+            "symbol": "ring::hkdf::Salt::extract"
+          }
+        ]
+      },
+      "name": "HKDF-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:ikm",
+          "value": "environment"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "environment"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HKDF-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HKDF",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: environment (std::env::args); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::Salt::new`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "ring::hkdf::Salt::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "ring::hkdf::HKDF_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: environment (std::env::args); line: `let _prk = salt.extract(&d);`; code: `extract`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "ring::hkdf::Salt::extract"
+          }
+        ]
+      },
+      "name": "HKDF-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:ikm",
+          "value": "environment"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "environment"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in vp5::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in vp5::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::hmac::HMAC_SHA384); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "ring::hkdf::HKDF_SHA384"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let p = if d.is_empty() { Pick::A(&digest::SHA384) } else { Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY) };`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 73,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `Pick::B(y) => digest::digest(y, &d),`; code: `digest::digest`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let a = &digest::SHA256;`; code: `digest::SHA256`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x1 = digest::digest(a, &d);`; code: `digest::digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x3 = digest::digest(&H256, &d);`; code: `digest::digest`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let x3 = digest::digest(&H256, &d);`; code: `H256`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let mut c = Ctx { alg: &digest::SHA256 };`; code: `digest::SHA256`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x8 = digest::digest(c.alg, &d);`; code: `digest::digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [component] in vp5::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::hkdf::HKDF_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in vp5::C384; line: `const C384: &digest::Algorithm = &digest::SHA384;`; code: `digest::SHA384`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let b = &digest::SHA384;`; code: `digest::SHA384`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x2 = digest::digest(b, &d);`; code: `digest::digest`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x4 = digest::digest(&SHA384, &d);`; code: `digest::digest`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let x4 = digest::digest(&SHA384, &d);`; code: `SHA384`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x5 = digest::digest(C384, &d);`; code: `digest::digest`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in vp5::main; vp5::C384 -> ring::digest::SHA384; line: `let x5 = digest::digest(C384, &d);`; code: `C384`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "vp5::C384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let p = if d.is_empty() { Pick::A(&digest::SHA384) } else { Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY) };`; code: `digest::SHA384`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `Pick::A(x) => digest::digest(x, &d),`; code: `digest::digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [component] in vp5::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::digest::SHA384); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "ring::hkdf::HKDF_SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "10"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in vp5::S512; line: `static S512: &digest::Algorithm = &digest::SHA512;`; code: `digest::SHA512`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x6 = digest::digest(&BIG, &d);`; code: `digest::digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `let x6 = digest::digest(&BIG, &d);`; code: `BIG`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x7 = digest::digest(S512, &d);`; code: `digest::digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in vp5::main; vp5::S512 -> ring::digest::SHA512; line: `let x7 = digest::digest(S512, &d);`; code: `S512`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "vp5::S512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in vp5::main; line: `c.alg = &digest::SHA512;`; code: `digest::SHA512`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x9 = digest::digest(c.alg, &d);`; code: `digest::digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:HKDF-SHA-256",
+        "crypto:algorithm:HKDF-SHA-384",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-384",
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/vp5@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HKDF-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:HMAC-SHA-384",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:HKDF-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/vp5@0.1.0",
+      "name": "vp5",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/vp5@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "61"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:e4c1c210-860c-89bf-b63e-43fb02492625",
+  "specVersion": "1.7",
+  "version": 1
+}

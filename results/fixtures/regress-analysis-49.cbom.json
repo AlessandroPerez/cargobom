@@ -210,28 +210,28 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `::rekey`; key: parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; key: parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `::rekey`; key: computed (m3::arg); line: `let lk1 = LessSafeKey::new(UnboundKey::new(k1.alg, &k1.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg); line: `let lk1 = LessSafeKey::new(UnboundKey::new(k1.alg, &k1.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 32); line: `let _ = lk1.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 32); line: `let _ = lk1.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 16,
@@ -639,7 +639,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:18066ade-0c7e-8e71-ab9f-99c90dbcfcb0",
+  "serialNumber": "urn:uuid:ccdc6853-fe76-8fe8-abab-d9bac6c76224",
   "specVersion": "1.7",
   "version": 1
 }

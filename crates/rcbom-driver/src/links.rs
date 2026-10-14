@@ -134,8 +134,16 @@ fn named_struct<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> Option<rustc_middle::ty::A
 }
 
 /// The links of one body: of function `did` (`func` true), of a static's initializer, or of a
-/// promoted constant of either.
-pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: &mut Links) {
+/// promoted constant of either; `instance`: the body is that instance's of a generic function
+/// (`origins::body_name`), whose summaries (returns, writes, calls) are recorded under its name.
+pub(crate) fn body_links(
+    cx: &Cx<'_>,
+    body: &Body,
+    did: DefId,
+    func: bool,
+    instance: Option<&str>,
+    out: &mut Links,
+) {
     // a stop crate's code is not analysed: its functions are what the knowledge base names
     // (`hmac::Key::new` is a constructor, not a function whose returns are followed)
     if cx.stop_crate(did.krate) {
@@ -149,7 +157,9 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     let static_init = !func && matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. });
     // whose parameters the values recorded name; a static's initializer names its static (a
     // value stored there reaches a call only if the static is reachable)
-    let here = if func {
+    let here = if let Some(name) = instance {
+        name.to_string()
+    } else if func {
         path_of(tcx, did)
     } else if static_init {
         rcbom_facts::static_owner(&path_of(tcx, did), &def_ref_internal(tcx, did).id)
@@ -361,6 +371,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                             .map(|a| origins.operand_at(a, bb, idx))
                             .collect(),
                         span: None,
+                        runs: None,
                     };
                     push_static(out, def, call);
                 }
@@ -387,7 +398,7 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                 }
             } else if program && writable(tcx, aty) && carries(cx, aty) {
                 let (callee, self_ty) =
-                    crate::origins::write_callee(tcx, cdid, cargs.skip_binder());
+                    crate::origins::write_callee(tcx, cdid, cargs.skip_binder(), None);
                 Some(Origin::Written {
                     callee,
                     index: i,
@@ -487,6 +498,15 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                     }
                 })
                 .collect();
+            // also of the body it runs (an implementation for a known `Self`, an instance of
+            // a generic function), whose parameters its summaries name
+            if let Some(runs) = crate::origins::runs_of(tcx, cdid, cargs.skip_binder()) {
+                out.calls.push(LocalCall {
+                    callee: runs,
+                    caller: here.clone(),
+                    args: args.clone(),
+                });
+            }
             out.calls.push(LocalCall {
                 callee: path_of(tcx, cdid),
                 caller: here.clone(),
@@ -527,12 +547,19 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     // a `&mut` parameter the body points elsewhere (`if c { slot = other }; *slot = v`): what
     // the place it pointed to on entry holds at the returns is not followed, nor what the
     // other parameters' places hold (one of them may be written through it)
-    let redirected = mut_params.iter().any(|&index| {
-        body.blocks.iter().flat_map(|b| &b.statements).any(|st| {
-            matches!(&st.kind, StatementKind::Assign(p, _)
-                if p.local == index + 1 && p.projection.is_empty())
+    // (or lends the parameter itself as `&mut`: `mem::swap(&mut slot, &mut other)`)
+    let redirected =
+        mut_params.iter().any(|&index| {
+            body.blocks.iter().flat_map(|b| &b.statements).any(|st| match &st.kind {
+            StatementKind::Assign(p, rv) => {
+                (p.local == index + 1 && p.projection.is_empty())
+                    || matches!(rv, Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q)
+                        if q.local == index + 1 && q.projection.is_empty())
+            }
+            _ => false,
         })
-    });
+        });
     for &index in &mut_params {
         let entry = Origin::Param { index, owner: None };
         let value = if redirected {
@@ -557,7 +584,8 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     if func {
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
         let mut names = vec![here.clone()];
-        if let Some(item) = tcx.trait_item_of(did)
+        if instance.is_none()
+            && let Some(item) = tcx.trait_item_of(did)
             && let Some(self_ty) = crate::origins::self_adt_path(
                 tcx,
                 did,
@@ -582,6 +610,42 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                         value: value.clone(),
                     });
                 }
+            }
+        }
+    }
+}
+
+/// The summaries of the instances of generic functions the crate's summaries name
+/// (`origins::body_name`), and of those theirs name, up to a bound: what each returns, writes
+/// through its `&mut` parameters and passes to the functions it calls, under the instance's
+/// name. The stores into fields and statics are the generic body's.
+pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
+    const MAX_INSTANCES: usize = 4096;
+    let mut done = HashSet::new();
+    loop {
+        let todo = crate::origins::take_instances();
+        if todo.is_empty() || done.len() >= MAX_INSTANCES {
+            break;
+        }
+        for (name, inst) in todo {
+            if done.len() >= MAX_INSTANCES || !done.insert(name.clone()) {
+                continue;
+            }
+            let did = rustc_internal::internal(cx.tcx, inst.def.def_id());
+            if cx.stop_crate(did.krate) {
+                continue;
+            }
+            let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let mut l = Links::default();
+                if let Some(body) = inst.body() {
+                    body_links(cx, &body, did, true, Some(&name), &mut l);
+                }
+                l.fields.clear();
+                l.statics.clear();
+                l
+            }));
+            if let Ok(l) = r {
+                out.merge(l);
             }
         }
     }
@@ -935,7 +999,7 @@ pub(crate) fn promoted_links(cx: &Cx<'_>, did: DefId, out: &mut Links) {
             continue;
         }
         let body: Body = rustc_internal::stable(&tcx.promoted_mir(did)[p]);
-        body_links(cx, &body, did, false, out);
+        body_links(cx, &body, did, false, None, out);
     }
 }
 
@@ -1080,6 +1144,7 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
                             self_ty: None,
                             args: Vec::new(),
                             span: None,
+                            runs: None,
                         },
                     );
                 }

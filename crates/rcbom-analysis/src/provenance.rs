@@ -436,6 +436,10 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     let mut inner = BTreeSet::new();
                     classify(kb, links, &args[0], depth + 1, &mut inner);
                     out.extend(inner.into_iter().map(without_length));
+                } else if LOOKUPS.iter().any(|m| path.ends_with(m)) {
+                    // a lookup in a container (`map.get(&kid)`, `iter.find(..)`): one of the
+                    // values it holds, not the key looked up
+                    classify(kb, links, &args[0], depth + 1, out);
                 } else if ERROR_ARGS.iter().any(|m| path.ends_with(m)) {
                     // the value is the receiver: `expect(msg)`, `ok_or(err)`, `map_err(f)` (the
                     // other argument is what an error carries)
@@ -465,6 +469,10 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     } else {
                         out.extend(inner.into_iter().map(without_length));
                     }
+                } else if LOOKUPS.iter().any(|m| path.ends_with(m)) && !args.is_empty() {
+                    // a lookup (`jwks.find(&kid)`): what it finds is held by the receiver; the
+                    // key it looks up with is not key material
+                    classify(kb, links, &args[0], depth + 1, out);
                 } else {
                     of_inputs(kb, links, args, depth, out);
                 }
@@ -686,6 +694,43 @@ pub fn data_in_args(
     [own, chain].map(|v| v.into_iter().partition(|d| is_descriptor(kb, d)))
 }
 
+/// Is descriptor `id`, named in the call's own arguments, an element of a container the call
+/// reads (`v[0]` of `vec![&SHA256, &SHA384]`, `m["a"]` after two `insert`s): one of the values
+/// it holds, not the one read?
+pub fn container_member(target: &Target, id: &str) -> bool {
+    fn walk(o: &Origin, id: &str, read: bool, depth: usize) -> Option<bool> {
+        if depth > 12 {
+            return None;
+        }
+        match crate::links::peel(o) {
+            Origin::Data { def, .. } if def.id == id => Some(false),
+            Origin::All(alts) => alts
+                .iter()
+                .find_map(|a| walk(a, id, read, depth + 1).map(|c| c || (read && alts.len() > 1))),
+            Origin::Any(alts) => alts.iter().find_map(|a| walk(a, id, read, depth + 1)),
+            Origin::Set { value, .. } => walk(value, id, read, depth + 1),
+            Origin::Call { callee, args, .. } if callee == "<closure>" || std_choice(callee) => {
+                args.iter().find_map(|a| walk(a, id, read, depth + 1))
+            }
+            Origin::Call { callee, args, .. } if container_store(callee) => args
+                .iter()
+                .find_map(|a| walk(a, id, true, depth + 1).map(|_| true)),
+            Origin::Call { krate, args, .. }
+                if matches!(krate.as_str(), "core" | "std" | "alloc") =>
+            {
+                args.iter().find_map(|a| walk(a, id, true, depth + 1))
+            }
+            _ => None,
+        }
+    }
+    let Target::Call { arg_origins, .. } = target else {
+        return false;
+    };
+    arg_origins
+        .iter()
+        .any(|o| walk(o, id, false, 0).unwrap_or(false))
+}
+
 /// Is what the call's own arguments name an incomplete answer: an argument (or the receiver
 /// chain) where a descriptor is named in the function has other alternatives that come from
 /// elsewhere (`if n > 1 { &SHA256 } else { pick() }`, a parameter, a field, what a function of
@@ -813,9 +858,12 @@ fn direct_data(
             zero: false,
         };
         if seen.insert((false, key, String::new())) {
-            for v in &values {
-                direct_data(kb, Some((ix, "")), v, depth + 1, out, seen);
-            }
+            let by = crate::links::Via::Static(rcbom_facts::static_owner(&def.path, &def.id));
+            ix.with_via(ix.current_via().then(by), || {
+                for v in &values {
+                    direct_data(kb, Some((ix, "")), v, depth + 1, out, seen);
+                }
+            });
         }
         return;
     }
@@ -834,6 +882,17 @@ fn direct_data(
         Origin::Call { callee, args, .. } if callee == "<closure>" => args
             .iter()
             .for_each(|a| direct_data(kb, links, a, depth + 1, out, seen)),
+        // the algorithm a value was made with (`if c { &SHA256 } else { ctx.algorithm() }`):
+        // the descriptor its receiver's chain names
+        Origin::Call { callee, krate, .. } if algorithm_getter(kb, krate, callee) => {
+            let mut chain = Vec::new();
+            receiver_data(kb, links, o, depth + 1, &mut chain, seen, false);
+            for d in chain {
+                if is_descriptor(kb, &d) && !out.contains(&d) {
+                    out.push(d);
+                }
+            }
+        }
         Origin::Any(alts) | Origin::All(alts) => alts
             .iter()
             .for_each(|a| direct_data(kb, links, a, depth + 1, out, seen)),
@@ -841,6 +900,21 @@ fn direct_data(
         // a field of a static (`TABLE.alg`): the static, whose own data says which descriptor
         // (`TABLE.alg = &SHA256`), not what every value of its type holds there
         Origin::Field { .. } if let Some(def) = static_root(o) => {
+            // with the links, what the static's initializer stores in that field (of each
+            // element of a table: `TABLE[i].h`)
+            if let Some((ix, owner)) = links
+                && ix.static_fields(&def.id)
+            {
+                let values = elsewhere(ix, o, owner, false, seen);
+                if !values.is_empty() {
+                    for (v, w, by) in values {
+                        ix.with_via(ix.current_via().then(by), || {
+                            direct_data(kb, Some((ix, &w)), &v, depth + 1, out, seen)
+                        });
+                    }
+                    return;
+                }
+            }
             if let Some((ix, _)) = links {
                 ix.note(&def.id, "");
             }
@@ -861,6 +935,31 @@ fn direct_data(
         }
         _ => {}
     }
+}
+
+/// A standard-library call choosing between an `Option`'s or a `Result`'s value and another
+/// (`unwrap_or`, `or_else`, `map_or`): its value is either.
+pub(crate) fn std_choice(callee: &str) -> bool {
+    const CHOICES: &[&str] = &[
+        "::unwrap_or",
+        "::unwrap_or_else",
+        "::or",
+        "::or_else",
+        "::xor",
+        "::map_or",
+        "::map_or_else",
+        "::get_or_insert",
+        "::get_or_insert_with",
+    ];
+    let bare = strip_generics(callee);
+    (bare.starts_with("core::option::") || bare.starts_with("core::result::"))
+        && CHOICES.iter().any(|c| bare.ends_with(c))
+}
+
+/// A crypto crate's getter for the algorithm a value was made with (`ctx.algorithm()`,
+/// `key.algorithm()`): the descriptor its receiver was built from.
+pub(crate) fn algorithm_getter(kb: &Kb, krate: &str, callee: &str) -> bool {
+    kb.crate_by_name(krate).is_some() && strip_generics(callee).ends_with("::algorithm")
 }
 
 /// A standard-library call that stores a value in a container (`Vec::push`, `HashMap::insert`).
@@ -944,12 +1043,10 @@ fn receiver_data(
         return;
     }
     match o {
-        // a container built by stores (`v.push(&SHA256); v.push(&SHA512)`, `m.insert(k, key)`):
-        // a read of it is any value stored (flow-insensitive), so every stored value's chain
-        // and the container's earlier stores are followed
-        Origin::Call { args, callee, .. } if container_store(callee) => {
-            for a in args.iter().skip(1) {
-                // a descriptor stored itself (`v.push(&SHA256)`), or a value built from one
+        // a choice between an `Option`'s or a `Result`'s value and a fallback
+        // (`v.first().copied().unwrap_or(&SHA512)`): either, each followed
+        Origin::Call { args, callee, .. } if std_choice(callee) => {
+            for a in args {
                 let mut here = Vec::new();
                 direct_data(kb, links, a, 0, &mut here, seen);
                 for d in here {
@@ -958,6 +1055,33 @@ fn receiver_data(
                     }
                 }
                 receiver_data(kb, links, a, depth + 1, out, seen, lengths);
+            }
+        }
+        // a container built by stores (`v.push(&SHA256); v.push(&SHA512)`, `m.insert(k, key)`):
+        // a read of it is any value stored (flow-insensitive), so every stored value's chain
+        // and the container's earlier stores are followed
+        Origin::Call { args, callee, .. } if container_store(callee) => {
+            for a in args.iter().skip(1) {
+                // a descriptor stored itself (`v.push(&SHA256)`), or a value built from one;
+                // read from the container, one of the values it holds
+                let mut search = || {
+                    let mut here = Vec::new();
+                    direct_data(kb, links, a, 0, &mut here, seen);
+                    for d in here {
+                        if !out.contains(&d) {
+                            out.push(d);
+                        }
+                    }
+                    receiver_data(kb, links, a, depth + 1, out, seen, lengths);
+                };
+                match links {
+                    Some((ix, _)) => ix.with_via(
+                        ix.current_via()
+                            .then(crate::links::Via::Container(strip_generics(callee))),
+                        search,
+                    ),
+                    None => search(),
+                }
             }
             if let Some(c) = args.first() {
                 receiver_data(kb, links, c, depth + 1, out, seen, lengths);
@@ -970,9 +1094,30 @@ fn receiver_data(
             } else {
                 HashSet::new()
             };
+            // the elements of a container a standard-library call reads (`vec![a, b][0]`,
+            // `[a, b].get(i)`): one of the values it holds
+            let std = callee.starts_with("core::")
+                || callee.starts_with("std::")
+                || callee.starts_with("alloc::");
             for (i, a) in args.iter().enumerate() {
                 if !skip.contains(&i) {
-                    direct_data(kb, links, a, 0, &mut here, seen);
+                    match links {
+                        Some((ix, _))
+                            if std
+                                && matches!(crate::links::peel(a), Origin::All(v) if v.len() > 1) =>
+                        {
+                            let by = if callee.contains("into_vec") {
+                                "vec![..]".to_string()
+                            } else {
+                                strip_generics(callee)
+                            };
+                            ix.with_via(
+                                ix.current_via().then(crate::links::Via::Container(by)),
+                                || direct_data(kb, links, a, 0, &mut here, seen),
+                            )
+                        }
+                        _ => direct_data(kb, links, a, 0, &mut here, seen),
+                    }
                 }
             }
             let named = here.iter().any(|d| is_descriptor(kb, d));
@@ -1027,6 +1172,9 @@ const ERROR_ARGS: &[&str] = &[
 ];
 
 /// Calls whose result is part of their receiver.
+/// Lookups: the value found is the receiver's (`JwkSet::find(&kid)`, `HashMap::get(&k)`).
+const LOOKUPS: &[&str] = &["::find", "::get", "::get_mut", "::get_key_value"];
+
 const INDEXING: &[&str] = &[
     "Index::index",
     "IndexMut::index_mut",
@@ -1129,6 +1277,7 @@ mod tests {
                 },
             ],
             span: None,
+            runs: None,
         };
         let mut out = BTreeSet::new();
         classify(&kb, &LinkIndex::default(), &key, 0, &mut out);
@@ -1211,6 +1360,7 @@ mod tests {
             self_ty: None,
             args,
             span: None,
+            runs: None,
         }
     }
 

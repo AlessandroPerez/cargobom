@@ -510,6 +510,7 @@ pub fn match_constructor<'o>(
             self_ty,
             args,
             span,
+            ..
         } = cur
         else {
             return None;

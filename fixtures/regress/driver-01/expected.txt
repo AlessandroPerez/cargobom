@@ -42,7 +42,7 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:11:0 | sha2 | [manifest] declared by t1 (dependencies)
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:235:0 | subtle | [manifest] locked subtle 2.6.1; reached via t1 -> aes-gcm -> subtle
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:257:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via t1 -> aes-gcm -> ghash -> polyval -> universal-hash
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:32:24 | ring::digest::digest | [reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments name no algorithm; instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:32:24 | ring::digest::digest | [reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:confidence=low
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:detection:method=manifest
   prop AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | rcbom:kb:version=0.2.0

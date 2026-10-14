@@ -214,7 +214,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: type-join, possible (a value `s3::main` stores in the field); nonce: hard-coded (12 bytes, literal at line 24); line: `let _ = b.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([2; 12]), Aad::empty(), &mut buf); // after another crate's fn`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm possibly from ring::aead::algorithm::AES_256_GCM, the only one found reaching the call from another function; member: type-join, possible (a value `s3::main` stores in the field); nonce: hard-coded (12 bytes, literal at line 24); line: `let _ = b.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([2; 12]), Aad::empty(), &mut buf); // after another crate's fn`; code: `seal_in_place_append_tag`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 18,
@@ -256,7 +256,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `s3::touch`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `s3::touch::`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 18,
@@ -2131,7 +2131,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d045374f-2e21-87a0-901e-fb6e79783ac9",
+  "serialNumber": "urn:uuid:89694776-a6c9-833b-89cf-8744a9fbe30b",
   "specVersion": "1.7",
   "version": 1
 }

@@ -23,7 +23,9 @@ in `function_mismatches`.
   honest-unknown   `unknown` reported, nothing wrong
   miss             a `must` algorithm not reported, nothing wrong
 Also counted: uses the CBOM reports in the program's own files at lines with no labelled site
-(`unlabelled`), for review.
+(`unlabelled`), for review; and sites where several algorithms are reported but one of them is
+labelled as the only one (`algorithm from X ..`, not `one of N`, `possibly` or `possible`):
+`label_mismatches`.
 """
 import collections, json, pathlib, re, sys, tomllib
 
@@ -48,7 +50,7 @@ def occurrences(cbom):
             at[(o["location"], o["line"])].append(
                 (c["name"], code.group(1) if code else o["symbol"], "; use: " in ctx,
                  ctx.startswith("[reachable]"), c["name"] == family,
-                 use.group(1) if use else None))
+                 use.group(1) if use else None, ctx))
     return at
 
 
@@ -94,6 +96,21 @@ def verdict(site, occ):
     return "correct"
 
 
+def exact_among_several(occ):
+    """The reachable algorithms labelled as the only one at a site reporting several (an
+    occurrence of one instance of a generic function, `instantiated by ..`, is that instance's)."""
+    reachable = [o for o in occ if o[3] and o[0] != "unknown" and "; instantiated by " not in o[6]]
+    if len({o[0] for o in reachable}) < 2:
+        return []
+    out = []
+    for o in reachable:
+        m = re.search(r"; (algorithm [^;]*)", o[6])
+        sentence = m.group(1) if m else ""
+        if not re.search(r"one of|possibl|selector", sentence):
+            out.append(o[0])
+    return sorted(set(out))
+
+
 def function_matches(site, occ):
     """Does a reported use of a reachable occurrence agree with the labelled function?"""
     uses = {u for o in occ if o[3] and o[5] for u in o[5].split(" or ")}
@@ -106,7 +123,7 @@ def main():
     total = collections.Counter()
     by_what = collections.defaultdict(collections.Counter)
     by_how = collections.defaultdict(collections.Counter)
-    details, unlabelled, function_mismatches = [], 0, []
+    details, unlabelled, function_mismatches, label_mismatches = [], 0, [], []
     for prog in sorted(programs):
         pid = prog.name
         what, _, how = pid.partition("-")
@@ -120,6 +137,10 @@ def main():
             if labelled_lines[(s["file"], s["line"])] > 1:
                 occ = [o for o in occ if o[1].endswith(s["callee"])]
             v = verdict(s, occ) if cbom_path.exists() else "miss"
+            exact = exact_among_several(occ)
+            if exact:
+                label_mismatches.append(f"{pid}:{s['line']} {s['callee']}: {exact} labelled as the"
+                                        f" only algorithm among several")
             if v == "correct" and not function_matches(s, occ):
                 function_mismatches.append(f"{pid}:{s['line']} {s['callee']}: labelled {s['function']},"
                                            f" reported {sorted({o[5] for o in occ if o[5]})}")
@@ -140,15 +161,19 @@ def main():
         "by_how": {h: {v: c[v] for v in VERDICTS if c[v]} for h, c in sorted(by_how.items())},
         "unlabelled_uses": unlabelled,
         "function_mismatches": function_mismatches,
+        "label_mismatches": label_mismatches,
         "not_correct": details,
     }
     if "--json" in sys.argv:
         print(json.dumps(result, indent=1, sort_keys=True))
     else:
         print(f"{result['sites']} sites: " + ", ".join(f"{v} {total[v]}" for v in VERDICTS)
-              + f"; unlabelled uses {unlabelled}; function mismatches {len(function_mismatches)}")
+              + f"; unlabelled uses {unlabelled}; function mismatches {len(function_mismatches)}"
+              + f"; label mismatches {len(label_mismatches)}")
         for m in function_mismatches:
             print(f"  function: {m}")
+        for m in label_mismatches:
+            print(f"  label: {m}")
         for d in details:
             print(f"  {d['program']}:{d['line']} {d['callee']}: {d['verdict']}: reported {d['reported']},"
                   f" must {d['must']}, may {d['may']}")

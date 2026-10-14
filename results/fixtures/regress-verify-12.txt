@@ -1,0 +1,150 @@
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:47:16 | ring::hkdf::Salt::new | [reachable] [call] in vp5::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: environment (std::env::args); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:47:32 | ring::hkdf::HKDF_SHA256 | [reachable] [static] in vp5::main; line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:47:55 | ring::hkdf::Salt::extract | [reachable] [call] in vp5::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: environment (std::env::args); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `extract`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:45:15 | ring::hkdf::Salt::new | [reachable] [call] in vp5::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: environment (std::env::args); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:45:31 | ring::hkdf::HKDF_SHA384 | [reachable] [static] in vp5::main; line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:46:20 | ring::hkdf::Salt::extract | [reachable] [call] in vp5::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: environment (std::env::args); line: `let _prk = salt.extract(&d);`; code: `extract`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:47:32 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in vp5::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:45:31 | ring::hkdf::HKDF_SHA384 | [reachable] [component] in vp5::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::hmac::HMAC_SHA384); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:39:73 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in vp5::main; line: `let p = if d.is_empty() { Pick::A(&digest::SHA384) } else { Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY) };`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:42:22 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `Pick::B(y) => digest::digest(y, &d),`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:13 | ring::digest::SHA256 | [reachable] [static] in vp5::main; line: `let a = &digest::SHA256;`; code: `digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x1 = digest::digest(a, &d);`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x3 = digest::digest(&H256, &d);`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:29 | ring::digest::SHA256 | [reachable] [static] in vp5::main; line: `let x3 = digest::digest(&H256, &d);`; code: `H256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:28 | ring::digest::SHA256 | [reachable] [static] in vp5::main; line: `let mut c = Ctx { alg: &digest::SHA256 };`; code: `digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let x8 = digest::digest(c.alg, &d);`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:47:32 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in vp5::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let _prk2 = hkdf::Salt::new(hkdf::HKDF_SHA256, &d).extract(&d);`; code: `hkdf::HKDF_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:34 | ring::digest::SHA384 | [reachable] [static] in vp5::C384; line: `const C384: &digest::Algorithm = &digest::SHA384;`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:13 | ring::digest::SHA384 | [reachable] [static] in vp5::main; line: `let b = &digest::SHA384;`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:27:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x2 = digest::digest(b, &d);`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:29:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x4 = digest::digest(&SHA384, &d);`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:29:29 | ring::digest::SHA384 | [reachable] [static] in vp5::main; line: `let x4 = digest::digest(&SHA384, &d);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:30:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let x5 = digest::digest(C384, &d);`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:30:28 | vp5::C384 | [reachable] [via-static] in vp5::main; vp5::C384 -> ring::digest::SHA384; line: `let x5 = digest::digest(C384, &d);`; code: `C384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:39:39 | ring::digest::SHA384 | [reachable] [static] in vp5::main; line: `let p = if d.is_empty() { Pick::A(&digest::SHA384) } else { Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY) };`; code: `digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:41:22 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `Pick::A(x) => digest::digest(x, &d),`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:45:31 | ring::hkdf::HKDF_SHA384 | [reachable] [component] in vp5::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::digest::SHA384); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA384, &d);`; code: `hkdf::HKDF_SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:35 | ring::digest::SHA512 | [reachable] [static] in vp5::S512; line: `static S512: &digest::Algorithm = &digest::SHA512;`; code: `digest::SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:31:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x6 = digest::digest(&BIG, &d);`; code: `digest::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:31:29 | ring::digest::SHA512 | [reachable] [static] in vp5::main; line: `let x6 = digest::digest(&BIG, &d);`; code: `BIG`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:32:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x7 = digest::digest(S512, &d);`; code: `digest::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:32:28 | vp5::S512 | [reachable] [via-static] in vp5::main; vp5::S512 -> ring::digest::SHA512; line: `let x7 = digest::digest(S512, &d);`; code: `S512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:36:13 | ring::digest::SHA512 | [reachable] [static] in vp5::main; line: `c.alg = &digest::SHA512;`; code: `digest::SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:37:13 | ring::digest::digest | [reachable] [call] in vp5::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let x9 = digest::digest(c.alg, &d);`; code: `digest::digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via vp5 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via vp5 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by vp5 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=3
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=environment
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:salt=environment
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:confidence=high
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:functions:source=observed
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:occurrences=3
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:provenance:ikm=environment
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:provenance:salt=environment
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=1
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:occurrences=1
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:only-as-component=true
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=7
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=10
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=7
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HKDF-SHA-384 -> crypto:algorithm:HMAC-SHA-384
+dep crypto:algorithm:HKDF-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/vp5@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:HKDF-SHA-256
+dependency crypto:algorithm:HKDF-SHA-384
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-384
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/vp5@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/vp5@0.1.0", "name": "vp5", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/vp5@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=61
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

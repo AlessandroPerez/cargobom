@@ -2,7 +2,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:33 | t11::TABLE | [reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `TABLE`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:18 | ring::digest::SHA256 | [present] [static] in t11::sha256_table; line: `Table { alg: &SHA256 }`; code: `SHA256`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:37 | ring::digest::SHA384 | [reachable] [static] in t11::TABLE2; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:51 | ring::digest::digest | [reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:51 | ring::digest::digest | [reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384, stored in `static t11::TABLE2`; member: table, stored by `static t11::TABLE2`; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:58 | t11::TABLE2 | [reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; line: `println!("{:?} {:?}", digest(TABLE.alg, b"a"), digest(TABLE2.alg, b"b"));`; code: `TABLE2`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t11 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t11 -> ring

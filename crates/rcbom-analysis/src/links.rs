@@ -28,8 +28,8 @@ pub struct LinkIndex {
     statics: HashMap<String, (bool, Vec<Origin>)>,
     /// By function and parameter: what it writes through the parameter.
     writes: HashMap<(String, usize), Vec<Origin>>,
-    /// By trait: the types coerced to a trait object of it, with where, and the methods they
-    /// run the trait's default body for.
+    /// By trait: the types coerced to a trait object of it, with where, and the body each
+    /// method runs for them.
     coerced: HashMap<String, Vec<Coerced>>,
     /// Lookups left for the current `values` call.
     budget: Cell<usize>,
@@ -68,6 +68,8 @@ pub enum Via {
         trait_path: String,
         ty: String,
         at: Option<rcbom_facts::Loc>,
+        /// The coercion is in a static's value (`at`: the static's item).
+        in_static: bool,
         only: bool,
     },
     /// The standard-library method that put it in a container it is read from
@@ -78,14 +80,20 @@ pub enum Via {
     Impl(String),
     /// The function (or `static ..`) storing it in the field.
     Join(String),
+    /// Stored in a static that never changes by its initializer (`rcbom_facts::static_owner`):
+    /// a table's element or a field read from it.
+    Table(String),
+    /// Held by a static whose contents change at run time (`rcbom_facts::static_owner`): its
+    /// initializer's value or one the program puts there.
+    Static(String),
 }
 
 impl Via {
     pub(crate) fn rank(&self) -> u8 {
         match self {
             Via::Fixed => 0,
-            Via::Caller(_) | Via::Object(_) | Via::Dyn { only: true, .. } => 1,
-            Via::Dyn { .. } | Via::Container(_) | Via::Impl(_) | Via::Join(_) => 2,
+            Via::Caller(_) | Via::Object(_) | Via::Dyn { only: true, .. } | Via::Table(_) => 1,
+            Via::Dyn { .. } | Via::Container(_) | Via::Impl(_) | Via::Join(_) | Via::Static(_) => 2,
         }
     }
 
@@ -122,8 +130,14 @@ const MAX_STEPS: usize = 4096;
 /// known).
 type FieldPath = [(String, usize, Option<String>)];
 
-/// A type coerced to a trait object: the type, where, the methods it does not override.
-type Coerced = (String, Option<rcbom_facts::Loc>, Vec<String>);
+/// A type coerced to a trait object: the type, where (in a static's value or not), and the
+/// body each method of the object runs for it.
+type Coerced = (
+    String,
+    Option<rcbom_facts::Loc>,
+    bool,
+    Vec<(String, String)>,
+);
 
 /// A read being resolved: the value, the fields read from it, the function it is read in.
 type Read = (Origin, Vec<(String, usize, Option<String>)>, String);
@@ -172,7 +186,7 @@ impl LinkIndex {
             for c in &f.links.coercions {
                 let v = ix.coerced.entry(c.trait_path.clone()).or_default();
                 if !v.iter().any(|(t, ..)| *t == c.ty) {
-                    v.push((c.ty.clone(), c.at.clone(), c.defaults.clone()));
+                    v.push((c.ty.clone(), c.at.clone(), c.in_static, c.methods.clone()));
                 }
             }
             for s in &f.links.statics {
@@ -364,21 +378,59 @@ impl LinkIndex {
             callee,
             index,
             args,
-            self_ty: None,
+            self_ty,
         } = w
         else {
+            // a field of a field (`o.inner.key`): the inner field's parts, each projected
+            if let Origin::Field {
+                adt: a,
+                field: f,
+                base,
+                ..
+            } = w
+                && let Some(inner) = self.field_parts(peel(base), a, *f)
+            {
+                let mut out = Vec::new();
+                for p in inner {
+                    match self.field_parts(peel(&p), adt, field) {
+                        Some(parts) => out.extend(parts),
+                        None => project(&p, adt, field, &mut out),
+                    }
+                }
+                return Some(out);
+            }
             return None;
         };
+        // the bodies it may run: its own, or a trait method's implementations (`dyn`, `impl`)
+        let bodies = match self_ty.as_deref() {
+            None => vec![callee.clone()],
+            Some(t) => self
+                .implementations(callee, t)?
+                .into_iter()
+                .map(|(b, _)| b)
+                .collect(),
+        };
         let mut out = Vec::new();
-        match self.writes.get(&(callee.clone(), *index)) {
-            Some(ws) => {
-                for s in ws {
-                    project(&substitute(s, args), adt, field, &mut out);
+        for b in bodies {
+            match self.writes.get(&(b, *index)) {
+                Some(ws) => {
+                    for s in ws {
+                        project(&substitute(s, args), adt, field, &mut out);
+                    }
                 }
+                None => project(args.get(*index)?, adt, field, &mut out),
             }
-            None => project(args.get(*index)?, adt, field, &mut out),
         }
         Some(out)
+    }
+
+    /// Does the initializer of static `id` store values in fields (a table of structs, a
+    /// struct): a field read of it is what it stores there.
+    pub fn static_fields(&self, id: &str) -> bool {
+        self.fields
+            .values()
+            .flatten()
+            .any(|s| rcbom_facts::owner_static(&s.func).is_some_and(|(_, sid)| sid == id))
     }
 
     /// A static whose contents change at run time, with the values recorded for it.
@@ -511,7 +563,8 @@ impl LinkIndex {
                         .collect();
                     if !own.is_empty() {
                         for s in own {
-                            self.resolve(&s.value, &[], &s.func, depth + 1, via, out);
+                            let by = via.then(Via::Table(s.func.clone()));
+                            self.resolve(&s.value, &[], &s.func, depth + 1, &by, out);
                         }
                         return;
                     }
@@ -645,11 +698,23 @@ impl LinkIndex {
                 callee,
                 args,
                 self_ty,
+                runs,
                 ..
             } => {
-                let names = std::iter::once(callee.clone())
-                    .chain(self_ty.iter().map(|t| rcbom_facts::impl_key(callee, t)));
+                // the body the driver resolved the call to (the implementation for the `Self`
+                // type, the trait's default body, a generic function's instance) and only it;
+                // else the implementation by the `Self` type's path before the trait's default
+                // body
+                let names: Vec<String> = match runs {
+                    Some(r) => vec![r.clone()],
+                    None => self_ty
+                        .iter()
+                        .map(|t| rcbom_facts::impl_key(callee, t))
+                        .chain(std::iter::once(callee.clone()))
+                        .collect(),
+                };
                 if let Some((name, k)) = names
+                    .into_iter()
                     .flat_map(|n| (0..=path.len()).rev().map(move |k| (n.clone(), k)))
                     .find(|(n, k)| self.returns.contains_key(&(n.clone(), fields(&path[..*k]))))
                 {
@@ -676,6 +741,11 @@ impl LinkIndex {
             if matches!(o, Origin::Truncated) {
                 push(out, (Origin::Truncated, owner.to_string(), via.clone()));
             }
+            // a part written through a borrow a function returned (`*self.slot() = v`): which
+            // part is not followed, and the value stays among the values, beside the stores
+            if matches!(o, Origin::Through { .. }) {
+                push(out, (o.clone(), owner.to_string(), via.clone()));
+            }
             self.stored(path, depth, via, out);
         }
     }
@@ -689,22 +759,24 @@ impl LinkIndex {
         let mut out = Vec::new();
         if let Some(t) = self_ty.strip_prefix("dyn ") {
             let types = self.coerced.get(t)?;
-            for (ty, at, defaults) in types {
-                let name = if defaults.iter().any(|d| d == callee) {
-                    callee.to_string()
-                } else {
-                    let own = format!("<{ty} as {tr}>::{method}");
-                    let key = rcbom_facts::impl_key(callee, ty);
-                    if self.writes.keys().any(|(f, _)| *f == key) {
-                        key
-                    } else {
-                        own
+            for (ty, at, in_static, methods) in types {
+                let name = match methods.iter().find(|(m, _)| m == callee) {
+                    Some((_, body)) => body.clone(),
+                    None => {
+                        let own = format!("<{ty} as {tr}>::{method}");
+                        let key = rcbom_facts::impl_key(callee, ty);
+                        if self.writes.keys().any(|(f, _)| *f == key) {
+                            key
+                        } else {
+                            own
+                        }
                     }
                 };
                 let via = Via::Dyn {
                     trait_path: t.to_string(),
                     ty: ty.clone(),
                     at: at.clone(),
+                    in_static: *in_static,
                     only: types.len() == 1,
                 };
                 out.push((name, via));
@@ -749,18 +821,19 @@ impl LinkIndex {
             return (out, false);
         };
         let mut all = true;
-        for (ty, at, defaults) in types {
-            // the type's own method (by its type's path, or its path as an impl's item for a
-            // type that is no ADT: `<u8 as app::Pick>::alg`), or the trait's default body it
-            // runs
-            let names = if defaults.contains(callee) {
-                vec![callee.clone()]
-            } else {
-                let (tr, method) = callee.rsplit_once("::").unwrap_or(("", callee));
-                vec![
-                    rcbom_facts::impl_key(callee, ty),
-                    format!("<{ty} as {tr}>::{method}"),
-                ]
+        for (ty, at, in_static, methods) in types {
+            // the body the method runs for the type (its implementation, or the trait's
+            // default body), as the driver resolved it; else the type's own method (by its
+            // type's path, or as an impl's item: `<u8 as app::Pick>::alg`)
+            let names = match methods.iter().find(|(m, _)| m == callee) {
+                Some((_, body)) => vec![body.clone()],
+                None => {
+                    let (tr, method) = callee.rsplit_once("::").unwrap_or(("", callee));
+                    vec![
+                        rcbom_facts::impl_key(callee, ty),
+                        format!("<{ty} as {tr}>::{method}"),
+                    ]
+                }
             };
             let Some((name, k)) = names
                 .iter()
@@ -778,6 +851,7 @@ impl LinkIndex {
                 trait_path: trait_path.to_string(),
                 ty: ty.clone(),
                 at: at.clone(),
+                in_static: *in_static,
                 only: types.len() == 1,
             });
             let mut found = Vec::new();
@@ -986,12 +1060,14 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             self_ty,
             args: inner,
             span,
+            runs,
         } => Origin::Call {
             callee: callee.clone(),
             krate: krate.clone(),
             self_ty: self_ty.clone(),
             args: inner.iter().map(|a| substitute(a, args)).collect(),
             span: span.clone(),
+            runs: runs.clone(),
         },
         Origin::Any(v) => Origin::Any(v.iter().map(|a| substitute(a, args)).collect()),
         Origin::All(v) => Origin::All(v.iter().map(|a| substitute(a, args)).collect()),

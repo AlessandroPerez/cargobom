@@ -1,0 +1,192 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:10:67 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::NESTED; line: `static NESTED: [[&Digest; 2]; 2] = [[&SHA256, &SHA384], [&SHA512, &SHA1]];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:67 | ring::digest::digest | [reachable] [call] in a64::use_map; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `fn use_map(m: &HashMap<&str, &'static Digest>, d: &[u8]) { let _ = digest(m["k"], d); }`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:29:12 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::main; line: `v.push(&SHA1);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v[i], &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:52:20 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::main; line: `m9.insert("k", &SHA1);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:57:44 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::main; line: `let v11 = vec![E { h: &SHA256, legacy: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:60:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v12[1], &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:63:24 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::main; line: `let mut v14 = vec![&SHA1, &SHA512];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:65:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(x14, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:66:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v.last().unwrap(), &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:72:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TABLE[i].h, &d);`; code: `TABLE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:73:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static a64::TABLE`; member: table, stored by `static a64::TABLE`; line: `let _ = digest(TABLE[i].legacy, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:73:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TABLE[i].legacy, &d);`; code: `TABLE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:74:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NESTED[i][j], &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:74:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NESTED[i][j], &d);`; code: `NESTED`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:75:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NESTED[0][1], &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:75:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NESTED[0][1], &d);`; code: `NESTED`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:9:49 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::TABLE; line: `static TABLE: [E; 2] = [E { h: &SHA256, legacy: &SHA1 }, E { h: &SHA512, legacy: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:9:82 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a64::TABLE; line: `static TABLE: [E; 2] = [E { h: &SHA256, legacy: &SHA1 }, E { h: &SHA512, legacy: &SHA1 }];`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:38 | ring::digest::SHA256 | [reachable] [static] in a64::NESTED; line: `static NESTED: [[&Digest; 2]; 2] = [[&SHA256, &SHA384], [&SHA512, &SHA1]];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:34 | a64::DIGESTS | [reachable] [via-static] in a64::TT; a64::DIGESTS -> ring::digest::SHA256; line: `static TT: [&[&Digest; 2]; 1] = [&DIGESTS];`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:20 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `m1.insert("a", &SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(m1["a"], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:12 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `v.push(&SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v[i], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:43:19 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let v6 = vec![&SHA256, &SHA384];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(f, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:24 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let mut v10 = vec![&SHA256];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:57:27 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let v11 = vec![E { h: &SHA256, legacy: &SHA1 }];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a64::main` stores in the field); line: `let _ = digest(v11[0].h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:60:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v12[1], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:66:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v.last().unwrap(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:21 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `m15.insert("a", &SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:69:58 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `if let Some(old) = m15.insert("a", &SHA512) { let _ = digest(old, &d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(DIGESTS[i], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:70:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA256; line: `let _ = digest(DIGESTS[i], &d);`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:71:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(DIGESTS[0], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:71:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA256; line: `let _ = digest(DIGESTS[0], &d);`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:72:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `static a64::TABLE` that may reach the call: ring::digest::SHA256; member: table, stored by `static a64::TABLE`; line: `let _ = digest(TABLE[i].h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:72:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA256; line: `let _ = digest(TABLE[i].h, &d);`; code: `TABLE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:73:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA256; line: `let _ = digest(TABLE[i].legacy, &d);`; code: `TABLE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:74:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(NESTED[i][j], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:74:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA256; line: `let _ = digest(NESTED[i][j], &d);`; code: `NESTED`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:75:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(NESTED[0][1], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:75:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA256; line: `let _ = digest(NESTED[0][1], &d);`; code: `NESTED`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:76:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::TT`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(TT[0][i], &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:76:19 | a64::TT | [reachable] [via-static] in a64::main; a64::TT -> ring::digest::SHA256; line: `let _ = digest(TT[0][i], &d);`; code: `TT`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:77:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(DIGESTS.get(i).unwrap(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:77:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA256; line: `let _ = digest(DIGESTS.get(i).unwrap(), &d);`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:78:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(DIGESTS.iter().find(|a| a.output_len() == 48).unwrap(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:78:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA256; line: `let _ = digest(DIGESTS.iter().find(|a| a.output_len() == 48).unwrap(), &d);`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:79:13 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA256; line: `for a in DIGESTS.iter() { let _ = digest(a, &d); }`; code: `DIGESTS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:79:38 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `for a in DIGESTS.iter() { let _ = digest(a, &d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:8:33 | ring::digest::SHA256 | [reachable] [static] in a64::DIGESTS; line: `static DIGESTS: [&Digest; 2] = [&SHA256, &SHA384];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:9:32 | ring::digest::SHA256 | [reachable] [static] in a64::TABLE; line: `static TABLE: [E; 2] = [E { h: &SHA256, legacy: &SHA1 }, E { h: &SHA512, legacy: &SHA1 }];`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:47 | ring::digest::SHA384 | [reachable] [static] in a64::NESTED; line: `static NESTED: [[&Digest; 2]; 2] = [[&SHA256, &SHA384], [&SHA512, &SHA1]];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:34 | a64::DIGESTS | [reachable] [via-static] in a64::TT; a64::DIGESTS -> ring::digest::SHA384; line: `static TT: [&[&Digest; 2]; 1] = [&DIGESTS];`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:61 | ring::digest::SHA384 | [reachable] [static] in a64::fill; line: `fn fill(m: &mut HashMap<u8, &'static Digest>) { m.insert(1, &SHA384); }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:20 | ring::digest::SHA384 | [reachable] [static] in a64::main; line: `m1.insert("b", &SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(m1["a"], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:33:17 | ring::digest::SHA384 | [reachable] [static] in a64::main; line: `q.push_back(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(q[0], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(q.pop_back().unwrap(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:38:29 | ring::digest::SHA384 | [reachable] [static] in a64::main; line: `m4.entry("k").or_insert(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:43:28 | ring::digest::SHA384 | [reachable] [static] in a64::main; line: `let v6 = vec![&SHA256, &SHA384];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(f, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:48:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `let _ = digest(m7[&1], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:61:38 | ring::digest::SHA384 | [reachable] [static] in a64::main; line: `let v13: Vec<&'static Digest> = [&SHA384, &SHA512].into_iter().collect();`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:62:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v13[0], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(DIGESTS[i], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:70:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA384; line: `let _ = digest(DIGESTS[i], &d);`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:71:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(DIGESTS[0], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:71:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA384; line: `let _ = digest(DIGESTS[0], &d);`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:74:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(NESTED[i][j], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:74:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA384; line: `let _ = digest(NESTED[i][j], &d);`; code: `NESTED`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:75:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(NESTED[0][1], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:75:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA384; line: `let _ = digest(NESTED[0][1], &d);`; code: `NESTED`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:76:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::TT`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(TT[0][i], &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:76:19 | a64::TT | [reachable] [via-static] in a64::main; a64::TT -> ring::digest::SHA384; line: `let _ = digest(TT[0][i], &d);`; code: `TT`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:77:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(DIGESTS.get(i).unwrap(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:77:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA384; line: `let _ = digest(DIGESTS.get(i).unwrap(), &d);`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:78:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(DIGESTS.iter().find(|a| a.output_len() == 48).unwrap(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:78:19 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA384; line: `let _ = digest(DIGESTS.iter().find(|a| a.output_len() == 48).unwrap(), &d);`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:79:13 | a64::DIGESTS | [reachable] [via-static] in a64::main; a64::DIGESTS -> ring::digest::SHA384; line: `for a in DIGESTS.iter() { let _ = digest(a, &d); }`; code: `DIGESTS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:79:38 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `a64::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `for a in DIGESTS.iter() { let _ = digest(a, &d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:8:42 | ring::digest::SHA384 | [reachable] [static] in a64::DIGESTS; line: `static DIGESTS: [&Digest; 2] = [&SHA256, &SHA384];`; code: `SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:10:58 | ring::digest::SHA512 | [reachable] [static] in a64::NESTED; line: `static NESTED: [[&Digest; 2]; 2] = [[&SHA256, &SHA384], [&SHA512, &SHA1]];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:68 | ring::digest::SHA512 | [reachable] [static] in a64::make; line: `fn make() -> Vec<&'static Digest> { let mut v = Vec::new(); v.push(&SHA512); v }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:20 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `m3.insert(1u8, &SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:27:42 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `if let Some(a) = m3.get(&1) { let _ = digest(a, &d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:34:18 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `q.push_front(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(q[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(q.pop_back().unwrap(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:41:16 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `v5.extend([&SHA512]);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:42:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(v5[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:50:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: container, possible (a value `alloc::vec::Vec::push` puts in it); line: `let _ = digest(v8[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:55:14 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `v10[0] = &SHA512;`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(v10[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `static a64::TABLE` stores in the field); line: `let _ = digest(v11[0].h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:61:47 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `let v13: Vec<&'static Digest> = [&SHA384, &SHA512].into_iter().collect();`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:62:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v13[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:63:31 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `let mut v14 = vec![&SHA1, &SHA512];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:65:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(x14, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:69:40 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `if let Some(old) = m15.insert("a", &SHA512) { let _ = digest(old, &d); }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:69:58 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `if let Some(old) = m15.insert("a", &SHA512) { let _ = digest(old, &d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:72:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 2 in `static a64::TABLE` that may reach the call: ring::digest::SHA512; member: table, stored by `static a64::TABLE`; line: `let _ = digest(TABLE[i].h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:72:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA512; line: `let _ = digest(TABLE[i].h, &d);`; code: `TABLE`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:73:19 | a64::TABLE | [reachable] [via-static] in a64::main; a64::TABLE -> ring::digest::SHA512; line: `let _ = digest(TABLE[i].legacy, &d);`; code: `TABLE`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:74:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; line: `let _ = digest(NESTED[i][j], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:74:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA512; line: `let _ = digest(NESTED[i][j], &d);`; code: `NESTED`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:75:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of the 4 in `a64::NESTED`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; line: `let _ = digest(NESTED[0][1], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:75:19 | a64::NESTED | [reachable] [via-static] in a64::main; a64::NESTED -> ring::digest::SHA512; line: `let _ = digest(NESTED[0][1], &d);`; code: `NESTED`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:65 | ring::digest::SHA512 | [reachable] [static] in a64::TABLE; line: `static TABLE: [E; 2] = [E { h: &SHA256, legacy: &SHA1 }, E { h: &SHA512, legacy: &SHA1 }];`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a64 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a64 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a64 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm unresolved: the result of `core::ops::index::Index::index`; line: `let _ = digest(m4["k"], &d);`; code: `digest`
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=19
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=36
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=31
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=27
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a64@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
+dependency pkg:cargo/a64@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
+root {"bom-ref": "pkg:cargo/a64@0.1.0", "name": "a64", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a64@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=497
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
