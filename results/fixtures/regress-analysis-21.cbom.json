@@ -104,21 +104,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::ec; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; line: `let doc = EcdsaKeyPair::generate_pkcs8(alg, &rng).ext()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in a21::Holder::ec; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; line: `let doc = EcdsaKeyPair::generate_pkcs8(alg, &rng).ext()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::ec; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; key: computed (a21::Ext::ext); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, doc.as_ref(), &rng).ext()?;`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a21::Holder::ec; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; key: computed (a21::Ext::ext); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, doc.as_ref(), &rng).ext()?;`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::run; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; line: `Kind::Ec(kp) => kp.sign(&SystemRandom::new(), msg).unwrap().as_ref().to_vec(),`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a21::Holder::run; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: type-join, possible (a value `a21::Holder::ec` stores in the field); line: `Kind::Ec(kp) => kp.sign(&SystemRandom::new(), msg).unwrap().as_ref().to_vec(),`; code: `sign`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 31,
@@ -300,7 +300,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::pick; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; line: `Some(a) => digest::digest(a, m).as_ref().to_vec(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a21::pick; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a21::main`; line: `Some(a) => digest::digest(a, m).as_ref().to_vec(),`; code: `digest::digest`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 19,
@@ -380,7 +380,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::run; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; line: `Kind::Hash(alg, _) => digest::digest(alg, msg).as_ref().to_vec(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a21::Holder::run; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: type-join, possible (a value `a21::Holder::hash` stores in the field); line: `Kind::Hash(alg, _) => digest::digest(alg, msg).as_ref().to_vec(),`; code: `digest::digest`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 34,
@@ -525,7 +525,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1b348d0a-360f-8c37-bba2-f874c6dcf795",
+  "serialNumber": "urn:uuid:e5540723-9635-8548-b1ba-f30cf7faa647",
   "specVersion": "1.7",
   "version": 1
 }

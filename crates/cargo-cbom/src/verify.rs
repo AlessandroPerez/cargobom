@@ -496,6 +496,16 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                         }
                         (_, None) => continue,
                     };
+                    // landing on another detail the occurrence itself gives (a pointer named in
+                    // both arms of a `match`): a copy of a correct detail, not a wrong one
+                    let start = m.get(0).map_or(0, |g| g.start());
+                    let part_end = shifted[start..]
+                        .find(';')
+                        .map_or(shifted.len(), |e| start + e);
+                    let part = &shifted[start..part_end];
+                    if o.context.split("; ").any(|p| p.ends_with(part)) {
+                        continue;
+                    }
                     total += 1;
                     if files
                         .check_with(i, o.line, o.offset, Some(&shifted))
@@ -2554,18 +2564,21 @@ impl Files<'_> {
             // callee expression, a name, a field or a parenthesised expression followed by its
             // arguments; the position the detail gives for where the function was made the
             // pointer names it (or an import alias of it)
-            let pointer = re!(
+            // (each function the pointer may hold: `FNS[i](..)` over `[digest, my_hash]`)
+            let pointers: Vec<(String, usize, usize)> = re!(
                 r"called through a function pointer to `[^`]+` named at ([^\s;]+?):(\d+):(\d+)(?:;|$)"
             )
-            .captures(ctx.details)
+            .captures_iter(ctx.details)
             .map(|m| {
                 (
                     m[1].to_string(),
                     m[2].parse::<usize>().unwrap_or(0),
                     m[3].parse::<usize>().unwrap_or(0),
                 )
-            });
-            if let Some((file, l2, c2)) = &pointer {
+            })
+            .collect();
+            let pointer = pointers.first().cloned();
+            for (file, l2, c2) in &pointers {
                 let (l2, c2) = (*l2, *c2);
                 // the callee expression: a parenthesised expression (`(h.f)`), or a name with
                 // fields, indexes and calls after it (`h`, `fs[0]`, `get()`), then the
@@ -2768,6 +2781,73 @@ impl Files<'_> {
                 continue;
             };
             let family = self.graph.family.get(&o.component_ref).map(String::as_str);
+            // named in the call's own arguments: when they name a descriptor of the same
+            // module, it is that one (`Salt::new(hkdf::HKDF_SHA256, ..)` is no `HKDF_SHA384`)
+            if p.ends_with(" in the arguments")
+                && let Some(open) = chars[offset..].iter().position(|&c| c == '(')
+                && let Some((args, _)) = code_until(&src, (line, offset + open + 1), |_| false)
+            {
+                let lasts: Vec<&str> = named
+                    .iter()
+                    .map(|d| d.rsplit("::").next().unwrap_or(d))
+                    .collect();
+                let others: Vec<String> = re!(r"\b[A-Z][A-Z0-9_]*\b")
+                    .find_iter(&args)
+                    .map(|m| {
+                        // an import alias (`SHA1_FOR_LEGACY_USE_ONLY as SHA1`): its item
+                        src.binds
+                            .iter()
+                            .find(|b| b.name == m.as_str())
+                            .and_then(|b| b.path.last().cloned())
+                            .unwrap_or_else(|| m.as_str().to_string())
+                    })
+                    // a descriptor of the same kind as the asset (another hash at a hash's
+                    // call), not one the call takes for another role (`expand(info,
+                    // &AES_256_GCM)`'s output length)
+                    .filter(|w| {
+                        let kind = |n: &str| n.split('-').next().unwrap_or(n).to_string();
+                        named.iter().any(|d| {
+                            let module = d.rsplit_once("::").map_or("", |(m, _)| m);
+                            let k = d.split("::").next().unwrap_or("");
+                            rcbom_analysis::static_names(self.kb, k, &format!("{module}::{w}"))
+                                .iter()
+                                .any(|n| kind(n) == kind(&o.component))
+                        })
+                    })
+                    .collect();
+                // or named where the receiver was made (`prk.expand(.., HKDF_SHA256)` with `prk`
+                // from `Salt::new(HKDF_SHA384, ..)`: the length is not the algorithm)
+                let before: String = chars[..offset].iter().collect();
+                let receiver_names = re!(r"([A-Za-z_]\w*)\s*\.\s*$")
+                    .captures(&before)
+                    .is_some_and(|r| {
+                        let mut var = (line, r[1].to_string());
+                        for _ in 0..4 {
+                            let Some(Bound::Let { first, init, .. }) = binding(&src, var.0, &var.1)
+                            else {
+                                return false;
+                            };
+                            if lasts.iter().any(|l| init.contains(l)) {
+                                return true;
+                            }
+                            match re!(r"^\s*&?\s*([A-Za-z_]\w*)\b").captures(&init) {
+                                Some(v) => var = (first, v[1].to_string()),
+                                None => return false,
+                            }
+                        }
+                        false
+                    });
+                if !others.is_empty()
+                    && !receiver_names
+                    && !others.iter().any(|w| lasts.contains(&w.as_str()))
+                {
+                    return Err(format!(
+                        "the call's arguments name {}, not {}",
+                        others.join(", "),
+                        lasts.join(", ")
+                    ));
+                }
+            }
             for d in named {
                 let names =
                     rcbom_analysis::static_names(self.kb, d.split("::").next().unwrap_or(""), d);
@@ -2958,6 +3038,9 @@ impl Files<'_> {
             .map(|n| n.name)
             .into_iter()
             .collect();
+        // the position the next detail's code holds: the occurrence's line, then each cited
+        // caller's
+        let mut inner: (PathBuf, usize) = (at.0.to_path_buf(), at.1);
         for part in parts(details) {
             let Some(m) =
                 re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?(?: as `([^`]*)`)?$")
@@ -3022,6 +3105,7 @@ impl Files<'_> {
                     earlier.push(n.name);
                 }
                 callee = caller;
+                inner = (path.clone(), line);
                 continue;
             }
             match &caller {
@@ -3040,6 +3124,7 @@ impl Files<'_> {
                         earlier.push(n.name);
                     }
                     callee = Some(c.clone());
+                    inner = (path.clone(), line);
                 }
                 Some(c) => {
                     let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
@@ -3161,6 +3246,20 @@ impl Files<'_> {
                             "`{part}`: line {line} writes no closure or `async` body"
                         ));
                     }
+                    // the closure cited holds the code instantiated in it (not the closure
+                    // beside it)
+                    if own_closure
+                        && let Some(c0) = col
+                        && inner.0 == path
+                        && let Some(end) = closure_end(&src, (line, c0))
+                        && !(line..=end).contains(&inner.1)
+                    {
+                        return Err(format!(
+                            "`{part}`: the closure at line {line} (to line {end}) does not hold \
+                             line {}",
+                            inner.1
+                        ));
+                    }
                     if named.is_empty() {
                         return Err(format!(
                             "`{part}`: line {line} does not name `{}`",
@@ -3209,6 +3308,7 @@ impl Files<'_> {
                     }
                     earlier.push(want.name);
                     callee = Some(c.clone());
+                    inner = (path.clone(), line);
                 }
                 None => {
                     // a procedural macro's code (a derive's, an attribute's, a function-like
@@ -3251,9 +3351,32 @@ impl Files<'_> {
                     let ident = sym.rsplit("::").next().unwrap_or(&sym);
                     let word = Regex::new(&format!(r"\b{}\b", regex::escape(ident))).unwrap();
                     let text = &src.lines[line - 1];
-                    let uses_metavar = re!(r"\$\w+")
-                        .find_iter(text)
-                        .any(|m| !text[m.end()..].trim_start().starts_with(':'));
+                    // the metavariables the line uses (not declares); where the macro's rule and
+                    // the invocation say which one the call's token binds (`mk!(m256, hash_a,
+                    // SHA256)` with `($m:ident, $f:ident, $alg:ident)`: `$alg`), that one
+                    let used: Vec<&str> = re!(r"\$(\w+)")
+                        .captures_iter(text)
+                        .filter(|m| {
+                            !text[m.get(0).map_or(0, |g| g.end())..]
+                                .trim_start()
+                                .starts_with(':')
+                        })
+                        .filter_map(|m| m.get(1).map(|g| g.as_str()))
+                        .collect();
+                    let binding = cols
+                        .iter()
+                        .find_map(|&col| src.enclosing((line, col), &[ItemKind::Macro]))
+                        .and_then(|m| {
+                            let body: String = (m.start.0..=m.end.0.min(src.lines.len()))
+                                .map(|l| src.lines[l - 1].as_str())
+                                .collect::<Vec<_>>()
+                                .join("\n");
+                            call_line.and_then(|l| metavars_of(&body, l, &word))
+                        });
+                    let uses_metavar = match &binding {
+                        Some(vars) => used.iter().any(|u| vars.iter().any(|v| v == u)),
+                        None => !used.is_empty(),
+                    };
                     if !word.is_match(text)
                         && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l)))
                     {
@@ -3268,76 +3391,369 @@ impl Files<'_> {
     }
 }
 
-/// The nearest binding of `name` above line `line` in the function around it, by `let` or a
-/// pattern (`let Some(name) =`, `if let Some(name) =`, `while let ..`): (its first line, its
-/// last line, the initializer's text).
-fn let_binding(src: &Source, line: usize, name: &str) -> Option<(usize, usize, String)> {
-    let fn_start = src
-        .enclosing((line, 0), &[ItemKind::Fn])
-        .map(|f| f.start.0)
-        .unwrap_or(1);
-    let pat = Regex::new(&format!(
-        r"\blet\s+(?:mut\s+)?{n}\b|\blet\s+[^=;]*?\b{n}\b[^=;]*=",
-        n = regex::escape(name)
-    ))
-    .ok()?;
-    for l in (fn_start..=line).rev() {
-        let text = src.lines.get(l - 1)?;
-        let Some(m) = pat.find(text) else { continue };
-        // the statement, to its `;` (or the block of an `if let`)
-        let mut stmt = text[m.start()..].to_string();
-        let mut last = l;
-        while !stmt.contains([';', '{']) && last < src.lines.len() && last < l + 20 {
-            last += 1;
-            stmt.push('\n');
-            stmt.push_str(&src.lines[last - 1]);
+/// The last line of the closure (or `async` block) starting at `at` (`|k| k.len()`, `move
+/// || { .. }`, `async move |d| expr`): its block's, or its expression's to the `,`, `;` or
+/// bracket that ends it.
+fn closure_end(src: &Source, at: (usize, usize)) -> Option<usize> {
+    let line: Vec<char> = src.lines.get(at.0.wrapping_sub(1))?.chars().collect();
+    let mut i = at.1;
+    let skip_ws = |mut i: usize| {
+        while i < line.len() && line[i].is_whitespace() {
+            i += 1;
         }
-        let init = stmt.split_once('=').map(|(_, i)| i).unwrap_or("");
-        let init = init.split([';', '{']).next().unwrap_or("").to_string();
-        return Some((l, last, init));
+        i
+    };
+    loop {
+        i = skip_ws(i);
+        let rest: String = line[i.min(line.len())..].iter().collect();
+        match ["async", "move", "static"]
+            .iter()
+            .find(|k| rest.starts_with(*k) && !rest[k.len()..].starts_with(|c: char| is_ident(c)))
+        {
+            Some(k) => i += k.len(),
+            None => break,
+        }
+    }
+    let after_params = match line.get(i)? {
+        '|' => {
+            let close = line[i + 1..].iter().position(|&c| c == '|')? + i + 1;
+            close + 1
+        }
+        '{' => i,
+        _ => return None,
+    };
+    let j = skip_ws(after_params);
+    if line.get(j) == Some(&'{') || line.get(j) == Some(&'-') {
+        let open = line[j..].iter().position(|&c| c == '{')? + j;
+        let (_, end) = code_until(src, (at.0, open + 1), |_| false)?;
+        return Some(end);
+    }
+    let (_, end) = code_until(src, (at.0, j), |c| c == ',' || c == ';')?;
+    Some(end)
+}
+
+/// The code of `src` from `from` until `stop` holds for a character outside all brackets
+/// opened after `from` (comments and literals skipped): the text and the line it ends on.
+fn code_until(
+    src: &Source,
+    from: (usize, usize),
+    stop: impl Fn(char) -> bool,
+) -> Option<(String, usize)> {
+    let (mut text, mut depth) = (String::new(), 0i32);
+    for l in from.0..=src.lines.len().min(from.0 + 3000) {
+        let chars: Vec<char> = src.lines[l - 1].chars().collect();
+        let start = if l == from.0 { from.1 } else { 0 };
+        for (ci, &ch) in chars.iter().enumerate().skip(start) {
+            let code = src
+                .class
+                .get(l - 1)
+                .and_then(|k| k.get(ci))
+                .is_some_and(|k| *k == Class::Code);
+            if code {
+                if depth == 0 && stop(ch) {
+                    return Some((text, l));
+                }
+                match ch {
+                    '(' | '[' | '{' => depth += 1,
+                    ')' | ']' | '}' => {
+                        depth -= 1;
+                        if depth < 0 {
+                            return Some((text, l));
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            text.push(ch);
+        }
+        text.push('\n');
     }
     None
 }
 
+/// The pattern of the `let` at byte `from` of `text` (with its type, `a: [HashFn; 1]`) and the
+/// byte of its `=`: the first `=` outside brackets that is no `==`, `=>`, `<=`, `>=` or `!=`.
+fn let_pattern(text: &str, from: usize) -> Option<(String, usize)> {
+    let start = from + text[from..].find("let")? + 3;
+    let b = text.as_bytes();
+    let mut depth = 0i32;
+    for i in start..b.len() {
+        match b[i] {
+            b'(' | b'[' | b'{' | b'<' => depth += 1,
+            // (not the `>` of `->` or `=>`)
+            b')' | b']' | b'}' | b'>'
+                if !(b[i] == b'>' && matches!(b.get(i.wrapping_sub(1)), Some(b'=' | b'-'))) =>
+            {
+                depth -= 1
+            }
+            b'=' if depth == 0
+                && b.get(i + 1) != Some(&b'=')
+                && b.get(i + 1) != Some(&b'>')
+                && !matches!(b.get(i.wrapping_sub(1)), Some(b'!' | b'<' | b'>' | b'=')) =>
+            {
+                return Some((text[start..i].to_string(), i));
+            }
+            b';' if depth == 0 => return None,
+            _ => {}
+        }
+    }
+    None
+}
+
+/// How the variable `name`, used at line `line`, is bound.
+enum Bound {
+    /// By a statement or pattern of the function at lines `first..=last`, from `init` (a
+    /// `let`'s initializer, an `if let`'s or `while let`'s scrutinee, a `for`'s iterator, a
+    /// `match`'s scrutinee for an arm's pattern).
+    Let {
+        first: usize,
+        last: usize,
+        init: String,
+    },
+    /// A parameter of the function `fun`.
+    Param { fun: String },
+    /// A closure's parameter: not followed.
+    ClosureParam,
+    /// A static or const of the file, at lines `start..=end`.
+    Item { start: usize, end: usize },
+}
+
+/// Where variable `name`, used at line `line`, is bound: the nearest binding above the use in
+/// its function, its parameters, then the file's statics and consts.
+fn binding(src: &Source, line: usize, name: &str) -> Option<Bound> {
+    let f = src.enclosing((line, 0), &[ItemKind::Fn]);
+    let fn_start = f.map(|f| f.start.0).unwrap_or(1);
+    let n = regex::escape(name);
+    let let_pat = Regex::new(r"\b(?:(if|while)\s+)?let\s").ok()?;
+    let word = Regex::new(&format!(r"\b{n}\b")).ok()?;
+    let for_pat = Regex::new(r"\bfor\s+(.*?)\s+in\s").ok()?;
+    let arm = Regex::new(r"^\s*(.*?)\s*(?:\bif\b.*)?=>").ok()?;
+    let closure = Regex::new(&format!(r"\|[^|]*\b{n}\b[^|]*\|")).ok()?;
+    let code_col = |l: usize, byte: usize| -> usize { src.lines[l - 1][..byte].chars().count() };
+    for l in (fn_start..=line).rev() {
+        let text = src.lines.get(l - 1)?;
+        if let Some(m) = let_pat.captures(text)
+            && let Some((pattern, eq)) = let_pattern(text, m.get(0)?.start())
+            && word.is_match(&pattern)
+        {
+            let cond = m.get(1).is_some();
+            let (init, last) = code_until(src, (l, code_col(l, eq + 1)), |c| {
+                if cond { c == '{' } else { c == ';' }
+            })?;
+            return Some(Bound::Let {
+                first: l,
+                last,
+                init,
+            });
+        }
+        if let Some(m) = for_pat.captures(text).filter(|m| word.is_match(&m[1])) {
+            let from = m.get(0)?.end();
+            let (init, last) = code_until(src, (l, code_col(l, from)), |c| c == '{')?;
+            return Some(Bound::Let {
+                first: l,
+                last,
+                init,
+            });
+        }
+        if closure.is_match(text) {
+            return Some(Bound::ClosureParam);
+        }
+        // a `match` arm's pattern: the scrutinee of the nearest `match` above
+        if let Some(m) = arm.captures(text).filter(|m| word.is_match(&m[1])) {
+            let _ = m;
+            for k in (fn_start..l).rev() {
+                let t = &src.lines[k - 1];
+                if let Some(i) = t.find("match ") {
+                    let from = code_col(k, i + "match ".len());
+                    let (init, last) = code_until(src, (k, from), |c| c == '{')?;
+                    return Some(Bound::Let {
+                        first: k,
+                        last: last.max(l),
+                        init,
+                    });
+                }
+            }
+        }
+    }
+    if let Some(f) = f {
+        let (sig, _) = code_until(src, f.start, |c| c == '{')?;
+        if Regex::new(&format!(r"\b{n}\s*:|\bself\b"))
+            .ok()?
+            .is_match(&sig)
+            && (name == "self" || Regex::new(&format!(r"\b{n}\s*:")).ok()?.is_match(&sig))
+        {
+            return Some(Bound::Param {
+                fun: f.name.clone(),
+            });
+        }
+    }
+    src.items
+        .iter()
+        .find(|i| i.kind == ItemKind::Static && i.name == name)
+        .map(|i| Bound::Item {
+            start: i.start.0,
+            end: i.end.0,
+        })
+}
+
 /// Is a function pointer held by variable `name` at line `line` the one named at line `named`:
-/// the variable bound where the function is named, or copied from one that is, or from the
-/// result of the file's function whose body names it? A variable bound elsewhere (a
-/// parameter) or from another file's function is not checked.
+/// the variable bound where the function is named (a `let`, a pattern of `if let`, `while let`,
+/// `for` or a `match` arm, over lines), or copied from one that is, or from the result of the
+/// file's function whose body names it, or of a closure that does; a parameter of a function
+/// called where it is named; a static or const whose value (or another static it refers to)
+/// names it? A variable bound by a closure's parameter is not checked.
 fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<(), String> {
     let mut at = (line, name.to_string());
     for _ in 0..8 {
-        let Some((first, last, init)) = let_binding(src, at.0, &at.1) else {
-            return Ok(());
+        // the file's function (`get()(..)`): named in its body
+        if let Some(f) = src
+            .items
+            .iter()
+            .find(|i| i.kind == ItemKind::Fn && i.name == at.1)
+            && binding(src, at.0, &at.1).is_none()
+        {
+            return if (f.start.0..=f.end.0).contains(&named) {
+                Ok(())
+            } else {
+                Err(format!(
+                    "`{}` is the function at lines {}-{}",
+                    at.1, f.start.0, f.end.0
+                ))
+            };
+        }
+        let bound = binding(src, at.0, &at.1)
+            .ok_or_else(|| format!("`{}` is not bound in its function or its file", at.1))?;
+        let (first, last, init) = match bound {
+            Bound::ClosureParam => return Ok(()),
+            Bound::Param { fun } => {
+                // a call of the function passes it: the naming is in the call's arguments
+                // (`run2(&Holder { f: digest::digest }, d)`), or in the binding of a variable
+                // they pass (`let h = Holder { .. }; run2(&h, d)`)
+                let call = Regex::new(&format!(
+                    r"\b{}\b\s*(?:::\s*<[^>]*>\s*)?\(",
+                    regex::escape(&fun)
+                ))
+                .map_err(|e| e.to_string())?;
+                let caller = src.enclosing((named, 0), &[ItemKind::Fn]);
+                let (from, to) = caller
+                    .map(|c| (c.start.0, c.end.0))
+                    .unwrap_or((named, named));
+                for l in from..=to.min(src.lines.len()) {
+                    let text = &src.lines[l - 1];
+                    for m in call.find_iter(text) {
+                        let open = text[..m.end()].chars().count();
+                        let Some((args, end)) = code_until(src, (l, open), |_| false) else {
+                            continue;
+                        };
+                        if (l..=end).contains(&named) {
+                            return Ok(());
+                        }
+                        for v in re!(r"\b([a-z_]\w*)\b").captures_iter(&args) {
+                            if let Some(Bound::Let { first, last, .. }) = binding(src, l, &v[1])
+                                && (first..=last).contains(&named)
+                            {
+                                return Ok(());
+                            }
+                        }
+                    }
+                }
+                return Err(format!(
+                    "`{}` is a parameter of `{fun}`, whose calls do not pass it",
+                    at.1
+                ));
+            }
+            Bound::Item { start, end } => {
+                if (start..=end).contains(&named) {
+                    return Ok(());
+                }
+                // a static of another static (`static B: &HashFn = &A`)
+                let text: String = (start..=end)
+                    .map(|l| src.lines[l - 1].as_str())
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                let refers = src.items.iter().any(|i| {
+                    i.kind == ItemKind::Static
+                        && i.name != at.1
+                        && (i.start.0..=i.end.0).contains(&named)
+                        && Regex::new(&format!(r"\b{}\b", regex::escape(&i.name)))
+                            .is_ok_and(|r| r.is_match(&text))
+                });
+                return if refers {
+                    Ok(())
+                } else {
+                    Err(format!("`{}` is the item at lines {start}-{end}", at.1))
+                };
+            }
+            Bound::Let { first, last, init } => (first, last, init),
         };
         let init = init.trim();
         // a copy of another variable (`if let Some(f) = o`, `let h = p;`): where that one is
-        // bound
-        if let Some(v) = re!(r"^&?\s*(?:mut\s+)?([A-Za-z_]\w*)$").captures(init) {
+        // bound; a method of another one (`while let Some(q) = it.next()`, `fs.iter()`):
+        // that one's
+        if let Some(v) =
+            re!(r"^&?\s*(?:mut\s+)?([A-Za-z_]\w*)(?:\s*\.\s*\w+\s*\([^()]*\))*$").captures(init)
+        {
             if first == at.0 && v[1] == at.1 {
                 return Ok(());
+            }
+            // a function item (`let f = digest;`, imported or the file's): this statement names it
+            if binding(src, first, &v[1]).is_none()
+                && !src
+                    .items
+                    .iter()
+                    .any(|i| i.kind == ItemKind::Fn && i.name == v[1])
+            {
+                return if (first..=last).contains(&named) {
+                    Ok(())
+                } else {
+                    Err(format!("`{}` is bound at lines {first}-{last}", at.1))
+                };
             }
             at = (first, v[1].to_string());
             continue;
         }
         // the result of a call of the file's function (`get()`, `pick(n)`): named in its body;
-        // a tuple struct's or variant's constructor (`Some(digest::digest)`) holds what it is
-        // given, named in the statement
+        // of a closure bound in the function (`let k = mk();`): in the closure; a tuple
+        // struct's or variant's constructor (`Some(digest::digest)`) holds what it is given,
+        // named in the statement
         if let Some(c) = re!(r"^(?:\w+::)*([a-z_]\w*)\s*\(").captures(init) {
             let fns: Vec<&Item> = src
                 .items
                 .iter()
                 .filter(|i| i.kind == ItemKind::Fn && i.name == c[1])
                 .collect();
-            if fns.is_empty() || fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
+            if fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
                 return Ok(());
+            }
+            if fns.is_empty() {
+                match binding(src, first, &c[1]) {
+                    // a closure of the function (`let mk = || digest::digest as HashFn`): its
+                    // own statement holds the naming
+                    Some(Bound::Let {
+                        first: f, last: l, ..
+                    }) => {
+                        return if (f..=l).contains(&named) {
+                            Ok(())
+                        } else {
+                            Err(format!(
+                                "`{}` holds what `{}` returns (lines {f}-{l})",
+                                at.1, &c[1]
+                            ))
+                        };
+                    }
+                    // a function of another file or crate: not followed
+                    _ => return Ok(()),
+                }
             }
             return Err(format!(
                 "`{}` holds what `{}` returns (lines {first}-{last})",
                 at.1, &c[1]
             ));
         }
-        // anything else that calls something (but a constructor): not followed
-        if re!(r"\w\s*\(|\w!").is_match(init) && !re!(r"^(?:\w+::)*[A-Z]\w*\s*\(").is_match(init) {
+        // anything else that calls something (but a constructor, a `vec!`): not followed
+        if re!(r"\w\s*\(|\w!").is_match(init)
+            && !re!(r"^(?:\w+::)*[A-Z]\w*\s*[({]|^vec!|^\[").is_match(init)
+        {
             return Ok(());
         }
         return if (first..=last).contains(&named) {
@@ -3392,8 +3808,8 @@ fn invocation_text(src: &Source, at: (usize, usize)) -> Option<(String, String)>
 }
 
 /// Does the macro invocation at `at` make the item `path` names rather than another invocation
-/// of the same macro in the file: the macro is invoked once, or this invocation names a segment
-/// of the path that another one does not (`nistp_dhkex!("P-256", DhP256, p256, ..)` for
+/// of the same macro in the file: the macro is invoked once, or no other invocation names more
+/// of the path's words in its code (`nistp_dhkex!("P-256", DhP256, p256, ..)` for
 /// `<..::p256::DhP256 as DhKeyExchange>::dh`, not the P-384 invocation)?
 fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
     let Some((name, mine)) = invocation_text(src, at) else {
@@ -3420,17 +3836,59 @@ fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
     if others.is_empty() {
         return true;
     }
+    // the words of the code (not of comments inside the invocation)
     let words = |t: &str| -> HashSet<String> {
+        let code = re!(r"(?s)//[^\n]*|/\*.*?\*/").replace_all(t, " ");
         re!(r"[A-Za-z_]\w*")
-            .find_iter(t)
+            .find_iter(&code)
             .map(|m| m.as_str().to_string())
             .collect()
     };
-    let mine = words(&mine);
-    let others: Vec<HashSet<String>> = others.iter().map(|t| words(t)).collect();
-    words(path)
-        .iter()
-        .any(|w| w.len() > 1 && mine.contains(w) && others.iter().any(|o| !o.contains(w)))
+    let wanted: Vec<String> = words(path).into_iter().filter(|w| w.len() > 1).collect();
+    let score = |t: &HashSet<String>| wanted.iter().filter(|w| t.contains(*w)).count();
+    // the invocation naming most of the path's words (others naming as many: the range)
+    let mine = score(&words(&mine));
+    mine > 0 && others.iter().all(|t| score(&words(t)) <= mine)
+}
+
+/// The metavariables of a `macro_rules!` (`body`) that the invocation on `call` binds to a
+/// token matching `word`, for a rule whose matcher lists only metavariables (`($m:ident,
+/// $alg:ident)`) and as many as the invocation's arguments; `None` when no rule says.
+fn metavars_of(body: &str, call: &str, word: &Regex) -> Option<Vec<String>> {
+    let args_text = re!(r"\w+\s*!\s*[(\[{](.*)[)\]}]").captures(call)?;
+    let mut args = Vec::new();
+    let (mut depth, mut cur) = (0i32, String::new());
+    for c in args_text[1].chars() {
+        match c {
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => depth -= 1,
+            ',' if depth == 0 => {
+                args.push(std::mem::take(&mut cur));
+                continue;
+            }
+            _ => {}
+        }
+        cur.push(c);
+    }
+    if !cur.trim().is_empty() {
+        args.push(cur);
+    }
+    for m in re!(r"\(\s*((?:\$\w+\s*:\s*\w+\s*,?\s*)+)\)\s*=>").captures_iter(body) {
+        let names: Vec<String> = re!(r"\$(\w+)\s*:")
+            .captures_iter(&m[1])
+            .map(|n| n[1].to_string())
+            .collect();
+        if names.len() == args.len() {
+            let bound: Vec<String> = names
+                .into_iter()
+                .zip(&args)
+                .filter(|(_, a)| word.is_match(a))
+                .map(|(n, _)| n)
+                .collect();
+            return Some(bound);
+        }
+    }
+    None
 }
 
 /// Does a macro invocation's path start exactly at `at` (`impl_dhkem!(`,

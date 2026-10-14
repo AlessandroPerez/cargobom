@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 17;
+pub const FACTS_VERSION: u32 = 18;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -74,6 +74,23 @@ pub struct Links {
     /// &SHA512 }`, `*l.write().unwrap() = a`): `Origin::Written` at its calls.
     #[serde(default)]
     pub writes: Vec<ParamWrite>,
+    /// The types the walked code coerces to a trait object (`Box::new(Blob) as Box<dyn
+    /// Source>`, a `&'static dyn Trait` in a constant): the implementations a call through
+    /// `dyn Source` (an `Origin::Call` whose `self_ty` is `dyn <trait>`) may run.
+    #[serde(default)]
+    pub coercions: Vec<Coercion>,
+}
+
+/// Type `ty` (an ADT's defining path, or the type as rustc prints it) is coerced to `dyn
+/// trait_path` at `at` (none: inside a constant or a static's value). `defaults`: the trait
+/// methods (defining paths) for which it runs the trait's default body.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct Coercion {
+    pub trait_path: String,
+    pub ty: String,
+    pub at: Option<Loc>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub defaults: Vec<String>,
 }
 
 /// Function `func` writes `value` through its parameter `index`; `value` names its parameters.
@@ -371,7 +388,8 @@ pub enum Origin {
     },
     /// The result of a call; `args` are the origins of its value arguments. `callee` is the
     /// defining path; `self_ty` the path of the type a method belongs to, when it is an ADT
-    /// (`argon2::Argon2` for `<Argon2 as Default>::default`).
+    /// (`argon2::Argon2` for `<Argon2 as Default>::default`), or `dyn <trait>` for a trait
+    /// method called on a trait object (`s.alg()` with `s: &dyn Source`; see `Coercion`).
     Call {
         callee: String,
         krate: String,
@@ -415,11 +433,16 @@ pub enum Origin {
         args: Option<String>,
     },
     /// What function `callee` writes through its parameter `index` (`Links::writes`), its
-    /// parameters being `args`: `set_slot(&mut c.alg)` stores it in `c.alg`.
+    /// parameters being `args`: `set_slot(&mut c.alg)` stores it in `c.alg`. For a trait
+    /// method the call does not resolve to one body, `self_ty` says how it dispatches: `dyn
+    /// <trait>` (the types coerced to the trait object) or `impl <trait>` (a generic `T:
+    /// Trait`: any implementation).
     Written {
         callee: String,
         index: usize,
         args: Vec<Origin>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        self_ty: Option<String>,
     },
     /// A write of `value` into field `path` of the value it is a part of (`h.alg =
     /// Algorithm::HS384` after `let mut h = Header::default()`), as a part of an `All`. `strong`:
@@ -482,10 +505,12 @@ impl Origin {
                 callee,
                 index,
                 args,
+                self_ty,
             } => Origin::Written {
                 callee,
                 index,
                 args: args.into_iter().map(|a| a.params_of(owner)).collect(),
+                self_ty,
             },
             Origin::Any(v) => Origin::Any(v.into_iter().map(|a| a.params_of(owner)).collect()),
             Origin::All(v) => Origin::All(v.into_iter().map(|a| a.params_of(owner)).collect()),
@@ -539,10 +564,12 @@ impl Origin {
                 callee,
                 index,
                 args,
+                self_ty,
             } => Origin::Written {
                 callee,
                 index,
                 args: cap(args),
+                self_ty,
             },
             Origin::Any(v) => Origin::Any(cap(v)),
             Origin::All(v) => Origin::All(cap(v)),

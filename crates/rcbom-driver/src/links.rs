@@ -386,13 +386,16 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                     _ => Some(Origin::Any(rest)),
                 }
             } else if program && writable(tcx, aty) && carries(cx, aty) {
+                let (callee, self_ty) =
+                    crate::origins::write_callee(tcx, cdid, cargs.skip_binder());
                 Some(Origin::Written {
-                    callee: path_of(tcx, cdid),
+                    callee,
                     index: i,
                     args: args
                         .iter()
                         .map(|a| origins.operand_at(a, bb, idx))
                         .collect(),
+                    self_ty,
                 })
             } else {
                 None
@@ -503,6 +506,16 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
         if !lazy && tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty) {
             push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
         }
+    } else if static_init {
+        // a static holding a function pointer (`static MY: HashFn = my`, `static B: &HashFn =
+        // &A`): its value, for the calls through it
+        let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+        let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
+        if holds_fn_ptr(tcx, ty, 0)
+            && tcx.erase_and_anonymize_regions(ret) == tcx.erase_and_anonymize_regions(ty)
+        {
+            push_static(out, def_ref_internal(tcx, did), origins.returned_part(&[]));
+        }
     }
     // what a function returns, and each part of it that can carry an algorithm or a key; a
     // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
@@ -511,9 +524,24 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     // what a `&mut` parameter points to at the returns (`set_slot(slot)`: `*slot = &SHA512`;
     // `upgrade(&mut self)`: the value on entry with `alg` set), when the function writes it:
     // a caller's `Written` resolves to it, the entry value standing for the caller's own
+    // a `&mut` parameter the body points elsewhere (`if c { slot = other }; *slot = v`): what
+    // the place it pointed to on entry holds at the returns is not followed, nor what the
+    // other parameters' places hold (one of them may be written through it)
+    let redirected = mut_params.iter().any(|&index| {
+        body.blocks.iter().flat_map(|b| &b.statements).any(|st| {
+            matches!(&st.kind, StatementKind::Assign(p, _)
+                if p.local == index + 1 && p.projection.is_empty())
+        })
+    });
     for &index in &mut_params {
-        let value = origins.written_through(index);
         let entry = Origin::Param { index, owner: None };
+        let value = if redirected {
+            Origin::Any(vec![entry.clone(), Origin::Unknown])
+        } else {
+            // a recursive call writing the same place (`rec(slot, n - 1)`) leaves what this
+            // summary says, or the value before: the value before stands for it
+            unrecurse(origins.written_through(index), &here)
+        };
         // (an `Unknown` too: written in a way not followed, not left as it was)
         if value != entry {
             let w = ParamWrite {
@@ -747,6 +775,47 @@ fn fn_ptr_target(
     None
 }
 
+/// `o` with each write by a recursive call of `here` (`Written { callee: here }`) replaced by
+/// the value before that call: the summary being made is what the call leaves, beside it.
+fn unrecurse(o: Origin, here: &str) -> Origin {
+    let go = |v: Vec<Origin>| v.into_iter().map(|a| unrecurse(a, here)).collect();
+    match o {
+        Origin::Written {
+            callee,
+            index,
+            args,
+            ..
+        } if callee == here => args
+            .get(index)
+            .cloned()
+            .map(|a| unrecurse(a, here))
+            .unwrap_or(Origin::Unknown),
+        Origin::Written {
+            callee,
+            index,
+            args,
+            self_ty,
+        } => Origin::Written {
+            callee,
+            index,
+            args: go(args),
+            self_ty,
+        },
+        Origin::Any(v) => Origin::Any(go(v)),
+        Origin::All(v) => Origin::All(go(v)),
+        Origin::Set {
+            path,
+            value,
+            strong,
+        } => Origin::Set {
+            path,
+            value: Box::new(unrecurse(*value, here)),
+            strong,
+        },
+        other => other,
+    }
+}
+
 /// Standard-library methods that write their other arguments into what their first one
 /// borrows mutably (`mem::replace(&mut c.alg, v)`, `c.v.push(v)`, `opt.replace(v)`).
 const WRITERS: &[&str] = &[
@@ -935,6 +1004,26 @@ fn static_behind(o: &Origin) -> Option<rcbom_facts::DefRef> {
             }
             _ => return None,
         }
+    }
+}
+
+/// Does a value of `ty` hold a function pointer (in a reference, an array, a tuple, a struct's
+/// field)?
+fn holds_fn_ptr<'tcx>(tcx: rustc_middle::ty::TyCtxt<'tcx>, ty: Ty<'tcx>, depth: usize) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 4 {
+        return false;
+    }
+    match ty.kind() {
+        K::FnPtr(..) => true,
+        K::Ref(_, t, _) | K::RawPtr(t, _) | K::Array(t, _) | K::Slice(t) => {
+            holds_fn_ptr(tcx, *t, depth + 1)
+        }
+        K::Tuple(ts) => ts.iter().any(|t| holds_fn_ptr(tcx, t, depth + 1)),
+        K::Adt(adt, args) => adt
+            .all_fields()
+            .any(|f| holds_fn_ptr(tcx, f.ty(tcx, args).skip_norm_wip(), depth + 1)),
+        _ => false,
     }
 }
 

@@ -111,7 +111,7 @@
             "symbol": "ring::aead::algorithm::AES_128_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static a14::GCM128` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 8,
@@ -132,7 +132,7 @@
             "symbol": "ring::aead::algorithm::AES_128_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::seal_with; use: encrypt; algorithm from ring::aead::algorithm::AES_128_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 113); line: `key.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a14::seal_with; use: encrypt; algorithm from ring::aead::algorithm::AES_128_GCM, reaching the call from another function; member: object, from `a14::make_key`; nonce: hard-coded (12 bytes, literal at line 113); line: `key.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
             "line": 114,
             "location": "src/main.rs",
             "offset": 8,
@@ -212,14 +212,14 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static a14::GCM256` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Sealer::seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (all zero, 12 bytes, literal at line 92); line: `.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a14::Sealer::seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: caller, passed by `a14::main`; nonce: hard-coded (all zero, 12 bytes, literal at line 92); line: `.seal_in_place_append_tag(nonce, Aad::empty(), buf)`; code: `seal_in_place_append_tag`",
             "line": 94,
             "location": "src/main.rs",
             "offset": 13,
@@ -312,7 +312,7 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::ChaCha::key; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::ChaCha::key; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: type-join, possible (a value `static a14::CHACHA` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 8,
@@ -390,7 +390,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Signer::sign; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; line: `let sig = self.inner.sign(&self.rng, msg).map_err(|_| Error)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a14::Signer::sign; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: type-join, possible (a value `a14::Signer::new` stores in the field); line: `let sig = self.inner.sign(&self.rng, msg).map_err(|_| Error)?;`; code: `sign`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 29,
@@ -460,7 +460,7 @@
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Mac::tag; use: tag; algorithm from ring::hmac::HMAC_SHA256, reaching the call from another function; line: `hmac::sign(&self.key, msg)`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in a14::Mac::tag; use: tag; algorithm from ring::hmac::HMAC_SHA256, reaching the call from another function; member: object, from `a14::Mac::new`; line: `hmac::sign(&self.key, msg)`; code: `hmac::sign`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 8,
@@ -530,7 +530,7 @@
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `digest::digest(alg, data)`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a14::main`; line: `digest::digest(alg, data)`; code: `digest::digest`",
             "line": 101,
             "location": "src/main.rs",
             "offset": 4,
@@ -589,7 +589,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; line: `digest::digest(alg, data)`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a14::hash_with; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `a14::main`; line: `digest::digest(alg, data)`; code: `digest::digest`",
             "line": 101,
             "location": "src/main.rs",
             "offset": 4,
@@ -751,7 +751,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:13365622-2fd1-88b0-b0d6-b78f6066affd",
+  "serialNumber": "urn:uuid:0ef8707f-0b2e-8fe3-8c2f-520c86b023f8",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1427,7 +1427,9 @@ fn site_matches(
             }
         }
         // a protocol crate's API modelled at its boundary
-        Target::Call { .. } if let Some(found) = boundary::site_matches(ctx, site) => {
+        Target::Call { .. }
+            if let Some(found) = boundary::site_matches(ctx, site, reachable, reached_path) =>
+        {
             out = found;
         }
         Target::Call {
@@ -1703,14 +1705,17 @@ fn site_matches(
                     local
                 };
                 let named = std::cell::RefCell::new(HashMap::new());
+                let named_via = std::cell::RefCell::new(HashMap::new());
                 let linked = std::iter::once_with(|| {
                     ctx.flow.take_named();
+                    ctx.flow.take_named_via();
                     let r = provenance::data_in_args(
                         kb,
                         Some((&ctx.flow, site.owner.path.as_str())),
                         &site.target,
                     );
                     *named.borrow_mut() = ctx.flow.take_named();
+                    *named_via.borrow_mut() = ctx.flow.take_named_via();
                     r
                 })
                 .flatten();
@@ -1720,8 +1725,9 @@ fn site_matches(
                     .chain(linked.map(|p| (p, true)));
                 for ((mut descriptors, others), from_elsewhere) in places {
                     // the user's own data naming exactly one descriptor (`digest(TABLE.alg, ..)`
-                    // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`)
-                    // is chosen at run time
+                    // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`):
+                    // any of them, the element read by an index (or a field) not followed
+                    let mut tables: HashMap<String, (String, usize)> = HashMap::new();
                     for d in others {
                         // a static that changes at run time holds what the program puts there
                         // (looked up with the values from elsewhere), not its initializer's
@@ -1744,10 +1750,18 @@ fn site_matches(
                             })
                             .collect();
                         found.retain(|x| !parts.contains(&x.id));
-                        if let [one] = found.as_slice()
-                            && !descriptors.contains(one)
-                        {
-                            descriptors.push(one.clone());
+                        if let [one] = found.as_slice() {
+                            if !descriptors.contains(one) {
+                                descriptors.push(one.clone());
+                            }
+                        } else {
+                            let k = found.len();
+                            for x in found {
+                                if !descriptors.contains(&x) {
+                                    tables.insert(x.id.clone(), (d.path.clone(), k));
+                                    descriptors.push(x);
+                                }
+                            }
                         }
                     }
                     // a value named only by code or data no entry point reaches (a caller never
@@ -1785,7 +1799,17 @@ fn site_matches(
                             let here = named_here.contains(&def.id);
                             let from_elsewhere = from_elsewhere && !here;
                             let unreached = unreached_by(&def);
+                            let table = tables.get(&def.id);
                             let mut d = vec![match (from_elsewhere, n) {
+                                _ if !unreached && table.is_some() => {
+                                    let (t, k) = table.cloned().unwrap_or_default();
+                                    format!(
+                                        "algorithm one of the {k} in `{}`, the element read by \
+                                         an index or a field the analysis does not follow: {}",
+                                        short(&t),
+                                        short(&def.path)
+                                    )
+                                }
                                 (true, _) if unreached => format!(
                                     "algorithm {} only through code or data no entry point \
                                      reaches{}",
@@ -1813,6 +1837,17 @@ fn site_matches(
                             if f.is_none() {
                                 d.insert(0, format!("{method}: setup, not a use"));
                             }
+                            // how the member reaches the call (its set label and witness)
+                            if from_elsewhere
+                                && !unreached
+                                && let Some(via) = named_via.borrow().get(&def.id)
+                            {
+                                let at = d
+                                    .iter()
+                                    .position(|x| x.starts_with("algorithm"))
+                                    .map_or(d.len(), |i| i + 1);
+                                d.insert(at, boundary::member_label(via));
+                            }
                             out.push((m, Kind::Call, f, symbol.clone(), d, unreached));
                         }
                     }
@@ -1826,13 +1861,8 @@ fn site_matches(
             // hit its bound (what was found is not all)
             let unresolved = if out.is_empty() {
                 unresolved_operation(ctx, site)
-            } else if algorithm_cut(ctx, site) {
-                unresolved_operation(ctx, site).map(|(p, f, _, pr)| {
-                    let reason = "the search for the value hit its bound: other algorithms than \
-                                  these may reach the call"
-                        .to_string();
-                    (p, f, reason, pr)
-                })
+            } else if let Some(reason) = algorithm_cut(ctx, site) {
+                unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason, pr))
             } else {
                 None
             };
@@ -1985,7 +2015,14 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
                 let o = arg_origins.get(op.algorithm)?;
                 let r = unresolved_reason(o);
                 if !r.contains("hit its bound") && linked_cut(ctx, site, o) {
-                    format!("{r}; the search for the value hit its bound")
+                    // a parameter whose callers the search followed until its bound: what
+                    // their arguments name is not known, not that they name none
+                    if matches!(links::peel(o), rcbom_facts::Origin::Param { .. }) {
+                        "a parameter: the search for the value through its callers hit its bound"
+                            .to_string()
+                    } else {
+                        format!("{r}; the search for the value hit its bound")
+                    }
                 } else {
                     r
                 }
@@ -2095,16 +2132,17 @@ fn cut(o: &rcbom_facts::Origin) -> bool {
     }
 }
 
-/// Was the search for a value-selected operation's algorithm cut at its bound (a choice among
-/// more alternatives than the driver keeps)?
-fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> bool {
+/// Why the algorithms found for a value-selected operation are not all: the search was cut at
+/// its bound (a choice among more alternatives than the driver keeps), or a value it met is
+/// not followed.
+fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> Option<String> {
     let Target::Call {
         callee,
         arg_origins,
         ..
     } = &site.target
     else {
-        return false;
+        return None;
     };
     let in_crate = callee
         .path
@@ -2114,7 +2152,133 @@ fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> bool {
         .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
         .filter(|op| !op.self_type)
         .and_then(|op| arg_origins.get(op.algorithm))
-        .is_some_and(|o| cut(o) || linked_cut(ctx, site, o))
+        .and_then(|o| {
+            // the cut among the values that reach the call, once followed (a cut inside a value
+            // a later write replaced is no part of them); the origin's own when none are
+            let cut_here = match ctx.flow.values(o, &site.owner.path) {
+                Some(vs) => vs
+                    .iter()
+                    .any(|(v, _)| matches!(v, rcbom_facts::Origin::Truncated)),
+                None => cut(o),
+            };
+            if cut_here {
+                Some(
+                    "the search for the value hit its bound: other algorithms than these may \
+                     reach the call"
+                        .to_string(),
+                )
+            } else {
+                unfollowed(ctx, site, o).map(|r| {
+                    format!("other algorithms than these may reach the call: {r} is not followed")
+                })
+            }
+        })
+}
+
+/// An alternative of the algorithm argument `o` (read at `site`), once the values from
+/// elsewhere are followed, that is neither an algorithm nor followed to one: a value of unknown
+/// origin, a parameter or field no value reaches, a call whose result is not followed (a
+/// closure's that writes the variable, a function writing through an `Option<&mut>`, a trait
+/// method on a type whose implementation records nothing). What it is, if any: the algorithms
+/// found beside it are not all.
+fn unfollowed(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> Option<String> {
+    use rcbom_facts::Origin;
+    type Seen = HashSet<(Origin, String)>;
+    fn leaf(
+        ctx: &Ctx<'_>,
+        o: &Origin,
+        owner: &str,
+        depth: usize,
+        seen: &mut Seen,
+    ) -> Option<String> {
+        if depth > 10 {
+            return None;
+        }
+        let o = links::peel(o);
+        match o {
+            Origin::Data { .. }
+            | Origin::Unit { .. }
+            | Origin::Const { .. }
+            | Origin::Truncated => None,
+            Origin::Any(v) | Origin::All(v) => {
+                v.iter().find_map(|a| leaf(ctx, a, owner, depth + 1, seen))
+            }
+            Origin::Set { value, .. } => leaf(ctx, value, owner, depth + 1, seen),
+            // the error a `?` returns: no value
+            Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => None,
+            Origin::Call { callee, args, .. } if callee == "<closure>" => args
+                .iter()
+                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen)),
+            // a crypto crate's call names its algorithm itself (matched at its own site)
+            Origin::Call { krate, .. } if ctx.kb.crate_by_name(krate).is_some() => None,
+            // a call of a closure runs the closure's code, not followed
+            Origin::Call { callee, krate, .. }
+                if matches!(krate.as_str(), "core" | "std" | "alloc")
+                    && ["Fn::call", "FnMut::call_mut", "FnOnce::call_once"]
+                        .iter()
+                        .any(|f| callee.ends_with(f)) =>
+            {
+                Some(unresolved_kind(o))
+            }
+            // a standard-library call passes its arguments' values on (an iterator, an
+            // `Option`'s fallback): a container read its container's (not the index or key), a
+            // map's store its value (not the key); a trait object's method is no such call
+            Origin::Call {
+                callee,
+                krate,
+                args,
+                self_ty,
+                ..
+            } if matches!(krate.as_str(), "core" | "std" | "alloc")
+                && !self_ty.as_deref().is_some_and(|t| t.starts_with("dyn ")) =>
+            {
+                let bare = matcher::strip_generics(callee);
+                let read = [
+                    "Index::index",
+                    "IndexMut::index_mut",
+                    "::get",
+                    "::get_mut",
+                    "::get_unchecked",
+                    "::nth",
+                    "::remove",
+                    "::swap_remove",
+                ]
+                .iter()
+                .any(|m| bare.ends_with(m));
+                let map_store = bare.ends_with("Map::insert");
+                args.iter()
+                    .enumerate()
+                    .filter(|(i, _)| {
+                        if read {
+                            *i == 0
+                        } else {
+                            !(map_store && *i == 1)
+                        }
+                    })
+                    .find_map(|(_, a)| leaf(ctx, a, owner, depth + 1, seen))
+            }
+            Origin::Unknown | Origin::Loop | Origin::Through { .. } => Some(unresolved_kind(o)),
+            // a value from elsewhere: what reaches it, followed; the value itself among them is
+            // one the links could not follow (a trait object's type whose method records
+            // nothing, a caller passing a value not known)
+            _ => {
+                if !seen.insert((o.clone(), owner.to_string())) {
+                    return None;
+                }
+                match ctx.flow.values(o, owner) {
+                    Some(vs) => {
+                        if vs.iter().any(|(v, w)| v == o && w == owner) {
+                            return Some(unresolved_kind(o));
+                        }
+                        vs.iter()
+                            .find_map(|(v, w)| leaf(ctx, v, w, depth + 1, seen))
+                    }
+                    None => Some(unresolved_kind(o)),
+                }
+            }
+        }
+    }
+    leaf(ctx, o, &site.owner.path, 0, &mut HashSet::new())
 }
 
 /// Do the values that reach `o` from elsewhere (read at `site`) include a cut (`Truncated`: in

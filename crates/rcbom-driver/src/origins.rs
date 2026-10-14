@@ -444,8 +444,12 @@ impl Flow {
                 continue;
             }
             // a call returning a value that holds the borrow (`chunks_mut`, `split_at_mut`):
-            // the writes come later, through that value
-            let through = !returns_mut_ref(body, place) && holds_borrow(body, place);
+            // the writes come later, through that value; not a store into a standard-library
+            // container, whose result is the value it replaced (`map.insert(k, (alg, &key[..]))`
+            // returns an `Option<(Algorithm, &[u8])>`, no borrow of the map)
+            let through = !returns_mut_ref(body, place)
+                && holds_borrow(body, place)
+                && !callee_name(body, func).is_some_and(|c| std_store(&c));
             // a call that writes the whole buffer it is given (`rng.fill_bytes(nonce)`,
             // `read_exact(buf)`): what was there before is gone
             let whole = fills_whole(body, func);
@@ -1238,10 +1242,16 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             .take(MAX_WIDTH)
             .map(|a| self.operand(a, d.at, depth + 1, seen))
             .collect();
+        let gargs = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
+            Some(TyKind::RigidTy(RigidTy::FnDef(_, g))) => rustc_internal::internal(self.tcx, g),
+            _ => return None,
+        };
+        let (callee, self_ty) = write_callee(self.tcx, did, gargs);
         Some(Origin::Written {
-            callee: path_of(self.tcx, did),
+            callee,
             index: *index,
             args,
+            self_ty,
         })
     }
 
@@ -1394,7 +1404,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 (
                     path_of(self.tcx, did),
                     self.tcx.crate_name(did.krate).to_string(),
-                    self_adt_path(self.tcx, did, gargs),
+                    self_adt_path(self.tcx, did, gargs).or_else(|| dyn_self(self.tcx, did, gargs)),
                 )
             }
             // a pointer to a function reified here (`let h: fn(..) = digest; h(..)`)
@@ -2610,6 +2620,18 @@ fn returns_receiver(body: &Body, dest: &Place, args: &[Operand]) -> bool {
 }
 
 /// Does the call's result hold a borrow (`ChunksMut<'_, u8>`, `(&mut [u8], &mut [u8])`)?
+/// A standard-library container's method that stores its other arguments in it
+/// (`std::collections::HashMap::<K, V, S, A>::insert`, `alloc::vec::Vec::<T, A>::push`).
+fn std_store(callee: &str) -> bool {
+    const TYPES: &[&str] = &[
+        "Vec", "VecDeque", "HashMap", "BTreeMap", "HashSet", "BTreeSet",
+    ];
+    const METHODS: &[&str] = &["push", "push_back", "push_front", "insert"];
+    let segs: Vec<&str> = callee.split("::").filter(|s| !s.starts_with('<')).collect();
+    matches!(segs.first(), Some(&("std" | "alloc" | "core")))
+        && matches!(segs.as_slice(), [.., ty, m] if TYPES.contains(ty) && METHODS.contains(m))
+}
+
 fn holds_borrow(body: &Body, dest: &Place) -> bool {
     fn borrows(t: &Ty, depth: usize) -> bool {
         if depth > 3 {
@@ -2857,6 +2879,52 @@ pub(crate) fn self_adt_path<'tcx>(
     };
     match ty.kind() {
         rustc_middle::ty::Adt(adt, _) => Some(path_of(tcx, adt.did())),
+        _ => None,
+    }
+}
+
+/// The function a call of `did` with `args` writes through, as `Links::writes` names it: a
+/// trait method's call with a known `Self` type is its implementation's (`<Ctx as Up>::up`, or
+/// the trait's default body); one on a trait object or a type parameter stays the trait
+/// method's, with `dyn <trait>` or `impl <trait>` (see `Origin::Written`).
+pub(crate) fn write_callee<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> (String, Option<String>) {
+    let Some(tr) = tcx.trait_of_assoc(did) else {
+        return (path_of(tcx, did), None);
+    };
+    if let Some(d) = dyn_self(tcx, did, args) {
+        return (path_of(tcx, did), Some(d));
+    }
+    if !rustc_middle::ty::TypeVisitableExt::has_non_region_param(&args) {
+        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+        if let Ok(Some(i)) = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args)
+            && matches!(i.def, rustc_middle::ty::InstanceKind::Item(_))
+        {
+            return (path_of(tcx, i.def_id()), None);
+        }
+    }
+    (
+        path_of(tcx, did),
+        Some(format!("impl {}", path_of(tcx, tr))),
+    )
+}
+
+/// For a trait method called on a trait object (`s.alg()` with `s: &dyn Source`), `dyn` and
+/// the object's trait (`dyn app::Source`): the call runs the implementation of a type coerced to
+/// it (`Links::coercions`).
+fn dyn_self<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Option<String> {
+    tcx.trait_of_assoc(did)?;
+    match args.first()?.as_type()?.kind() {
+        rustc_middle::ty::Dynamic(preds, ..) => {
+            Some(format!("dyn {}", path_of(tcx, preds.principal_def_id()?)))
+        }
         _ => None,
     }
 }

@@ -1,0 +1,1496 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via b1 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by b1 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via b1 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in b1::h; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `b1::c70`; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-1, SHA-256`; code: `digest`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in b1::h2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `b1::e0`; line: `fn h2(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-1, SHA-384`; code: `digest`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c70; line: `fn c70(d: &[u8]) { h(&SHA1, d) }`; code: `SHA1`",
+            "line": 78,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e0; line: `fn e0(d: &[u8]) { h2(&SHA1, d) }`; code: `SHA1`",
+            "line": 79,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in b1::h; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `b1::c0`; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-1, SHA-256`; code: `digest`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c0; line: `fn c0(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c1; line: `fn c1(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c2; line: `fn c2(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c3; line: `fn c3(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c4; line: `fn c4(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c5; line: `fn c5(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c6; line: `fn c6(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c7; line: `fn c7(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c8; line: `fn c8(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c9; line: `fn c9(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c10; line: `fn c10(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c11; line: `fn c11(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c12; line: `fn c12(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c13; line: `fn c13(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c14; line: `fn c14(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c15; line: `fn c15(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c16; line: `fn c16(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c17; line: `fn c17(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c18; line: `fn c18(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c19; line: `fn c19(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c20; line: `fn c20(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c21; line: `fn c21(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c22; line: `fn c22(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c23; line: `fn c23(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c24; line: `fn c24(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c25; line: `fn c25(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c26; line: `fn c26(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c27; line: `fn c27(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c28; line: `fn c28(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c29; line: `fn c29(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c30; line: `fn c30(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c31; line: `fn c31(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c32; line: `fn c32(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c33; line: `fn c33(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c34; line: `fn c34(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c35; line: `fn c35(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c36; line: `fn c36(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c37; line: `fn c37(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c38; line: `fn c38(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c39; line: `fn c39(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c40; line: `fn c40(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 48,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c41; line: `fn c41(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c42; line: `fn c42(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c43; line: `fn c43(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c44; line: `fn c44(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 52,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c45; line: `fn c45(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 53,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c46; line: `fn c46(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c47; line: `fn c47(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c48; line: `fn c48(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c49; line: `fn c49(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 57,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c50; line: `fn c50(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c51; line: `fn c51(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 59,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c52; line: `fn c52(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c53; line: `fn c53(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 61,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c54; line: `fn c54(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 62,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c55; line: `fn c55(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c56; line: `fn c56(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 64,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c57; line: `fn c57(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c58; line: `fn c58(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 66,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c59; line: `fn c59(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 67,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c60; line: `fn c60(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c61; line: `fn c61(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 69,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c62; line: `fn c62(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c63; line: `fn c63(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c64; line: `fn c64(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 72,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c65; line: `fn c65(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 73,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c66; line: `fn c66(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 74,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c67; line: `fn c67(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 75,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c68; line: `fn c68(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 76,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::c69; line: `fn c69(d: &[u8]) { h(&SHA256, d) }`; code: `SHA256`",
+            "line": 77,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::main; line: `let mut s = S { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "line": 185,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::main; line: `p0(&SHA256, &d);`; code: `SHA256`",
+            "line": 191,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "73"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in b1::h2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `b1::e1`; line: `fn h2(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-1, SHA-384`; code: `digest`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e1; line: `fn e1(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 80,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e2; line: `fn e2(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 81,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e3; line: `fn e3(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 82,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e4; line: `fn e4(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 83,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e5; line: `fn e5(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 84,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e6; line: `fn e6(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 85,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e7; line: `fn e7(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 86,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e8; line: `fn e8(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 87,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e9; line: `fn e9(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 88,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e10; line: `fn e10(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 89,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e11; line: `fn e11(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 90,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e12; line: `fn e12(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 91,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e13; line: `fn e13(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 92,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e14; line: `fn e14(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 93,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e15; line: `fn e15(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 94,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e16; line: `fn e16(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 95,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e17; line: `fn e17(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 96,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e18; line: `fn e18(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 97,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e19; line: `fn e19(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 98,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e20; line: `fn e20(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 99,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e21; line: `fn e21(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 100,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e22; line: `fn e22(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 101,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e23; line: `fn e23(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 102,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e24; line: `fn e24(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 103,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e25; line: `fn e25(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 104,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e26; line: `fn e26(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 105,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e27; line: `fn e27(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 106,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e28; line: `fn e28(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 107,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e29; line: `fn e29(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 108,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e30; line: `fn e30(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 109,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e31; line: `fn e31(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 110,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e32; line: `fn e32(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 111,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e33; line: `fn e33(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 112,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e34; line: `fn e34(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 113,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e35; line: `fn e35(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 114,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e36; line: `fn e36(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 115,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e37; line: `fn e37(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 116,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e38; line: `fn e38(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 117,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e39; line: `fn e39(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 118,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e40; line: `fn e40(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 119,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e41; line: `fn e41(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 120,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e42; line: `fn e42(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 121,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e43; line: `fn e43(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 122,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e44; line: `fn e44(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 123,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e45; line: `fn e45(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 124,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e46; line: `fn e46(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 125,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e47; line: `fn e47(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 126,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e48; line: `fn e48(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 127,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e49; line: `fn e49(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 128,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e50; line: `fn e50(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 129,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e51; line: `fn e51(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 130,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e52; line: `fn e52(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 131,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e53; line: `fn e53(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 132,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e54; line: `fn e54(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 133,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e55; line: `fn e55(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 134,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e56; line: `fn e56(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 135,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e57; line: `fn e57(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 136,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e58; line: `fn e58(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 137,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e59; line: `fn e59(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 138,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e60; line: `fn e60(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 139,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e61; line: `fn e61(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 140,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e62; line: `fn e62(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 141,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e63; line: `fn e63(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 142,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e64; line: `fn e64(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 143,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e65; line: `fn e65(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 144,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e66; line: `fn e66(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 145,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e67; line: `fn e67(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 146,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e68; line: `fn e68(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 147,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e69; line: `fn e69(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 148,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::e70; line: `fn e70(d: &[u8]) { h2(&SHA384, d) }`; code: `SHA384`",
+            "line": 149,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in b1::rec; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `b1::main`; line: `fn rec(a: &'static Digest, n: usize, d: &[u8]) { if n > 0 { rec(a, n - 1, d) } else { let _ = digest(a, d); } } // SHA-384`; code: `digest`",
+            "line": 156,
+            "location": "src/main.rs",
+            "offset": 94,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in b1::main; line: `rec(&SHA384, arg(1).len(), &d);`; code: `SHA384`",
+            "line": 190,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "73"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in b1::S::set; line: `fn set(&mut self) { self.alg = &SHA512; }`; code: `SHA512`",
+            "line": 154,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in b1::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `b1::S::set`; line: `let _ = digest(s.alg, &d); // SHA-512: a complete set after a cut chain`; code: `digest`",
+            "line": 189,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in b1::p12; use: digest; algorithm unresolved: a parameter: the search for the value through its callers hit its bound; line: `fn p12(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-256`; code: `digest`",
+            "line": 169,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/b1@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/b1@0.1.0",
+      "name": "b1",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/b1@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "227"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:eceba465-e32b-8919-9aab-1bdb01dd425d",
+  "specVersion": "1.7",
+  "version": 1
+}

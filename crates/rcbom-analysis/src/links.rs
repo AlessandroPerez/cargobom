@@ -28,6 +28,9 @@ pub struct LinkIndex {
     statics: HashMap<String, (bool, Vec<Origin>)>,
     /// By function and parameter: what it writes through the parameter.
     writes: HashMap<(String, usize), Vec<Origin>>,
+    /// By trait: the types coerced to a trait object of it, with where, and the methods they
+    /// run the trait's default body for.
+    coerced: HashMap<String, Vec<Coerced>>,
     /// Lookups left for the current `values` call.
     budget: Cell<usize>,
     /// The reads being resolved (value, path, function), outermost first: one met again is a
@@ -38,6 +41,10 @@ pub struct LinkIndex {
     /// For the current question: the functions each descriptor found was named in (`""`: a
     /// static's initializer, or what a static holds at run time).
     named_in: RefCell<HashMap<String, std::collections::BTreeSet<String>>>,
+    /// For the current question: how each descriptor found reaches it, the most specific way
+    /// (the set label of the member), and the way of the value being followed now.
+    named_via: RefCell<HashMap<String, Via>>,
+    current_via: RefCell<Via>,
 }
 
 type Values = Option<Vec<(Origin, String)>>;
@@ -45,24 +52,40 @@ type Values = Option<Vec<(Origin, String)>>;
 /// How a value reaches the read (the set label of each member, with its witness): named in the
 /// function itself, passed by a caller, returned or written by a function, or one of the values
 /// the program stores in a field of the type anywhere (a flow-insensitive join: possible, not
-/// shown to reach this read). Ordered from the most to the least specific.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+/// shown to reach this read), or what a type coerced to a trait object returns from a call
+/// through it. Ordered from the most to the least specific.
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Via {
+    #[default]
     Fixed,
     /// The calling function.
     Caller(String),
     /// The function returning or writing it.
     Object(String),
+    /// The implementation of type `ty`, coerced to `dyn trait_path` at `at`, called through
+    /// the trait object; `only`: no other type is coerced to it.
+    Dyn {
+        trait_path: String,
+        ty: String,
+        at: Option<rcbom_facts::Loc>,
+        only: bool,
+    },
+    /// The standard-library method that put it in a container it is read from
+    /// (`HashMap::insert`).
+    Container(String),
+    /// One of the implementations (its path) a trait method called on a type parameter may
+    /// run.
+    Impl(String),
     /// The function (or `static ..`) storing it in the field.
     Join(String),
 }
 
 impl Via {
-    fn rank(&self) -> u8 {
+    pub(crate) fn rank(&self) -> u8 {
         match self {
             Via::Fixed => 0,
-            Via::Caller(_) | Via::Object(_) => 1,
-            Via::Join(_) => 2,
+            Via::Caller(_) | Via::Object(_) | Via::Dyn { only: true, .. } => 1,
+            Via::Dyn { .. } | Via::Container(_) | Via::Impl(_) | Via::Join(_) => 2,
         }
     }
 
@@ -91,13 +114,16 @@ struct Stored {
 }
 
 /// Values found per lookup, lookups chained, and lookups per question.
-const MAX_VALUES: usize = 64;
+const MAX_VALUES: usize = 256;
 const MAX_DEPTH: usize = 10;
 const MAX_STEPS: usize = 4096;
 
 /// A field read, from the outermost struct in: (struct, field, the struct's type arguments when
 /// known).
 type FieldPath = [(String, usize, Option<String>)];
+
+/// A type coerced to a trait object: the type, where, the methods it does not override.
+type Coerced = (String, Option<rcbom_facts::Loc>, Vec<String>);
 
 /// A read being resolved: the value, the fields read from it, the function it is read in.
 type Read = (Origin, Vec<(String, usize, Option<String>)>, String);
@@ -143,6 +169,12 @@ impl LinkIndex {
                     v.push(w.value.clone());
                 }
             }
+            for c in &f.links.coercions {
+                let v = ix.coerced.entry(c.trait_path.clone()).or_default();
+                if !v.iter().any(|(t, ..)| *t == c.ty) {
+                    v.push((c.ty.clone(), c.at.clone(), c.defaults.clone()));
+                }
+            }
             for s in &f.links.statics {
                 let e = ix.statics.entry(s.def.id.clone()).or_default();
                 e.0 |= s.mutable;
@@ -153,16 +185,72 @@ impl LinkIndex {
                 }
             }
         }
+        // a trait object made from another (`&dyn Sub` upcast to `&dyn Super`): the types
+        // coerced to that one, transitively
+        for _ in 0..MAX_DEPTH {
+            let mut changed = false;
+            let traits: Vec<String> = ix.coerced.keys().cloned().collect();
+            for t in traits {
+                let mut v = ix.coerced[&t].clone();
+                let subs: Vec<String> = v
+                    .iter()
+                    .filter_map(|(ty, ..)| ty.strip_prefix("dyn ").map(str::to_string))
+                    .collect();
+                for sub in subs {
+                    for e in ix.coerced.get(&sub).cloned().unwrap_or_default() {
+                        if !v.iter().any(|(ty, ..)| *ty == e.0) {
+                            v.push(e);
+                            changed = true;
+                        }
+                    }
+                }
+                ix.coerced.insert(t, v);
+            }
+            if !changed {
+                break;
+            }
+        }
+        for v in ix.coerced.values_mut() {
+            v.retain(|(ty, ..)| !ty.starts_with("dyn "));
+        }
         ix
     }
 
     /// Notes that descriptor `id` was found named in function `owner`.
     pub fn note(&self, id: &str, owner: &str) {
+        let via = self.current_via.borrow().clone();
+        self.named_via
+            .borrow_mut()
+            .entry(id.to_string())
+            .and_modify(|v| {
+                if via < *v {
+                    *v = via.clone();
+                }
+            })
+            .or_insert_with(|| via.clone());
         self.named_in
             .borrow_mut()
             .entry(id.to_string())
             .or_default()
             .insert(owner.to_string());
+    }
+
+    /// How each descriptor noted since the last call reaches the question, by descriptor.
+    pub fn take_named_via(&self) -> HashMap<String, Via> {
+        std::mem::take(&mut *self.named_via.borrow_mut())
+    }
+
+    /// Runs `f` with `via` as the way the values it notes reach the question.
+    pub fn with_via<T>(&self, via: Via, f: impl FnOnce() -> T) -> T {
+        let old = self.current_via.replace(via);
+        let r = f();
+        *self.current_via.borrow_mut() = old;
+        r
+    }
+
+    /// The way the value being followed reaches the question.
+    pub fn current_via(&self) -> Via {
+        self.current_via.borrow().clone()
     }
 
     /// The functions noted since the last call, by descriptor.
@@ -247,6 +335,52 @@ impl LinkIndex {
             .collect()
     }
 
+    /// The values recorded for a static (its initializer's, for one holding a function
+    /// pointer; what the program puts there, for one that changes at run time).
+    pub fn static_values(&self, id: &str) -> &[Origin] {
+        self.statics
+            .get(id)
+            .map(|(_, v)| v.as_slice())
+            .unwrap_or_default()
+    }
+
+    /// Field `field` of struct `adt` in `w`, the values in it once the writes into the value's
+    /// fields are taken into account: what a call of the program's function writes through a
+    /// parameter (an `Origin::Written`, per its summary), or a value with field writes (`All` with
+    /// `Set`s): the values a write to that field puts there, and the field of the value before
+    /// where it may not write it; none for a write to another field (`self.n += 7` is no part of
+    /// `self.key`). `None` for any other value.
+    pub fn field_parts(&self, w: &Origin, adt: &str, field: usize) -> Option<Vec<Origin>> {
+        // a value with fields written into it (`k.n = 7` after `k = K { .. }`): those writes
+        // projected the same way
+        if let Origin::All(alts) = w
+            && alts.iter().any(|a| matches!(a, Origin::Set { .. }))
+        {
+            let mut out = Vec::new();
+            project(w, adt, field, &mut out);
+            return Some(out);
+        }
+        let Origin::Written {
+            callee,
+            index,
+            args,
+            self_ty: None,
+        } = w
+        else {
+            return None;
+        };
+        let mut out = Vec::new();
+        match self.writes.get(&(callee.clone(), *index)) {
+            Some(ws) => {
+                for s in ws {
+                    project(&substitute(s, args), adt, field, &mut out);
+                }
+            }
+            None => project(args.get(*index)?, adt, field, &mut out),
+        }
+        Some(out)
+    }
+
     /// A static whose contents change at run time, with the values recorded for it.
     pub fn mutable_static(&self, id: &str) -> Option<&[Origin]> {
         self.statics
@@ -308,7 +442,9 @@ impl LinkIndex {
         via: &Via,
         out: &mut Found,
     ) {
+        // the bound on values: a set this large is cut, and says so
         if out.len() >= MAX_VALUES {
+            push(out, (Origin::Truncated, owner.to_string(), via.clone()));
             return;
         }
         // the bound: what lies further is not known, and the values say so (a set found
@@ -349,7 +485,9 @@ impl LinkIndex {
                 return;
             }
             Origin::Unit { .. } if !path.is_empty() => return,
-            // the field read, outermost struct first (bounded by the origin: not a hop)
+            // the field read, outermost struct first (bounded by the origin: not a hop); of a
+            // static that never changes (`CFG.alg`), what its initializer stores there: that
+            // value, not every value the type holds there
             Origin::Field {
                 adt,
                 field,
@@ -358,30 +496,70 @@ impl LinkIndex {
             } => {
                 let mut p = vec![(adt.clone(), *field, args.clone())];
                 p.extend_from_slice(path);
+                if let Origin::Data { def, .. } = peel(base)
+                    && self.mutable_static(&def.id).is_none()
+                {
+                    let key = (adt.clone(), fields(&p));
+                    let own: Vec<&Stored> = self
+                        .fields
+                        .get(&key)
+                        .into_iter()
+                        .flatten()
+                        .filter(|s| {
+                            rcbom_facts::owner_static(&s.func).is_some_and(|(_, id)| id == def.id)
+                        })
+                        .collect();
+                    if !own.is_empty() {
+                        for s in own {
+                            self.resolve(&s.value, &[], &s.func, depth + 1, via, out);
+                        }
+                        return;
+                    }
+                }
                 return self.resolve(base, &p, owner, depth, via, out);
             }
             // what a function the program calls leaves behind the parameter (`set_slot(&mut
             // c.alg)`), its parameters being the call's arguments: its value on entry is the
             // value before the call (argument `index`); a function that records no write
-            // leaves that value as it was (`touch(&mut d)`)
+            // leaves that value as it was (`touch(&mut d)`). A trait method called on a trait
+            // object or a type parameter: what each implementation it may run leaves there.
             Origin::Written {
                 callee,
                 index,
                 args,
+                self_ty,
             } => {
                 let mut found = Vec::new();
-                let by = via.then(Via::Object(callee.clone()));
-                match self.writes.get(&(callee.clone(), *index)) {
-                    Some(ws) => {
-                        for w in ws {
-                            let v = substitute(w, args);
-                            self.resolve(&v, path, owner, depth + 1, &by, &mut found);
+                let before = |found: &mut Found, via: &Via| {
+                    if let Some(b) = args.get(*index) {
+                        self.resolve(b, path, owner, depth + 1, via, found);
+                    }
+                };
+                let bodies = match self_ty.as_deref() {
+                    Some(t) => self.implementations(callee, t),
+                    None => Some(vec![(
+                        callee.clone(),
+                        via.then(Via::Object(callee.clone())),
+                    )]),
+                };
+                match bodies {
+                    Some(bodies) => {
+                        for (f, by) in bodies {
+                            match self.writes.get(&(f, *index)) {
+                                Some(ws) => {
+                                    for w in ws {
+                                        let v = substitute(w, args);
+                                        self.resolve(&v, path, owner, depth + 1, &by, &mut found);
+                                    }
+                                }
+                                None => before(&mut found, &by),
+                            }
                         }
                     }
+                    // implementations not known: the value before, and an unknown beside it
                     None => {
-                        if let Some(before) = args.get(*index) {
-                            self.resolve(before, path, owner, depth + 1, via, &mut found);
-                        }
+                        before(&mut found, via);
+                        push(&mut found, (o.clone(), owner.to_string(), via.clone()));
                     }
                 }
                 found.into_iter().for_each(|v| push(out, v));
@@ -428,6 +606,17 @@ impl LinkIndex {
                     let mut unknown = false;
                     for (caller, args) in callers {
                         let mut found = Vec::new();
+                        // a caller passing on what is being resolved (`rec(a, n - 1)` inside
+                        // `rec`): a cycle, which adds nothing and leaves nothing unknown
+                        if let Some(a) = args.get(*index)
+                            && self.active.borrow().contains(&(
+                                a.clone(),
+                                path.to_vec(),
+                                caller.clone(),
+                            ))
+                        {
+                            continue;
+                        }
                         if let Some(a) = args.get(*index) {
                             let by = via.then(Via::Caller(caller.clone()));
                             self.resolve(a, path, caller, depth + 1, &by, &mut found);
@@ -443,6 +632,15 @@ impl LinkIndex {
             // a call of the program's own function: what it returns, the part read first; a
             // trait method's call (`r._err()` on a `Result`), what the implementation for the
             // `Self` type it names returns
+            Origin::Call {
+                self_ty: Some(t), ..
+            } if t.starts_with("dyn ") => {
+                let (found, all) = self.dispatch(o, &t["dyn ".len()..], path, owner, depth, via);
+                found.into_iter().for_each(|v| push(out, v));
+                if all {
+                    return;
+                }
+            }
             Origin::Call {
                 callee,
                 args,
@@ -482,6 +680,117 @@ impl LinkIndex {
         }
     }
 
+    /// The bodies a call of trait method `callee` may run, dispatched as `self_ty` says (`dyn
+    /// <trait>`: the types coerced to the trait object; `impl <trait>`: every implementation
+    /// the program records a write for, and the trait's default body), each with how it
+    /// reaches the read; `None` when none is known.
+    fn implementations(&self, callee: &str, self_ty: &str) -> Option<Vec<(String, Via)>> {
+        let (tr, method) = callee.rsplit_once("::")?;
+        let mut out = Vec::new();
+        if let Some(t) = self_ty.strip_prefix("dyn ") {
+            let types = self.coerced.get(t)?;
+            for (ty, at, defaults) in types {
+                let name = if defaults.iter().any(|d| d == callee) {
+                    callee.to_string()
+                } else {
+                    let own = format!("<{ty} as {tr}>::{method}");
+                    let key = rcbom_facts::impl_key(callee, ty);
+                    if self.writes.keys().any(|(f, _)| *f == key) {
+                        key
+                    } else {
+                        own
+                    }
+                };
+                let via = Via::Dyn {
+                    trait_path: t.to_string(),
+                    ty: ty.clone(),
+                    at: at.clone(),
+                    only: types.len() == 1,
+                };
+                out.push((name, via));
+            }
+        } else {
+            let suffix = format!(" as {tr}>::{method}");
+            let mut names: Vec<String> = self
+                .writes
+                .keys()
+                .filter(|(f, _)| f.starts_with('<') && f.ends_with(&suffix))
+                .map(|(f, _)| f.clone())
+                .collect();
+            names.sort();
+            names.dedup();
+            if self.writes.keys().any(|(f, _)| f == callee) {
+                names.push(callee.to_string());
+            }
+            out.extend(names.into_iter().map(|n| (n.clone(), Via::Impl(n))));
+        }
+        (!out.is_empty()).then_some(out)
+    }
+
+    /// A call of a trait method on a trait object of `trait_path`: what the implementations of
+    /// the types the walked code coerces to it return (a member each, labelled with its
+    /// coercion), and whether that is all. It is not when no type is coerced, or a type's
+    /// implementation (or the trait's default body it runs) records no result: the call stays
+    /// among the values.
+    fn dispatch(
+        &self,
+        o: &Origin,
+        trait_path: &str,
+        path: &FieldPath,
+        owner: &str,
+        depth: usize,
+        via: &Via,
+    ) -> (Found, bool) {
+        let mut out = Vec::new();
+        let Origin::Call { callee, args, .. } = o else {
+            return (out, false);
+        };
+        let Some(types) = self.coerced.get(trait_path) else {
+            return (out, false);
+        };
+        let mut all = true;
+        for (ty, at, defaults) in types {
+            // the type's own method (by its type's path, or its path as an impl's item for a
+            // type that is no ADT: `<u8 as app::Pick>::alg`), or the trait's default body it
+            // runs
+            let names = if defaults.contains(callee) {
+                vec![callee.clone()]
+            } else {
+                let (tr, method) = callee.rsplit_once("::").unwrap_or(("", callee));
+                vec![
+                    rcbom_facts::impl_key(callee, ty),
+                    format!("<{ty} as {tr}>::{method}"),
+                ]
+            };
+            let Some((name, k)) = names
+                .iter()
+                .flat_map(|n| (0..=path.len()).rev().map(move |k| (n, k)))
+                .find(|(n, k)| {
+                    self.returns
+                        .contains_key(&((*n).clone(), fields(&path[..*k])))
+                })
+                .map(|(n, k)| (n.clone(), k))
+            else {
+                all = false;
+                continue;
+            };
+            let by = via.then(Via::Dyn {
+                trait_path: trait_path.to_string(),
+                ty: ty.clone(),
+                at: at.clone(),
+                only: types.len() == 1,
+            });
+            let mut found = Vec::new();
+            for r in &self.returns[&(name, fields(&path[..k]))] {
+                let v = substitute(r, args);
+                self.resolve(&v, &path[k..], owner, depth + 1, &by, &mut found);
+            }
+            all &= !found.is_empty();
+            found.into_iter().for_each(|v| push(&mut out, v));
+        }
+        (out, all)
+    }
+
     /// The values the program stores in the fields of `path`: the stores of the longest part
     /// of the path that has any (`Chacha20Poly1305Aead.0.0` before `AeadAlgorithm.0`), with
     /// those of the shorter parts made through a reference.
@@ -510,6 +819,38 @@ impl LinkIndex {
                 }
             }
         }
+    }
+}
+
+/// Field `field` of struct `adt` in `o`, a value made of parts with writes into its fields (a
+/// function's write summary, `All[before, Set { [1], .. }]`): the value a write to the field
+/// puts there (only those where it is written on every way), the field of the other parts,
+/// nothing from a write to another field.
+fn project(o: &Origin, adt: &str, field: usize, out: &mut Vec<Origin>) {
+    match o {
+        Origin::All(alts) => {
+            let strong = alts.iter().any(|a| {
+                matches!(a, Origin::Set { path, strong: true, .. } if path.first() == Some(&field))
+            });
+            for a in alts {
+                if strong && !matches!(a, Origin::Set { .. }) {
+                    continue;
+                }
+                project(a, adt, field, out);
+            }
+        }
+        Origin::Any(alts) => alts.iter().for_each(|a| project(a, adt, field, out)),
+        Origin::Set { path, value, .. } => match path.as_slice() {
+            [f] if *f == field => out.push((**value).clone()),
+            [f, ..] if *f == field => out.push(o.clone()),
+            _ => {}
+        },
+        _ => out.push(Origin::Field {
+            adt: adt.to_string(),
+            field,
+            base: Box::new(o.clone()),
+            args: None,
+        }),
     }
 }
 
@@ -596,7 +937,8 @@ fn names_param(o: &Origin) -> bool {
     }
 }
 
-/// Adds a value once; reached several ways, it keeps the most specific.
+/// Adds a value once; reached several ways, it keeps the most specific. Past `MAX_VALUES`,
+/// a cut (`Truncated`) stands for the values refused.
 fn push(out: &mut Found, v: (Origin, String, Via)) {
     if let Some(e) = out.iter_mut().find(|e| e.0 == v.0 && e.1 == v.1) {
         if v.2 < e.2 {
@@ -604,6 +946,8 @@ fn push(out: &mut Found, v: (Origin, String, Via)) {
         }
     } else if out.len() < MAX_VALUES {
         out.push(v);
+    } else if !out.iter().any(|e| matches!(e.0, Origin::Truncated)) {
+        out.push((Origin::Truncated, v.1, v.2));
     }
 }
 
@@ -629,10 +973,12 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             callee,
             index,
             args: inner,
+            self_ty,
         } => Origin::Written {
             callee: callee.clone(),
             index: *index,
             args: inner.iter().map(|a| substitute(a, args)).collect(),
+            self_ty: self_ty.clone(),
         },
         Origin::Call {
             callee,

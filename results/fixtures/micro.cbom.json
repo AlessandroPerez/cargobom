@@ -1078,6 +1078,13 @@
             "symbol": "ring::digest::SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
@@ -1102,7 +1109,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -1110,7 +1117,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -1196,6 +1203,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
@@ -1227,57 +1241,6 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm unresolved: `micro::DIGESTS`, which leads to no single algorithm; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
-            "line": 71,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
           "value": "observed"
         },
         {
@@ -1285,12 +1248,8 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -1483,8 +1442,7 @@
         "crypto:algorithm:AES-256-GCM",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1550,10 +1508,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:candidate:sha1@0.10.7:SHA-1"
     }
   ],
@@ -1615,7 +1569,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f462cf47-b7b1-8e01-a4f3-aadf3810065a",
+  "serialNumber": "urn:uuid:bdfb5eb1-5432-89c4-b0d2-fce62d8897a2",
   "specVersion": "1.7",
   "version": 1
 }

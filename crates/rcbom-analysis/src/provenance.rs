@@ -261,9 +261,17 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 ),
             ));
         }
-        // a field of a value from elsewhere: as for that value (a parameter's field is the
-        // parameter's)
-        Origin::Field { base, .. } => classify(kb, links, base, depth + 1, out),
+        // a field of a value a method wrote or fields were written into: what is in that field
+        // (`self.key` after a method replaced it, not the counter beside it); of any other
+        // value, as for that value (a parameter's field is the parameter's)
+        Origin::Field {
+            adt, field, base, ..
+        } => match links.field_parts(crate::links::peel(base), adt, *field) {
+            Some(parts) => parts
+                .iter()
+                .for_each(|p| classify(kb, links, p, depth + 1, out)),
+            None => classify(kb, links, base, depth + 1, out),
+        },
         Origin::Param { index, owner } => {
             out.insert(class(
                 "parameter",
@@ -542,9 +550,22 @@ fn without_length(c: Class) -> Class {
 fn empty_container(o: &Origin) -> bool {
     matches!(o, Origin::Call { callee, krate, .. }
         if matches!(krate.as_str(), "core" | "std" | "alloc")
-            && ["String::new", "String::with_capacity", "Vec::new", "Vec::with_capacity"]
-                .iter()
-                .any(|m| strip_generics(callee).ends_with(m)))
+            && [
+                "String::new",
+                "String::with_capacity",
+                "Vec::new",
+                "Vec::with_capacity",
+                "VecDeque::new",
+                "VecDeque::with_capacity",
+                "HashMap::new",
+                "HashMap::with_capacity",
+                "BTreeMap::new",
+                "HashSet::new",
+                "HashSet::with_capacity",
+                "BTreeSet::new",
+            ]
+            .iter()
+            .any(|m| strip_generics(callee).ends_with(m)))
 }
 
 /// Does the value depend on its own earlier value (a loop's `Origin::Loop` inside it)?
@@ -760,11 +781,11 @@ fn elsewhere(
     owner: &str,
     receiver: bool,
     seen: &mut Seen,
-) -> Vec<(Origin, String)> {
+) -> Vec<(Origin, String, crate::links::Via)> {
     if !seen.insert((receiver, o.clone(), owner.to_string())) {
         return Vec::new();
     }
-    ix.values(o, owner).unwrap_or_default()
+    ix.values_via(o, owner).unwrap_or_default()
 }
 
 fn direct_data(
@@ -831,8 +852,10 @@ fn direct_data(
             if let Some((ix, owner)) = links {
                 // a value from elsewhere, read in its own function: what it names there is
                 // followed too (a key pair stored by `start`, built from `self.alg`)
-                for (v, w) in elsewhere(ix, o, owner, false, seen) {
-                    direct_data(kb, Some((ix, &w)), &v, depth + 1, out, seen);
+                for (v, w, by) in elsewhere(ix, o, owner, false, seen) {
+                    ix.with_via(ix.current_via().then(by), || {
+                        direct_data(kb, Some((ix, &w)), &v, depth + 1, out, seen)
+                    });
                 }
             }
         }
@@ -841,7 +864,7 @@ fn direct_data(
 }
 
 /// A standard-library call that stores a value in a container (`Vec::push`, `HashMap::insert`).
-fn container_store(callee: &str) -> bool {
+pub(crate) fn container_store(callee: &str) -> bool {
     const STORES: &[&str] = &[
         "Vec::push",
         "Vec::insert",
@@ -911,9 +934,11 @@ fn receiver_data(
     if from_elsewhere(kb, links.map(|(ix, _)| ix), o)
         && let Some((ix, owner)) = links
     {
-        for (v, w) in elsewhere(ix, o, owner, true, seen) {
+        for (v, w, by) in elsewhere(ix, o, owner, true, seen) {
             if !from_elsewhere(kb, Some(ix), &v) {
-                receiver_data(kb, Some((ix, &w)), &v, depth + 1, out, seen, lengths);
+                ix.with_via(ix.current_via().then(by), || {
+                    receiver_data(kb, Some((ix, &w)), &v, depth + 1, out, seen, lengths)
+                });
             }
         }
         return;

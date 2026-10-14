@@ -26,14 +26,13 @@
    "correct": 3
   },
   "container": {
-   "correct": 11,
-   "honest-unknown": 2
+   "correct": 13
   },
   "crates": {
    "correct": 2
   },
   "dyn": {
-   "honest-unknown": 8
+   "correct": 8
   },
   "field": {
    "correct": 7,
@@ -64,10 +63,10 @@
    "correct": 2
   },
   "table-const": {
-   "honest-unknown": 1
+   "correct": 1
   },
   "table-runtime": {
-   "honest-unknown": 1
+   "correct": 1
   },
   "thread": {
    "correct": 1
@@ -75,23 +74,20 @@
  },
  "by_what": {
   "aead": {
-   "correct": 11,
-   "honest-unknown": 1
+   "correct": 12
   },
   "cipher": {
    "correct": 3
   },
   "hash": {
-   "correct": 22,
-   "honest-unknown": 4
+   "correct": 25,
+   "honest-unknown": 1
   },
   "jwt": {
-   "correct": 9,
-   "honest-unknown": 4
+   "correct": 13
   },
   "kdf": {
-   "correct": 9,
-   "honest-unknown": 1
+   "correct": 10
   },
   "kem": {
    "correct": 3
@@ -113,26 +109,12 @@
    "correct": 4
   },
   "sig": {
-   "correct": 12,
-   "honest-unknown": 3,
+   "correct": 15,
    "less-specific": 2
   }
  },
  "function_mismatches": [],
  "not_correct": [
-  {
-   "callee": "seal_in_place_append_tag",
-   "line": 27,
-   "may": [],
-   "must": [
-    "ChaCha20-Poly1305"
-   ],
-   "program": "aead-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
   {
    "callee": "digest",
    "line": 6,
@@ -142,125 +124,6 @@
     "SHA-256"
    ],
    "program": "hash-closure",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "digest",
-   "line": 22,
-   "may": [
-    "SHA-1"
-   ],
-   "must": [
-    "SHA-384"
-   ],
-   "program": "hash-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "digest",
-   "line": 6,
-   "may": [
-    "SHA-1"
-   ],
-   "must": [
-    "SHA-512/256"
-   ],
-   "program": "hash-table-const",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "digest",
-   "line": 7,
-   "may": [
-    "SHA-512"
-   ],
-   "must": [
-    "SHA-256",
-    "SHA-384"
-   ],
-   "program": "hash-table-runtime",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "encode",
-   "line": 13,
-   "may": [
-    "HMAC-SHA-256"
-   ],
-   "must": [
-    "HMAC-SHA-512"
-   ],
-   "program": "jwt-container",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "decode",
-   "line": 18,
-   "may": [
-    "HMAC-SHA-256"
-   ],
-   "must": [
-    "HMAC-SHA-512"
-   ],
-   "program": "jwt-container",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "encode",
-   "line": 22,
-   "may": [],
-   "must": [
-    "RSA-PKCS1-1.5-SHA-256",
-    "RSA-PSS-SHA-256"
-   ],
-   "program": "jwt-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "decode",
-   "line": 24,
-   "may": [],
-   "must": [
-    "RSA-PKCS1-1.5-SHA-256",
-    "RSA-PSS-SHA-256"
-   ],
-   "program": "jwt-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "derive",
-   "line": 24,
-   "may": [
-    "PBKDF2-SHA-512"
-   ],
-   "must": [
-    "PBKDF2-SHA-256"
-   ],
-   "program": "kdf-dyn",
    "reported": [
     "unknown"
    ],
@@ -278,45 +141,6 @@
     "Argon2"
    ],
    "verdict": "less-specific"
-  },
-  {
-   "callee": "generate_pkcs8",
-   "line": 24,
-   "may": [],
-   "must": [
-    "ECDSA-P-384-SHA-384"
-   ],
-   "program": "sig-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "sign",
-   "line": 27,
-   "may": [],
-   "must": [
-    "ECDSA-P-384-SHA-384"
-   ],
-   "program": "sig-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
-  },
-  {
-   "callee": "verify",
-   "line": 29,
-   "may": [],
-   "must": [
-    "ECDSA-P-384-SHA-384"
-   ],
-   "program": "sig-dyn",
-   "reported": [
-    "unknown"
-   ],
-   "verdict": "honest-unknown"
   },
   {
    "callee": "sign",
@@ -348,8 +172,8 @@
  "sites": 107,
  "unlabelled_uses": 4,
  "verdicts": {
-  "correct": 91,
-  "honest-unknown": 13,
+  "correct": 103,
+  "honest-unknown": 1,
   "less-specific": 3,
   "miss": 0,
   "wrong": 0

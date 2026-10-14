@@ -70,7 +70,7 @@ pub(crate) fn resolve(
                         .unwrap_or_else(|| vec![(origin.clone(), s.owner.path.clone())]);
                     let mut named = Vec::new();
                     for (v, _) in &found {
-                        functions(v, &in_statics, &mut named);
+                        functions(v, &in_statics, flow, 0, &mut named);
                     }
                     named.sort();
                     named.dedup();
@@ -116,13 +116,21 @@ pub(crate) fn resolve(
 }
 
 /// The functions named as values that `o` can be: (where named, defining path); through the
-/// standard library's containers and wrappers (`vec![f][0]`, `Some(f)`), and statics holding
-/// one (`static H: fn(..) = digest::digest`).
+/// standard library's containers and wrappers (`vec![f][0]`, `Some(f)`), what a closure
+/// returns (`(|| digest::digest as HashFn)()`), and statics holding one (`static H: fn(..) =
+/// digest::digest`, the program's `static MY: HashFn = my`, `static B: &HashFn = &A`).
 fn functions(
     o: &Origin,
     in_statics: &HashMap<&str, Vec<(Loc, String)>>,
+    flow: &LinkIndex,
+    depth: usize,
     out: &mut Vec<(Loc, String)>,
 ) {
+    if depth > 8 {
+        return;
+    }
+    let go =
+        |o: &Origin, out: &mut Vec<(Loc, String)>| functions(o, in_statics, flow, depth + 1, out);
     match o {
         Origin::Unit {
             path,
@@ -131,13 +139,18 @@ fn functions(
         } => out.push((at.clone(), path.clone())),
         Origin::Any(alts) | Origin::All(alts) => {
             for a in alts {
-                functions(a, in_statics, out);
+                go(a, out);
             }
         }
-        Origin::Set { value, .. } => functions(value, in_statics, out),
+        Origin::Set { value, .. } => go(value, out),
+        Origin::Call { callee, args, .. } if callee == "<closure>" => {
+            for a in args {
+                go(a, out);
+            }
+        }
         Origin::Call { krate, args, .. } if matches!(krate.as_str(), "core" | "std" | "alloc") => {
             for a in args {
-                functions(a, in_statics, out);
+                go(a, out);
             }
         }
         Origin::Data { def, .. } => {
@@ -148,6 +161,9 @@ fn functions(
                     .flatten()
                     .cloned(),
             );
+            for v in flow.static_values(&def.id) {
+                go(v, out);
+            }
         }
         _ => {}
     }

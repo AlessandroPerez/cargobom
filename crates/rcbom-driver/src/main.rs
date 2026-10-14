@@ -38,7 +38,7 @@ mod links;
 mod origins;
 mod statics;
 
-use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::{Path, PathBuf};
 use std::process::{Command, exit};
@@ -52,8 +52,8 @@ use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::mono::{Instance, InstanceKind};
 use rustc_public::mir::visit::{Location, MirVisitor};
 use rustc_public::mir::{
-    Body, CastKind, ConstOperand, Operand, PointerCoercion, Rvalue, StatementKind, Terminator,
-    TerminatorKind,
+    AggregateKind, Body, CastKind, ConstOperand, Operand, PointerCoercion, Rvalue, StatementKind,
+    Terminator, TerminatorKind,
 };
 use rustc_public::rustc_internal;
 use rustc_public::ty::{
@@ -433,6 +433,16 @@ fn analyze(tcx: TyCtxt<'_>) {
     let reach = (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
         let mut w = Walker::new(&mut cx);
         let mut r = w.run(roots, static_roots);
+        let coercions = std::mem::take(&mut w.coercions);
+        w.cx.links.coercions = coercions
+            .into_iter()
+            .map(|((trait_path, ty), (at, defaults))| rcbom_facts::Coercion {
+                trait_path,
+                ty,
+                at,
+                defaults,
+            })
+            .collect();
         sites.extend(w.sites);
         r.fns.extend(generic);
         r.fns.sort();
@@ -1637,6 +1647,56 @@ impl Scanner<'_, '_> {
     }
 }
 
+/// A call of `Fn::call`, `FnMut::call_mut` or `FnOnce::call_once` on a trait object (`dyn
+/// Fn(..)`, behind a reference or a `Box`).
+fn dyn_fn_call(
+    tcx: TyCtxt<'_>,
+    def: &rustc_public::ty::FnDef,
+    args: &rustc_public::ty::GenericArgs,
+) -> bool {
+    fn dynamic(t: &Ty, depth: usize) -> bool {
+        match t.kind().rigid() {
+            Some(RigidTy::Dynamic(..)) => true,
+            Some(RigidTy::Ref(_, t, _)) if depth < 4 => dynamic(t, depth + 1),
+            Some(RigidTy::Adt(adt, a)) if depth < 4 && adt.is_box() => match a.0.first() {
+                Some(GenericArgKind::Type(t)) => dynamic(t, depth + 1),
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+    let did = rustc_internal::internal(tcx, def.def_id());
+    let path = path_of(tcx, did);
+    matches!(
+        path.as_str(),
+        "core::ops::function::Fn::call"
+            | "core::ops::function::FnMut::call_mut"
+            | "core::ops::function::FnOnce::call_once"
+    ) && matches!(args.0.first(), Some(GenericArgKind::Type(t)) if dynamic(t, 0))
+}
+
+/// The operands a tuple argument was built from (`(a, b)` passed to `Fn::call`), when the body
+/// builds it in one statement.
+fn untuple(body: &Body, tuple: &Operand) -> Option<Vec<Operand>> {
+    let (Operand::Copy(p) | Operand::Move(p)) = tuple else {
+        return None;
+    };
+    if !p.projection.is_empty() {
+        return None;
+    }
+    body.blocks
+        .iter()
+        .flat_map(|b| &b.statements)
+        .find_map(|st| match &st.kind {
+            StatementKind::Assign(lhs, Rvalue::Aggregate(AggregateKind::Tuple, ops))
+                if lhs.local == p.local && lhs.projection.is_empty() =>
+            {
+                Some(ops.clone())
+            }
+            _ => None,
+        })
+}
+
 impl Scanner<'_, '_> {
     fn scan_terminator(&mut self, term: &Terminator, loc: Location) {
         if let TerminatorKind::Call {
@@ -1690,6 +1750,32 @@ impl Scanner<'_, '_> {
                         callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span))
                 {
                     let (const_args, arg_origins, arg_lens) = self.call_values(call_args, term);
+                    self.push_internal(
+                        call,
+                        Target::Pointer {
+                            origin,
+                            const_args,
+                            arg_origins,
+                            arg_lens,
+                        },
+                    );
+                }
+            } else if let Ok(ty) = func.ty(self.body.locals())
+                && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
+                && dyn_fn_call(self.cx.tcx, def, args)
+                && let [recv, tuple] = call_args.as_slice()
+                && let Some(untupled) = untuple(self.body, tuple)
+            {
+                // a call through a closure or function boxed as a trait object (`b(&SHA1, d)`
+                // with `b: Box<dyn Fn(..)>`): as through a pointer, the object's origin and the
+                // call's own arguments
+                let origin = self.origins.of_arg(recv, term);
+                let tcx = self.cx.tcx;
+                if !matches!(origin, Origin::Unknown | Origin::Truncated)
+                    && let Some(call) =
+                        callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span))
+                {
+                    let (const_args, arg_origins, arg_lens) = self.call_values(&untupled, term);
                     self.push_internal(
                         call,
                         Target::Pointer {
@@ -1884,6 +1970,9 @@ struct Walker<'a, 'tcx> {
     fns: Vec<String>,
     /// Defining paths of the walked functions.
     paths: Vec<String>,
+    /// Types coerced to trait objects in the walked code: first position seen, and the
+    /// methods for which the type runs the trait's default body.
+    coercions: BTreeMap<(String, String), (Option<Loc>, Vec<String>)>,
     limit: usize,
 }
 
@@ -1907,6 +1996,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             sites: Vec::new(),
             fns: Vec::new(),
             paths: Vec::new(),
+            coercions: BTreeMap::new(),
             limit,
         }
     }
@@ -2036,7 +2126,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         };
         let mut found = Vec::new();
         let mut nested = Vec::new();
-        alloc_callees(tcx, &a, &mut found, &mut nested, 0);
+        alloc_callees(tcx, &a, &mut found, &mut nested, &mut Vec::new(), 0);
         for i in found {
             self.enqueue_usage(i);
         }
@@ -2107,12 +2197,17 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             tcx: self.cx.tcx,
             body: &body,
             found: Vec::new(),
+            coerced: Vec::new(),
             cur: None,
             unconvertible: has_unconvertible(self.cx.tcx, &body),
             errors: 0,
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
+        for (c, span) in std::mem::take(&mut edges.coerced) {
+            let at = locate_stable(self.cx.tcx, span).0;
+            self.coerced(c, (at.line > 0).then_some(at));
+        }
         // RCBOM_DEBUG_WALK=<substring>: print the edges out of matching instances
         let debug = std::env::var("RCBOM_DEBUG_WALK")
             .ok()
@@ -2213,6 +2308,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
     }
 
+    /// A type is coerced to a trait object (at `at`, when in a function's body).
+    fn coerced(&mut self, (trait_path, ty, defaults): Coerced, at: Option<Loc>) {
+        self.coercions
+            .entry((trait_path, ty))
+            .or_insert((at, defaults));
+    }
+
     /// A static is reached: remember it, and walk the function pointers and vtables in its
     /// value (rustls keeps its providers as `&dyn` objects inside statics).
     fn reach_static(&mut self, did: rustc_span::def_id::DefId) {
@@ -2242,7 +2344,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         };
         let mut found = Vec::new();
         let mut nested = Vec::new();
-        alloc_callees(tcx, &a, &mut found, &mut nested, 0);
+        let mut coerced = Vec::new();
+        alloc_callees(tcx, &a, &mut found, &mut nested, &mut coerced, 0);
+        for c in coerced {
+            self.coerced(c, None);
+        }
         for i in found {
             self.enqueue(i, None);
         }
@@ -2269,6 +2375,8 @@ struct Edges<'a, 'tcx> {
     tcx: TyCtxt<'tcx>,
     body: &'a Body,
     found: Vec<(Instance, Span)>,
+    /// Types coerced to a trait object, and where.
+    coerced: Vec<(Coerced, Span)>,
     /// Span of the statement being visited, for casts.
     cur: Option<Span>,
     /// As in `Scanner`: the body holds an `async` closure; panics that are bugs.
@@ -2375,6 +2483,13 @@ impl Edges<'_, '_> {
                     }
                     CastKind::PointerCoercion(PointerCoercion::Unsize) => {
                         if let Some((concrete, dynamic)) = unsize_tails(&src, target) {
+                            let c = rustc_internal::internal(self.tcx, concrete);
+                            if let rustc_middle::ty::Dynamic(preds, ..) =
+                                rustc_internal::internal(self.tcx, dynamic).kind()
+                                && let Some(c) = coercion(self.tcx, c, preds)
+                            {
+                                self.coerced.push((c, span));
+                            }
                             for i in vtable_methods(self.tcx, concrete, dynamic) {
                                 self.found.push((i, span));
                             }
@@ -2390,8 +2505,11 @@ impl Edges<'_, '_> {
     fn edges_of_const(&mut self, c: &ConstOperand, loc: Location) {
         if let ConstantKind::Allocated(a) = c.const_.kind() {
             let mut found = Vec::new();
-            alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), 0);
+            let mut coerced = Vec::new();
+            alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), &mut coerced, 0);
             self.found.extend(found.into_iter().map(|i| (i, c.span)));
+            self.coerced
+                .extend(coerced.into_iter().map(|x| (x, c.span)));
         }
         self.super_const_operand(c, loc);
     }
@@ -2403,6 +2521,7 @@ fn alloc_callees(
     a: &Allocation,
     found: &mut Vec<Instance>,
     statics: &mut Vec<rustc_public::mir::mono::StaticDef>,
+    coerced: &mut Vec<Coerced>,
     depth: usize,
 ) {
     if depth > 8 {
@@ -2411,7 +2530,7 @@ fn alloc_callees(
     for (_, prov) in &a.provenance.ptrs {
         match GlobalAlloc::from(prov.0) {
             GlobalAlloc::Function(i) => found.push(i),
-            GlobalAlloc::Memory(m) => alloc_callees(tcx, &m, found, statics, depth + 1),
+            GlobalAlloc::Memory(m) => alloc_callees(tcx, &m, found, statics, coerced, depth + 1),
             GlobalAlloc::Static(s) => statics.push(s),
             GlobalAlloc::VTable(..) => {
                 let id = rustc_internal::internal(tcx, prov.0);
@@ -2419,6 +2538,7 @@ fn alloc_callees(
                     tcx.global_alloc(id)
                 {
                     // as for an unsizing coercion: the methods and the type's drop glue
+                    coerced.extend(coercion(tcx, ty, preds));
                     found.extend(vtable_methods_internal(tcx, ty, preds));
                     found.push(Instance::resolve_drop_in_place(rustc_internal::stable(ty)));
                 }
@@ -2448,6 +2568,53 @@ fn unsize_tails(src: &Ty, dst: &Ty) -> Option<(Ty, Ty)> {
             }),
         _ => None,
     }
+}
+
+/// A type coerced to a trait object: the trait's path, the type's, and the trait methods for
+/// which the type's vtable holds the trait's default body.
+type Coerced = (String, String, Vec<String>);
+
+/// A coercion of `concrete` to a trait object with predicates `preds`: the trait's path, the
+/// type's (an ADT's defining path, as `Links` names a method's `Self` type; `dyn` and the
+/// trait of another trait object; any other type as rustc prints it), and the methods it does
+/// not override.
+fn coercion<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    concrete: rustc_middle::ty::Ty<'tcx>,
+    preds: &'tcx rustc_middle::ty::List<rustc_middle::ty::PolyExistentialPredicate<'tcx>>,
+) -> Option<Coerced> {
+    let t = path_of(tcx, preds.principal_def_id()?);
+    let ty = match concrete.kind() {
+        rustc_middle::ty::Adt(adt, _) => path_of(tcx, adt.did()),
+        // an upcast (`&dyn Sub` to `&dyn Super`): the types coerced to `Sub`; none for the
+        // same trait (a reborrow)
+        rustc_middle::ty::Dynamic(p, ..) => {
+            let sub = path_of(tcx, p.principal_def_id()?);
+            if sub == t {
+                return None;
+            }
+            format!("dyn {sub}")
+        }
+        _ => concrete.to_string(),
+    };
+    // the vtable's methods that are the trait's own items (default bodies), not an impl's
+    let defaults = if concrete.is_trait() {
+        Vec::new()
+    } else {
+        let principal = preds.principal()?;
+        let trait_ref = principal.with_self_ty(tcx, concrete);
+        let trait_ref = tcx.instantiate_bound_regions_with_erased(trait_ref);
+        tcx.vtable_entries(trait_ref)
+            .iter()
+            .filter_map(|e| match e {
+                rustc_middle::ty::VtblEntry::Method(i) => Some(i.def_id()),
+                _ => None,
+            })
+            .filter(|&d| tcx.trait_of_assoc(d).is_some())
+            .map(|d| path_of(tcx, d))
+            .collect()
+    };
+    Some((t, ty, defaults))
 }
 
 fn vtable_methods(tcx: TyCtxt<'_>, concrete: Ty, dynamic: Ty) -> Vec<Instance> {

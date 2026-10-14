@@ -21,12 +21,18 @@ use crate::{Ctx, Kind, SiteMatch, UNKNOWN, unresolved_reason};
 #[derive(Default)]
 struct Found {
     names: BTreeMap<String, Via>,
+    /// Every way each variant was found.
+    ways: BTreeMap<String, BTreeSet<Via>>,
     unresolved: Vec<String>,
 }
 
 impl Found {
     /// A variant found; found several ways, it keeps the most specific.
     fn add(&mut self, name: String, via: &Via) {
+        self.ways
+            .entry(name.clone())
+            .or_default()
+            .insert(via.clone());
         let e = self.names.entry(name).or_insert_with(|| via.clone());
         if *via < *e {
             *e = via.clone();
@@ -34,8 +40,31 @@ impl Found {
     }
 }
 
+/// Does a member found this way reach the call at run time: not only through a function no
+/// entry point reaches, or a static no reachable code or data names?
+fn reached(
+    via: &Via,
+    reachable: &dyn Fn(&str) -> bool,
+    reached_path: &dyn Fn(&str) -> bool,
+) -> bool {
+    // what a function returns into the call's own value is on its way (reached with it); a
+    // caller, or a store into the field anywhere, may be code no entry point reaches
+    match via {
+        Via::Caller(w) | Via::Join(w) => match rcbom_facts::owner_static(w) {
+            Some((_, id)) => reachable(id),
+            None => w.is_empty() || w.contains(" for ") || reached_path(w),
+        },
+        _ => true,
+    }
+}
+
 /// The occurrences of a call a boundary model describes; `None` when none does.
-pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>> {
+pub(crate) fn site_matches(
+    ctx: &Ctx<'_>,
+    site: &Site,
+    reachable: &dyn Fn(&str) -> bool,
+    reached_path: &dyn Fn(&str) -> bool,
+) -> Option<Vec<SiteMatch>> {
     let Target::Call {
         callee,
         arg_origins,
@@ -78,12 +107,39 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
                     .is_none_or(|f| key.names.contains_key(f))
             };
             let before = found.names.len();
+            // a variant of another family than the key's put in the list beside the others
+            // (`v.algorithms.push(HS256)` after `Validation::new(RS256)`, `vec![RS256, HS256]`),
+            // not an alternative to them: jsonwebtoken refuses the call when it is there, so
+            // which of the others it verifies with, if any, is not known
+            let refused: Vec<String> = found
+                .names
+                .keys()
+                .filter(|n| {
+                    !allowed(n)
+                        && found
+                            .ways
+                            .get(*n)
+                            .is_some_and(|w| w.iter().any(|v| matches!(v, Via::Container(_))))
+                })
+                .cloned()
+                .collect();
             found.names.retain(|n, _| allowed(n));
             possible = all.iter().filter(|n| allowed(n)).count();
             // none the key allows (`Validation::new(HS256)` with an RSA key): jsonwebtoken
             // refuses the token before any verification
             if before > 0 && found.names.is_empty() && found.unresolved.is_empty() {
                 return Some(Vec::new());
+            }
+            if !refused.is_empty() && !found.names.is_empty() {
+                found.unresolved.push(format!(
+                    "{what} may list {}, of another family than the key's ({}): jsonwebtoken \
+                     then refuses the token before any verification, else it verifies with one \
+                     of {}",
+                    refused.join(", "),
+                    key.names.keys().cloned().collect::<Vec<_>>().join(", "),
+                    found.names.keys().cloned().collect::<Vec<_>>().join(", ")
+                ));
+                found.names.clear();
             }
             detail.push(format!(
                 "the key's family ({}) allows these",
@@ -93,9 +149,53 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
     }
     let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
     let symbol = callee.path.clone();
-    let n = found.names.len();
+    // a member found only through code or data no entry point reaches (a header a function
+    // never called builds, a static nothing uses) does not reach the call: shown, not counted
+    let ways = std::mem::take(&mut found.ways);
+    let live = |name: &str| {
+        ways.get(name)
+            .is_none_or(|w| w.iter().any(|v| reached(v, reachable, reached_path)))
+    };
+    // the witness shown: one that reaches the call, the most specific, and of those one of the
+    // program's functions before the modelled crate's own (`translate_algorithm`, the choice
+    // the program makes, not `Validation::new`, which passes it on)
+    let own = format!("{}::", b.krate);
+    let modelled = |v: &Via| match v {
+        Via::Caller(f) | Via::Object(f) | Via::Join(f) => f.starts_with(&own),
+        _ => false,
+    };
+    for (name, via) in found.names.iter_mut() {
+        if let Some(best) = ways.get(name).and_then(|w| {
+            w.iter()
+                .filter(|v| reached(v, reachable, reached_path))
+                .min_by_key(|v| (v.rank(), modelled(v), (*v).clone()))
+        }) {
+            *via = best.clone();
+        }
+    }
+    let n = found.names.keys().filter(|n| live(n)).count();
     let mut out = Vec::new();
     for (name, via) in &found.names {
+        if !live(name) {
+            let algo = e.variants[name].algo.clone();
+            let function = ctx
+                .kb
+                .use_of(&b.function, &algo.primitive)
+                .unwrap_or_else(|| b.function.clone());
+            let d = vec![format!(
+                "algorithm from {what} only through code or data no entry point reaches{}",
+                witness_unreached(via)
+            )];
+            out.push((
+                matched(algo, provider.clone()),
+                Kind::Call,
+                Some(function),
+                symbol.clone(),
+                d,
+                true,
+            ));
+            continue;
+        }
         let algo = e.variants[name].algo.clone();
         let function = ctx
             .kb
@@ -103,18 +203,38 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
             .unwrap_or_else(|| b.function.clone());
         // how the variant reaches the call: a choice the program makes at run time, or one of
         // the values it stores in the field anywhere (possible, not shown to reach this call)
+        let one_of = if n > 1 {
+            format!("one of {n} ")
+        } else {
+            String::new()
+        };
         let mut d = vec![match (via, n > 1) {
             (Via::Join(w), _) => format!(
-                "algorithm {}from {what}: possible (type-join: a value `{}` stores in the field)",
-                if n > 1 {
-                    format!("one of {n} ")
-                } else {
-                    String::new()
-                },
+                "algorithm {one_of}from {what}: possible (type-join: a value `{}` stores in the \
+                 field)",
                 short_fn(w)
             ),
-            (_, true) => format!(
+            // a call through a trait object of which several types are made: each type's
+            // value may reach it
+            (Via::Dyn { only: false, .. } | Via::Impl(_), _) => {
+                format!("algorithm {one_of}from {what}: possible{}", witness(via))
+            }
+            // one of the values a container holds, read from it
+            (Via::Container(f), _) => format!(
+                "algorithm {one_of}from {what}: possible (container: a value `{}` puts in it)",
+                short_fn(f)
+            ),
+            // several that a function of the program returns (`translate_algorithm(&cli.alg)`):
+            // it chooses at run time; not the modelled crate's own constructor, which only
+            // passes its argument on (`Header::new(alg)`)
+            (Via::Object(f), true) if !f.starts_with(&format!("{}::", b.krate)) => format!(
                 "algorithm one of {n} chosen at run time (selector: configuration) from {what}{}",
+                witness(via)
+            ),
+            // several the program passes or names itself (callers, a loop over them): each
+            // may reach the call
+            (_, true) => format!(
+                "algorithm one of {n} that may reach the call from {what}{}",
                 witness(via)
             ),
             (_, false) => format!("algorithm from {what}{}", witness(via)),
@@ -159,12 +279,75 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
     Some(out)
 }
 
+/// `member: ..`: how a member of a set found across functions reaches the call, with its
+/// witness (the set label): fixed, caller, object, type-join (possible), through a trait
+/// object, a container or a type parameter's implementations (possible).
+pub(crate) fn member_label(via: &Via) -> String {
+    match via {
+        Via::Fixed => "member: fixed".to_string(),
+        Via::Caller(c) => format!("member: caller, passed by `{}`", short_fn(c)),
+        Via::Object(f) => format!("member: object, from `{}`", short_fn(f)),
+        Via::Join(w) => format!(
+            "member: type-join, possible (a value `{}` stores in the field)",
+            short_fn(w)
+        ),
+        Via::Container(f) => format!(
+            "member: container, possible (a value `{}` puts in it)",
+            short_fn(f)
+        ),
+        Via::Dyn { only, .. } => format!(
+            "member: dyn{}{}",
+            if *only { "" } else { ", possible" },
+            witness(via)
+        ),
+        Via::Impl(f) => format!(
+            "member: impl, possible (what `{}` writes)",
+            strip_generics(f)
+        ),
+    }
+}
+
+/// ` (stored by static `X`)`, ` (stored by `f`)`: the code or data no entry point reaches that
+/// a member comes through.
+fn witness_unreached(via: &Via) -> String {
+    match via {
+        Via::Caller(w) => format!(" (passed by `{}`)", short_fn(w)),
+        Via::Join(w) => format!(" (stored by `{}`)", short_fn(w)),
+        _ => String::new(),
+    }
+}
+
 /// `, passed by `caller``, `, from `f``: where a member reaches the call from.
 fn witness(via: &Via) -> String {
     match via {
         Via::Caller(c) => format!(" (caller: passed by `{}`)", short_fn(c)),
         Via::Object(f) => format!(" (object: from `{}`)", short_fn(f)),
-        Via::Fixed | Via::Join(_) => String::new(),
+        Via::Dyn {
+            trait_path,
+            ty,
+            at,
+            only,
+        } => {
+            let at = at
+                .as_ref()
+                .map(|l| format!(" at {}:{}", l.file, l.line))
+                .unwrap_or_else(|| " in a constant".to_string());
+            if *only {
+                format!(
+                    " (dyn: `{}`, the only type coerced to `dyn {}`{at})",
+                    strip_generics(ty),
+                    strip_generics(trait_path)
+                )
+            } else {
+                format!(
+                    " (dyn: `{}` is coerced to `dyn {}`{at})",
+                    strip_generics(ty),
+                    strip_generics(trait_path)
+                )
+            }
+        }
+        Via::Impl(f) => format!(" (impl: what `{}` writes)", strip_generics(f)),
+        Via::Fixed | Via::Join(_) | Via::Container(_) => String::new(),
     }
 }
 
@@ -282,7 +465,11 @@ fn members(
 /// (`<Header as Default>::default`, `<Algorithm as Clone>::clone`): that crate's code.
 fn std_call(krate: &str, self_ty: Option<&str>) -> bool {
     let is_std = |k: &str| matches!(k, "core" | "std" | "alloc");
-    is_std(krate) && self_ty.is_none_or(|t| is_std(t.split("::").next().unwrap_or(t)))
+    let self_krate = |t: &str| {
+        let t = t.strip_prefix("dyn ").unwrap_or(t);
+        t.split("::").next().unwrap_or(t).to_string()
+    };
+    is_std(krate) && self_ty.is_none_or(|t| is_std(&self_krate(t)))
 }
 
 enum Base {
@@ -317,6 +504,7 @@ fn struct_bases(
         Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => {}
         Origin::Unit { .. } => {}
         Origin::Call {
+            callee,
             krate,
             self_ty,
             args,
@@ -324,6 +512,17 @@ fn struct_bases(
         } if std_call(krate, self_ty.as_deref()) => {
             for a in args {
                 struct_bases(ctx, a, adt, field, out, depth + 1);
+            }
+            // `hdr().unwrap_or_default()`: the type's default where there is no value
+            if callee.ends_with("::unwrap_or_default") {
+                let default = Origin::Call {
+                    callee: "core::default::Default::default".to_string(),
+                    krate: "core".to_string(),
+                    self_ty: Some(adt.to_string()),
+                    args: Vec::new(),
+                    span: None,
+                };
+                struct_bases(ctx, &default, adt, field, out, depth + 1);
             }
         }
         // the links read the field from what the function returns in it
@@ -423,13 +622,59 @@ fn collect(
         // a standard-library call passes its arguments' values on (`vec![alg]`, `alg.clone()`,
         // `Ok(key).map_err(..)`)
         Origin::Call {
+            callee,
             krate: k,
             self_ty,
             args,
             ..
         } if std_call(k, self_ty.as_deref()) => {
-            for a in args {
-                collect(ctx, a, owner, krate, accept, depth + 1, true, via, out);
+            // a read from a container (`map[kid]`, `v.get(i)`) gives what it holds, not the key
+            let read = ["Index::index", "IndexMut::index_mut", "::get", "::get_mut"]
+                .iter()
+                .any(|m| strip_generics(callee).ends_with(m));
+            let args = if read {
+                &args[..args.len().min(1)]
+            } else {
+                &args[..]
+            };
+            // what a container's method put in it (`map.insert(kid, (HS512, secret))`, the
+            // value, not the key): one of the values it holds, possible at a read of it
+            let store = crate::provenance::container_store(callee);
+            let map = store && strip_generics(callee).ends_with("Map::insert");
+            // the elements of a `vec![a, b]`: each in the list beside the others
+            if callee.contains("into_vec")
+                && let Some(Origin::All(xs)) = args.first()
+            {
+                // (the elements, nested in the box's parts: `All[new_uninit(), All[a, b]]`)
+                fn elements<'o>(xs: &'o [Origin], out: &mut Vec<&'o Origin>) {
+                    for x in xs {
+                        match x {
+                            Origin::All(inner) => elements(inner, out),
+                            Origin::Call { krate, .. } if krate == "alloc" => {}
+                            _ => out.push(x),
+                        }
+                    }
+                }
+                let mut elems = Vec::new();
+                elements(xs, &mut elems);
+                if elems.len() > 1 {
+                    let by = via.then(Via::Container("vec![..]".to_string()));
+                    for x in elems {
+                        collect(ctx, x, owner, krate, accept, depth + 1, true, &by, out);
+                    }
+                    return;
+                }
+            }
+            for (i, a) in args.iter().enumerate() {
+                if map && i == 1 {
+                    continue;
+                }
+                let by = if store && i > 0 {
+                    via.then(Via::Container(strip_generics(callee)))
+                } else {
+                    via.clone()
+                };
+                collect(ctx, a, owner, krate, accept, depth + 1, true, &by, out);
             }
         }
         // more alternatives, or steps, than the search keeps
@@ -450,6 +695,12 @@ fn collect(
         _ => match ctx.flow.values_via(o, owner) {
             Some(vs) if !(vs.len() == 1 && vs[0].0 == *o) => {
                 for (v, w, by) in vs {
+                    // the value itself among others (a call through a trait object, one of
+                    // whose types' results is not followed): not followed
+                    if v == *o && w == owner {
+                        out.unresolved.push(unresolved_reason(o));
+                        continue;
+                    }
                     let by = via.then(by);
                     collect(ctx, &v, &w, krate, accept, depth + 1, in_std, &by, out);
                 }

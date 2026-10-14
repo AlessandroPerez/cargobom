@@ -1,0 +1,113 @@
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:30 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; key: parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:17:15 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:29:41 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in m3::main; line: `let mut k1 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:33:41 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in m3::main; line: `let mut k2 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:37:37 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in m3::main; line: `let k3 = K { key: [9; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:10:90 | ring::aead::algorithm::CHACHA20_POLY1305 | [reachable] [static] in <m3::K as m3::Rekey>::rekey; line: `fn rekey(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:13:99 | ring::aead::algorithm::CHACHA20_POLY1305 | [reachable] [static] in m3::K::rekey_inherent; line: `fn rekey_inherent(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:16:30 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `::rekey`; key: parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:17:15 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:31:31 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `::rekey`; key: computed (m3::arg); line: `let lk1 = LessSafeKey::new(UnboundKey::new(k1.alg, &k1.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:32:16 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 32); line: `let _ = lk1.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:35:31 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; key: computed (m3::arg); line: `let lk2 = LessSafeKey::new(UnboundKey::new(k2.alg, &k2.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:36:16 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; nonce: hard-coded (all zero, 12 bytes, literal at line 36); line: `let _ = lk2.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `m3::main`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:41:15 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in m3::main; line: `mixed(&s, &SHA1, arg(2).len(), &buf);`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:28 | ring::digest::SHA256 | [reachable] [static] in m3::mixed; line: `let a = match n { 0 => &SHA256, 1 => p, 2 => s.alg, _ => pick() };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:20:32 | ring::digest::SHA384 | [reachable] [static] in m3::pick; line: `fn pick() -> &'static Digest { &SHA384 }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m3::pick`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `m3::main`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:40:22 | ring::digest::SHA512 | [reachable] [static] in m3::main; line: `let s = S { alg: &SHA512 };`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via m3 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via m3 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by m3 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=5
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:finding=hard-coded-nonce
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:occurrences=8
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:provenance:key=computed,parameter
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:provenance:nonce=hard-coded
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/m3@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ChaCha20-Poly1305
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/m3@0.1.0
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/m3@0.1.0", "name": "m3", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/m3@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=97
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
