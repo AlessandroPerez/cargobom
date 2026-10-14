@@ -16,6 +16,7 @@
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:21:26 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [reachable] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; line: `let out = signing_key.sign(message);`; code: `sign`
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:10:12 | jsonwebtoken::encoding::encode | [reachable] [call] in a23::main; use: sign; algorithm from `Header.alg`; line: `let _ = encode(&Header::new(Algorithm::EdDSA), &claims, &k1);`; code: `encode`
   occ Ed25519 | crypto:material:private-key:Ed25519 | src/main.rs:9:13 | jsonwebtoken::encoding::EncodingKey::from_ed_pem | [reachable] [call] in a23::main; from_ed_pem: setup, not a use; key: hard-coded (static a23::PEM); line: `let k1 = EncodingKey::from_ed_pem(PEM).unwrap();`; code: `EncodingKey::from_ed_pem`
   occ Ed25519 | crypto:material:public-key:Ed25519 | jsonwebtoken-9.3.1/src/decoding.rs:185:57 | jsonwebtoken::decoding::DecodingKey::from_ed_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`
   occ HMAC | crypto:candidate:hmac@0.12.1:HMAC | Cargo.lock:147:0 | hmac | [manifest] locked hmac 0.12.1; reached via a23 -> hmac
@@ -26,12 +27,14 @@
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:12:12 | jsonwebtoken::encoding::encode | [reachable] [call] in a23::main; use: tag; algorithm from `Header.alg`; line: `let _ = encode(&Header::default(), &claims, &k2);`; code: `encode`
   occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
   occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
   occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
   occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:14:12 | jsonwebtoken::decoding::decode | [reachable] [call] in a23::main; use: verify; algorithm from `Validation.algorithms`; the key's family (Hmac) allows these; line: `let _ = decode::<std::collections::BTreeMap<String, String>>(`; code: `decode::<std::collections::BTreeMap<String, String>>`
   occ RSA | crypto:material:private-key:RSA | jsonwebtoken-9.3.1/src/crypto/rsa.rs:41:19 | ring::rsa::keypair::KeyPair::from_der | [reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`
   occ RSA | crypto:material:public-key:RSA | jsonwebtoken-9.3.1/src/decoding.rs:180:16 | jsonwebtoken::decoding::DecodingKey::from_rsa_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`
   occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
@@ -132,7 +135,7 @@
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
-  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=5
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=6
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:public-key=parameter
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
@@ -170,7 +173,7 @@
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=3
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
   prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
@@ -184,7 +187,7 @@
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=observed
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
-  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=3
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=4
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=parameter
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
   prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
@@ -313,7 +316,7 @@ asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algor
 asset HMAC | crypto:material:secret-key:HMAC | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "secret-key"}}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
-asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag", "verify"], "primitive": "mac"}, "assetType": "algorithm"}
 asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
 asset RSA | crypto:material:public-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
@@ -397,6 +400,9 @@ doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/hmac@0.12.1 -> crypto:candidate:hmac@0.12.1:HMAC
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:algorithm:Ed25519
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:algorithm:HMAC-SHA-512
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:private-key:Ed25519
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:Ed25519

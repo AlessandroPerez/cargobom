@@ -8,8 +8,7 @@
    "correct": 1
   },
   "basic": {
-   "correct": 29,
-   "miss": 2
+   "correct": 31
   },
   "bcryptpbkdf": {
    "correct": 1
@@ -21,26 +20,24 @@
    "honest-unknown": 1
   },
   "config": {
-   "miss": 1
+   "correct": 1
   },
   "const-enum": {
    "correct": 3
   },
   "container": {
    "correct": 11,
-   "miss": 2
+   "honest-unknown": 2
   },
   "crates": {
    "correct": 2
   },
   "dyn": {
-   "honest-unknown": 6,
-   "miss": 2
+   "honest-unknown": 8
   },
   "field": {
-   "correct": 5,
-   "less-specific": 2,
-   "miss": 2
+   "correct": 7,
+   "less-specific": 2
   },
   "fnptr": {
    "correct": 1
@@ -49,8 +46,7 @@
    "correct": 1
   },
   "interproc": {
-   "correct": 10,
-   "miss": 2
+   "correct": 12
   },
   "macro": {
    "correct": 2
@@ -59,8 +55,7 @@
    "correct": 3
   },
   "path": {
-   "correct": 6,
-   "miss": 2
+   "correct": 8
   },
   "scrypt": {
    "correct": 1
@@ -91,7 +86,8 @@
    "honest-unknown": 4
   },
   "jwt": {
-   "miss": 13
+   "correct": 9,
+   "honest-unknown": 4
   },
   "kdf": {
    "correct": 9,
@@ -199,50 +195,6 @@
   },
   {
    "callee": "encode",
-   "line": 7,
-   "may": [],
-   "must": [
-    "HMAC-SHA-256"
-   ],
-   "program": "jwt-basic",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "decode",
-   "line": 9,
-   "may": [],
-   "must": [
-    "HMAC-SHA-256"
-   ],
-   "program": "jwt-basic",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "encode",
-   "line": 19,
-   "may": [],
-   "must": [
-    "ECDSA-P-256-SHA-256",
-    "ECDSA-P-384-SHA-384",
-    "Ed25519",
-    "HMAC-SHA-256",
-    "HMAC-SHA-384",
-    "HMAC-SHA-512",
-    "RSA-PKCS1-1.5-SHA-256",
-    "RSA-PKCS1-1.5-SHA-384",
-    "RSA-PKCS1-1.5-SHA-512",
-    "RSA-PSS-SHA-256",
-    "RSA-PSS-SHA-384",
-    "RSA-PSS-SHA-512"
-   ],
-   "program": "jwt-config",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "encode",
    "line": 13,
    "may": [
     "HMAC-SHA-256"
@@ -251,8 +203,10 @@
     "HMAC-SHA-512"
    ],
    "program": "jwt-container",
-   "reported": [],
-   "verdict": "miss"
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
   },
   {
    "callee": "decode",
@@ -264,8 +218,10 @@
     "HMAC-SHA-512"
    ],
    "program": "jwt-container",
-   "reported": [],
-   "verdict": "miss"
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
   },
   {
    "callee": "encode",
@@ -276,8 +232,10 @@
     "RSA-PSS-SHA-256"
    ],
    "program": "jwt-dyn",
-   "reported": [],
-   "verdict": "miss"
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
   },
   {
    "callee": "decode",
@@ -288,76 +246,10 @@
     "RSA-PSS-SHA-256"
    ],
    "program": "jwt-dyn",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "encode",
-   "line": 16,
-   "may": [],
-   "must": [
-    "ECDSA-P-256-SHA-256"
+   "reported": [
+    "unknown"
    ],
-   "program": "jwt-field",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "decode",
-   "line": 23,
-   "may": [],
-   "must": [
-    "ECDSA-P-256-SHA-256"
-   ],
-   "program": "jwt-field",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "encode",
-   "line": 12,
-   "may": [],
-   "must": [
-    "Ed25519"
-   ],
-   "program": "jwt-interproc",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "decode",
-   "line": 22,
-   "may": [],
-   "must": [
-    "Ed25519"
-   ],
-   "program": "jwt-interproc",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "encode",
-   "line": 15,
-   "may": [],
-   "must": [
-    "HMAC-SHA-384",
-    "HMAC-SHA-512"
-   ],
-   "program": "jwt-path",
-   "reported": [],
-   "verdict": "miss"
-  },
-  {
-   "callee": "decode",
-   "line": 17,
-   "may": [],
-   "must": [
-    "HMAC-SHA-384",
-    "HMAC-SHA-512"
-   ],
-   "program": "jwt-path",
-   "reported": [],
-   "verdict": "miss"
+   "verdict": "honest-unknown"
   },
   {
    "callee": "derive",
@@ -456,10 +348,10 @@
  "sites": 107,
  "unlabelled_uses": 4,
  "verdicts": {
-  "correct": 82,
-  "honest-unknown": 9,
+  "correct": 91,
+  "honest-unknown": 13,
   "less-specific": 3,
-  "miss": 13,
+  "miss": 0,
   "wrong": 0
  }
 }

@@ -454,6 +454,27 @@ fn analyze(tcx: TyCtxt<'_>) {
     {
         cx.errors += 1;
     }
+    // the field names of a knowledge-base crate's structs, for the boundary models that name
+    // fields (`Header.alg`)
+    let fields = if cx.kb_crate(rustc_span::def_id::LOCAL_CRATE) {
+        tcx.hir_crate_items(())
+            .definitions()
+            .map(|d| d.to_def_id())
+            .filter(|&d| matches!(tcx.def_kind(d), rustc_hir::def::DefKind::Struct))
+            .map(|d| {
+                let names = tcx
+                    .adt_def(d)
+                    .non_enum_variant()
+                    .fields
+                    .iter()
+                    .map(|f| f.name.to_string())
+                    .collect();
+                (path_of(tcx, d), names)
+            })
+            .collect()
+    } else {
+        Default::default()
+    };
     let facts = CrateFacts {
         facts_version: FACTS_VERSION,
         krate,
@@ -461,6 +482,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         data_edges,
         reach,
         links: crate_links,
+        fields,
     };
     let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
     std::fs::create_dir_all(&out).unwrap();
@@ -838,7 +860,7 @@ fn split_self(
 }
 
 /// The value of an integer constant argument (`2048`, `1_000`); `None` for anything else.
-fn const_int(op: &Operand) -> Option<i128> {
+pub(crate) fn const_int(op: &Operand) -> Option<i128> {
     let Operand::Constant(c) = op else {
         return None;
     };

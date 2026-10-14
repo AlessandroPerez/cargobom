@@ -38,8 +38,8 @@ fn c3(d: &[u8]) -> usize {
 }
 
 // C4: writes into a field other than a literal or an assignment: `mem::replace`, a function
-// writing through `&mut`, a reference to the field, an element, a push. Each read is one of
-// the values stored there (SHA-256 from the literals too).
+// writing through `&mut`, a reference to the field, an element, a push. Each read is the
+// value stored last on the way there: SHA-384, SHA-512, SHA-1 (`use_ctx`).
 struct Ctx {
     alg: &'static Algorithm,
 }

@@ -33,8 +33,9 @@ use crate::{def_ref_internal, locate, path_of};
 /// Call, aggregate and closure hops followed before the origin is cut (`Truncated`); moves,
 /// borrows and casts are free.
 const MAX_DEPTH: usize = 10;
-/// Alternatives, call arguments and aggregate parts kept per node.
-const MAX_WIDTH: usize = 8;
+/// Alternatives, call arguments and aggregate parts kept per node: a `match` over every
+/// variant of a selector (jwt-cli's 12 JWT algorithms) is kept whole.
+const MAX_WIDTH: usize = 16;
 /// Nodes per origin tree.
 const MAX_NODES: usize = 400;
 /// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
@@ -123,6 +124,8 @@ enum DefKind {
     OutParam {
         func: Operand,
         args: Vec<Operand>,
+        /// The argument that points at the place (`None`: a value holding a pointer to it).
+        index: Option<usize>,
     },
     /// The place was mutably borrowed by this call, which returned a value holding the borrow
     /// (`key.chunks_mut(16)`, `split_at_mut`): later writes go through that value.
@@ -468,6 +471,7 @@ impl Flow {
                                     DefKind::OutParam {
                                         func: func.clone(),
                                         args: args.clone(),
+                                        index: None,
                                     },
                                     single,
                                     false,
@@ -512,6 +516,7 @@ impl Flow {
                                 DefKind::OutParam {
                                     func: func.clone(),
                                     args: args.clone(),
+                                    index: Some(k),
                                 },
                                 single,
                                 k == 0 || whole,
@@ -1092,6 +1097,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let mut parts: Vec<Origin> = Vec::new();
         for &i in &defs {
             let d = &self.flow().defs[i];
+            let part = !is_prefix(&d.path, &path) && is_prefix(&path, &d.path);
             let (list, rest) = if is_prefix(&d.path, &path) {
                 if self.shadowed(i, &defs, &path, at) {
                     continue;
@@ -1121,6 +1127,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 ty = walk_ty(self.tcx, ty, &d.path);
                 o = self.read_fields(ty, &rest, o);
             }
+            // a write to a field of it (`h.alg = ..`, `set_slot(&mut c.alg)`): which field
+            if part && let Some(fields) = field_steps(&d.path[path.len()..]) {
+                let strong = d.strong && self.part_always_after(&defs, i, &path, at);
+                o = Origin::Set {
+                    path: fields,
+                    value: Box::new(o),
+                    strong,
+                };
+            }
             if !list.contains(&o) {
                 if list.len() >= MAX_WIDTH {
                     list.push(Origin::Truncated);
@@ -1145,6 +1160,51 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 Origin::All(parts)
             }
         }
+    }
+
+    /// What a call of a function of the program (`d`, an out-parameter definition) writes
+    /// through the argument pointing at the place: `Written`, which the links resolve to the
+    /// values the function stores there. `None` for another crate's function, whose result
+    /// stands for what it writes (`rng.fill_bytes(&mut c.key)`, `v.push(x)`).
+    fn written(&self, d: &Def, depth: usize, seen: &mut HashSet<Key>) -> Option<Origin> {
+        let DefKind::OutParam {
+            func,
+            args,
+            index: Some(index),
+        } = &d.kind
+        else {
+            return None;
+        };
+        let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
+            func.ty(self.body.locals()).ok().map(|t| t.kind())
+        else {
+            return None;
+        };
+        let did = rustc_internal::internal(self.tcx, def.def_id());
+        if !did.is_local() {
+            return None;
+        }
+        let args = args
+            .iter()
+            .take(MAX_WIDTH)
+            .map(|a| self.operand(a, d.at, depth + 1, seen))
+            .collect();
+        Some(Origin::Written {
+            callee: path_of(self.tcx, did),
+            index: *index,
+            args,
+        })
+    }
+
+    /// Does the write `j` to a part of the place `path` lie on every way to the read at `at`
+    /// from each definition of the whole that reaches it (`h.alg = ..` after `h = Header::
+    /// default()`)?
+    fn part_always_after(&self, defs: &[usize], j: usize, path: &[Step], at: At) -> bool {
+        let e = &self.flow().defs[j];
+        defs.iter()
+            .map(|&i| &self.flow().defs[i])
+            .filter(|d| is_prefix(&d.path, path))
+            .all(|d| self.always_through(d, e.at, at))
     }
 
     /// Is definition `i`, of a whole that contains `path`, overwritten for `path` before the
@@ -1245,9 +1305,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         match &d.kind {
             DefKind::Entry => self.entry_origin(d.local, rest, depth),
             DefKind::Assign(rv, span) => self.rvalue(rv, *span, rest, d.at, depth, seen),
-            DefKind::Call { func, args } | DefKind::OutParam { func, args } => {
-                self.call(func, args, d.at, depth, seen)
-            }
+            DefKind::Call { func, args } => self.call(func, args, d.at, depth, seen),
+            // a function of the program writing it through `&mut` (`set_slot(&mut a)`): what
+            // it writes there; another crate's call stands for what it writes
+            // (`rng.fill_bytes(&mut key)`)
+            DefKind::OutParam { func, args, .. } => self
+                .written(d, depth, seen)
+                .unwrap_or_else(|| self.call(func, args, d.at, depth, seen)),
             DefKind::Through { func } => Origin::Through {
                 callee: callee_name(self.body, func).unwrap_or_default(),
             },
@@ -1328,6 +1392,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 value: None,
                 len: bytes_of_ty(t),
                 span: None,
+                zero: false,
             });
         }
         // the position the scanner gives this call's site
@@ -1395,6 +1460,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     value: None,
                     len: byte_len(&c.const_.ty(), n.eval_target_usize().ok()),
                     span: Some(self.loc(span)),
+                    zero: crate::const_int(op) == Some(0)
+                        && n.eval_target_usize().is_ok_and(|n| n > 0),
                 },
                 _ => self.operand(op, at, depth, seen),
             },
@@ -1501,6 +1568,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     value: None,
                     len,
                     span: Some(self.loc(span)),
+                    zero: ops.iter().all(|o| crate::const_int(o) == Some(0)),
                 }
             }
             _ => {
@@ -1767,34 +1835,54 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     1 => return statics.pop().unwrap(),
                     _ => return Origin::Any(statics),
                 }
+                let (len, zero) = literal_data(a, &ty);
                 Origin::Const {
                     value,
-                    len: bytes_of_ty(&ty),
+                    len,
                     span,
+                    zero,
                 }
             }
             // `&CONST`, `&[42u8; 32]`, `const { &SHA256 }`: what the promoted or inline
             // constant names, else literal data of this function
-            ConstantKind::Unevaluated(u) => self
-                .unevaluated(
-                    (
-                        rustc_internal::internal(self.tcx, u.def.def_id()),
-                        rustc_internal::internal(self.tcx, &u.args),
-                        u.promoted.map(rustc_middle::mir::Promoted::from_u32),
-                    ),
-                    &ty,
-                    None,
-                    int_ty,
-                )
-                .unwrap_or(Origin::Const {
-                    value: None,
-                    len: bytes_of_ty(&ty),
-                    span,
-                }),
+            ConstantKind::Unevaluated(u) => {
+                let uneval = (
+                    rustc_internal::internal(self.tcx, u.def.def_id()),
+                    rustc_internal::internal(self.tcx, &u.args),
+                    u.promoted.map(rustc_middle::mir::Promoted::from_u32),
+                );
+                self.unevaluated(uneval, &ty, None, int_ty)
+                    .unwrap_or_else(|| {
+                        // a promoted literal (`&[0; 32]` in an item body): its data, as an
+                        // instance body has it evaluated
+                        let (len, zero) = uneval
+                            .2
+                            .and_then(|_| self.evaluate(uneval))
+                            .and_then(|v| {
+                                let c: rustc_public::ty::MirConst =
+                                    rustc_internal::stable(rustc_middle::mir::Const::Val(
+                                        v,
+                                        rustc_internal::internal(self.tcx, ty),
+                                    ));
+                                match c.kind() {
+                                    ConstantKind::Allocated(a) => Some(literal_data(a, &ty)),
+                                    _ => None,
+                                }
+                            })
+                            .unwrap_or((bytes_of_ty(&ty), false));
+                        Origin::Const {
+                            value: None,
+                            len,
+                            span,
+                            zero,
+                        }
+                    })
+            }
             _ => Origin::Const {
                 value: None,
                 len: bytes_of_ty(&ty),
                 span,
+                zero: false,
             },
         }
     }
@@ -1836,27 +1924,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 .into_iter()
                 .collect(),
         };
-        let evaluate = || {
-            let def = match promoted {
-                Some(_) => Some(did),
-                None => crate::statics::resolve_const(tcx, did, args, None),
-            };
-            if args.has_non_region_param()
-                || !def.is_some_and(|d| crate::statics::evaluable(tcx, d, promoted))
-            {
-                return None;
-            }
-            tcx.const_eval_resolve(
-                rustc_middle::ty::TypingEnv::fully_monomorphized(),
-                rustc_middle::mir::UnevaluatedConst {
-                    def: did,
-                    args,
-                    promoted,
-                },
-                rustc_span::DUMMY_SP,
-            )
-            .ok()
-        };
+        let evaluate = || self.evaluate((did, uargs, promoted));
         // a promoted or inline constant that names nothing itself (`const { pick() }`, a
         // `const fn` result): the statics its value points at
         if named.is_empty()
@@ -1892,6 +1960,58 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             1 => data.pop(),
             _ => Some(Origin::Any(data)),
         }
+    }
+
+    /// The value of an unevaluated constant, when its arguments are known (in terms of the
+    /// instance, when this is one).
+    fn evaluate(
+        &self,
+        (did, uargs, promoted): Uneval<'tcx>,
+    ) -> Option<rustc_middle::mir::ConstValue> {
+        use rustc_middle::ty::TypeVisitableExt;
+        let tcx = self.tcx;
+        let args = match self.inst_args() {
+            Some(a) if uargs.has_non_region_param() => {
+                rustc_middle::ty::EarlyBinder::bind(tcx, uargs)
+                    .instantiate(tcx, a)
+                    .skip_norm_wip()
+            }
+            // a closure's own body: its arguments name the closure's synthetic parameters
+            // (kind, signature, captures); its type has them
+            None if uargs.has_non_region_param() && tcx.is_closure_like(did) => {
+                match tcx
+                    .type_of(did)
+                    .instantiate_identity()
+                    .skip_norm_wip()
+                    .kind()
+                {
+                    rustc_middle::ty::Closure(_, a)
+                    | rustc_middle::ty::Coroutine(_, a)
+                    | rustc_middle::ty::CoroutineClosure(_, a) => a,
+                    _ => uargs,
+                }
+            }
+            _ => uargs,
+        };
+        let def = match promoted {
+            Some(_) => Some(did),
+            None => crate::statics::resolve_const(tcx, did, args, None),
+        };
+        if args.has_non_region_param()
+            || !def.is_some_and(|d| crate::statics::evaluable(tcx, d, promoted))
+        {
+            return None;
+        }
+        tcx.const_eval_resolve(
+            rustc_middle::ty::TypingEnv::fully_monomorphized(),
+            rustc_middle::mir::UnevaluatedConst {
+                def: did,
+                args,
+                promoted,
+            },
+            rustc_span::DUMMY_SP,
+        )
+        .ok()
     }
 
     /// An enum whose variants have no fields: its values are their discriminants.
@@ -1937,9 +2057,10 @@ fn clone_kind(k: &DefKind) -> DefKind {
             func: func.clone(),
             args: args.clone(),
         },
-        DefKind::OutParam { func, args } => DefKind::OutParam {
+        DefKind::OutParam { func, args, index } => DefKind::OutParam {
             func: func.clone(),
             args: args.clone(),
+            index: *index,
         },
         DefKind::Through { func } => DefKind::Through { func: func.clone() },
     }
@@ -2590,6 +2711,62 @@ fn byte_len(elem: &Ty, n: Option<u64>) -> Option<u64> {
 }
 
 /// `[u8; N]`, `&[u8; N]`, `&mut [u8; N]`: N bytes.
+/// Literal data in an allocated constant: its length in bytes (an array in place, or the
+/// array, slice or `&str` a reference points to: `b"salt"`, `""`) and whether all its bytes are
+/// zero (`&[0u8; 32]`). Not an integer (its value says that).
+fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option<u64>, bool) {
+    let zero = |bytes: &[Option<u8>]| !bytes.is_empty() && bytes.iter().all(|b| *b == Some(0));
+    let pointee = || {
+        a.provenance
+            .ptrs
+            .first()
+            .and_then(|(_, p)| match GlobalAlloc::from(p.0) {
+                GlobalAlloc::Memory(m) => Some(m),
+                _ => None,
+            })
+    };
+    match ty.kind().rigid() {
+        Some(RigidTy::Array(..)) => (bytes_of_ty(ty), zero(&a.bytes)),
+        Some(RigidTy::Ref(_, t, _)) => match t.kind().rigid() {
+            Some(RigidTy::Array(..)) => {
+                (bytes_of_ty(ty), pointee().is_some_and(|m| zero(&m.bytes)))
+            }
+            // a fat pointer: the data's address, then its length in elements
+            Some(RigidTy::Str) | Some(RigidTy::Slice(_)) if a.bytes.len() == 16 => {
+                let len = a.bytes[8..16]
+                    .iter()
+                    .rev()
+                    .try_fold(0u64, |acc, b| b.map(|b| (acc << 8) | b as u64));
+                let bytes_per = match t.kind().rigid() {
+                    Some(RigidTy::Slice(e)) => byte_len(e, Some(1)),
+                    _ => Some(1),
+                };
+                let len = len.zip(bytes_per).map(|(n, k)| n * k);
+                let data_zero = len.is_some_and(|n| n > 0)
+                    && pointee().is_some_and(|m| {
+                        let n = len.unwrap_or(0) as usize;
+                        m.bytes.len() >= n && zero(&m.bytes[..n])
+                    });
+                (len, data_zero)
+            }
+            _ => (None, false),
+        },
+        _ => (bytes_of_ty(ty), false),
+    }
+}
+
+/// The field indices of a path made of fields only (`.alg`, `.0.key`).
+fn field_steps(steps: &[Step]) -> Option<Vec<usize>> {
+    steps
+        .iter()
+        .map(|s| match s {
+            Step::Field(f) => Some(*f),
+            _ => None,
+        })
+        .collect::<Option<Vec<_>>>()
+        .filter(|v| !v.is_empty())
+}
+
 fn bytes_of_ty(ty: &Ty) -> Option<u64> {
     match ty.kind().rigid()? {
         RigidTy::Array(t, n) => byte_len(t, n.eval_target_usize().ok()),

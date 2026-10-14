@@ -2054,7 +2054,7 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; use: keyderive; password: environment (std::env::var) or hard-coded (literal at line 17); salt: hard-coded (16 bytes, literal at line 35); line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`",
+            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; use: keyderive; password: environment (std::env::var) or hard-coded (32 bytes, literal at line 17); salt: hard-coded (16 bytes, literal at line 35); line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 30,
@@ -4372,21 +4372,21 @@
             "symbol": "aws_lc_rs::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; salt: hard-coded (literal at line 352) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; salt: absent (all zero, literal at line 352) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `hkdf::Salt::new`",
             "line": 359,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 17,
             "symbol": "aws_lc_rs::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; use: keyderive; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; ikm: hard-coded (literal at line 352); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `extract`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; use: keyderive; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; ikm: absent (all zero, literal at line 352); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `extract`",
             "line": 359,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 47,
             "symbol": "aws_lc_rs::hkdf::Salt::extract"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_secret; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; salt: hard-coded (literal at line 364) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(secret),`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_secret; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA256; salt: absent (all zero, literal at line 364) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(secret),`; code: `hkdf::Salt::new`",
             "line": 371,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 17,
@@ -4446,11 +4446,7 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-ikm"
+          "value": "absent,parameter"
         },
         {
           "name": "rcbom:provenance:key",
@@ -4458,11 +4454,7 @@
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-salt"
+          "value": "absent,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -4514,21 +4506,21 @@
             "symbol": "aws_lc_rs::hkdf::HKDF_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; salt: hard-coded (literal at line 352) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; salt: absent (all zero, literal at line 352) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `hkdf::Salt::new`",
             "line": 359,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 17,
             "symbol": "aws_lc_rs::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; use: keyderive; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; ikm: hard-coded (literal at line 352); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `extract`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_zero_ikm; use: keyderive; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; ikm: absent (all zero, literal at line 352); line: `prk: hkdf::Salt::new(self.0, salt).extract(&zeroes[..self.0.len()]),`; code: `extract`",
             "line": 359,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 47,
             "symbol": "aws_lc_rs::hkdf::Salt::extract"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_secret; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; salt: hard-coded (literal at line 364) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(secret),`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::tls13::AwsLcHkdf as rustls::crypto::tls13::Hkdf>::extract_from_secret; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::hkdf::HKDF_SHA384; salt: absent (all zero, literal at line 364) or parameter (argument 1 of the enclosing function); line: `prk: hkdf::Salt::new(self.0, salt).extract(secret),`; code: `hkdf::Salt::new`",
             "line": 371,
             "location": "rustls-0.23.40/src/crypto/aws_lc_rs/tls13.rs",
             "offset": 17,
@@ -4588,11 +4580,7 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-ikm"
+          "value": "absent,parameter"
         },
         {
           "name": "rcbom:provenance:key",
@@ -4600,11 +4588,7 @@
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-salt"
+          "value": "absent,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -4628,7 +4612,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 17); line: `let _ = Hmac::<Sha256>::new_from_slice(app_secret.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (32 bytes, literal at line 17); line: `let _ = Hmac::<Sha256>::new_from_slice(app_secret.as_bytes());`; code: `Hmac::<Sha256>::new_from_slice`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
@@ -5440,7 +5424,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; from_secret: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 17); line: `let app_key = EncodingKey::from_secret(app_secret.as_bytes());`; code: `EncodingKey::from_secret`",
+            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; from_secret: setup, not a use; key: environment (std::env::var) or hard-coded (32 bytes, literal at line 17); line: `let app_key = EncodingKey::from_secret(app_secret.as_bytes());`; code: `EncodingKey::from_secret`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 18,
@@ -5775,7 +5759,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; use: keyderive; password: environment (std::env::var) or hard-coded (literal at line 17); salt: hard-coded (9 bytes, literal at line 33); line: `pbkdf2_hmac::<Sha256>(app_secret.as_bytes(), b\"saltysalt\", 1_000, &mut nonce_seed);`; code: `pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; use: keyderive; password: environment (std::env::var) or hard-coded (32 bytes, literal at line 17); salt: hard-coded (9 bytes, literal at line 33); line: `pbkdf2_hmac::<Sha256>(app_secret.as_bytes(), b\"saltysalt\", 1_000, &mut nonce_seed);`; code: `pbkdf2_hmac::<Sha256>`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 4,
@@ -9654,7 +9638,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0e2ca142-adb7-8500-9d37-9060dfe2b812",
+  "serialNumber": "urn:uuid:02f5e998-b973-86e8-bf64-73d3cab1a5ee",
   "specVersion": "1.7",
   "version": 1
 }

@@ -2409,6 +2409,138 @@ primitive = "key-agree"
 use = "keygen"
 algorithm = 0
 
+# --- Boundary models ---------------------------------------------------------------------------
+# A protocol crate's API whose algorithm is a value the program chooses: reported at the
+# program's call with the variants of the `[[enum]]` that reach it. `algorithm` is the value
+# argument (the receiver is argument 0) or a field of the struct it points to; `key` the key's
+# family enum, which narrows the variants (jsonwebtoken checks that every algorithm of a
+# `Validation` matches the key's family). A variant the analysis cannot find makes the call an
+# unknown algorithm, not a partial set.
+
+# jsonwebtoken 9: `encode(&header, &claims, &key)` signs (or MACs) with `header.alg`;
+# `decode(token, &key, &validation)` verifies with one of `validation.algorithms` the key's
+# family allows; `crypto::sign(msg, &key, alg)`, `crypto::verify(sig, msg, &key, alg)`
+[[boundary]]
+crate = "jsonwebtoken"
+path = "^(encoding::)?encode$"
+use = "sign"
+algorithm = { arg = 0, struct = "Header", field = "alg" }
+enum = "Algorithm"
+
+[[boundary]]
+crate = "jsonwebtoken"
+path = "^(decoding::)?decode$"
+use = "verify"
+algorithm = { arg = 2, struct = "Validation", field = "algorithms" }
+key = { arg = 1, struct = "DecodingKey", field = "family" }
+enum = "Algorithm"
+
+[[boundary]]
+crate = "jsonwebtoken"
+path = "^crypto::sign$"
+use = "sign"
+algorithm = { arg = 2 }
+enum = "Algorithm"
+
+[[boundary]]
+crate = "jsonwebtoken"
+path = "^crypto::verify$"
+use = "verify"
+algorithm = { arg = 3 }
+enum = "Algorithm"
+
+# jsonwebtoken's `Algorithm`: the JWS algorithms (RFC 7518) and the key family each needs
+[[enum]]
+crate = "jsonwebtoken"
+name = "Algorithm"
+
+[enum.variants.HS256]
+asset = "HMAC-SHA-256"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag", "verify"]
+key = "Hmac"
+
+[enum.variants.HS384]
+asset = "HMAC-SHA-384"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag", "verify"]
+key = "Hmac"
+
+[enum.variants.HS512]
+asset = "HMAC-SHA-512"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag", "verify"]
+key = "Hmac"
+
+[enum.variants.RS256]
+asset = "RSA-PKCS1-1.5-SHA-256"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.RS384]
+asset = "RSA-PKCS1-1.5-SHA-384"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.RS512]
+asset = "RSA-PKCS1-1.5-SHA-512"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.PS256]
+asset = "RSA-PSS-SHA-256"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.PS384]
+asset = "RSA-PSS-SHA-384"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.PS512]
+asset = "RSA-PSS-SHA-512"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Rsa"
+
+[enum.variants.ES256]
+asset = "ECDSA-P-256-SHA-256"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Ec"
+curve = "nist/P-256"
+
+[enum.variants.ES384]
+asset = "ECDSA-P-384-SHA-384"
+family = "ECDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Ec"
+curve = "nist/P-384"
+
+[enum.variants.EdDSA]
+asset = "Ed25519"
+family = "EdDSA"
+primitive = "signature"
+functions = ["sign", "verify"]
+key = "Ed"
+curve = "other/Ed25519"
+
 # --- Provenance -------------------------------------------------------------------------------
 # Roles: which value argument of an API is key material (method calls count the receiver as
 # argument 0). `path` is a regex over the callee's defining path, or over `<Self type>::<method>`

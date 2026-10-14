@@ -41,8 +41,36 @@ struct Raw {
     produces: Vec<ProducesRaw>,
     #[serde(rename = "operation", default)]
     operations: Vec<OperationRaw>,
+    #[serde(rename = "boundary", default)]
+    boundaries: Vec<BoundaryRaw>,
+    #[serde(rename = "enum", default)]
+    enums: Vec<EnumRaw>,
     #[serde(default)]
     unmodelled: UnmodelledRaw,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BoundaryRaw {
+    #[serde(rename = "crate")]
+    krate: String,
+    path: String,
+    #[serde(rename = "use")]
+    function: String,
+    algorithm: FieldRef,
+    #[serde(default)]
+    key: Option<FieldRef>,
+    #[serde(rename = "enum")]
+    enumeration: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EnumRaw {
+    #[serde(rename = "crate")]
+    krate: String,
+    name: String,
+    variants: BTreeMap<String, Variant>,
 }
 
 /// Layer 1 for packages without `[[crate]]` entries: which are cryptographic anyway.
@@ -158,6 +186,51 @@ pub struct OperationEntry {
     /// The call sets the algorithm up (`Digest::new`, `KeyInit::new`) without using it: its
     /// occurrence has no use.
     pub setup: bool,
+}
+
+/// A call's value argument (the receiver is argument 0), or a field of the struct behind it
+/// (`Header.alg` of `encode(&header, ..)`: struct `adt` by its name, field `field`).
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FieldRef {
+    pub arg: usize,
+    #[serde(rename = "struct", default)]
+    pub adt: Option<String>,
+    #[serde(default)]
+    pub field: Option<String>,
+}
+
+/// A protocol crate's API modelled at its boundary (jsonwebtoken's `encode`, `decode`): the
+/// algorithm is a variant of an enum (`[[enum]]`) held in a field of the struct an argument
+/// points to; with `key`, only the variants the key's family allows.
+#[derive(Debug)]
+pub struct BoundaryEntry {
+    pub krate: String,
+    /// Regex over the callee's path inside its crate, generic arguments removed.
+    pub pattern: Regex,
+    /// The call's use (`sign`; a `mac` asset's is the use of `sign` for MACs, `tag`).
+    pub function: String,
+    pub algorithm: FieldRef,
+    pub key: Option<FieldRef>,
+    pub enumeration: String,
+}
+
+/// One variant of an algorithm enum: its asset, and the key family it needs (the variant name
+/// of the key's family enum: jsonwebtoken's `AlgorithmFamily::Hmac`).
+#[derive(Clone, Debug, Deserialize)]
+pub struct Variant {
+    #[serde(flatten)]
+    pub algo: Algo,
+    #[serde(default)]
+    pub key: Option<String>,
+}
+
+/// An enum whose values name algorithms (jsonwebtoken's `Algorithm`), by variant name.
+#[derive(Debug)]
+pub struct EnumEntry {
+    pub krate: String,
+    pub name: String,
+    pub variants: BTreeMap<String, Variant>,
 }
 
 /// A package the knowledge base has no `[[crate]]` entry for, recognised as cryptographic from
@@ -420,6 +493,8 @@ pub struct Kb {
     pub seeded: Vec<SourceEntry>,
     pub produces: Vec<ProducesEntry>,
     pub operations: Vec<OperationEntry>,
+    pub boundaries: Vec<BoundaryEntry>,
+    pub enums: Vec<EnumEntry>,
     /// Packages without `[[crate]]` entries that are cryptographic although their metadata does
     /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
     pub unmodelled_crypto: Vec<String>,
@@ -629,6 +704,30 @@ impl Kb {
                     })
                 })
                 .collect::<Result<_>>()?,
+            boundaries: raw
+                .boundaries
+                .into_iter()
+                .map(|b| {
+                    Ok(BoundaryEntry {
+                        pattern: Regex::new(&b.path)
+                            .with_context(|| format!("[[boundary]] path {:?}", b.path))?,
+                        krate: b.krate,
+                        function: b.function,
+                        algorithm: b.algorithm,
+                        key: b.key,
+                        enumeration: b.enumeration,
+                    })
+                })
+                .collect::<Result<_>>()?,
+            enums: raw
+                .enums
+                .into_iter()
+                .map(|e| EnumEntry {
+                    krate: e.krate,
+                    name: e.name,
+                    variants: e.variants,
+                })
+                .collect(),
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
             not_crypto: raw.unmodelled.not_crypto,
@@ -645,12 +744,29 @@ impl Kb {
                 Regex::new(m).with_context(|| format!("[[type]] {}: module {m:?}", t.name))?;
             }
         }
+        for b in &self.boundaries {
+            if !self.enums.iter().any(|e| e.name == b.enumeration) {
+                bail!("[[boundary]] {}: no [[enum]] {}", b.pattern, b.enumeration);
+            }
+            if !FUNCTIONS.contains(&b.function.as_str()) {
+                bail!(
+                    "[[boundary]] {}: use {:?} is not a CycloneDX value",
+                    b.pattern,
+                    b.function
+                );
+            }
+        }
         let algos = self
             .types
             .iter()
             .map(|t| &t.algo)
             .chain(self.statics.iter().map(|s| &s.algo))
-            .chain(self.fns.iter().map(|f| &f.algo));
+            .chain(self.fns.iter().map(|f| &f.algo))
+            .chain(
+                self.enums
+                    .iter()
+                    .flat_map(|e| e.variants.values().map(|v| &v.algo)),
+            );
         for a in algos {
             // a family of the 1.7 enum, or one the registry has added since (written as a
             // property); key material has no algorithmProperties, its family is a property
@@ -811,6 +927,13 @@ impl Kb {
         } else {
             Unmodelled::Crypto
         })
+    }
+
+    /// The boundary model of a call (`[[boundary]]`), by crate name and path inside it.
+    pub fn boundary(&self, krate: &str, path: &str) -> Option<&BoundaryEntry> {
+        self.boundaries
+            .iter()
+            .find(|b| b.krate == krate && b.pattern.is_match(path))
     }
 
     /// The `[[operation]]` entry of a callee: its crate name and its path inside the crate,

@@ -664,6 +664,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a23::main; use: sign; algorithm from `Header.alg`; line: `let _ = encode(&Header::new(Algorithm::EdDSA), &claims, &k1);`; code: `encode`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "jsonwebtoken::encoding::encode"
+          },
+          {
             "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
@@ -732,7 +739,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -864,6 +871,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a23::main; use: tag; algorithm from `Header.alg`; line: `let _ = encode(&Header::default(), &claims, &k2);`; code: `encode`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "jsonwebtoken::encoding::encode"
+          },
+          {
             "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -914,7 +928,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -995,7 +1009,8 @@
         "algorithmProperties": {
           "algorithmFamily": "HMAC",
           "cryptoFunctions": [
-            "tag"
+            "tag",
+            "verify"
           ],
           "primitive": "mac"
         },
@@ -1003,6 +1018,13 @@
       },
       "evidence": {
         "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a23::main; use: verify; algorithm from `Validation.algorithms`; the key's family (Hmac) allows these; line: `let _ = decode::<std::collections::BTreeMap<String, String>>(`; code: `decode::<std::collections::BTreeMap<String, String>>`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "jsonwebtoken::decoding::decode"
+          },
           {
             "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
             "line": 17,
@@ -1054,7 +1076,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -2174,6 +2196,9 @@
         "pkg:cargo/ring@0.17.14"
       ],
       "provides": [
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-512",
         "crypto:material:private-key:Ed25519",
         "crypto:material:public-key:ECDSA",
         "crypto:material:public-key:Ed25519",
@@ -2394,7 +2419,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4e3b5e2e-2925-8724-a9e4-7ef555c13c89",
+  "serialNumber": "urn:uuid:d3425211-e737-899e-91f7-d78e1021b0fe",
   "specVersion": "1.7",
   "version": 1
 }

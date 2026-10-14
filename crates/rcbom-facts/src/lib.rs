@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 12;
+pub const FACTS_VERSION: u32 = 15;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -31,6 +31,12 @@ pub struct CrateFacts {
     /// hold at run time.
     #[serde(default)]
     pub links: Links,
+    /// The field names of this crate's structs, by path as `Origin::Field` names them, when the
+    /// knowledge base describes the crate: a boundary model names a field (`Header.alg`), whose
+    /// index changes between versions (`Validation.algorithms` is field 8 in jsonwebtoken 9.2,
+    /// 9 in 9.3).
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub fields: std::collections::BTreeMap<String, Vec<String>>,
 }
 
 /// Value flow across the functions of a crate (see `CrateFacts::links`). Flow-insensitive: a
@@ -324,6 +330,9 @@ pub enum Origin {
         value: Option<i128>,
         len: Option<u64>,
         span: Option<Loc>,
+        /// Literal data all of whose bytes are zero (`[0u8; 64]`).
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        zero: bool,
     },
     /// A named static or const item (`&ring::aead::AES_256_GCM`). `value` is an integer
     /// const's value (`const ITERATIONS: u32 = 600_000`), when the compiler can evaluate it.
@@ -392,6 +401,16 @@ pub enum Origin {
         index: usize,
         args: Vec<Origin>,
     },
+    /// A write of `value` into field `path` of the value it is a part of (`h.alg =
+    /// Algorithm::HS384` after `let mut h = Header::default()`), as a part of an `All`. `strong`:
+    /// the write happens on every way from the value's definition to the read, so the field
+    /// holds `value`, not what the definition put there.
+    Set {
+        path: Vec<usize>,
+        value: Box<Origin>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        strong: bool,
+    },
     /// Several definitions reach the value: it is one of these.
     Any(Vec<Origin>),
     /// A value built from all of these parts: the elements of an array or the fields of a
@@ -450,6 +469,15 @@ impl Origin {
             },
             Origin::Any(v) => Origin::Any(v.into_iter().map(|a| a.params_of(owner)).collect()),
             Origin::All(v) => Origin::All(v.into_iter().map(|a| a.params_of(owner)).collect()),
+            Origin::Set {
+                path,
+                value,
+                strong,
+            } => Origin::Set {
+                path,
+                value: Box::new(value.params_of(owner)),
+                strong,
+            },
             o => o,
         }
     }

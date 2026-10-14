@@ -12,7 +12,8 @@ use crate::links::LinkIndex;
 /// What a value was found to come from, with a short human-readable trace.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Class {
-    /// `hard-coded`, `parameter`, `environment`, `file`, `rng`, `derived`, `computed`, `unknown`
+    /// `hard-coded`, `parameter`, `environment`, `file`, `rng`, `derived`, `computed`, `unknown`,
+    /// `absent` (no material: empty, or a protocol's all-zero salt or input key)
     pub kind: String,
     pub detail: String,
 }
@@ -101,6 +102,24 @@ pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTre
                         })
                         .collect();
                 }
+                // an all-zero salt or input key is what a protocol puts where it has none (TLS 1.3's
+                // key schedule: HKDF-Extract of zeros, RFC 8446 7.1; HKDF's default salt, RFC
+                // 5869): no material, not a hard-coded secret. An all-zero key is a hard-coded one.
+                if matches!(role.as_str(), "salt" | "ikm") {
+                    classes = classes
+                        .into_iter()
+                        .map(|c| {
+                            if c.kind == "hard-coded" && c.detail.starts_with("all zero") {
+                                Class {
+                                    kind: "absent".into(),
+                                    detail: c.detail,
+                                }
+                            } else {
+                                c
+                            }
+                        })
+                        .collect();
+                }
                 out.push((role.clone(), classes));
             }
         }
@@ -185,8 +204,17 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         return;
     }
     match o {
-        Origin::Const { len, span, .. } => {
+        // no data at all (`""`, `&[]`): nothing is hard-coded
+        Origin::Const { len: Some(0), .. } => {
+            out.insert(class("absent", "empty".into()));
+        }
+        Origin::Const {
+            len, span, zero, ..
+        } => {
             let mut d = Vec::new();
+            if *zero {
+                d.push("all zero".to_string());
+            }
             if let Some(n) = len {
                 d.push(format!("{n} bytes"));
             }
@@ -463,6 +491,8 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         // built from all of these parts (`[user, b"pepper"].concat()`, `key[31] = 1` after the
         // key was read from the environment): a constant only if every part is
         Origin::All(parts) => of_inputs(kb, links, parts, depth, out),
+        // a field written into the value: what was written
+        Origin::Set { value, .. } => classify(kb, links, value, depth, out),
         Origin::Truncated => {
             out.insert(class("unknown", "origin search bound reached".into()));
         }
@@ -502,6 +532,7 @@ fn recurs(o: &Origin) -> bool {
     match o {
         Origin::Loop => true,
         Origin::Any(v) | Origin::All(v) => v.iter().any(recurs),
+        Origin::Set { value, .. } => recurs(value),
         Origin::Call { args, .. } => args.iter().any(recurs),
         Origin::Field { base, .. } => recurs(base),
         _ => false,
@@ -567,6 +598,7 @@ fn seeded<'a>(kb: &Kb, o: &'a Origin, depth: usize) -> Option<&'a Origin> {
             args.first().and_then(|a| seeded(kb, a, depth + 1))
         }
         Origin::Any(alts) | Origin::All(alts) => alts.iter().find_map(|a| seeded(kb, a, depth + 1)),
+        Origin::Set { value, .. } => seeded(kb, value, depth + 1),
         _ => None,
     }
 }
@@ -697,6 +729,7 @@ fn direct_data(
         Origin::Any(alts) | Origin::All(alts) => alts
             .iter()
             .for_each(|a| direct_data(kb, links, a, depth + 1, out, seen)),
+        Origin::Set { value, .. } => direct_data(kb, links, value, depth + 1, out, seen),
         // a field of a static (`TABLE.alg`): the static, whose own data says which descriptor
         // (`TABLE.alg = &SHA256`), not what every value of its type holds there
         Origin::Field { .. } if let Some(def) = static_root(o) => {
@@ -842,6 +875,7 @@ fn receiver_data(
         Origin::Any(alts) | Origin::All(alts) => alts
             .iter()
             .for_each(|a| receiver_data(kb, links, a, depth + 1, out, seen, lengths)),
+        Origin::Set { value, .. } => receiver_data(kb, links, value, depth + 1, out, seen, lengths),
         _ => {}
     }
 }
@@ -999,6 +1033,59 @@ mod tests {
         assert_eq!(kinds, ["hard-coded"]);
     }
 
+    #[test]
+    fn no_data_and_a_protocols_zeros_are_absent() {
+        let kb = Kb::seed().unwrap();
+        let empty = Origin::Const {
+            value: None,
+            len: Some(0),
+            span: None,
+            zero: false,
+        };
+        assert_eq!(kinds(&kb, &empty), ["absent"]);
+        let zeros = Origin::Const {
+            value: None,
+            len: Some(32),
+            span: None,
+            zero: true,
+        };
+        assert_eq!(kinds(&kb, &zeros), ["hard-coded"]);
+        // as HKDF's salt or input key: what TLS 1.3 puts where it has none
+        let call = |role_arg: usize| Target::Call {
+            callee: rcbom_facts::DefRef {
+                id: String::new(),
+                krate: rcbom_facts::CrateRef {
+                    name: "ring".into(),
+                    stable_id: String::new(),
+                },
+                path: "ring::hkdf::Salt::new".into(),
+            },
+            method: "new".into(),
+            self_ty: None,
+            args: vec![],
+            const_args: vec![None, None],
+            arg_origins: (0..2)
+                .map(|i| {
+                    if i == role_arg {
+                        zeros.clone()
+                    } else {
+                        Origin::Unknown
+                    }
+                })
+                .collect(),
+            arg_lens: vec![None, None],
+            through: None,
+            value: false,
+        };
+        let found = of_call(&kb, &LinkIndex::default(), &call(1));
+        let salt: Vec<_> = found
+            .iter()
+            .filter(|(r, _)| r == "salt")
+            .flat_map(|(_, c)| c.iter().map(|c| c.kind.as_str()))
+            .collect();
+        assert_eq!(salt, ["absent"]);
+    }
+
     fn call(callee: &str, krate: &str, args: Vec<Origin>) -> Origin {
         Origin::Call {
             callee: callee.into(),
@@ -1012,8 +1099,9 @@ mod tests {
     fn lit() -> Origin {
         Origin::Const {
             value: None,
-            len: Some(0),
+            len: Some(4),
             span: None,
+            zero: false,
         }
     }
 

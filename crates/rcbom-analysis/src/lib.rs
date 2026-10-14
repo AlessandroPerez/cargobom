@@ -3,6 +3,7 @@
 //! parameters and composition from generic arguments, classify uses by the method called, and
 //! assemble a CycloneDX 1.7 CBOM together with Layer 1.
 
+mod boundary;
 mod cbom;
 mod links;
 mod matcher;
@@ -238,6 +239,8 @@ struct Ctx<'a> {
     links: std::cell::RefCell<HashMap<CallKey<'a>, Vec<Match>>>,
     /// Values across functions (`links`): fields, results, parameters, mutable statics.
     flow: links::LinkIndex,
+    /// The field names of the knowledge-base crates' structs, by path (`CrateFacts::fields`).
+    fields: HashMap<String, Vec<String>>,
     /// Crates of cryptographic packages the knowledge base does not model (Layer 1's
     /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`), by (crate name, stable id): two
     /// packages may name their library alike.
@@ -357,6 +360,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 .collect()
         },
         flow,
+        fields: facts
+            .iter()
+            .flat_map(|f| f.fields.iter().map(|(k, v)| (k.clone(), v.clone())))
+            .collect(),
     };
     let mut notes = Vec::new();
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
@@ -1397,6 +1404,10 @@ fn site_matches(
                 }
             }
         }
+        // a protocol crate's API modelled at its boundary
+        Target::Call { .. } if let Some(found) = boundary::site_matches(ctx, site) => {
+            out = found;
+        }
         Target::Call {
             callee,
             method,
@@ -1624,10 +1635,15 @@ fn site_matches(
                     .any(|u| u.methods.iter().any(|m| m == method))
             };
             // a protocol crate's own function (rustls's `KeySchedule::derive`, jsonwebtoken's
-            // `crypto::ecdsa::sign`) is not a crypto API: its crypto is at the algorithm crate's
-            // calls inside it, which are looked up there
+            // `crypto::ecdsa::sign`), also a standard trait's method on its type (`<rustls::
+            // Writer as io::Write>::write`, plaintext into the connection), is not a crypto API:
+            // its crypto is at the algorithm crate's calls inside it, which are looked up there
+            let implementer = match self_ty {
+                Some(rcbom_facts::TyTree::Adt { krate, .. }) if std_callee => &krate.name,
+                _ => &callee.krate.name,
+            };
             let protocol_callee = kb
-                .crate_by_name(&callee.krate.name)
+                .crate_by_name(implementer)
                 .is_some_and(|c| c.role == Role::Protocol);
             if out.is_empty() && into_kb && !protocol_callee && (can_occur() || has_roles()) {
                 let has_roles = has_roles();
@@ -1739,11 +1755,21 @@ fn site_matches(
                 }
             }
             // an operation is never dropped: when no algorithm reaches it, it is reported with
-            // an unknown one, and why
-            if out.is_empty()
-                && let Some((primitive, function, reason, provider)) =
-                    unresolved_operation(ctx, site)
-            {
+            // an unknown one, and why; so is the rest of the algorithms when the search for them
+            // hit its bound (what was found is not all)
+            let unresolved = if out.is_empty() {
+                unresolved_operation(ctx, site)
+            } else if algorithm_cut(ctx, site) {
+                unresolved_operation(ctx, site).map(|(p, f, _, pr)| {
+                    let reason = "the search for the value hit its bound: other algorithms than \
+                                  these may reach the call"
+                        .to_string();
+                    (p, f, reason, pr)
+                })
+            } else {
+                None
+            };
+            if let Some((primitive, function, reason, provider)) = unresolved {
                 // a set-up call (`Md5::new()`): the algorithm is there, not used yet
                 let setup = function.is_empty();
                 let mut m = Match {
@@ -1983,6 +2009,39 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
     }
 }
 
+/// Was the search for a value-selected operation's algorithm cut at its bound (a choice among
+/// more alternatives than the driver keeps)?
+fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> bool {
+    fn cut(o: &rcbom_facts::Origin) -> bool {
+        use rcbom_facts::Origin;
+        match o {
+            Origin::Truncated => true,
+            Origin::Any(v) | Origin::All(v) => v.iter().any(cut),
+            Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(cut),
+            Origin::Field { base, .. } => cut(base),
+            Origin::Set { value, .. } => cut(value),
+            _ => false,
+        }
+    }
+    let Target::Call {
+        callee,
+        arg_origins,
+        ..
+    } = &site.target
+    else {
+        return false;
+    };
+    let in_crate = callee
+        .path
+        .strip_prefix(&format!("{}::", callee.krate.name))
+        .unwrap_or(&callee.path);
+    ctx.kb
+        .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
+        .filter(|op| !op.self_type)
+        .and_then(|op| arg_origins.get(op.algorithm))
+        .is_some_and(cut)
+}
+
 /// Method names that say nothing about cryptography without a modelled type to scope them: a
 /// `write` is a hash update on a `Sha256` but plain output on age's `ArmoredWriter`.
 const GENERIC_METHODS: &[&str] = &[
@@ -2153,6 +2212,7 @@ fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
         }
         Origin::Any(_) => "one of several values, none naming an algorithm".into(),
         Origin::Truncated => "the search for the value hit its bound".into(),
+        Origin::Set { value, .. } => unresolved_reason(value),
         Origin::Loop | Origin::All(_) | Origin::Const { .. } | Origin::Unit { .. } => {
             "a value the analysis does not follow".into()
         }

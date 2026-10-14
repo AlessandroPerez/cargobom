@@ -108,6 +108,7 @@ fn functions<'o>(o: &'o Origin, out: &mut Vec<(&'o Loc, &'o str)>) {
                 functions(a, out);
             }
         }
+        Origin::Set { value, .. } => functions(value, out),
         _ => {}
     }
 }

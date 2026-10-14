@@ -158,6 +158,28 @@ impl LinkIndex {
             .collect()
     }
 
+    /// Does the crate record what function `func` returns?
+    pub fn returns_of(&self, func: &str) -> bool {
+        self.returns.keys().any(|(f, _)| f == func)
+    }
+
+    /// Does it record what `func` returns in field `field` of its result?
+    pub fn returns_field(&self, func: &str, field: usize) -> bool {
+        self.returns.contains_key(&(func.to_string(), vec![field]))
+    }
+
+    /// The values function `func` stores in field `field` of struct `adt` (`self.alg = a` in a
+    /// setter), as written there.
+    pub fn stored_by(&self, adt: &str, field: usize, func: &str) -> Vec<Origin> {
+        self.fields
+            .get(&(adt.to_string(), vec![field]))
+            .into_iter()
+            .flatten()
+            .filter(|s| s.func == func)
+            .map(|s| s.value.clone())
+            .collect()
+    }
+
     /// A static whose contents change at run time, with the values recorded for it.
     pub fn mutable_static(&self, id: &str) -> Option<&[Origin]> {
         self.statics
@@ -249,9 +271,36 @@ impl LinkIndex {
                 found.into_iter().for_each(|v| push(out, v));
                 return;
             }
+            // a field read of a value with fields written after it was made (`h.alg = X`
+            // after `h = Header::default()`): a write that happens on every way to the read
+            // replaces what the value held in that field
+            Origin::All(alts) if !path.is_empty() => {
+                let want = fields(path);
+                let covers = |a: &Origin| matches!(a, Origin::Set { path: p, strong: true, .. } if want.starts_with(p));
+                let replaced = alts.iter().any(covers);
+                for a in alts {
+                    if replaced && !matches!(a, Origin::Set { .. }) {
+                        continue;
+                    }
+                    self.resolve(a, path, owner, depth, out);
+                }
+                return;
+            }
             Origin::Any(alts) | Origin::All(alts) => {
                 for a in alts {
                     self.resolve(a, path, owner, depth, out);
+                }
+                return;
+            }
+            // a write into a field: the field read, if it is that field (or inside it); a
+            // write elsewhere is no part of it; a read of the whole is made of it too
+            Origin::Set { path: p, value, .. } => {
+                let want = fields(path);
+                if want.starts_with(p) {
+                    return self.resolve(value, &path[p.len()..], owner, depth, out);
+                }
+                if p.starts_with(&want) {
+                    return self.resolve(value, &[], owner, depth, out);
                 }
                 return;
             }
@@ -417,6 +466,7 @@ fn names_param(o: &Origin) -> bool {
         Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(names_param),
         Origin::Field { base, .. } => names_param(base),
         Origin::Any(v) | Origin::All(v) => v.iter().any(names_param),
+        Origin::Set { value, .. } => names_param(value),
         _ => false,
     }
 }
@@ -429,7 +479,7 @@ fn push(out: &mut Vec<(Origin, String)>, v: (Origin, String)) {
 
 /// `r`, a function's return value in terms of its parameters, with the call's arguments for
 /// them.
-fn substitute(r: &Origin, args: &[Origin]) -> Origin {
+pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
     match r {
         Origin::Param { index, owner: None } => {
             args.get(*index).cloned().unwrap_or(Origin::Unknown)
@@ -469,6 +519,15 @@ fn substitute(r: &Origin, args: &[Origin]) -> Origin {
         },
         Origin::Any(v) => Origin::Any(v.iter().map(|a| substitute(a, args)).collect()),
         Origin::All(v) => Origin::All(v.iter().map(|a| substitute(a, args)).collect()),
+        Origin::Set {
+            path,
+            value,
+            strong,
+        } => Origin::Set {
+            path: path.clone(),
+            value: Box::new(substitute(value, args)),
+            strong: *strong,
+        },
         other => other.clone(),
     }
 }

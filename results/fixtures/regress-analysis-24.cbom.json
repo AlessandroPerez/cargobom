@@ -1165,7 +1165,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 76); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `SealingKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 76); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `SealingKey::new`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 18,
@@ -1490,6 +1490,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms`; the key's family (Ec) allows these; line: `|| jsonwebtoken::decode::<HashMap<String, String>>(token, &ec, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::ES256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
+            "line": 94,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "jsonwebtoken::decoding::decode"
+          },
+          {
             "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
@@ -1565,7 +1572,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -2463,6 +2470,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms`; the key's family (Rsa) allows these; line: `jsonwebtoken::decode::<HashMap<String, String>>(token, &key, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
+            "line": 93,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "jsonwebtoken::decoding::decode"
+          },
+          {
             "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -2534,7 +2548,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -3643,7 +3657,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (19 bytes, literal at line 39); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `EncryptorBE32::from_aead`",
+            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 39); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `EncryptorBE32::from_aead`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 14,
@@ -3664,7 +3678,7 @@
             "symbol": "aead::stream::Encryptor::<A, S>::encrypt_last"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (19 bytes, literal at line 41); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `DecryptorBE32::from_aead`",
+            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 41); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `DecryptorBE32::from_aead`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 14,
@@ -3846,6 +3860,8 @@
         "pkg:cargo/ring@0.17.14"
       ],
       "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
         "crypto:material:public-key:ECDSA",
         "crypto:material:public-key:Ed25519",
         "crypto:material:public-key:RSA",
@@ -4232,7 +4248,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5934f26c-3cab-8c76-803a-ce9bf46a1b46",
+  "serialNumber": "urn:uuid:a65e6b70-ab2c-8e61-963f-7e5a4e9b4be3",
   "specVersion": "1.7",
   "version": 1
 }
