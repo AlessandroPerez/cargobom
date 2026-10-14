@@ -16,17 +16,17 @@
   occ ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | src/main.rs:41:6 | signature::verifier::DigestVerifier::verify_digest | [reachable] [call] in probe32::main; use: verify; line: `v.verify_digest(Sha3_256::new_with_prefix(&d), &sig2).unwrap();`; code: `verify_digest`
   occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:42:15 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let s384 = p384::ecdsa::SigningKey::random(&mut OsRng);`; code: `p384::ecdsa::SigningKey::random`
   occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:43:44 | signature::signer::Signer::sign | [reachable] [call] in probe32::main; use: sign; line: `let sig4: p384::ecdsa::Signature = s384.sign(&d);`; code: `sign`
-  occ HKDF | crypto:algorithm:HKDF | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [call] in probe32::main; use: keyderive; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
-  occ HKDF | crypto:algorithm:HKDF | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in probe32::main; use: keyderive; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [call] in probe32::main; use: keyderive; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in probe32::main; use: keyderive; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:45:19 | ml_kem::KemCore::generate_deterministic | [reachable] [call] in probe32::main; use: keygen; line: `let (dk, ek) = MlKem768::generate_deterministic(&B32::default(), &B32::default());`; code: `MlKem768::generate_deterministic`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:46:22 | kem::Encapsulate::encapsulate | [reachable] [call] in probe32::main; use: encapsulate; line: `let (ct, ss) = ek.encapsulate(&mut OsRng).unwrap();`; code: `encapsulate`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:47:17 | kem::Decapsulate::decapsulate | [reachable] [call] in probe32::main; use: decapsulate; line: `let ss2 = dk.decapsulate(&ct).unwrap();`; code: `decapsulate`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:48:23 | ml_kem::KemCore::generate | [reachable] [call] in probe32::main; use: keygen; line: `let (_dk2, _ek2) = MlKem768::generate(&mut OsRng);`; code: `MlKem768::generate`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:61:26 | rand::distributions::distribution::DistString::sample_string | [reachable] [call] in probe32::main; use: generate; line: `let pw = Alphanumeric.sample_string(&mut OsRng, 16);`; code: `sample_string`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:63:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `OsRng.fill_bytes(&mut os);`; code: `fill_bytes`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [component] in probe32::main; part of HKDF; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
   occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:18:12 | digest::digest::Digest::digest | [reachable] [call] in probe32::main; use: digest; line: `let a = Sha3_256::digest(&d);`; code: `Sha3_256::digest`
   occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:37:28 | signature::signer::DigestSigner::sign_digest | [reachable] [component] in probe32::main; part of ECDSA-P-256-SHA3-256; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `sign_digest`
   occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:37:40 | digest::digest::Digest::new_with_prefix | [reachable] [call] in probe32::main; use: digest; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `Sha3_256::new_with_prefix`
@@ -133,12 +133,12 @@
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=2
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=reachable
-  prop HKDF | crypto:algorithm:HKDF | rcbom:confidence=high
-  prop HKDF | crypto:algorithm:HKDF | rcbom:detection:method=type-resolved
-  prop HKDF | crypto:algorithm:HKDF | rcbom:functions:source=observed
-  prop HKDF | crypto:algorithm:HKDF | rcbom:kb:version=0.2.0
-  prop HKDF | crypto:algorithm:HKDF | rcbom:occurrences=2
-  prop HKDF | crypto:algorithm:HKDF | rcbom:reachability=reachable
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=2
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
@@ -269,6 +269,7 @@
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:crypto-role=unmodelled
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:kb-coverage=unmodelled
   prop rfc6979 | pkg:cargo/rfc6979@0.4.0 | rcbom:scope=required
@@ -326,7 +327,7 @@ asset ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | {"algorithmProperties": {"alg
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
 asset ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
 asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "primitive": "signature"}, "assetType": "algorithm"}
-asset HKDF | crypto:algorithm:HKDF | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
 asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
@@ -372,8 +373,8 @@ component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA3-256 -> crypto:algorithm:SHA3-256
-dep crypto:algorithm:HKDF -> crypto:algorithm:HMAC-SHA-256
-dep crypto:algorithm:HKDF -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep pkg:cargo/block-buffer@0.10.4 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/crypto-bigint@0.5.5 -> pkg:cargo/rand_core@0.6.4
@@ -464,7 +465,7 @@ dependency crypto:algorithm:ECDSA-P-256
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-256-SHA3-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
-dependency crypto:algorithm:HKDF
+dependency crypto:algorithm:HKDF-SHA-256
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:ML-KEM-768
 dependency crypto:algorithm:OS-RNG
@@ -519,11 +520,11 @@ provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256-SHA3-256
 provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-384-SHA-384
 provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-256
 provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-384
-provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:HKDF
+provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:HKDF-SHA-256
 provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
 provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:unknown:unknown:elliptic-curve+p384
 provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
-provides pkg:cargo/hkdf@0.12.4 -> crypto:algorithm:HKDF
+provides pkg:cargo/hkdf@0.12.4 -> crypto:algorithm:HKDF-SHA-256
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/ml-kem@0.2.3 -> crypto:algorithm:ML-KEM-768
 provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256

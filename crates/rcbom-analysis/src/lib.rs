@@ -103,9 +103,10 @@ pub struct Asset {
 }
 
 impl Asset {
-    /// An operation's asset whose algorithm the analysis does not find.
+    /// An operation's asset whose algorithm the analysis does not find (not key material of
+    /// no single family: `DecodingKey::from_jwk`'s).
     pub fn unresolved(&self) -> bool {
-        self.name == UNKNOWN && self.algo.family.is_empty()
+        self.name == UNKNOWN && self.algo.family.is_empty() && self.algo.material.is_none()
     }
 
     pub fn reachable(&self) -> bool {
@@ -200,7 +201,8 @@ pub fn load_facts(
             continue;
         }
         if p.extension().is_some_and(|x| x == "json") {
-            let f: CrateFacts = serde_json::from_slice(&std::fs::read(&p)?)?;
+            let f: CrateFacts = serde_json::from_slice(&std::fs::read(&p)?)
+                .map_err(|e| anyhow::anyhow!("{}: {e}", p.display()))?;
             if f.facts_version != FACTS_VERSION {
                 bail!(
                     "{}: facts version {} (expected {FACTS_VERSION}); rebuild the driver",
@@ -241,6 +243,8 @@ struct Ctx<'a> {
     flow: links::LinkIndex,
     /// The field names of the knowledge-base crates' structs, by path (`CrateFacts::fields`).
     fields: HashMap<String, Vec<String>>,
+    /// The variants of their field-less enums (name, discriminant), by path.
+    variants: HashMap<String, Vec<(String, i128)>>,
     /// Crates of cryptographic packages the knowledge base does not model (Layer 1's
     /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`), by (crate name, stable id): two
     /// packages may name their library alike.
@@ -304,7 +308,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .map(|f| (f.krate.name.clone(), f.krate.package.clone()))
             .collect(),
     );
-    let flow = {
+    let mut flow = {
         let t = std::time::Instant::now();
         let ix = links::LinkIndex::new(facts);
         if std::env::var_os("RCBOM_DEBUG").is_some() {
@@ -313,8 +317,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         ix
     };
     // calls through function pointers, as calls of the functions they hold; the namings they
-    // account for are no occurrences of their own
-    let (pointer_calls, named_for_pointers) = pointers::resolve(facts, &flow);
+    // account for are no occurrences of their own; the program's own functions called through
+    // one get the call's arguments for their parameters
+    let (pointer_calls, named_for_pointers, through_pointers) = pointers::resolve(facts, &flow);
+    flow.add_calls(through_pointers);
     let sites_of = |i: usize| {
         facts[i]
             .sites
@@ -363,6 +369,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         fields: facts
             .iter()
             .flat_map(|f| f.fields.iter().map(|(k, v)| (k.clone(), v.clone())))
+            .collect(),
+        variants: facts
+            .iter()
+            .flat_map(|f| f.variants.iter().map(|(k, v)| (k.clone(), v.clone())))
             .collect(),
     };
     let mut notes = Vec::new();
@@ -697,7 +707,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 }
             }
             let matches = site_matches(&ctx, site, &closure, &reached_data, &reached_path);
-            let prov = provenance::of_call(kb, &ctx.flow, &site.target);
+            let protocol = kb
+                .crate_by_name(&site.owner.krate.name)
+                .is_some_and(|c| c.role == Role::Protocol);
+            let prov = provenance::of_call(kb, &ctx.flow, &site.target, protocol);
             for (m, kind, function, symbol, detail, unreached) in matches {
                 let tier = if unreached { Tier::Present } else { tier };
                 for prov in &m.providers {
@@ -766,8 +779,17 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                     let vp = PathBuf::from(&v.span.file);
                     let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
+                    // with the call's text where it has one: a neighbouring call that
+                    // instantiates the function with other type arguments is told apart
+                    // (`aes_ctr::<Aes128Ctr>` above `aes_ctr::<Aes192Ctr>`)
+                    let text = v
+                        .text
+                        .as_ref()
+                        .filter(|t| !t.contains('`') && !t.contains(';'))
+                        .map(|t| format!(" as `{t}`"))
+                        .unwrap_or_default();
                     detail.push(format!(
-                        "instantiated by {} at {}:{}:{}",
+                        "instantiated by {} at {}:{}:{}{text}",
                         short(&v.caller),
                         man.location(&vp),
                         v.span.line,
@@ -1537,10 +1559,20 @@ fn site_matches(
                     && let Some(r) = receiver
                     && let Some((c, at)) = from_receiver(r)
                 {
-                    let comps = std::mem::take(&mut m.components);
-                    renamed.insert(m.name.clone(), c.name.clone());
-                    m = c;
-                    m.components = comps;
+                    // the constructor's asset, unless the type names more of what the
+                    // constructor's name leaves open: the `Hkdf<Sha256, SimpleHmac<Sha256>>`
+                    // that `SharedSecret::extract::<Sha256>` builds is HKDF-SHA-256 (`HKDF-{hash}`,
+                    // the constructor's origin has no type arguments); a constructor naming its
+                    // asset whole stays (`SigningKey::<Sha1>::new_unprefixed`: RSA-PKCS1-1.5)
+                    let finer = !c.algo.open.is_empty()
+                        && m.name.len() > c.name.len()
+                        && m.name.starts_with(&c.name);
+                    if !finer {
+                        let comps = std::mem::take(&mut m.components);
+                        renamed.insert(m.name.clone(), c.name.clone());
+                        m = c;
+                        m.components = comps;
+                    }
                     if let Some(at) = at
                         && let Some(c) = ctx.calls.get(&(
                             site.owner.id.as_str(),
@@ -1626,7 +1658,7 @@ fn site_matches(
             // ring / aws-lc-rs: keys are untyped, the algorithm is a static passed when the key
             // was built. `k.seal_in_place_append_tag(..)` gets AES-256-GCM from the
             // `UnboundKey::new(&AES_256_GCM, ..)` in the origin of `k`.
-            let has_roles = || !provenance::of_call(kb, &ctx.flow, &site.target).is_empty();
+            let has_roles = || !provenance::of_call(kb, &ctx.flow, &site.target, false).is_empty();
             // a call that can give an occurrence: the method is a use, or it has key-material
             // roles (most calls into a protocol crate's own code are neither)
             let can_occur = || {
@@ -1652,6 +1684,24 @@ fn site_matches(
                 // algorithm from other functions (a field, a parameter, a function's result),
                 // looked up only then
                 let local = provenance::data_in_args(kb, None, &site.target);
+                // what an argument names here is not all that reaches it when its other
+                // alternatives come from elsewhere (`if c { &SHA256 } else { pick() }`): then
+                // the values from other functions are looked up too, those named here kept as
+                // named here
+                let incomplete = provenance::incomplete(kb, &site.target);
+                let named_here: HashSet<String> = if incomplete {
+                    local
+                        .iter()
+                        .flat_map(|(d, _)| d.iter().map(|x| x.id.clone()))
+                        .collect()
+                } else {
+                    HashSet::new()
+                };
+                let local = if incomplete {
+                    Default::default()
+                } else {
+                    local
+                };
                 let named = std::cell::RefCell::new(HashMap::new());
                 let linked = std::iter::once_with(|| {
                     ctx.flow.take_named();
@@ -1700,7 +1750,25 @@ fn site_matches(
                             descriptors.push(one.clone());
                         }
                     }
-                    let n = descriptors.len();
+                    // a value named only by code or data no entry point reaches (a caller never
+                    // called, ALL_KX_GROUPS's MLKEM1024, a static only a test uses: rustls's own
+                    // `HMAC_SHA512`) does not reach this call at run time
+                    let unreached_by = |def: &rcbom_facts::DefRef| {
+                        from_elsewhere && !named_here.contains(&def.id) && {
+                            let owners = named.borrow().get(&def.id).cloned().unwrap_or_default();
+                            !owners.iter().any(|w| {
+                                if w.is_empty() {
+                                    reachable(&def.id)
+                                } else if let Some((_, id)) = rcbom_facts::owner_static(w) {
+                                    reachable(id)
+                                } else {
+                                    reached_path(w)
+                                }
+                            }) && !(owners.is_empty() && reachable(&def.id))
+                        }
+                    };
+                    // the members counted are those that reach the call
+                    let n = descriptors.iter().filter(|d| !unreached_by(d)).count();
                     for def in descriptors {
                         if let Some(mut m) =
                             matcher::match_static_called(kb, &def, Some(method), &supported)
@@ -1714,7 +1782,20 @@ fn site_matches(
                             );
                             // several algorithms reach it (rustls's record keys, one per cipher
                             // suite): which one is chosen at run time
+                            let here = named_here.contains(&def.id);
+                            let from_elsewhere = from_elsewhere && !here;
+                            let unreached = unreached_by(&def);
                             let mut d = vec![match (from_elsewhere, n) {
+                                (true, _) if unreached => format!(
+                                    "algorithm {} only through code or data no entry point \
+                                     reaches{}",
+                                    short(&def.path),
+                                    static_witness(&named.borrow(), &def.id)
+                                ),
+                                (false, n) if here && n > 1 => format!(
+                                    "algorithm one of {n} that may reach the call: {} in the arguments",
+                                    short(&def.path)
+                                ),
                                 (false, _) => {
                                     format!("algorithm from {} in the arguments", short(&def.path))
                                 }
@@ -1727,20 +1808,6 @@ fn site_matches(
                                     short(&def.path)
                                 ),
                             }];
-                            // a value named only by code or data no entry point reaches (a
-                            // caller never called, ALL_KX_GROUPS's MLKEM1024) does not reach
-                            // this call at run time
-                            let unreached = from_elsewhere && {
-                                let owners =
-                                    named.borrow().get(&def.id).cloned().unwrap_or_default();
-                                !owners.iter().any(|w| {
-                                    if w.is_empty() {
-                                        reachable(&def.id)
-                                    } else {
-                                        reached_path(w)
-                                    }
-                                }) && !(owners.is_empty() && reachable(&def.id))
-                            };
                             // a call that is no use sets the asset up, as for a typed call
                             // (`UnboundKey::new(&AES_256_GCM, k)`, `hmac::Key::new(..)`)
                             if f.is_none() {
@@ -1915,7 +1982,13 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
             let reason = if *value {
                 "named as a function value; the calls through it are not followed".to_string()
             } else {
-                unresolved_reason(arg_origins.get(op.algorithm)?)
+                let o = arg_origins.get(op.algorithm)?;
+                let r = unresolved_reason(o);
+                if !r.contains("hit its bound") && linked_cut(ctx, site, o) {
+                    format!("{r}; the search for the value hit its bound")
+                } else {
+                    r
+                }
             };
             let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
             Some((
@@ -2009,20 +2082,22 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
     }
 }
 
+/// Does the driver's search for the value `o` stop at its bound somewhere (`Truncated`)?
+fn cut(o: &rcbom_facts::Origin) -> bool {
+    use rcbom_facts::Origin;
+    match o {
+        Origin::Truncated => true,
+        Origin::Any(v) | Origin::All(v) => v.iter().any(cut),
+        Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(cut),
+        Origin::Field { base, .. } => cut(base),
+        Origin::Set { value, .. } => cut(value),
+        _ => false,
+    }
+}
+
 /// Was the search for a value-selected operation's algorithm cut at its bound (a choice among
 /// more alternatives than the driver keeps)?
 fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> bool {
-    fn cut(o: &rcbom_facts::Origin) -> bool {
-        use rcbom_facts::Origin;
-        match o {
-            Origin::Truncated => true,
-            Origin::Any(v) | Origin::All(v) => v.iter().any(cut),
-            Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(cut),
-            Origin::Field { base, .. } => cut(base),
-            Origin::Set { value, .. } => cut(value),
-            _ => false,
-        }
-    }
     let Target::Call {
         callee,
         arg_origins,
@@ -2039,7 +2114,38 @@ fn algorithm_cut(ctx: &Ctx<'_>, site: &Site) -> bool {
         .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
         .filter(|op| !op.self_type)
         .and_then(|op| arg_origins.get(op.algorithm))
-        .is_some_and(cut)
+        .is_some_and(|o| cut(o) || linked_cut(ctx, site, o))
+}
+
+/// Do the values that reach `o` from elsewhere (read at `site`) include a cut (`Truncated`: in
+/// a function's summary, or where the lookup stopped at its bound)?
+fn linked_cut(ctx: &Ctx<'_>, site: &Site, o: &rcbom_facts::Origin) -> bool {
+    ctx.flow.values(o, &site.owner.path).is_some_and(|vs| {
+        vs.iter()
+            .any(|(v, _)| matches!(v, rcbom_facts::Origin::Truncated))
+    })
+}
+
+/// `: stored by static `X``, when the descriptor `id` was found stored by statics only.
+fn static_witness(named: &HashMap<String, std::collections::BTreeSet<String>>, id: &str) -> String {
+    let statics: Vec<&str> = named
+        .get(id)
+        .into_iter()
+        .flatten()
+        .filter_map(|w| rcbom_facts::owner_static(w).map(|(p, _)| p))
+        .collect();
+    if statics.is_empty() {
+        String::new()
+    } else {
+        format!(
+            " (stored by static {})",
+            statics
+                .iter()
+                .map(|p| format!("`{}`", short(p)))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
 }
 
 /// Method names that say nothing about cryptography without a modelled type to scope them: a
@@ -2201,7 +2307,31 @@ pub const UNKNOWN: &str = "unknown";
 /// comes (`the result of `Scheme::alg``).
 fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
     use rcbom_facts::Origin;
-    match links::peel(o) {
+    // the value itself was cut, not the arguments of a call whose result is not followed: a
+    // field of a value whose search stopped at its bound (a chain of writes through `&mut
+    // self` longer than the driver follows)
+    fn value_cut(o: &Origin) -> bool {
+        match o {
+            Origin::Truncated => true,
+            Origin::Any(v) | Origin::All(v) => v.iter().any(value_cut),
+            Origin::Written { args, .. } => args.iter().any(value_cut),
+            Origin::Field { base, .. } => value_cut(base),
+            Origin::Set { value, .. } => value_cut(value),
+            _ => false,
+        }
+    }
+    let peeled = links::peel(o);
+    let reason = unresolved_kind(peeled);
+    if !matches!(peeled, Origin::Truncated) && value_cut(peeled) {
+        format!("{reason}; the search for the value hit its bound")
+    } else {
+        reason
+    }
+}
+
+fn unresolved_kind(o: &rcbom_facts::Origin) -> String {
+    use rcbom_facts::Origin;
+    match o {
         Origin::Param { .. } => "a parameter, whose arguments name no algorithm".into(),
         Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
         Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
@@ -2212,7 +2342,7 @@ fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
         }
         Origin::Any(_) => "one of several values, none naming an algorithm".into(),
         Origin::Truncated => "the search for the value hit its bound".into(),
-        Origin::Set { value, .. } => unresolved_reason(value),
+        Origin::Set { value, .. } => unresolved_kind(links::peel(value)),
         Origin::Loop | Origin::All(_) | Origin::Const { .. } | Origin::Unit { .. } => {
             "a value the analysis does not follow".into()
         }

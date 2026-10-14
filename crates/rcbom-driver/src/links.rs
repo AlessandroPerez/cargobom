@@ -147,13 +147,37 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     // a fill through `&mut` can only reach a mutable static the body names
     let fills_static = names_mutable_static(cx, body);
     let static_init = !func && matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. });
-    // whose parameters the values recorded name
+    // whose parameters the values recorded name; a static's initializer names its static (a
+    // value stored there reaches a call only if the static is reachable)
     let here = if func {
         path_of(tcx, did)
+    } else if static_init {
+        rcbom_facts::static_owner(&path_of(tcx, did), &def_ref_internal(tcx, did).id)
     } else {
         String::new()
     };
     let borrows = field_borrows(tcx, body);
+    // the `&mut` parameters of a function (not a closure's): what each points to when the
+    // function returns is recorded whole below
+    let mut_params: Vec<usize> = if func && !tcx.is_closure_like(did) {
+        body.arg_locals()
+            .iter()
+            .enumerate()
+            .filter(|(_, l)| {
+                matches!(
+                    l.ty.kind().rigid(),
+                    Some(rustc_public::ty::RigidTy::Ref(
+                        _,
+                        _,
+                        rustc_public::mir::Mutability::Mut
+                    ))
+                )
+            })
+            .map(|(i, _)| i)
+            .collect()
+    } else {
+        Vec::new()
+    };
     for (bb, block) in body.blocks.iter().enumerate() {
         for (idx, stmt) in block.statements.iter().enumerate() {
             let StatementKind::Assign(place, rv) = &stmt.kind else {
@@ -231,15 +255,17 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
                     field_store(cx, &origins, &p, &value, &here, out);
                 }
             }
-            // `*slot = v` on a parameter (`slot: &mut &Algorithm`), `*l.write().unwrap() = v`
-            // on a parameter's lock: what the function writes through it
+            // `*l.write().unwrap() = v` on a parameter's lock: what the function writes
+            // through it (through a `&mut` parameter: its value at the returns, below)
             if func && matches!(place.projection.as_slice(), [ProjectionElem::Deref]) {
                 let base = rustc_public::mir::Place {
                     local: place.local,
                     projection: Vec::new(),
                 };
                 let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
-                if let Some(index) = param_behind(&ptr) {
+                if let Some(index) = param_behind(&ptr)
+                    && !mut_params.contains(&index)
+                {
                     let v = value(&[]);
                     if !empty(&v) {
                         let w = ParamWrite {
@@ -482,6 +508,24 @@ pub(crate) fn body_links(cx: &Cx<'_>, body: &Body, did: DefId, func: bool, out: 
     // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
     // have (`ExternalError::_err` on a `Result`: `rcgen::error::ExternalError::_err for
     // core::result::Result`)
+    // what a `&mut` parameter points to at the returns (`set_slot(slot)`: `*slot = &SHA512`;
+    // `upgrade(&mut self)`: the value on entry with `alg` set), when the function writes it:
+    // a caller's `Written` resolves to it, the entry value standing for the caller's own
+    for &index in &mut_params {
+        let value = origins.written_through(index);
+        let entry = Origin::Param { index, owner: None };
+        // (an `Unknown` too: written in a way not followed, not left as it was)
+        if value != entry {
+            let w = ParamWrite {
+                func: here.clone(),
+                index,
+                value,
+            };
+            if !out.writes.contains(&w) {
+                out.writes.push(w);
+            }
+        }
+    }
     if func {
         let ret = rustc_internal::internal(tcx, body.locals()[rustc_public::mir::RETURN_LOCAL].ty);
         let mut names = vec![here.clone()];

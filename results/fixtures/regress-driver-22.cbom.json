@@ -447,14 +447,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t22::c1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 19); instantiated by t22::c1 at src/main.rs:20:12; line: `let f = || cfg.name.len() + Aes256Gcm::new_from_slice(&cfg.key).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t22::c1::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 19); instantiated by t22::c1 at src/main.rs:20:12 as `|| cfg.name.len() + Aes256Gcm::new_from_slice(&cfg.key).is_ok() as usize`; line: `let f = || cfg.name.len() + Aes256Gcm::new_from_slice(&cfg.key).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 32,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t22::c2_async::{closure#0}; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 27); instantiated by t22::main at src/main.rs:128:62; line: `let _ = key.seal_in_place_append_tag(Nonce::assume_unique_for_key([2; 12]), Aad::empty(), buf);`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in t22::c2_async::{closure#0}; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; nonce: hard-coded (12 bytes, literal at line 27); instantiated by t22::main at src/main.rs:128:62 as `poll`; line: `let _ = key.seal_in_place_append_tag(Nonce::assume_unique_for_key([2; 12]), Aad::empty(), buf);`; code: `seal_in_place_append_tag`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 16,
@@ -1184,7 +1184,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:558f1e3c-a41b-822d-bfdd-63182701cfc5",
+  "serialNumber": "urn:uuid:e2c0c189-b72f-8273-b952-a8ce320d87a3",
   "specVersion": "1.7",
   "version": 1
 }

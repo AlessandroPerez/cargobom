@@ -1337,6 +1337,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1883,7 +1887,7 @@
             "symbol": "aead::AeadInPlace::encrypt_in_place_detached"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (literal at line 85); line: `let _ = cipher.encrypt(Nonce::from_slice(&buf[..12]), msg.as_ref());`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 85); line: `let _ = cipher.encrypt(Nonce::from_slice(&buf[..12]), msg.as_ref());`; code: `encrypt`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 19,
@@ -3932,7 +3936,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7cb3d2a8-8b13-88b0-bcdc-d854315b2c49",
+  "serialNumber": "urn:uuid:df08ab0b-5d31-834e-8449-6fbdea095af5",
   "specVersion": "1.7",
   "version": 1
 }

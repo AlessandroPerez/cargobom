@@ -623,6 +623,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -757,7 +761,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t16::d2::{closure#0}; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); instantiated by t16::main at src/main.rs:177:33; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t16::d2::{closure#0}; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); instantiated by t16::main at src/main.rs:177:33 as `poll`; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 4,
@@ -813,7 +817,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t16::d11; new_from_slice: setup, not a use; key: computed (written by t16::fill); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t16::d11; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 114); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 120,
             "location": "src/main.rs",
             "offset": 4,
@@ -909,10 +913,10 @@
             "symbol": "blake3::hash"
           },
           {
-            "additionalContext": "[reachable] [call] in t16::HASH; use: digest; line: `static HASH: fn(&[u8]) -> blake3::Hash = blake3::hash;`; code: `blake3::hash`",
-            "line": 142,
+            "additionalContext": "[reachable] [call] in t16::d14; use: digest; called through a function pointer to `blake3::hash` named at src/main.rs:142:41; line: `HASH(&d).as_bytes()[0] == 0`; code: `HASH`",
+            "line": 146,
             "location": "src/main.rs",
-            "offset": 41,
+            "offset": 4,
             "symbol": "blake3::hash"
           }
         ]
@@ -960,7 +964,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t16::d2::{closure#0}; use: generate; instantiated by t16::main at src/main.rs:177:33; line: `rand::rngs::OsRng.fill_bytes(&mut key);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in t16::d2::{closure#0}; use: generate; instantiated by t16::main at src/main.rs:177:33 as `poll`; line: `rand::rngs::OsRng.fill_bytes(&mut key);`; code: `fill_bytes`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 22,
@@ -1399,7 +1403,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4431a35b-461e-8d83-87b9-c3877b753914",
+  "serialNumber": "urn:uuid:01503953-d284-8be1-beb2-50b3a9d52875",
   "specVersion": "1.7",
   "version": 1
 }

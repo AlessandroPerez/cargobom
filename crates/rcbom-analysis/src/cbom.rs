@@ -230,7 +230,9 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     let crypto = match &a.algo.material {
         // a key with no scheme: material, linked to its family by a property
         Some(m) => {
-            props.push(prop("rcbom:algorithm-family", &a.algo.family));
+            if !a.algo.family.is_empty() {
+                props.push(prop("rcbom:algorithm-family", &a.algo.family));
+            }
             let mut rp = serde_json::Map::new();
             rp.insert("type".into(), json!(m));
             if let Some(size) = a.algo.size.as_ref().and_then(|s| s.parse::<u64>().ok()) {
@@ -326,7 +328,14 @@ fn manifest_occurrences(man: &Manifest, p: &Pkg) -> Vec<Value> {
         .collect()
 }
 
-fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool) -> Value {
+/// `provider`: the package provides an asset (an occurrence names it).
+fn library_component(
+    man: &Manifest,
+    p: &Pkg,
+    usage: Option<Usage>,
+    layer2: bool,
+    provider: bool,
+) -> Value {
     let v = p.version.to_string();
     let mut props = vec![prop(
         "rcbom:scope",
@@ -378,7 +387,11 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
         props.push(prop("rcbom:native-links", l));
         props.push(prop("rcbom:ffi-boundary", "true"));
     }
-    if let (Some(u), Some(r)) = (usage, p.role) {
+    // an interface package (`digest`, `crypto-common`) has no use of its own to report, unless
+    // it provides an asset (rand_core 0.6's `OsRng`, drawn from)
+    if let (Some(u), Some(r)) = (usage, p.role)
+        && (r != Role::Trait || provider)
+    {
         if !layer2 || (u == Usage::DeclaredNotUsed && (!p.kb_supported || p.scope == Scope::Build))
         {
             // without Layer 2 (`--manifest-only`) no use was looked for; its APIs are not in
@@ -386,7 +399,7 @@ fn library_component(man: &Manifest, p: &Pkg, usage: Option<Usage>, layer2: bool
             // only what the walk and its unknown occurrences say; only build scripts and proc
             // macros use it, and they are not analysed
             props.push(prop("rcbom:usage", "unknown"));
-        } else if r != Role::Trait {
+        } else {
             props.push(prop(
                 "rcbom:usage",
                 match u {
@@ -499,16 +512,18 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         .filter(|p| p.member || p.role.is_some() || p.unmodelled.is_some() || p.links.is_some())
         .collect();
     let included_ids: HashSet<_> = included.iter().map(|p| p.id.clone()).collect();
+    let providers: HashSet<&(String, String)> =
+        an.assets.values().flat_map(|a| &a.providers).collect();
     let mut components: Vec<Value> = included
         .iter()
         .map(|p| {
+            let key = (p.name.clone(), p.version.to_string());
             library_component(
                 man,
                 p,
-                an.usage
-                    .get(&(p.name.clone(), p.version.to_string()))
-                    .copied(),
+                an.usage.get(&key).copied(),
                 an.layer2,
+                providers.contains(&key),
             )
         })
         .collect();

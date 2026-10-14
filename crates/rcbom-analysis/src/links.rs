@@ -12,7 +12,7 @@
 //! `AeadAlgorithm` holds.
 
 use std::cell::{Cell, RefCell};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use rcbom_facts::{CrateFacts, Origin};
 
@@ -30,14 +30,54 @@ pub struct LinkIndex {
     writes: HashMap<(String, usize), Vec<Origin>>,
     /// Lookups left for the current `values` call.
     budget: Cell<usize>,
+    /// The reads being resolved (value, path, function), outermost first: one met again is a
+    /// cycle.
+    active: RefCell<HashSet<Read>>,
     /// Answers already given: the same field is read at many calls.
-    memo: RefCell<HashMap<(Origin, String), Values>>,
+    memo: RefCell<HashMap<(Origin, String), Option<Found>>>,
     /// For the current question: the functions each descriptor found was named in (`""`: a
     /// static's initializer, or what a static holds at run time).
     named_in: RefCell<HashMap<String, std::collections::BTreeSet<String>>>,
 }
 
 type Values = Option<Vec<(Origin, String)>>;
+
+/// How a value reaches the read (the set label of each member, with its witness): named in the
+/// function itself, passed by a caller, returned or written by a function, or one of the values
+/// the program stores in a field of the type anywhere (a flow-insensitive join: possible, not
+/// shown to reach this read). Ordered from the most to the least specific.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Via {
+    Fixed,
+    /// The calling function.
+    Caller(String),
+    /// The function returning or writing it.
+    Object(String),
+    /// The function (or `static ..`) storing it in the field.
+    Join(String),
+}
+
+impl Via {
+    fn rank(&self) -> u8 {
+        match self {
+            Via::Fixed => 0,
+            Via::Caller(_) | Via::Object(_) => 1,
+            Via::Join(_) => 2,
+        }
+    }
+
+    /// The less specific of the two: a value passed by a caller that read it from a field's
+    /// join is a join member.
+    pub(crate) fn then(&self, next: Via) -> Via {
+        if next.rank() >= self.rank() {
+            next
+        } else {
+            self.clone()
+        }
+    }
+}
+
+type Found = Vec<(Origin, String, Via)>;
 
 #[derive(PartialEq)]
 struct Stored {
@@ -58,6 +98,9 @@ const MAX_STEPS: usize = 4096;
 /// A field read, from the outermost struct in: (struct, field, the struct's type arguments when
 /// known).
 type FieldPath = [(String, usize, Option<String>)];
+
+/// A read being resolved: the value, the fields read from it, the function it is read in.
+type Read = (Origin, Vec<(String, usize, Option<String>)>, String);
 
 impl LinkIndex {
     pub fn new(facts: &[CrateFacts]) -> LinkIndex {
@@ -163,6 +206,30 @@ impl LinkIndex {
         self.returns.keys().any(|(f, _)| f == func)
     }
 
+    /// Adds calls (callee, caller, arguments) found after the index was built (calls through
+    /// function pointers); answers given before are forgotten.
+    pub(crate) fn add_calls(&mut self, calls: Vec<(String, String, Vec<Origin>)>) {
+        if calls.is_empty() {
+            return;
+        }
+        for (callee, caller, args) in calls {
+            let v = self.calls.entry(callee).or_default();
+            let call = (caller, args);
+            if !v.contains(&call) {
+                v.push(call);
+            }
+        }
+        self.memo.borrow_mut().clear();
+    }
+
+    /// What `func` returns, whole.
+    pub fn returned(&self, func: &str) -> Vec<Origin> {
+        self.returns
+            .get(&(func.to_string(), Vec::new()))
+            .cloned()
+            .unwrap_or_default()
+    }
+
     /// Does it record what `func` returns in field `field` of its result?
     pub fn returns_field(&self, func: &str, field: usize) -> bool {
         self.returns.contains_key(&(func.to_string(), vec![field]))
@@ -197,6 +264,12 @@ impl LinkIndex {
     /// names those of the function that stored it). `None` when nothing is known from
     /// elsewhere.
     pub fn values(&self, o: &Origin, owner: &str) -> Values {
+        self.values_via(o, owner)
+            .map(|vs| vs.into_iter().map(|(v, w, _)| (v, w)).collect())
+    }
+
+    /// `values`, each with how it reaches the read (`Via`).
+    pub fn values_via(&self, o: &Origin, owner: &str) -> Option<Found> {
         let key = (o.clone(), owner.to_string());
         if let Some(v) = self.memo.borrow().get(&key) {
             return v.clone();
@@ -206,15 +279,15 @@ impl LinkIndex {
         v
     }
 
-    fn lookup(&self, o: &Origin, owner: &str) -> Values {
+    fn lookup(&self, o: &Origin, owner: &str) -> Option<Found> {
         let mut out = Vec::new();
         self.budget.set(MAX_STEPS);
-        self.resolve(o, &[], owner, 0, &mut out);
+        self.resolve(o, &[], owner, 0, &Via::Fixed, &mut out);
         if std::env::var("RCBOM_DEBUG_LINKS").is_ok() {
             eprintln!("links: {owner}: {o:?}\n  -> {out:?}");
         }
         // nothing learned: `o` itself
-        if let [(v, w)] = out.as_slice()
+        if let [(v, w, _)] = out.as_slice()
             && v == peel(o)
             && w == owner
         {
@@ -232,14 +305,50 @@ impl LinkIndex {
         path: &FieldPath,
         owner: &str,
         depth: usize,
-        out: &mut Vec<(Origin, String)>,
+        via: &Via,
+        out: &mut Found,
     ) {
-        if depth > MAX_DEPTH || out.len() >= MAX_VALUES || self.budget.get() == 0 {
+        if out.len() >= MAX_VALUES {
             return;
         }
+        // the bound: what lies further is not known, and the values say so (a set found
+        // beside it is not all), never dropped
+        if depth > MAX_DEPTH || self.budget.get() == 0 {
+            push(out, (Origin::Truncated, owner.to_string(), via.clone()));
+            return;
+        }
+        // a read met again inside its own resolution is a cycle (a field stored from itself:
+        // rustls's `Context(self.0.clone())` in `fork`): what it reaches, the outer read
+        // reaches; it adds nothing and cuts nothing
+        let key = (o.clone(), path.to_vec(), owner.to_string());
+        if !self.active.borrow_mut().insert(key.clone()) {
+            return;
+        }
+        self.resolve_step(o, path, owner, depth, via, out);
+        self.active.borrow_mut().remove(&key);
+    }
+
+    /// One step of `resolve`, within its bounds.
+    fn resolve_step(
+        &self,
+        o: &Origin,
+        path: &FieldPath,
+        owner: &str,
+        depth: usize,
+        via: &Via,
+        out: &mut Found,
+    ) {
         self.budget.set(self.budget.get() - 1);
         let o = peel_ix(Some(self), o);
         match o {
+            // a field of the error a `?` returns, or of a field-less value (an enum variant, a
+            // unit struct): none (not the struct a field of the type would be stored in)
+            Origin::Call { callee, .. }
+                if !path.is_empty() && callee.ends_with("FromResidual::from_residual") =>
+            {
+                return;
+            }
+            Origin::Unit { .. } if !path.is_empty() => return,
             // the field read, outermost struct first (bounded by the origin: not a hop)
             Origin::Field {
                 adt,
@@ -249,24 +358,31 @@ impl LinkIndex {
             } => {
                 let mut p = vec![(adt.clone(), *field, args.clone())];
                 p.extend_from_slice(path);
-                return self.resolve(base, &p, owner, depth, out);
+                return self.resolve(base, &p, owner, depth, via, out);
             }
-            // what a function the program calls writes through the parameter (`set_slot(&mut
-            // c.alg)`), its parameters being the call's arguments
+            // what a function the program calls leaves behind the parameter (`set_slot(&mut
+            // c.alg)`), its parameters being the call's arguments: its value on entry is the
+            // value before the call (argument `index`); a function that records no write
+            // leaves that value as it was (`touch(&mut d)`)
             Origin::Written {
                 callee,
                 index,
                 args,
             } => {
                 let mut found = Vec::new();
-                for w in self
-                    .writes
-                    .get(&(callee.clone(), *index))
-                    .into_iter()
-                    .flatten()
-                {
-                    let v = substitute(w, args);
-                    self.resolve(&v, path, owner, depth + 1, &mut found);
+                let by = via.then(Via::Object(callee.clone()));
+                match self.writes.get(&(callee.clone(), *index)) {
+                    Some(ws) => {
+                        for w in ws {
+                            let v = substitute(w, args);
+                            self.resolve(&v, path, owner, depth + 1, &by, &mut found);
+                        }
+                    }
+                    None => {
+                        if let Some(before) = args.get(*index) {
+                            self.resolve(before, path, owner, depth + 1, via, &mut found);
+                        }
+                    }
                 }
                 found.into_iter().for_each(|v| push(out, v));
                 return;
@@ -282,13 +398,13 @@ impl LinkIndex {
                     if replaced && !matches!(a, Origin::Set { .. }) {
                         continue;
                     }
-                    self.resolve(a, path, owner, depth, out);
+                    self.resolve(a, path, owner, depth, via, out);
                 }
                 return;
             }
             Origin::Any(alts) | Origin::All(alts) => {
                 for a in alts {
-                    self.resolve(a, path, owner, depth, out);
+                    self.resolve(a, path, owner, depth, via, out);
                 }
                 return;
             }
@@ -297,10 +413,10 @@ impl LinkIndex {
             Origin::Set { path: p, value, .. } => {
                 let want = fields(path);
                 if want.starts_with(p) {
-                    return self.resolve(value, &path[p.len()..], owner, depth, out);
+                    return self.resolve(value, &path[p.len()..], owner, depth, via, out);
                 }
                 if p.starts_with(&want) {
-                    return self.resolve(value, &[], owner, depth, out);
+                    return self.resolve(value, &[], owner, depth, via, out);
                 }
                 return;
             }
@@ -313,7 +429,8 @@ impl LinkIndex {
                     for (caller, args) in callers {
                         let mut found = Vec::new();
                         if let Some(a) = args.get(*index) {
-                            self.resolve(a, path, caller, depth + 1, &mut found);
+                            let by = via.then(Via::Caller(caller.clone()));
+                            self.resolve(a, path, caller, depth + 1, &by, &mut found);
                         }
                         unknown |= found.is_empty();
                         found.into_iter().for_each(|v| push(out, v));
@@ -339,9 +456,10 @@ impl LinkIndex {
                     .find(|(n, k)| self.returns.contains_key(&(n.clone(), fields(&path[..*k]))))
                 {
                     let mut found = Vec::new();
+                    let by = via.then(Via::Object(name.clone()));
                     for r in &self.returns[&(name, fields(&path[..k]))] {
                         let v = substitute(r, args);
-                        self.resolve(&v, &path[k..], owner, depth + 1, &mut found);
+                        self.resolve(&v, &path[k..], owner, depth + 1, &by, &mut found);
                     }
                     if !found.is_empty() {
                         found.into_iter().for_each(|v| push(out, v));
@@ -352,16 +470,22 @@ impl LinkIndex {
             _ => {}
         }
         if path.is_empty() {
-            push(out, (o.clone(), owner.to_string()));
+            push(out, (o.clone(), owner.to_string(), via.clone()));
         } else {
-            self.stored(path, depth, out);
+            // a field of a value the driver's search cut (a chain of writes through `&mut
+            // self` longer than it follows): the cut stays among the values, beside the
+            // field's stores, so that the reader says the search hit its bound
+            if matches!(o, Origin::Truncated) {
+                push(out, (Origin::Truncated, owner.to_string(), via.clone()));
+            }
+            self.stored(path, depth, via, out);
         }
     }
 
     /// The values the program stores in the fields of `path`: the stores of the longest part
     /// of the path that has any (`Chacha20Poly1305Aead.0.0` before `AeadAlgorithm.0`), with
     /// those of the shorter parts made through a reference.
-    fn stored(&self, path: &FieldPath, depth: usize, out: &mut Vec<(Origin, String)>) {
+    fn stored(&self, path: &FieldPath, depth: usize, via: &Via, out: &mut Found) {
         let keys: Vec<(String, Vec<usize>)> = (0..path.len())
             .map(|j| (path[j].0.clone(), fields(&path[j..])))
             .collect();
@@ -381,7 +505,8 @@ impl LinkIndex {
         for (j, key) in keys.iter().enumerate().skip(first) {
             for s in self.fields.get(key).into_iter().flatten() {
                 if (j == first || s.via_ref) && seen(j, s) {
-                    self.resolve(&s.value, &[], &s.func, depth + 1, out);
+                    let by = via.then(Via::Join(s.func.clone()));
+                    self.resolve(&s.value, &[], &s.func, depth + 1, &by, out);
                 }
             }
         }
@@ -471,8 +596,13 @@ fn names_param(o: &Origin) -> bool {
     }
 }
 
-fn push(out: &mut Vec<(Origin, String)>, v: (Origin, String)) {
-    if !out.contains(&v) && out.len() < MAX_VALUES {
+/// Adds a value once; reached several ways, it keeps the most specific.
+fn push(out: &mut Found, v: (Origin, String, Via)) {
+    if let Some(e) = out.iter_mut().find(|e| e.0 == v.0 && e.1 == v.1) {
+        if v.2 < e.2 {
+            e.2 = v.2;
+        }
+    } else if out.len() < MAX_VALUES {
         out.push(v);
     }
 }

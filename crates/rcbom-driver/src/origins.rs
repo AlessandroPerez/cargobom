@@ -17,7 +17,7 @@
 use std::cell::{Cell, OnceCell, RefCell};
 use std::collections::{HashMap, HashSet};
 
-use rcbom_facts::{Loc, Origin};
+use rcbom_facts::{Loc, MAX_ORIGIN_DEPTH, Origin};
 use rustc_middle::ty::{GenericArgsRef, TyCtxt};
 use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::{
@@ -36,6 +36,8 @@ const MAX_DEPTH: usize = 10;
 /// Alternatives, call arguments and aggregate parts kept per node: a `match` over every
 /// variant of a selector (jwt-cli's 12 JWT algorithms) is kept whole.
 const MAX_WIDTH: usize = 16;
+/// Fields of a struct literal given each its own value (`Origin::Set`); further ones are cut.
+const MAX_FIELDS: usize = 32;
 /// Nodes per origin tree.
 const MAX_NODES: usize = 400;
 /// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
@@ -280,13 +282,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     }
 
     fn flow(&self) -> &Flow {
-        self.flow
-            .get_or_init(|| Flow::new(self.body, self.kind == BodyKind::Coroutine))
+        self.flow.get_or_init(|| {
+            Flow::new(self.body, self.kind == BodyKind::Coroutine, &|f| {
+                self.local_fn(f)
+            })
+        })
     }
 }
 
 impl Flow {
-    fn new(body: &Body, coroutine: bool) -> Self {
+    /// `local_fn`: is a callee a function of the crate (whose writes through `&mut` its links
+    /// summarize, the value before included where it may not write)?
+    fn new(body: &Body, coroutine: bool, local_fn: &dyn Fn(&Operand) -> bool) -> Self {
         let nargs = body.arg_locals().len();
         let mut defs = Vec::new();
         for l in 1..=nargs {
@@ -519,7 +526,7 @@ impl Flow {
                                     index: Some(k),
                                 },
                                 single,
-                                k == 0 || whole,
+                                k == 0 || whole || local_fn(func),
                             ));
                         }
                     }
@@ -552,6 +559,22 @@ impl Flow {
         } else {
             HashSet::new()
         };
+        // `&mut` parameters the body never reassigns: each points at one place for the whole
+        // body, so a write through it (`*slot = v`, `(*self).alg = v`) certainly lands there
+        let reassigned: HashSet<Local> = pending
+            .iter()
+            .filter(|(p, ..)| p.projection.is_empty())
+            .map(|(p, ..)| p.local)
+            .collect();
+        let unique = |l: Local| {
+            !coroutine
+                && (1..=nargs).contains(&l)
+                && !reassigned.contains(&l)
+                && matches!(
+                    body.locals()[l].ty.kind().rigid(),
+                    Some(RigidTy::Ref(_, _, Mutability::Mut))
+                )
+        };
         for (place, at, kind) in pending {
             let path = path_of_place(&place);
             // a coroutine's saved local (`((*_44) as variant#3).0`, a local of an `async` body
@@ -564,7 +587,11 @@ impl Flow {
                     || (self_ptrs.contains(&place.local)
                         && matches!(path.as_slice(), [Step::Deref, rest @ ..]
                             if !rest.contains(&Step::Deref))));
-            let strong = (saved || !path.contains(&Step::Deref)) && !partial(&path);
+            let through_param = matches!(path.as_slice(), [Step::Deref, rest @ ..]
+                    if !rest.contains(&Step::Deref))
+                && unique(place.local);
+            let strong =
+                (saved || through_param || !path.contains(&Step::Deref)) && !partial(&path);
             let init = is_init(body, &kind) && !partial(&path);
             defs.push(Def {
                 local: place.local,
@@ -614,6 +641,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     pub(crate) fn operand_at(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
         self.nodes.set(0);
         self.operand(op, At { bb, idx }, 0, &mut HashSet::new())
+            .capped(MAX_ORIGIN_DEPTH)
     }
 
     pub(crate) fn body(&self) -> &'a Body {
@@ -639,6 +667,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             }
             _ => self.operand(op, at, 0, &mut HashSet::new()),
         }
+        .capped(MAX_ORIGIN_DEPTH)
     }
 
     /// Origin of the part `rest` of what `rv` computes at statement `idx` of block `bb`.
@@ -652,10 +681,21 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     ) -> Origin {
         self.nodes.set(0);
         self.rvalue(rv, span, rest, At { bb, idx }, 0, &mut HashSet::new())
+            .capped(MAX_ORIGIN_DEPTH)
     }
 
     /// What the function returns, or the part `rest` of it: the return place at each `return`.
     pub(crate) fn returned_part(&self, rest: &[Step]) -> Origin {
+        self.at_returns(rustc_public::mir::RETURN_LOCAL, rest)
+    }
+
+    /// What a `&mut` parameter (argument `index`) points to when the function returns: what
+    /// the function wrote there, its value on entry (`Param`) where it may not have.
+    pub(crate) fn written_through(&self, index: usize) -> Origin {
+        self.at_returns(index + 1, &[Step::Deref])
+    }
+
+    fn at_returns(&self, local: Local, rest: &[Step]) -> Origin {
         let mut alts = Vec::new();
         for (bb, block) in self.body.blocks.iter().enumerate() {
             if matches!(block.terminator.kind, TerminatorKind::Return) {
@@ -664,13 +704,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     bb,
                     idx: block.statements.len(),
                 };
-                let o = self.place(
-                    rustc_public::mir::RETURN_LOCAL,
-                    rest.to_vec(),
-                    at,
-                    0,
-                    &mut HashSet::new(),
-                );
+                let o = self
+                    .place(local, rest.to_vec(), at, 0, &mut HashSet::new())
+                    .capped(MAX_ORIGIN_DEPTH);
                 if !alts.contains(&o) {
                     alts.push(o);
                 }
@@ -792,6 +828,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             idx: self.body.blocks[bb].statements.len(),
         };
         self.operand(op, at, 0, &mut HashSet::new())
+            .capped(MAX_ORIGIN_DEPTH)
     }
 
     /// The span that names the callee of the call terminating `term` when it is held in a
@@ -1162,6 +1199,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
     }
 
+    /// Is `func` a function of this crate?
+    fn local_fn(&self, func: &Operand) -> bool {
+        matches!(func.ty(self.body.locals()).ok().map(|t| t.kind()),
+            Some(TyKind::RigidTy(RigidTy::FnDef(def, _)))
+                if rustc_internal::internal(self.tcx, def.def_id()).is_local())
+    }
+
     /// What a call of a function of the program (`d`, an out-parameter definition) writes
     /// through the argument pointing at the place: `Written`, which the links resolve to the
     /// values the function stores there. `None` for another crate's function, whose result
@@ -1183,6 +1227,11 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let did = rustc_internal::internal(self.tcx, def.def_id());
         if !did.is_local() {
             return None;
+        }
+        // A chain of writes through `&mut self` (`self.a(); self.b(); ..`) nests each value
+        // before in the next call's arguments: cut like a call.
+        if depth >= MAX_DEPTH {
+            return Some(Origin::Truncated);
         }
         let args = args
             .iter()
@@ -1559,6 +1608,29 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
             }
             AggregateKind::Tuple if ops.is_empty() => Origin::Unknown,
+            // a struct literal read whole (`&Header { alg: HS384, ..Default::default() }`
+            // passed on): each field's value at that field, so that a read of one field
+            // elsewhere finds it, not every value the program stores in fields of its type
+            AggregateKind::Adt(def, ..)
+                if rest.is_empty() && !ops.is_empty() && self.program_struct(def.def_id()) =>
+            {
+                if depth >= MAX_DEPTH {
+                    return Origin::Truncated;
+                }
+                let mut parts = Vec::new();
+                for (f, o) in ops.iter().enumerate() {
+                    if f >= MAX_FIELDS {
+                        parts.push(Origin::Truncated);
+                        break;
+                    }
+                    parts.push(Origin::Set {
+                        path: vec![f],
+                        value: Box::new(self.operand(o, at, depth + 1, seen)),
+                        strong: true,
+                    });
+                }
+                Origin::All(parts)
+            }
             _ if !ops.is_empty() && ops.iter().all(|o| matches!(o, Operand::Constant(_))) => {
                 let len = match kind {
                     AggregateKind::Array(t) => byte_len(t, Some(ops.len() as u64)),
@@ -1598,6 +1670,16 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
             }
         }
+    }
+
+    /// A struct (not an enum, a union) of a crate other than the standard library's.
+    fn program_struct(&self, def: rustc_public::DefId) -> bool {
+        let did = rustc_internal::internal(self.tcx, def);
+        self.tcx.adt_def(did).is_struct()
+            && !matches!(
+                self.tcx.crate_name(did.krate).as_str(),
+                "core" | "std" | "alloc"
+            )
     }
 
     /// A closure's return value, with its captures' origins when the caller knows them.
@@ -1824,6 +1906,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                         let o = Origin::Data {
                             def: def_ref_internal(self.tcx, did),
                             value: None,
+                            zero: self.item_zero(did),
                         };
                         if !statics.contains(&o) {
                             statics.push(o);
@@ -1935,6 +2018,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             named = crate::statics::statics_of_value(tcx, v, rustc_internal::internal(tcx, ty));
         }
         named.dedup();
+        // a promoted value naming nothing that holds a function (`&Holder { f: digest::digest
+        // }`): what its body builds, the function named where it is
+        if named.is_empty()
+            && let Some(p) = promoted
+            && let Some(o) = self.promoted_origin(did, p)
+        {
+            return Some(o);
+        }
         let value = match named.as_slice() {
             [_] if int => value.or_else(|| match evaluate()? {
                 rustc_middle::mir::ConstValue::Scalar(
@@ -1952,6 +2043,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             .map(|d| Origin::Data {
                 def: def_ref_internal(tcx, d),
                 value,
+                zero: self.item_zero(d),
             })
             .collect();
         data.dedup();
@@ -1960,6 +2052,27 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             1 => data.pop(),
             _ => Some(Origin::Any(data)),
         }
+    }
+
+    /// What promoted constant `p` of `did` builds, when it holds a function named as a value.
+    fn promoted_origin(&self, did: DefId, p: rustc_middle::mir::Promoted) -> Option<Origin> {
+        fn names_fn(o: &Origin) -> bool {
+            match o {
+                Origin::Unit { span: Some(_), .. } => true,
+                Origin::Any(xs) | Origin::All(xs) => xs.iter().any(names_fn),
+                Origin::Set { value, .. } => names_fn(value),
+                Origin::Call { args, .. } => args.iter().any(names_fn),
+                _ => false,
+            }
+        }
+        if !self.tcx.is_mir_available(did) {
+            return None;
+        }
+        let body: Body = rustc_internal::stable(&self.tcx.promoted_mir(did)[p]);
+        let mut inner = Origins::new(self.tcx, &body, Some(did));
+        inner.followed = true;
+        let o = inner.returned_part(&[]);
+        names_fn(&o).then_some(o)
     }
 
     /// The value of an unevaluated constant, when its arguments are known (in terms of the
@@ -2012,6 +2125,54 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             rustc_span::DUMMY_SP,
         )
         .ok()
+    }
+
+    /// Is a const or static item of data (an integer, an array of them) all zero bytes
+    /// (`const ZERO: [u8; 32] = [0; 32]`)?
+    fn item_zero(&self, did: DefId) -> bool {
+        let tcx = self.tcx;
+        let ty = tcx.type_of(did).instantiate_identity().skip_norm_wip();
+        let data = |t: rustc_middle::ty::Ty<'_>| {
+            matches!(
+                t.kind(),
+                rustc_middle::ty::Int(_) | rustc_middle::ty::Uint(_)
+            )
+        };
+        let is_data = match ty.kind() {
+            rustc_middle::ty::Array(e, _) => data(*e),
+            _ => data(ty),
+        };
+        // a generic item (an associated const of a generic impl) has no one value
+        if !is_data || tcx.is_foreign_item(did) || tcx.generics_of(did).count() > 0 {
+            return false;
+        }
+        match tcx.def_kind(did) {
+            rustc_hir::def::DefKind::Static { .. } => {
+                tcx.eval_static_initializer(did).ok().is_some_and(|a| {
+                    let a = a.inner();
+                    let bytes = a.inspect_with_uninit_and_ptr_outside_interpreter(0..a.len());
+                    !bytes.is_empty()
+                        && a.provenance().ptrs().is_empty()
+                        && bytes.iter().all(|b| *b == 0)
+                })
+            }
+            rustc_hir::def::DefKind::Const | rustc_hir::def::DefKind::AssocConst => {
+                if !crate::statics::evaluable(tcx, did, None) {
+                    return false;
+                }
+                tcx.const_eval_poly(did).ok().is_some_and(|v| {
+                    let c: rustc_public::ty::MirConst =
+                        rustc_internal::stable(rustc_middle::mir::Const::Val(v, ty));
+                    match c.kind() {
+                        ConstantKind::Allocated(a) => {
+                            literal_data(a, &rustc_internal::stable(ty)).1
+                        }
+                        _ => false,
+                    }
+                })
+            }
+            _ => false,
+        }
     }
 
     /// An enum whose variants have no fields: its values are their discriminants.
@@ -2751,6 +2912,8 @@ fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option<u64>, bool
             }
             _ => (None, false),
         },
+        // an integer: its bytes (`vec![0u8; 32]`'s element)
+        Some(RigidTy::Int(_) | RigidTy::Uint(_)) => (bytes_of_ty(ty), zero(&a.bytes)),
         _ => (bytes_of_ty(ty), false),
     }
 }

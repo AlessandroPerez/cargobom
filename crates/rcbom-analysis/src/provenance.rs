@@ -57,7 +57,15 @@ fn length_args(kb: &Kb, paths: &[String]) -> HashSet<usize> {
         .collect()
 }
 
-pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTreeSet<Class>)> {
+///
+/// `protocol`: the call is a protocol crate's (rustls's key schedule), where an all-zero salt
+/// or input key is the protocol's own "none".
+pub fn of_call(
+    kb: &Kb,
+    links: &LinkIndex,
+    target: &Target,
+    protocol: bool,
+) -> Vec<(String, BTreeSet<Class>)> {
     let Target::Call {
         arg_origins,
         arg_lens,
@@ -104,8 +112,10 @@ pub fn of_call(kb: &Kb, links: &LinkIndex, target: &Target) -> Vec<(String, BTre
                 }
                 // an all-zero salt or input key is what a protocol puts where it has none (TLS 1.3's
                 // key schedule: HKDF-Extract of zeros, RFC 8446 7.1; HKDF's default salt, RFC
-                // 5869): no material, not a hard-coded secret. An all-zero key is a hard-coded one.
-                if matches!(role.as_str(), "salt" | "ikm") {
+                // 5869): no material, not a hard-coded secret. An all-zero key is a hard-coded one,
+                // and so is the program's own all-zero input (a derived key that depends on
+                // nothing secret)
+                if protocol && matches!(role.as_str(), "salt" | "ikm") {
                     classes = classes
                         .into_iter()
                         .map(|c| {
@@ -241,8 +251,15 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 classify(kb, links, v, depth + 1, out);
             }
         }
-        Origin::Data { def, .. } => {
-            out.insert(class("hard-coded", format!("static {}", short(&def.path))));
+        Origin::Data { def, zero, .. } => {
+            out.insert(class(
+                "hard-coded",
+                format!(
+                    "{}static {}",
+                    if *zero { "all zero, " } else { "" },
+                    short(&def.path)
+                ),
+            ));
         }
         // a field of a value from elsewhere: as for that value (a parameter's field is the
         // parameter's)
@@ -405,12 +422,15 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     } else {
                         out.extend(inner.into_iter().map(without_length));
                     }
-                } else if ERROR_ARGS.iter().any(|m| path.ends_with(m))
-                    || REPEATING.iter().any(|m| path.ends_with(m))
-                {
+                } else if REPEATING.iter().any(|m| path.ends_with(m)) {
+                    // copies of the element: `vec![0; n]` (the length is not data, nor is the
+                    // element's own)
+                    let mut inner = BTreeSet::new();
+                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    out.extend(inner.into_iter().map(without_length));
+                } else if ERROR_ARGS.iter().any(|m| path.ends_with(m)) {
                     // the value is the receiver: `expect(msg)`, `ok_or(err)`, `map_err(f)` (the
-                    // other argument is what an error carries); copies of the element:
-                    // `vec![0; n]` (the length is not data)
+                    // other argument is what an error carries)
                     classify(kb, links, &args[0], depth + 1, out);
                 } else if FALLBACKS.iter().any(|m| path.ends_with(m)) {
                     // the receiver, or what the fallback supplies instead
@@ -645,6 +665,72 @@ pub fn data_in_args(
     [own, chain].map(|v| v.into_iter().partition(|d| is_descriptor(kb, d)))
 }
 
+/// Is what the call's own arguments name an incomplete answer: an argument (or the receiver
+/// chain) where a descriptor is named in the function has other alternatives that come from
+/// elsewhere (`if n > 1 { &SHA256 } else { pick() }`, a parameter, a field, what a function of
+/// the program writes through `&mut`)? Then the values from other functions are looked up too.
+pub fn incomplete(kb: &Kb, target: &Target) -> bool {
+    let Target::Call { arg_origins, .. } = target else {
+        return false;
+    };
+    let lengths = length_args(kb, &call_paths(target));
+    let named = |o: &Origin| {
+        let mut here = Vec::new();
+        direct_data(kb, None, o, 0, &mut here, &mut HashSet::new());
+        here.iter().any(|d| is_descriptor(kb, d))
+    };
+    let own = arg_origins
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| !lengths.contains(i))
+        .any(|(_, o)| named(o) && elsewhere_direct(kb, o, 0));
+    own || arg_origins.first().is_some_and(|r| {
+        let mut chain = Vec::new();
+        receiver_data(kb, None, r, 0, &mut chain, &mut HashSet::new(), false);
+        chain.iter().any(|d| is_descriptor(kb, d)) && elsewhere_receiver(kb, r, 0)
+    })
+}
+
+/// Does `direct_data`'s local search of `o` pass a value from elsewhere it cannot follow?
+fn elsewhere_direct(kb: &Kb, o: &Origin, depth: usize) -> bool {
+    if depth > 6 {
+        return false;
+    }
+    let o = crate::links::peel(o);
+    match o {
+        Origin::Data { .. } => false,
+        Origin::Call { callee, args, .. } if callee == "<closure>" => {
+            args.iter().any(|a| elsewhere_direct(kb, a, depth + 1))
+        }
+        Origin::Any(alts) | Origin::All(alts) => {
+            alts.iter().any(|a| elsewhere_direct(kb, a, depth + 1))
+        }
+        Origin::Set { value, .. } => elsewhere_direct(kb, value, depth + 1),
+        Origin::Field { .. } if static_root(o).is_some() => false,
+        _ => from_elsewhere(kb, None, o),
+    }
+}
+
+/// Does `receiver_data`'s local search of `o` pass a value from elsewhere it cannot follow?
+fn elsewhere_receiver(kb: &Kb, o: &Origin, depth: usize) -> bool {
+    if depth > 8 {
+        return false;
+    }
+    if from_elsewhere(kb, None, o) {
+        return true;
+    }
+    match o {
+        Origin::Call { args, .. } => args
+            .iter()
+            .any(|a| elsewhere_direct(kb, a, 0) || elsewhere_receiver(kb, a, depth + 1)),
+        Origin::Any(alts) | Origin::All(alts) => {
+            alts.iter().any(|a| elsewhere_receiver(kb, a, depth + 1))
+        }
+        Origin::Set { value, .. } => elsewhere_receiver(kb, value, depth + 1),
+        _ => false,
+    }
+}
+
 /// A value that comes from outside the function: a field read, a parameter, or a call of a
 /// function whose code is analysed (not the standard library's, nor an algorithm or trait
 /// crate's: a protocol crate's, rustls's, is).
@@ -703,6 +789,7 @@ fn direct_data(
         let key = Origin::Data {
             def: def.clone(),
             value: None,
+            zero: false,
         };
         if seen.insert((false, key, String::new())) {
             for v in &values {
@@ -810,6 +897,7 @@ fn receiver_data(
         let key = Origin::Data {
             def: def.clone(),
             value: None,
+            zero: false,
         };
         if seen.insert((true, key, String::new())) {
             for v in &values {
@@ -995,6 +1083,7 @@ mod tests {
                 id: "0".into(),
             },
             value: None,
+            zero: false,
         }
     }
 
@@ -1077,13 +1166,17 @@ mod tests {
             through: None,
             value: false,
         };
-        let found = of_call(&kb, &LinkIndex::default(), &call(1));
-        let salt: Vec<_> = found
-            .iter()
-            .filter(|(r, _)| r == "salt")
-            .flat_map(|(_, c)| c.iter().map(|c| c.kind.as_str()))
-            .collect();
-        assert_eq!(salt, ["absent"]);
+        let salt = |protocol: bool| -> Vec<String> {
+            of_call(&kb, &LinkIndex::default(), &call(1), protocol)
+                .iter()
+                .filter(|(r, _)| r == "salt")
+                .flat_map(|(_, c)| c.iter().map(|c| c.kind.clone()))
+                .collect()
+        };
+        // inside a protocol crate (TLS 1.3's key schedule) the all-zero salt is its "none"; the
+        // program's own all-zero input is hard-coded
+        assert_eq!(salt(true), ["absent"]);
+        assert_eq!(salt(false), ["hard-coded"]);
     }
 
     fn call(callee: &str, krate: &str, args: Vec<Origin>) -> Origin {

@@ -1,0 +1,491 @@
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:33:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 30); line: `let _ = UnboundKey::new(&AES_256_GCM, &c4.key); // key: hard-coded (the literal [1; 32])`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:33:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s1::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &c4.key); // key: hard-coded (the literal [1; 32])`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:45:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: computed (s1::arg); line: `let _ = UnboundKey::new(&AES_256_GCM, &k8); // key: from the arguments, not the literal`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:45:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s1::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &k8); // key: from the arguments, not the literal`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:46:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (all zero, 32 bytes, literal at line 46); line: `let _ = UnboundKey::new(&AES_256_GCM, &[0u8; 32]); // all-zero key: hard-coded`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:46:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s1::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &[0u8; 32]); // all-zero key: hard-coded`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:47:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, all zero, static s1::ZERO); line: `let _ = UnboundKey::new(&AES_256_GCM, &ZERO); // all-zero const key: hard-coded`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:47:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s1::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &ZERO); // all-zero const key: hard-coded`; code: `AES_256_GCM`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:12 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 57); line: `let _ = UnboundKey::new(&AES_256_GCM, &c9.key); // hard-coded`; code: `UnboundKey::new`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:29 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s1::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &c9.key); // hard-coded`; code: `AES_256_GCM`
+  occ ECDSA | crypto:material:public-key:ECDSA | jsonwebtoken-9.3.1/src/decoding.rs:183:16 | jsonwebtoken::decoding::DecodingKey::from_ec_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ec_components: setup, not a use; line: `DecodingKey::from_ec_components(&params.x, &params.y)`; code: `DecodingKey::from_ec_components`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:35:22 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8 | [present] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:36:26 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign | [present] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING only through code or data no entry point reaches; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:35:22 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8 | [present] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:36:26 | ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign | [present] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING only through code or data no entry point reaches; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:12:29 | ring::ec::curve25519::ed25519::verification::ED25519 | [present] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:20:22 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked | [present] [call] in jsonwebtoken::crypto::eddsa::sign; from_pkcs8_maybe_unchecked: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let signing_key = signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked(key)?;`; code: `signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:21:26 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [present] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; line: `let out = signing_key.sign(message);`; code: `sign`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::curve25519::ed25519::verification::ED25519 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::curve25519::ed25519::verification::ED25519 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ Ed25519 | crypto:material:public-key:Ed25519 | jsonwebtoken-9.3.1/src/decoding.rs:185:57 | jsonwebtoken::decoding::DecodingKey::from_ed_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:49:15 | ring::hkdf::Salt::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (all zero, 32 bytes, literal at line 49); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, &[0u8; 32]); // the program's all-zero salt: hard-coded`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:49:31 | ring::hkdf::HKDF_SHA256 | [reachable] [static] in s1::main; line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, &[0u8; 32]); // the program's all-zero salt: hard-coded`; code: `hkdf::HKDF_SHA256`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:50:20 | ring::hkdf::Salt::extract | [reachable] [call] in s1::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: hard-coded (all zero, 32 bytes, literal at line 50); line: `let _prk = salt.extract(&[0u8; 32]); // the program's own all-zero IKM`; code: `extract`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:52:12 | ring::hkdf::Salt::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: hard-coded (12 bytes, literal at line 52); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA384, b"nonzero-salt").extract(&ikm); // vec![0; 32] IKM`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:52:28 | ring::hkdf::HKDF_SHA384 | [reachable] [static] in s1::main; line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA384, b"nonzero-salt").extract(&ikm); // vec![0; 32] IKM`; code: `hkdf::HKDF_SHA384`
+  occ HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | src/main.rs:52:64 | ring::hkdf::Salt::extract | [reachable] [call] in s1::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: hard-coded (all zero, literal at line 51); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA384, b"nonzero-salt").extract(&ikm); // vec![0; 32] IKM`; code: `extract`
+  occ HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | src/main.rs:54:12 | ring::hkdf::Salt::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA512 in the arguments; salt: hard-coded (all zero, 48 bytes, literal at line 53); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA512, &lz[..]).extract(&lz); // local all-zero array`; code: `hkdf::Salt::new`
+  occ HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | src/main.rs:54:28 | ring::hkdf::HKDF_SHA512 | [reachable] [static] in s1::main; line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA512, &lz[..]).extract(&lz); // local all-zero array`; code: `hkdf::HKDF_SHA512`
+  occ HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | src/main.rs:54:56 | ring::hkdf::Salt::extract | [reachable] [call] in s1::main; use: keyderive; algorithm from ring::hkdf::HKDF_SHA512 in the arguments; ikm: hard-coded (all zero, 48 bytes, literal at line 53); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA512, &lz[..]).extract(&lz); // local all-zero array`; code: `extract`
+  occ HMAC | crypto:material:secret-key:HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm ring::hmac::HMAC_SHA256 only through code or data no entry point reaches; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [present] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm ring::hmac::HMAC_SHA256 only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:48:12 | ring::hmac::sign | [reachable] [call] in s1::main; use: tag; algorithm from ring::hmac::HMAC_SHA256 in the arguments; line: `let _ = hmac::sign(&hmac::Key::new(hmac::HMAC_SHA256, b""), &d); // empty key`; code: `hmac::sign`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:48:24 | ring::hmac::Key::new | [reachable] [call] in s1::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: absent (empty); line: `let _ = hmac::sign(&hmac::Key::new(hmac::HMAC_SHA256, b""), &d); // empty key`; code: `hmac::Key::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:48:39 | ring::hmac::HMAC_SHA256 | [reachable] [static] in s1::main; line: `let _ = hmac::sign(&hmac::Key::new(hmac::HMAC_SHA256, b""), &d); // empty key`; code: `hmac::HMAC_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:49:31 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in s1::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, &[0u8; 32]); // the program's all-zero salt: hard-coded`; code: `hkdf::HKDF_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:56:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in s1::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(1000).unwrap(), &[], b"", &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm ring::hmac::HMAC_SHA384 only through code or data no entry point reaches; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [present] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm ring::hmac::HMAC_SHA384 only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:52:28 | ring::hkdf::HKDF_SHA384 | [reachable] [component] in s1::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::hmac::HMAC_SHA384); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA384, b"nonzero-salt").extract(&ikm); // vec![0; 32] IKM`; code: `hkdf::HKDF_SHA384`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm ring::hmac::HMAC_SHA512 only through code or data no entry point reaches; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [present] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm ring::hmac::HMAC_SHA512 only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:54:28 | ring::hkdf::HKDF_SHA512 | [reachable] [component] in s1::main; part of HKDF-SHA-512 (ring::hkdf::HKDF_SHA512 -> ring::hmac::HMAC_SHA512); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA512, &lz[..]).extract(&lz); // local all-zero array`; code: `hkdf::HKDF_SHA512`
+  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:56:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [static] in s1::main; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(1000).unwrap(), &[], b"", &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:56:4 | ring::pbkdf2::derive | [reachable] [call] in s1::main; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: absent (empty); password: absent (empty); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(1000).unwrap(), &[], b"", &mut out);`; code: `pbkdf2::derive`
+  occ RSA | crypto:material:private-key:RSA | jsonwebtoken-9.3.1/src/crypto/rsa.rs:41:19 | ring::rsa::keypair::KeyPair::from_der | [present] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`
+  occ RSA | crypto:material:public-key:RSA | jsonwebtoken-9.3.1/src/decoding.rs:180:16 | jsonwebtoken::decoding::DecodingKey::from_rsa_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pss::RSA_PSS_SHA256 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pss::RSA_PSS_SHA384 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:54:21 | ring::signature::UnparsedPublicKey::<B>::new | [present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:46:13 | ring::rsa::keypair::KeyPair::sign | [present] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm ring::rsa::padding::pss::RSA_PSS_SHA512 only through code or data no entry point reaches; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`
+  occ RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:60:21 | ring::rsa::verification::<impl ring::rsa::public_key_components::PublicKeyComponents<B>>::verify | [present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:61 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in s1::set_second; line: `fn set_second(_n: u8, slot: &mut &'static Digest) { *slot = &SHA1; }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; line: `let _ = digest(a6, &d); // SHA-1 (`set_second` writes its second argument on every path)`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:10:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c1 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(c1.alg, &d); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c3 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `let _ = digest(c3.alg, &d); // SHA-256, SHA-512`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c4 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c5 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; line: `let _ = digest(c5.alg, &d); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c7 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:42:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(c7.alg, &d); // SHA-256, SHA-512`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:48:39 | ring::hmac::HMAC_SHA256 | [reachable] [component] in s1::main; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `let _ = hmac::sign(&hmac::Key::new(hmac::HMAC_SHA256, b""), &d); // empty key`; code: `hmac::HMAC_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:49:31 | ring::hkdf::HKDF_SHA256 | [reachable] [component] in s1::main; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let salt = hkdf::Salt::new(hkdf::HKDF_SHA256, &[0u8; 32]); // the program's all-zero salt: hard-coded`; code: `hkdf::HKDF_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in s1::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(1000).unwrap(), &[], b"", &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:57:29 | ring::digest::SHA256 | [reachable] [static] in s1::main; line: `let mut c9 = Ctx { alg: &SHA256, key: [1; 32] };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:59:16 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(c9.alg, &d); // SHA-256`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:13:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:22:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING | [present] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/mod.rs:28:41 | ring::hmac::HMAC_SHA384 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:11:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:12:62 | ring::digest::SHA384 | [reachable] [static] in s1::Ctx::maybe_upgrade; line: `fn maybe_upgrade(&mut self, b: bool) { if b { self.alg = &SHA384; } }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:22:33 | ring::digest::SHA384 | [reachable] [static] in s1::main; line: `if arg(1) == "x" { c1.alg = &SHA384; }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(c1.alg, &d); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:35 | ring::digest::SHA384 | [reachable] [static] in s1::main; line: `let mut a2: &'static Digest = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; line: `let _ = digest(a2, &d); // SHA-384, SHA-512`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; line: `let _ = digest(c5.alg, &d); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:37:35 | ring::digest::SHA384 | [reachable] [static] in s1::main; line: `let mut a6: &'static Digest = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:52:28 | ring::hkdf::HKDF_SHA384 | [reachable] [component] in s1::main; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::digest::SHA384); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA384, b"nonzero-salt").extract(&ikm); // vec![0; 32] IKM`; code: `hkdf::HKDF_SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:62:14 | ring::digest::SHA384 | [reachable] [static] in s1::main; line: `c9.alg = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:63:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(c9.alg, &d); // SHA-384`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:40 | ring::digest::SHA512 | [reachable] [static] in s1::Ctx::upgrade; line: `fn upgrade(&mut self) { self.alg = &SHA512; }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:68 | ring::digest::SHA512 | [reachable] [static] in s1::maybe_set; line: `fn maybe_set(slot: &mut &'static Digest, b: bool) { if b { *slot = &SHA512; } }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; line: `let _ = digest(a2, &d); // SHA-384, SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; line: `let _ = digest(c3.alg, &d); // SHA-256, SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; line: `let _ = digest(c4.alg, &d); // SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:41:41 | ring::digest::SHA512 | [reachable] [static] in s1::main; line: `for _ in 0..arg(7).len() { c7.alg = &SHA512; }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:42:12 | ring::digest::digest | [reachable] [call] in s1::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(c7.alg, &d); // SHA-256, SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:54:28 | ring::hkdf::HKDF_SHA512 | [reachable] [component] in s1::main; part of HKDF-SHA-512 (ring::hkdf::HKDF_SHA512 -> ring::digest::SHA512); line: `let _ = hkdf::Salt::new(hkdf::HKDF_SHA512, &lz[..]).extract(&lz); // local all-zero array`; code: `hkdf::HKDF_SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:76:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via s1 -> ring -> getrandom
+  occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.lock:106:0 | jsonwebtoken | [manifest] locked jsonwebtoken 9.3.1; reached via s1 -> jsonwebtoken
+  occ jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | Cargo.toml:9:0 | jsonwebtoken | [manifest] declared by s1 (dependencies)
+  occ pem | pkg:cargo/pem@3.0.6 | Cargo.lock:173:0 | pem | [manifest] locked pem 3.0.6; reached via s1 -> jsonwebtoken -> pem
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:213:0 | ring | [manifest] locked ring 0.17.14; reached via s1 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:10:0 | ring | [manifest] declared by s1 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=knowledge-base
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=10
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:algorithm-family=ECDSA
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:confidence=high
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:detection:method=type-resolved
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:functions:source=knowledge-base
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:kb:version=0.2.0
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:note=JWT EC verification key; ES256 or ES384 is chosen by the token header
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:occurrences=1
+  prop ECDSA | crypto:material:public-key:ECDSA | rcbom:reachability=present
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=6
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:key=parameter
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:public-key=parameter
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=present
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:confidence=high
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:detection:method=type-resolved
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:functions:source=observed
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=6
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:provenance:key=parameter
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:provenance:public-key=parameter
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=present
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=5
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:public-key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=present
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:algorithm-family=EdDSA
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:functions:source=knowledge-base
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:occurrences=1
+  prop Ed25519 | crypto:material:public-key:Ed25519 | rcbom:reachability=present
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:finding=hard-coded-ikm
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:finding=hard-coded-salt
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=3
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=hard-coded
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:salt=hard-coded
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:confidence=high
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:finding=hard-coded-ikm
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:finding=hard-coded-salt
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:functions:source=observed
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:occurrences=3
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:provenance:ikm=hard-coded
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:provenance:salt=hard-coded
+  prop HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | rcbom:reachability=reachable
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:confidence=high
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:finding=hard-coded-ikm
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:finding=hard-coded-salt
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:functions:source=observed
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:occurrences=3
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:provenance:ikm=hard-coded
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:provenance:salt=hard-coded
+  prop HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | rcbom:reachability=reachable
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:algorithm-family=HMAC
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:confidence=high
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:detection:method=type-resolved
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:functions:source=knowledge-base
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:note=JWT HMAC key; HS256, HS384 or HS512 is chosen by the token header, not here
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:occurrences=1
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:provenance:key=parameter
+  prop HMAC | crypto:material:secret-key:HMAC | rcbom:reachability=present
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=8
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=absent,parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:occurrences=4
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:reachability=reachable
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=4
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:confidence=high
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:occurrences=2
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:password=absent
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:salt=absent
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:reachability=reachable
+  prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
+  prop RSA | crypto:material:private-key:RSA | rcbom:confidence=high
+  prop RSA | crypto:material:private-key:RSA | rcbom:detection:method=type-resolved
+  prop RSA | crypto:material:private-key:RSA | rcbom:functions:source=knowledge-base
+  prop RSA | crypto:material:private-key:RSA | rcbom:kb:version=0.2.0
+  prop RSA | crypto:material:private-key:RSA | rcbom:occurrences=1
+  prop RSA | crypto:material:private-key:RSA | rcbom:provenance:key=parameter
+  prop RSA | crypto:material:private-key:RSA | rcbom:reachability=present
+  prop RSA | crypto:material:public-key:RSA | rcbom:algorithm-family=RSA
+  prop RSA | crypto:material:public-key:RSA | rcbom:confidence=high
+  prop RSA | crypto:material:public-key:RSA | rcbom:detection:method=type-resolved
+  prop RSA | crypto:material:public-key:RSA | rcbom:functions:source=knowledge-base
+  prop RSA | crypto:material:public-key:RSA | rcbom:kb:version=0.2.0
+  prop RSA | crypto:material:public-key:RSA | rcbom:note=JWT RSA verification key; RS256/384/512 or PS256/384/512 is chosen by the token header
+  prop RSA | crypto:material:public-key:RSA | rcbom:occurrences=1
+  prop RSA | crypto:material:public-key:RSA | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=6
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:provenance:public-key=parameter
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=6
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:provenance:public-key=parameter
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=present
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:occurrences=6
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:provenance:public-key=parameter
+  prop RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | rcbom:reachability=present
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:confidence=high
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=6
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:public-key=parameter
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=present
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:confidence=high
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:occurrences=6
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:provenance:public-key=parameter
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:reachability=present
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:confidence=high
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:occurrences=6
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:provenance:public-key=parameter
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:reachability=present
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=21
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=17
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=13
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:crypto-role=protocol
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:scope=required
+  prop jsonwebtoken | pkg:cargo/jsonwebtoken@9.3.1 | rcbom:usage=present
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:crypto-role=support
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:kb-coverage=unmodelled
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:scope=required
+  prop pem | pkg:cargo/pem@3.0.6 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
+asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:material:public-key:Ed25519 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HKDF-SHA-384 | crypto:algorithm:HKDF-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HKDF-SHA-512 | crypto:algorithm:HKDF-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC | crypto:material:secret-key:HMAC | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "secret-key"}}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset RSA | crypto:material:private-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "private-key"}}
+asset RSA | crypto:material:public-key:RSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
+asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-512 | crypto:algorithm:RSA-PKCS1-1.5-SHA-512 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1 | purl pkg:cargo/jsonwebtoken@9.3.1
+component library pem 3.0.6 | pkg:cargo/pem@3.0.6 | purl pkg:cargo/pem@3.0.6
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HKDF-SHA-384 -> crypto:algorithm:HMAC-SHA-384
+dep crypto:algorithm:HKDF-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HKDF-SHA-512 -> crypto:algorithm:HMAC-SHA-512
+dep crypto:algorithm:HKDF-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PSS-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:RSA-PSS-SHA-512 -> crypto:algorithm:SHA-512
+dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/pem@3.0.6
+dep pkg:cargo/jsonwebtoken@9.3.1 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/s1@0.1.0 -> pkg:cargo/jsonwebtoken@9.3.1
+dep pkg:cargo/s1@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ECDSA-P-256-SHA-256
+dependency crypto:algorithm:ECDSA-P-384-SHA-384
+dependency crypto:algorithm:Ed25519
+dependency crypto:algorithm:HKDF-SHA-256
+dependency crypto:algorithm:HKDF-SHA-384
+dependency crypto:algorithm:HKDF-SHA-512
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-384
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:PBKDF2-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-512
+dependency crypto:algorithm:RSA-PSS-SHA-256
+dependency crypto:algorithm:RSA-PSS-SHA-384
+dependency crypto:algorithm:RSA-PSS-SHA-512
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:material:private-key:RSA
+dependency crypto:material:public-key:ECDSA
+dependency crypto:material:public-key:Ed25519
+dependency crypto:material:public-key:RSA
+dependency crypto:material:secret-key:HMAC
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/jsonwebtoken@9.3.1
+dependency pkg:cargo/pem@3.0.6
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/s1@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:Ed25519
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:RSA
+provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:secret-key:HMAC
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-256-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:ECDSA-P-384-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:Ed25519
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HKDF-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PSS-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PSS-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PSS-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
+root {"bom-ref": "pkg:cargo/s1@0.1.0", "name": "s1", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/s1@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=36
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=133
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -466,7 +466,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             let (mut caught, mut total) = (0, 0);
             for (i, o) in occs.iter().enumerate().filter(|&(i, _)| verified[i]) {
                 for m in re!(
-                    r"(?:instantiated by .*? at|expanded from|named at) [^\s;]+?:(\d+)(?::(\d+))?(?:;|$)"
+                    r"(?:instantiated by .*? at|expanded from|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?(?:;|$)"
                 )
                 .captures_iter(&o.context)
                 {
@@ -2609,19 +2609,14 @@ impl Files<'_> {
                         "`{root}` is a function of the file, not a pointer, in {text:?}"
                     ));
                 }
-                // a variable the function binds to what calls nothing (`let h = Holder { f:
-                // digest::digest };`, `let p: HashFn = digest::digest;`) holds the function
-                // named in that statement
-                if !root.is_empty()
-                    && let Some((first, last, init)) = let_binding(&src, line, &root)
-                    && !re!(r"\w\s*\(|\w!").is_match(&init)
-                    && self.resolve(file).ok().as_deref() == Some(path.as_path())
-                    && !(first..=last).contains(&l2)
-                {
-                    return Err(format!(
-                        "`{root}` is bound at lines {first}-{last}, not where the function is \
-                         named ({file}:{l2}:{c2})"
-                    ));
+                // the variable holds the function named where the function binds it: in the
+                // statement when it calls nothing (`let p: HashFn = digest::digest;`), in the
+                // binding of the variable it copies (`if let Some(f) = o`: `o`'s), in the body
+                // of the file's function it calls (`let g = get();`: `get`'s)
+                if !root.is_empty() && self.resolve(file).ok().as_deref() == Some(path.as_path()) {
+                    pointer_bound(&src, line, &root, l2).map_err(|e| {
+                        format!("{e}, not where the function is named ({file}:{l2}:{c2})")
+                    })?;
                 }
                 let p2 = self.resolve(file)?;
                 let src2 = self
@@ -2965,13 +2960,16 @@ impl Files<'_> {
             .collect();
         for part in parts(details) {
             let Some(m) =
-                re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?$")
+                re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?(?: as `([^`]*)`)?$")
                     .captures(part)
             else {
                 continue;
             };
             let (file, line) = (m[3].to_string(), m[4].parse::<usize>().unwrap_or(0));
             let col: Option<usize> = m.get(5).and_then(|c| c.as_str().parse().ok());
+            // the call's text, where the detail gives it, is what the line holds at the column
+            // (`aes_ctr::<Aes128Ctr>`, not its neighbour's `aes_ctr::<Aes192Ctr>`)
+            let call_text = m.get(6).map(|t| t.as_str().to_string());
             let caller = m.get(2).map(|c| c.as_str().to_string());
             let path = self.resolve(&file)?;
             let src = self
@@ -2992,6 +2990,12 @@ impl Files<'_> {
                 .unwrap_or_default();
             if cols.is_empty() {
                 return Err(format!("`{part}`: no code at line {line} of {file}"));
+            }
+            if let (Some(t), Some(c0)) = (&call_text, col) {
+                let at: String = src.lines[line - 1].chars().skip(c0).collect();
+                if !at.starts_with(t.as_str()) {
+                    return Err(format!("`{part}`: line {line} has no `{t}` at column {c0}"));
+                }
             }
             // in the standard library, the line names the caller: a closure's `call_once` shim
             // is cited at the trait's declaration of it
@@ -3029,6 +3033,7 @@ impl Files<'_> {
                         src.enclosing((line, c0), &[ItemKind::Fn, ItemKind::Static])
                             .is_none()
                             && macro_call_at(&src, (line, c0))
+                            && invocation_names(&src, (line, c0), c)
                     } =>
                 {
                     if let Some(n) = in_item(c) {
@@ -3263,30 +3268,169 @@ impl Files<'_> {
     }
 }
 
-/// The nearest `let` binding `name` above line `line` in the function around it: (its first
-/// line, its last line, the initializer's text).
+/// The nearest binding of `name` above line `line` in the function around it, by `let` or a
+/// pattern (`let Some(name) =`, `if let Some(name) =`, `while let ..`): (its first line, its
+/// last line, the initializer's text).
 fn let_binding(src: &Source, line: usize, name: &str) -> Option<(usize, usize, String)> {
     let fn_start = src
         .enclosing((line, 0), &[ItemKind::Fn])
         .map(|f| f.start.0)
         .unwrap_or(1);
-    let pat = Regex::new(&format!(r"\blet\s+(?:mut\s+)?{}\b", regex::escape(name))).ok()?;
+    let pat = Regex::new(&format!(
+        r"\blet\s+(?:mut\s+)?{n}\b|\blet\s+[^=;]*?\b{n}\b[^=;]*=",
+        n = regex::escape(name)
+    ))
+    .ok()?;
     for l in (fn_start..=line).rev() {
         let text = src.lines.get(l - 1)?;
         let Some(m) = pat.find(text) else { continue };
-        // the statement, to its `;`
-        let mut stmt = text[m.end()..].to_string();
+        // the statement, to its `;` (or the block of an `if let`)
+        let mut stmt = text[m.start()..].to_string();
         let mut last = l;
-        while !stmt.contains(';') && last < src.lines.len() && last < l + 20 {
+        while !stmt.contains([';', '{']) && last < src.lines.len() && last < l + 20 {
             last += 1;
             stmt.push('\n');
             stmt.push_str(&src.lines[last - 1]);
         }
         let init = stmt.split_once('=').map(|(_, i)| i).unwrap_or("");
-        let init = init.split(';').next().unwrap_or("").to_string();
+        let init = init.split([';', '{']).next().unwrap_or("").to_string();
         return Some((l, last, init));
     }
     None
+}
+
+/// Is a function pointer held by variable `name` at line `line` the one named at line `named`:
+/// the variable bound where the function is named, or copied from one that is, or from the
+/// result of the file's function whose body names it? A variable bound elsewhere (a
+/// parameter) or from another file's function is not checked.
+fn pointer_bound(src: &Source, line: usize, name: &str, named: usize) -> Result<(), String> {
+    let mut at = (line, name.to_string());
+    for _ in 0..8 {
+        let Some((first, last, init)) = let_binding(src, at.0, &at.1) else {
+            return Ok(());
+        };
+        let init = init.trim();
+        // a copy of another variable (`if let Some(f) = o`, `let h = p;`): where that one is
+        // bound
+        if let Some(v) = re!(r"^&?\s*(?:mut\s+)?([A-Za-z_]\w*)$").captures(init) {
+            if first == at.0 && v[1] == at.1 {
+                return Ok(());
+            }
+            at = (first, v[1].to_string());
+            continue;
+        }
+        // the result of a call of the file's function (`get()`, `pick(n)`): named in its body;
+        // a tuple struct's or variant's constructor (`Some(digest::digest)`) holds what it is
+        // given, named in the statement
+        if let Some(c) = re!(r"^(?:\w+::)*([a-z_]\w*)\s*\(").captures(init) {
+            let fns: Vec<&Item> = src
+                .items
+                .iter()
+                .filter(|i| i.kind == ItemKind::Fn && i.name == c[1])
+                .collect();
+            if fns.is_empty() || fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
+                return Ok(());
+            }
+            return Err(format!(
+                "`{}` holds what `{}` returns (lines {first}-{last})",
+                at.1, &c[1]
+            ));
+        }
+        // anything else that calls something (but a constructor): not followed
+        if re!(r"\w\s*\(|\w!").is_match(init) && !re!(r"^(?:\w+::)*[A-Z]\w*\s*\(").is_match(init) {
+            return Ok(());
+        }
+        return if (first..=last).contains(&named) {
+            Ok(())
+        } else {
+            Err(format!("`{}` is bound at lines {first}-{last}", at.1))
+        };
+    }
+    Ok(())
+}
+
+/// The macro an invocation at or around `at` calls, and the invocation's text from its path to
+/// its closing bracket.
+fn invocation_text(src: &Source, at: (usize, usize)) -> Option<(String, String)> {
+    let start = src
+        .enclosing(at, &[ItemKind::MacroCall])
+        .map(|i| i.start)
+        .or_else(|| macro_call_at(src, at).then_some(at))?;
+    let (mut text, mut depth, mut opened) = (String::new(), 0i32, false);
+    for l in start.0..=src.lines.len().min(start.0 + 400) {
+        let chars: Vec<char> = src.lines[l - 1].chars().collect();
+        let from = if l == start.0 { start.1 } else { 0 };
+        for (ci, &ch) in chars.iter().enumerate().skip(from) {
+            text.push(ch);
+            let code = src
+                .class
+                .get(l - 1)
+                .and_then(|k| k.get(ci))
+                .is_some_and(|k| *k == Class::Code);
+            if !code {
+                continue;
+            }
+            match ch {
+                '(' | '[' | '{' => {
+                    depth += 1;
+                    opened = true;
+                }
+                ')' | ']' | '}' => {
+                    depth -= 1;
+                    if opened && depth == 0 {
+                        let name = re!(r"^(?:\w+::)*(\w+)\s*!").captures(text.trim_start())?[1]
+                            .to_string();
+                        return Some((name, text));
+                    }
+                }
+                _ => {}
+            }
+        }
+        text.push('\n');
+    }
+    None
+}
+
+/// Does the macro invocation at `at` make the item `path` names rather than another invocation
+/// of the same macro in the file: the macro is invoked once, or this invocation names a segment
+/// of the path that another one does not (`nistp_dhkex!("P-256", DhP256, p256, ..)` for
+/// `<..::p256::DhP256 as DhKeyExchange>::dh`, not the P-384 invocation)?
+fn invocation_names(src: &Source, at: (usize, usize), path: &str) -> bool {
+    let Some((name, mine)) = invocation_text(src, at) else {
+        return true;
+    };
+    let call = Regex::new(&format!(r"\b{}\s*!\s*[(\[{{]", regex::escape(&name))).ok();
+    let mut others = Vec::new();
+    for (l, text) in src.lines.iter().enumerate() {
+        for m in call.iter().flat_map(|r| r.find_iter(text)) {
+            let c = text[..m.start()].chars().count();
+            let code = src
+                .class
+                .get(l)
+                .and_then(|k| k.get(c))
+                .is_some_and(|k| *k == Class::Code);
+            if code
+                && let Some((_, t)) = invocation_text(src, (l + 1, c))
+                && t != mine
+            {
+                others.push(t);
+            }
+        }
+    }
+    if others.is_empty() {
+        return true;
+    }
+    let words = |t: &str| -> HashSet<String> {
+        re!(r"[A-Za-z_]\w*")
+            .find_iter(t)
+            .map(|m| m.as_str().to_string())
+            .collect()
+    };
+    let mine = words(&mine);
+    let others: Vec<HashSet<String>> = others.iter().map(|t| words(t)).collect();
+    words(path)
+        .iter()
+        .any(|w| w.len() > 1 && mine.contains(w) && others.iter().any(|o| !o.contains(w)))
 }
 
 /// Does a macro invocation's path start exactly at `at` (`impl_dhkem!(`,
@@ -3674,7 +3818,18 @@ fn check_item(
         // an item a macro invocation outside any item makes (`hash_fn!(..)` at module level),
         // cited inside the invocation or at its start (hpke's `nistp_dhkex!(..)`)
         if src.enclosing(at, &[ItemKind::MacroCall]).is_some() || macro_call_at(src, at) {
-            return Ok(());
+            let path = details
+                .strip_prefix("in ")
+                .and_then(|d| parts(d).into_iter().next())
+                .unwrap_or_default();
+            if invocation_names(src, at, path) {
+                return Ok(());
+            }
+            return Err(format!(
+                "the macro invocation does not make `{}`: another invocation of the same \
+                 macro in the file does",
+                want.name
+            ));
         }
         return Err(format!("position outside any item, not in `{}`", want.name));
     };

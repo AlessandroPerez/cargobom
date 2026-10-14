@@ -7,7 +7,19 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 15;
+pub const FACTS_VERSION: u32 = 17;
+
+/// How the links name a static's initializer as the owner of what it stores and calls
+/// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
+/// reaches a call only when the static is reachable.
+pub fn static_owner(path: &str, id: &str) -> String {
+    format!("static {path} {id}")
+}
+
+/// The path and id of the static an owner names (`static_owner`).
+pub fn owner_static(owner: &str) -> Option<(&str, &str)> {
+    owner.strip_prefix("static ")?.rsplit_once(' ')
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CrateFacts {
@@ -37,6 +49,11 @@ pub struct CrateFacts {
     /// 9 in 9.3).
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub fields: std::collections::BTreeMap<String, Vec<String>>,
+    /// The variants of this crate's field-less enums (name, discriminant), by path, when the
+    /// knowledge base describes the crate: a constant of one is its discriminant
+    /// (`const ALG: Algorithm = Algorithm::ES384` is `Data { value: 4 }`).
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub variants: std::collections::BTreeMap<String, Vec<(String, i128)>>,
 }
 
 /// Value flow across the functions of a crate (see `CrateFacts::links`). Flow-insensitive: a
@@ -340,6 +357,9 @@ pub enum Origin {
         def: DefRef,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         value: Option<i128>,
+        /// An item whose value's bytes are all zero (`const ZERO: [u8; 32] = [0; 32]`).
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        zero: bool,
     },
     /// Argument `index` of the enclosing function, or of `owner` (its defining path) when that
     /// is another: a closure or `async` body reads its parent function's parameter through a
@@ -481,7 +501,67 @@ impl Origin {
             o => o,
         }
     }
+
+    /// The origin with what lies more than `depth` origins down cut (`Truncated`): facts are
+    /// read back by a parser with a nesting bound (serde_json's 128 levels, up to 3 per
+    /// origin), whatever bounds the search that built them.
+    pub fn capped(self, depth: usize) -> Origin {
+        if depth == 0 {
+            return Origin::Truncated;
+        }
+        let cap = |v: Vec<Origin>| v.into_iter().map(|a| a.capped(depth - 1)).collect();
+        match self {
+            Origin::Call {
+                callee,
+                krate,
+                self_ty,
+                args,
+                span,
+            } => Origin::Call {
+                callee,
+                krate,
+                self_ty,
+                args: cap(args),
+                span,
+            },
+            Origin::Field {
+                adt,
+                field,
+                base,
+                args,
+            } => Origin::Field {
+                adt,
+                field,
+                base: Box::new(base.capped(depth - 1)),
+                args,
+            },
+            Origin::Written {
+                callee,
+                index,
+                args,
+            } => Origin::Written {
+                callee,
+                index,
+                args: cap(args),
+            },
+            Origin::Any(v) => Origin::Any(cap(v)),
+            Origin::All(v) => Origin::All(cap(v)),
+            Origin::Set {
+                path,
+                value,
+                strong,
+            } => Origin::Set {
+                path,
+                value: Box::new(value.capped(depth - 1)),
+                strong,
+            },
+            o => o,
+        }
+    }
 }
+
+/// Origins nested deeper than this are cut when the driver writes them (`Origin::capped`).
+pub const MAX_ORIGIN_DEPTH: usize = 30;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Site {
@@ -532,6 +612,11 @@ pub struct Expansion {
 pub struct ViaStep {
     pub caller: String,
     pub span: Loc,
+    /// The source text of the callee expression at the call, when written on one line outside
+    /// macros (`decrypt::aes_ctr::<Aes128Ctr>`): it tells the call apart from a neighbour that
+    /// instantiates the function with other type arguments.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

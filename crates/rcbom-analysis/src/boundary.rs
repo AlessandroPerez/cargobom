@@ -7,19 +7,31 @@
 //! of the enum's. A key's family enum (`key`) narrows the variants: jsonwebtoken refuses an
 //! algorithm whose family is not the key's.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use rcbom_facts::{Origin, Site, Target};
 use rcbom_kb::{Algo, FieldRef};
 
+use crate::links::Via;
 use crate::matcher::{Match, strip_generics};
 use crate::{Ctx, Kind, SiteMatch, UNKNOWN, unresolved_reason};
 
-/// What reaches an argument: the variants found, and why some members were not followed.
+/// What reaches an argument: the variants found, each with how it reaches the call, and why
+/// some members were not followed.
 #[derive(Default)]
 struct Found {
-    names: BTreeSet<String>,
+    names: BTreeMap<String, Via>,
     unresolved: Vec<String>,
+}
+
+impl Found {
+    /// A variant found; found several ways, it keeps the most specific.
+    fn add(&mut self, name: String, via: &Via) {
+        let e = self.names.entry(name).or_insert_with(|| via.clone());
+        if *via < *e {
+            *e = via.clone();
+        }
+    }
 }
 
 /// The occurrences of a call a boundary model describes; `None` when none does.
@@ -63,10 +75,10 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
                 e.variants[n]
                     .key
                     .as_ref()
-                    .is_none_or(|f| key.names.contains(f))
+                    .is_none_or(|f| key.names.contains_key(f))
             };
             let before = found.names.len();
-            found.names.retain(|n| allowed(n));
+            found.names.retain(|n, _| allowed(n));
             possible = all.iter().filter(|n| allowed(n)).count();
             // none the key allows (`Validation::new(HS256)` with an RSA key): jsonwebtoken
             // refuses the token before any verification
@@ -75,7 +87,7 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
             }
             detail.push(format!(
                 "the key's family ({}) allows these",
-                key.names.iter().cloned().collect::<Vec<_>>().join(", ")
+                key.names.keys().cloned().collect::<Vec<_>>().join(", ")
             ));
         }
     }
@@ -83,16 +95,29 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
     let symbol = callee.path.clone();
     let n = found.names.len();
     let mut out = Vec::new();
-    for name in &found.names {
+    for (name, via) in &found.names {
         let algo = e.variants[name].algo.clone();
         let function = ctx
             .kb
             .use_of(&b.function, &algo.primitive)
             .unwrap_or_else(|| b.function.clone());
-        let mut d = vec![if n > 1 {
-            format!("algorithm one of {n} chosen at run time (selector: configuration) from {what}")
-        } else {
-            format!("algorithm from {what}")
+        // how the variant reaches the call: a choice the program makes at run time, or one of
+        // the values it stores in the field anywhere (possible, not shown to reach this call)
+        let mut d = vec![match (via, n > 1) {
+            (Via::Join(w), _) => format!(
+                "algorithm {}from {what}: possible (type-join: a value `{}` stores in the field)",
+                if n > 1 {
+                    format!("one of {n} ")
+                } else {
+                    String::new()
+                },
+                short_fn(w)
+            ),
+            (_, true) => format!(
+                "algorithm one of {n} chosen at run time (selector: configuration) from {what}{}",
+                witness(via)
+            ),
+            (_, false) => format!("algorithm from {what}{}", witness(via)),
         }];
         d.extend(detail.iter().cloned());
         out.push((
@@ -132,6 +157,25 @@ pub(crate) fn site_matches(ctx: &Ctx<'_>, site: &Site) -> Option<Vec<SiteMatch>>
         ));
     }
     Some(out)
+}
+
+/// `, passed by `caller``, `, from `f``: where a member reaches the call from.
+fn witness(via: &Via) -> String {
+    match via {
+        Via::Caller(c) => format!(" (caller: passed by `{}`)", short_fn(c)),
+        Via::Object(f) => format!(" (object: from `{}`)", short_fn(f)),
+        Via::Fixed | Via::Join(_) => String::new(),
+    }
+}
+
+/// A function's path without its generic arguments, or `static X` for a static's
+/// initializer.
+fn short_fn(f: &str) -> String {
+    match rcbom_facts::owner_static(f) {
+        Some((path, _)) => format!("static {path}"),
+        None if f.is_empty() => "a static's initializer".to_string(),
+        None => strip_generics(f),
+    }
 }
 
 fn matched(algo: Algo, provider: Option<(String, String)>) -> Match {
@@ -191,14 +235,17 @@ fn members(
             let mut bases = Vec::new();
             struct_bases(ctx, base, &adt, field, &mut bases, 0);
             for b in bases {
-                let o = match b {
-                    Base::Struct(b) => Origin::Field {
-                        adt: adt.clone(),
-                        field,
-                        base: Box::new(b),
-                        args: None,
-                    },
-                    Base::Field(v) => v,
+                let (o, via) = match b {
+                    Base::Struct(b) => (
+                        Origin::Field {
+                            adt: adt.clone(),
+                            field,
+                            base: Box::new(b),
+                            args: None,
+                        },
+                        Via::Fixed,
+                    ),
+                    Base::Field(v, f) => (v, Via::Object(f)),
                 };
                 collect(
                     ctx,
@@ -208,6 +255,7 @@ fn members(
                     accept,
                     0,
                     false,
+                    &via,
                     &mut found,
                 );
             }
@@ -223,6 +271,7 @@ fn members(
         accept,
         0,
         false,
+        &Via::Fixed,
         &mut found,
     );
     found
@@ -239,17 +288,18 @@ fn std_call(krate: &str, self_ty: Option<&str>) -> bool {
 enum Base {
     /// A value the struct is read from.
     Struct(Origin),
-    /// The field's own value.
-    Field(Origin),
+    /// The field's own value, as a function stores it.
+    Field(Origin, String),
 }
 
 /// Where the field `field` of a struct of type `adt` an argument holds comes from: through
 /// standard-library calls that hand the struct on (`DecodingKey::from_ec_pem(pem).unwrap()`);
-/// what a function the struct comes from stores in the field when what it returns is no
-/// summary of the field (`from_ec_pem` builds `Ok(DecodingKey { family: Ec, .. })`), its
-/// parameters being the call's arguments; through the struct's own methods called on it by
-/// `&mut self` (`v.set_required_spec_claims(..)`, which the origin writes as a call with the
-/// value as its receiver), the value before and what the method stores.
+/// what a function the struct comes from returns, each way it returns (`from_jwk`: `from_rsa_
+/// components(..)`, `from_ec_components(..)`, .. or `Ok(DecodingKey { family: Hmac, .. })`;
+/// a program's `fn hdr() -> Option<Header>`), its parameters being the call's arguments; what
+/// it stores in the field when nothing it returns is recorded; through the struct's own methods
+/// called on it by `&mut self` (`v.set_required_spec_claims(..)`, which the origin writes as a
+/// call with the value as its receiver), the value before and what the method stores.
 fn struct_bases(
     ctx: &Ctx<'_>,
     o: &Origin,
@@ -263,6 +313,9 @@ fn struct_bases(
         return;
     }
     match o {
+        // the error a `?` returns, a field-less enum's value (an `ErrorKind`): no struct
+        Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => {}
+        Origin::Unit { .. } => {}
         Origin::Call {
             krate,
             self_ty,
@@ -271,6 +324,16 @@ fn struct_bases(
         } if std_call(krate, self_ty.as_deref()) => {
             for a in args {
                 struct_bases(ctx, a, adt, field, out, depth + 1);
+            }
+        }
+        // the links read the field from what the function returns in it
+        Origin::Call { callee, .. } if ctx.flow.returns_field(callee, field) => {
+            out.push(Base::Struct(o.clone()))
+        }
+        Origin::Call { callee, args, .. } if !ctx.flow.returned(callee).is_empty() => {
+            for r in ctx.flow.returned(callee) {
+                let r = crate::links::substitute(&r, args);
+                struct_bases(ctx, &r, adt, field, out, depth + 1);
             }
         }
         Origin::Call {
@@ -282,11 +345,11 @@ fn struct_bases(
             let stores = ctx.flow.stored_by(adt, field, callee);
             let mutator =
                 self_ty.as_deref() == Some(adt) && !ctx.flow.returns_of(callee) && !args.is_empty();
-            if !stores.is_empty() && !ctx.flow.returns_field(callee, field) {
+            if !stores.is_empty() {
                 out.extend(
                     stores
                         .iter()
-                        .map(|v| Base::Field(crate::links::substitute(v, args))),
+                        .map(|v| Base::Field(crate::links::substitute(v, args), callee.clone())),
                 );
                 if mutator {
                     struct_bases(ctx, &args[0], adt, field, out, depth + 1);
@@ -306,6 +369,18 @@ fn struct_bases(
     }
 }
 
+/// The variant of crate `krate`'s field-less enum whose variants are `accept` that has
+/// discriminant `v`.
+fn variant(ctx: &Ctx<'_>, krate: &str, accept: &BTreeSet<&str>, v: i128) -> Option<String> {
+    let prefix = format!("{krate}::");
+    ctx.variants
+        .iter()
+        .filter(|(path, vs)| {
+            path.starts_with(&prefix) && vs.iter().all(|(n, _)| accept.contains(n.as_str()))
+        })
+        .find_map(|(_, vs)| vs.iter().find(|(_, d)| *d == v).map(|(n, _)| n.clone()))
+}
+
 #[allow(clippy::too_many_arguments)]
 fn collect(
     ctx: &Ctx<'_>,
@@ -315,6 +390,7 @@ fn collect(
     accept: &BTreeSet<&str>,
     depth: usize,
     in_std: bool,
+    via: &Via,
     out: &mut Found,
 ) {
     if depth > 12 {
@@ -325,17 +401,25 @@ fn collect(
         Origin::Unit { path, .. } if path.starts_with(&format!("{krate}::")) => {
             let v = path.rsplit("::").next().unwrap_or(path);
             if accept.contains(v) {
-                out.names.insert(v.to_string());
+                out.add(v.to_string(), via);
+            }
+        }
+        // a constant of the enum (`const ALG: Algorithm = Algorithm::ES384`): its discriminant
+        Origin::Data { value: Some(v), .. } if variant(ctx, krate, accept, *v).is_some() => {
+            if let Some(n) = variant(ctx, krate, accept, *v) {
+                out.add(n, via);
             }
         }
         // another value (`Option::None`, a length): not one of the variants
         Origin::Unit { .. } | Origin::Const { .. } => {}
         Origin::Any(xs) | Origin::All(xs) => {
             for x in xs {
-                collect(ctx, x, owner, krate, accept, depth, in_std, out);
+                collect(ctx, x, owner, krate, accept, depth, in_std, via, out);
             }
         }
-        Origin::Set { value, .. } => collect(ctx, value, owner, krate, accept, depth, in_std, out),
+        Origin::Set { value, .. } => {
+            collect(ctx, value, owner, krate, accept, depth, in_std, via, out)
+        }
         // a standard-library call passes its arguments' values on (`vec![alg]`, `alg.clone()`,
         // `Ok(key).map_err(..)`)
         Origin::Call {
@@ -345,23 +429,29 @@ fn collect(
             ..
         } if std_call(k, self_ty.as_deref()) => {
             for a in args {
-                collect(ctx, a, owner, krate, accept, depth + 1, true, out);
+                collect(ctx, a, owner, krate, accept, depth + 1, true, via, out);
             }
         }
+        // more alternatives, or steps, than the search keeps
         Origin::Truncated => out
             .unresolved
-            .push("a choice among more alternatives than the analysis keeps".into()),
+            .push("the search for the value hit its bound".into()),
         // inside a standard-library call, what is not followed is the container's own (its
-        // capacity, its allocation), not the values it holds
-        Origin::Unknown | Origin::Loop | Origin::Through { .. } if in_std => {}
+        // capacity, its allocation), not the values it holds; but a value written through a
+        // borrow a call returned (`keyring.insert(..)` into a map's entry) is one it holds
+        Origin::Through { .. } if in_std => out
+            .unresolved
+            .push("a value written into a container the analysis does not follow".into()),
+        Origin::Unknown | Origin::Loop if in_std => {}
         Origin::Unknown | Origin::Loop | Origin::Through { .. } => {
             out.unresolved.push(unresolved_reason(o))
         }
         // a parameter, a field, a call's result: what reaches it from elsewhere
-        _ => match ctx.flow.values(o, owner) {
+        _ => match ctx.flow.values_via(o, owner) {
             Some(vs) if !(vs.len() == 1 && vs[0].0 == *o) => {
-                for (v, w) in vs {
-                    collect(ctx, &v, &w, krate, accept, depth + 1, in_std, out);
+                for (v, w, by) in vs {
+                    let by = via.then(by);
+                    collect(ctx, &v, &w, krate, accept, depth + 1, in_std, &by, out);
                 }
             }
             _ => out.unresolved.push(unresolved_reason(o)),

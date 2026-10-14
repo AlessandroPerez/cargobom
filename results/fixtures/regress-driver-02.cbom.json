@@ -306,6 +306,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -455,14 +459,14 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:19:12; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t2::o2::{closure#0}; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by t2::o2 at src/main.rs:19:12 as `|k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize`; line: `let f = |k: &[u8]| Aes256Gcm::new_from_slice(k).is_ok() as usize;`; code: `Aes256Gcm::new_from_slice`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 23,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t2::o3::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 25); instantiated by t2::main at src/main.rs:94:23; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t2::o3::{closure#0}; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 25); instantiated by t2::main at src/main.rs:94:23 as `poll`; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 4,
@@ -794,7 +798,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:a7a8e229-b7e4-8cee-91a4-48660d93f3db",
+  "serialNumber": "urn:uuid:a02b5a91-e455-8a77-8632-a36b9a17dde0",
   "specVersion": "1.7",
   "version": 1
 }

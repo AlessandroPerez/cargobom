@@ -52,7 +52,8 @@ use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::mono::{Instance, InstanceKind};
 use rustc_public::mir::visit::{Location, MirVisitor};
 use rustc_public::mir::{
-    Body, CastKind, ConstOperand, Operand, PointerCoercion, Rvalue, Terminator, TerminatorKind,
+    Body, CastKind, ConstOperand, Operand, PointerCoercion, Rvalue, StatementKind, Terminator,
+    TerminatorKind,
 };
 use rustc_public::rustc_internal;
 use rustc_public::ty::{
@@ -386,6 +387,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                     None,
                 );
                 sc.visit_body(&body);
+                sc.promoted_values(did);
                 let mut l = rcbom_facts::Links::default();
                 links::body_links(&cx, &body, did, true, &mut l);
                 links::promoted_links(&cx, did, &mut l);
@@ -475,6 +477,30 @@ fn analyze(tcx: TyCtxt<'_>) {
     } else {
         Default::default()
     };
+    // and the variants of its field-less enums, for a constant of one (`const ALG: Algorithm`)
+    let variants = if cx.kb_crate(rustc_span::def_id::LOCAL_CRATE) {
+        tcx.hir_crate_items(())
+            .definitions()
+            .map(|d| d.to_def_id())
+            .filter(|&d| matches!(tcx.def_kind(d), rustc_hir::def::DefKind::Enum))
+            .filter(|&d| tcx.adt_def(d).all_fields().next().is_none())
+            .map(|d| {
+                let adt = tcx.adt_def(d);
+                let vs = adt
+                    .discriminants(tcx)
+                    .map(|(i, discr)| {
+                        (
+                            adt.variant(i).name.to_string(),
+                            i128::try_from(discr.val).unwrap_or(i128::MAX),
+                        )
+                    })
+                    .collect();
+                (path_of(tcx, d), vs)
+            })
+            .collect()
+    } else {
+        Default::default()
+    };
     let facts = CrateFacts {
         facts_version: FACTS_VERSION,
         krate,
@@ -483,6 +509,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         reach,
         links: crate_links,
         fields,
+        variants,
     };
     let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
     std::fs::create_dir_all(&out).unwrap();
@@ -1681,6 +1708,40 @@ impl Scanner<'_, '_> {
         self.super_terminator(term, loc);
     }
 
+    /// Functions named as values inside the item's promoted constants (`run(&Holder { f:
+    /// digest::digest })`): where they are named, as `scan_rvalue` records it in a body (the
+    /// body itself only holds the promoted constant).
+    fn promoted_values(&mut self, did: rustc_span::def_id::DefId) {
+        let tcx = self.cx.tcx;
+        if !tcx.is_mir_available(did) || tcx.is_closure_like(did) && !did.is_local() {
+            return;
+        }
+        for p in tcx.promoted_mir(did).iter() {
+            let pb: Body = rustc_internal::stable(p);
+            for block in &pb.blocks {
+                for st in &block.statements {
+                    match &st.kind {
+                        StatementKind::Assign(
+                            _,
+                            Rvalue::Cast(
+                                CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)),
+                                op,
+                                _,
+                            )
+                            | Rvalue::Use(op, _),
+                        ) => self.function_value(op),
+                        StatementKind::Assign(_, Rvalue::Aggregate(_, ops)) => {
+                            for op in ops {
+                                self.function_value(op);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
+
     fn scan_rvalue(&mut self, rv: &Rvalue, loc: Location) {
         match rv {
             // a function made a pointer, or kept as a value in a struct, a tuple, an array or a
@@ -1814,7 +1875,7 @@ struct Walker<'a, 'tcx> {
     usage_statics: HashSet<rustc_span::def_id::DefId>,
     /// Crates whose code the walk reached.
     crates: BTreeSet<rustc_span::def_id::CrateNum>,
-    parent: HashMap<Instance, (Instance, Loc)>,
+    parent: HashMap<Instance, (Instance, Loc, Option<String>)>,
     statics: BTreeSet<String>,
     static_refs: Vec<DefRef>,
     static_seen: HashSet<String>,
@@ -1906,7 +1967,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
     }
 
-    fn enqueue(&mut self, inst: Instance, from: Option<(Instance, Loc)>) {
+    fn enqueue(&mut self, inst: Instance, from: Option<(Instance, Loc, Option<String>)>) {
         if matches!(
             inst.kind,
             InstanceKind::Virtual { .. } | InstanceKind::Intrinsic | InstanceKind::LlvmIntrinsic
@@ -1987,7 +2048,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     fn via(&self, inst: Instance) -> Vec<ViaStep> {
         let mut out = Vec::new();
         let mut cur = inst;
-        while let Some((p, loc)) = self.parent.get(&cur) {
+        while let Some((p, loc, text)) = self.parent.get(&cur) {
             // only generic instantiations need the chain to explain their arguments
             if cur.args().0.is_empty() || out.len() >= 4 {
                 break;
@@ -1995,6 +2056,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             out.push(ViaStep {
                 caller: instance_name(self.cx.tcx, p),
                 span: loc.clone(),
+                text: text.clone(),
             });
             cur = *p;
         }
@@ -2140,7 +2202,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 continue;
             }
             let loc = locate_stable(self.cx.tcx, span).0;
-            self.enqueue(callee, Some((inst, loc)));
+            // the text of the function named at the call (`decrypt::aes_ctr::<Aes128Ctr>`: the
+            // span is the callee's); none for a call through a value (the span is the call's)
+            let internal = rustc_internal::internal(self.cx.tcx, span);
+            let text = callee_span(self.cx.tcx, internal)
+                .is_none()
+                .then(|| span_text(self.cx.tcx, internal))
+                .flatten();
+            self.enqueue(callee, Some((inst, loc, text)));
         }
     }
 

@@ -290,14 +290,14 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -386,14 +386,14 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -531,14 +531,14 @@
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::ec::curve25519::ed25519::verification::ED25519 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::curve25519::ed25519::verification::ED25519 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -811,7 +811,7 @@
             "symbol": "ring::hmac::HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in probe36::main; use: tag; algorithm from `Header.alg`; line: `let t = encode(&h, &claims, &EncodingKey::from_secret(b\"k\")).unwrap();`; code: `encode`",
+            "additionalContext": "[reachable] [call] in probe36::main; use: tag; algorithm from `Header.alg` (object: from `probe36::set_alg`); the key's family (Hmac) allows these; line: `let t = encode(&h, &claims, &EncodingKey::from_secret(b\"k\")).unwrap();`; code: `encode`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 12,
@@ -938,14 +938,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -973,7 +973,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -1029,14 +1029,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1064,7 +1064,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -1120,14 +1120,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1155,7 +1155,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -1211,14 +1211,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1246,7 +1246,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA256 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -1302,14 +1302,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1337,7 +1337,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA384 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -1393,14 +1393,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1428,7 +1428,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm ring::rsa::verification::RSA_PSS_2048_8192_SHA512 only through code or data no entry point reaches; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -2105,7 +2105,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b1f60ec4-ab1f-899b-9a71-5c04b62e0127",
+  "serialNumber": "urn:uuid:4dffb18c-fe6a-8e28-980c-41b37298acdb",
   "specVersion": "1.7",
   "version": 1
 }

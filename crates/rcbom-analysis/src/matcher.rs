@@ -137,6 +137,23 @@ fn filled_algo(algo: &Algo, vals: &BTreeMap<String, String>) -> Algo {
     let none = BTreeMap::new();
     let fill = |t: &str, v: &BTreeMap<String, String>| fill(t, v, &none);
     a.asset = self::fill(&algo.asset, vals, &algo.defaults);
+    let mut required = String::new();
+    let mut optional = 0usize;
+    for ch in algo.asset.chars() {
+        match ch {
+            '[' => optional += 1,
+            ']' => optional = optional.saturating_sub(1),
+            _ if optional == 0 => required.push(ch),
+            _ => {}
+        }
+    }
+    a.open = required
+        .split('{')
+        .skip(1)
+        .filter_map(|s| s.split_once('}'))
+        .map(|(p, _)| p.to_string())
+        .filter(|p| !vals.contains_key(p))
+        .collect();
     a.parameter_set = algo
         .parameter_set
         .as_ref()
@@ -762,7 +779,10 @@ impl Match {
     pub fn key(&self) -> String {
         // an unknown algorithm is one per primitive and providing package: ML-KEM's and P-256's
         // unknown operations are two assets
-        if self.name == crate::UNKNOWN && self.algo.family.is_empty() {
+        if self.name == crate::UNKNOWN
+            && self.algo.family.is_empty()
+            && self.algo.material.is_none()
+        {
             let providers: Vec<&str> = self.providers.iter().map(|(n, _)| n.as_str()).collect();
             return format!(
                 "{}|{}",

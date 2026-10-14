@@ -302,6 +302,11 @@ pub struct Algo {
     /// (`{ nonce_bits = "96", tag_bits = "128" }` for AES-GCM).
     #[serde(default)]
     pub defaults: BTreeMap<String, String>,
+    /// Placeholders of `asset` (outside its optional `[..]` parts) the analysis left
+    /// unresolved when it filled the name: `["hash"]` for `HKDF-{hash}` with no hash found.
+    /// Set by the analysis, never by the knowledge base.
+    #[serde(skip)]
+    pub open: Vec<String>,
     /// What a call matched by a `[[fn]]` entry does when its method is not a listed use
     /// (`keygen` for `RsaPrivateKey::new`). Without it such a call sets the asset up.
     #[serde(default, rename = "use")]

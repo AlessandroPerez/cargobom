@@ -10,7 +10,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: computed (t19::fill_out); line: `let _ = Aes256Gcm::new_from_slice(&k2);`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:73:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::load::{closure#0}; new_from_slice: setup, not a use; key: environment (std::env::var); instantiated by t19::load at src/main.rs:68:24; line: `Aes256Gcm::new_from_slice(&key).is_ok() && n == 32`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:83:19 | aead::AeadInPlace::encrypt_in_place_detached | [reachable] [call] in t19::buffers; use: encrypt; nonce: rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b"", in_out);`; code: `encrypt_in_place_detached`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:86:19 | aead::Aead::encrypt | [reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (literal at line 85); line: `let _ = cipher.encrypt(Nonce::from_slice(&buf[..12]), msg.as_ref());`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:86:19 | aead::Aead::encrypt | [reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 85); line: `let _ = cipher.encrypt(Nonce::from_slice(&buf[..12]), msg.as_ref());`; code: `encrypt`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:127:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t19::password_hashing; new: setup, not a use; line: `let c = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:127:60 | core::default::Default::default | [reachable] [call] in t19::password_hashing; default: setup, not a use; line: `let c = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:128:14 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t19::password_hashing; use: keyderive; password: environment (std::env::var); salt: rng (salt::SaltString::generate); line: `let _ = c.hash_password(pw.as_bytes(), &salt);`; code: `hash_password`
@@ -408,6 +408,7 @@
   prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
   prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:usage=reachable
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:crypto-role=algorithm
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:scope=required
   prop rsa | pkg:cargo/rsa@0.9.10 | rcbom:usage=reachable

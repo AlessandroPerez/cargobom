@@ -948,6 +948,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1739,7 +1743,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:HKDF",
+      "bom-ref": "crypto:algorithm:HKDF-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "HKDF",
@@ -1768,7 +1772,7 @@
           }
         ]
       },
-      "name": "HKDF",
+      "name": "HKDF-SHA-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -1812,7 +1816,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 7,
@@ -2005,14 +2009,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`",
+            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "elliptic_curve::ecdh::SharedSecret::<C>::extract"
           },
           {
-            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in probe32::main; part of HKDF-SHA-256; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 7,
@@ -2457,7 +2461,7 @@
       "provides": [
         "crypto:algorithm:ECDH-P-256",
         "crypto:algorithm:ECDH-P-384",
-        "crypto:algorithm:HKDF",
+        "crypto:algorithm:HKDF-SHA-256",
         "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
         "crypto:algorithm:unknown:unknown:elliptic-curve+p384"
       ],
@@ -2490,7 +2494,7 @@
         "pkg:cargo/hmac@0.12.1"
       ],
       "provides": [
-        "crypto:algorithm:HKDF"
+        "crypto:algorithm:HKDF-SHA-256"
       ],
       "ref": "pkg:cargo/hkdf@0.12.4"
     },
@@ -2688,7 +2692,7 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:SHA-256"
       ],
-      "ref": "crypto:algorithm:HKDF"
+      "ref": "crypto:algorithm:HKDF-SHA-256"
     },
     {
       "dependsOn": [
@@ -2815,7 +2819,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2b002edc-8ab2-875a-adcd-3b90b3aac872",
+  "serialNumber": "urn:uuid:b142e658-bd8f-8ad4-b111-a292a85d891f",
   "specVersion": "1.7",
   "version": 1
 }

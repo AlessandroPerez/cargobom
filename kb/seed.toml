@@ -1932,6 +1932,19 @@ primitive = "signature"
 material = "public-key"
 curve = "other/Ed25519"
 
+# jsonwebtoken 9 `DecodingKey::from_jwk(&jwk)` (decoding.rs): an RSA, EC or Ed25519 public key
+# (also reported at the `from_*_components` call `from_jwk` makes) or an HMAC secret (an octet
+# key, built in place), as the JWK's key type says at run time: key material of no single
+# family or type
+[[fn]]
+crate = "jsonwebtoken"
+path = "DecodingKey::from_jwk$"
+asset = "unknown"
+family = ""
+primitive = "unknown"
+material = "key"
+note = "JWT verification key from a JWK: an RSA, EC or Ed25519 public key or an HMAC secret, as the JWK's key type says at run time"
+
 # getrandom's functions draw from the operating system's generator
 [[fn]]
 crate = "getrandom"
@@ -2417,14 +2430,16 @@ algorithm = 0
 # `Validation` matches the key's family). A variant the analysis cannot find makes the call an
 # unknown algorithm, not a partial set.
 
-# jsonwebtoken 9: `encode(&header, &claims, &key)` signs (or MACs) with `header.alg`;
-# `decode(token, &key, &validation)` verifies with one of `validation.algorithms` the key's
-# family allows; `crypto::sign(msg, &key, alg)`, `crypto::verify(sig, msg, &key, alg)`
+# jsonwebtoken 9: `encode(&header, &claims, &key)` signs (or MACs) with `header.alg` if the
+# key's family allows it (it refuses another, encoding.rs `InvalidAlgorithm`); `decode(token,
+# &key, &validation)` verifies with one of `validation.algorithms` the key's family allows;
+# `crypto::sign(msg, &key, alg)`, `crypto::verify(sig, msg, &key, alg)` check no family
 [[boundary]]
 crate = "jsonwebtoken"
 path = "^(encoding::)?encode$"
 use = "sign"
 algorithm = { arg = 0, struct = "Header", field = "alg" }
+key = { arg = 2, struct = "EncodingKey", field = "family" }
 enum = "Algorithm"
 
 [[boundary]]
