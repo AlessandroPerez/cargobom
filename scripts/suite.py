@@ -13,9 +13,9 @@ labels make it dead, and a miss when they make it live. Names compare as the reg
 them: a name with numeric parameter parts (`PBKDF2-SHA-256-600000-32`, `Argon2id-19456-2-1`) is
 the labelled name when the parts are the labelled parameters, or when the label fixes none; a
 family name (`Argon2`, the asset's algorithmFamily) of a labelled algorithm is less specific.
-Reporting only algorithms outside `must` while missing it, or a reachable `unknown` at a dead
-site, is wrong. A correct site whose reported use differs from the labelled function is counted
-in `function_mismatches`.
+Reporting only algorithms outside `must` while missing it, or a reachable `unknown` where
+nothing runs or may run (a dead site; `must` and `may` empty), is wrong. A correct site whose
+reported use differs from the labelled function is counted in `function_mismatches`.
   correct          must <= S <= must | may, no `unknown`
   wrong            a member outside must | may: a misclassification (any report at a dead site)
   less-specific    a less specific name of a labelled one (`RSA-PKCS1-1.5` for
@@ -82,8 +82,10 @@ def verdict(site, occ):
                       for m in must | may)}
     if known - must - may - general:
         return "wrong"
-    # a reachable operation where none runs
-    if not must and "unknown" in names:
+    # a reachable operation where none runs, nor may by the reference analysis (a jsonwebtoken
+    # decode whose list may hold another family than the key's has the key's algorithms in
+    # `may`: that the refusal happens on every way cannot be shown)
+    if not must and not may and "unknown" in names:
         return "wrong"
     if general:
         return "less-specific"

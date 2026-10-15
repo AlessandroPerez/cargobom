@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Score the CBOMs of real projects against their ground truth (fixtures/corpus/<project>.toml).
 
-usage: corpus_score.py CBOM_DIR LABELS.toml... [--json]
+usage: corpus_score.py CBOM_DIR LABELS.toml... [--json] [--against OLD_CBOM_DIR]
 CBOM_DIR/<project>.cbom.json is scored against fixtures/corpus/<project>.toml:
 - Layer 1: the labelled crypto packages (kind other than `support`) against the CBOM's library
   components with a crypto role (algorithm, trait, protocol, unmodelled): recall, precision,
   and agreement on support crates;
-- Layer 2: each labelled operation site in the project's own source, with suite.py's verdicts.
+- Layer 2: each labelled operation site in the project's own source, with suite.py's verdicts;
+- with --against OLD_CBOM_DIR (the previous round's CBOMs): at each labelled site, the label
+  kinds that changed (a run-time selector, a member's kind, a possible or partial set, the
+  set's size), which the verdicts do not see.
 """
-import collections, importlib.util, json, pathlib, sys, tomllib
+import collections, importlib.util, json, pathlib, re, sys, tomllib
 
 spec = importlib.util.spec_from_file_location("suite", pathlib.Path(__file__).with_name("suite.py"))
 suite = importlib.util.module_from_spec(spec)
@@ -65,8 +68,30 @@ def layer2(labels, cbom):
             "not_correct": details}
 
 
+# the parts of a call occurrence's text that say how its algorithm reaches the call
+LABEL_KINDS = [r"selector: [\w-]+", r"member: [\w-]+", r"\bpossible\b", r"beside others not followed",
+               r"hit its bound", r"algorithm one of \d+", r"algorithm unresolved"]
+
+
+def label_kinds(cbom, sites):
+    """(file, line, asset) -> the label kinds of its call occurrences, at the labelled sites."""
+    at = suite.occurrences(cbom)
+    out = {}
+    for s in sites:
+        for o in at.get((s["file"], s["line"]), []):
+            kinds = {m.group(0) for k in LABEL_KINDS for m in re.finditer(k, o[6])}
+            out.setdefault((s["file"], s["line"], o[0]), set()).update(kinds)
+    return out
+
+
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    argv = sys.argv[1:]
+    against = None
+    if "--against" in argv:
+        i = argv.index("--against")
+        against = pathlib.Path(argv[i + 1])
+        del argv[i:i + 2]
+    args = [a for a in argv if not a.startswith("--")]
     cbom_dir = pathlib.Path(args[0])
     out = {}
     for lp in sorted(map(pathlib.Path, args[1:])):
@@ -74,6 +99,14 @@ def main():
         cbom = json.load(open(cbom_dir / f"{name}.cbom.json"))
         labels = tomllib.load(open(lp, "rb"))
         out[name] = {"layer1": layer1(labels, cbom), "layer2": layer2(labels, cbom)}
+        if against is not None:
+            old = json.load(open(against / f"{name}.cbom.json"))
+            sites = labels.get("site", [])
+            a, b = label_kinds(old, sites), label_kinds(cbom, sites)
+            out[name]["label_changes"] = [
+                f"{f}:{l} {asset}: {sorted(a.get((f, l, asset), set()))} -> {sorted(b.get((f, l, asset), set()))}"
+                for (f, l, asset) in sorted(set(a) | set(b))
+                if a.get((f, l, asset)) != b.get((f, l, asset))]
     if "--json" in sys.argv:
         print(json.dumps(out, indent=1, sort_keys=True))
         return
@@ -89,6 +122,8 @@ def main():
             print("   L1 reported, not labelled:", ", ".join(l1["reported_not_crypto"]))
         for d in l2["not_correct"]:
             print(f"   L2 {d['line']} {d['callee']}: {d['verdict']}: reported {d['reported']}, must {d['must'][:6]}{'…' if len(d['must'])>6 else ''}")
+        for c in r.get("label_changes", []):
+            print(f"   label changed: {c}")
 
 
 if __name__ == "__main__":
