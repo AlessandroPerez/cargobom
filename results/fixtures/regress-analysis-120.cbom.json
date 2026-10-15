@@ -130,7 +130,7 @@
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `a120::main` puts in `static a120::CELLT`); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `a120::main` puts in `static a120::CELLT`); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
@@ -142,13 +142,6 @@
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `a120::main` puts in `static a120::CELLT`); line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`",
-            "line": 36,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -176,7 +169,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "7"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -245,7 +238,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: static, possible (the value `static a120::local_key::INFN` holds); line: `let _ = digest(local_key(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a120::local_key::INFN` holds); line: `let _ = digest(local_key(), &d);`; code: `digest`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
@@ -325,7 +318,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static a120::inner::MODT` holds); line: `let _ = digest(inner::MODT.get(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static a120::inner::MODT` holds); line: `let _ = digest(inner::MODT.get(), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -412,7 +405,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (the value `static a120::CELLT` starts with, which the program may replace); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (the value `static a120::CELLT` starts with, which the program may replace); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
@@ -421,13 +414,6 @@
           {
             "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a120::set_wr` stores in the field); line: `let _ = digest(via_helper(), &d);`; code: `digest`",
             "line": 33,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (the value `static a120::CELLT` starts with, which the program may replace); line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`",
-            "line": 36,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -458,7 +444,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "7"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -477,6 +463,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(CELLT.get(), &d);`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: the result of `std::thread::local::LocalKey::<..>::with_borrow`; line: `let _ = digest(b, &d);`; code: `digest`",
             "line": 28,
             "location": "src/main.rs",
@@ -491,7 +484,21 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(inner::MODT.get(), &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(local_key(), &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a120::main; use: digest; algorithm unresolved: the result of `std::thread::local::LocalKey::<T>::with`; line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 12,
@@ -527,7 +534,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -636,7 +643,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e1ba9684-33de-8102-ab0d-acec25758542",
+  "serialNumber": "urn:uuid:3d4121b7-67ae-87bd-8c17-23daebe6a428",
   "specVersion": "1.7",
   "version": 1
 }

@@ -192,7 +192,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: static, possible (the value `static clib::CFG` starts with, which the program may replace); line: `let _ = digest(clib::CFG.lock().unwrap().legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static clib::CFG` starts with, which the program may replace); line: `let _ = digest(clib::CFG.lock().unwrap().legacy, &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
@@ -293,7 +293,7 @@
             "symbol": "clib::CFG"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static clib::CFG` starts with, which the program may replace); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static clib::CFG` starts with, which the program may replace); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 12,
@@ -314,7 +314,7 @@
             "symbol": "a123::LOCAL"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a123::LOCAL` starts with, which the program may replace); line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a123::LOCAL` starts with, which the program may replace); line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -422,8 +422,15 @@
             "symbol": "clib::BASE"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `clib::set_direct` puts in `static clib::CFG`); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `clib::set_direct` puts in `static clib::CFG`); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 13,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `clib::set_direct` stores in the field); line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -443,7 +450,7 @@
             "symbol": "a123::ALIAS"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static clib::TL` holds); line: `let _ = digest(clib::TL.get(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static clib::TL` holds); line: `let _ = digest(clib::TL.get(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
@@ -517,7 +524,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "11"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -537,14 +544,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `clib::set_cfg` stores in the field); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `clib::set_cfg` stores in the field); line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `clib::set_cfg` puts in `static a123::LOCAL`); line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `clib::set_cfg` puts in `static a123::LOCAL`); line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -630,8 +637,36 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(clib::CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(LOCAL.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(clib::TL.get(), &d);`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x1, &d);`; code: `digest`",
             "line": 21,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(clib::CFG.lock().unwrap().legacy, &d);`; code: `digest`",
+            "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -666,7 +701,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -782,7 +817,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0cd29b1e-07be-8326-a431-d9e3ee6becb2",
+  "serialNumber": "urn:uuid:9ee90af6-ba79-885f-883b-cbe01e49eb96",
   "specVersion": "1.7",
   "version": 1
 }

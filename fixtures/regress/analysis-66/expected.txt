@@ -39,9 +39,9 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a66 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a66 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x1, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x1, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: the result of `ring::hmac::Algorithm::digest_algorithm`; line: `let _ = digest(a4, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::ops::function::FnMut::call_mut` is not followed; line: `let _ = digest(x5, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::ops::function::FnMut::call_mut`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x5, &d);`; code: `digest`
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:finding=hard-coded-key

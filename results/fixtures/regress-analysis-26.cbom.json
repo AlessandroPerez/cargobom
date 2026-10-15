@@ -102,7 +102,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 4,
@@ -313,6 +313,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in unresolved::main::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by unresolved::main at src/main.rs:63:40; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `digest`",
             "line": 63,
             "location": "src/main.rs",
@@ -349,7 +356,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -453,7 +460,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b46b435b-e6a1-8276-bcea-90c55456f6f3",
+  "serialNumber": "urn:uuid:dfae09bc-00b8-89be-88c0-57f443663704",
   "specVersion": "1.7",
   "version": 1
 }

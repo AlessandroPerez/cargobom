@@ -168,7 +168,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a61::B as a61::Up>::up`; line: `let _ = digest(b1.alg, &d); // SHA-256`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `<a61::B as a61::Up>::up`; line: `let _ = digest(b1.alg, &d); // SHA-256`; code: `digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 12,
@@ -409,7 +409,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a61::B as a61::Up>::up`; line: `let _ = digest(b2.alg, &d); // SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a61::B as a61::Up>::up`; line: `let _ = digest(b2.alg, &d); // SHA-384`; code: `digest`",
             "line": 57,
             "location": "src/main.rs",
             "offset": 12,
@@ -680,6 +680,20 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a61::B as a61::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b1.alg, &d); // SHA-256`; code: `digest`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a61::B as a61::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b2.alg, &d); // SHA-384`; code: `digest`",
+            "line": 57,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a61::Slot::slot` is not followed; line: `let _ = digest(a3.alg, &d); // SHA-384`; code: `digest`",
             "line": 64,
             "location": "src/main.rs",
@@ -722,7 +736,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `a61::arg` is not followed; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 105,
             "location": "src/main.rs",
             "offset": 12,
@@ -765,7 +779,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -874,7 +888,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9f49fdf7-d5b5-8155-9b40-bd56b978bd70",
+  "serialNumber": "urn:uuid:41265347-18fd-802d-a797-0798cafa1e04",
   "specVersion": "1.7",
   "version": 1
 }

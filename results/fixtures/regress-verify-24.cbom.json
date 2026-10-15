@@ -252,7 +252,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in v24::from_static; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static v24::CUR` starts with, which the program may replace); line: `let a = digest(*CUR.read().unwrap(), d).as_ref().len();`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v24::from_static; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static v24::CUR` starts with, which the program may replace); line: `let a = digest(*CUR.read().unwrap(), d).as_ref().len();`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -353,7 +353,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in v24::from_static; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `v24::set_cur` puts in `static v24::CUR`); line: `let a = digest(*CUR.read().unwrap(), d).as_ref().len();`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v24::from_static; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `v24::set_cur` puts in `static v24::CUR`); line: `let a = digest(*CUR.read().unwrap(), d).as_ref().len();`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -525,6 +525,61 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in v24::from_static; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let a = digest(*CUR.read().unwrap(), d).as_ref().len();`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -540,7 +595,8 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -565,6 +621,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -625,7 +685,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7469b1c1-894d-8c58-9aca-0713ad0e9c6c",
+  "serialNumber": "urn:uuid:3c365e77-8868-8c15-925b-c4178a853b70",
   "specVersion": "1.7",
   "version": 1
 }

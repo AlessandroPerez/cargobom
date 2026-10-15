@@ -1,4 +1,4 @@
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:22 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static <t24::LS as core::ops::deref::Deref>::deref::__stability::LAZY` starts with, which the program may replace); line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:22 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static <t24::LS as core::ops::deref::Deref>::deref::__stability::LAZY` starts with, which the program may replace); line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:7:41 | ring::digest::SHA384 | [reachable] [static] in <t24::LS as core::ops::deref::Deref>::deref::__static_ref_initialize; line: `static ref LS: &'static Algorithm = &SHA384;`; code: `SHA384`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:13:54 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: static, possible (the value `static t24::OC` holds); line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:86 | ring::digest::SHA512 | [reachable] [static] in t24::OC::{closure#0}; instantiated by <{closure@t24::OC::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `static OC: once_cell::sync::Lazy<&'static Algorithm> = once_cell::sync::Lazy::new(|| &SHA512);`; code: `SHA512`
@@ -6,6 +6,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:57:0 | ring | [manifest] locked ring 0.17.14; reached via t24 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t24 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:13:22 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
@@ -26,14 +27,23 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t24@0.1.0 -> pkg:cargo/ring@0.17.14
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/t24@0.1.0
@@ -42,6 +52,7 @@ doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
 root {"bom-ref": "pkg:cargo/t24@0.1.0", "name": "t24", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t24@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=

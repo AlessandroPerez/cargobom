@@ -26,6 +26,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:43:19 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let v6 = vec![&SHA256, &SHA384];`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:45:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(f, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:24 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let mut v10 = vec![&SHA256];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v10[0], &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:57:27 | ring::digest::SHA256 | [reachable] [static] in a64::main; line: `let v11 = vec![E { h: &SHA256, legacy: &SHA1 }];`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a64::main` stores in the field); line: `let _ = digest(v11[0].h, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:60:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v12[1], &d);`; code: `digest`
@@ -95,7 +96,7 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:42:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(v5[0], &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:50:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: container, possible (a value `alloc::vec::Vec::push` puts in it); line: `let _ = digest(v8[0], &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:55:14 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `v10[0] = &SHA512;`; code: `SHA512`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(v10[0], &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v10[0], &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `static a64::TABLE` stores in the field); line: `let _ = digest(v11[0].h, &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:61:47 | ring::digest::SHA512 | [reachable] [static] in a64::main; line: `let v13: Vec<&'static Digest> = [&SHA384, &SHA512].into_iter().collect();`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:62:12 | ring::digest::digest | [reachable] [call] in a64::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v13[0], &d);`; code: `digest`
@@ -126,7 +127,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=36
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=37
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved

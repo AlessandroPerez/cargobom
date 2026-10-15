@@ -259,7 +259,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(t4, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `a80::take_val`; line: `let _ = digest(t4, &d);`; code: `digest`",
             "line": 75,
             "location": "src/main.rs",
             "offset": 12,
@@ -346,7 +346,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(o.b.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(o.b.alg, &d);`; code: `digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 12,
@@ -360,7 +360,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(bx.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(bx.alg, &d);`; code: `digest`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 12,
@@ -374,7 +374,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
@@ -388,7 +388,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b2.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a80::B as a80::Up>::up`; line: `let _ = digest(b2.alg, &d);`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
@@ -402,7 +402,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(b3.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `let _ = digest(b3.alg, &d);`; code: `digest`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 12,
@@ -638,6 +638,41 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a80::B as a80::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(o.b.alg, &d);`; code: `digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a80::B as a80::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(bx.alg, &d);`; code: `digest`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a80::B as a80::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a80::B as a80::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b2.alg, &d);`; code: `digest`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a80::B as a80::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b3.alg, &d);`; code: `digest`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a80::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x3, &d);`; code: `digest`",
             "line": 71,
             "location": "src/main.rs",
@@ -681,7 +716,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -790,7 +825,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cf73b365-6732-8385-ac68-85d511b6c474",
+  "serialNumber": "urn:uuid:e0864baf-18e9-8c2e-a666-631964021351",
   "specVersion": "1.7",
   "version": 1
 }

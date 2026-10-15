@@ -333,7 +333,7 @@
             "symbol": "a93::OUTER"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `digest`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 12,
@@ -567,7 +567,7 @@
             "symbol": "a93::CFG"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::CFG` starts with, which the program may replace); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a93::CFG` starts with, which the program may replace); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -581,14 +581,14 @@
             "symbol": "a93::CFG"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (a value `a93::set_rw` puts in `static a93::RW`); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (a value `a93::set_rw` puts in `static a93::RW`); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: static, possible (the value `static a93::DEADW` starts with, which the program may replace); line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a93::DEADW` starts with, which the program may replace); line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `digest`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 12,
@@ -602,7 +602,7 @@
             "symbol": "a93::DEADW"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
@@ -787,7 +787,14 @@
             "symbol": "a93::SLICE"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (the value `static a93::RW` starts with, which the program may replace); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `a93::set_outer` stores in the field); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static a93::RW` starts with, which the program may replace); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
@@ -801,7 +808,7 @@
             "symbol": "a93::RW"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a93::set_outer` puts in `static a93::OUTER`); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a93::set_outer` puts in `static a93::OUTER`); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
@@ -847,7 +854,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "22"
+          "value": "23"
         }
       ],
       "type": "cryptographic-asset"
@@ -965,14 +972,14 @@
             "symbol": "a93::OUTERS"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a93::set_cfg` puts in `static a93::CFG`); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a93::set_cfg` puts in `static a93::CFG`); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a93::set_cfg` stores in the field); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `a93::set_cfg` stores in the field); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
@@ -1036,6 +1043,89 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `digest`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -1057,7 +1147,8 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1076,6 +1167,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -1136,7 +1231,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5a722dab-affe-8607-84b5-69b507e7c753",
+  "serialNumber": "urn:uuid:37f9dc3c-6cd2-8c93-9c66-3a5ad4fad7a9",
   "specVersion": "1.7",
   "version": 1
 }

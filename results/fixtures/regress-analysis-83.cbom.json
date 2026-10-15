@@ -118,14 +118,14 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a83::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 38); line: `let k2 = LessSafeKey::new(UnboundKey::new(key_alg(&k), &[1u8; 32]).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a83::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `a83::key_alg`; key: hard-coded (32 bytes, literal at line 38); line: `let k2 = LessSafeKey::new(UnboundKey::new(key_alg(&k), &[1u8; 32]).unwrap());`; code: `UnboundKey::new`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a83::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 40); line: `let _ = k2.seal_in_place_append_tag(aead::Nonce::assume_unique_for_key([0u8; 12]), aead::Aad::empty(), &mut buf);`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a83::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `a83::key_alg`; nonce: hard-coded (all zero, 12 bytes, literal at line 40); line: `let _ = k2.seal_in_place_append_tag(aead::Nonce::assume_unique_for_key([0u8; 12]), aead::Aad::empty(), &mut buf);`; code: `seal_in_place_append_tag`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 15,
@@ -670,7 +670,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(ctx_alg(&c1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `a83::ctx_alg`; line: `let _ = digest(ctx_alg(&c1), &d);`; code: `digest`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 12,
@@ -1068,7 +1068,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:363f9a21-52d2-8305-9af1-c3aa6cb9542f",
+  "serialNumber": "urn:uuid:e8bb3e63-3134-82e3-b3ab-a5648c33416e",
   "specVersion": "1.7",
   "version": 1
 }

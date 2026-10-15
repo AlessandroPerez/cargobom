@@ -116,7 +116,7 @@
             "symbol": "a131::LIVE"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a131::LIVE` starts with, which the program may replace); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a131::LIVE` starts with, which the program may replace); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -128,6 +128,13 @@
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a131::LIVE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: type-join, possible (a value `static a131::LIVE` stores in the field); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -155,7 +162,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -189,7 +196,14 @@
             "symbol": "a131::DEAD"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (the value `static a131::DEAD` starts with, which the program may replace); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `static a131::DEAD` stores in the field); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static a131::DEAD` starts with, which the program may replace); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -228,7 +242,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -255,14 +269,14 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::LIVE`); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::LIVE`); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::DEAD`); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::DEAD`); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -298,6 +312,68 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -318,7 +394,8 @@
       "provides": [
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512"
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -333,6 +410,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -393,7 +474,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9fe62163-7e20-8912-9a57-bcd2ed03f576",
+  "serialNumber": "urn:uuid:b99d0f36-c874-89b7-b194-4238337dca69",
   "specVersion": "1.7",
   "version": 1
 }

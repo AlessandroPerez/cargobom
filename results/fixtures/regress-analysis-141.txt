@@ -96,6 +96,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | src/main.rs:21:12 | jsonwebtoken::decoding::decode | [reachable] [call] in a141::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (`Validation.algorithms` may list HS256, of another family than the key's (Rsa): jsonwebtoken then refuses the token before any verification, else it verifies with one of RS256); line: `let _ = decode::<C>(&t, &dk, &v1);`; code: `decode::<C>`
   occ unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | src/main.rs:23:12 | jsonwebtoken::decoding::decode | [reachable] [call] in a141::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (`Validation.algorithms` may list HS384, of another family than the key's (Rsa): jsonwebtoken then refuses the token before any verification, else it verifies with one of RS384); line: `let _ = decode::<C>(&t, &dk, &v2);`; code: `decode::<C>`
+  occ unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | src/main.rs:25:12 | jsonwebtoken::decoding::decode | [reachable] [call] in a141::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (a value written into a static with interior mutability through a borrow of it); line: `let _ = decode::<C>(&t, &dk, &v3);`; code: `decode::<C>`
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:algorithm-family=ECDSA
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:confidence=high
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:detection:method=type-resolved
@@ -264,7 +265,7 @@
   prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:occurrences=3
   prop unknown | crypto:algorithm:unknown:unknown:jsonwebtoken | rcbom:reachability=reachable
 asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}

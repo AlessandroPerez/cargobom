@@ -123,7 +123,7 @@
             "symbol": "a128::M6"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a128::M6` starts with, which the program may replace); line: `let _ = digest(M6.lock().unwrap().legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a128::M6` starts with, which the program may replace); line: `let _ = digest(M6.lock().unwrap().legacy, &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -151,7 +151,7 @@
             "symbol": "a128::M7"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a128::M7` starts with, which the program may replace); line: `let _ = digest(M7.lock().unwrap().legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a128::M7` starts with, which the program may replace); line: `let _ = digest(M7.lock().unwrap().legacy, &d);`; code: `digest`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 12,
@@ -259,7 +259,7 @@
             "symbol": "a128::M7"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a128::M7` starts with, which the program may replace); line: `let _ = digest(M7.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a128::M7` starts with, which the program may replace); line: `let _ = digest(M7.lock().unwrap().h, &d);`; code: `digest`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
@@ -353,14 +353,14 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a128::set6` puts in `static a128::M6`); line: `let _ = digest(M6.lock().unwrap().legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a128::set6` puts in `static a128::M6`); line: `let _ = digest(M6.lock().unwrap().legacy, &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a128::set7` stores in the field); line: `let _ = digest(M7.lock().unwrap().legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `a128::set7` stores in the field); line: `let _ = digest(M7.lock().unwrap().legacy, &d);`; code: `digest`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 12,
@@ -433,7 +433,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a128::set7` puts in `static a128::M7`); line: `let _ = digest(M7.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a128::set7` puts in `static a128::M7`); line: `let _ = digest(M7.lock().unwrap().h, &d);`; code: `digest`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
@@ -489,6 +489,27 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(M6.lock().unwrap().legacy, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(M7.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a128::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(M7.lock().unwrap().legacy, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -520,7 +541,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -629,7 +650,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0d76fc1c-3487-83eb-bcd5-4ea6e8306f1d",
+  "serialNumber": "urn:uuid:c18a50fc-fc63-8bd2-a6b6-6b2f1deb4435",
   "specVersion": "1.7",
   "version": 1
 }

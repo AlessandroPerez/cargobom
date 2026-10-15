@@ -294,6 +294,13 @@
             "symbol": "ring::digest::SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a91::main; line: `let mut x5: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 50,
             "location": "src/main.rs",
@@ -390,13 +397,6 @@
             "location": "src/main.rs",
             "offset": 48,
             "symbol": "ring::digest::SHA256"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(*t3, &d);`; code: `digest`",
-            "line": 87,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -472,7 +472,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a91::B as a91::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a91::B as a91::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -657,7 +657,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 12,
@@ -706,7 +706,7 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(*t3, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(*t3, &d);`; code: `digest`",
             "line": 87,
             "location": "src/main.rs",
             "offset": 12,
@@ -756,6 +756,13 @@
       },
       "evidence": {
         "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a91::B as a91::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
           {
             "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x6, &d);`; code: `digest`",
             "line": 56,
@@ -807,7 +814,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -916,7 +923,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9e888b80-9ae7-8aca-ad83-ff0a23c3f353",
+  "serialNumber": "urn:uuid:6bf6bf34-a445-84ac-a447-92d206f4082c",
   "specVersion": "1.7",
   "version": 1
 }

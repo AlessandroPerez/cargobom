@@ -1,0 +1,6 @@
+# correct positions the text verifier cannot confirm (checked by hand): p4's `set4(&c)` and p5's
+# `set5(&c)` always store SHA512 in the cell through a shared borrow (`c.set`, `*c.borrow_mut() =`)
+# before it is read; the verifier reads the cell's initializer and does not follow stores through
+# a cell handed to a function
+MISMATCH SHA-512 src/main.rs:23:61: the code the call reads names SHA256, not SHA512
+MISMATCH SHA-512 src/main.rs:27:85: the code the call reads names SHA256, not SHA512
