@@ -9,6 +9,7 @@ mod links;
 mod matcher;
 mod pointers;
 mod provenance;
+mod search;
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -432,6 +433,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
         out
     };
+    // the statics and constants an initializer names directly
+    let edges = |id: &str| -> Vec<rcbom_facts::DefRef> {
+        static_edges.get(id).cloned().unwrap_or_default()
+    };
     // Reachable functions, from every binary's walk; the data their bodies name (statics, and
     // consts whose values evaluation copied away) is reachable, and so is what that data names.
     let reached_fns: HashSet<&str> = facts
@@ -532,7 +537,14 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
         keys.sort();
         for k in keys {
-            let _ = site_matches(&ctx, ctx.calls[&k], &closure, &reached_data, &reached_path);
+            let _ = site_matches(
+                &ctx,
+                ctx.calls[&k],
+                &closure,
+                &edges,
+                &reached_data,
+                &reached_path,
+            );
         }
         let links = ctx.links.take();
         *ctx.consumers.borrow_mut() = links;
@@ -781,7 +793,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                 }
             }
-            let matches = site_matches(&ctx, site, &closure, &reached_data, &reached_path);
+            let matches = site_matches(&ctx, site, &closure, &edges, &reached_data, &reached_path);
             let protocol = kb
                 .crate_by_name(&site.owner.krate.name)
                 .is_some_and(|c| c.role == Role::Protocol);
@@ -1407,6 +1419,7 @@ fn site_matches(
     ctx: &Ctx<'_>,
     site: &Site,
     closure: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
+    edges: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
     reachable: &dyn Fn(&str) -> bool,
     reached_path: &dyn Fn(&str) -> bool,
 ) -> Vec<SiteMatch> {
@@ -1753,37 +1766,44 @@ fn site_matches(
             let protocol_callee = kb
                 .crate_by_name(implementer)
                 .is_some_and(|c| c.role == Role::Protocol);
-            // a static's field read whose value the analysis does not follow (`table` fallback)
-            let mut field_table: Option<String> = None;
+            // why the algorithms found are not all that may reach the call (the gaps of the
+            // value search, of the place used), and a table of several algorithms read where
+            // which one is not followed
+            let mut gaps: Vec<search::Gap> = Vec::new();
+            let mut table_gap: Option<String> = None;
             if out.is_empty() && into_kb && !protocol_callee && (can_occur() || has_roles()) {
                 let has_roles = has_roles();
+                let live = |v: &links::Via| boundary::reached(v, reachable, reached_path);
+                // the argument that carries the algorithm of an operation
+                let algorithm = operation_algorithm(ctx, site);
                 // the call's own arguments; if what they name is not used here, its receiver's;
                 // if nothing in this function names the algorithm, what reaches the key or
                 // algorithm from other functions (a field, a parameter, a function's result),
                 // looked up only then
-                let local = provenance::data_in_args(kb, None, &site.target);
+                // a static or constant that is no descriptor leads to one (a table)
+                let leads = |d: &rcbom_facts::DefRef| {
+                    closure(&d.id)
+                        .iter()
+                        .any(|x| x.id != d.id && match_static(kb, x, &supported).is_some())
+                };
+                let local = {
+                    let mut s = search::Search::new(kb, &ctx.flow, false, &live).with_leads(&leads);
+                    search::data_in_args(&mut s, &site.owner.path, &site.target, algorithm)
+                };
                 // what an argument names here is not all that reaches it when its other
-                // alternatives come from elsewhere (`if c { &SHA256 } else { pick() }`): then
-                // the values from other functions are looked up too, those named here kept as
+                // alternatives come from elsewhere (`if c { &SHA256 } else { pick() }`, a field
+                // read of a table of structs, a static that changes at run time): then the
+                // values from other functions are looked up too, those named here kept as
                 // named here
-                // a field read of a static that stores values in fields (`TABLE[i].h`, a table of
-                // structs) is what its initializer stores in that field: looked up with the links
-                // (or a field of a static whose contents change at run time, or that a `const
-                // fn` makes: `LAZY.h`, `MADE.h`)
-                let static_field = local
+                let incomplete = local
                     .iter()
-                    .any(|(_, others)| others.iter().any(|d| ctx.flow.static_fields(&d.id)))
-                    || matches!(&site.target, Target::Call { arg_origins, .. }
-                    if arg_origins.iter().any(|o| provenance::reads_static_field(
-                        o,
-                        &|id| ctx.flow.field_readable(id),
-                        0,
-                    )));
-                let incomplete = provenance::incomplete(kb, &site.target) || static_field;
+                    .any(|p| p.gaps.iter().any(|g| g.kind == search::GapKind::Elsewhere));
                 let named_here: HashSet<String> = if incomplete {
                     local
                         .iter()
-                        .flat_map(|(d, _)| d.iter().map(|x| x.id.clone()))
+                        .flat_map(|p| p.defs.iter())
+                        .filter(|d| provenance::is_descriptor(kb, d))
+                        .map(|x| x.id.clone())
                         .collect()
                 } else {
                     HashSet::new()
@@ -1798,10 +1818,12 @@ fn site_matches(
                 let linked = std::iter::once_with(|| {
                     ctx.flow.take_named();
                     ctx.flow.take_named_via();
-                    let r = provenance::data_in_args(
-                        kb,
-                        Some((&ctx.flow, site.owner.path.as_str())),
+                    let mut s = search::Search::new(kb, &ctx.flow, true, &live).with_leads(&leads);
+                    let r = search::data_in_args(
+                        &mut s,
+                        site.owner.path.as_str(),
                         &site.target,
+                        algorithm,
                     );
                     *named.borrow_mut() = ctx.flow.take_named();
                     *named_via.borrow_mut() = ctx.flow.take_named_via();
@@ -1812,58 +1834,55 @@ fn site_matches(
                     .into_iter()
                     .map(|p| (p, false))
                     .chain(linked.map(|p| (p, true)));
-                for ((mut descriptors, others), from_elsewhere) in places {
+                for (place, from_elsewhere) in places {
+                    let (mut descriptors, others): (Vec<_>, Vec<_>) = place
+                        .defs
+                        .iter()
+                        .cloned()
+                        .partition(|d| provenance::is_descriptor(kb, d));
                     // the user's own data naming exactly one descriptor (`digest(TABLE.alg, ..)`
-                    // with `TABLE.alg = &SHA256`) names it; a table of several (`DIGESTS[i]`):
-                    // any of them, the element read by an index (or a field) not followed
+                    // with `TABLE.alg = &SHA256`) names it; a list of several (`DIGESTS[i]`): any
+                    // of them, the element read by an index not followed (R4.3)
                     let mut tables: HashMap<String, (String, usize)> = HashMap::new();
+                    let mut place_table_gap: Option<String> = None;
                     for d in others {
                         // a static that changes at run time holds what the program puts there
                         // (looked up with the values from elsewhere), not its initializer's
                         if ctx.flow.mutable_static(&d.id).is_some() {
                             continue;
                         }
-                        let mut found: Vec<rcbom_facts::DefRef> = closure(&d.id)
-                            .into_iter()
-                            .filter(|x| match_static(kb, x, &supported).is_some())
-                            .collect();
-                        // a descriptor another one is made of (`HMAC_SHA256`'s `SHA256`) is part
-                        // of it, not a second one
-                        let parts: Vec<String> = found
-                            .iter()
-                            .flat_map(|y| {
-                                closure(&y.id)
-                                    .into_iter()
-                                    .filter(|x| x.id != y.id)
-                                    .map(|x| x.id)
-                            })
-                            .collect();
-                        found.retain(|x| !parts.contains(&x.id));
-                        // a field read of it (`AREF[i].h`, `OPT.unwrap().h`) where nothing says what
-                        // the field holds: not every descriptor of the data (another field's
-                        // among them), the unknown
-                        if found.len() > 1
-                            && matches!(&site.target, Target::Call { arg_origins, .. }
-                            if arg_origins.iter().any(|o| provenance::reads_static_field(
-                                o,
-                                &|id| id == d.id,
-                                0,
-                            )))
-                        {
-                            field_table.get_or_insert_with(|| d.path.clone());
-                            continue;
-                        }
-                        if let [one] = found.as_slice() {
-                            if !descriptors.contains(one) {
-                                descriptors.push(one.clone());
-                            }
-                        } else {
-                            let k = found.len();
-                            for x in found {
-                                if !descriptors.contains(&x) {
-                                    tables.insert(x.id.clone(), (d.path.clone(), k));
-                                    descriptors.push(x);
+                        let read_field = matches!(&site.target, Target::Call { arg_origins, .. }
+                        if arg_origins.iter().any(|o| provenance::reads_static_field(
+                            o,
+                            &|id| id == d.id,
+                            0,
+                        )));
+                        match table_members(
+                            kb,
+                            &d,
+                            read_field,
+                            closure,
+                            edges,
+                            &|id| ctx.flow.static_fields(id),
+                            &supported,
+                        ) {
+                            Ok(found) => {
+                                if let [one] = found.as_slice() {
+                                    if !descriptors.contains(one) {
+                                        descriptors.push(one.clone());
+                                    }
+                                } else {
+                                    let k = found.len();
+                                    for x in found {
+                                        if !descriptors.contains(&x) {
+                                            tables.insert(x.id.clone(), (d.path.clone(), k));
+                                            descriptors.push(x);
+                                        }
+                                    }
                                 }
+                            }
+                            Err(why) => {
+                                place_table_gap.get_or_insert(why);
                             }
                         }
                     }
@@ -2014,35 +2033,50 @@ fn site_matches(
                             out.push((m, Kind::Call, f, symbol.clone(), d, unreached));
                         }
                     }
+                    // a table read where which of its algorithms is not followed says so
+                    if table_gap.is_none() {
+                        table_gap = place_table_gap;
+                    }
+                    // the place that names the algorithm is the answer, with its gaps
                     if !out.is_empty() {
+                        gaps = place.gaps;
                         break;
                     }
                 }
             }
             // an operation is never dropped: when no algorithm reaches it, it is reported with
             // an unknown one, and why; so is the rest of the algorithms when the search for them
-            // hit its bound (what was found is not all)
-            let unresolved = if let Some(t) = &field_table {
+            // met a value it does not follow or hit its bound (what was found is not all)
+            let gap_reason = gaps_reason(&gaps);
+            let unresolved = if let Some(t) = &table_gap {
                 unresolved_operation(ctx, site).map(|(p, f, _, pr)| {
                     let reason = format!(
-                        "{}a field of `{}` the analysis does not follow (the data holds several \
-                         algorithms)",
+                        "{}{t}",
                         if out.is_empty() {
                             ""
                         } else {
                             "other algorithms than these may reach the call: "
                         },
-                        boundary::short_fn(t)
                     );
                     (p, f, reason, pr)
                 })
             } else if out.is_empty() {
                 unresolved_operation(ctx, site)
-            } else if let Some(reason) = algorithm_cut(ctx, site, reachable, reached_path) {
-                unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason, pr))
+            } else if let Some(reason) = &gap_reason {
+                unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason.clone(), pr))
             } else {
                 None
             };
+            // a call that is no operation (a key set up with the algorithm) gives no unknown
+            // occurrence: its members say they are not all
+            if unresolved.is_none() && (gap_reason.is_some() || table_gap.is_some()) {
+                let n = out.iter().filter(|o| !o.5).count();
+                for o in out.iter_mut().filter(|o| !o.5) {
+                    if let Some(s) = o.4.iter_mut().find(|s| s.starts_with("algorithm ")) {
+                        *s = beside_unknown(s, n);
+                    }
+                }
+            }
             if let Some((primitive, function, reason, provider)) = unresolved {
                 // the members found beside it are not all that may reach the call: none is
                 // the only one
@@ -2304,34 +2338,10 @@ fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresolved> {
     }
 }
 
-/// Does the driver's search for the value `o` stop at its bound somewhere (`Truncated`)?
-fn cut(o: &rcbom_facts::Origin) -> bool {
-    use rcbom_facts::Origin;
-    match o {
-        Origin::Truncated => true,
-        Origin::Any(v) | Origin::All(v) => v.iter().any(cut),
-        Origin::Call { args, .. } | Origin::Written { args, .. } => args.iter().any(cut),
-        Origin::Field { base, .. } => cut(base),
-        Origin::Set { value, .. } => cut(value),
-        _ => false,
-    }
-}
-
-/// Why the algorithms found for a value-selected operation are not all: the search was cut at
-/// its bound (a choice among more alternatives than the driver keeps), or a value it met is
-/// not followed.
-fn algorithm_cut(
-    ctx: &Ctx<'_>,
-    site: &Site,
-    reachable: &dyn Fn(&str) -> bool,
-    reached_path: &dyn Fn(&str) -> bool,
-) -> Option<String> {
-    let Target::Call {
-        callee,
-        arg_origins,
-        ..
-    } = &site.target
-    else {
+/// The argument of an operation (`[[operation]]`, of a value-selected algorithm) that carries
+/// its algorithm.
+fn operation_algorithm(ctx: &Ctx<'_>, site: &Site) -> Option<usize> {
+    let Target::Call { callee, .. } = &site.target else {
         return None;
     };
     let in_crate = callee
@@ -2341,31 +2351,101 @@ fn algorithm_cut(
     ctx.kb
         .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
         .filter(|op| !op.self_type)
-        .and_then(|op| arg_origins.get(op.algorithm))
-        .and_then(|o| {
-            // the cut among the values that reach the call, once followed (a cut inside a value
-            // a later write replaced is no part of them); the origin's own when none are
-            let cut_here = match ctx.flow.values(o, &site.owner.path) {
-                Some(vs) => vs
-                    .iter()
-                    .any(|(v, _)| matches!(v, rcbom_facts::Origin::Truncated)),
-                None => cut(o),
-            };
-            if cut_here {
-                Some(
-                    "the search for the value hit its bound: other algorithms than these may \
-                     reach the call"
-                        .to_string(),
-                )
-            } else {
-                unfollowed(ctx, site, o, &|v| {
-                    boundary::reached(v, reachable, reached_path)
-                })
-                .map(|r| {
-                    format!("other algorithms than these may reach the call: {r} is not followed")
-                })
-            }
+        .map(|op| op.algorithm)
+}
+
+/// Why the algorithms found are not all that may reach the call, from the gaps of the value
+/// search that reach it (not those met only through code no entry point reaches): its bound
+/// first, then the first value it does not follow.
+fn gaps_reason(gaps: &[search::Gap]) -> Option<String> {
+    let live: Vec<&search::Gap> = gaps
+        .iter()
+        .filter(|g| !g.dead && g.kind != search::GapKind::Elsewhere)
+        .collect();
+    if live.iter().any(|g| g.kind == search::GapKind::Cut) {
+        return Some(
+            "the search for the value hit its bound: other algorithms than these may reach the \
+             call"
+                .to_string(),
+        );
+    }
+    live.first().map(|g| {
+        format!(
+            "other algorithms than these may reach the call: {} is not followed",
+            g.reason
+        )
+    })
+}
+
+/// The descriptors a value read from static (or constant) `d` can be, when its data says: the
+/// one descriptor it leads to, or each element of a list of descriptors (`static DIGESTS:
+/// [&Algorithm; 2] = [&SHA256, &SHA384]`, read at any index: R4.3). Otherwise (a field read,
+/// `TABLE[i].h`; a table of structs or of other statics, `[&BASE, &FIX]`), which of its several
+/// algorithms is read is not followed: the reason.
+fn table_members(
+    kb: &Kb,
+    d: &rcbom_facts::DefRef,
+    read_field: bool,
+    closure: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
+    edges: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
+    stores_fields: &dyn Fn(&str) -> bool,
+    supported: &dyn Fn(&rcbom_facts::CrateRef) -> bool,
+) -> std::result::Result<Vec<rcbom_facts::DefRef>, String> {
+    let mut found: Vec<rcbom_facts::DefRef> = closure(&d.id)
+        .into_iter()
+        .filter(|x| match_static(kb, x, supported).is_some())
+        .collect();
+    // a descriptor another one is made of (`HMAC_SHA256`'s `SHA256`) is part of it, not a
+    // second one
+    let parts: Vec<String> = found
+        .iter()
+        .flat_map(|y| {
+            closure(&y.id)
+                .into_iter()
+                .filter(|x| x.id != y.id)
+                .map(|x| x.id)
         })
+        .collect();
+    found.retain(|x| !parts.contains(&x.id));
+    if found.len() <= 1 {
+        return Ok(found);
+    }
+    // a field read of it (`AREF[i].h`, `OPT.unwrap().h`) where nothing says what the field
+    // holds: not every descriptor of the data (another field's among them), the unknown
+    if read_field {
+        return Err(format!(
+            "a field of `{}` the analysis does not follow (the data holds several algorithms)",
+            boundary::short_fn(&d.path)
+        ));
+    }
+    // a list of the descriptors themselves, or of such lists (`[&DIGESTS]`): any element
+    // (R4.3); a static or constant holding structs or tuples (its initializer stores fields:
+    // `stores_fields`) is no list
+    fn list(
+        kb: &Kb,
+        id: &str,
+        edges: &dyn Fn(&str) -> Vec<rcbom_facts::DefRef>,
+        stores_fields: &dyn Fn(&str) -> bool,
+        supported: &dyn Fn(&rcbom_facts::CrateRef) -> bool,
+        depth: usize,
+    ) -> bool {
+        let items = edges(id);
+        depth < 4
+            && !stores_fields(id)
+            && !items.is_empty()
+            && items.iter().all(|x| {
+                match_static(kb, x, supported).is_some()
+                    || list(kb, &x.id, edges, stores_fields, supported, depth + 1)
+            })
+    }
+    if list(kb, &d.id, edges, stores_fields, supported, 0) {
+        return Ok(found);
+    }
+    Err(format!(
+        "a value read from `{}` the analysis does not follow (the data holds several \
+         algorithms, not as a list of them)",
+        boundary::short_fn(&d.path)
+    ))
 }
 
 /// A member's algorithm sentence when the set found has an unknown beside it (others may reach
@@ -2400,169 +2480,6 @@ fn beside_unknown(s: &str, n: usize) -> String {
         ),
         None => s.to_string(),
     }
-}
-
-/// An alternative of the algorithm argument `o` (read at `site`), once the values from
-/// elsewhere are followed, that is neither an algorithm nor followed to one: a value of unknown
-/// origin, a parameter or field no value reaches, a call whose result is not followed (a
-/// closure's that writes the variable, a function writing through an `Option<&mut>`, a trait
-/// method on a type whose implementation records nothing). What it is, if any: the algorithms
-/// found beside it are not all.
-fn unfollowed(
-    ctx: &Ctx<'_>,
-    site: &Site,
-    o: &rcbom_facts::Origin,
-    live: &dyn Fn(&links::Via) -> bool,
-) -> Option<String> {
-    use rcbom_facts::Origin;
-    type Seen = HashSet<(Origin, String)>;
-    fn leaf(
-        ctx: &Ctx<'_>,
-        o: &Origin,
-        owner: &str,
-        depth: usize,
-        seen: &mut Seen,
-        live: &dyn Fn(&links::Via) -> bool,
-    ) -> Option<String> {
-        if depth > 10 {
-            return None;
-        }
-        let o = links::peel(o);
-        match o {
-            Origin::Data { .. }
-            | Origin::Unit { .. }
-            | Origin::Const { .. }
-            | Origin::Truncated => None,
-            // a `Result`'s error value: no candidate value of the read
-            Origin::Call { callee, .. } if callee == rcbom_facts::RESULT_ERR => None,
-            Origin::Any(v) | Origin::All(v) => v
-                .iter()
-                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live)),
-            Origin::Set { value, .. } => leaf(ctx, value, owner, depth + 1, seen, live),
-            // the error a `?` returns: no value
-            Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => None,
-            Origin::Call { callee, args, .. } if callee == "<closure>" => args
-                .iter()
-                .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live)),
-            // a crypto crate's getter for the algorithm a value was made with is followed to
-            // the value (`ctx.algorithm()`); another of its calls returning an algorithm
-            // (`algorithm().digest_algorithm()`) is not
-            Origin::Call { krate, callee, .. } if ctx.kb.crate_by_name(krate).is_some() => {
-                let bare = matcher::strip_generics(callee);
-                (bare.ends_with("_algorithm") && !bare.ends_with("::algorithm"))
-                    .then(|| unresolved_kind(o))
-            }
-            // a call of a closure runs the closure's code, not followed
-            Origin::Call { callee, krate, .. }
-                if matches!(krate.as_str(), "core" | "std" | "alloc")
-                    && ["Fn::call", "FnMut::call_mut", "FnOnce::call_once"]
-                        .iter()
-                        .any(|f| callee.ends_with(f)) =>
-            {
-                Some(unresolved_kind(o))
-            }
-            // a standard-library call passes its arguments' values on (an iterator, an
-            // `Option`'s fallback): a container read its container's (not the index or key), a
-            // map's store its value (not the key); a trait object's method is no such call
-            Origin::Call {
-                callee,
-                krate,
-                args,
-                self_ty,
-                ..
-            } if matches!(krate.as_str(), "core" | "std" | "alloc")
-                && !self_ty.as_deref().is_some_and(|t| t.starts_with("dyn ")) =>
-            {
-                let bare = matcher::strip_generics(callee);
-                let read = [
-                    "Index::index",
-                    "IndexMut::index_mut",
-                    "::get",
-                    "::get_mut",
-                    "::get_unchecked",
-                    "::nth",
-                    "::remove",
-                    "::swap_remove",
-                ]
-                .iter()
-                .any(|m| bare.ends_with(m));
-                let map_store = bare.ends_with("Map::insert");
-                // what a closure makes of an `Option`'s value: not the value itself; the value
-                // a place held before a call replaced it: not the new value
-                // a predicate or an error mapping (`o.filter(|_| i > 3)`, `map_err(|e| ..)`,
-                // `ok_or(e)`): the value is the receiver's, the closure's captures are none
-                if [
-                    "::filter",
-                    "::map_err",
-                    "::inspect",
-                    "::inspect_err",
-                    "::take_if",
-                    "::ok_or",
-                    "::ok_or_else",
-                ]
-                .iter()
-                .any(|m| bare.ends_with(m))
-                {
-                    return args
-                        .first()
-                        .and_then(|a| leaf(ctx, a, owner, depth + 1, seen, live));
-                }
-                let mapped = provenance::std_map(callee);
-                if mapped {
-                    return provenance::mapped_values(args)
-                        .iter()
-                        .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live));
-                }
-                // (a fallback function called: `unwrap_or_else(fallback)`)
-                if provenance::std_choice(callee) {
-                    return provenance::choice_values(args)
-                        .iter()
-                        .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live));
-                }
-                let old = provenance::std_old_value(callee);
-                args.iter()
-                    .enumerate()
-                    .filter(|(i, _)| {
-                        if read {
-                            *i == 0
-                        } else {
-                            !(map_store && *i == 1) && !(mapped && *i == 0) && !(old && *i > 0)
-                        }
-                    })
-                    .find_map(|(_, a)| leaf(ctx, a, owner, depth + 1, seen, live))
-            }
-            // an iterator advanced by `next` (`for a in DIGESTS.iter()`): its elements are the
-            // container's, followed beside it
-            Origin::Through { callee } if callee.ends_with("Iterator::next") => None,
-            // the marker of a value written into an element (the value is beside it, followed)
-            Origin::Through { callee } if rcbom_facts::element_writer(callee).is_some() => None,
-            Origin::Unknown | Origin::Loop | Origin::Through { .. } => Some(unresolved_kind(o)),
-            // a value from elsewhere: what reaches it, followed; the value itself among them is
-            // one the links could not follow (a trait object's type whose method records
-            // nothing, a caller passing a value not known)
-            _ => {
-                if !seen.insert((o.clone(), owner.to_string())) {
-                    return None;
-                }
-                // (only the values that reach the call: not a caller no entry point reaches,
-                // nor what is found through one)
-                match ctx.flow.values_via_live(o, owner) {
-                    Some(vs) => {
-                        let vs: Vec<_> = vs.into_iter().filter(|(_, _, by)| live(by)).collect();
-                        if vs.iter().any(|(v, w, _)| v == o && w == owner) {
-                            return Some(unresolved_kind(o));
-                        }
-                        vs.iter()
-                            .find_map(|(v, w, _)| leaf(ctx, v, w, depth + 1, seen, live))
-                    }
-                    // what reaches it, only through callers no entry point reaches: none
-                    None if ctx.flow.values_via(o, owner).is_some() => None,
-                    None => Some(unresolved_kind(o)),
-                }
-            }
-        }
-    }
-    leaf(ctx, o, &site.owner.path, 0, &mut HashSet::new(), live)
 }
 
 /// Do the values that reach `o` from elsewhere (read at `site`) include a cut (`Truncated`: in
@@ -2769,38 +2686,11 @@ fn unresolved_reason(o: &rcbom_facts::Origin) -> String {
         }
     }
     let peeled = links::peel(o);
-    let reason = unresolved_kind(peeled);
+    let reason = search::unresolved_kind(peeled);
     if !matches!(peeled, Origin::Truncated) && value_cut(peeled) {
         format!("{reason}; the search for the value hit its bound")
     } else {
         reason
-    }
-}
-
-fn unresolved_kind(o: &rcbom_facts::Origin) -> String {
-    use rcbom_facts::Origin;
-    match o {
-        Origin::Param { .. } => {
-            "a parameter, whose arguments (where a recorded call passes one) name no algorithm"
-                .into()
-        }
-        Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
-        Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
-        Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),
-        Origin::Through { callee } if rcbom_facts::element_writer(callee).is_some() => {
-            "a value written into an element of a list".into()
-        }
-        Origin::Through { callee } => format!("a value written through `{}`", short(callee)),
-        Origin::Data { def, .. } => {
-            format!("`{}`, which leads to no single algorithm", short(&def.path))
-        }
-        Origin::Any(_) => "one of several values, none naming an algorithm".into(),
-        Origin::Truncated => "the search for the value hit its bound".into(),
-        Origin::Set { value, .. } => unresolved_kind(links::peel(value)),
-        Origin::Loop | Origin::All(_) | Origin::Const { .. } | Origin::Unit { .. } => {
-            "a value the analysis does not follow".into()
-        }
-        Origin::Unknown => "a value of unknown origin".into(),
     }
 }
 
@@ -2923,7 +2813,92 @@ fn adt_crates<'a>(t: &'a rcbom_facts::TyTree, out: &mut Vec<&'a rcbom_facts::Cra
 
 #[cfg(test)]
 mod tests {
-    use super::short;
+    use super::{short, table_members};
+    use rcbom_facts::{CrateRef, DefRef};
+
+    fn def(krate: &str, path: &str) -> DefRef {
+        DefRef {
+            krate: CrateRef {
+                name: krate.into(),
+                stable_id: "0".into(),
+            },
+            path: path.into(),
+            id: path.into(),
+        }
+    }
+
+    /// A value read from a static's data is one of its descriptors only when the data is a
+    /// list of them (R4.3) or holds one; a field read of a table of several, or a table of
+    /// other statics, is the unknown, never every descriptor of the data.
+    #[test]
+    fn a_table_gives_members_only_as_a_list_of_descriptors() {
+        let kb = rcbom_kb::Kb::seed().unwrap();
+        let supported = |_: &CrateRef| true;
+        let sha256 = def("ring", "ring::digest::SHA256");
+        let sha384 = def("ring", "ring::digest::SHA384");
+        let base = def("app", "app::BASE");
+        let fix = def("app", "app::FIX");
+        let list = def("app", "app::DIGESTS");
+        let refs = def("app", "app::AREF");
+        let nested = def("app", "app::TT");
+        let edges = |id: &str| match id {
+            "app::DIGESTS" => vec![sha256.clone(), sha384.clone()],
+            "app::TT" => vec![list.clone()],
+            "app::AREF" => vec![base.clone(), fix.clone()],
+            "app::BASE" => vec![sha256.clone()],
+            "app::FIX" => vec![sha384.clone()],
+            _ => Vec::new(),
+        };
+        let closure = |id: &str| {
+            let mut out = vec![def("app", id)];
+            let mut stack = edges(id);
+            while let Some(d) = stack.pop() {
+                stack.extend(edges(&d.id));
+                out.push(d);
+            }
+            out
+        };
+        // `BASE` and `FIX` are structs (their initializers store fields); the lists store none
+        let fields = |id: &str| matches!(id, "app::BASE" | "app::FIX");
+        let no_fields = |_: &str| false;
+        let paths = |r: Result<Vec<DefRef>, String>| -> Result<Vec<String>, String> {
+            r.map(|v| {
+                let mut p: Vec<String> = v.into_iter().map(|d| d.path).collect();
+                p.sort();
+                p
+            })
+        };
+        // `DIGESTS[i]`: any element
+        assert_eq!(
+            paths(table_members(
+                &kb, &list, false, &closure, &edges, &no_fields, &supported
+            )),
+            Ok(vec![
+                "ring::digest::SHA256".to_string(),
+                "ring::digest::SHA384".to_string()
+            ])
+        );
+        // `TT[0][i]`, a list of lists: any element
+        assert_eq!(
+            paths(table_members(
+                &kb, &nested, false, &closure, &edges, &no_fields, &supported
+            )),
+            Ok(vec![
+                "ring::digest::SHA256".to_string(),
+                "ring::digest::SHA384".to_string()
+            ])
+        );
+        // `DIGESTS[i].h`-like field read, and `AREF[i]` of structs: not followed
+        assert!(table_members(&kb, &list, true, &closure, &edges, &no_fields, &supported).is_err());
+        assert!(table_members(&kb, &refs, false, &closure, &edges, &fields, &supported).is_err());
+        // one algorithm in the data: that one
+        assert_eq!(
+            paths(table_members(
+                &kb, &base, true, &closure, &edges, &fields, &supported
+            )),
+            Ok(vec!["ring::digest::SHA256".to_string()])
+        );
+    }
 
     #[test]
     fn short_names_keep_the_item() {

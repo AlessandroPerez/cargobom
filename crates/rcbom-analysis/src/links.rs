@@ -36,6 +36,12 @@ pub struct LinkIndex {
     coerced: HashMap<String, Vec<Coerced>>,
     /// The instances whose summaries the driver's bound left unrecorded (`Links::truncated`).
     truncated: HashSet<String>,
+    /// The functions (and instances) the facts show the driver summarised: those some record
+    /// names as its maker (a call it makes, a value it stores or returns, what it writes). The
+    /// driver merges a body's records only once its whole summary is made, the writes through
+    /// its `&mut` parameters included, and records a write only where the value changes: for
+    /// these, no write recorded is a parameter left as it was; for another, it is not known.
+    summarised: HashSet<String>,
     /// By static def id: the values functions put there at run time, with the function.
     static_writers: HashMap<String, Vec<(String, Origin)>>,
     /// The trait methods some type of the program implements (`<A as app::Pick>::alg` returns
@@ -56,11 +62,9 @@ pub struct LinkIndex {
     /// (the set label of the member), and the way of the value being followed now.
     named_via: RefCell<HashMap<String, Via>>,
     current_via: RefCell<Via>,
-    /// The functions an entry point reaches, by defining path, once known: in a lookup made
-    /// with `live_only`, a caller outside them (dead code) is not followed.
+    /// The functions an entry point reaches, by defining path, once known: a value found
+    /// through a caller outside them (dead code) is labelled with that caller.
     reached: RefCell<Option<HashSet<String>>>,
-    live_only: Cell<bool>,
-    memo_live: RefCell<HashMap<(Origin, String), Option<Found>>>,
     /// The generic functions whose instances' summaries are recorded (`app::pass` for
     /// `app::pass::<app::A>`), none cut by the bound: what the generic item's own body records
     /// (its calls, its stores, for no type in particular) is said by the instances.
@@ -97,6 +101,62 @@ fn instance_base(name: &str) -> String {
 
 type Values = Option<Vec<(Origin, String)>>;
 
+/// The prefix of the `Origin::Through::callee` the links give for a value they do not follow
+/// (`marker`): never a value of the read, a gap beside the values found.
+const NOT_FOLLOWED: &str = "<not followed>";
+
+/// A value the links do not follow, with why (`what `f` writes: no summary of it`): the value
+/// search reports it as a gap, never as the value before or as another part of the value.
+pub(crate) fn marker(reason: String) -> Origin {
+    Origin::Through {
+        callee: format!("{NOT_FOLLOWED} {reason}"),
+    }
+}
+
+/// Why the links did not follow a value (`marker`), for a marker.
+pub(crate) fn not_followed(o: &Origin) -> Option<&str> {
+    match o {
+        Origin::Through { callee } => callee.strip_prefix(NOT_FOLLOWED).map(str::trim_start),
+        _ => None,
+    }
+}
+
+/// Constructors of values with interior mutability (locks, cells, once-cells, atomics,
+/// `thread_local!` keys and their storage), by the end of their path without generic
+/// arguments: a static holding one can be written through any borrow of it.
+const INTERIOR: &[&str] = &[
+    "::Mutex::new",
+    "::RwLock::new",
+    "::ReentrantLock::new",
+    "::ReentrantMutex::new",
+    "::Cell::new",
+    "::RefCell::new",
+    "::UnsafeCell::new",
+    "::OnceCell::new",
+    "::OnceLock::new",
+    "::LocalKey::new",
+    "::Storage::new",
+];
+
+/// Does the value a static is initialised with hold a value with interior mutability
+/// (`Mutex::new(..)`, a `LazyLock`'s closure making one, an atomic)?
+fn interior(o: &Origin, depth: usize) -> bool {
+    if depth > 8 {
+        return false;
+    }
+    match o {
+        Origin::Call { callee, args, .. } => {
+            let bare = crate::matcher::strip_generics(callee);
+            INTERIOR.iter().any(|t| bare.ends_with(t))
+                || bare.contains("::atomic::Atomic")
+                || ((callee == "<closure>" || bare.ends_with("LazyLock::new"))
+                    && args.iter().any(|a| interior(a, depth + 1)))
+        }
+        Origin::Any(v) | Origin::All(v) => v.iter().any(|a| interior(a, depth + 1)),
+        _ => false,
+    }
+}
+
 /// How a value reaches the read (the set label of each member, with its witness): named in the
 /// function itself, passed by a caller, returned or written by a function, or one of the values
 /// the program stores in a field of the type anywhere (a flow-insensitive join: possible, not
@@ -124,9 +184,6 @@ pub enum Via {
     /// (`HashMap::insert`; `+` before it: a value already in the list it adds to), or the
     /// function writing it into an element of a list (`v.algorithms[0] = HS256`).
     Container(String),
-    /// One of the implementations (its path) a trait method called on a type parameter may
-    /// run.
-    Impl(String),
     /// The function (or `static ..`) storing it in the field.
     Join(String),
     /// Stored in a static that never changes by its initializer (`rcbom_facts::static_owner`):
@@ -148,7 +205,6 @@ impl Via {
             Via::Caller(_) | Via::Object(_) | Via::Dyn { only: true, .. } | Via::Table(_) => 1,
             Via::Dyn { .. }
             | Via::Container(_)
-            | Via::Impl(_)
             | Via::Join(_)
             | Via::Static(_)
             | Via::Store { .. } => 2,
@@ -243,6 +299,22 @@ impl LinkIndex {
                 }
             }
             ix.truncated.extend(f.links.truncated.iter().cloned());
+            ix.summarised.extend(
+                f.links
+                    .calls
+                    .iter()
+                    .chain(&f.links.arg_calls)
+                    .map(|c| c.caller.clone())
+                    .chain(f.links.fields.iter().map(|s| s.func.clone()))
+                    .chain(f.links.returns.iter().map(|r| r.func.clone()))
+                    .chain(f.links.writes.iter().map(|w| w.func.clone()))
+                    .chain(
+                        f.links
+                            .statics
+                            .iter()
+                            .flat_map(|s| s.writers.iter().map(|(w, _)| w.clone())),
+                    ),
+            );
             for name in f
                 .links
                 .calls
@@ -605,6 +677,24 @@ impl LinkIndex {
         out
     }
 
+    /// Why what a static whose contents change at run time holds is not all followed, when its
+    /// value has interior mutability (a lock, a cell, a once-cell, an atomic, a `thread_local!`
+    /// key) or functions write it at run time: the facts record the writes made through the
+    /// static's name, through a guard of it and through a function given it, not every borrow
+    /// of it (one kept in a struct, a closure capturing it, another crate's code given it).
+    /// `None` for one only its initializer fills (a `LazyLock`, a `lazy_static!`).
+    pub fn interior_mutable(&self, id: &str) -> Option<String> {
+        let (mutable, values) = self.statics.get(id)?;
+        if !mutable {
+            return None;
+        }
+        let written = self.static_writers.get(id).is_some_and(|w| !w.is_empty());
+        if !(written || values.iter().any(|v| interior(v, 0))) {
+            return None;
+        }
+        Some("a value written into a static with interior mutability through a borrow of it".into())
+    }
+
     /// A static whose contents change at run time, with the values recorded for it.
     pub fn mutable_static(&self, id: &str) -> Option<&[Origin]> {
         self.statics
@@ -644,23 +734,9 @@ impl LinkIndex {
             .flatten()
     }
 
-    /// The functions an entry point reaches (by defining path), for `values_via_live`.
+    /// The functions an entry point reaches (by defining path).
     pub fn set_reached(&self, reached: HashSet<String>) {
         *self.reached.borrow_mut() = Some(reached);
-    }
-
-    /// `values_via`, not following callers no entry point reaches (a value found only through
-    /// them reaches no call at run time).
-    pub fn values_via_live(&self, o: &Origin, owner: &str) -> Option<Found> {
-        let key = (o.clone(), owner.to_string());
-        if let Some(v) = self.memo_live.borrow().get(&key) {
-            return v.clone();
-        }
-        self.live_only.set(true);
-        let v = self.lookup(o, owner);
-        self.live_only.set(false);
-        self.memo_live.borrow_mut().insert(key, v.clone());
-        v
     }
 
     /// Is `func` a generic item whose instances' summaries say what its body does?
@@ -670,22 +746,18 @@ impl LinkIndex {
             && !self.truncated.iter().any(|t| instance_base(t) == func)
     }
 
+    /// Is a summary the driver's bound left unrecorded (`Links::truncated`) one of an
+    /// implementation of trait method `callee` (`<app::W<app::A> as app::Pick>::alg` for
+    /// `app::Pick::alg`)? Then a call whose body is not known may run it.
+    fn cut_implementation(&self, callee: &str) -> bool {
+        self.truncated
+            .iter()
+            .any(|t| implemented_method(t).is_some_and(|m| m == callee))
+    }
+
     /// Is `caller` a function no entry point reaches (once the reached functions are known)?
     fn unreached_caller(&self, caller: &str) -> bool {
         !caller.is_empty()
-            && !caller.contains(" for ")
-            && rcbom_facts::owner_static(caller).is_none()
-            && self
-                .reached
-                .borrow()
-                .as_ref()
-                .is_some_and(|r| !r.contains(caller))
-    }
-
-    /// Is `caller` a function no entry point reaches (in a `live_only` lookup)?
-    fn dead_caller(&self, caller: &str) -> bool {
-        self.live_only.get()
-            && !caller.is_empty()
             && !caller.contains(" for ")
             && rcbom_facts::owner_static(caller).is_none()
             && self
@@ -850,6 +922,10 @@ impl LinkIndex {
                             }
                         }
                     }
+                    // a lock or a cell: written through borrows the facts do not all record
+                    if let Some(why) = self.interior_mutable(&def.id) {
+                        push(out, (marker(why), owner.to_string(), via.clone()));
+                    }
                     return;
                 }
                 if let Origin::Data { def, .. } = peel(base)
@@ -939,14 +1015,45 @@ impl LinkIndex {
                                 None if self.truncated.contains(&f) => {
                                     push(&mut found, (Origin::Truncated, owner.to_string(), by))
                                 }
-                                None => before(&mut found, &by),
+                                // a function the driver summarised that records no write: it
+                                // leaves the value as it was (`touch(&mut d)`)
+                                None if self.summarised.contains(&f) => before(&mut found, &by),
+                                // no summary of the function known: the value before, and what
+                                // it may write, not known, beside it
+                                None => {
+                                    before(&mut found, &by);
+                                    push(
+                                        &mut found,
+                                        (
+                                            marker(format!(
+                                                "what `{}` writes through its parameter (no \
+                                                 summary of it)",
+                                                crate::short(&f)
+                                            )),
+                                            owner.to_string(),
+                                            by,
+                                        ),
+                                    );
+                                }
                             }
                         }
                     }
-                    // implementations not known: the value before, and an unknown beside it
+                    // implementations not known (a trait object no type is coerced to, a type
+                    // parameter): the value before, and an unknown beside it
                     None => {
                         before(&mut found, via);
-                        push(&mut found, (o.clone(), owner.to_string(), via.clone()));
+                        push(
+                            &mut found,
+                            (
+                                marker(format!(
+                                    "what `{}` writes through its parameter on a type not \
+                                     known",
+                                    crate::short(callee)
+                                )),
+                                owner.to_string(),
+                                via.clone(),
+                            ),
+                        );
                     }
                 }
                 found.into_iter().for_each(|v| push(out, v));
@@ -1020,7 +1127,7 @@ impl LinkIndex {
                 if let Some(callers) = self.calls.get(owner) {
                     let mut unknown = false;
                     for (caller, args) in callers {
-                        if self.dead_caller(caller) || self.superseded(caller) {
+                        if self.superseded(caller) {
                             continue;
                         }
                         let mut found = Vec::new();
@@ -1092,7 +1199,11 @@ impl LinkIndex {
                     None => self_ty
                         .iter()
                         .map(|t| rcbom_facts::impl_key(callee, t))
-                        .chain((!self.implemented.contains(callee)).then(|| callee.clone()))
+                        .chain(
+                            (!self.implemented.contains(callee)
+                                && !self.cut_implementation(callee))
+                            .then(|| callee.clone()),
+                        )
                         .collect(),
                 };
                 if let Some((name, k)) = names
@@ -1128,7 +1239,20 @@ impl LinkIndex {
             if matches!(o, Origin::Through { .. }) {
                 push(out, (o.clone(), owner.to_string(), via.clone()));
             }
-            self.stored(path, depth, via, out);
+            if !self.stored(path, depth, via, out) && !matches!(o, Origin::Truncated) {
+                // no code the facts record stores in the field: not known
+                push(
+                    out,
+                    (
+                        marker(format!(
+                            "a field of `{}` no recorded code stores",
+                            crate::short(&path[path.len() - 1].0)
+                        )),
+                        owner.to_string(),
+                        via.clone(),
+                    ),
+                );
+            }
         }
     }
 
@@ -1212,9 +1336,10 @@ impl LinkIndex {
     }
 
     /// The bodies a call of trait method `callee` may run, dispatched as `self_ty` says (`dyn
-    /// <trait>`: the types coerced to the trait object; `impl <trait>`: every implementation
-    /// the program records a write for, and the trait's default body), each with how it
-    /// reaches the read; `None` when none is known.
+    /// <trait>`: the types coerced to the trait object), each with how it reaches the read;
+    /// `None` when they are not known: no type coerced to the object, or a type parameter
+    /// (`impl <trait>`), whose instantiations the facts do not name (every implementation the
+    /// program has is not what the call runs: R4.7 counts the reachable instantiations only).
     fn implementations(&self, callee: &str, self_ty: &str) -> Option<Vec<(String, Via)>> {
         let (tr, method) = callee.rsplit_once("::")?;
         let mut out = Vec::new();
@@ -1236,20 +1361,6 @@ impl LinkIndex {
                 };
                 out.push((name, via));
             }
-        } else {
-            let suffix = format!(" as {tr}>::{method}");
-            let mut names: Vec<String> = self
-                .writes
-                .keys()
-                .filter(|(f, _)| f.starts_with('<') && f.ends_with(&suffix))
-                .map(|(f, _)| f.clone())
-                .collect();
-            names.sort();
-            names.dedup();
-            if self.writes.keys().any(|(f, _)| f == callee) {
-                names.push(callee.to_string());
-            }
-            out.extend(names.into_iter().map(|n| (n.clone(), Via::Impl(n))));
         }
         (!out.is_empty()).then_some(out)
     }
@@ -1323,7 +1434,7 @@ impl LinkIndex {
     /// The values the program stores in the fields of `path`: the stores of the longest part
     /// of the path that has any (`Chacha20Poly1305Aead.0.0` before `AeadAlgorithm.0`), with
     /// those of the shorter parts made through a reference.
-    fn stored(&self, path: &FieldPath, depth: usize, via: &Via, out: &mut Found) {
+    fn stored(&self, path: &FieldPath, depth: usize, via: &Via, out: &mut Found) -> bool {
         let keys: Vec<(String, Vec<usize>)> = (0..path.len())
             .map(|j| (path[j].0.clone(), fields(&path[j..])))
             .collect();
@@ -1338,7 +1449,7 @@ impl LinkIndex {
                 .get(k)
                 .is_some_and(|v| v.iter().any(|s| seen(j, s)))
         }) else {
-            return;
+            return false;
         };
         for (j, key) in keys.iter().enumerate().skip(first) {
             for s in self.fields.get(key).into_iter().flatten() {
@@ -1348,6 +1459,7 @@ impl LinkIndex {
                 }
             }
         }
+        true
     }
 }
 

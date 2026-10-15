@@ -283,10 +283,7 @@ pub(crate) fn site_matches(
             ),
             // a call through a trait object of which several types are made: each type's
             // value may reach it
-            (
-                Via::Dyn { only: false, .. } | Via::Impl(_) | Via::Static(_) | Via::Store { .. },
-                _,
-            ) => {
+            (Via::Dyn { only: false, .. } | Via::Static(_) | Via::Store { .. }, _) => {
                 format!("algorithm {one_of}from {what}: possible{}", witness(via))
             }
             // one of the values a container holds, read from it
@@ -583,7 +580,6 @@ pub(crate) fn member_label(via: &Via) -> String {
             if *only { "" } else { ", possible" },
             witness(via)
         ),
-        Via::Impl(f) => format!("member: impl, possible (what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!("member: table, stored by `{}`", short_fn(w)),
         // (a static no function puts a value in, a `LazyLock`: the value it holds)
         Via::Static(w) => match w.strip_prefix('=') {
@@ -655,7 +651,6 @@ fn witness(via: &Via) -> String {
                 )
             }
         }
-        Via::Impl(f) => format!(" (impl: what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!(" (table: stored by `{}`)", short_fn(w)),
         Via::Static(w) => match w.strip_prefix('=') {
             Some(w) => format!(" (static: the value `{}` holds)", short_fn(w)),
@@ -1146,6 +1141,10 @@ fn collect(
                 };
                 collect(ctx, a, owner, krate, accept, depth + 1, true, &by, out);
             }
+        }
+        // a value the links do not follow, with why (`links::marker`)
+        Origin::Through { .. } if crate::links::not_followed(o).is_some() => {
+            out.unresolved.push((unresolved_reason(o), via.clone()))
         }
         // more alternatives, or steps, than the search keeps
         Origin::Truncated => out
