@@ -226,6 +226,8 @@ pub(crate) fn body_links(
         body.arg_locals()
             .iter()
             .enumerate()
+            // (or a shared borrow of a value holding a cell, `set(c: &Cell<T>)`, written
+            // through it)
             .filter(|(_, l)| {
                 matches!(
                     l.ty.kind().rigid(),
@@ -234,7 +236,9 @@ pub(crate) fn body_links(
                         _,
                         rustc_public::mir::Mutability::Mut
                     ))
-                )
+                ) || matches!(rustc_internal::internal(tcx, l.ty).kind(),
+                    rustc_middle::ty::Ref(_, inner, rustc_middle::ty::Mutability::Not)
+                        if crate::origins::holds_cell(tcx, *inner, 0))
             })
             .map(|(i, _)| i)
             .collect()
@@ -846,16 +850,29 @@ pub(crate) fn body_links(
         // (moved into a closure, or into the value the function returns: written through
         // where the body does not see; moved into a value it uses itself, `let (s, _o) = (slot,
         // other)`, `p.a = slot`: followed, or lost, by the body's own pointer search)
+        // (or returned itself, `fn id(s: &mut T) -> &mut T { s }`, or stored through another
+        // pointer, `(*o).r = slot`: written through outside the body)
+        let outside = |p: &rustc_public::mir::Place| {
+            p.local == rustc_public::mir::RETURN_LOCAL
+                || p.projection
+                    .iter()
+                    .any(|e| matches!(e, rustc_public::mir::ProjectionElem::Deref))
+        };
         let escapes = stmts().any(|st| match &st.kind {
             StatementKind::Assign(p, Rvalue::Aggregate(kind, ops)) => {
                 (matches!(
                     kind,
                     AggregateKind::Closure(..) | AggregateKind::Coroutine(..)
-                ) || p.local == rustc_public::mir::RETURN_LOCAL)
+                ) || outside(p))
                     && ops
                         .iter()
                         .any(|o| matches!(o, Operand::Copy(q) | Operand::Move(q) if copy(q)))
             }
+            StatementKind::Assign(
+                p,
+                Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
+                | Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _),
+            ) => outside(p) && copy(q),
             _ => false,
         });
         (repointed, escapes)

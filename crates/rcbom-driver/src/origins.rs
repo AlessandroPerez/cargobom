@@ -415,6 +415,14 @@ impl Flow {
             part_stores,
             cur_at: Cell::new(None),
             holders,
+            mut_holding: body
+                .locals()
+                .iter()
+                .enumerate()
+                .filter(|(_, l)| holds_mut_borrow(tcx, internal(l.ty), 0))
+                .map(|(i, _)| i)
+                .collect(),
+            // (all of it or a part of it, `&mut s.f`; not a place reached through a pointer)
             lent_locals: body
                 .blocks
                 .iter()
@@ -424,7 +432,13 @@ impl Flow {
                         _,
                         Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
                         | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
-                    ) if q.projection.is_empty() => Some(q.local),
+                    ) if !q
+                        .projection
+                        .iter()
+                        .any(|e| matches!(e, ProjectionElem::Deref)) =>
+                    {
+                        Some(q.local)
+                    }
                     _ => None,
                 })
                 .collect(),
@@ -501,6 +515,18 @@ impl Flow {
                 lost_at.push((at, ty));
             }
         };
+        // a shared pointer to a value holding a cell (`&Cell<T>`, `&RefCell<T>`, `&Mutex<T>`,
+        // a struct with one)
+        let cell_ptr =
+            |p: &Place| match walk_ty(tcx, internal(body.locals()[p.local].ty), &path_of_place(p))
+                .kind()
+            {
+                rustc_middle::ty::TyKind::Ref(_, i, rustc_middle::ty::Mutability::Not)
+                | rustc_middle::ty::TyKind::RawPtr(i, rustc_middle::ty::Mutability::Not) => {
+                    holds_cell(tcx, *i, 0)
+                }
+                _ => false,
+            };
         // the type a pointer points to (with the compiler's own types, as above)
         let pointee =
             |p: &Place| match walk_ty(tcx, internal(body.locals()[p.local].ty), &path_of_place(p))
@@ -656,6 +682,9 @@ impl Flow {
             // a call that writes the whole buffer it is given (`rng.fill_bytes(nonce)`,
             // `read_exact(buf)`): what was there before is gone
             let whole = fills_whole(body, func);
+            let std_callee = ["core::", "std::", "alloc::"]
+                .iter()
+                .any(|c| name.starts_with(c));
             for (k, a) in args.iter().enumerate() {
                 // a closure or a struct handed over (by value or `&mut`) that holds a `&mut` to
                 // a place (`|| rng.fill_bytes(&mut k1)` called, `fill_out(Out { buf: &mut k2 })`):
@@ -670,6 +699,11 @@ impl Flow {
                     } else if p.projection.is_empty() {
                         vec![p.local]
                     } else {
+                        // a part of a value handed over (`f(s.holder)`, `f(t.0)`) that holds a
+                        // `&mut`: what it points to is not followed
+                        if mut_holder(internal(body.locals()[p.local].ty), &path_of_place(p)) {
+                            ptr.lost.set(true);
+                        }
                         Vec::new()
                     };
                     note(*at, pointee(p), &mut cut_at, &mut lost_at);
@@ -706,8 +740,14 @@ impl Flow {
                         }
                     }
                 }
+                // (or a shared borrow of a value with a cell inside, `set(&cell)`, which the
+                // function may write through; of the standard library's own cell methods, those
+                // handing out a guard written through later, `borrow_mut`, `lock`, `write`: the
+                // others are modelled above or only read)
                 if let Operand::Copy(p) | Operand::Move(p) = a
-                    && is_mut_ptr(body, p)
+                    && (is_mut_ptr(body, p)
+                        || (cell_ptr(p)
+                            && (!std_callee || WRITE_GUARDS.iter().any(|g| name.ends_with(g)))))
                 {
                     let targets = ptr.targets(p.local, &path_of_place(p), 0);
                     let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
@@ -3006,6 +3046,9 @@ struct Pointees<'a> {
     /// Locals the body lends by `&mut` (`o.insert(..)` on `&mut o`): what a value built in one
     /// holds may change through the loan.
     lent_locals: HashSet<Local>,
+    /// Locals whose value holds a `&mut` (`W { r: &mut x }`, a closure capturing one, a type
+    /// parameter's): handed to a call, it may be written through.
+    mut_holding: HashSet<Local>,
     /// The number of arguments.
     nargs: usize,
 }
@@ -3066,6 +3109,11 @@ impl Pointees<'_> {
                         .collect();
                     out.extend(self.through_held_at(found, depth + 1));
                 }
+                Some(j) if !t.alias && !(1..=self.nargs).contains(&t.local) && through_ptr(j) => {
+                    // (past the bound: where the held pointer points is not followed)
+                    self.cut.set(true);
+                    out.push(t);
+                }
                 _ => out.push(t),
             }
         }
@@ -3118,6 +3166,19 @@ impl Pointees<'_> {
         // Holder { r: &mut x }`, `*t.0 = v`)
         if !path.is_empty() {
             return self.field_targets(local, path, depth);
+        }
+        // a pointer no statement of this body defines: an argument's, what it points to on
+        // entry; any other, not followed
+        if !self.direct.contains_key(&local) {
+            if (1..=self.nargs).contains(&local) {
+                return vec![Target {
+                    local,
+                    path: vec![Step::Deref],
+                    alias: false,
+                }];
+            }
+            self.lost.set(true);
+            return Vec::new();
         }
         let mut out = Vec::new();
         for k in self.direct.get(&local).into_iter().flatten() {
@@ -3381,7 +3442,18 @@ impl Pointees<'_> {
     /// captures, its fields), each with whether it points at one place.
     fn held(&self, local: Local) -> Vec<(Vec<Target>, bool)> {
         let mut out = Vec::new();
-        for k in self.direct.get(&local).into_iter().flatten() {
+        // a value holding a `&mut` that this body does not build here (a parameter, a call's
+        // result, a copy of another): what it points to is not followed
+        let defs = self.direct.get(&local);
+        if self.mut_holding.contains(&local)
+            && defs.is_none_or(|d| {
+                d.iter()
+                    .any(|k| !matches!(k, DefKind::Assign(Rvalue::Aggregate(..), _)))
+            })
+        {
+            self.lost.set(true);
+        }
+        for k in defs.into_iter().flatten() {
             if let DefKind::Assign(Rvalue::Aggregate(_, ops), _) = k {
                 for op in ops {
                     if let Operand::Copy(q) | Operand::Move(q) = op
@@ -3614,10 +3686,26 @@ fn std_store(callee: &str) -> bool {
 /// Does a value of the type hold a `&mut` (a field, an element, a type argument)?
 fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, depth: usize) -> bool {
     use rustc_middle::ty::TyKind as K;
+    use rustc_middle::ty::TypeVisitableExt;
+    // (past the bound: any type with a borrowed lifetime may)
     if depth > 4 {
-        return false;
+        return t.has_free_regions();
     }
     match t.kind() {
+        // what a closure or a coroutine captures (`|| fill(&mut k)`)
+        K::Closure(_, args) => {
+            holds_mut_borrow(tcx, args.as_closure().tupled_upvars_ty(), depth + 1)
+        }
+        K::Coroutine(_, args) => {
+            holds_mut_borrow(tcx, args.as_coroutine().tupled_upvars_ty(), depth + 1)
+        }
+        K::CoroutineClosure(_, args) => holds_mut_borrow(
+            tcx,
+            args.as_coroutine_closure().tupled_upvars_ty(),
+            depth + 1,
+        ),
+        // a type parameter: any type, a `&mut` included
+        K::Param(_) => true,
         K::Ref(_, _, rustc_middle::ty::Mutability::Mut)
         | K::RawPtr(_, rustc_middle::ty::Mutability::Mut) => true,
         K::Ref(_, inner, _) | K::Array(inner, _) | K::Slice(inner) => {
@@ -3635,6 +3723,42 @@ fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, dept
                         holds_mut_borrow(tcx, f.ty(tcx, args).skip_normalization(), depth + 1)
                     }))
         }
+        _ => false,
+    }
+}
+
+/// Standard-library methods taking a shared borrow of a cell and returning a guard through
+/// which the cell's value is written (`*c.borrow_mut() = v`, `*m.lock().unwrap() = v`).
+const WRITE_GUARDS: &[&str] = &[
+    "RefCell::<T>::borrow_mut",
+    "RefCell::<T>::try_borrow_mut",
+    "Mutex::<T>::lock",
+    "Mutex::<T>::try_lock",
+    "RwLock::<T>::write",
+    "RwLock::<T>::try_write",
+    "UnsafeCell::<T>::get",
+    "Cell::<T>::as_ptr",
+];
+
+/// Does a value of type `t` hold a cell (`UnsafeCell`, inside `Cell`, `RefCell`, `Mutex`,
+/// `RwLock`, `OnceLock`, an atomic; a field's, an element's), not behind a pointer: what a
+/// shared borrow of it reaches may change.
+pub(crate) fn holds_cell<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 6 {
+        return false;
+    }
+    match t.kind() {
+        K::Adt(def, _) if def.is_unsafe_cell() => true,
+        K::Adt(def, args) => def
+            .all_fields()
+            .any(|f| holds_cell(tcx, f.ty(tcx, args).skip_normalization(), depth + 1)),
+        K::Array(inner, _) | K::Slice(inner) => holds_cell(tcx, *inner, depth + 1),
+        K::Tuple(ts) => ts.iter().any(|t| holds_cell(tcx, t, depth + 1)),
         _ => false,
     }
 }
