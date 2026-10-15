@@ -135,6 +135,9 @@
 //! beside `E2.ext()`): counted apart and printed (`AS TRUE`), not hidden.
 //!
 //! Known limits:
+//! - A cell handed to a function by a shared borrow (`set(&c)` with `fn set(c: &Cell<A>)`,
+//!   `RefCell`, `Mutex`) is read as its initializer: stores through it are not followed, so a
+//!   claim that the function's value is the only one is rejected (R4.12).
 //! - The check of "in the arguments" follows stores by the file's functions and inherent
 //!   methods named in the function, not trait methods dispatched on a type the code does not
 //!   say (`u.up()` on a `&mut dyn`, `t.up()` in a generic function): a value such a call
@@ -4093,6 +4096,19 @@ impl Files<'_> {
             }),
             _ => false,
         };
+        // (an impl's self type through the package's type aliases: `impl Put for &mut A` with
+        // `type A = &'static Algorithm` is `<&mut &'static Algorithm as Put>`'s)
+        let aliases: Vec<Rc<HashMap<String, Vec<String>>>> =
+            dirs.iter().map(|d| self.package_aliases(d)).collect();
+        let dealias = |t: &str| {
+            let lookup = &mut |a: &str| {
+                aliases
+                    .iter()
+                    .find_map(|m| m.get(a).cloned())
+                    .unwrap_or_default()
+            };
+            type_name(&expand_aliases(&type_name(t), lookup, 3))
+        };
         let mut found = false;
         for f in files {
             let Some(src) = self.source(&f) else { continue };
@@ -4104,7 +4120,7 @@ impl Files<'_> {
             let in_block = |kind: ItemKind, name: &str, tr: Option<&str>, f: &Item| {
                 src.items.iter().any(|b| {
                     b.kind == kind
-                        && b.name == name
+                        && (b.name == name || dealias(&b.name) == dealias(name))
                         && b.contains(f.start)
                         && b.start != f.start
                         && tr.is_none_or(|t| {
@@ -5260,9 +5276,19 @@ impl Files<'_> {
                         && let Some(n) = callee.as_deref().and_then(in_item)
                         && let Some(found) = call_type_args(&src, src.idx((line, c0)), &n.name)
                     {
+                        let man = self.man;
+                        let owner = man.owner_of(&path);
                         for (k, t) in found.iter().enumerate() {
+                            // (through the file's type aliases: `apply(&mut a)` with `a: A`,
+                            // `type A = &'static Algorithm`)
                             if let (Some(w), Some(t)) = (want_args.get(k), t)
                                 && type_name(w) != type_name(t)
+                                && type_name(w)
+                                    != type_name(&expand_aliases(
+                                        &type_name(t),
+                                        &mut |a| self.alias_targets(&src, owner, a),
+                                        3,
+                                    ))
                             {
                                 return Err(format!(
                                     "`{part}`: the call at {line}:{c0} instantiates `{}` with `{}`, \
@@ -6840,6 +6866,14 @@ fn same_type(
     if written.contains('?') {
         let pat = regex::escape(written).replace(r"\?", r"[^,;\[\]()]+");
         return Regex::new(&format!("^{pat}$")).is_ok_and(|r| r.is_match(ty));
+    }
+    // (an alias of a type of that name: `impl Put for &mut A` with `type A = &'static
+    // Algorithm`, its block named `A`)
+    if aliases(written)
+        .iter()
+        .any(|t| type_name(&expand_aliases(t, aliases, 3)) == type_name(ty))
+    {
+        return true;
     }
     let Some(full) = full else {
         return false;
