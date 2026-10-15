@@ -1,0 +1,100 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/algs/inner.rs:1:46 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in v22::algs::inner::DEEPER; line: `pub const DEEPER: &ring::digest::Algorithm = &ring::digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `ring::digest::SHA1_FOR_LEGACY_USE_ONLY`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(algs::inner::DEEPER, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:19 | v22::algs::inner::DEEPER | [reachable] [via-static] in v22::main; v22::algs::inner::DEEPER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(algs::inner::DEEPER, &d);`; code: `algs::inner::DEEPER`
+  occ SHA-256 | crypto:algorithm:SHA-256 | picklib/src/lib.rs:10:37 | ring::digest::SHA256 | [reachable] [static] in picklib::BOTH; line: `pub static BOTH: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | picklib/src/lib.rs:3:49 | ring::digest::SHA256 | [reachable] [static] in picklib::inner::DEEP; line: `pub static DEEP: &ring::digest::Algorithm = &ring::digest::SHA256;`; code: `ring::digest::SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(picklib::SHALLOW, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:19 | picklib::inner::DEEP | [reachable] [via-static] in v22::main; picklib::inner::DEEP -> ring::digest::SHA256; line: `let _ = digest(picklib::SHALLOW, &d);`; code: `picklib::SHALLOW`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(picklib::inner::DEEP, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:19 | picklib::inner::DEEP | [reachable] [via-static] in v22::main; picklib::inner::DEEP -> ring::digest::SHA256; line: `let _ = digest(picklib::inner::DEEP, &d);`; code: `picklib::inner::DEEP`
+  occ SHA-384 | crypto:algorithm:SHA-384 | picklib/src/lib.rs:10:46 | ring::digest::SHA384 | [reachable] [static] in picklib::BOTH; line: `pub static BOTH: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | picklib/src/lib.rs:6:30 | ring::digest::SHA384 | [reachable] [static] in picklib::CALG; line: `pub const CALG: &Algorithm = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/algs/mod.rs:3:32 | ring::digest::SHA384 | [reachable] [static] in v22::algs::CHOSEN; line: `pub const CHOSEN: &Algorithm = &SHA384;`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/algs/mod.rs:4:45 | ring::digest::SHA384 | [reachable] [static] in v22::algs::pick; line: `pub const fn pick() -> &'static Algorithm { &SHA384 }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(algs::CHOSEN, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:19 | v22::algs::CHOSEN | [reachable] [via-static] in v22::main; v22::algs::CHOSEN -> ring::digest::SHA384; line: `let _ = digest(algs::CHOSEN, &d);`; code: `algs::CHOSEN`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:14:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(PICKED, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:14:19 | v22::algs::CHOSEN | [reachable] [via-static] in v22::main; v22::algs::CHOSEN -> ring::digest::SHA384; line: `let _ = digest(PICKED, &d);`; code: `PICKED`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `v22::algs::pick`; line: `let _ = digest(algs::pick(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(picklib::CALG, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:19 | picklib::CALG | [reachable] [via-static] in v22::main; picklib::CALG -> ring::digest::SHA384; line: `let _ = digest(picklib::CALG, &d);`; code: `picklib::CALG`
+  occ SHA-512 | crypto:algorithm:SHA-512 | picklib/src/lib.rs:8:48 | ring::digest::SHA512 | [reachable] [static] in picklib::twin::CALG; line: `pub const CALG: &ring::digest::Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(other::CHOSEN, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:19 | v22::other::CHOSEN | [reachable] [via-static] in v22::main; v22::other::CHOSEN -> ring::digest::SHA512; line: `let _ = digest(other::CHOSEN, &d);`; code: `other::CHOSEN`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:12 | ring::digest::digest | [reachable] [call] in v22::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(picklib::twin::CALG, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:19 | picklib::twin::CALG | [reachable] [via-static] in v22::main; picklib::twin::CALG -> ring::digest::SHA512; line: `let _ = digest(picklib::twin::CALG, &d);`; code: `picklib::twin::CALG`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/other.rs:2:32 | ring::digest::SHA512 | [reachable] [static] in v22::other::CHOSEN; line: `pub const CHOSEN: &Algorithm = &SHA512;`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via v22 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via v22 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by v22 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | picklib/Cargo.toml:7:0 | ring | [manifest] declared by picklib (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=3
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=11
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=6
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop picklib | pkg:cargo/picklib@0.1.0 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library picklib 0.1.0 | pkg:cargo/picklib@0.1.0 | purl pkg:cargo/picklib@0.1.0
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/picklib@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/v22@0.1.0 -> pkg:cargo/picklib@0.1.0
+dep pkg:cargo/v22@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/picklib@0.1.0
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/v22@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/v22@0.1.0", "name": "v22", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v22@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=10
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=66
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -198,6 +198,10 @@ pub struct FieldRef {
     pub adt: Option<String>,
     #[serde(default)]
     pub field: Option<String>,
+    /// The field is a list the call uses all of (`Validation.algorithms`): a value in it is
+    /// beside the others, not instead of them.
+    #[serde(default)]
+    pub list: bool,
 }
 
 /// A protocol crate's API modelled at its boundary (jsonwebtoken's `encode`, `decode`): the

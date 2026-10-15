@@ -1153,7 +1153,7 @@ fn async_closure(e: &Box<dyn std::any::Any + Send>) -> bool {
 /// Does a local of `body` have a type `rustc_public` cannot convert yet? An `async` closure's
 /// (`CoroutineClosure`): converting it panics ("FIXME(async_closures): Lower these to SMIR").
 /// Reading a statement or call that involves one is a known limit of the interface, not a bug.
-fn has_unconvertible(tcx: TyCtxt<'_>, body: &Body) -> bool {
+pub(crate) fn has_unconvertible(tcx: TyCtxt<'_>, body: &Body) -> bool {
     let unconvertible = |ty: rustc_public::ty::Ty| {
         rustc_internal::internal(tcx, ty).walk().any(|g| {
             g.as_type()

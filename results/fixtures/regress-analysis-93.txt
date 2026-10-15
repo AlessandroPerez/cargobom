@@ -1,0 +1,177 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:10:20 | a93::BASE | [reachable] [via-static] in a93::CREF; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const CREF: &Cfg = &BASE;`; code: `BASE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:11:45 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::FIX; line: `static FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:12:21 | a93::FIX | [reachable] [via-static] in a93::SREF; a93::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SREF: &Cfg = &FIX;`; code: `FIX`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:23 | a93::SREF | [reachable] [via-static] in a93::SREF2; a93::SREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SREF2: &&Cfg = &SREF;`; code: `SREF`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:14:51 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:14:86 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:21 | a93::TAB | [reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:16:24 | a93::TAB | [reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:17:57 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:18:128 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:18:70 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:19:63 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::CFG; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:20:64 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::RW; line: `static RW: RwLock<Cfg> = RwLock::new(Cfg { h: &SHA384, legacy: &SHA1 });`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:22:82 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::OUTER; line: `static OUTER: Mutex<Outer> = Mutex::new(Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 0 });`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:24:15 | a93::RW | [reachable] [via-static] in a93::set_rw; a93::RW -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `RW`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:24:64 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::set_rw; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:26:17 | a93::OUTER | [reachable] [via-static] in a93::set_outer; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `OUTER`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:31:19 | a93::ALIAS | [reachable] [via-static] in a93::main; a93::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:32:19 | a93::CREF | [reachable] [via-static] in a93::main; a93::CREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(CREF.h, &d);`; code: `CREF`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:19 | a93::SREF | [reachable] [via-static] in a93::main; a93::SREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SREF.h, &d);`; code: `SREF`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:34:19 | a93::SREF2 | [reachable] [via-static] in a93::main; a93::SREF2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SREF2.h, &d);`; code: `SREF2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:35:19 | a93::ELEM | [reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:36:19 | a93::SLICE | [reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:37:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static a93::NEST`; member: table, stored by `static a93::NEST`; line: `let _ = digest(NEST.0.1, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:37:19 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:38:20 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:39:19 | a93::OUTERS | [reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:40:25 | a93::CFG | [reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `if i == 1 { set_cfg(&CFG); }`; code: `CFG`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:41:19 | a93::CFG | [reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:43:19 | a93::RW | [reachable] [via-static] in a93::main; a93::RW -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `RW`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:46:19 | a93::OUTER | [reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `OUTER`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:47:19 | a93::OUTER | [reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `OUTER`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:48:44 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::main; line: `let local = [Cfg { h: &SHA512, legacy: &SHA1 }; 3];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:50:16 | a93::BASE | [reachable] [via-static] in a93::main; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let lits = [BASE, FIX];`; code: `BASE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:50:22 | a93::FIX | [reachable] [via-static] in a93::main; a93::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let lits = [BASE, FIX];`; code: `FIX`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:8:45 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a93::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:9:19 | a93::BASE | [reachable] [via-static] in a93::ALIAS; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = BASE;`; code: `BASE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:14:34 | ring::digest::SHA256 | [reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:21 | a93::TAB | [reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA256; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:24 | a93::TAB | [reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA256; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:48 | ring::digest::SHA256 | [reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:18:111 | ring::digest::SHA256 | [reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:46 | ring::digest::SHA256 | [reachable] [static] in a93::CFG; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:53 | ring::digest::SHA256 | [reachable] [static] in a93::DEADW; line: `static DEADW: RwLock<&'static Digest> = RwLock::new(&SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:65 | ring::digest::SHA256 | [reachable] [static] in a93::OUTER; line: `static OUTER: Mutex<Outer> = Mutex::new(Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 0 });`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:47 | ring::digest::SHA256 | [reachable] [static] in a93::set_rw; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:13 | a93::DEADW | [present] [via-static] in a93::dead; a93::DEADW -> ring::digest::SHA256; line: `fn dead() { *DEADW.write().unwrap() = &SHA256; }`; code: `DEADW`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:39 | ring::digest::SHA256 | [present] [static] in a93::dead; line: `fn dead() { *DEADW.write().unwrap() = &SHA256; }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:17 | a93::OUTER | [reachable] [via-static] in a93::set_outer; a93::OUTER -> ring::digest::SHA256; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `OUTER`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA256; member: table, stored by `static a93::TAB`; line: `let _ = digest(ELEM.h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:19 | a93::ELEM | [reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA256; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA256; member: table, stored by `static a93::TAB`; line: `let _ = digest(SLICE[i].h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:19 | a93::SLICE | [reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA256; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:37:19 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA256; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:38:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA256, stored in `static a93::NEST`; member: table, stored by `static a93::NEST`; line: `let _ = digest((NEST.0).0, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:38:20 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA256; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `const a93::OUTERS` that may reach the call: ring::digest::SHA256; member: table, stored by `const a93::OUTERS`; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:19 | a93::OUTERS | [reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA256; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:25 | a93::CFG | [reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA256; line: `if i == 1 { set_cfg(&CFG); }`; code: `CFG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:41:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::CFG` starts with, which the program may replace); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:41:19 | a93::CFG | [reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA256; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:43:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (a value `a93::set_rw` puts in `static a93::RW`); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: static, possible (the value `static a93::DEADW` starts with, which the program may replace); line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:20 | a93::DEADW | [reachable] [via-static] in a93::main; a93::DEADW -> ring::digest::SHA256; line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `DEADW`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:46:19 | a93::OUTER | [reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA256; line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `OUTER`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:47:19 | a93::OUTER | [reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA256; line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `OUTER`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:20 | a93::BASE | [reachable] [via-static] in a93::CREF; a93::BASE -> ring::digest::SHA384; line: `const CREF: &Cfg = &BASE;`; code: `BASE`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:14:69 | ring::digest::SHA384 | [reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:21 | a93::TAB | [reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA384; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:24 | a93::TAB | [reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA384; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:20:47 | ring::digest::SHA384 | [reachable] [static] in a93::RW; line: `static RW: RwLock<Cfg> = RwLock::new(Cfg { h: &SHA384, legacy: &SHA1 });`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:15 | a93::RW | [reachable] [via-static] in a93::set_rw; a93::RW -> ring::digest::SHA384; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `RW`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:26:50 | ring::digest::SHA384 | [reachable] [static] in a93::set_outer; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a93::BASE`; member: table, stored by `const a93::BASE`; line: `let _ = digest(ALIAS.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:19 | a93::ALIAS | [reachable] [via-static] in a93::main; a93::ALIAS -> ring::digest::SHA384; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a93::BASE`; member: table, stored by `const a93::BASE`; line: `let _ = digest(CREF.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:32:19 | a93::CREF | [reachable] [via-static] in a93::main; a93::CREF -> ring::digest::SHA384; line: `let _ = digest(CREF.h, &d);`; code: `CREF`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:35:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA384; member: table, stored by `static a93::TAB`; line: `let _ = digest(ELEM.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:35:19 | a93::ELEM | [reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA384; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA384; member: table, stored by `static a93::TAB`; line: `let _ = digest(SLICE[i].h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:36:19 | a93::SLICE | [reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA384; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:43:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (the value `static a93::RW` starts with, which the program may replace); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:43:19 | a93::RW | [reachable] [via-static] in a93::main; a93::RW -> ring::digest::SHA384; line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `RW`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:46:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a93::set_outer` puts in `static a93::OUTER`); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:50:16 | a93::BASE | [reachable] [via-static] in a93::main; a93::BASE -> ring::digest::SHA384; line: `let lits = [BASE, FIX];`; code: `BASE`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:51:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a93::BASE`; line: `let _ = digest(lits[i].h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:8:28 | ring::digest::SHA384 | [reachable] [static] in a93::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:9:19 | a93::BASE | [reachable] [via-static] in a93::ALIAS; a93::BASE -> ring::digest::SHA384; line: `const ALIAS: Cfg = BASE;`; code: `BASE`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:28 | ring::digest::SHA512 | [reachable] [static] in a93::FIX; line: `static FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:21 | a93::FIX | [reachable] [via-static] in a93::SREF; a93::FIX -> ring::digest::SHA512; line: `static SREF: &Cfg = &FIX;`; code: `FIX`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:13:23 | a93::SREF | [reachable] [via-static] in a93::SREF2; a93::SREF -> ring::digest::SHA512; line: `static SREF2: &&Cfg = &SREF;`; code: `SREF`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:17:65 | ring::digest::SHA512 | [reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:53 | ring::digest::SHA512 | [reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:52 | ring::digest::SHA512 | [reachable] [static] in a93::set_cfg; line: `fn set_cfg(m: &Mutex<Cfg>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:33:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a93::FIX`; member: table, stored by `static a93::FIX`; line: `let _ = digest(SREF.h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:33:19 | a93::SREF | [reachable] [via-static] in a93::main; a93::SREF -> ring::digest::SHA512; line: `let _ = digest(SREF.h, &d);`; code: `SREF`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:34:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a93::FIX`; member: table, stored by `static a93::FIX`; line: `let _ = digest(SREF2.h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:34:19 | a93::SREF2 | [reachable] [via-static] in a93::main; a93::SREF2 -> ring::digest::SHA512; line: `let _ = digest(SREF2.h, &d);`; code: `SREF2`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:37:19 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA512; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:38:20 | a93::NEST | [reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA512; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:39:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `const a93::OUTERS` that may reach the call: ring::digest::SHA512; member: table, stored by `const a93::OUTERS`; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:39:19 | a93::OUTERS | [reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA512; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:41:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a93::set_cfg` puts in `static a93::CFG`); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:48:27 | ring::digest::SHA512 | [reachable] [static] in a93::main; line: `let local = [Cfg { h: &SHA512, legacy: &SHA1 }; 3];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:49:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(local[i].h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:50:22 | a93::FIX | [reachable] [via-static] in a93::main; a93::FIX -> ring::digest::SHA512; line: `let lits = [BASE, FIX];`; code: `FIX`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:51:12 | ring::digest::digest | [reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `static a93::FIX`; line: `let _ = digest(lits[i].h, &d);`; code: `digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a93 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a93 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a93 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=38
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=30
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=22
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=19
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a93@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/a93@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/a93@0.1.0", "name": "a93", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a93@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=136
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

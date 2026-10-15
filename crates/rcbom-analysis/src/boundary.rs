@@ -53,6 +53,7 @@ pub(crate) fn reached(
     // caller, or a store into the field anywhere, may be code no entry point reaches
     match via {
         Via::Caller(w) | Via::Join(w) | Via::Table(w) | Via::Static(w) => {
+            let w = w.strip_prefix('=').unwrap_or(w);
             match rcbom_facts::owner_static(w) {
                 Some((_, id)) => reachable(id),
                 None => w.is_empty() || w.contains(" for ") || reached_path(w),
@@ -128,24 +129,69 @@ pub(crate) fn site_matches(
                     .is_none_or(|f| key.names.contains_key(f))
             };
             let before = found.names.len();
-            // a variant of another family than the key's put in the list beside the others
-            // (`v.algorithms.push(HS256)` after `Validation::new(RS256)`, `vec![RS256, HS256]`),
-            // not an alternative to them: jsonwebtoken refuses the call when it is there, so
-            // which of the others it verifies with, if any, is not known
+            // a variant of another family than the key's that may be in a list the call uses
+            // all of (put there beside the others: `v.algorithms.push(HS256)`, `vec![RS256,
+            // HS256]`, `fill`, an element write in a helper; or instead of them):
+            // jsonwebtoken refuses the call when it is there, so which of the others it
+            // verifies with, if any, is not known; in a single value (`Header.alg`) it is an
+            // alternative, the call failing when it is chosen; a value only stored in the field
+            // somewhere (a type-join) is not shown to be in this list
+            // (a value the program's own code puts there: a write into the list, by a function
+            // of the program or a container call; not one only stored in the field somewhere,
+            // nor what another crate's code returns, which reaches it as `Validation::new`'s
+            // argument: the list's one value)
+            let list = b.algorithm.list;
+            let program_fn = |f: &str| {
+                let krate = f.trim_start_matches('<').split("::").next().unwrap_or("");
+                ctx.crates
+                    .iter()
+                    .any(|((name, _), pkg)| name == krate && ctx.local.contains(pkg))
+            };
+            // (a variant named in the function is put in the list by a container call
+            // (`push`, `fill`): named alone it is the list's value, an alternative (`if c {
+            // vec![RS384] } else { vec![HS256] }`); a value not followed there, a closure's
+            // write, is a write)
+            let in_list = |v: &Via, fixed: bool| match v {
+                Via::Container(_) => true,
+                _ if !list => false,
+                Via::Join(_) => false,
+                Via::Fixed => fixed,
+                Via::Object(f) | Via::Caller(f) => program_fn(f),
+                _ => true,
+            };
             let refused: Vec<String> = found
                 .names
                 .keys()
                 .filter(|n| {
                     !allowed(n)
-                        && found
-                            .ways
-                            .get(*n)
-                            .is_some_and(|w| w.iter().any(|v| matches!(v, Via::Container(_))))
+                        && found.ways.get(*n).is_some_and(|w| {
+                            w.iter()
+                                .any(|v| in_list(v, false) && reached(v, reachable, reached_path))
+                        })
                 })
                 .cloned()
                 .collect();
             found.names.retain(|n, _| allowed(n));
             possible = all.iter().filter(|n| allowed(n)).count();
+            // values in the list the analysis does not follow (a write through `get_mut`, a
+            // closure, `splice`): any of them may be of another family, then refused; the
+            // members are not known to be verified with
+            if list
+                && found.unresolved.iter().any(|(_, v)| in_list(v, true))
+                && possible < all.len()
+                && !found.names.is_empty()
+            {
+                let note = format!(
+                    "; jsonwebtoken refuses the token when one is of another family than the \
+                     key's ({}), else it verifies with one of {} or a value not followed",
+                    key.names.keys().cloned().collect::<Vec<_>>().join(", "),
+                    found.names.keys().cloned().collect::<Vec<_>>().join(", ")
+                );
+                for (r, _) in found.unresolved.iter_mut() {
+                    r.push_str(&note);
+                }
+                found.names.clear();
+            }
             // none the key allows (`Validation::new(HS256)` with an RSA key): jsonwebtoken
             // refuses the token before any verification
             if before > 0 && found.names.is_empty() && found.unresolved.is_empty() {
@@ -327,10 +373,29 @@ pub(crate) fn site_matches(
 /// The functions of the program a value tree calls with constant arguments only, at every
 /// call of them in it (`Header::new(alg_for(0))`).
 fn constant_calls(origins: &[Origin]) -> BTreeSet<String> {
+    // the iteration of a loop (`for i in 0..2u8`, `for i in [0u8, 1]`): each value in turn,
+    // not a choice
+    fn looped(o: &Origin) -> bool {
+        match o {
+            Origin::Loop => true,
+            Origin::Through { callee } => callee.ends_with("Iterator::next"),
+            Origin::Call { callee, krate, .. } => {
+                matches!(krate.as_str(), "core" | "std" | "alloc")
+                    && strip_generics(callee).ends_with("Iterator::next")
+            }
+            _ => false,
+        }
+    }
+    // several different values a branch picks between (`if arg(1).is_empty() { 0 } else
+    // { 1 }`), not a loop's: chosen at run time
+    fn branch(v: &[Origin]) -> bool {
+        v.iter().skip(1).any(|x| x != &v[0]) && !v.iter().any(looped)
+    }
     fn constant(o: &Origin) -> bool {
         match o {
             Origin::Const { .. } | Origin::Unit { .. } | Origin::Data { .. } => true,
-            Origin::All(v) | Origin::Any(v) => v.iter().all(constant),
+            Origin::All(v) => v.iter().all(constant),
+            Origin::Any(v) => v.iter().all(constant) && !branch(v),
             // an element of a literal the program iterates (`for i in [0u8, 1]`)
             Origin::Call {
                 callee,
@@ -356,27 +421,35 @@ fn constant_calls(origins: &[Origin]) -> BTreeSet<String> {
             _ => false,
         }
     }
-    fn walk(o: &Origin, all: &mut BTreeMap<String, bool>, depth: usize) {
+    // `chosen`: under a branch between different values (`if c { alg_for(0) } else {
+    // alg_for(1) }`): a call there is one the run picks
+    fn walk(o: &Origin, all: &mut BTreeMap<String, bool>, chosen: bool, depth: usize) {
         if depth > 16 {
             return;
         }
         match o {
             Origin::Call { callee, args, .. } => {
-                let c = !args.is_empty() && args.iter().all(constant);
+                let c = !chosen && !args.is_empty() && args.iter().all(constant);
                 all.entry(callee.clone())
                     .and_modify(|v| *v &= c)
                     .or_insert(c);
-                args.iter().for_each(|a| walk(a, all, depth + 1));
+                args.iter().for_each(|a| walk(a, all, chosen, depth + 1));
             }
-            Origin::Any(v) | Origin::All(v) => v.iter().for_each(|a| walk(a, all, depth + 1)),
-            Origin::Set { value, .. } => walk(value, all, depth + 1),
-            Origin::Field { base, .. } => walk(base, all, depth + 1),
-            Origin::Written { args, .. } => args.iter().for_each(|a| walk(a, all, depth + 1)),
+            Origin::Any(v) => {
+                let chosen = chosen || branch(v);
+                v.iter().for_each(|a| walk(a, all, chosen, depth + 1))
+            }
+            Origin::All(v) => v.iter().for_each(|a| walk(a, all, chosen, depth + 1)),
+            Origin::Set { value, .. } => walk(value, all, chosen, depth + 1),
+            Origin::Field { base, .. } => walk(base, all, chosen, depth + 1),
+            Origin::Written { args, .. } => {
+                args.iter().for_each(|a| walk(a, all, chosen, depth + 1))
+            }
             _ => {}
         }
     }
     let mut all = BTreeMap::new();
-    origins.iter().for_each(|o| walk(o, &mut all, 0));
+    origins.iter().for_each(|o| walk(o, &mut all, false, 0));
     all.into_iter()
         .filter(|(_, c)| *c)
         .map(|(f, _)| f)
@@ -411,10 +484,18 @@ pub(crate) fn member_label(via: &Via) -> String {
         ),
         Via::Impl(f) => format!("member: impl, possible (what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!("member: table, stored by `{}`", short_fn(w)),
-        Via::Static(w) => format!(
-            "member: static, possible (the value `{}` starts with, which the program may replace)",
-            short_fn(w)
-        ),
+        // (a static no function puts a value in, a `LazyLock`: the value it holds)
+        Via::Static(w) => match w.strip_prefix('=') {
+            Some(w) => format!(
+                "member: static, possible (the value `{}` holds)",
+                short_fn(w)
+            ),
+            None => format!(
+                "member: static, possible (the value `{}` starts with, which the program may \
+                 replace)",
+                short_fn(w)
+            ),
+        },
         Via::Store { writer, statik } => format!(
             "member: static, possible (a value `{}` puts in `{}`)",
             short_fn(writer),
@@ -428,7 +509,11 @@ pub(crate) fn member_label(via: &Via) -> String {
 fn witness_unreached(via: &Via) -> String {
     match via {
         Via::Caller(w) => format!(" (passed by `{}`)", short_fn(w)),
-        Via::Join(w) | Via::Table(w) | Via::Static(w) => format!(" (stored by `{}`)", short_fn(w)),
+        Via::Join(w) | Via::Table(w) => format!(" (stored by `{}`)", short_fn(w)),
+        Via::Static(w) => format!(
+            " (stored by `{}`)",
+            short_fn(w.strip_prefix('=').unwrap_or(w))
+        ),
         Via::Store { writer, .. } => format!(" (stored by `{}`)", short_fn(writer)),
         _ => String::new(),
     }
@@ -471,7 +556,10 @@ fn witness(via: &Via) -> String {
         }
         Via::Impl(f) => format!(" (impl: what `{}` writes)", short_fn(f)),
         Via::Table(w) => format!(" (table: stored by `{}`)", short_fn(w)),
-        Via::Static(w) => format!(" (static: the value `{}` starts with)", short_fn(w)),
+        Via::Static(w) => match w.strip_prefix('=') {
+            Some(w) => format!(" (static: the value `{}` holds)", short_fn(w)),
+            None => format!(" (static: the value `{}` starts with)", short_fn(w)),
+        },
         Via::Store { writer, statik } => format!(
             " (static: a value `{}` puts in `{}`)",
             short_fn(writer),
@@ -778,7 +866,7 @@ fn collect(
                 |x| matches!(x, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE),
             ) =>
         {
-            let by = via.then(Via::Container("an element write".to_string()));
+            let by = via.then(Via::Container(owner.to_string()));
             for x in xs {
                 if !matches!(x, Origin::Through { .. }) {
                     collect(ctx, x, owner, krate, accept, depth, in_std, &by, out);
@@ -840,7 +928,10 @@ fn collect(
             ]
             .iter()
             .any(|m| bare.ends_with(m));
-            let store = crate::provenance::container_store(callee) || extend;
+            // (`fill`: every element of the list set to the value, `v.algorithms.fill(HS256)`)
+            let store = crate::provenance::container_store(callee)
+                || extend
+                || bare.ends_with("slice::fill");
             let map = store && bare.ends_with("Map::insert");
             let list = store && !map && !bare.ends_with("Set::insert");
             // the elements of a list literal (`vec![a, b]`, `Vec::from([a, b])`, `[a,

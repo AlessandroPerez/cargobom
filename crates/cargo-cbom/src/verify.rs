@@ -6,7 +6,8 @@
 //! (not in a comment or a literal), and begin a path (comments between its segments skipped, raw
 //! identifiers read without `r#`) whose last segment is the symbol's name or an import alias of
 //! it: from the file's `use` items, or from those of any file of its package or of the crate the
-//! path goes through (`pub use ring::digest::digest as hash_it;` in `src/algs.rs`). Besides:
+//! path goes through (`pub use ring::digest::digest as hash_it;` in `src/algs.rs`, a re-export
+//! inside that crate, `pub use inner::DEEP as SHALLOW;`). Besides:
 //! - the source line the context records (`line: `..``) is the line's, and the text at the
 //!   position is the one it records (`code: `..``) when it records one; only the leading `[..]`
 //!   tags of the context are read as tags, never the recorded source text;
@@ -21,57 +22,90 @@
 //!   comment or a string) in the table the context names, in the manifest of the package it
 //!   names; a `Cargo.lock` position is the `name` line of the locked version the context names;
 //!   lines are compared without the `\r` of a CRLF file;
-//! - a standard-library location (`/rustc/<commit>/..`) names the pinned toolchain's commit;
-//! - "algorithm from X in the arguments": X is named in the code the call reads (its arguments
-//!   and receiver; the variables they read, through bindings in scope, the stores into them that
-//!   may reach the call (an assignment, `*f(&mut v, ..) = x`), a store or a call of the file's
-//!   function that replaces the place read on every way to it, `mem::swap` / `mem::replace`
-//!   with another argument; the file's functions and methods it calls, the method of a value of
-//!   one of the file's types; the statics, consts and `const fn`s named, also of other files
-//!   and packages of the build), and no other descriptor of the asset's primitive (nor a type
-//!   the knowledge base gives one) is read instead;
-//! - a member reaching the call from another function and labelled as one that does (`member:
-//!   object`, `caller`, `fixed`): where the code the call reads holds no value from elsewhere (a
-//!   parameter, a variable lent to a call not followed, a constant of a crate not at hand, a static
-//!   the program may change), it names no other descriptor of the primitive instead; a witness
-//!   function (`member: object, from F`, `caller, passed by F`, `impl, possible (what F writes)`,
-//!   `type-join, possible (a value F stores ..)`) of the build's own packages, not made by the
-//!   compiler, exists (`<T as Tr>::m`, `Tr::m for T`: T's impl of Tr, or the trait's default body)
-//!   and can give X: its body names X, or passes or keeps a value from its parameters (a writer not
-//!   replacing what it writes, on every way, with other descriptors only);
+//! - a standard-library location (`/rustc/<commit>/..`) names the pinned toolchain's commit, and
+//!   is read from its rust-src: a line a standard-library macro expands from names the symbol
+//!   (`= __RUST_STD_INTERNAL_INIT;`), or uses a metavariable the invocation's line, which names
+//!   the symbol, fills;
+//! - "algorithm from X in the arguments": X is named in the code the call reads: the argument
+//!   that carries the algorithm (the knowledge base's operation says which, the receiver of a
+//!   method being the first; every argument and the receiver for other calls), the variables it
+//!   reads through bindings in scope (the part a destructuring pattern binds, `let (p, q) =
+//!   (..)`, `let Two { h, l } = ..`), the stores into them that may reach the call (an
+//!   assignment, a `mem::swap` / `mem::replace` with another argument in a block around the
+//!   read, one on some ways only as a value beside the one before, a store through another
+//!   binding that may point to the variable: `let r = &mut a; *r = v`, reborrows, copies,
+//!   holders, `*f(&mut v) = x`, a method's returned borrow), a store or a call of the file's
+//!   function that replaces the place read on every way to it; an `Option` combinator's closure
+//!   (`o.map_or(&SHA512, |_| &SHA1)`: the default and the closure's value, not `o`'s unless the
+//!   closure reads its parameter); the file's functions and methods it calls, the method of a
+//!   value of one of the file's types; the statics, consts and `const fn`s named, projected
+//!   through the fields, tuple elements and array elements read (`TABLE[i].h`, `NESTED.inner.h`,
+//!   `PAIRS[i].1`, through a constant an initializer names, `[BASE, ..]`), also of other files
+//!   and packages of the build (by the module path written and `pub use` re-exports; one not
+//!   found in a package at hand names nothing); an instance's associated constant (`T::ALG` in
+//!   `hash_c::<CFast>`: CFast's, else the trait's default); an index (`[i]`) is no value read.
+//!   No other descriptor of the asset's primitive (nor a type the knowledge base gives one) is
+//!   read instead. A claim that the values found are all (no unknown beside them) is held to a
+//!   store through a pointer that replaces the place on every way to the call; a member found
+//!   beside others not followed may be the value before it;
+//! - a member reaching the call from another function (`member: object`, `caller`, `fixed`,
+//!   `dyn`, `container`, and `type-join`, `impl` at a call reading no field): where the argument
+//!   carrying the algorithm holds no value from elsewhere (a parameter, a variable lent to a
+//!   call not followed, a constant of a crate not at hand, a static the program may change), it
+//!   names no other descriptor of the primitive (nor a type the knowledge base gives one)
+//!   instead; a witness function (`member: object, from F`, `caller, passed by F`, `impl,
+//!   possible (what F writes)`, `type-join, possible (a value F stores ..)`) of the build's own
+//!   packages, not made by the compiler, exists (`<T as Tr>::m`, `Tr::m for T`: T's impl of Tr,
+//!   or the trait's default body where T's impl writes no `m`) and can give X: its body names
+//!   X, or reads a parameter that can hold it (not an integer, a string, bytes), or, returning or
+//!   writing the object, has a result or a `&mut` parameter that can (a writer not replacing what
+//!   it writes, on every way, with other descriptors only);
 //! - a static table's member ("one of the N in `T`", "stored in `static T`", `member: table`,
-//!   `member: static`) is held by the static or const `T` of the package (the field read, where
-//!   the context reads one), and, where the call's code reads no value from elsewhere, that code
-//!   reads `T` and, through the field it reads, X; a coercion ("`T` is coerced to `dyn Tr` at
-//!   F:L") is a pointer made of a `T` (or of a variable or parameter bound to one, or of a type
-//!   parameter's value in a generic function) on that line that becomes a trait object there (a
-//!   `dyn` type or an `as` cast in its statement, the return type of its function, the type of
-//!   the file's function's parameter, of the field or of the container it is stored in), in a
-//!   static's item exactly when the detail says "in a static";
+//!   `member: static`) is held by the static or const `T` of the package (the fields read, where
+//!   the context reads some), and, where the argument carrying the algorithm reads no value from
+//!   elsewhere, that code reads `T` and, through the fields it reads, X; a coercion ("`T` is
+//!   coerced to `dyn Tr` at F:L") is a pointer made of a `T` (or of a variable bound to one, a
+//!   parameter declared of `T` or of a type parameter of its function, a type parameter's value
+//!   in a generic function) on that line that becomes an object of `Tr`, or of a trait whose
+//!   supertraits include `Tr`, there: by the innermost context it is in (an `as` cast after it,
+//!   the parameter of the function it is passed to, also another crate's, the field of the
+//!   struct literal, the variable whose method stores it, the annotation of the `let`, `static`
+//!   or `const` whose value, tuple element or array element it is, the return type of the
+//!   function whose tail or `return` it is), in a static's item exactly when the detail says "in
+//!   a static";
 //! - a pointer's `named at` is where the variable called is bound, the binding in scope (blocks,
 //!   closures, nested functions, shadowing, `let f = f;`, a macro's `let`), or the statement
-//!   storing it into the container it is read from (`map.insert("a", digest)`); a variable
-//!   computed by code not followed (another crate's function, a labelled block) must read a
-//!   variable bound there;
+//!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
+//!   `t.map.insert(1, digest)`); a variable computed by code not followed (another crate's
+//!   function, a labelled block) must read a variable bound there;
 //! - a closure's instantiation detail cites the innermost closure, or `async` closure's body,
-//!   whose extent strictly holds the next position inward; an instantiation detail citing an
+//!   whose extent strictly holds the next position inward, and a closure caller that is the
+//!   closure's parent but for closure indexes is its parent; an instantiation detail citing an
 //!   `[instantiation]` occurrence's position is of one of that position's assets, and an
 //!   `[instantiation]` occurrence cited by details is cited by its own asset's; a method call it
-//!   cites on a value of one of the file's types is of the chain's type, or of one implementing
-//!   the chain's trait; a vtable's detail cites the coercion's expression from its first token
-//!   (a cast to a pointer, not `as fn(..)`); a call a macro invoked in the function makes is
-//!   cited at the invocation, one through a variable bound to a function item running the
-//!   chain's body at the variable's call (not at the `let` binding it);
+//!   cites on a value whose type the code says (a variable's annotation or initializer, a
+//!   field's declared type, a function's or method's return type, `vec![..]`'s elements) is of
+//!   the chain's type, or of one implementing the chain's trait; a generic function's instance
+//!   (`pass::<A>`) is called with those type arguments, written or given by an argument of a
+//!   type of the file (`pass(&B, ..)` is `pass::<B>`); a vtable's detail cites the coercion's
+//!   expression from its first token (a cast to a pointer, not `as fn(..)`), also a value made
+//!   an object of the method's trait by a function's parameter (`up_dyn(&mut a1)`, a default
+//!   body only for a type whose impl does not write it); a call a macro invoked in the function
+//!   makes is cited at the invocation, one through a variable bound to a function item running
+//!   the chain's body at the variable's call (not at the `let` binding it);
 //! - a macro's body line cited is in the rule the invocation matches (rustc's first; repetitions
 //!   `$(..)sep*+?` matched), and uses the metavariable that rule binds to the symbol; of several
 //!   invocations of one macro, the one inside the modules the item's path names and naming most
-//!   of its words (and the occurrence's descriptor) makes it.
+//!   of its words (and the occurrence's descriptor: the algorithm a call's comes from, a
+//!   static's own symbol) makes it.
 //!
 //! Verdicts: a position is verified exactly, or, where the context cannot tell identical
 //! candidates apart (invocations of one macro that make the same item as far as its path says),
 //! within a range of them (counted apart, never as exact; the self-test counts a shift that
 //! lands only within such a range as rejected, and shifts a detail once per function, position
-//! and text it cites, not once per instance of a generic function citing the same).
+//! and text it cites, not once per instance of a generic function citing the same). A shifted
+//! coercion detail that lands on another line coercing a value of the type to the trait is as
+//! true: counted apart and printed (`AS TRUE`), not hidden.
 //!
 //! Known limits:
 //! - The check of "in the arguments" follows stores by the file's functions and inherent
@@ -79,11 +113,29 @@
 //!   say (`u.up()` on a `&mut dyn`, `t.up()` in a generic function): a value such a call
 //!   replaces is still read as the variable's binding. The check of members from other
 //!   functions takes such a call as a value from elsewhere (no check).
+//! - A store through a pointer bound by a pattern, a loop or a condition (`if let Some(r) = o {
+//!   *r = v }`, `for r in [&mut x]`), or through a function's result whose body is not one
+//!   returned expression, is a possible store: the value before is still accepted. A member
+//!   labelled beside others not followed is accepted where such a store replaces it on every way
+//!   (the analysis may not have followed that store); only claims without an unknown are held
+//!   to it.
+//! - `type-join` and `impl` members (any value stored in a field of that type, or that a
+//!   function writes) are checked against the call's code only where the call reads no field.
+//!   A `dyn` member is checked to be at a call on an object of its trait (where the receivers'
+//!   types are known), not on the object the coerced value reaches: moved to a call on another
+//!   object of the same trait, it is accepted.
 //! - Witness functions are checked in the build's own packages only, and by what their bodies
-//!   name, not by whether the call's value comes through them.
-//! - A coercion's detail is checked as a coercion of the type on that line, not as the one whose
-//!   value reaches the call: of two lines coercing the same type to the same trait (two generic
-//!   functions boxing their `T`), a shift from one to the other is accepted by the self-test.
+//!   name and their signatures can carry, not by whether the call's value comes through them.
+//! - A coercion's detail is checked as a coercion of the type to the trait on that line, not as
+//!   the one whose value reaches the call: of two lines coercing the same type to the same trait
+//!   (two generic functions boxing their `T`), a shift from one to the other is as true.
+//! - A generic call's type arguments are compared only where written, or given by an argument
+//!   whose type is one of the file's; an elided `<..>` is not compared. A closure's index is not
+//!   counted against the closures of its parent's body.
+//! - A standard-library macro's line is checked against the symbol or a metavariable, not
+//!   against the rule the invocation matches (the standard library's `macro` items are not read).
+//! - The jsonwebtoken boundary model's members (`Validation.algorithms`, `Header.alg`) are not
+//!   checked against the call's code (open plan item 10).
 //! - `#[cfg(..)]` is not evaluated. A shifted position that lands on an identical line that the
 //!   configuration removes (`#[cfg(any())] let d = Sha256::digest(data);` just above the same
 //!   statement) is accepted by the self-test. The generator never cites such code (rustc does not
@@ -130,6 +182,23 @@ struct PkgMods {
     paths: Vec<(PathBuf, PathBuf, String)>,
     included: HashSet<PathBuf>,
 }
+
+/// A constant `Files::resolve_foreign` looks for: the package directory and module where it is
+/// named (None: modules not known), the path written before it, its name, the fields read of it.
+type Pending = (
+    PathBuf,
+    Option<Vec<String>>,
+    Vec<String>,
+    String,
+    Option<String>,
+);
+
+/// Where `Files::resolve_foreign` found one: the file, the item's extent, its module.
+type Spot = (PathBuf, (usize, usize), Option<Vec<String>>);
+
+/// Reads the type of a parameter of another crate's function (`Files::foreign_param`): the
+/// path written before the function's name, the name, the argument's index.
+type ForeignParam<'a> = dyn FnMut(&[String], &str, usize) -> Option<String> + 'a;
 
 /// What the CBOM says about packages: which assets each provides, and its dependencies.
 struct Graph {
@@ -479,6 +548,8 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         at_line,
         cited,
         graph,
+        inst: Vec::new(),
+        alg_arg: None,
     };
     let mut bad = 0;
     let mut ranged = 0;
@@ -631,10 +702,19 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
                     } else if m[0].starts_with("coerced to") {
-                        // the shifted line coerces the type to the trait too: the claim (the
-                        // type is coerced there) is as true, no wrong position
+                        // the shifted line coerces the type to the trait too (a value of the type
+                        // becomes an object of that trait there, as `check_coercions` reads it):
+                        // the claim is as true, no wrong position; printed, not hidden
                         total -= 1;
                         also_true += 1;
+                        println!(
+                            "AS TRUE {what}: {} {}:{}:{} cites {}",
+                            o.component,
+                            o.location,
+                            o.line,
+                            o.offset,
+                            &shifted[start..part_end]
+                        );
                     } else {
                         println!(
                             "ACCEPTED {what}: {} {}:{}:{} cites {}",
@@ -1160,6 +1240,11 @@ struct Files<'a> {
     /// F:L:C`)
     cited: HashMap<(String, usize, usize), HashSet<String>>,
     graph: Graph,
+    /// the type arguments of the generic function's instance the occurrence being checked is
+    /// in, by the function's type parameters (`Reads::inst`)
+    inst: Vec<(String, String)>,
+    /// the argument of the occurrence's call that carries the algorithm (`alg_arg`)
+    alg_arg: Option<usize>,
 }
 
 fn strip_generics(s: &str) -> String {
@@ -2586,6 +2671,24 @@ impl Files<'_> {
                 .map(|m| m[1].to_string())
                 .ok_or("no tier and evidence kind among the tags")?;
         let starts_token = token_start(&src, line, offset);
+        // the instance of a generic function the occurrence is in (`in tlib::hash_c::<ilib::
+        // CFast>`, or a closure in it): its function's type parameters' arguments
+        self.alg_arg = alg_arg(self.kb, &o.symbol);
+        self.inst = ctx
+            .details
+            .strip_prefix(ctx.tags)
+            .unwrap_or(ctx.details)
+            .trim_start()
+            .strip_prefix("in ")
+            .and_then(|d| parts(d).into_iter().next())
+            .and_then(|item| {
+                let item = re!(r"(?:::\{closure#\d+\})+\s*$").replace(item.trim(), "");
+                let args = instance_args(&item)?;
+                let f = src.enclosing((line, offset), &[ItemKind::Fn])?;
+                let g = fn_sig(&src, f).generics;
+                (g.len() == args.len()).then(|| g.into_iter().zip(args).collect())
+            })
+            .unwrap_or_default();
         // code positions are in code, not in a comment or a literal
         if src.class[line - 1].get(offset) != Some(&Class::Code) {
             return Err(format!("position inside a comment or literal in {text:?}"));
@@ -2709,12 +2812,21 @@ impl Files<'_> {
         if macro_tagged {
             let chains = self.module_chains(&path, 0);
             let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
+            // (a static's own descriptor tells invocations apart too: `#[cfg(unix)] g!(run,
+            // SHA384)` beside `#[cfg(not(unix))] g!(run, SHA512)`)
+            let own = sym.rsplit("::").next().unwrap_or("");
+            let own = (kind == "static"
+                && own
+                    .chars()
+                    .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_'))
+            .then_some(own);
             check_item(
                 &src,
                 ctx.details.strip_prefix(ctx.tags).unwrap_or(ctx.details),
                 (line, offset),
                 &mut aliases,
                 chains.as_deref(),
+                own,
             )?;
         }
         if !tagged {
@@ -2729,6 +2841,7 @@ impl Files<'_> {
                 (line, offset),
                 &mut aliases,
                 chains.as_deref(),
+                None,
             )?;
             // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
             if let Some(w) = word_before(&src, line, offset)
@@ -2919,9 +3032,29 @@ impl Files<'_> {
                 }
                 for d in dirs {
                     let binds = self.package_binds(&d);
+                    // (a re-export inside the symbol's own crate, relative to it: `pub use
+                    // inner::DEEP as SHALLOW;` in picklib for `picklib::inner::DEEP`)
+                    let own_crate = self
+                        .man
+                        .packages
+                        .iter()
+                        .find(|p| p.manifest_dir == d)
+                        .is_some_and(|p| {
+                            p.lib_name.as_deref() == Some(sym_crate.as_str())
+                                || p.name.replace('-', "_") == sym_crate
+                        });
                     if binds.iter().any(|b| {
                         b.name == *last
-                            && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
+                            && (self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
+                                || (own_crate && b.path.last() == Some(&ident) && {
+                                    let rel: Vec<&str> = b
+                                        .path
+                                        .iter()
+                                        .map(String::as_str)
+                                        .skip_while(|g| matches!(*g, "crate" | "self"))
+                                        .collect();
+                                    sym.ends_with(&format!("::{}", rel.join("::")))
+                                }))
                     }) {
                         ok = true;
                         break;
@@ -3026,6 +3159,40 @@ impl Files<'_> {
                 self.check_table(&src, &path, st, "", call_at)?;
                 continue;
             }
+            // a member through a trait object (`member: dyn, possible (dyn: `T` is coerced to
+            // `dyn Tr` ..)`): the call calls a method on an object of `Tr` (or of a trait whose
+            // supertraits include it), wherever the receivers' types are known
+            if let Some(m) = re!(r"^member: dyn, possible \(dyn: `[^`]+`(?:, the only type)? (?:is )?coerced to `([^`]+)`")
+                .captures(p)
+                && let Some(at) = call_at
+            {
+                let want = type_name(m[1].trim().trim_start_matches("dyn ").trim());
+                let supers = self.supertraits(&path, &m[1]);
+                if let Some(ts) = call_dyn_receivers(&src, src.idx(at))
+                    && !ts.iter().any(|t| {
+                        let mut seen = vec![t.clone()];
+                        let mut k = 0;
+                        while k < seen.len() {
+                            if seen[k] == want {
+                                return true;
+                            }
+                            for s2 in supers.get(&seen[k]).into_iter().flatten() {
+                                if !seen.contains(s2) {
+                                    seen.push(s2.clone());
+                                }
+                            }
+                            k += 1;
+                        }
+                        false
+                    })
+                {
+                    return Err(format!(
+                        "the call calls no method on a `dyn {want}` (its trait objects: {})",
+                        if ts.is_empty() { "none".to_string() } else { ts.join(", ") }
+                    ));
+                }
+                continue;
+            }
             // the function a member comes from (returned or written by it, passed by it, stored
             // by it in the field) is one of the build's that can give it
             if let Some(m) = re!(
@@ -3065,6 +3232,9 @@ impl Files<'_> {
             };
             let family = self.graph.family.get(&o.component_ref).cloned();
             let family = family.as_deref();
+            // the values the label says are all that reach the call (no unknown beside them):
+            // a store through a pointer that replaces one on every way to the call excludes it
+            let exact = !p.contains("beside others not followed") && !p.contains(" possibly ");
             // the code the call reads names it (`Salt::new(hkdf::HKDF_SHA256, ..)` is no
             // `HKDF_SHA384`; `prk.expand(.., HKDF_SHA256)` with `prk` from `Salt::new(HKDF_SHA384,
             // ..)` may be either)
@@ -3082,6 +3252,7 @@ impl Files<'_> {
                     &members,
                     &o.component_ref,
                     ctx.tags.contains("[macro ").then_some(expanded.as_slice()),
+                    exact,
                 )?;
             }
             // a member reaching the call from another function, labelled as one that does
@@ -3091,9 +3262,21 @@ impl Files<'_> {
                 && kind == "call"
                 && !ctx.tags.contains("[macro ")
                 && re!(r"reaching the call from another function|from other functions").is_match(p)
-                && re!(r"; member: (?:object|caller|fixed)").is_match(ctx.details)
+                && re!(r"; member: (?:object|caller|fixed|dyn|container|type-join|impl)\b")
+                    .is_match(ctx.details)
             {
-                self.check_elsewhere(&src, &path, (line, offset), &named, &o.component_ref)?;
+                // (a `type-join` or `impl` member is any value stored in a field of that type,
+                // or that a function writes: only a call that reads no field is checked)
+                let join = re!(r"; member: (?:type-join|impl)\b").is_match(ctx.details);
+                self.check_elsewhere(
+                    &src,
+                    &path,
+                    (line, offset),
+                    &named,
+                    &o.component_ref,
+                    exact,
+                    join,
+                )?;
             }
             descriptors.extend(named.iter().map(|d| d.to_string()));
             for d in named {
@@ -3212,9 +3395,10 @@ impl Files<'_> {
     }
 
     /// "algorithm from X in the arguments" (or one of several such `members`) at the call at
-    /// `at`: X is named in the code the call reads (its arguments and receiver, the variables
-    /// they read and what the function stores in them, the statics, consts and `const fn`s
-    /// those name), and the call reads no other descriptor of the asset's primitive instead.
+    /// `at`: X is named in the code the call reads (`call_reads`: the argument carrying the
+    /// algorithm, the variables it reads and what the function stores in them, the statics,
+    /// consts and `const fn`s those name), and the call reads no other descriptor of the asset's
+    /// primitive instead. `exact`: the label says the values found are all (`Reads::strict`).
     /// Where that code reads values from elsewhere (a parameter), X is named in the function.
     /// A macro's call (`expanded` gives the lines of its body cited) reads the invocation and
     /// those lines.
@@ -3227,6 +3411,7 @@ impl Files<'_> {
         members: &[&str],
         component_ref: &str,
         expanded: Option<&[usize]>,
+        exact: bool,
     ) -> Result<(), String> {
         let s = &src.code;
         let lasts: Vec<String> = members
@@ -3255,10 +3440,11 @@ impl Files<'_> {
                 lasts.join(", ")
             ));
         }
-        let Some(mut call) = call_reads(src, self.kb, p) else {
+        let Some(mut call) = call_reads(src, self.kb, p, exact, &self.inst, self.alg_arg) else {
             return Ok(());
         };
         self.resolve_foreign(path, &mut call);
+        self.resolve_assoc(path, &mut call);
         if has(&call) {
             return Ok(());
         }
@@ -3300,9 +3486,13 @@ impl Files<'_> {
         // values from elsewhere: X named in the function at least
         if let Some(f) = src.enclosing(at, &[ItemKind::Fn]) {
             let (a, b) = src.span(f);
-            let mut whole = Reads::default();
+            let mut whole = Reads {
+                inst: self.inst.clone(),
+                ..Reads::default()
+            };
             names_read(src, self.kb, a, b, 2, &mut HashSet::new(), &mut whole, true);
             self.resolve_foreign(path, &mut whole);
+            self.resolve_assoc(path, &mut whole);
             if !has(&whole) && !whole.foreign {
                 return Err(format!(
                     "the function names no {} (the call reads values from elsewhere)",
@@ -3313,83 +3503,338 @@ impl Files<'_> {
         Ok(())
     }
 
+    /// The statics and consts named `item` in module `module` of the package in `dir`: those its
+    /// files define there, else those a `use` item of that module re-exports under that name
+    /// (`pub use inner::DEEP as SHALLOW;`, a glob `pub use inner::*;`), followed in turn: (file,
+    /// the item's extent in its `code`, the item's module). None when the modules of the
+    /// package's files are not known (no `cargo metadata`).
+    #[allow(clippy::type_complexity)]
+    fn find_item(
+        &mut self,
+        dir: &Path,
+        module: &[String],
+        item: &str,
+        depth: usize,
+    ) -> Option<Vec<(PathBuf, (usize, usize), Vec<String>)>> {
+        let files = package_files(dir);
+        let mut out = Vec::new();
+        let mut known = false;
+        for f in &files {
+            let Some(chains) = self.module_chains(f, 0) else {
+                continue;
+            };
+            known = true;
+            let Some(src) = self.source(f) else { continue };
+            for it in src
+                .items
+                .iter()
+                .filter(|it| it.kind == ItemKind::Static && it.name == item)
+            {
+                // (an associated const of an impl or trait is no module's item)
+                if src.items.iter().any(|b| {
+                    matches!(b.kind, ItemKind::Impl | ItemKind::Trait | ItemKind::Fn)
+                        && b.contains(it.start)
+                        && b.start != it.start
+                }) {
+                    continue;
+                }
+                for c in &chains {
+                    let mut full = c.clone();
+                    full.extend(modules_at(&src, it.start));
+                    if full == module {
+                        out.push((f.clone(), src.span(it), full));
+                    }
+                }
+            }
+        }
+        if !known {
+            return None;
+        }
+        if !out.is_empty() || depth == 0 {
+            return Some(out);
+        }
+        // a re-export: a `use` of a file of that module binding the name (or a glob)
+        for f in &files {
+            let Some(chains) = self.module_chains(f, 0) else {
+                continue;
+            };
+            if !chains.iter().any(|c| c == module) {
+                continue;
+            }
+            let Some(src) = self.source(f) else { continue };
+            let binds: Vec<Binding> = src
+                .binds
+                .iter()
+                .filter(|b| b.name == item || b.name == "*")
+                .cloned()
+                .collect();
+            for b in binds {
+                let (target, name) = if b.name == "*" {
+                    (b.path.clone(), item.to_string())
+                } else {
+                    let Some((last, head)) = b.path.split_last() else {
+                        continue;
+                    };
+                    (head.to_vec(), last.clone())
+                };
+                let Some((d2, m2)) = self.module_of(dir, module, &target) else {
+                    continue;
+                };
+                if let Some(found) = self.find_item(&d2, &m2, &name, depth - 1) {
+                    out.extend(found);
+                }
+            }
+        }
+        Some(out)
+    }
+
+    /// The package and module a path written in module `here` of the package in `dir` names
+    /// (`crate::a`, `self::a`, `super::a`, `a` a child module, `dep::a` another package's).
+    fn module_of(
+        &self,
+        dir: &Path,
+        here: &[String],
+        prefix: &[String],
+    ) -> Option<(PathBuf, Vec<String>)> {
+        let Some(first) = prefix.first() else {
+            return Some((dir.to_path_buf(), here.to_vec()));
+        };
+        match first.as_str() {
+            "crate" | "$crate" => Some((dir.to_path_buf(), prefix[1..].to_vec())),
+            "self" => {
+                let mut m = here.to_vec();
+                m.extend(prefix[1..].iter().cloned());
+                Some((dir.to_path_buf(), m))
+            }
+            "super" => {
+                let mut m = here.to_vec();
+                let mut k = 0;
+                while prefix.get(k).is_some_and(|g| g == "super") {
+                    m.pop();
+                    k += 1;
+                }
+                m.extend(prefix[k..].iter().cloned());
+                Some((dir.to_path_buf(), m))
+            }
+            _ => {
+                let pkg = self.man.packages.iter().find(|p| {
+                    p.lib_name.as_deref() == Some(first.as_str())
+                        || p.name.replace('-', "_") == *first
+                });
+                match pkg {
+                    // (another package's, unless a child module of the same name shadows it:
+                    // the caller tries both)
+                    Some(p) if p.manifest_dir != dir => {
+                        Some((p.manifest_dir.clone(), prefix[1..].to_vec()))
+                    }
+                    _ => {
+                        let mut m = here.to_vec();
+                        m.extend(prefix.iter().cloned());
+                        Some((dir.to_path_buf(), m))
+                    }
+                }
+            }
+        }
+    }
+
     /// The constants of other files and packages of the build `r` reads (`algs::CHOSEN`, `use
-    /// picklib::CALG as X`): what their initializers name (the field read, where one is), read
-    /// into `r`; `r.foreign` stays only for those not found (a crate whose sources are not at
-    /// hand).
+    /// picklib::CALG as X`, `picklib::SHALLOW` re-exporting `inner::DEEP`): found by the module
+    /// path the code writes (from the module of the file `path`, or another package's root), what
+    /// their initializers name (the field read, where one is) is read into `r`, and what those
+    /// name in turn, from their own module. One not found in a package of the build makes the
+    /// code name nothing there; `r.foreign` stays only for one of a crate whose sources are not
+    /// at hand. Where the modules are not known (no `cargo metadata`), by name in the package.
     fn resolve_foreign(&mut self, path: &Path, r: &mut Reads) {
-        let mut pending = std::mem::take(&mut r.foreign_items);
-        let mut done = Vec::new();
+        let items = std::mem::take(&mut r.foreign_items);
+        let own = self.man.owner_of(path).map(|p| p.manifest_dir.clone());
+        let here = self
+            .module_chains(path, 0)
+            .and_then(|c| c.into_iter().next());
+        // (package dir, module where it is written, prefix, item, field)
+        let mut pending: Vec<Pending> = Vec::new();
         let mut unresolved = false;
+        for (prefix, item, field) in items {
+            match &own {
+                Some(d) => pending.push((d.clone(), here.clone(), prefix, item, field)),
+                None => unresolved = true,
+            }
+        }
+        let mut done = Vec::new();
         while let Some(key) = pending.pop() {
             if done.contains(&key) || done.len() > 32 {
                 continue;
             }
             done.push(key.clone());
-            let (prefix, item, field) = &key;
-            // the package the path names (`picklib::ALG`), else the file's own (`algs::CHOSEN`,
-            // `crate::X`)
-            let own = self.man.owner_of(path).map(|p| p.manifest_dir.clone());
-            let named = prefix.first().and_then(|first| {
-                self.man
+            let (dir, here, prefix, item, field) = key;
+            // where it is: by module path, else (modules not known) by name in the package
+            let mut spots: Vec<Spot> = Vec::new();
+            let mut local = true;
+            let by_module = here.as_ref().and_then(|h| {
+                let (d2, m2) = self.module_of(&dir, h, &prefix)?;
+                local = self
+                    .man
                     .packages
                     .iter()
-                    .find(|p| {
-                        p.lib_name.as_deref() == Some(first.as_str())
-                            || p.name.replace('-', "_") == *first
-                    })
-                    .map(|p| p.manifest_dir.clone())
+                    .find(|p| p.manifest_dir == d2)
+                    .is_some_and(|p| p.local);
+                let mut found = self.find_item(&d2, &m2, &item, 4)?;
+                // (`a::X` with no child module `a`: a path from the root, 2015 style)
+                if found.is_empty()
+                    && prefix
+                        .first()
+                        .is_some_and(|f| !matches!(f.as_str(), "crate" | "self" | "super"))
+                {
+                    found = self.find_item(&d2, &prefix, &item, 4).unwrap_or_default();
+                }
+                Some(found)
             });
-            let Some(dir) = named.or(own) else {
-                unresolved = true;
+            match by_module {
+                Some(found) => spots.extend(found.into_iter().map(|(f, sp, m)| (f, sp, Some(m)))),
+                None => {
+                    // the package the path names, else the file's own
+                    let named = prefix.first().and_then(|first| {
+                        self.man
+                            .packages
+                            .iter()
+                            .find(|p| {
+                                p.lib_name.as_deref() == Some(first.as_str())
+                                    || p.name.replace('-', "_") == *first
+                            })
+                            .map(|p| (p.manifest_dir.clone(), p.local))
+                    });
+                    let (d2, l2) = named.unwrap_or((dir.clone(), true));
+                    local = l2;
+                    for f in package_files(&d2) {
+                        let Some(src) = self.source(&f) else { continue };
+                        for it in src
+                            .items
+                            .iter()
+                            .filter(|it| it.kind == ItemKind::Static && it.name == item)
+                        {
+                            spots.push((f.clone(), src.span(it), None));
+                        }
+                    }
+                }
+            }
+            if spots.is_empty() {
+                // a package of the build whose sources are at hand: nothing of that name there
+                unresolved |= !local;
                 continue;
-            };
-            let mut found = false;
-            for f in package_files(&dir) {
+            }
+            for (f, sp, m) in spots {
                 let Some(src) = self.source(&f) else { continue };
                 let mut sub = Reads::default();
-                for it in src
-                    .items
-                    .iter()
-                    .filter(|it| it.kind == ItemKind::Static && it.name == *item)
-                {
-                    found = true;
-                    let sp = src.span(it);
-                    let parts = field
-                        .as_deref()
-                        .map(|fd| field_values(&src.code, sp.0, sp.1, fd))
-                        .filter(|v| !v.is_empty())
-                        .unwrap_or(vec![sp]);
-                    for (x, y) in parts {
-                        names_read(&src, self.kb, x, y, 3, &mut HashSet::new(), &mut sub, false);
-                    }
+                let parts = field
+                    .as_deref()
+                    .map(|fd| {
+                        project(
+                            &src,
+                            sp.0,
+                            sp.1,
+                            &fd.split('.').collect::<Vec<_>>(),
+                            8,
+                            &mut sub.names,
+                        )
+                    })
+                    .unwrap_or(vec![sp]);
+                for (x, y) in parts {
+                    names_read(&src, self.kb, x, y, 3, &mut HashSet::new(), &mut sub, false);
                 }
                 r.names.extend(sub.names);
                 r.types.extend(sub.types);
                 r.replaced |= sub.replaced;
-                // what that initializer names in turn, in its own file
+                // what that initializer names in turn, from its own module
+                let d3 = self
+                    .man
+                    .owner_of(&f)
+                    .map(|p| p.manifest_dir.clone())
+                    .unwrap_or_else(|| dir.clone());
                 for (pre, it, fd) in sub.foreign_items {
-                    let pre = if pre.is_empty()
-                        || matches!(pre[0].as_str(), "crate" | "self" | "super")
-                    {
-                        prefix.clone()
-                    } else {
-                        pre
-                    };
-                    pending.push((pre, it, fd));
+                    pending.push((d3.clone(), m.clone(), pre, it, fd));
                 }
             }
-            unresolved |= !found;
         }
+        // (`names_read` marks every such constant; what is left is what was not found)
         r.foreign = unresolved;
     }
 
-    /// A member said to reach the call at `at` from another function: when the code the call
-    /// reads holds no value from elsewhere (a parameter, a constant of a crate not at hand, a
-    /// variable a swap may change, a static the program may change), it does not name only
-    /// other descriptors of the asset's
-    /// primitive (`digest(b2.alg)` with `b2 = B { alg: &SHA256 }` and nothing storing into it is
-    /// no SHA-384).
+    /// The associated items `r` reads of an instance's types (`Reads::assoc`, `T::ALG` in
+    /// `hash_c::<CFast>`): what the type's impl gives them (`impl HasConst for CFast { const ALG:
+    /// .. = &SHA512; }`), in the package its path names or the file's, else the trait's default
+    /// (a const of that name in a trait); neither found: a value from elsewhere (`foreign`).
+    fn resolve_assoc(&mut self, path: &Path, r: &mut Reads) {
+        let items = std::mem::take(&mut r.assoc);
+        for (ty, name) in items {
+            let krate = ty
+                .trim_start_matches(['&', '<'])
+                .split("::")
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_string();
+            let tname = type_name(&ty);
+            let mut dirs: Vec<PathBuf> = Vec::new();
+            if let Some(p) = self.man.packages.iter().find(|p| {
+                p.lib_name.as_deref() == Some(krate.as_str()) || p.name.replace('-', "_") == krate
+            }) {
+                dirs.push(p.manifest_dir.clone());
+            }
+            if let Some(p) = self.man.owner_of(path)
+                && !dirs.contains(&p.manifest_dir)
+            {
+                dirs.push(p.manifest_dir.clone());
+            }
+            let files: Vec<PathBuf> = dirs.iter().flat_map(|d| package_files(d)).collect();
+            let mut found = false;
+            for in_trait in [false, true] {
+                for f in &files {
+                    let Some(src2) = self.source(f) else { continue };
+                    for it in src2.items.iter().filter(|it| {
+                        it.kind == ItemKind::Static
+                            && it.name == name
+                            && src2.items.iter().any(|b| {
+                                b.contains(it.start)
+                                    && b.start != it.start
+                                    && if in_trait {
+                                        b.kind == ItemKind::Trait
+                                    } else {
+                                        b.kind == ItemKind::Impl && b.name == tname
+                                    }
+                            })
+                    }) {
+                        found = true;
+                        let (a, b) = src2.span(it);
+                        let mut sub = Reads::default();
+                        names_read(
+                            &src2,
+                            self.kb,
+                            a,
+                            b,
+                            3,
+                            &mut HashSet::new(),
+                            &mut sub,
+                            false,
+                        );
+                        r.names.extend(sub.names);
+                        r.types.extend(sub.types);
+                    }
+                }
+                if found {
+                    break;
+                }
+            }
+            r.foreign |= !found;
+        }
+    }
+
+    /// A member said to reach the call at `at` from another function (any label but a table's
+    /// or a static's, which `check_table` reads): when the argument carrying the algorithm holds
+    /// no value from elsewhere (a parameter, a constant of a crate not at hand, a variable a swap
+    /// may change, a static the program may change), it does not name only other descriptors of
+    /// the asset's primitive, or a type the knowledge base gives one (`digest(b2.alg)` with `b2 =
+    /// B { alg: &SHA256 }` and nothing storing into it is no SHA-384). `join`: a `type-join` or
+    /// `impl` member, any value of a field's type, is not checked at a call reading a field.
+    #[allow(clippy::too_many_arguments)]
     fn check_elsewhere(
         &mut self,
         src: &Source,
@@ -3397,11 +3842,18 @@ impl Files<'_> {
         at: (usize, usize),
         members: &[&str],
         component_ref: &str,
+        exact: bool,
+        join: bool,
     ) -> Result<(), String> {
-        let Some(mut r) = call_reads(src, self.kb, src.idx(at)) else {
+        let Some(mut r) = call_reads(src, self.kb, src.idx(at), exact, &self.inst, self.alg_arg)
+        else {
             return Ok(());
         };
+        if join && r.fields {
+            return Ok(());
+        }
         self.resolve_foreign(path, &mut r);
+        self.resolve_assoc(path, &mut r);
         let lasts: Vec<&str> = members
             .iter()
             .map(|d| d.rsplit("::").next().unwrap_or(d))
@@ -3424,6 +3876,8 @@ impl Files<'_> {
             return Ok(());
         }
         let prim = self.graph.primitive.get(component_ref);
+        // other descriptors of its primitive, or a type of the build's crates the knowledge
+        // base gives one (`kp.sign(..)` with `kp` an `Ed25519KeyPair` is no ECDSA)
         let others: Vec<&String> = r
             .names
             .iter()
@@ -3433,6 +3887,13 @@ impl Files<'_> {
                     .iter()
                     .any(|e| e.pattern.is_match(w) && Some(&e.algo.primitive) == prim)
             })
+            .chain(r.types.iter().filter(|w| {
+                self.kb.types.iter().any(|e| {
+                    e.name == **w
+                        && Some(&e.algo.primitive) == prim
+                        && self.libs.as_ref().is_some_and(|l| l.contains_key(&e.krate))
+                })
+            }))
             .collect();
         if others.is_empty() {
             return Ok(());
@@ -3514,8 +3975,30 @@ impl Files<'_> {
         let _ = path;
         let last = d.rsplit("::").next().unwrap_or(d).to_string();
         let prim = self.graph.primitive.get(component_ref).cloned();
+        let files: Vec<PathBuf> = dirs.iter().flat_map(|d| package_files(d)).collect();
+        // `<T as Tr>::m` runs the trait's default body only where T's impl of Tr writes no `m`
+        let overrides = match (n.self_ty.as_deref(), n.trait_name.as_deref()) {
+            (Some(t), Some(tr)) => files.iter().any(|f| {
+                self.source(f).is_some_and(|src| {
+                    src.items.iter().any(|b| {
+                        b.kind == ItemKind::Impl
+                            && b.name == t
+                            && b.trait_name
+                                .as_deref()
+                                .is_some_and(|bt| type_name(bt) == type_name(tr))
+                            && src.items.iter().any(|g| {
+                                g.kind == ItemKind::Fn
+                                    && g.name == n.name
+                                    && b.contains(g.start)
+                                    && b.start != g.start
+                            })
+                    })
+                })
+            }),
+            _ => false,
+        };
         let mut found = false;
-        for f in dirs.iter().flat_map(|d| package_files(d)) {
+        for f in files {
             let Some(src) = self.source(&f) else { continue };
             let is_trait = |t: &str| {
                 src.items
@@ -3543,7 +4026,7 @@ impl Files<'_> {
                     // `<T as Tr>::m`: T's impl of Tr, else the trait's default body
                     (Some(t), Some(tr)) => {
                         in_block(ItemKind::Impl, t, Some(tr), f)
-                            || in_block(ItemKind::Trait, &type_name(tr), None, f)
+                            || (!overrides && in_block(ItemKind::Trait, &type_name(tr), None, f))
                     }
                     // a trait's method, or an inherent one
                     (Some(t), None) if is_trait(t) => in_block(ItemKind::Trait, t, None, f),
@@ -3570,9 +4053,30 @@ impl Files<'_> {
                         .iter()
                         .any(|e| e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref())
                 });
+                // a parameter it reads that can hold the algorithm (not an integer, a string,
+                // bytes): a value from its caller it passes on or keeps
+                let sig = fn_sig(&src, f);
+                let body = src.text(a, b);
+                let carrying = r.open
+                    && sig.params.iter().any(|(p, ty)| {
+                        !neutral_type(ty)
+                            && Regex::new(&format!(
+                                r"\b{}\b",
+                                regex::escape(p.trim_start_matches("mut ").trim())
+                            ))
+                            .is_ok_and(|x| x.is_match(&body))
+                    });
                 if !others {
-                    // what it passes on or keeps: a value from its caller
-                    if r.open || kind == "object, from" || kind.starts_with("impl") {
+                    // one that returns or writes the object: of a type that can hold it (not a
+                    // `String` made of the arguments)
+                    let gives = sig.ret.as_deref().is_some_and(|t| !neutral_type(t))
+                        || sig.params.iter().any(|(p, ty)| {
+                            (p == "self" || ty.contains("&mut")) && !neutral_type(ty)
+                        });
+                    if carrying
+                        || r.lent
+                        || ((kind == "object, from" || kind.starts_with("impl")) && gives)
+                    {
                         return Ok(());
                     }
                     continue;
@@ -3584,7 +4088,7 @@ impl Files<'_> {
                         .params
                         .iter()
                         .any(|p| !body_assigns(&src, f, p, 3).is_empty());
-                    if !replaced && r.open {
+                    if !replaced && carrying {
                         return Ok(());
                     }
                 }
@@ -3597,10 +4101,112 @@ impl Files<'_> {
         })
     }
 
+    /// The supertraits the traits of the package of `path`, and of the crate `trait_path` names
+    /// (`dyn tlib::Pick`), declare (`trait Sub: Super + Send`: `Sub` -> `[Super, Send]`).
+    fn supertraits(&mut self, path: &Path, trait_path: &str) -> HashMap<String, Vec<String>> {
+        let mut dirs: Vec<PathBuf> = self
+            .man
+            .owner_of(path)
+            .map(|p| p.manifest_dir.clone())
+            .into_iter()
+            .collect();
+        let krate = trait_path
+            .trim()
+            .trim_start_matches("dyn ")
+            .split("::")
+            .next()
+            .unwrap_or("")
+            .to_string();
+        if let Some(p) = self.man.packages.iter().find(|p| {
+            p.lib_name.as_deref() == Some(krate.as_str()) || p.name.replace('-', "_") == krate
+        }) && !dirs.contains(&p.manifest_dir)
+        {
+            dirs.push(p.manifest_dir.clone());
+        }
+        let mut out: HashMap<String, Vec<String>> = HashMap::new();
+        for d in dirs {
+            for f in package_files(&d) {
+                let Some(src) = self.source(&f) else { continue };
+                let text: String = src.code.iter().collect();
+                for m in
+                    re!(r"\btrait\s+(\w+)\s*(?:<[^>{]*>)?\s*:\s*([^{;]+?)\s*(?:\bwhere\b|\{|;)")
+                        .captures_iter(&text)
+                {
+                    let e = out.entry(m[1].to_string()).or_default();
+                    for b in split_top(&m[2].replace('+', ",")) {
+                        let b = b.trim();
+                        if !b.is_empty() && !b.starts_with('\'') && !b.starts_with('?') {
+                            e.push(type_name(b));
+                        }
+                    }
+                }
+            }
+        }
+        out
+    }
+
+    /// The type of parameter `idx` of the function `name` that a call in `src` names with the
+    /// path `prefix` (`tlib::by_dyn`, or `by_dyn` imported from `tlib`), read from the sources
+    /// of the package the path or the import leads to (the file's own for a `crate::` path).
+    fn foreign_param(
+        &mut self,
+        src: &Source,
+        owner: Option<&rcbom_manifest::Pkg>,
+        prefix: &[String],
+        name: &str,
+        idx: usize,
+    ) -> Option<String> {
+        let owner_id = owner.map(|p| p.id.repr.clone());
+        let roots: Vec<String> = match prefix.first() {
+            Some(f) if matches!(f.as_str(), "crate" | "self" | "super") => Vec::new(),
+            Some(f) => import_roots(&src.binds, f)
+                .map(|r| r.into_iter().collect())
+                .unwrap_or_else(|| vec![f.clone()]),
+            None => import_roots(&src.binds, name)?.into_iter().collect(),
+        };
+        let mut dirs: Vec<PathBuf> = Vec::new();
+        for r in &roots {
+            for p in self.crate_refs(owner_id.as_deref(), r) {
+                if let Some(pkg) = self
+                    .man
+                    .packages
+                    .iter()
+                    .find(|k| pkg_ref(&k.name, &k.version.to_string()) == p)
+                    && !dirs.contains(&pkg.manifest_dir)
+                {
+                    dirs.push(pkg.manifest_dir.clone());
+                }
+            }
+        }
+        if dirs.is_empty() {
+            dirs.extend(owner.map(|p| p.manifest_dir.clone()));
+        }
+        for d in dirs {
+            for f in package_files(&d) {
+                let Some(s2) = self.source(&f) else { continue };
+                for it in s2.items.iter().filter(|it| {
+                    it.kind == ItemKind::Fn
+                        && it.name == name
+                        && !s2.items.iter().any(|o| {
+                            matches!(o.kind, ItemKind::Impl | ItemKind::Trait)
+                                && o.contains(it.start)
+                        })
+                }) {
+                    if let Some(p) = fn_sig(&s2, it).params.get(idx) {
+                        return Some(p.1.clone());
+                    }
+                }
+            }
+        }
+        None
+    }
+
     /// "dyn: `T` is coerced to `dyn Tr` at F:L" (or "in a static at F:L"): line L of F makes a
-    /// `T` a pointer there: it names the type (`Box::new(Fast)`, `&Legacy`, `W::<A>(..)` with its
-    /// type arguments, `3u8`), or a variable or parameter whose binding does (`&mut c4` with
-    /// `let mut c4 = Ctx { .. }`), beside a pointer made (`&`, `Box::new`) or a `dyn` type.
+    /// `T` a pointer there that becomes a `dyn Tr` (or a trait object of a trait whose
+    /// supertraits include `Tr`; `coercion_traits`): it names the type (`Box::new(Fast)`,
+    /// `&Legacy`, `W::<A>(..)` with its type arguments, `3u8`), or a variable or parameter whose
+    /// binding does (`&mut c4` with `let mut c4 = Ctx { .. }`, a parameter declared of the type or
+    /// of a type parameter of its function).
     fn check_coercions(&mut self, details: &str) -> Result<(), String> {
         for m in re!(
             r"dyn: `([^`]+)`(?:, the only type)? (?:is )?coerced to `([^`]+)` (in a static )?at ([^\s;)]+?):(\d+)\)"
@@ -3609,10 +4215,31 @@ impl Files<'_> {
         {
             let (ty, file, line) = (&m[1], &m[4], m[5].parse::<usize>().unwrap_or(0));
             let what = m[0].trim_end_matches(')');
+            let want = type_name(m[2].trim().trim_start_matches("dyn ").trim());
             let path = self.resolve(file)?;
             let src = self
                 .source(&path)
                 .ok_or_else(|| format!("cannot read {file}, named in `{what}`"))?;
+            // the traits whose objects are objects of `want` too (their supertraits include it)
+            let supers = self.supertraits(&path, &m[2]);
+            let fits = |ts: &[String]| {
+                ts.iter().any(|t| {
+                    let mut seen = vec![t.clone()];
+                    let mut k = 0;
+                    while k < seen.len() {
+                        if seen[k] == want {
+                            return true;
+                        }
+                        for s2 in supers.get(&seen[k]).into_iter().flatten() {
+                            if !seen.contains(s2) {
+                                seen.push(s2.clone());
+                            }
+                        }
+                        k += 1;
+                    }
+                    false
+                })
+            };
             let Some(text) = src.lines.get(line.wrapping_sub(1)) else {
                 return Err(format!("`{what}`: no line {line} in {file}"));
             };
@@ -3679,9 +4306,15 @@ impl Files<'_> {
                     _ => false,
                 }
             };
-            // where it is made a pointer, it becomes a trait object: a `dyn` type or an `as` cast in
-            // its statement, a parameter, field or return type with `dyn` it is passed to
-            let coerced = |i: usize| coercion_at(&src, i);
+            // where it is made a pointer, it becomes an object of the trait (`coercion_traits`;
+            // another crate's function's parameter read from its sources)
+            let man = self.man;
+            let owner = man.owner_of(&path);
+            let mut foreign = |prefix: &[String], name: &str, idx: usize| {
+                self.foreign_param(&src, owner, prefix, name, idx)
+            };
+            let mut coerced =
+                |i: usize| coercion_traits(&src, i, &mut foreign).is_some_and(|ts| fits(&ts));
             // its arguments are written on the line, or the line is in a generic function whose
             // instance gives them (`Box::new(W(t))` in `fn boxed<T: Pick>(t: T) -> Box<dyn Gen>`)
             let generic_at = |i: usize| {
@@ -3738,7 +4371,38 @@ impl Files<'_> {
                                 r.is_match(&init) || stmt.iter().any(|l| r.is_match(l))
                             }) && !stmt.iter().any(|l| re!(r"\bdyn\b").is_match(l))
                         }
-                        Some(Bound::Param { .. }) => true,
+                        // a parameter declared of the type, or of a type parameter of its
+                        // function or impl block
+                        Some(Bound::Param { .. }) => {
+                            src.enclosing(src.pos(i), &[ItemKind::Fn]).is_some_and(|f| {
+                                let sig = fn_sig(&src, f);
+                                let impl_params = impl_of(&src, f)
+                                    .map(|b| {
+                                        let (ba, bb) = src.span(b);
+                                        let h = src.text(
+                                            ba,
+                                            scan_to(&src.code, ba, bb, |k| src.code[k] == '{'),
+                                        );
+                                        h.trim_start()
+                                            .strip_prefix("impl")
+                                            .filter(|r| r.trim_start().starts_with('<'))
+                                            .map(|r| r.to_string())
+                                            .unwrap_or_default()
+                                    })
+                                    .unwrap_or_default();
+                                sig.params.iter().any(|(p, t)| {
+                                    p.trim_start_matches("mut ").trim() == w && {
+                                        let tn = type_name(&deref_type(t));
+                                        tn == base
+                                            || sig.generics.contains(&tn)
+                                            || t.trim_start_matches('&').trim().starts_with("impl ")
+                                            || re!(r"[<,]\s*(\w+)\s*[:,>]")
+                                                .captures_iter(&impl_params)
+                                                .any(|x| x[1] == tn)
+                                    }
+                                })
+                            })
+                        }
                         _ => false,
                     }
                 });
@@ -3769,9 +4433,11 @@ impl Files<'_> {
         // through the field it reads of it, the descriptor)
         let tie = |this: &mut Self| -> Result<(), String> {
             if let Some(at) = at
-                && let Some(mut r) = call_reads(src, this.kb, src.idx(at))
+                && let Some(mut r) =
+                    call_reads(src, this.kb, src.idx(at), false, &this.inst, this.alg_arg)
             {
                 this.resolve_foreign(path, &mut r);
+                this.resolve_assoc(path, &mut r);
                 if !r.open && !r.foreign {
                     if !r.names.contains(name) {
                         return Err(format!("the call reads no `{table}`"));
@@ -4007,6 +4673,26 @@ impl Files<'_> {
                     if !earlier.contains(&n.name) {
                         earlier.push(n.name);
                     }
+                } else if caller.is_none() {
+                    // a standard-library macro's line (`thread_local!`'s, read from the
+                    // toolchain's sources): it names the symbol (`= __RUST_STD_INTERNAL_INIT;`),
+                    // or uses a metavariable the invocation's line, which names it, fills
+                    let sym = strip_generics(symbol);
+                    let ident = sym.rsplit("::").next().unwrap_or(&sym);
+                    let word = Regex::new(&format!(r"\b{}\b", regex::escape(ident))).unwrap();
+                    let text: String = src.lines[line - 1]
+                        .chars()
+                        .zip(&src.class[line - 1])
+                        .map(|(c, k)| if *k == Class::Code { c } else { ' ' })
+                        .collect();
+                    let metavar = re!(r"\$(\w+)")
+                        .captures_iter(&text)
+                        .any(|m| &m[1] != "crate");
+                    if !word.is_match(&text)
+                        && !(metavar && call_line.is_some_and(|l| word.is_match(l)))
+                    {
+                        return Err(format!("`{part}`: line {line} does not name `{ident}`"));
+                    }
                 }
                 callee = caller;
                 inner = (path.clone(), line, col);
@@ -4054,6 +4740,24 @@ impl Files<'_> {
                         .as_deref()
                         .and_then(closure_parent)
                         .is_some_and(|p| strip_generics(p) == strip_generics(c));
+                    // a closure's caller that is its parent but for the closures' indexes
+                    // (`main::{closure#7}` for `main::{closure#0}::{closure#0}`) names another
+                    // closure than the one holding it
+                    if let Some(p) = callee.as_deref().and_then(closure_parent) {
+                        let idx = |x: &str| {
+                            re!(r"\{closure#\d+\}")
+                                .replace_all(x, "{closure}")
+                                .to_string()
+                        };
+                        let (p, c2) = (strip_generics(p), strip_generics(c));
+                        if p.trim() != c2.trim() && idx(&p).trim() == idx(&c2).trim() {
+                            return Err(format!(
+                                "`{part}`: the closure is in `{}`, not in `{}`",
+                                p.trim(),
+                                c2.trim()
+                            ));
+                        }
+                    }
                     let unnamed = callee.as_deref().is_none_or(|p| {
                         p.trim_end().ends_with('}') || in_item(p).is_some_and(|n| by_syntax(&n))
                     });
@@ -4111,7 +4815,78 @@ impl Files<'_> {
                             .is_some_and(|n| n.trait_name.is_some() || n.owner.is_some())
                             && re!(r"\b(Box|Arc|Rc)::(new|pin)\(|\bas\s+(?:[&*]|dyn\b|Box\b|Arc\b|Rc\b|Pin\b)|\bdyn\s")
                                 .is_match(text);
-                        let names_owner = coerces || owners.iter().any(|o| path_names(text, o));
+                        // (or the value at the column becomes an object of the method's trait
+                        // there: `up_dyn(&mut a1)` with `fn up_dyn(u: &mut dyn Up)` makes the
+                        // vtable of `a1`'s type, whose `up` is the trait's default body unless the
+                        // type's impl writes its own)
+                        let vtable = match (col, callee.as_deref().and_then(in_item)) {
+                            (Some(c0), Some(n)) if c0 < chars.len() => {
+                                let s = &src.code;
+                                let is_trait = |t: &str| {
+                                    src.items
+                                        .iter()
+                                        .any(|x| x.kind == ItemKind::Trait && x.name == t)
+                                };
+                                let (ty, tr) = match (n.self_ty.clone(), n.trait_name.clone()) {
+                                    (Some(st), Some(tr)) => (Some(st), Some(type_name(&tr))),
+                                    (Some(st), None) if is_trait(&st) => (None, Some(st)),
+                                    _ => (None, None),
+                                };
+                                let mut v = src.idx((line, c0));
+                                if s.get(v) == Some(&'&') {
+                                    v = skip_blank(s, v + 1);
+                                    if kw(s, v, "mut") {
+                                        v = skip_blank(s, v + 3);
+                                    }
+                                }
+                                let vty = expr_type(&src, v, src.idx((line + 1, 0)), 4)
+                                    .map(|t| type_name(&deref_type(&t)));
+                                let overrides = |vt: &str, tr: &str| {
+                                    src.items.iter().any(|b| {
+                                        b.kind == ItemKind::Impl
+                                            && b.name == vt
+                                            && b.trait_name.as_deref().map(type_name).as_deref()
+                                                == Some(tr)
+                                            && src.items.iter().any(|f| {
+                                                f.kind == ItemKind::Fn
+                                                    && f.name == n.name
+                                                    && b.contains(f.start)
+                                                    && b.start != f.start
+                                            })
+                                    })
+                                };
+                                match tr {
+                                    Some(tr)
+                                        if word_start(s, v)
+                                            && match (&ty, &vty) {
+                                                (Some(st), Some(vt)) => type_name(st) == *vt,
+                                                (Some(_), None) => false,
+                                                (None, Some(vt)) => !overrides(vt, &tr),
+                                                (None, None) => true,
+                                            } =>
+                                    {
+                                        let supers = self.supertraits(&path, "");
+                                        let man = self.man;
+                                        let owner = man.owner_of(&path);
+                                        let mut foreign = |p: &[String], f: &str, k: usize| {
+                                            self.foreign_param(&src, owner, p, f, k)
+                                        };
+                                        coercion_traits(&src, v, &mut foreign).is_some_and(|ts| {
+                                            ts.iter().any(|t| {
+                                                *t == tr
+                                                    || supers
+                                                        .get(t)
+                                                        .is_some_and(|x| x.contains(&tr))
+                                            })
+                                        })
+                                    }
+                                    _ => false,
+                                }
+                            }
+                            _ => false,
+                        };
+                        let names_owner =
+                            coerces || vtable || owners.iter().any(|o| path_names(text, o));
                         earlier
                             .iter()
                             .flat_map(|n| {
@@ -4289,6 +5064,29 @@ impl Files<'_> {
                             n.path
                         ));
                     }
+                    // a generic function's instance (`pass::<A>`): the call's type arguments,
+                    // written (`pass::<Last>(..)`) or given by its arguments (`pass(&B, ..)` for
+                    // `fn pass<T: Pick>(t: &T, ..)`), are the instance's
+                    if let Some(c0) = col
+                        && !own_closure
+                        && let Some(want_args) = callee.as_deref().and_then(instance_args)
+                        && let Some(n) = callee.as_deref().and_then(in_item)
+                        && let Some(found) = call_type_args(&src, src.idx((line, c0)), &n.name)
+                    {
+                        for (k, t) in found.iter().enumerate() {
+                            if let (Some(w), Some(t)) = (want_args.get(k), t)
+                                && type_name(w) != type_name(t)
+                            {
+                                return Err(format!(
+                                    "`{part}`: the call at {line}:{c0} instantiates `{}` with `{}`, \
+                                     not `{}`",
+                                    n.name,
+                                    type_name(t),
+                                    type_name(w)
+                                ));
+                            }
+                        }
+                    }
                     // the caller is around it, as for an occurrence: its item, the impl block
                     // or trait, the module; or the attribute on it (`#[tokio::main]` makes
                     // `main`'s body)
@@ -4305,6 +5103,7 @@ impl Files<'_> {
                             (line, col),
                             &mut aliases,
                             chains.as_deref(),
+                            None,
                         ) {
                             Ok(()) => {
                                 inside = true;
@@ -4566,6 +5365,14 @@ fn pointer_bound(src: &Source, at: usize, name: &str, named: usize) -> Result<()
         // `HashMap::new()`, another type's): named in its body
         let fns = file_fns_called(src, init);
         if fns.iter().any(|f| (f.start.0..=f.end.0).contains(&named)) {
+            return Ok(());
+        }
+        // a container in a field of it the function fills (`t.map.insert(1, digest)` with `let
+        // mut t = Table::new();`): the statement storing it names it
+        if container_stores(src, init_at, &cur.1)
+            .iter()
+            .any(|&(a, b)| (a..=b).contains(&named))
+        {
             return Ok(());
         }
         // a container the function fills (`map.insert("a", digest)`, `v.push(digest)`): one of
@@ -4897,15 +5704,17 @@ fn container_stores(src: &Source, at: usize, var: &str) -> Vec<(usize, usize)> {
     };
     let (a, b) = src.span(f);
     let text = src.text(a, b);
+    // (of the variable, or of a field of it: `t.map.insert(..)`)
     let Ok(r) = Regex::new(&format!(
-        r"\b{}\s*\.\s*(?:insert|push|push_back|push_front|extend|append|entry\s*\([^)]*\)\s*\.\s*or_insert(?:_with)?)\s*\(",
+        r"(?:^|[^\w.])({})(?:\s*\.\s*\w+)*?\s*\.\s*(?:insert|push|push_back|push_front|extend|append|entry\s*\([^)]*\)\s*\.\s*or_insert(?:_with)?)\s*\(",
         regex::escape(var)
     )) else {
         return Vec::new();
     };
-    r.find_iter(&text)
-        .filter_map(|m| {
-            let i = a + text[..m.start()].chars().count();
+    r.captures_iter(&text)
+        .filter_map(|c| {
+            let (m, v) = (c.get(0)?, c.get(1)?);
+            let i = a + text[..v.start()].chars().count();
             let open = a + text[..m.end()].chars().count() - 1;
             let close = close_of_at(s, open)?;
             Some((src.pos(i).0, src.pos(close).0))
@@ -5449,6 +6258,15 @@ fn fn_item_runs(src: &Source, callee: &str, init: &str) -> bool {
         })
 }
 
+/// A type that holds no algorithm: an integer, a float, `bool`, `char`, a string, bytes, a path
+/// (`&[u8]`, `String`, `Vec<u8>`, `&mut [u8; 32]`).
+fn neutral_type(t: &str) -> bool {
+    let d = deref_type(t);
+    let d: String = d.chars().filter(|c| !c.is_whitespace()).collect();
+    re!(r"^(?:u8|u16|u32|u64|u128|usize|i8|i16|i32|i64|i128|isize|f32|f64|bool|char|str|String|\[u8(?:;\w+)?\]|Vec<u8>|Path|PathBuf|OsStr|OsString)$")
+        .is_match(&d)
+}
+
 fn in_item(item: &str) -> Option<InItem> {
     // the path's segments, generic arguments kept whole
     let chars: Vec<char> = item.chars().collect();
@@ -5581,6 +6399,7 @@ fn check_item(
     at: (usize, usize),
     aliases: &mut dyn FnMut(&str) -> Vec<String>,
     chains: Option<&[Vec<String>]>,
+    descriptor: Option<&str>,
 ) -> Result<(), String> {
     if let Some(m) = src.enclosing(at, &[ItemKind::Macro]) {
         return Err(format!(
@@ -5607,6 +6426,7 @@ fn check_item(
             let extra: Vec<String> = re!(r"algorithm (?:possibly )?from (?:\w+::)*(\w+)")
                 .captures_iter(details)
                 .map(|m| m[1].to_string())
+                .chain(descriptor.map(str::to_string))
                 .collect();
             match invocation_names(src, at, path, &extra) {
                 Pick::Exact => return Ok(()),
@@ -6604,33 +7424,601 @@ fn receiver_at(s: &[char], dot: usize) -> Option<(usize, String, usize)> {
 }
 
 /// The type of the value a method called at `i` (`E1.ext()`, `W(S1).alg()`, `g.alg()` with `let
-/// g = &W(S2);`) is called on, when the code says which type of the file it is: `None` when it
-/// does not (a parameter, a trait object, a value of another crate's type).
+/// g = &W(S2);`, `p.b.ext()` with `p` a `Pair` whose `b` is an `E2`, `mk1().ext()`, `e.ext()` with
+/// `let e = E1.upgrade();`) is called on, when the code says which type of the file it is: `None`
+/// when it does not (a parameter of a type parameter, a trait object, a value of another crate's
+/// type).
 fn receiver_type(src: &Source, i: usize) -> Option<String> {
     let s = &src.code;
     let dot = before_blank(s, i).filter(|&d| s[d] == '.')?;
-    let (r, word, _) = receiver_at(s, dot)?;
-    let ty = if word.starts_with(char::is_uppercase) {
-        word
-    } else {
-        match binding(src, r, &word)? {
-            Bound::Let {
-                first, last, init, ..
-            } => {
-                if (first..=last).any(|l| re!(r"\bdyn\b").is_match(&src.lines[l - 1])) {
-                    return None;
-                }
-                let t = re!(r"^(?:&\s*(?:mut\s+)?|Box\s*::\s*new\s*\(\s*)*([A-Z]\w*)")
-                    .captures(init.trim())?;
-                t[1].to_string()
-            }
-            _ => return None,
-        }
-    };
+    let (r, _, _) = receiver_at(s, dot)?;
+    let ty = type_name(&deref_type(&expr_type(src, r, dot, 5)?));
     src.items
         .iter()
         .any(|it| it.kind == ItemKind::TypeDef && it.name == ty)
         .then_some(ty)
+}
+
+/// The type arguments of a generic function's instance as a context names it (`g2::pass::<g2::A>`:
+/// `[g2::A]`); `None` for a method, a closure or an item without them.
+fn instance_args(path: &str) -> Option<Vec<String>> {
+    let p = path.trim();
+    if p.starts_with('<') || !p.ends_with('>') {
+        return None;
+    }
+    let chars: Vec<char> = p.chars().collect();
+    let mut depth = 0i32;
+    let mut open = None;
+    for k in (0..chars.len()).rev() {
+        match chars[k] {
+            '>' if k == 0 || chars[k - 1] != '-' => depth += 1,
+            '<' => {
+                depth -= 1;
+                if depth == 0 {
+                    open = Some(k);
+                    break;
+                }
+            }
+            _ => {}
+        }
+    }
+    let o = open?;
+    if o < 2 || chars[o - 1] != ':' || chars[o - 2] != ':' {
+        return None;
+    }
+    // the segment before: a function's name, not a type's
+    let before: String = chars[..o - 2].iter().collect();
+    let name = before.rsplit("::").next().unwrap_or("");
+    if !name.starts_with(|c: char| c.is_lowercase() || c == '_') {
+        return None;
+    }
+    let inner: String = chars[o + 1..chars.len() - 1].iter().collect();
+    // (`<..>`: arguments the context leaves out)
+    if inner.contains("..") {
+        return None;
+    }
+    Some(
+        split_top(&inner)
+            .into_iter()
+            .map(|a| a.trim().to_string())
+            .collect(),
+    )
+}
+
+/// The type arguments the call of the file's generic function `name` at `ci` gives it, by its
+/// type parameters: written (`pass::<Last>(..)`), or the type of the argument passed for a
+/// parameter of that type (`pass(&B, ..)` for `fn pass<T>(t: &T, ..)`: `B`, a type of the file);
+/// `None` for one not known. `None` when no such call is there (a method, a macro).
+fn call_type_args(src: &Source, ci: usize, name: &str) -> Option<Vec<Option<String>>> {
+    let s = &src.code;
+    if before_blank(s, ci).is_some_and(|p| s[p] == '.') {
+        return None;
+    }
+    // the path at `ci` up to `name`
+    let mut i = ci;
+    let mut prefix = Vec::new();
+    loop {
+        if !word_start(s, i) {
+            return None;
+        }
+        let w = word_of(s, i);
+        i += w.chars().count();
+        if w == name {
+            break;
+        }
+        prefix.push(w);
+        let j = skip_blank(s, i);
+        if !(s.get(j) == Some(&':') && s.get(j + 1) == Some(&':')) {
+            return None;
+        }
+        i = skip_blank(s, j + 2);
+    }
+    let j = skip_blank(s, i);
+    if s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+        let o = skip_blank(s, j + 2);
+        if s.get(o) != Some(&'<') {
+            return None;
+        }
+        let cls = vec![Class::Code; s.len() - o];
+        let e = skip_angle(&s[o..], &cls, 0)?;
+        // (a type parameter of the caller, `labeled_extract::<Kdf>` in a generic function, is
+        // whatever its own instance gives: not compared)
+        let mut params: Vec<String> = Vec::new();
+        if let Some(f) = src.enclosing(src.pos(ci), &[ItemKind::Fn]) {
+            params.extend(fn_sig(src, f).generics);
+            if let Some(b) = impl_of(src, f) {
+                let (ba, bb) = src.span(b);
+                let h = src.text(ba, scan_to(s, ba, bb, |k| s[k] == '{'));
+                if let Some(r) = h
+                    .trim_start()
+                    .strip_prefix("impl")
+                    .filter(|r| r.trim_start().starts_with('<'))
+                {
+                    params.extend(
+                        re!(r"[<,]\s*(\w+)\s*[:,>]")
+                            .captures_iter(r)
+                            .map(|x| x[1].to_string()),
+                    );
+                }
+            }
+        }
+        return Some(
+            split_top(&src.text(o + 1, o + e - 1))
+                .into_iter()
+                .map(|a| {
+                    Some(a.trim().to_string())
+                        .filter(|a| a != "_" && !params.contains(&type_name(a)))
+                })
+                .collect(),
+        );
+    }
+    if s.get(j) != Some(&'(') {
+        return None;
+    }
+    let close = close_of_at(s, j)?;
+    let f = free_fn_called(src, ci, name, &prefix)?;
+    let sig = fn_sig(src, f);
+    if sig.generics.is_empty() {
+        return None;
+    }
+    // the arguments' extents
+    let mut args = Vec::new();
+    let mut a = j + 1;
+    while a < close {
+        let e = scan_to(s, a, close, |k| s[k] == ',');
+        args.push((a, e));
+        a = e + 1;
+    }
+    Some(
+        sig.generics
+            .iter()
+            .map(|g| {
+                let p = sig
+                    .params
+                    .iter()
+                    .position(|(_, t)| type_name(&deref_type(t)) == *g && deref_type(t) == *g)?;
+                let &(x, y) = args.get(p)?;
+                let t = type_name(&deref_type(&expr_type(src, x, y, 4)?));
+                src.items
+                    .iter()
+                    .any(|it| it.kind == ItemKind::TypeDef && it.name == t)
+                    .then_some(t)
+            })
+            .collect(),
+    )
+}
+
+/// A type as a method or field is looked up on: references, `mut`, lifetimes and the smart
+/// pointers a method call sees through (`Box`, `Rc`, `Arc`) dropped, a path cut to its last
+/// segment with its arguments (`&'a mut Box<m::Vec<E2>>` -> `Vec<E2>`). A trait object (`dyn`,
+/// `impl`) is no type of the file: empty.
+fn deref_type(t: &str) -> String {
+    let mut t = t.trim().to_string();
+    loop {
+        let before = t.clone();
+        t = t.trim_start_matches('&').trim().to_string();
+        t = re!(r"^'\w+\s*").replace(&t, "").trim().to_string();
+        if let Some(r) = t.strip_prefix("mut ") {
+            t = r.trim().to_string();
+        }
+        if let Some(m) = re!(r"^(?:\w+\s*::\s*)*(?:Box|Rc|Arc)\s*<(.*)>$").captures(&t) {
+            t = m[1].trim().to_string();
+        }
+        if t == before {
+            break;
+        }
+    }
+    if t.starts_with("dyn ") || t.starts_with("impl ") {
+        return String::new();
+    }
+    // the last segment of the path, outside its arguments
+    let chars: Vec<char> = t.chars().collect();
+    let (mut depth, mut cut) = (0i32, 0);
+    for (k, &c) in chars.iter().enumerate() {
+        match c {
+            '<' | '(' | '[' => depth += 1,
+            '>' | ')' | ']' => depth -= 1,
+            ':' if depth == 0 && chars.get(k + 1) == Some(&':') => cut = k + 2,
+            _ => {}
+        }
+    }
+    chars[cut.min(chars.len())..]
+        .iter()
+        .collect::<String>()
+        .trim()
+        .to_string()
+}
+
+/// The arguments of a type (`Vec<E2>`: `[E2]`; `HashMap<K, V>`: `[K, V]`).
+fn type_args(t: &str) -> Vec<String> {
+    let t = t.trim();
+    match (t.find('<'), t.ends_with('>')) {
+        (Some(o), true) => split_top(&t[o + 1..t.len() - 1])
+            .into_iter()
+            .map(|a| a.trim().to_string())
+            .filter(|a| !a.starts_with('\''))
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
+/// The type of an element of a value of type `t` read by an index (`Vec<X>`, `[X; N]`, `&[X]`,
+/// `VecDeque<X>`: `X`).
+fn elem_type(t: &str) -> Option<String> {
+    let t = deref_type(t);
+    if let Some(inner) = t.strip_prefix('[').and_then(|x| x.strip_suffix(']')) {
+        return split_top(inner.split(';').next().unwrap_or(inner))
+            .first()
+            .map(|x| x.trim().to_string());
+    }
+    let base = type_name(&t);
+    matches!(base.as_str(), "Vec" | "VecDeque" | "SmallVec" | "ArrayVec")
+        .then(|| type_args(&t).into_iter().next())
+        .flatten()
+}
+
+/// A function's signature as written: its type parameters, its parameters (pattern, type; a
+/// method's receiver as `self`, of type `Self`) and its return type.
+struct FnSig {
+    generics: Vec<String>,
+    params: Vec<(String, String)>,
+    ret: Option<String>,
+}
+
+fn fn_sig(src: &Source, f: &Item) -> FnSig {
+    let s = &src.code;
+    let (a, b) = src.span(f);
+    let mut out = FnSig {
+        generics: Vec::new(),
+        params: Vec::new(),
+        ret: None,
+    };
+    let name_at = skip_blank(s, a + 2);
+    let mut i = skip_blank(s, name_at + word_of(s, name_at).len());
+    if s.get(i) == Some(&'<') {
+        let cls = vec![Class::Code; s.len() - i];
+        let Some(e) = skip_angle(&s[i..], &cls, 0) else {
+            return out;
+        };
+        out.generics = split_top(&src.text(i + 1, i + e - 1))
+            .iter()
+            .filter_map(|g| {
+                let g = g.trim().trim_start_matches("const ").trim();
+                let n: String = g.chars().take_while(|c| is_ident(*c)).collect();
+                (!n.is_empty() && !g.starts_with('\'')).then_some(n)
+            })
+            .collect();
+        i = skip_blank(s, i + e);
+    }
+    let Some(close) = (s.get(i) == Some(&'('))
+        .then(|| close_of_at(s, i))
+        .flatten()
+    else {
+        return out;
+    };
+    for p in split_top(&src.text(i + 1, close)) {
+        let p = p.trim();
+        if p.is_empty() {
+            continue;
+        }
+        let pc: Vec<char> = p.chars().collect();
+        let colon = (0..pc.len())
+            .find(|&k| pc[k] == ':' && pc.get(k + 1) != Some(&':') && (k == 0 || pc[k - 1] != ':'));
+        match colon {
+            Some(k) => {
+                let pat: String = pc[..k].iter().collect();
+                let ty: String = pc[k + 1..].iter().collect();
+                if re!(r"\bself\b").is_match(&pat) {
+                    out.params.push(("self".into(), ty.trim().to_string()));
+                } else {
+                    out.params
+                        .push((pat.trim().to_string(), ty.trim().to_string()));
+                }
+            }
+            None if re!(r"\bself\b").is_match(p) => out.params.push(("self".into(), "Self".into())),
+            None => out.params.push((p.to_string(), String::new())),
+        }
+    }
+    let open = scan_to(s, close + 1, b, |k| s[k] == '{' || s[k] == ';');
+    let tail = src.text(close + 1, open);
+    if let Some(r) = tail.trim_start().strip_prefix("->") {
+        let r = r.split(" where ").next().unwrap_or(r);
+        let r = re!(r"\bwhere\b").split(r).next().unwrap_or(r);
+        out.ret = Some(r.trim().to_string());
+    }
+    out
+}
+
+/// The impl block (or trait) a function of the file is a method of.
+fn impl_of<'a>(src: &'a Source, f: &Item) -> Option<&'a Item> {
+    src.items
+        .iter()
+        .filter(|b| {
+            matches!(b.kind, ItemKind::Impl | ItemKind::Trait)
+                && b.contains(f.start)
+                && b.start != f.start
+        })
+        .max_by_key(|b| b.start)
+}
+
+/// The declared type of field `field` (a name, or a tuple index) of the file's struct `ty`.
+fn field_type(src: &Source, ty: &str, field: &str) -> Option<String> {
+    let s = &src.code;
+    let def = src.items.iter().find(|it| {
+        it.kind == ItemKind::TypeDef && it.name == ty && kw(s, src.idx(it.start), "struct")
+    })?;
+    let at = src.idx(def.start);
+    let mut i = skip_blank(s, at + 6);
+    i = skip_blank(s, i + word_of(s, i).len());
+    if s.get(i) == Some(&'<') {
+        let cls = vec![Class::Code; s.len() - i];
+        i = skip_blank(s, i + skip_angle(&s[i..], &cls, 0)?);
+    }
+    let open = scan_to(s, i, s.len(), |k| matches!(s[k], '{' | '(' | ';'));
+    let close = close_of_at(s, open)?;
+    let fields = split_top(&src.text(open + 1, close));
+    if s[open] == '(' {
+        let k: usize = field.parse().ok()?;
+        let f = fields.get(k)?.trim();
+        return Some(f.trim_start_matches("pub").trim().to_string());
+    }
+    fields.iter().find_map(|f| {
+        let f = f.trim();
+        let f = re!(r"^(?:#\[[^\]]*\]\s*)*(?:pub(?:\s*\([^)]*\))?\s+)?").replace(f, "");
+        let (n, t) = f.split_once(':')?;
+        (n.trim() == field).then(|| t.trim().to_string())
+    })
+}
+
+/// The return type of the file's method or associated function `name` of type `ty` (its impl's,
+/// or the default body of a trait it implements), `Self` read as `ty`.
+fn method_ret(src: &Source, ty: &str, name: &str) -> Option<String> {
+    let fns: Vec<&Item> = src
+        .items
+        .iter()
+        .filter(|f| f.kind == ItemKind::Fn && f.name == name)
+        .collect();
+    let own = fns
+        .iter()
+        .find(|f| impl_of(src, f).is_some_and(|b| b.kind == ItemKind::Impl && b.name == ty));
+    let f = own.or_else(|| {
+        fns.iter().find(|f| {
+            impl_of(src, f).is_some_and(|t| {
+                t.kind == ItemKind::Trait
+                    && src.items.iter().any(|b| {
+                        b.kind == ItemKind::Impl
+                            && (b.name == ty || b.name.is_empty())
+                            && b.trait_name.as_deref().map(type_name) == Some(t.name.clone())
+                    })
+            })
+        })
+    })?;
+    let ret = fn_sig(src, f).ret?;
+    Some(re!(r"\bSelf\b").replace_all(&ret, ty).to_string())
+}
+
+/// The type of the expression at `a..b` of `code` (a variable, a path to a value or a function
+/// of the file called, a struct literal, `vec![..]`, then fields, tuple fields, indexes, `?` and
+/// the file's methods called), as far as the code says: `None` where it does not.
+fn expr_type(src: &Source, a: usize, b: usize, depth: usize) -> Option<String> {
+    if depth == 0 {
+        return None;
+    }
+    let s = &src.code;
+    let b = b.min(s.len());
+    let mut i = skip_blank(s, a);
+    // references and derefs: a method or field is looked up on what they point to
+    loop {
+        if s.get(i) == Some(&'&') || s.get(i) == Some(&'*') {
+            i = skip_blank(s, i + 1);
+            if kw(s, i, "mut") {
+                i = skip_blank(s, i + 3);
+            }
+            continue;
+        }
+        break;
+    }
+    if i >= b {
+        return None;
+    }
+    let mut ty: String;
+    if s[i] == '(' {
+        let c = close_of_at(s, i)?;
+        if scan_to(s, i + 1, c, |k| s[k] == ',') < c {
+            return None;
+        }
+        ty = expr_type(src, i + 1, c, depth - 1)?;
+        i = c + 1;
+    } else if word_start(s, i) {
+        let start = i;
+        let mut segs: Vec<String> = Vec::new();
+        loop {
+            let w = word_of(s, i);
+            i += w.chars().count();
+            segs.push(w);
+            let j = skip_blank(s, i);
+            if s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+                let mut k = skip_blank(s, j + 2);
+                if s.get(k) == Some(&'<') {
+                    let cls = vec![Class::Code; s.len() - k];
+                    k = skip_blank(s, k + skip_angle(&s[k..], &cls, 0)?);
+                    i = k;
+                    if s.get(k) == Some(&':') && s.get(k + 1) == Some(&':') {
+                        k = skip_blank(s, k + 2);
+                    } else {
+                        break;
+                    }
+                }
+                if word_start(s, k) {
+                    i = k;
+                    continue;
+                }
+            }
+            break;
+        }
+        let last = segs.last()?.clone();
+        let n = skip_blank(s, i);
+        let upper = last.starts_with(char::is_uppercase);
+        let is_type = |t: &str| {
+            src.items
+                .iter()
+                .any(|it| it.kind == ItemKind::TypeDef && it.name == t)
+        };
+        let around = |k: usize| -> Option<String> {
+            src.enclosing(src.pos(k), &[ItemKind::Impl])
+                .map(|b| b.name.clone())
+                .filter(|n| !n.is_empty())
+        };
+        if upper {
+            // a struct literal, a tuple struct's or variant's constructor, a unit struct
+            if matches!(s.get(n), Some('{' | '(')) {
+                i = close_of_at(s, n)? + 1;
+            }
+            ty = if is_type(&last) {
+                last
+            } else if segs.len() >= 2 && is_type(&segs[segs.len() - 2]) {
+                segs[segs.len() - 2].clone()
+            } else if last == "Self" {
+                around(start)?
+            } else {
+                return None;
+            };
+        } else if s.get(n) == Some(&'!') {
+            // `vec![X, ..]`: a `Vec` of the first element's type
+            let o = skip_blank(s, n + 1);
+            let c = close_of_at(s, o)?;
+            if last != "vec" {
+                return None;
+            }
+            let e = scan_to(s, o + 1, c, |k| s[k] == ',' || s[k] == ';');
+            ty = format!("Vec<{}>", expr_type(src, o + 1, e, depth - 1)?);
+            i = c + 1;
+        } else if s.get(n) == Some(&'(') {
+            let c = close_of_at(s, n)?;
+            i = c + 1;
+            if segs.len() >= 2 && segs[segs.len() - 2].starts_with(char::is_uppercase) {
+                let q = &segs[segs.len() - 2];
+                let q = if q == "Self" {
+                    around(start)?
+                } else {
+                    q.clone()
+                };
+                ty = method_ret(src, &q, &last)?;
+            } else {
+                if segs.len() == 1 && matches!(binding(src, start, &last), Some(Bound::Let { .. }))
+                {
+                    // a closure or pointer held by a variable
+                    return None;
+                }
+                let f = free_fn_called(src, start, &last, &segs[..segs.len() - 1])?;
+                let sig = fn_sig(src, f);
+                let r = sig.ret?;
+                if sig
+                    .generics
+                    .iter()
+                    .any(|g| re!(r"\w+").find_iter(&r).any(|m| m.as_str() == g))
+                {
+                    return None;
+                }
+                ty = r;
+            }
+        } else if segs.len() == 1 && last == "self" {
+            ty = around(start)?;
+        } else if segs.len() == 1 {
+            ty = match binding(src, start, &last)? {
+                Bound::Let { .. } => {
+                    let Some(Found::Bind(bd)) = lookup(src, start, &last) else {
+                        return None;
+                    };
+                    // the annotation (`let x: T = ..`), else the initializer's type, for a
+                    // binding of the whole value (not a pattern's part)
+                    let pat = src.text(bd.pat.0, bd.pat.1);
+                    let (p, annot) = match pat.split_once(':') {
+                        Some((p, t)) if !t.starts_with(':') => (p.trim().to_string(), Some(t)),
+                        _ => (pat.trim().to_string(), None),
+                    };
+                    let p = p.trim_start_matches("mut ").trim();
+                    if p != last || !matches!(bd.kind, BindKind::Let) {
+                        return None;
+                    }
+                    match annot {
+                        Some(t) => t.trim().to_string(),
+                        None => {
+                            let (x, y) = bd.init?;
+                            expr_type(src, x, y, depth - 1)?
+                        }
+                    }
+                }
+                Bound::Param { .. } => {
+                    let f = src.enclosing(src.pos(start), &[ItemKind::Fn])?;
+                    let sig = fn_sig(src, f);
+                    let t = sig
+                        .params
+                        .iter()
+                        .find(|(p, _)| p.trim_start_matches("mut ").trim() == last)?;
+                    let base = type_name(&deref_type(&t.1));
+                    if sig.generics.contains(&base) {
+                        return None;
+                    }
+                    t.1.clone()
+                }
+                _ => return None,
+            };
+        } else {
+            return None;
+        }
+    } else {
+        return None;
+    }
+    // fields, tuple fields, indexes, `?`, method calls
+    loop {
+        let j = skip_blank(s, i);
+        if j >= b {
+            break;
+        }
+        match s[j] {
+            '.' => {
+                let k = skip_blank(s, j + 1);
+                let w = word_of(s, k);
+                if w.is_empty() {
+                    return None;
+                }
+                let mut n = skip_blank(s, k + w.chars().count());
+                if s.get(n) == Some(&':') && s.get(n + 1) == Some(&':') {
+                    let o = skip_blank(s, n + 2);
+                    let cls = vec![Class::Code; s.len() - o];
+                    n = skip_blank(s, o + skip_angle(&s[o..], &cls, 0)?);
+                }
+                let base = type_name(&deref_type(&ty));
+                if s.get(n) == Some(&'(') {
+                    i = close_of_at(s, n)? + 1;
+                    ty = match w.as_str() {
+                        // what these return is the value itself, as far as a method sees
+                        "clone" | "as_ref" | "as_mut" | "borrow" | "borrow_mut" | "to_owned"
+                        | "deref" | "deref_mut" | "by_ref" => ty,
+                        "unwrap" | "expect" | "unwrap_or_default" => {
+                            type_args(&deref_type(&ty)).into_iter().next()?
+                        }
+                        _ => method_ret(src, &base, &w)?,
+                    };
+                } else {
+                    // a field, or a tuple field (`.0`)
+                    i = k + w.chars().count();
+                    ty = field_type(src, &base, &w)?;
+                }
+            }
+            '[' => {
+                i = close_of_at(s, j)? + 1;
+                ty = elem_type(&ty)?;
+            }
+            '?' => {
+                i = j + 1;
+                ty = type_args(&deref_type(&ty)).into_iter().next()?;
+            }
+            _ => break,
+        }
+    }
+    Some(ty)
 }
 
 /// Is a method of item `n` (an instantiation chain's) called on a `t`: `<T as Tr>::m` on a `T`, a
@@ -6682,6 +8070,20 @@ struct Reads {
     replaced: bool,
     /// a variable it reads was lent as `&mut` to another crate's function, which may write it
     lent: bool,
+    /// it reads a field of a variable or static (`v[0].h`): a value of the field's type, which a
+    /// `type-join` member may be, wherever the program stores it
+    fields: bool,
+    /// (an input) a store through another binding that points to the variable read, on every
+    /// way to the read (`let r = &mut a; *r = v;`), replaces what it held: for a claim that the
+    /// values found are all (no unknown beside them). Otherwise such a store may or may not be
+    /// the one that reaches the read: both are read.
+    strict: bool,
+    /// (an input) the type arguments of the generic function's instance the code is in (`T` ->
+    /// `ilib::CFast` in `hash_c::<ilib::CFast>`)
+    inst: Vec<(String, String)>,
+    /// the associated items of those types it reads (`T::ALG`: `(ilib::CFast, ALG)`), which
+    /// `Files::resolve_assoc` reads: the type's impl's, or the trait's default
+    assoc: Vec<(String, String)>,
 }
 
 fn is_keyword(w: &str) -> bool {
@@ -6719,145 +8121,387 @@ fn is_keyword(w: &str) -> bool {
     )
 }
 
-/// Is the value at `i` (made a pointer there) made a trait object: a `dyn` type or an `as` cast in
-/// the statement around it (`let b: Box<dyn Tr> = Box::new(X);`, `static T: [&dyn Tr; 2] = ..`,
-/// `x as &dyn Tr`), the return type of the function whose result it is (`-> Box<dyn Tr>`), the
-/// type of the parameter of the file's function it is passed to (`f(&x)` with `fn f(p: &dyn
-/// Tr)`), of the field it initializes (`S { inner: Box::new(X) }` with `inner: Box<dyn Tr>`), or
-/// of the variable whose method stores it (`m.insert(k, Box::new(X))` with `m` declared with
-/// `dyn`)?
-fn coercion_at(src: &Source, i: usize) -> bool {
-    let s = &src.code;
-    let dyn_in = |a: usize, b: usize| {
-        let t = src.text(a, b.min(s.len()));
-        re!(r"\bdyn\b").is_match(&t) || re!(r"\bas\s+(?:&|Box|Rc|Arc|\*)").is_match(&t)
-    };
-    // the statement around it, out of the blocks it is in (`let p: &dyn Tr = if c { &a } else
-    // { &b };`), not past the function's body or the item
-    let item = src.enclosing(src.pos(i), &[ItemKind::Fn, ItemKind::Static]);
-    let floor = item.map_or(0, |f| {
-        let (fa, fb) = src.span(f);
-        if f.kind == ItemKind::Fn {
-            scan_to(s, fa, fb, |k| s[k] == '{') + 1
-        } else {
-            fa
-        }
-    });
-    // (a `;` inside a group passed on the way, `[&dyn Tr; 2]`, is not the statement's)
-    let (mut depth, mut low) = (0i32, 0i32);
-    let mut a = i;
-    while a > floor {
-        match s[a - 1] {
-            ')' | ']' | '}' => depth += 1,
-            '(' | '[' | '{' => {
-                depth -= 1;
-                low = low.min(depth);
+/// The traits of the `dyn` types a type names (`Box<dyn Pick>`: `Pick`; `&(dyn Konst + Sync)`:
+/// `Konst`, `Sync`), by their last segment.
+fn dyn_traits(t: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for m in re!(
+        r"\bdyn\s+([\w:]+(?:<[^<>]*(?:<[^<>]*>[^<>]*)*>)?(?:\s*\+\s*(?:[\w:]+(?:<[^<>]*>)?|'\w+))*)"
+    )
+    .captures_iter(t)
+    {
+        for b in m[1].split('+') {
+            let b = b.trim();
+            if !b.is_empty() && !b.starts_with('\'') {
+                out.push(type_name(b));
             }
-            ';' if depth <= low => break,
-            _ => {}
         }
-        a -= 1;
     }
-    let (mut depth, mut low) = (0i32, 0i32);
-    let mut b = i;
-    while b < s.len() {
-        match s[b] {
-            '(' | '[' | '{' => depth += 1,
-            ')' | ']' | '}' => {
-                depth -= 1;
-                low = low.min(depth);
+    out
+}
+
+/// The type an annotation gives the part of a value a projection names (`(&Fast, &dyn Tr)` and
+/// `[1]`: `&dyn Tr`; `[&dyn Tr; 2]` and an element: `&dyn Tr`), innermost projection last; the
+/// whole type where it says no more.
+fn project_type(t: &str, proj: &[Option<usize>]) -> String {
+    let mut t = t.trim().to_string();
+    for p in proj.iter().rev() {
+        let inner = t.trim_start_matches('&').trim();
+        let inner = inner.strip_prefix("mut ").unwrap_or(inner).trim();
+        t = match p {
+            Some(k) if inner.starts_with('(') && inner.ends_with(')') => {
+                match split_top(&inner[1..inner.len() - 1]).get(*k) {
+                    Some(e) => e.trim().to_string(),
+                    None => return t,
+                }
             }
-            ';' if depth <= low => break,
-            _ => {}
+            None => match elem_type(inner) {
+                Some(e) => e,
+                None => return t,
+            },
+            _ => return t,
+        };
+    }
+    t
+}
+
+/// Where the path whose last segment starts at `wb` starts (`Box::new`: at `Box`).
+fn path_start(s: &[char], wb: usize) -> usize {
+    let mut st = wb;
+    while let Some(c) = before_blank(s, st).filter(|&c| s[c] == ':' && c > 0 && s[c - 1] == ':') {
+        let Some(e2) = before_blank(s, c - 1).filter(|&e2| is_ident(s[e2])) else {
+            break;
+        };
+        let mut b = e2 + 1;
+        while b > 0 && is_ident(s[b - 1]) {
+            b -= 1;
         }
-        b += 1;
+        st = b;
     }
-    if dyn_in(a, b) {
-        return true;
-    }
-    // the function whose result (or tail expression) it is, returning a trait object
-    if let Some(f) = src.enclosing(src.pos(i), &[ItemKind::Fn]) {
-        let (fa, fb) = src.span(f);
-        let open = scan_to(s, fa, fb, |k| s[k] == '{');
-        let sig = src.text(fa, open);
-        if let Some(r) = sig.find("->")
-            && re!(r"\bdyn\b").is_match(&sig[r..])
-        {
-            return true;
-        }
-    }
-    // an argument of a call: the parameter's type, of the file's function of that name
-    let mut depth = 0i32;
-    let mut j = i;
-    let mut index = 0;
-    while j > a {
-        j -= 1;
-        match s[j] {
-            ')' | ']' | '}' => depth += 1,
-            '[' | '{' if depth > 0 => depth -= 1,
-            '(' if depth > 0 => depth -= 1,
-            ',' if depth == 0 => index += 1,
-            '(' => {
-                let callee = word_before_at(s, j);
-                let method = before_blank(s, j)
-                    .and_then(|e| before_blank(s, e + 1 - callee.chars().count().min(e + 1)))
-                    .is_some_and(|d| s[d] == '.');
-                for f in src
-                    .items
-                    .iter()
-                    .filter(|it| it.kind == ItemKind::Fn && it.name == callee)
-                {
-                    let (fa, fb) = src.span(f);
-                    let po = scan_to(s, fa, fb, |k| s[k] == '(');
-                    let Some(pc) = close_of_at(s, po) else {
-                        continue;
-                    };
-                    let params: Vec<String> = split_top(&src.text(po + 1, pc));
-                    let k = index
-                        + usize::from(method && params.first().is_some_and(|p| p.contains("self")));
-                    if params.get(k).is_some_and(|p| re!(r"\bdyn\b").is_match(p)) {
-                        return true;
+    st
+}
+
+/// The call whose arguments the bracket at `ob` opens: the start of its callee's last segment
+/// and that name (`f`, `m::f::<T>`, `.m`), skipping a turbofish.
+fn callee_before(s: &[char], ob: usize) -> Option<(usize, String)> {
+    let mut e = before_blank(s, ob)?;
+    if s[e] == '>' {
+        // `::<..>`: back to its `<`, then past the `::`
+        let mut depth = 0;
+        let mut k = e + 1;
+        loop {
+            k = k.checked_sub(1)?;
+            match s[k] {
+                '>' => depth += 1,
+                '<' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
                     }
                 }
-                // a store into a variable declared with a trait object (`m.insert(k, b)`)
-                if method
-                    && let Some(d) = before_blank(s, j)
-                        .and_then(|e| before_blank(s, e + 1 - callee.chars().count().min(e + 1)))
-                    && let Some((r, recv, _)) = receiver_at(s, d)
-                    && recv.chars().all(is_ident)
-                    && let Some(Bound::Let { first, last, .. }) = binding(src, r, &recv)
-                    && (first..=last).any(|l| re!(r"\bdyn\b").is_match(&src.lines[l - 1]))
+                _ => {}
+            }
+        }
+        let c = before_blank(s, k)?;
+        if s[c] != ':' || c == 0 || s[c - 1] != ':' {
+            return None;
+        }
+        e = before_blank(s, c - 1)?;
+    }
+    if !is_ident(s[e]) {
+        return None;
+    }
+    let mut b = e + 1;
+    while b > 0 && is_ident(s[b - 1]) {
+        b -= 1;
+    }
+    Some((b, s[b..=e].iter().collect()))
+}
+
+/// The traits the value at `i` (`Fast`, `x`, `W::<A>(..)`, `3u8`), made a pointer there (`&x`,
+/// `&mut x`, `Box::new(x)`), becomes a trait object of: the `dyn` type of the context the
+/// pointer is in, from the inside out: an `as` cast after it, the parameter of the function or
+/// method it is passed to (`foreign` reads another crate's: path written, name, argument index ->
+/// the parameter's type), the field of the struct literal it initializes, the variable whose
+/// method stores it (`m.insert(k, b)` with `m` declared with `dyn`), the annotation of the `let`,
+/// `static` or `const` whose value it is (the tuple element or array element it is), the return
+/// type of the function whose result it is (its tail or `return`). Through tuples, arrays,
+/// blocks, `if`s, `match`es, `Some`/`Ok`/`Err` and `Box::new`/`Rc::new`/`Arc::new`. None when
+/// it becomes none there (`let probe = &Fast;`, `label(&Fast)` taking another trait's object
+/// returns that trait).
+fn coercion_traits(src: &Source, i: usize, foreign: &mut ForeignParam<'_>) -> Option<Vec<String>> {
+    let s = &src.code;
+    let some = |v: Vec<String>| (!v.is_empty()).then_some(v);
+    // the value: a path (with turbofish), a struct literal or constructor's arguments
+    let mut e = i;
+    loop {
+        e += word_of(s, e).chars().count();
+        let j = skip_blank(s, e);
+        if s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+            let k = skip_blank(s, j + 2);
+            if s.get(k) == Some(&'<') {
+                let cls = vec![Class::Code; s.len() - k];
+                e = k + skip_angle(&s[k..], &cls, 0)?;
+                let j2 = skip_blank(s, e);
+                if s.get(j2) == Some(&':')
+                    && s.get(j2 + 1) == Some(&':')
+                    && word_start(s, skip_blank(s, j2 + 2))
                 {
-                    return true;
+                    e = skip_blank(s, j2 + 2);
+                    continue;
                 }
                 break;
             }
-            _ => {}
+            if word_start(s, k) {
+                e = k;
+                continue;
+            }
         }
+        break;
     }
-    // a field of a struct literal whose declared type is a trait object
-    if let Some(p) = before_blank(s, i) {
-        let mut k = p;
-        // past `Box::new(` / `&` / `&mut`
-        while k > a && s[k] != ':' && s[k] != ',' && s[k] != '{' {
-            k -= 1;
-        }
-        if s[k] == ':' && (k == 0 || s[k - 1] != ':') {
-            let field = word_before_at(s, k);
-            if !field.is_empty()
-                && src.lines.iter().any(|l| {
-                    Regex::new(&format!(
-                        r"\b{}\s*:\s*[^,;=]*\bdyn\b",
-                        regex::escape(&field)
-                    ))
-                    .is_ok_and(|r| r.is_match(l))
-                })
+    let j = skip_blank(s, e);
+    if matches!(s.get(j), Some('{' | '(')) && s[i].is_uppercase() {
+        e = close_of_at(s, j)? + 1;
+    }
+    let (mut ps, mut pe) = (i, e);
+    // the pointer made of it
+    if let Some(p) = before_blank(s, ps) {
+        if s[p] == '&' {
+            ps = p;
+        } else if word_before_at(s, ps) == "mut"
+            && let Some(a) = before_blank(s, p + 1 - 3).filter(|&a| s[a] == '&')
+        {
+            ps = a;
+        } else if s[p] == '('
+            && let Some((wb, w)) = callee_before(s, p)
+            && matches!(w.as_str(), "new" | "pin")
+        {
+            let path = path_before(s, wb);
+            if path
+                .last()
+                .is_some_and(|q| matches!(q.as_str(), "Box" | "Rc" | "Arc" | "Pin"))
             {
-                return true;
+                let st = path_start(s, wb);
+                ps = st;
+                pe = close_of_at(s, p)? + 1;
             }
         }
     }
-    false
+    // the item: a function's body or a static's value, not past it
+    let item = src.enclosing(src.pos(i), &[ItemKind::Fn, ItemKind::Static])?;
+    let (fa, fb) = src.span(item);
+    let floor = if item.kind == ItemKind::Fn {
+        scan_to(s, fa, fb, |k| s[k] == '{')
+    } else {
+        fa
+    };
+    // the first index of its body or value
+    let lo = if item.kind == ItemKind::Fn {
+        floor + 1
+    } else {
+        fa
+    };
+    let mut proj: Vec<Option<usize>> = Vec::new();
+    for _ in 0..24 {
+        // `as T`
+        let n = skip_blank(s, pe);
+        if kw(s, n, "as") {
+            let t_end = scan_to(s, n + 2, fb, |k| matches!(s[k], ',' | ';' | '=' | '{'));
+            return some(dyn_traits(&src.text(n + 2, t_end)));
+        }
+        // back to the bracket around it, the statement's start, a `=` of its statement
+        let mut depth = 0i32;
+        let mut k = ps;
+        let mut eq = None;
+        // (where the statement starts when no bracket is around it)
+        let mut st = lo;
+        let stop = loop {
+            if k <= lo {
+                break None;
+            }
+            k -= 1;
+            if s[k] == ';' && depth == 0 {
+                st = k + 1;
+                break None;
+            }
+            match s[k] {
+                ')' | ']' | '}' => depth += 1,
+                '(' | '[' | '{' => {
+                    if depth == 0 {
+                        break Some(k);
+                    }
+                    depth -= 1;
+                }
+                '=' if depth == 0
+                    && eq.is_none()
+                    && !matches!(s.get(k + 1), Some('=' | '>'))
+                    && !matches!(
+                        k.checked_sub(1).map(|q| s[q]),
+                        Some('=' | '!' | '<' | '>' | '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|')
+                    ) =>
+                {
+                    eq = Some(k)
+                }
+                _ => {}
+            }
+        };
+        if let Some(eq) = eq {
+            // the value of a `let`, `static` or `const`: its annotation
+            let st = stop.map_or(st, |b| b + 1);
+            let head = src.text(st, eq);
+            let head = head.trim();
+            let head = re!(r"^(?:pub(?:\s*\([^)]*\))?\s+)?").replace(head, "");
+            if !re!(r"^(?:let|static|const)\b").is_match(&head) {
+                return None;
+            }
+            let hc: Vec<char> = head.chars().collect();
+            let colon = (0..hc.len()).find(|&c| {
+                hc[c] == ':' && hc.get(c + 1) != Some(&':') && (c == 0 || hc[c - 1] != ':')
+            })?;
+            let t: String = hc[colon + 1..].iter().collect();
+            return some(dyn_traits(&project_type(&t, &proj)));
+        }
+        let Some(ob) = stop else {
+            // a statement's start: its function's result (a tail expression, `return`)
+            let st = skip_blank(s, st);
+            if item.kind != ItemKind::Fn {
+                return None;
+            }
+            let body_end = close_of_at(s, floor)?;
+            let tail = kw(s, st, "return") || scan_to(s, st, body_end, |m| s[m] == ';') >= body_end;
+            if !tail {
+                return None;
+            }
+            let ret = fn_sig(src, item).ret?;
+            return some(dyn_traits(&ret));
+        };
+        let cb = close_of_at(s, ob)?;
+        // its element index
+        let idx = (ob + 1..ps)
+            .filter(|&m| s[m] == ',' && scan_to(s, ob + 1, m + 1, |q| q == m) == m)
+            .count();
+        match s[ob] {
+            '(' => match callee_before(s, ob)
+                .filter(|(_, w)| !is_keyword(w) && w != "match" && w != "if")
+            {
+                None => {
+                    // a tuple (or parentheses)
+                    if scan_to(s, ob + 1, cb, |m| s[m] == ',') < cb {
+                        proj.push(Some(idx));
+                    }
+                }
+                Some((wb, w)) => {
+                    let path = path_before(s, wb);
+                    let method = before_blank(s, wb).is_some_and(|d| s[d] == '.');
+                    let wrapper = matches!(w.as_str(), "Some" | "Ok" | "Err")
+                        || (matches!(w.as_str(), "new" | "pin" | "from")
+                            && path.last().is_some_and(|q| {
+                                matches!(q.as_str(), "Box" | "Rc" | "Arc" | "Pin")
+                            }));
+                    if wrapper {
+                        let st = path_start(s, wb);
+                        ps = st;
+                        pe = cb + 1;
+                        continue;
+                    }
+                    if w.starts_with(char::is_uppercase) {
+                        // a constructor: what is coerced is the value it makes
+                        return None;
+                    }
+                    if method {
+                        let d = before_blank(s, wb)?;
+                        // a store into a variable declared with a trait object (`m.insert(k, b)`)
+                        if let Some((r, recv, _)) = receiver_at(s, d)
+                            && recv.chars().all(is_ident)
+                            && let Some(Bound::Let { first, last, .. }) = binding(src, r, &recv)
+                        {
+                            let decl: String = (first..=last)
+                                .map(|l| src.lines[l - 1].as_str())
+                                .collect::<Vec<_>>()
+                                .join("\n");
+                            let t = dyn_traits(&decl);
+                            if !t.is_empty() {
+                                return Some(t);
+                            }
+                        }
+                        // the file's method of that name: its parameter after `self`
+                        let ts: Vec<String> = src
+                            .items
+                            .iter()
+                            .filter(|f| f.kind == ItemKind::Fn && f.name == w)
+                            .filter_map(|f| {
+                                let sig = fn_sig(src, f);
+                                let k = idx
+                                    + usize::from(
+                                        sig.params.first().is_some_and(|p| p.0 == "self"),
+                                    );
+                                sig.params.get(k).map(|p| dyn_traits(&p.1))
+                            })
+                            .flatten()
+                            .collect();
+                        return some(ts);
+                    }
+                    let ty = match free_fn_called(src, wb, &w, &path) {
+                        Some(f) => fn_sig(src, f).params.get(idx).map(|p| p.1.clone()),
+                        None => foreign(&path, &w, idx),
+                    };
+                    return some(dyn_traits(&ty?));
+                }
+            },
+            '[' => {
+                // an array literal (`[&A, &B]`, `vec![..]`), not an index
+                let p = before_blank(s, ob);
+                if p.is_some_and(|p| is_ident(s[p]) || matches!(s[p], ')' | ']')) {
+                    return None;
+                }
+                proj.push(None);
+                if let Some(pb) = p.filter(|&pb| s[pb] == '!') {
+                    let we = before_blank(s, pb)?;
+                    let mut wb = we + 1;
+                    while wb > 0 && is_ident(s[wb - 1]) {
+                        wb -= 1;
+                    }
+                    ps = path_start(s, wb);
+                    pe = cb + 1;
+                    continue;
+                }
+            }
+            '{' => {
+                // a field of a struct literal (`S { inner: Box::new(X) }`)
+                let head = word_before_at(s, ob);
+                let colon =
+                    before_blank(s, ps).filter(|&c| s[c] == ':' && (c == 0 || s[c - 1] != ':'));
+                if head.starts_with(char::is_uppercase)
+                    && let Some(c) = colon
+                {
+                    let field = word_before_at(s, c);
+                    if let Some(t) = field_type(src, &head, &field) {
+                        return some(dyn_traits(&t));
+                    }
+                    let ts: Vec<String> = src
+                        .lines
+                        .iter()
+                        .filter_map(|l| {
+                            Regex::new(&format!(
+                                r"\b{}\s*:\s*([^,;=]*\bdyn\b[^,;=]*)",
+                                regex::escape(&field)
+                            ))
+                            .ok()?
+                            .captures(l)
+                            .map(|m| dyn_traits(&m[1]))
+                        })
+                        .flatten()
+                        .collect();
+                    return some(ts);
+                }
+                // a block, an `if`'s or a `match`'s: the value of the expression around it
+            }
+            _ => return None,
+        }
+        ps = ob;
+        pe = cb + 1;
+    }
+    None
 }
 
 /// The parameters of a parameter list, split at its top-level commas.
@@ -6885,11 +8529,22 @@ fn split_top(t: &str) -> Vec<String> {
 
 /// What the call at `p` reads: its callee (a path, or an expression through a pointer), its
 /// arguments and its receiver, followed through variables, statics and the file's functions
-/// (`names_read`); `None` when no call starts there.
-fn call_reads(src: &Source, kb: &Kb, p: usize) -> Option<Reads> {
+/// (`names_read`); `None` when no call starts there. `strict`: see `Reads::strict`.
+fn call_reads(
+    src: &Source,
+    kb: &Kb,
+    p: usize,
+    strict: bool,
+    inst: &[(String, String)],
+    alg: Option<usize>,
+) -> Option<Reads> {
     let s = &src.code;
     let mut seen = HashSet::new();
-    let mut call = Reads::default();
+    let mut call = Reads {
+        strict,
+        inst: inst.to_vec(),
+        ..Reads::default()
+    };
     // the call: its callee (a path, or an expression through a pointer: `(h.f)`, `FNS[i]`,
     // `get()`), then its arguments; the receiver of a method
     let mut j = p;
@@ -6921,15 +8576,101 @@ fn call_reads(src: &Source, kb: &Kb, p: usize) -> Option<Reads> {
     if !groups.iter().any(|&(o, _)| s[o] == '(') {
         return None;
     }
-    for &(o, c) in &groups {
-        names_read(src, kb, o + 1, c, 4, &mut seen, &mut call, true);
-    }
-    if let Some(dot) = before_blank(s, p).filter(|&d| s[d] == '.')
-        && let Some((r, _, _)) = receiver_at(s, dot)
-    {
-        names_read(src, kb, r, dot, 4, &mut seen, &mut call, true);
+    let receiver = before_blank(s, p)
+        .filter(|&d| s[d] == '.')
+        .and_then(|dot| receiver_at(s, dot).map(|(r, _, _)| (r, dot)));
+    // the argument that carries the algorithm (`alg`, the knowledge base's: the receiver is 0 of
+    // a method): only that one is read, beside the callee's own groups (`FNS[i]`), where the
+    // call has it; the data argument is no value of the algorithm
+    let args = groups.iter().rev().find(|&&(o, _)| s[o] == '(').copied();
+    let target: Option<Option<(usize, usize)>> = match (alg, receiver, args) {
+        (Some(0), Some(_), _) => Some(None),
+        (Some(k), Some(_), Some((o, c))) => list_elems(s, o + 1, c).get(k - 1).map(|&a| Some(a)),
+        (Some(k), None, Some((o, c))) => list_elems(s, o + 1, c).get(k).map(|&a| Some(a)),
+        _ => None,
+    };
+    match target {
+        Some(arg) => {
+            for &(o, c) in groups.iter().filter(|&&g| Some(g) != args) {
+                names_read(src, kb, o + 1, c, 4, &mut seen, &mut call, true);
+            }
+            match (arg, receiver) {
+                (Some((x, y)), _) => {
+                    for (x, y) in value_parts(s, x, y) {
+                        names_read(src, kb, x, y, 4, &mut seen, &mut call, true);
+                    }
+                }
+                (None, Some((r, dot))) => {
+                    names_read(src, kb, r, dot, 4, &mut seen, &mut call, true)
+                }
+                (None, None) => {}
+            }
+        }
+        None => {
+            for &(o, c) in &groups {
+                names_read(src, kb, o + 1, c, 4, &mut seen, &mut call, true);
+            }
+            if let Some((r, dot)) = receiver {
+                names_read(src, kb, r, dot, 4, &mut seen, &mut call, true);
+            }
+        }
     }
     Some(call)
+}
+
+/// The traits of the trait objects the call at `p` calls methods on (`digest(g.alg(), d)` with
+/// `g: Box<dyn Gen>`: `Gen`), in its arguments and receiver: None where it calls none, or one on
+/// a value whose type the code does not say (a type parameter's, a call's not followed).
+fn call_dyn_receivers(src: &Source, p: usize) -> Option<Vec<String>> {
+    let s = &src.code;
+    let mut j = p;
+    let end = loop {
+        j = skip_blank(s, j);
+        if word_start(s, j) {
+            j += word_of(s, j).chars().count();
+        } else if s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+            j += 2;
+        } else if s.get(j) == Some(&'<') {
+            let cls = vec![Class::Code; s.len() - j];
+            j += skip_angle(&s[j..], &cls, 0)?;
+        } else if s.get(j) == Some(&'(') {
+            break close_of_at(s, j)?;
+        } else {
+            return None;
+        }
+    };
+    let start = before_blank(s, p)
+        .filter(|&d| s[d] == '.')
+        .and_then(|dot| receiver_at(s, dot).map(|(r, _, _)| r))
+        .unwrap_or(p);
+    let (mut out, mut any) = (Vec::new(), false);
+    for k in start..end {
+        if s[k] != '.' {
+            continue;
+        }
+        let m = skip_blank(s, k + 1);
+        let w = word_of(s, m);
+        if w.is_empty() || s.get(skip_blank(s, m + w.chars().count())) != Some(&'(') {
+            continue;
+        }
+        let (r, _, _) = receiver_at(s, k)?;
+        let t = expr_type(src, r, k, 5)?;
+        any = true;
+        out.extend(dyn_traits(&t));
+    }
+    any.then_some(out)
+}
+
+/// The value argument of a call of `symbol` that carries the algorithm, from the knowledge
+/// base's operation the symbol is (`ring::digest::digest`: 0; the receiver is 0 of a method);
+/// None for another call, or an algorithm that is the call's type.
+fn alg_arg(kb: &Kb, symbol: &str) -> Option<usize> {
+    let sym = strip_generics(symbol);
+    let (krate, rest) = sym.split_once("::")?;
+    kb.operations
+        .iter()
+        .find(|e| e.krates.iter().any(|k| k == krate) && e.pattern.is_match(rest) && !e.self_type)
+        .map(|e| e.algorithm)
 }
 
 /// The path written before the word at `start` (`dep::inner::` before `X`: `[dep, inner]`).
@@ -6978,6 +8719,15 @@ fn names_read(
     let s = &src.code;
     let mut i = a;
     while i < b.min(s.len()) {
+        // an index picks an element (`TABLE[i]`): it is no value read
+        if s[i] == '['
+            && before_blank(s, i)
+                .is_some_and(|p| p >= a && (is_ident(s[p]) || matches!(s[p], ')' | ']')))
+            && let Some(c) = close_of_at(s, i)
+        {
+            i = c + 1;
+            continue;
+        }
         if !word_start(s, i) {
             i += 1;
             continue;
@@ -7036,6 +8786,23 @@ fn names_read(
             // a field or a method, a macro
             continue;
         }
+        // `T::ALG` in an instance whose `T` is known: that type's `ALG`
+        if path_head
+            && !after_colons
+            && let Some((_, ty)) = r.inst.iter().find(|(p, _)| *p == w).cloned()
+        {
+            let k = skip_blank(s, n + 2);
+            let item = word_of(s, k);
+            if item.starts_with(char::is_uppercase)
+                && s.get(skip_blank(s, k + item.chars().count())) != Some(&'(')
+            {
+                if !r.assoc.contains(&(ty.clone(), item.clone())) {
+                    r.assoc.push((ty, item.clone()));
+                }
+                i = k + item.chars().count();
+            }
+            continue;
+        }
         let first = w.chars().next().unwrap_or('_');
         let upper = first.is_uppercase()
             && w.chars()
@@ -7057,22 +8824,74 @@ fn names_read(
                 .find(|bd| bd.name == w)
                 .and_then(|bd| bd.path.last().cloned())
                 .unwrap_or(w);
-            let statics: Vec<&Item> = src
+            // (a definition's own name, `const X: ..`, `static mut X`, is no read of it)
+            let before = word_before_at(s, start);
+            if matches!(before.as_str(), "const" | "static")
+                || (matches!(before.as_str(), "mut" | "ref")
+                    && before_blank(s, start)
+                        .is_some_and(|p| word_before_at(s, p + 1 - before.len()) == "static"))
+            {
+                continue;
+            }
+            let mut statics: Vec<&Item> = src
                 .items
                 .iter()
                 .filter(|it| it.kind == ItemKind::Static && it.name == item)
                 .collect();
+            // of several of that name in the file's modules, those of the module the path
+            // written (or the import) leads to from the read's (`twin::CALG` beside `CALG`)
+            if statics.len() > 1 {
+                let here = modules_at(src, src.pos(start));
+                let prefix = match src.binds.iter().find(|bd| bd.name == w0) {
+                    Some(bd) => bd.path[..bd.path.len().saturating_sub(1)].to_vec(),
+                    None => path_before(s, start),
+                };
+                let want: Option<Vec<String>> = match prefix.first().map(String::as_str) {
+                    Some("crate" | "$crate") => None,
+                    Some("self") => Some(here.iter().chain(&prefix[1..]).cloned().collect()),
+                    Some("super") => {
+                        let k = prefix.iter().take_while(|g| *g == "super").count();
+                        Some(
+                            here[..here.len().saturating_sub(k)]
+                                .iter()
+                                .chain(&prefix[k..])
+                                .cloned()
+                                .collect(),
+                        )
+                    }
+                    _ => Some(here.iter().chain(&prefix).cloned().collect()),
+                };
+                if let Some(want) = want {
+                    let pick: Vec<&Item> = statics
+                        .iter()
+                        .copied()
+                        .filter(|it| modules_at(src, it.start) == want)
+                        .collect();
+                    if !pick.is_empty() {
+                        statics = pick;
+                    }
+                }
+            }
             if !statics.is_empty() {
                 // a field of its elements (`TABLE[i].h`): the values its literals give it
                 let field = field_read(s, i);
+                r.fields |= field.is_some();
                 for it in statics {
                     let sp = src.span(it);
                     let key = (sp.0, sp.1, field.clone().unwrap_or_default());
                     if depth > 0 && seen.insert(key) {
                         let parts = field
                             .as_deref()
-                            .map(|f| field_values(s, sp.0, sp.1, f))
-                            .filter(|v| !v.is_empty())
+                            .map(|f| {
+                                project(
+                                    src,
+                                    sp.0,
+                                    sp.1,
+                                    &f.split('.').collect::<Vec<_>>(),
+                                    8,
+                                    &mut r.names,
+                                )
+                            })
                             .unwrap_or(vec![sp]);
                         for (x, y) in parts {
                             names_read(src, kb, x, y, depth - 1, seen, r, false);
@@ -7101,7 +8920,14 @@ fn names_read(
             continue;
         }
         let found = lookup(src, start, &w);
-        if call && !matches!(found, Some(Found::Bind(_))) {
+        // (a function item passed as a value, `o.map(fixed)`: what it returns, as a call)
+        let fn_item = !call
+            && found.is_none()
+            && src
+                .items
+                .iter()
+                .any(|it| it.kind == ItemKind::Fn && it.name == w);
+        if (call && !matches!(found, Some(Found::Bind(_)))) || fn_item {
             // the file's function: what its body names
             for f in src
                 .items
@@ -7128,6 +8954,7 @@ fn names_read(
                     .map(|f| src.fn_scope(f));
                 let place = read_place(s, start).0;
                 let field = field_read(s, i);
+                r.fields |= field.is_some();
                 let in_loop = |w: usize| {
                     sc.as_ref().is_some_and(|sc| {
                         sc.loops
@@ -7160,21 +8987,67 @@ fn names_read(
                     Some(k) if dom.is_none_or(|d| k.0 > d.0) => Some(k),
                     _ => dom,
                 };
+                let around = |o: usize| {
+                    sc.as_ref().is_some_and(|sc| {
+                        let (bo, bc) = sc.block_of(o);
+                        bo < start && start < bc
+                    })
+                };
+                // stores through another binding pointing to it (`let r = &mut a; *r = v;`):
+                // of the place read or of what holds it; one on every way to the read replaces
+                // it for a claim that the values are all (`strict`), else it may or may not
+                let pstores: Vec<PtrStore> = pointer_stores(src, &bd, start)
+                    .into_iter()
+                    .filter(|p| {
+                        (p.at < start || in_loop(p.at))
+                            && (place == p.place
+                                || place.starts_with(&format!("{}.", p.place))
+                                || place.starts_with(&format!("{}[", p.place))
+                                || p.place.starts_with(&format!("{place}.")))
+                    })
+                    .collect();
+                let pdom = pstores
+                    .iter()
+                    .filter(|p| {
+                        r.strict
+                            && p.definite
+                            && p.at < start
+                            && around(p.at)
+                            && !p.place.starts_with(&format!("{place}."))
+                            && dom.is_none_or(|d| p.at > d.0)
+                    })
+                    .max_by_key(|p| p.at)
+                    .map(|p| (p.at, p.value));
+                let dom = pdom.or(dom);
                 // lent whole as `&mut` to `mem::swap(&mut a, &mut b)` or `mem::replace(&mut a,
                 // v)`: it may hold what the call's other arguments hold; to `mem::take`, a
                 // default not read
                 // (the last such call in a block around the read replaces it: after it, the
                 // variable holds the other argument's value, or the default)
-                let swap = swaps_of(src, &bd, start)
+                // (not the call the read is an argument of)
+                let swaps: Vec<(usize, usize, String)> = swaps_of(src, &bd, start)
                     .into_iter()
+                    .filter(|&(o, c, _)| !(o < start && start < c))
+                    .collect();
+                let swap = swaps
+                    .iter()
                     .rev()
-                    .find(|&(o, _, _)| {
-                        dom.is_none_or(|d| o > d.0)
-                            && sc.as_ref().is_some_and(|sc| {
-                                let (bo, bc) = sc.block_of(o);
-                                bo < start && start < bc
-                            })
-                    });
+                    .find(|&&(o, _, _)| o < start && dom.is_none_or(|d| o > d.0) && around(o))
+                    .cloned();
+                // the other argument: `swap`'s other place, `replace`'s value
+                let other = |o: usize, c: usize, f: &str| {
+                    let comma = scan_to(s, o + 1, c, |k| s[k] == ',');
+                    let mine = src.text(o + 1, comma);
+                    if f == "replace"
+                        || re!(r"\b\w+\b")
+                            .find_iter(&mine)
+                            .any(|m| m.as_str() == bd.name)
+                    {
+                        (comma + 1, c)
+                    } else {
+                        (o + 1, comma)
+                    }
+                };
                 if let Some((o, c, f)) = &swap {
                     match f.as_str() {
                         "take" => {
@@ -7182,21 +9055,24 @@ fn names_read(
                             r.replaced |= own;
                         }
                         _ => {
-                            // the other argument: `swap`'s other place, `replace`'s value
-                            let comma = scan_to(s, o + 1, *c, |k| s[k] == ',');
-                            let mine = src.text(o + 1, comma);
-                            let (x, y) = if f == "replace"
-                                || re!(r"\b\w+\b")
-                                    .find_iter(&mine)
-                                    .any(|m| m.as_str() == bd.name)
-                            {
-                                (comma + 1, *c)
-                            } else {
-                                (o + 1, comma)
-                            };
+                            let (x, y) = other(*o, *c, f);
                             names_read(src, kb, x, y, depth - 1, seen, r, own);
                         }
                     }
+                }
+                // one that may or may not run on the way to the read (in an `if`, in a loop
+                // around the read, after the one that replaces it): it may hold the other
+                // argument's value too, beside its own
+                for (o, c, f) in &swaps {
+                    if swap.as_ref().is_some_and(|w| w.0 >= *o) || dom.is_some_and(|d| d.0 > *o) {
+                        continue;
+                    }
+                    if !(*o < start || in_loop(*o)) || f == "take" {
+                        continue;
+                    }
+                    let (x, y) = other(*o, *c, f);
+                    names_read(src, kb, x, y, depth - 1, seen, r, own);
+                    r.replaced |= own;
                 }
                 let dom = match &swap {
                     Some((o, _, _)) => Some((*o, (*o, *o))),
@@ -7216,12 +9092,28 @@ fn names_read(
                     // what the literals give that field (`v11[0].h` of `vec![E { h: .. }]`)
                     let parts = variant_parts(src, &bd)
                         .or_else(|| {
-                            field
-                                .as_deref()
-                                .map(|f| field_values(s, x, y, f))
-                                .filter(|v| !v.is_empty())
+                            // where the pattern binds it in the value (`let (p, q) = (..)`,
+                            // `let Two { h, l } = ..`; a condition's, loop's or arm's only when
+                            // it binds the whole), then the fields read of it
+                            let mut path: Vec<String> =
+                                match pattern_path(s, bd.pat.0, bd.pat.1, &bd.name) {
+                                    Some(p) if bd.kind == BindKind::Let || p.is_empty() => p,
+                                    _ => return None,
+                                };
+                            path.extend(
+                                field
+                                    .as_deref()
+                                    .into_iter()
+                                    .flat_map(|f| f.split('.'))
+                                    .map(str::to_string),
+                            );
+                            if path.is_empty() {
+                                return None;
+                            }
+                            let path: Vec<&str> = path.iter().map(String::as_str).collect();
+                            Some(project(src, x, y, &path, 8, &mut r.names))
                         })
-                        .unwrap_or(vec![(x, y)]);
+                        .unwrap_or_else(|| value_parts(s, x, y));
                     for (x, y) in parts {
                         names_read(src, kb, x, y, depth - 1, seen, r, own);
                     }
@@ -7240,6 +9132,9 @@ fn names_read(
                     .filter(|w| dom.is_none_or(|d| w.0 > d.0) && !other_field(w))
                 {
                     names_read(src, kb, x, y, depth - 1, seen, r, own);
+                }
+                for p in pstores.iter().filter(|p| dom.is_none_or(|d| p.at > d.0)) {
+                    names_read(src, kb, p.value.0, p.value.1, depth - 1, seen, r, own);
                 }
                 // what the file's functions it is lent to (`maybe(&mut z, c)`, `b.up()`) may
                 // write there; lent to another crate's function, it may hold what that puts
@@ -7270,12 +9165,388 @@ fn names_read(
     }
 }
 
+/// A store through another binding that may point to a variable read (`pointer_stores`).
+struct PtrStore {
+    /// where the store's statement starts, and the value it stores
+    at: usize,
+    value: (usize, usize),
+    /// the place of the variable it writes (`a`, `s1.alg`)
+    place: String,
+    /// the pointer points there on every way: a `let` of the borrow itself, of a struct or tuple
+    /// literal holding it, of a reborrow or copy of one that does, the result of the file's
+    /// function or method returning it; not one bound by a pattern, a loop, a condition
+    definite: bool,
+}
+
+/// What the file's function `f` returns of its parameter `param` (its tail expression): the
+/// path in the result to it (`""` the parameter, `.r` a field of the struct literal returned,
+/// `.0` a tuple's element, `?` an `Option`'s value), the part of it a borrow returned names
+/// (`&mut self.alg`: `.alg`), and whether it returns that on every way (no `return` before).
+fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(String, String, bool)> {
+    let s = &src.code;
+    let sc = src.fn_scope(f);
+    let (o, c) = sc.body;
+    if c < o + 2 {
+        return None;
+    }
+    let mut tail_at = o + 1;
+    let mut k = o + 1;
+    while k < c - 1 {
+        let e = scan_to(s, k, c - 1, |m| s[m] == ';');
+        if e >= c - 1 {
+            break;
+        }
+        tail_at = e + 1;
+        k = e + 1;
+    }
+    let tail = src.text(tail_at, c - 1);
+    let tail = tail.trim();
+    let definite = !(o..c).any(|m| kw(s, m, "return") || s[m] == '?');
+    let p = regex::escape(param);
+    // `x`, `&mut *x`, `&mut x.f.g`, `&mut self.alg`
+    if let Some(m) = Regex::new(&format!(
+        r"^(?:&\s*mut\s+\**\s*)?\(?\s*\**{p}\s*\)?((?:\s*\.\s*\w+)*)$"
+    ))
+    .ok()?
+    .captures(tail)
+    {
+        let sub: String = m[1].chars().filter(|c| !c.is_whitespace()).collect();
+        if !sub.is_empty() && !tail.starts_with('&') {
+            return None;
+        }
+        return Some((String::new(), sub, definite));
+    }
+    if Regex::new(&format!(r"^Some\s*\(\s*{p}\s*\)$"))
+        .ok()?
+        .is_match(tail)
+    {
+        return Some(("?".into(), String::new(), definite));
+    }
+    // `W { r: x, .. }`, `Self { r: x }`
+    if let Some(m) = Regex::new(&format!(
+        r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*(\w+)\s*:\s*{p}\s*(?:,[^{{}}]*)?\}}$"
+    ))
+    .ok()?
+    .captures(tail)
+    {
+        return Some((format!(".{}", &m[1]), String::new(), definite));
+    }
+    // `(x, ..)`
+    if tail.starts_with('(') && tail.ends_with(')') {
+        let parts = split_top(&tail[1..tail.len() - 1]);
+        if parts.len() > 1
+            && let Some(k) = parts.iter().position(|e| e.trim() == param)
+        {
+            return Some((format!(".{k}"), String::new(), definite));
+        }
+    }
+    None
+}
+
+/// The stores through other bindings of the function that may point to the variable bound by
+/// `bd` (or a part of it): `let r = &mut a; *r = v;`, reborrows and copies of such a pointer
+/// (`let r1 = &mut *r0;`, `let r2 = r1;`), values holding one (`Holder { r: &mut x }`, `(&mut x,
+/// ..)`, `Some(&mut x)`, `[&mut x]`, and the patterns and loops binding what they hold), a
+/// pointer the file's function or method returns (`let r = s.slot();`, `let w = wrap(&mut x);`,
+/// `*slot_of(&mut s) = v;`), and a field written through a pointer (`r.alg = v`).
+fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
+    let s = &src.code;
+    let Some(f) = src.enclosing(src.pos(start), &[ItemKind::Fn]) else {
+        return Vec::new();
+    };
+    let sc = src.fn_scope(f);
+    let is = |k: usize, b: &Bind| matches!(lookup(src, k, &b.name), Some(Found::Bind(x)) if x.stmt == b.stmt && x.name == b.name);
+    // (binding, path in it to the pointer, the variable's part it points to, definite)
+    let mut aliases: Vec<(Bind, String, String, bool)> = Vec::new();
+    // the holder an expression at `e0..e1` of a binding's initializer `x..y` is in: the path to
+    // it, and whether the initializer is that holder itself
+    let holder = |x: usize, y: usize, e0: usize, e1: usize| -> Option<(String, bool)> {
+        let x = skip_blank(s, x);
+        let y = before_blank(s, y).map_or(y, |q| q + 1);
+        if e0 == x && e1 >= y {
+            return Some((String::new(), true));
+        }
+        // the bracket around it
+        let mut depth = 0;
+        let mut ob = None;
+        let mut k = e0;
+        while k > x {
+            k -= 1;
+            match s[k] {
+                ')' | ']' | '}' => depth += 1,
+                '(' | '[' | '{' => {
+                    if depth == 0 {
+                        ob = Some(k);
+                        break;
+                    }
+                    depth -= 1;
+                }
+                _ => {}
+            }
+        }
+        let ob = ob?;
+        let cb = close_of_at(s, ob)?;
+        let head = word_before_at(s, ob);
+        let whole_from = |from: usize| skip_blank(s, from) == x && cb + 1 >= y;
+        let head_at = ob - head.chars().count();
+        let head_at =
+            before_blank(s, ob).map_or(head_at, |p| p + 1 - head.chars().count().min(p + 1));
+        // its element index (top-level commas before it)
+        let idx = (ob + 1..e0)
+            .filter(|&m| s[m] == ',' && scan_to(s, ob + 1, m + 1, |q| q == m) == m)
+            .count();
+        match s[ob] {
+            '(' if head.is_empty() => Some((format!(".{idx}"), whole_from(ob))),
+            '(' if head == "Some" => Some(("?".into(), false)),
+            '{' if head.starts_with(char::is_uppercase) => {
+                let p = before_blank(s, e0)?;
+                if s[p] != ':' {
+                    return None;
+                }
+                let fld = word_before_at(s, p);
+                Some((format!(".{fld}"), whole_from(head_at)))
+            }
+            '[' => Some(("[]".into(), false)),
+            '(' => {
+                // a call of the file's function returning the pointer
+                let fi = free_fn_called(src, head_at, &head, &path_before(s, head_at))?;
+                let pn = src.fn_scope(fi).params.get(idx)?.clone();
+                let (path, _, def) = returns_part(src, fi, &pn)?;
+                Some((path, def && whole_from(head_at)))
+            }
+            _ => None,
+        }
+    };
+    for _ in 0..12 {
+        let mut grew = false;
+        for b in &sc.binds {
+            if (b.stmt == bd.stmt && b.name == bd.name)
+                || aliases
+                    .iter()
+                    .any(|a| a.0.stmt == b.stmt && a.0.name == b.name)
+            {
+                continue;
+            }
+            let Some((x, y)) = b.init else { continue };
+            let simple = b.kind == BindKind::Let && {
+                let p = src.text(b.pat.0, b.pat.1);
+                let p = p.split(':').next().unwrap_or("").trim();
+                p.trim_start_matches("mut ").trim() == b.name
+            };
+            let mut found: Option<(String, String, bool)> = None;
+            for k in x..y.min(s.len()) {
+                if found.is_some() {
+                    break;
+                }
+                // `&mut NAME..`
+                if kw(s, k, &bd.name) && is(k, bd) {
+                    let (pl, end) = read_place(s, k);
+                    let sub = pl[bd.name.len()..].to_string();
+                    let borrow = (word_before_at(s, k) == "mut")
+                        .then(|| before_blank(s, k).and_then(|m| before_blank(s, m + 1 - 3)))
+                        .flatten()
+                        .filter(|&a| s[a] == '&');
+                    if let Some(a) = borrow {
+                        match holder(x, y, a, end) {
+                            Some((path, whole)) => {
+                                found = Some((path, sub, whole && simple));
+                            }
+                            None => found = Some(("*".into(), String::new(), false)),
+                        }
+                    } else if s.get(skip_blank(s, end)) == Some(&'.') {
+                        // `NAME.m()`: the file's method returning a borrow of a part of it
+                        let m = skip_blank(s, skip_blank(s, end) + 1);
+                        let name = word_of(s, m);
+                        if s.get(skip_blank(s, m + name.chars().count())) == Some(&'(')
+                            && let Some(fi) = method_for(src, &m, &name)
+                            && let Some((path, sub2, def)) = returns_part(src, fi, "self")
+                        {
+                            let c = close_of_at(s, skip_blank(s, m + name.chars().count()));
+                            let whole = c.is_some_and(|c| skip_blank(s, c + 1) >= y)
+                                && k == skip_blank(s, x);
+                            found = Some((path, format!("{sub}{sub2}"), def && whole && simple));
+                        }
+                    }
+                    continue;
+                }
+                // a pointer already found: a copy, a reborrow, a part of a holder
+                if !word_start(s, k)
+                    || before_blank(s, k).is_some_and(|p| s[p] == '.' || s[p] == ':')
+                {
+                    continue;
+                }
+                let Some(a) = aliases.iter().find(|a| kw(s, k, &a.0.name) && is(k, &a.0)) else {
+                    continue;
+                };
+                let (pl, end) = read_place(s, k);
+                let acc = pl[a.0.name.len()..].to_string();
+                let rest = if a.1 == "*" {
+                    "*".to_string()
+                } else if let Some(r) = a.1.strip_prefix(acc.as_str()) {
+                    r.to_string()
+                } else {
+                    continue;
+                };
+                // (`&mut *r0`, `&mut **r0`, `r0`)
+                let mut e0 = k;
+                while let Some(p) = before_blank(s, e0).filter(|&p| s[p] == '*') {
+                    e0 = p;
+                }
+                if word_before_at(s, e0) == "mut"
+                    && let Some(m) = before_blank(s, e0)
+                    && let Some(amp) = before_blank(s, m + 1 - 3).filter(|&q| s[q] == '&')
+                {
+                    e0 = amp;
+                } else if let Some(amp) = before_blank(s, e0).filter(|&q| s[q] == '&') {
+                    e0 = amp;
+                }
+                match holder(x, y, e0, end) {
+                    Some((path, whole)) if rest != "*" => {
+                        found =
+                            Some((format!("{path}{rest}"), a.2.clone(), whole && simple && a.3));
+                    }
+                    _ => found = Some(("*".into(), a.2.clone(), false)),
+                }
+            }
+            if let Some((path, sub, def)) = found {
+                let path = if simple { path } else { "*".to_string() };
+                aliases.push((b.clone(), path, sub, def));
+                grew = true;
+            }
+        }
+        if !grew {
+            break;
+        }
+    }
+    let mut out = Vec::new();
+    let assign_at = |end: usize| {
+        let j = skip_blank(s, end);
+        (s.get(j) == Some(&'=') && !matches!(s.get(j + 1), Some('=' | '>'))).then_some(j)
+    };
+    let stmt_start = |k: usize| before_blank(s, k).is_none_or(|p| matches!(s[p], ';' | '{' | '}'));
+    for (b, path, sub, def) in &aliases {
+        let mut stores = Vec::new();
+        let mut retargeted = false;
+        let mut i = b.scope.0;
+        while i < b.scope.1.min(s.len()) {
+            if !kw(s, i, &b.name) || !is(i, b) {
+                i += 1;
+                continue;
+            }
+            let mut st = i;
+            let mut derefs = 0;
+            while let Some(p) = before_blank(s, st).filter(|&p| s[p] == '*') {
+                st = p;
+                derefs += 1;
+            }
+            let (pl, end) = read_place(s, i);
+            let acc = pl[b.name.len()..].to_string();
+            i = end.max(i + 1);
+            if !stmt_start(st) {
+                continue;
+            }
+            let Some(eq) = assign_at(end) else { continue };
+            let e = scan_to(s, eq + 1, b.scope.1, |m| s[m] == ';');
+            let place = if derefs == 0 && acc.is_empty() {
+                retargeted = true;
+                continue;
+            } else if path == "*" || path.starts_with('?') || path.starts_with("[]") {
+                bd.name.clone()
+            } else if derefs >= 1 && acc == *path {
+                format!("{}{sub}", bd.name)
+            } else if derefs == 0 && path.is_empty() && acc.starts_with('.') {
+                format!("{}{sub}{acc}", bd.name)
+            } else {
+                continue;
+            };
+            stores.push((st, (eq + 1, e), place));
+        }
+        for (at, value, place) in stores {
+            out.push(PtrStore {
+                at,
+                value,
+                place,
+                definite: *def && !retargeted && path != "*",
+            });
+        }
+    }
+    // `*f(.., &mut v.x, ..) = x;` with the file's `f` returning that borrow
+    let (from, to) = bd.scope;
+    let mut i = from;
+    while i < to.min(s.len()) {
+        if s[i] != '*' || !stmt_start(i) {
+            i += 1;
+            continue;
+        }
+        let w0 = skip_blank(s, i + 1);
+        let mut j = w0;
+        while j < to && (is_ident(s[j]) || s[j] == ':') {
+            j += 1;
+        }
+        let name = src.text(w0, j);
+        let name = name.rsplit("::").next().unwrap_or("").to_string();
+        let open = skip_blank(s, j);
+        if s.get(open) != Some(&'(') || name.is_empty() {
+            i += 1;
+            continue;
+        }
+        let Some(close) = close_of_at(s, open) else {
+            i += 1;
+            continue;
+        };
+        if let Some(eq) = assign_at(close + 1)
+            && let Some(fi) =
+                free_fn_called(src, w0, &name, &path_before(s, open - name.chars().count()))
+        {
+            let mut a = open + 1;
+            let mut idx = 0;
+            while a < close {
+                let e2 = scan_to(s, a, close, |m| s[m] == ',');
+                let k = skip_blank(s, a);
+                let n = if s.get(k) == Some(&'&') {
+                    skip_blank(s, k + 1)
+                } else {
+                    k
+                };
+                let n = if kw(s, n, "mut") {
+                    skip_blank(s, n + 3)
+                } else {
+                    n
+                };
+                if kw(s, n, &bd.name)
+                    && is(n, bd)
+                    && let Some(pn) = src.fn_scope(fi).params.get(idx)
+                    && let Some((path, sub, def)) = returns_part(src, fi, pn)
+                    && path.is_empty()
+                {
+                    let (pl, _) = read_place(s, n);
+                    let e = scan_to(s, eq + 1, to, |m| s[m] == ';');
+                    out.push(PtrStore {
+                        at: i,
+                        value: (eq + 1, e),
+                        place: format!("{pl}{sub}"),
+                        definite: def,
+                    });
+                }
+                idx += 1;
+                a = e2 + 1;
+            }
+            i = close + 1;
+            continue;
+        }
+        i += 1;
+    }
+    out
+}
+
 /// The `swap`, `take` and `replace` calls the variable bound by `bd` is lent to whole as `&mut`
-/// before the read at `start`: their argument lists (brackets) and names.
+/// in its scope (before the read at `start`, or after it in a loop around both: the caller
+/// tells): their argument lists (brackets) and names.
 fn swaps_of(src: &Source, bd: &Bind, start: usize) -> Vec<(usize, usize, String)> {
     let s = &src.code;
     let mut out = Vec::new();
-    for i in bd.scope.0..start.min(s.len()) {
+    let _ = start;
+    for i in bd.scope.0..bd.scope.1.min(s.len()) {
         if kw(s, i, &bd.name)
             && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
             && word_before_at(s, i) == "mut"
@@ -7621,39 +9892,428 @@ fn read_place(s: &[char], start: usize) -> (String, usize) {
     (out, j)
 }
 
-/// The first field read after a variable or static ending at `end`, past its indexes
-/// (`TABLE[i].h`: `h`).
+/// The fields read after a variable or static ending at `end`, past its indexes, as a path
+/// (`TABLE[i].h`: `h`; `NESTED.inner.h`: `inner.h`; `TS.1.h`: `1.h`), not a method called.
 fn field_read(s: &[char], end: usize) -> Option<String> {
+    let mut out: Vec<String> = Vec::new();
     let mut j = skip_blank(s, end);
-    while s.get(j) == Some(&'[') {
-        j = skip_blank(s, close_of_at(s, j)? + 1);
+    loop {
+        while s.get(j) == Some(&'[') {
+            j = skip_blank(s, close_of_at(s, j)? + 1);
+        }
+        if s.get(j) != Some(&'.') {
+            break;
+        }
+        let f = skip_blank(s, j + 1);
+        let w = word_of(s, f);
+        let n = skip_blank(s, f + w.chars().count());
+        if w.is_empty() || matches!(s.get(n), Some('(' | ':')) {
+            break;
+        }
+        j = n;
+        out.push(w);
     }
-    if s.get(j) != Some(&'.') {
-        return None;
-    }
-    let f = skip_blank(s, j + 1);
-    let w = word_of(s, f);
-    (!w.is_empty() && s.get(skip_blank(s, f + w.len())) != Some(&'(')).then_some(w)
+    (!out.is_empty()).then(|| out.join("."))
 }
 
-/// The values the struct literals in `a..b` give the field `f` (`E { h: &SHA256, .. }`:
-/// `&SHA256`).
-fn field_values(s: &[char], a: usize, b: usize, f: &str) -> Vec<(usize, usize)> {
-    let mut out = Vec::new();
-    let mut i = a;
-    while i < b {
-        if kw(s, i, f) && before_blank(s, i).is_some_and(|p| matches!(s[p], '{' | ',')) {
-            let n = skip_blank(s, i + f.len());
-            if s.get(n) == Some(&':') && s.get(n + 1) != Some(&':') {
-                let e = scan_to(s, n + 1, b, |k| s[k] == ',');
-                out.push((n + 1, e));
-                i = e.max(i + 1);
-                continue;
-            }
+/// Where a pattern at `a..b` binds `name` in the value it matches, as a path of fields (`(x, _)`:
+/// `0`; `[a, b]`: `[1]` for `b`; `Two { h, l }`: `l`; `((x, _), y)`: `0.0` for `x`; `S(a, b)`:
+/// `1`); empty for the pattern itself (`x`, `mut x`, `x @ ..`); None where it does not say (a
+/// rest `..` before it, an or-pattern).
+fn pattern_path(s: &[char], a: usize, b: usize, name: &str) -> Option<Vec<String>> {
+    let mut a = skip_blank(s, a);
+    let mut b = b.min(s.len());
+    // (its type annotation: not the pattern's)
+    let colon = scan_to(s, a, b, |k| {
+        s[k] == ':' && s.get(k + 1) != Some(&':') && (k == 0 || s[k - 1] != ':')
+    });
+    b = colon.min(b);
+    while b > a && s[b - 1].is_whitespace() {
+        b -= 1;
+    }
+    loop {
+        if s.get(a) == Some(&'&') {
+            a = skip_blank(s, a + 1);
+        } else if kw(s, a, "mut") || kw(s, a, "ref") {
+            a = skip_blank(s, a + 3);
+        } else {
+            break;
         }
-        i += 1;
+    }
+    if a >= b {
+        return None;
+    }
+    if word_start(s, a) && word_of(s, a) == name {
+        let e = skip_blank(s, a + name.chars().count());
+        return (e >= b || s.get(e) == Some(&'@')).then(Vec::new);
+    }
+    let elems_in = |o: usize, c: usize| list_elems(s, o + 1, c);
+    let rest_before = |els: &[(usize, usize)], k: usize| {
+        els[..k].iter().any(|&(x, y)| src_text_is(s, x, y, ".."))
+    };
+    let mut head_end = a;
+    while head_end < b && (is_ident(s[head_end]) || s[head_end] == ':') {
+        head_end += 1;
+    }
+    let o = skip_blank(s, head_end);
+    let c = close_of_at(s, o)?;
+    if skip_blank(s, c + 1) < b {
+        return None;
+    }
+    let els = elems_in(o, c);
+    for (k, &(x, y)) in els.iter().enumerate() {
+        match s[o] {
+            '(' | '[' => {
+                if let Some(mut p) = pattern_path(s, x, y, name) {
+                    if rest_before(&els, k) {
+                        return None;
+                    }
+                    let step = if s[o] == '[' {
+                        format!("[{k}]")
+                    } else {
+                        k.to_string()
+                    };
+                    p.insert(0, step);
+                    return Some(p);
+                }
+            }
+            '{' => {
+                let x0 = skip_blank(s, x);
+                let fname = word_of(s, x0);
+                let n = skip_blank(s, x0 + fname.chars().count());
+                let sub = if s.get(n) == Some(&':') {
+                    pattern_path(s, n + 1, y, name)
+                } else {
+                    pattern_path(s, x, y, name)
+                };
+                if let Some(mut p) = sub {
+                    p.insert(0, fname);
+                    return Some(p);
+                }
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+/// Whether the code at `a..b` is `t`, blanks aside.
+fn src_text_is(s: &[char], a: usize, b: usize, t: &str) -> bool {
+    s[a..b.min(s.len())]
+        .iter()
+        .filter(|c| !c.is_whitespace())
+        .copied()
+        .eq(t.chars())
+}
+
+/// The parts of an expression at `a..b` that give its value, through the `Option` and `Result`
+/// combinators a closure decides (`o.map_or(&SHA512, |_| &SHA1)`: the default and the closure's
+/// body, not `o`'s value unless the closure reads its parameter; `.map(f)`, `.and_then(f)`,
+/// `.map_or_else(d, f)` likewise; `.unwrap_or(d)` adds `d`); the whole where it says no more.
+fn value_parts(s: &[char], a: usize, b: usize) -> Vec<(usize, usize)> {
+    let b = b.min(s.len());
+    let mut end = b;
+    while end > a && s[end - 1].is_whitespace() {
+        end -= 1;
+    }
+    let mut extra = Vec::new();
+    // trailing calls keeping the value (`.unwrap()`, `.copied()`, `?`), or adding one
+    loop {
+        if end > a && s[end - 1] == '?' {
+            end -= 1;
+            continue;
+        }
+        if end == 0 || s[end - 1] != ')' {
+            break;
+        }
+        let Some(o) = open_of_at(s, end - 1) else {
+            break;
+        };
+        let name = word_before_at(s, o);
+        let nb = before_blank(s, o).map_or(o, |p| p + 1 - name.chars().count().min(p + 1));
+        let Some(dot) = before_blank(s, nb).filter(|&d| s[d] == '.' && d > a) else {
+            break;
+        };
+        match name.as_str() {
+            "unwrap" | "expect" | "copied" | "cloned" | "unwrap_or_default" | "as_ref"
+            | "as_deref" => end = dot,
+            "unwrap_or" | "or" => {
+                extra.push((o + 1, end - 1));
+                end = dot;
+            }
+            "unwrap_or_else" | "or_else" => {
+                extra.extend(closure_value(s, o + 1, end - 1).unwrap_or(vec![(o + 1, end - 1)]));
+                end = dot;
+            }
+            "map" | "and_then" | "map_or" | "map_or_else" => {
+                let args = list_elems(s, o + 1, end - 1);
+                let f = args.last().copied();
+                let Some(f) = f else { break };
+                let Some(body) = closure_value(s, f.0, f.1) else {
+                    // a function item: what it makes of the receiver's value
+                    return [(a, b)].into_iter().chain(extra).collect();
+                };
+                let mut out = body;
+                if let Some(&d) = args.first().filter(|_| args.len() == 2) {
+                    out.extend(closure_value(s, d.0, d.1).unwrap_or(vec![d]));
+                }
+                // a closure reading its parameter: what it makes of the receiver's value
+                if closure_reads_param(s, f.0, f.1) {
+                    out.push((a, dot));
+                }
+                out.extend(extra);
+                return out;
+            }
+            _ => break,
+        }
+    }
+    [(a, b)].into_iter().chain(extra).collect()
+}
+
+/// The body of a closure written at `a..b` (`|_| &SHA1`, `|| x`), None for another expression.
+fn closure_value(s: &[char], a: usize, b: usize) -> Option<Vec<(usize, usize)>> {
+    let k = skip_blank(s, a);
+    let k = if kw(s, k, "move") {
+        skip_blank(s, k + 4)
+    } else {
+        k
+    };
+    if !closure_at(s, k) {
+        return None;
+    }
+    let (_, (x, y)) = closure_parts(s, k, b)?;
+    Some(vec![(x, y.min(b))])
+}
+
+/// Whether the closure written at `a..b` reads one of its parameters in its body.
+fn closure_reads_param(s: &[char], a: usize, b: usize) -> bool {
+    let k = skip_blank(s, a);
+    let k = if kw(s, k, "move") {
+        skip_blank(s, k + 4)
+    } else {
+        k
+    };
+    let Some((Some((pa, pb)), (x, y))) = closure_parts(s, k, b) else {
+        return false;
+    };
+    let names = params_names(s, pa, pb);
+    (x..y.min(b)).any(|i| names.iter().any(|n| n != "_" && kw(s, i, n)))
+}
+
+/// The top-level elements of a list at `a..b` (between brackets): their extents.
+fn list_elems(s: &[char], a: usize, b: usize) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    let mut x = a;
+    while x < b {
+        let e = scan_to(s, x, b, |k| s[k] == ',');
+        if s[x..e].iter().any(|c| !c.is_whitespace()) {
+            out.push((x, e));
+        }
+        x = e + 1;
     }
     out
+}
+
+/// What the code at `a..b` (an expression, or a static's or const's item) gives the field path
+/// `fields` (`h`, `inner.h`, `1`, `0.1`) of the value it makes: the field's value in a struct
+/// literal (through `..base`), a tuple literal's element, through each element of an array
+/// literal or `vec![..]`, and through a constant or static of the file it names (`[BASE, ..]`,
+/// `Outer { inner: BASE }`, `FIX`, `&FIX`); the whole code where it says no more (a call, a
+/// `const fn`, another crate's constant); nothing where a literal has no such field. `via`
+/// collects the constants and statics passed through.
+fn project(
+    src: &Source,
+    a: usize,
+    b: usize,
+    fields: &[&str],
+    depth: usize,
+    via: &mut BTreeSet<String>,
+) -> Vec<(usize, usize)> {
+    let s = &src.code;
+    let mut a = skip_blank(s, a);
+    let mut b = b.min(s.len());
+    if fields.is_empty() || depth == 0 || a >= b {
+        return vec![(a, b)];
+    }
+    // an item: its initializer
+    if (kw(s, a, "static") || kw(s, a, "const"))
+        && let Some(eq) = let_eq_at(s, a, b)
+    {
+        a = skip_blank(s, eq + 1);
+    }
+    while b > a && (s[b - 1].is_whitespace() || s[b - 1] == ';') {
+        b -= 1;
+    }
+    while a < b && s[a] == '&' {
+        a = skip_blank(s, a + 1);
+        if kw(s, a, "mut") {
+            a = skip_blank(s, a + 3);
+        }
+    }
+    if a >= b {
+        return Vec::new();
+    }
+    let (f, rest) = (fields[0], &fields[1..]);
+    let index: Option<usize> = f.parse().ok();
+    let whole = |o: usize| close_of_at(s, o) == Some(b - 1);
+    match s[a] {
+        '(' if whole(a) => {
+            let elems = list_elems(s, a + 1, b - 1);
+            let tuple = scan_to(s, a + 1, b - 1, |k| s[k] == ',') < b - 1;
+            if !tuple {
+                return project(src, a + 1, b - 1, fields, depth - 1, via);
+            }
+            match index.and_then(|k| elems.get(k)) {
+                Some(&(x, y)) => project(src, x, y, rest, depth - 1, via),
+                None => Vec::new(),
+            }
+        }
+        '[' if whole(a) => {
+            let semi = scan_to(s, a + 1, b - 1, |k| s[k] == ';');
+            let elems = if semi < b - 1 {
+                vec![(a + 1, semi)]
+            } else {
+                list_elems(s, a + 1, b - 1)
+            };
+            // a slice pattern's element (`[k]`): that one; a field: each element's
+            if let Some(k) = f
+                .strip_prefix('[')
+                .and_then(|x| x.strip_suffix(']'))
+                .and_then(|x| x.parse::<usize>().ok())
+            {
+                let el = if semi < b - 1 {
+                    elems.first()
+                } else {
+                    elems.get(k)
+                };
+                return match el {
+                    Some(&(x, y)) => project(src, x, y, rest, depth - 1, via),
+                    None => Vec::new(),
+                };
+            }
+            elems
+                .into_iter()
+                .flat_map(|(x, y)| project(src, x, y, fields, depth - 1, via))
+                .collect()
+        }
+        _ if word_start(s, a) => {
+            // a path
+            let mut e = a;
+            let mut last;
+            loop {
+                last = word_of(s, e);
+                e += last.chars().count();
+                let j = skip_blank(s, e);
+                if s.get(j) == Some(&':')
+                    && s.get(j + 1) == Some(&':')
+                    && word_start(s, skip_blank(s, j + 2))
+                {
+                    e = skip_blank(s, j + 2);
+                    continue;
+                }
+                break;
+            }
+            let n = skip_blank(s, e);
+            // `vec![..]`
+            if last == "vec" && s.get(n) == Some(&'!') {
+                let o = skip_blank(s, n + 1);
+                if s.get(o) == Some(&'[') && whole(o) {
+                    return project(src, o, b, fields, depth - 1, via);
+                }
+                return vec![(a, b)];
+            }
+            // a constant or static of the file, or an element of one (`TABLE[i]`: each)
+            let indexed = s.get(n) == Some(&'[')
+                && close_of_at(s, n).is_some_and(|c| skip_blank(s, c + 1) >= b);
+            if (n >= b || indexed)
+                && last.chars().next().is_some_and(char::is_uppercase)
+                && last
+                    .chars()
+                    .all(|c| c.is_uppercase() || c.is_ascii_digit() || c == '_')
+            {
+                let items: Vec<&Item> = src
+                    .items
+                    .iter()
+                    .filter(|it| it.kind == ItemKind::Static && it.name == last)
+                    .collect();
+                if items.is_empty() {
+                    return vec![(a, b)];
+                }
+                via.insert(last.clone());
+                return items
+                    .into_iter()
+                    .flat_map(|it| {
+                        let (x, y) = src.span(it);
+                        project(src, x, y, fields, depth - 1, via)
+                    })
+                    .collect();
+            }
+            match s.get(n) {
+                // a struct literal: the field's value, or its base's
+                Some('{') if whole(n) && index.is_none() => {
+                    let mut vals = Vec::new();
+                    let mut base = None;
+                    for (x, y) in list_elems(s, n + 1, b - 1) {
+                        let x = skip_blank(s, x);
+                        if s.get(x) == Some(&'.') && s.get(x + 1) == Some(&'.') {
+                            base = Some((x + 2, y));
+                        } else if kw(s, x, f) {
+                            let c = skip_blank(s, x + f.len());
+                            if s.get(c) == Some(&':') {
+                                vals.push((c + 1, y));
+                            } else if c >= y {
+                                // shorthand `S { h }`
+                                vals.push((x, y));
+                            }
+                        }
+                    }
+                    if vals.is_empty()
+                        && let Some((x, y)) = base
+                    {
+                        return project(src, x, y, fields, depth - 1, via);
+                    }
+                    vals.into_iter()
+                        .flat_map(|(x, y)| project(src, x, y, rest, depth - 1, via))
+                        .collect()
+                }
+                // a call of the file's function (`make()`, a `const fn`): what its tail
+                // expression gives, where it has no other way out
+                Some('(')
+                    if whole(n) && last.starts_with(|c: char| c.is_lowercase() || c == '_') =>
+                {
+                    let Some(f) =
+                        free_fn_called(src, a, &last, &path_before(s, e - last.chars().count()))
+                    else {
+                        return vec![(a, b)];
+                    };
+                    let (o, c) = src.fn_scope(f).body;
+                    if c < o + 2 || (o..c).any(|m| kw(s, m, "return") || s[m] == '?') {
+                        return vec![(a, b)];
+                    }
+                    let mut tail = o + 1;
+                    let mut k = o + 1;
+                    while k < c - 1 {
+                        let e2 = scan_to(s, k, c - 1, |m| s[m] == ';');
+                        if e2 >= c - 1 {
+                            break;
+                        }
+                        tail = e2 + 1;
+                        k = e2 + 1;
+                    }
+                    project(src, tail, c - 1, fields, depth - 1, via)
+                }
+                // a tuple struct's constructor: its element
+                Some('(') if whole(n) && last.starts_with(char::is_uppercase) => {
+                    match index.and_then(|k| list_elems(s, n + 1, b - 1).get(k).copied()) {
+                        Some((x, y)) => project(src, x, y, rest, depth - 1, via),
+                        None => vec![(a, b)],
+                    }
+                }
+                _ => vec![(a, b)],
+            }
+        }
+        _ => vec![(a, b)],
+    }
 }
 
 /// The place a statement (`writes_to`) assigns (`c9.alg = ..`, `v10[0] = ..`), if it is an

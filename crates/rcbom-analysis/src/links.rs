@@ -53,6 +53,43 @@ pub struct LinkIndex {
     /// (the set label of the member), and the way of the value being followed now.
     named_via: RefCell<HashMap<String, Via>>,
     current_via: RefCell<Via>,
+    /// The functions an entry point reaches, by defining path, once known: in a lookup made
+    /// with `live_only`, a caller outside them (dead code) is not followed.
+    reached: RefCell<Option<HashSet<String>>>,
+    live_only: Cell<bool>,
+    memo_live: RefCell<HashMap<(Origin, String), Option<Found>>>,
+    /// The generic functions whose instances' summaries are recorded (`app::pass` for
+    /// `app::pass::<app::A>`), none cut by the bound: what the generic item's own body records
+    /// (its calls, its stores, for no type in particular) is said by the instances.
+    instanced: HashSet<String>,
+}
+
+/// The generic item an instance's name names (`app::pass::<app::A>`: `app::pass`;
+/// `<A as Tr>::m::<T>::{closure#0}`: `<A as Tr>::m::{closure#0}`).
+fn instance_base(name: &str) -> String {
+    let mut out = String::new();
+    let mut rest = name;
+    while let Some(i) = rest.find("::<") {
+        out.push_str(&rest[..i]);
+        let mut depth = 0usize;
+        let mut end = rest.len();
+        for (j, ch) in rest[i + 2..].char_indices() {
+            match ch {
+                '<' => depth += 1,
+                '>' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        end = i + 2 + j + 1;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        rest = &rest[end..];
+    }
+    out.push_str(rest);
+    out
 }
 
 type Values = Option<Vec<(Origin, String)>>;
@@ -81,7 +118,8 @@ pub enum Via {
         only: bool,
     },
     /// The standard-library method that put it in a container it is read from
-    /// (`HashMap::insert`).
+    /// (`HashMap::insert`; `+` before it: a value already in the list it adds to), or the
+    /// function writing it into an element of a list (`v.algorithms[0] = HS256`).
     Container(String),
     /// One of the implementations (its path) a trait method called on a type parameter may
     /// run.
@@ -92,7 +130,8 @@ pub enum Via {
     /// a table's element or a field read from it.
     Table(String),
     /// Held by a static whose contents change at run time (`rcbom_facts::static_owner`): its
-    /// initializer's value.
+    /// initializer's value (with a `=` before it: a static no function of the program puts a
+    /// value in, a `LazyLock`'s: the value it holds).
     Static(String),
     /// Put in a static that changes at run time (`statik`, as `Static` names it) by function
     /// `writer`.
@@ -194,6 +233,18 @@ impl LinkIndex {
                 }
             }
             ix.truncated.extend(f.links.truncated.iter().cloned());
+            for name in f
+                .links
+                .calls
+                .iter()
+                .map(|c| &c.caller)
+                .chain(f.links.fields.iter().map(|s| &s.func))
+            {
+                let base = instance_base(name);
+                if base != *name {
+                    ix.instanced.insert(base);
+                }
+            }
             for w in &f.links.writes {
                 let v = ix.writes.entry((w.func.clone(), w.index)).or_default();
                 if !v.contains(&w.value) {
@@ -481,11 +532,23 @@ impl LinkIndex {
         false
     }
 
-    /// The static a static that never changes refers to (`static REF: &Cfg = &FIX`: `FIX`).
+    /// Is a field read of static `id` answered by the links: `static_fields`, or a static whose
+    /// contents change at run time (that field of each value it holds: a `LazyLock`'s), or one
+    /// a `const fn` makes (`static MADE: Cfg = make()`: the field of what it returns)?
+    pub fn field_readable(&self, id: &str) -> bool {
+        self.static_fields(id)
+            || self.mutable_static(id).is_some()
+            || matches!(self.static_alias(id), Some(Origin::Call { .. }))
+    }
+
+    /// The static or constant a static or constant that never changes refers to (`static REF:
+    /// &Cfg = &FIX`: `FIX`; `const ALIAS: Cfg = BASE`), or the call of a `const fn` it is
+    /// (`static MADE: Cfg = make()`).
     fn static_alias(&self, id: &str) -> Option<Origin> {
         match self.statics.get(id) {
             Some((false, v)) => match v.as_slice() {
                 [d @ Origin::Data { def, .. }] if def.id != id => Some(d.clone()),
+                [c @ Origin::Call { .. }] => Some(c.clone()),
                 _ => None,
             },
             _ => None,
@@ -507,7 +570,17 @@ impl LinkIndex {
                 .map(|(w, _)| w)
                 .collect();
             if by.is_empty() {
-                out.push((v.clone(), Via::Static(owner.clone())));
+                // (a lazy static's: what its closure returns, which nothing replaces)
+                let held = writers.is_none_or(|w| w.is_empty())
+                    && matches!(v, Origin::Call { callee, .. } if callee == "<closure>");
+                out.push((
+                    v.clone(),
+                    Via::Static(if held {
+                        format!("={owner}")
+                    } else {
+                        owner.clone()
+                    }),
+                ));
             }
             for w in by {
                 out.push((
@@ -541,6 +614,45 @@ impl LinkIndex {
     pub fn values(&self, o: &Origin, owner: &str) -> Values {
         self.values_via(o, owner)
             .map(|vs| vs.into_iter().map(|(v, w, _)| (v, w)).collect())
+    }
+
+    /// The functions an entry point reaches (by defining path), for `values_via_live`.
+    pub fn set_reached(&self, reached: HashSet<String>) {
+        *self.reached.borrow_mut() = Some(reached);
+    }
+
+    /// `values_via`, not following callers no entry point reaches (a value found only through
+    /// them reaches no call at run time).
+    pub fn values_via_live(&self, o: &Origin, owner: &str) -> Option<Found> {
+        let key = (o.clone(), owner.to_string());
+        if let Some(v) = self.memo_live.borrow().get(&key) {
+            return v.clone();
+        }
+        self.live_only.set(true);
+        let v = self.lookup(o, owner);
+        self.live_only.set(false);
+        self.memo_live.borrow_mut().insert(key, v.clone());
+        v
+    }
+
+    /// Is `func` a generic item whose instances' summaries say what its body does?
+    fn superseded(&self, func: &str) -> bool {
+        self.instanced.contains(func)
+            && instance_base(func) == func
+            && !self.truncated.iter().any(|t| instance_base(t) == func)
+    }
+
+    /// Is `caller` a function no entry point reaches (in a `live_only` lookup)?
+    fn dead_caller(&self, caller: &str) -> bool {
+        self.live_only.get()
+            && !caller.is_empty()
+            && !caller.contains(" for ")
+            && rcbom_facts::owner_static(caller).is_none()
+            && self
+                .reached
+                .borrow()
+                .as_ref()
+                .is_some_and(|r| !r.contains(caller))
     }
 
     /// `values`, each with how it reaches the read (`Via`).
@@ -646,8 +758,14 @@ impl LinkIndex {
                     for (v, by) in self.static_value_vias(def) {
                         let mut parts = Vec::new();
                         project(&v, adt, *field, &mut parts);
+                        // (a value a function puts there names that function's parameters:
+                        // `fn set_h(a) { CFG.lock().unwrap().h = a }`)
+                        let w = match &by {
+                            Via::Store { writer, .. } => writer.clone(),
+                            _ => String::new(),
+                        };
                         for part in parts {
-                            self.resolve(&part, path, "", depth + 1, &via.then(by.clone()), out);
+                            self.resolve(&part, path, &w, depth + 1, &via.then(by.clone()), out);
                         }
                     }
                     return;
@@ -667,7 +785,14 @@ impl LinkIndex {
                         .collect();
                     if !own.is_empty() {
                         for s in own {
-                            let by = via.then(Via::Table(s.func.clone()));
+                            // (a constant copied into a table, `[BASE, ..]`: the table the call
+                            // reads stays the witness; a static it points to stores the value)
+                            let by = if matches!(via, Via::Table(_)) && s.func.starts_with("const ")
+                            {
+                                via.clone()
+                            } else {
+                                via.then(Via::Table(s.func.clone()))
+                            };
                             self.resolve(&s.value, &[], &s.func, depth + 1, &by, out);
                         }
                         return;
@@ -767,7 +892,7 @@ impl LinkIndex {
                     matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
                 }) =>
             {
-                let by = via.then(Via::Container("an element write".to_string()));
+                let by = via.then(Via::Container(owner.to_string()));
                 for a in alts {
                     // (the marker itself is no value)
                     if !matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
@@ -802,6 +927,9 @@ impl LinkIndex {
                 if let Some(callers) = self.calls.get(owner) {
                     let mut unknown = false;
                     for (caller, args) in callers {
+                        if self.dead_caller(caller) || self.superseded(caller) {
+                            continue;
+                        }
                         let mut found = Vec::new();
                         // a caller passing on what is being resolved (`rec(a, n - 1)` inside
                         // `rec`): a cycle, which adds nothing and leaves nothing unknown
@@ -1116,7 +1244,7 @@ impl LinkIndex {
         };
         for (j, key) in keys.iter().enumerate().skip(first) {
             for s in self.fields.get(key).into_iter().flatten() {
-                if (j == first || s.via_ref) && seen(j, s) {
+                if (j == first || s.via_ref) && seen(j, s) && !self.superseded(&s.func) {
                     let by = via.then(Via::Join(s.func.clone()));
                     self.resolve(&s.value, &[], &s.func, depth + 1, &by, out);
                 }
@@ -1143,6 +1271,10 @@ fn project(o: &Origin, adt: &str, field: usize, out: &mut Vec<Origin>) {
             }
         }
         Origin::Any(alts) => alts.iter().for_each(|a| project(a, adt, field, out)),
+        // what a closure returns (a `LazyLock`'s value): its values
+        Origin::Call { callee, args, .. } if callee == "<closure>" => {
+            args.iter().for_each(|a| project(a, adt, field, out))
+        }
         Origin::Set { path, value, .. } => match path.as_slice() {
             [f] if *f == field => out.push((**value).clone()),
             [f, ..] if *f == field => out.push(o.clone()),

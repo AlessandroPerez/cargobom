@@ -785,6 +785,11 @@ fn elsewhere_receiver(kb: &Kb, o: &Origin, depth: usize) -> bool {
         return true;
     }
     match o {
+        // (a function item a `map` calls with the value: `o.map(keep)` is `keep(..)`)
+        Origin::Call { args, callee, .. } if std_map(callee) => mapped_values(args)
+            .iter()
+            .chain(args)
+            .any(|a| elsewhere_direct(kb, a, 0) || elsewhere_receiver(kb, a, depth + 1)),
         Origin::Call { args, .. } => args
             .iter()
             .any(|a| elsewhere_direct(kb, a, 0) || elsewhere_receiver(kb, a, depth + 1)),
@@ -908,7 +913,7 @@ fn direct_data(
             // with the links, what the static's initializer stores in that field (of each
             // element of a table: `TABLE[i].h`)
             if let Some((ix, owner)) = links
-                && ix.static_fields(&def.id)
+                && ix.field_readable(&def.id)
             {
                 let values = elsewhere(ix, o, owner, false, seen);
                 if !values.is_empty() {
@@ -969,6 +974,47 @@ pub(crate) fn std_map(callee: &str) -> bool {
         && MAPS.iter().any(|c| bare.ends_with(c))
 }
 
+/// What a `map`-like call's value is made of (`std_map`): the closure's result or the default
+/// (`map_or(&SHA512, |x| ..)`); a function item given instead of a closure is called with the
+/// receiver's value (`o.map(keep)` is `keep(o's value)`; `identity`, `Some`, `Ok`: the value
+/// itself).
+pub(crate) fn mapped_values(args: &[Origin]) -> Vec<Origin> {
+    let Some(receiver) = args.first() else {
+        return Vec::new();
+    };
+    args.iter()
+        .skip(1)
+        .map(|a| match a {
+            Origin::Unit {
+                path, krate, value, ..
+            } => {
+                let std = matches!(krate.as_str(), "core" | "std" | "alloc");
+                let bare = strip_generics(path);
+                if std
+                    && (bare.ends_with("convert::identity")
+                        || bare.ends_with("::Some")
+                        || bare.ends_with("::Ok")
+                        || bare.ends_with("::Err"))
+                {
+                    receiver.clone()
+                } else if std || value.is_some() {
+                    Origin::Unknown
+                } else {
+                    Origin::Call {
+                        callee: path.clone(),
+                        krate: krate.clone(),
+                        self_ty: None,
+                        args: vec![receiver.clone()],
+                        span: None,
+                        runs: None,
+                    }
+                }
+            }
+            _ => a.clone(),
+        })
+        .collect()
+}
+
 /// A standard-library call whose result is the value its first argument held before
 /// (`mem::replace(slot, v)`, `mem::take(slot)`, `opt.take()`, `opt.replace(v)`): not the
 /// value it puts there.
@@ -1002,6 +1048,20 @@ pub(crate) fn container_store(callee: &str) -> bool {
     let bare = strip_generics(callee);
     (bare.starts_with("alloc::") || bare.starts_with("std::") || bare.starts_with("core::"))
         && STORES.iter().any(|s| bare.ends_with(s))
+}
+
+/// Does `o` read a field of a static (`MADE.h`, `LAZY.h`, `TABLE[i].h`) for which `pred` holds?
+pub(crate) fn reads_static_field(o: &Origin, pred: &dyn Fn(&str) -> bool, depth: usize) -> bool {
+    if depth > 8 {
+        return false;
+    }
+    match o {
+        Origin::Field { .. } => static_root(o).is_some_and(|d| pred(&d.id)),
+        Origin::Any(v) | Origin::All(v) => v.iter().any(|x| reads_static_field(x, pred, depth + 1)),
+        Origin::Call { args, .. } => args.iter().any(|x| reads_static_field(x, pred, depth + 1)),
+        Origin::Set { value, .. } => reads_static_field(value, pred, depth + 1),
+        _ => false,
+    }
 }
 
 /// The static a field read reads from (`TABLE.inner.alg`).
@@ -1089,13 +1149,20 @@ fn receiver_data(
         // what a closure makes of the value (`opt.map(|x| x.h)`, `map_or(&SHA512, |_| &SHA1)`):
         // the closure's result, or the default; never the receiver's own value
         Origin::Call { args, callee, .. } if std_map(callee) => {
-            for a in args.iter().skip(1) {
+            for a in &mapped_values(args) {
                 let mut here = Vec::new();
                 direct_data(kb, links, a, 0, &mut here, seen);
                 for d in here {
                     if !out.contains(&d) {
                         out.push(d);
                     }
+                }
+                // the value itself, or a function item's result made of it (`o.map(keep)`):
+                // its chain too (`v.first().copied()`: the elements)
+                if !matches!(a, Origin::Call { callee, .. } if callee == "<closure>")
+                    && !args.iter().skip(1).any(|x| x == a)
+                {
+                    receiver_data(kb, links, a, depth + 1, out, seen, lengths);
                 }
             }
         }

@@ -465,6 +465,40 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             reachable_statics.extend(closure(&d.id).into_iter().map(|d| d.id));
         }
     }
+    // a `thread_local!`'s own items (its initializer `__RUST_STD_INTERNAL_INIT`, its storage
+    // `{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL`) are reached when its key is: the
+    // key's `with` runs them through a pointer the walk does not follow
+    let key_of = |path: &str| -> Option<String> {
+        let i = path
+            .find("::__RUST_STD_INTERNAL")
+            .or_else(|| path.find("::__rust_std_internal"))?;
+        let head = &path[..i];
+        Some(head.find("::{").map_or(head, |j| &head[..j]).to_string())
+    };
+    let keys: HashSet<String> = reachable_statics
+        .iter()
+        .filter_map(|id| static_defs.get(id))
+        .map(|d| d.path.clone())
+        .collect();
+    let internals: Vec<String> = static_defs
+        .values()
+        .map(|d| (d.id.clone(), d.path.clone()))
+        .chain(
+            facts
+                .iter()
+                .flat_map(|f| &f.sites)
+                .filter(|s| s.owner.kind == OwnerKind::Static)
+                .map(|s| (s.owner.id.clone(), s.owner.path.clone())),
+        )
+        .filter(|(id, path)| {
+            !reachable_statics.contains(id) && key_of(path).is_some_and(|k| keys.contains(&k))
+        })
+        .map(|(id, _)| id)
+        .collect();
+    for id in internals {
+        reachable_statics.insert(id.clone());
+        reachable_statics.extend(closure(&id).into_iter().map(|d| d.id));
+    }
     let reached_data = |id: &str| reachable_statics.contains(id);
     // the functions reachable from an entry point, by defining path (as links name them)
     let reached_paths: HashSet<String> = facts
@@ -482,6 +516,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 .map(|s| s.owner.path.clone()),
         )
         .collect();
+    ctx.flow.set_reached(reached_paths.clone());
     let reached_path = |p: &str| reached_paths.contains(p);
     if truncated {
         notes.push(
@@ -1731,9 +1766,17 @@ fn site_matches(
                 // named here
                 // a field read of a static that stores values in fields (`TABLE[i].h`, a table of
                 // structs) is what its initializer stores in that field: looked up with the links
+                // (or a field of a static whose contents change at run time, or that a `const
+                // fn` makes: `LAZY.h`, `MADE.h`)
                 let static_field = local
                     .iter()
-                    .any(|(_, others)| others.iter().any(|d| ctx.flow.static_fields(&d.id)));
+                    .any(|(_, others)| others.iter().any(|d| ctx.flow.static_fields(&d.id)))
+                    || matches!(&site.target, Target::Call { arg_origins, .. }
+                    if arg_origins.iter().any(|o| provenance::reads_static_field(
+                        o,
+                        &|id| ctx.flow.field_readable(id),
+                        0,
+                    )));
                 let incomplete = provenance::incomplete(kb, &site.target) || static_field;
                 let named_here: HashSet<String> = if incomplete {
                     local
@@ -2414,7 +2457,30 @@ fn unfollowed(
                 let map_store = bare.ends_with("Map::insert");
                 // what a closure makes of an `Option`'s value: not the value itself; the value
                 // a place held before a call replaced it: not the new value
+                // a predicate or an error mapping (`o.filter(|_| i > 3)`, `map_err(|e| ..)`,
+                // `ok_or(e)`): the value is the receiver's, the closure's captures are none
+                if [
+                    "::filter",
+                    "::map_err",
+                    "::inspect",
+                    "::inspect_err",
+                    "::take_if",
+                    "::ok_or",
+                    "::ok_or_else",
+                ]
+                .iter()
+                .any(|m| bare.ends_with(m))
+                {
+                    return args
+                        .first()
+                        .and_then(|a| leaf(ctx, a, owner, depth + 1, seen, live));
+                }
                 let mapped = provenance::std_map(callee);
+                if mapped {
+                    return provenance::mapped_values(args)
+                        .iter()
+                        .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live));
+                }
                 let old = provenance::std_old_value(callee);
                 args.iter()
                     .enumerate()
@@ -2440,8 +2506,9 @@ fn unfollowed(
                 if !seen.insert((o.clone(), owner.to_string())) {
                     return None;
                 }
-                // (only the values that reach the call: not a caller no entry point reaches)
-                match ctx.flow.values_via(o, owner) {
+                // (only the values that reach the call: not a caller no entry point reaches,
+                // nor what is found through one)
+                match ctx.flow.values_via_live(o, owner) {
                     Some(vs) => {
                         let vs: Vec<_> = vs.into_iter().filter(|(_, _, by)| live(by)).collect();
                         if vs.iter().any(|(v, w, _)| v == o && w == owner) {
@@ -2450,6 +2517,8 @@ fn unfollowed(
                         vs.iter()
                             .find_map(|(v, w, _)| leaf(ctx, v, w, depth + 1, seen, live))
                     }
+                    // what reaches it, only through callers no entry point reaches: none
+                    None if ctx.flow.values_via(o, owner).is_some() => None,
                     None => Some(unresolved_kind(o)),
                 }
             }

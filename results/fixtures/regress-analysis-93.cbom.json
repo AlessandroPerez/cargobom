@@ -1,0 +1,1135 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a93 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a93 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a93 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a93::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::ALIAS; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::CREF; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const CREF: &Cfg = &BASE;`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::FIX; line: `static FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SREF; a93::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SREF: &Cfg = &FIX;`; code: `FIX`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a93::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SREF2; a93::SREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SREF2: &&Cfg = &SREF;`; code: `SREF`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "a93::SREF"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA1`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 51,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA1`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 86,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA1`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 57,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA1`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 70,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA1`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 128,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::CFG; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA1`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 63,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::RW; line: `static RW: RwLock<Cfg> = RwLock::new(Cfg { h: &SHA384, legacy: &SHA1 });`; code: `SHA1`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 64,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTER; line: `static OUTER: Mutex<Outer> = Mutex::new(Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 0 });`; code: `SHA1`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 82,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::set_rw; a93::RW -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `RW`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a93::RW"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::set_rw; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `SHA1`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 64,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::set_outer; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `OUTER`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "a93::OUTER"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(CREF.h, &d);`; code: `CREF`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::CREF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SREF.h, &d);`; code: `SREF`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SREF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SREF2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SREF2.h, &d);`; code: `SREF2`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SREF2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::ELEM"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SLICE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static a93::NEST`; member: table, stored by `static a93::NEST`; line: `let _ = digest(NEST.0.1, &d);`; code: `digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTERS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `if i == 1 { set_cfg(&CFG); }`; code: `CFG`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a93::CFG"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::CFG"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::RW -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `RW`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::RW"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `OUTER`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTER"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `digest`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `OUTER`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTER"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::main; line: `let local = [Cfg { h: &SHA512, legacy: &SHA1 }; 3];`; code: `SHA1`",
+            "line": 48,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let lits = [BASE, FIX];`; code: `BASE`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let lits = [BASE, FIX];`; code: `FIX`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a93::FIX"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "38"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA256`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA256; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA256; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA256`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 48,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA256`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 111,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::CFG; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA256`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::DEADW; line: `static DEADW: RwLock<&'static Digest> = RwLock::new(&SHA256);`; code: `SHA256`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 53,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTER; line: `static OUTER: Mutex<Outer> = Mutex::new(Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 0 });`; code: `SHA256`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 65,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::set_rw; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `SHA256`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[present] [via-static] in a93::dead; a93::DEADW -> ring::digest::SHA256; line: `fn dead() { *DEADW.write().unwrap() = &SHA256; }`; code: `DEADW`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "a93::DEADW"
+          },
+          {
+            "additionalContext": "[present] [static] in a93::dead; line: `fn dead() { *DEADW.write().unwrap() = &SHA256; }`; code: `SHA256`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::set_outer; a93::OUTER -> ring::digest::SHA256; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `OUTER`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "a93::OUTER"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA256; member: table, stored by `static a93::TAB`; line: `let _ = digest(ELEM.h, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA256; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::ELEM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA256; member: table, stored by `static a93::TAB`; line: `let _ = digest(SLICE[i].h, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA256; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SLICE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA256; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA256, stored in `static a93::NEST`; member: table, stored by `static a93::NEST`; line: `let _ = digest((NEST.0).0, &d);`; code: `digest`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA256; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `const a93::OUTERS` that may reach the call: ring::digest::SHA256; member: table, stored by `const a93::OUTERS`; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `digest`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA256; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTERS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA256; line: `if i == 1 { set_cfg(&CFG); }`; code: `CFG`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a93::CFG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::CFG` starts with, which the program may replace); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CFG -> ring::digest::SHA256; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::CFG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (a value `a93::set_rw` puts in `static a93::RW`); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: static, possible (the value `static a93::DEADW` starts with, which the program may replace); line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::DEADW -> ring::digest::SHA256; line: `let _ = digest(*DEADW.read().unwrap(), &d);`; code: `DEADW`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::DEADW"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a93::OUTER` starts with, which the program may replace); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA256; line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `OUTER`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTER"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTER -> ring::digest::SHA256; line: `let _ = digest(OUTER.lock().unwrap().inner.legacy, &d);`; code: `OUTER`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTER"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "30"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a93::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::ALIAS; a93::BASE -> ring::digest::SHA384; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::CREF; a93::BASE -> ring::digest::SHA384; line: `const CREF: &Cfg = &BASE;`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::TAB; line: `static TAB: [Cfg; 2] = [Cfg { h: &SHA256, legacy: &SHA1 }, Cfg { h: &SHA384, legacy: &SHA1 }];`; code: `SHA384`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 69,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::ELEM; a93::TAB -> ring::digest::SHA384; line: `static ELEM: &Cfg = &TAB[1];`; code: `TAB`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SLICE; a93::TAB -> ring::digest::SHA384; line: `static SLICE: &[Cfg] = &TAB;`; code: `TAB`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "a93::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::RW; line: `static RW: RwLock<Cfg> = RwLock::new(Cfg { h: &SHA384, legacy: &SHA1 });`; code: `SHA384`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::set_rw; a93::RW -> ring::digest::SHA384; line: `fn set_rw() { *RW.write().unwrap() = Cfg { h: &SHA256, legacy: &SHA1 }; }`; code: `RW`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a93::RW"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::set_outer; line: `fn set_outer() { OUTER.lock().unwrap().inner.h = &SHA384; }`; code: `SHA384`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 50,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a93::BASE`; member: table, stored by `const a93::BASE`; line: `let _ = digest(ALIAS.h, &d);`; code: `digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::ALIAS -> ring::digest::SHA384; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a93::BASE`; member: table, stored by `const a93::BASE`; line: `let _ = digest(CREF.h, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::CREF -> ring::digest::SHA384; line: `let _ = digest(CREF.h, &d);`; code: `CREF`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::CREF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA384; member: table, stored by `static a93::TAB`; line: `let _ = digest(ELEM.h, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::ELEM -> ring::digest::SHA384; line: `let _ = digest(ELEM.h, &d);`; code: `ELEM`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::ELEM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `static a93::TAB` that may reach the call: ring::digest::SHA384; member: table, stored by `static a93::TAB`; line: `let _ = digest(SLICE[i].h, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SLICE -> ring::digest::SHA384; line: `let _ = digest(SLICE[i].h, &d);`; code: `SLICE`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SLICE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (the value `static a93::RW` starts with, which the program may replace); line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::RW -> ring::digest::SHA384; line: `let _ = digest(RW.read().unwrap().h, &d);`; code: `RW`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::RW"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a93::set_outer` puts in `static a93::OUTER`); line: `let _ = digest(OUTER.lock().unwrap().inner.h, &d);`; code: `digest`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::BASE -> ring::digest::SHA384; line: `let lits = [BASE, FIX];`; code: `BASE`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "a93::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a93::BASE`; line: `let _ = digest(lits[i].h, &d);`; code: `digest`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "22"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a93::FIX; line: `static FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA512`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SREF; a93::FIX -> ring::digest::SHA512; line: `static SREF: &Cfg = &FIX;`; code: `FIX`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a93::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::SREF2; a93::SREF -> ring::digest::SHA512; line: `static SREF2: &&Cfg = &SREF;`; code: `SREF`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "a93::SREF"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::NEST; line: `static NEST: ((&Digest, &Digest), &Digest) = ((&SHA256, &SHA1), &SHA512);`; code: `SHA512`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 65,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::OUTERS; line: `const OUTERS: [Outer; 2] = [Outer { inner: Cfg { h: &SHA512, legacy: &SHA1 }, n: 0 }, Outer { inner: Cfg { h: &SHA256, legacy: &SHA1 }, n: 1 }];`; code: `SHA512`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 53,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::set_cfg; line: `fn set_cfg(m: &Mutex<Cfg>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 52,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a93::FIX`; member: table, stored by `static a93::FIX`; line: `let _ = digest(SREF.h, &d);`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SREF -> ring::digest::SHA512; line: `let _ = digest(SREF.h, &d);`; code: `SREF`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SREF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a93::FIX`; member: table, stored by `static a93::FIX`; line: `let _ = digest(SREF2.h, &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::SREF2 -> ring::digest::SHA512; line: `let _ = digest(SREF2.h, &d);`; code: `SREF2`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::SREF2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA512; line: `let _ = digest(NEST.0.1, &d);`; code: `NEST`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::NEST -> ring::digest::SHA512; line: `let _ = digest((NEST.0).0, &d);`; code: `NEST`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a93::NEST"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of the 2 in `const a93::OUTERS` that may reach the call: ring::digest::SHA512; member: table, stored by `const a93::OUTERS`; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `digest`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::OUTERS -> ring::digest::SHA512; line: `let _ = digest(OUTERS[i].inner.h, &d);`; code: `OUTERS`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a93::OUTERS"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a93::set_cfg` puts in `static a93::CFG`); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a93::main; line: `let local = [Cfg { h: &SHA512, legacy: &SHA1 }; 3];`; code: `SHA512`",
+            "line": 48,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(local[i].h, &d);`; code: `digest`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a93::main; a93::FIX -> ring::digest::SHA512; line: `let lits = [BASE, FIX];`; code: `FIX`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a93::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a93::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `static a93::FIX`; line: `let _ = digest(lits[i].h, &d);`; code: `digest`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "19"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a93@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a93@0.1.0",
+      "name": "a93",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a93@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "136"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:bfdaf1e4-4350-8bbd-8347-204ce98610a1",
+  "specVersion": "1.7",
+  "version": 1
+}

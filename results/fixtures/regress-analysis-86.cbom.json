@@ -907,20 +907,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm one of 1 that may reach the call from `Validation.algorithms`, beside others not followed (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Rsa) allows these; line: `let _ = decode::<C>(&t, &dk, &v3);`; code: `decode::<C>`",
-            "line": 29,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "jsonwebtoken::decoding::decode"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm one of 1 that may reach the call from `Validation.algorithms`, beside others not followed (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Rsa) allows these; line: `let _ = decode::<C>(&t, &dk, &v4);`; code: `decode::<C>`",
-            "line": 32,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "jsonwebtoken::decoding::decode"
-          },
-          {
             "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -992,7 +978,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -1884,14 +1870,14 @@
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (a value written through `core::slice::<impl [T]>::first_mut`); line: `let _ = decode::<C>(&t, &dk, &v3);`; code: `decode::<C>`",
+            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (a value written through `core::slice::<impl [T]>::first_mut`; jsonwebtoken refuses the token when one is of another family than the key's (Rsa), else it verifies with one of RS256 or a value not followed); line: `let _ = decode::<C>(&t, &dk, &v3);`; code: `decode::<C>`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (a value written through `core::slice::<impl [T]>::iter_mut`); line: `let _ = decode::<C>(&t, &dk, &v4);`; code: `decode::<C>`",
+            "additionalContext": "[reachable] [call] in a86::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (a value written through `core::slice::<impl [T]>::iter_mut`; jsonwebtoken refuses the token when one is of another family than the key's (Rsa), else it verifies with one of RS256 or a value not followed); line: `let _ = decode::<C>(&t, &dk, &v4);`; code: `decode::<C>`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -2016,7 +2002,6 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:HMAC-SHA-384",
         "crypto:algorithm:HMAC-SHA-512",
-        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
         "crypto:algorithm:unknown:unknown:jsonwebtoken",
         "crypto:material:public-key:ECDSA",
         "crypto:material:public-key:Ed25519",
@@ -2218,7 +2203,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:600cc5cc-43aa-83ba-820f-017ba82b7030",
+  "serialNumber": "urn:uuid:9741b129-21fb-82de-a27f-604250d93ee0",
   "specVersion": "1.7",
   "version": 1
 }

@@ -33,8 +33,8 @@ VERDICTS = ["correct", "wrong", "less-specific", "honest-unknown", "miss"]
 
 
 def occurrences(cbom):
-    """(file, line) -> [(asset name, code, has use, reachable, family name)] for call occurrences in
-    the program's files."""
+    """(file, line) -> [(asset name, code, has use, reachable, family name, use, context, column)]
+    for call occurrences in the program's files."""
     at = collections.defaultdict(list)
     for c in cbom["components"]:
         if c["type"] != "cryptographic-asset" or c["cryptoProperties"]["assetType"] != "algorithm":
@@ -50,7 +50,7 @@ def occurrences(cbom):
             at[(o["location"], o["line"])].append(
                 (c["name"], code.group(1) if code else o["symbol"], "; use: " in ctx,
                  ctx.startswith("[reachable]"), c["name"] == family,
-                 use.group(1) if use else None, ctx))
+                 use.group(1) if use else None, ctx, o.get("offset")))
     return at
 
 
@@ -58,7 +58,8 @@ def verdict(site, occ):
     """occ: [(name, code, has use, reachable, family name)] cited at the site."""
     must, may = set(site["must"]), set(site.get("may", []))
     params = {str(v) for v in site.get("params", {}).values()}
-    reachable = [o for o in occ if o[3]]
+    # a use, or the labelled call itself: not a constructor on the same line (R1.1, setup)
+    reachable = [o for o in occ if o[3] and (o[2] or o[1].endswith(site["callee"]))]
     if not reachable:
         # cited only as present: right for a dead site, a reachability miss for a live one
         return "correct" if not must and occ else ("miss" if must else "correct")
@@ -98,20 +99,24 @@ def verdict(site, occ):
 
 def exact_among_several(occ):
     """The reachable algorithms labelled as the only one where the call may use several: several
-    algorithms reported for one instance of the call (occurrences grouped by their `instantiated
-    by` chain), or one beside an `unknown` (others may reach it). Only occurrences with a use
-    count (a constructor on the same line is no site)."""
+    algorithms reported for one instance of the call (occurrences grouped by their column and
+    `instantiated by` chain), or one beside an `unknown` (others may reach it). Only occurrences
+    with a use count (a constructor on the same line is no site). A macro invocation expanding
+    several calls at one position, each with its own value (`hash_all!(&d; SHA256, SHA384)`), is
+    no such call."""
     groups = collections.defaultdict(list)
     for o in occ:
         if not (o[3] and o[2]):
             continue
         chain = re.findall(r"; instantiated by [^;]*", o[6])
-        groups[tuple(chain)].append(o)
+        groups[(o[7], tuple(chain))].append(o)
     out = set()
     for group in groups.values():
         names = {o[0] for o in group if o[0] != "unknown"}
         unknown = any(o[0] == "unknown" for o in group)
         if len(names) < 2 and not (names and unknown):
+            continue
+        if not unknown and all("[macro " in o[6] for o in group):
             continue
         for o in group:
             if o[0] == "unknown":
