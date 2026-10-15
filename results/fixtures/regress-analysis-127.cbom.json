@@ -1,0 +1,603 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a127 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a127 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a127 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a127::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a127::FIX; line: `const FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::ALIAS; a127::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let o = Outer { inner: BASE, n: 0 };`; code: `BASE`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a127::BASE`; member: table, stored by `const a127::BASE`; line: `let _ = digest(o.inner.legacy, &d);`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let t = (BASE, FIX);`; code: `BASE`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let t = (BASE, FIX);`; code: `FIX`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let arr = [ALIAS, FIX];`; code: `ALIAS`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a127::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let arr = [ALIAS, FIX];`; code: `FIX`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let v = vec![BASE, FIX];`; code: `BASE`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let v = vec![BASE, FIX];`; code: `FIX`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let rep = [BASE; 2];`; code: `BASE`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a127::BASE`; member: table, stored by `const a127::BASE`; line: `let _ = digest(rep[i].legacy, &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "13"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a127::main; line: `let mut a: &'static Digest = &SHA256;`; code: `SHA256`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(a, &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a127::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::ALIAS; a127::BASE -> ring::digest::SHA384; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA384; line: `let o = Outer { inner: BASE, n: 0 };`; code: `BASE`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA384; line: `let t = (BASE, FIX);`; code: `BASE`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::ALIAS -> ring::digest::SHA384; line: `let arr = [ALIAS, FIX];`; code: `ALIAS`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a127::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a127::BASE`; line: `let _ = digest(arr[i].h, &d);`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA384; line: `let v = vec![BASE, FIX];`; code: `BASE`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `const a127::BASE` stores in the field); line: `let _ = digest(v[i].h, &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::BASE -> ring::digest::SHA384; line: `let rep = [BASE; 2];`; code: `BASE`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "a127::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a127::main; line: `let mut b: &'static Digest = &SHA384;`; code: `SHA384`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(b, &d);`; code: `digest`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "11"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a127::FIX; line: `const FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA512`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA512; line: `let t = (BASE, FIX);`; code: `FIX`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm from ring::digest::SHA512, stored in `const a127::FIX`; member: table, stored by `const a127::FIX`; line: `let _ = digest(t.1.h, &d);`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA512; line: `let arr = [ALIAS, FIX];`; code: `FIX`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `const a127::FIX`; line: `let _ = digest(arr[i].h, &d);`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a127::main; a127::FIX -> ring::digest::SHA512; line: `let v = vec![BASE, FIX];`; code: `FIX`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "a127::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a127::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `const a127::FIX` stores in the field); line: `let _ = digest(v[i].h, &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a127@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a127@0.1.0",
+      "name": "a127",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a127@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "89"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:fa3548b2-751f-8059-90db-b8ce59c8cd9e",
+  "specVersion": "1.7",
+  "version": 1
+}

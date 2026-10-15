@@ -1,0 +1,182 @@
+{
+ "by_how": {
+  "argon2": {
+   "correct": 1,
+   "less-specific": 1
+  },
+  "async": {
+   "correct": 1
+  },
+  "basic": {
+   "correct": 31
+  },
+  "bcryptpbkdf": {
+   "correct": 1
+  },
+  "cfg": {
+   "correct": 2
+  },
+  "closure": {
+   "honest-unknown": 1
+  },
+  "config": {
+   "correct": 1
+  },
+  "const-enum": {
+   "correct": 3
+  },
+  "container": {
+   "correct": 13
+  },
+  "crates": {
+   "correct": 2
+  },
+  "dyn": {
+   "correct": 8
+  },
+  "field": {
+   "correct": 7,
+   "less-specific": 2
+  },
+  "fnptr": {
+   "correct": 1
+  },
+  "generic": {
+   "correct": 1
+  },
+  "interproc": {
+   "correct": 12
+  },
+  "macro": {
+   "correct": 2
+  },
+  "multibin": {
+   "correct": 3
+  },
+  "path": {
+   "correct": 8
+  },
+  "scrypt": {
+   "correct": 1
+  },
+  "static": {
+   "correct": 2
+  },
+  "table-const": {
+   "correct": 1
+  },
+  "table-runtime": {
+   "correct": 1
+  },
+  "thread": {
+   "correct": 1
+  }
+ },
+ "by_what": {
+  "aead": {
+   "correct": 12
+  },
+  "cipher": {
+   "correct": 3
+  },
+  "hash": {
+   "correct": 25,
+   "honest-unknown": 1
+  },
+  "jwt": {
+   "correct": 13
+  },
+  "kdf": {
+   "correct": 10
+  },
+  "kem": {
+   "correct": 3
+  },
+  "kex": {
+   "correct": 6
+  },
+  "lib": {
+   "correct": 3
+  },
+  "mac": {
+   "correct": 6
+  },
+  "pwhash": {
+   "correct": 3,
+   "less-specific": 1
+  },
+  "rng": {
+   "correct": 4
+  },
+  "sig": {
+   "correct": 15,
+   "less-specific": 2
+  }
+ },
+ "function_mismatches": [],
+ "label_mismatches": [],
+ "not_correct": [
+  {
+   "callee": "digest",
+   "line": 6,
+   "may": [],
+   "must": [
+    "SHA-1",
+    "SHA-256"
+   ],
+   "program": "hash-closure",
+   "reported": [
+    "unknown"
+   ],
+   "verdict": "honest-unknown"
+  },
+  {
+   "callee": "verify_password",
+   "line": 8,
+   "may": [],
+   "must": [
+    "Argon2id"
+   ],
+   "program": "pwhash-argon2",
+   "reported": [
+    "Argon2"
+   ],
+   "verdict": "less-specific"
+  },
+  {
+   "callee": "sign",
+   "line": 17,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-384"
+   ],
+   "program": "sig-field",
+   "reported": [
+    "RSA-PKCS1-1.5"
+   ],
+   "verdict": "less-specific"
+  },
+  {
+   "callee": "verify",
+   "line": 23,
+   "may": [],
+   "must": [
+    "RSA-PKCS1-1.5-SHA-384"
+   ],
+   "program": "sig-field",
+   "reported": [
+    "RSA-PKCS1-1.5"
+   ],
+   "verdict": "less-specific"
+  }
+ ],
+ "sites": 107,
+ "unlabelled_uses": 4,
+ "verdicts": {
+  "correct": 103,
+  "honest-unknown": 1,
+  "less-specific": 3,
+  "miss": 0,
+  "wrong": 0
+ }
+}

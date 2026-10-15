@@ -1,0 +1,77 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:4 | ring::digest::digest | [reachable] [call] in v40::hash_with::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `v40::main`; instantiated by v40::run::{closure#0} at src/main.rs:14:42; instantiated by v40::run at src/main.rs:13:44; line: `digest(alg, &d).as_ref().len()`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:25 | ring::digest::digest | [reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `v40::main`; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:26 | ring::digest::SHA256 | [reachable] [static] in v40::main; line: `let job = Job { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:27 | ring::digest::SHA384 | [reachable] [static] in v40::run::{closure#0}; instantiated by v40::run at src/main.rs:13:44; line: `let alg = if n > 40 { &SHA384 } else { job.alg };`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:25 | ring::digest::digest | [reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:24 | ring::digest::digest | [reachable] [call] in v40::run::{closure#0}::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:32 | ring::digest::SHA512 | [reachable] [static] in v40::run::{closure#0}::{closure#0}; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:63:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via v40 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:86:0 | ring | [manifest] locked ring 0.17.14; reached via v40 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by v40 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:17:25 | ring::digest::digest | [reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/v40@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/v40@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
+root {"bom-ref": "pkg:cargo/v40@0.1.0", "name": "v40", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v40@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=15
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=248
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

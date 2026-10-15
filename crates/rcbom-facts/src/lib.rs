@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 21;
+pub const FACTS_VERSION: u32 = 23;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -20,6 +20,22 @@ pub fn static_owner(path: &str, id: &str) -> String {
 /// (`v.algorithms[0] = RS512`, `*v.algorithms.first_mut().unwrap() = ..`): the value written is
 /// one of the list's, beside the others.
 pub const ELEMENT_WRITE: &str = "<element write>";
+
+/// The `Origin::Call::callee` of a `Result`'s error value (`Err(e)`, its argument `e`): the
+/// error side, which `ok()`, `?` and `unwrap_or` do not read.
+pub const RESULT_ERR: &str = "core::result::Result::Err";
+
+/// The marker of a write into an element of a list by function `writer` (`ELEMENT_WRITE`, then
+/// the function).
+pub fn element_write(writer: &str) -> String {
+    format!("{ELEMENT_WRITE} {writer}")
+}
+
+/// The function a list element write marker names (`Some("")` when it names none); `None` for
+/// another callee.
+pub fn element_writer(callee: &str) -> Option<&str> {
+    callee.strip_prefix(ELEMENT_WRITE).map(|w| w.trim_start())
+}
 
 /// The `FieldStore::adt` and `Origin::Field::adt` of a tuple's element, recorded only in a
 /// static's or a constant's initializer and read only from that static (`PAIRS[i].0`).
@@ -102,6 +118,11 @@ pub struct Links {
     /// call or a write through one of them is cut, not "returns or writes nothing".
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub truncated: Vec<String>,
+    /// A call between functions of the program's own crates none of whose arguments can carry
+    /// an algorithm (`decode_token(&args)` with the parsed command line): its arguments'
+    /// origins, read only to tell whether a value depends on the program's input.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub arg_calls: Vec<LocalCall>,
 }
 
 /// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn <trait>`
@@ -147,6 +168,11 @@ impl Links {
         for c in other.calls {
             if !self.calls.contains(&c) {
                 self.calls.push(c);
+            }
+        }
+        for c in other.arg_calls {
+            if !self.arg_calls.contains(&c) {
+                self.arg_calls.push(c);
             }
         }
         for w in other.writes {

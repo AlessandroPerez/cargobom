@@ -1753,6 +1753,8 @@ fn site_matches(
             let protocol_callee = kb
                 .crate_by_name(implementer)
                 .is_some_and(|c| c.role == Role::Protocol);
+            // a static's field read whose value the analysis does not follow (`table` fallback)
+            let mut field_table: Option<String> = None;
             if out.is_empty() && into_kb && !protocol_callee && (can_occur() || has_roles()) {
                 let has_roles = has_roles();
                 // the call's own arguments; if what they name is not used here, its receiver's;
@@ -1837,6 +1839,20 @@ fn site_matches(
                             })
                             .collect();
                         found.retain(|x| !parts.contains(&x.id));
+                        // a field read of it (`AREF[i].h`, `OPT.unwrap().h`) where nothing says what
+                        // the field holds: not every descriptor of the data (another field's
+                        // among them), the unknown
+                        if found.len() > 1
+                            && matches!(&site.target, Target::Call { arg_origins, .. }
+                            if arg_origins.iter().any(|o| provenance::reads_static_field(
+                                o,
+                                &|id| id == d.id,
+                                0,
+                            )))
+                        {
+                            field_table.get_or_insert_with(|| d.path.clone());
+                            continue;
+                        }
                         if let [one] = found.as_slice() {
                             if !descriptors.contains(one) {
                                 descriptors.push(one.clone());
@@ -2006,7 +2022,21 @@ fn site_matches(
             // an operation is never dropped: when no algorithm reaches it, it is reported with
             // an unknown one, and why; so is the rest of the algorithms when the search for them
             // hit its bound (what was found is not all)
-            let unresolved = if out.is_empty() {
+            let unresolved = if let Some(t) = &field_table {
+                unresolved_operation(ctx, site).map(|(p, f, _, pr)| {
+                    let reason = format!(
+                        "{}a field of `{}` the analysis does not follow (the data holds several \
+                         algorithms)",
+                        if out.is_empty() {
+                            ""
+                        } else {
+                            "other algorithms than these may reach the call: "
+                        },
+                        boundary::short_fn(t)
+                    );
+                    (p, f, reason, pr)
+                })
+            } else if out.is_empty() {
                 unresolved_operation(ctx, site)
             } else if let Some(reason) = algorithm_cut(ctx, site, reachable, reached_path) {
                 unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason, pr))
@@ -2403,6 +2433,8 @@ fn unfollowed(
             | Origin::Unit { .. }
             | Origin::Const { .. }
             | Origin::Truncated => None,
+            // a `Result`'s error value: no candidate value of the read
+            Origin::Call { callee, .. } if callee == rcbom_facts::RESULT_ERR => None,
             Origin::Any(v) | Origin::All(v) => v
                 .iter()
                 .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live)),
@@ -2481,6 +2513,12 @@ fn unfollowed(
                         .iter()
                         .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live));
                 }
+                // (a fallback function called: `unwrap_or_else(fallback)`)
+                if provenance::std_choice(callee) {
+                    return provenance::choice_values(args)
+                        .iter()
+                        .find_map(|a| leaf(ctx, a, owner, depth + 1, seen, live));
+                }
                 let old = provenance::std_old_value(callee);
                 args.iter()
                     .enumerate()
@@ -2497,7 +2535,7 @@ fn unfollowed(
             // container's, followed beside it
             Origin::Through { callee } if callee.ends_with("Iterator::next") => None,
             // the marker of a value written into an element (the value is beside it, followed)
-            Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE => None,
+            Origin::Through { callee } if rcbom_facts::element_writer(callee).is_some() => None,
             Origin::Unknown | Origin::Loop | Origin::Through { .. } => Some(unresolved_kind(o)),
             // a value from elsewhere: what reaches it, followed; the value itself among them is
             // one the links could not follow (a trait object's type whose method records
@@ -2749,7 +2787,7 @@ fn unresolved_kind(o: &rcbom_facts::Origin) -> String {
         Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
         Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
         Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),
-        Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE => {
+        Origin::Through { callee } if rcbom_facts::element_writer(callee).is_some() => {
             "a value written into an element of a list".into()
         }
         Origin::Through { callee } => format!("a value written through `{}`", short(callee)),

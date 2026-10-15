@@ -1,0 +1,146 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:10:36 | v38::BASE | [reachable] [via-static] in v38::B2; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `BASE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:11:19 | v38::B2 | [reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = B2;`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:12:19 | v38::B2 | [reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const REF: &Cfg = &B2;`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:62 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [present] [static] in v38::make; line: `const fn make(x: &'static Algorithm) -> Cfg { Cfg { h: x, l: &SHA1 } }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:34 | v38::BASE | [reachable] [via-static] in v38::OUT; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `BASE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:45 | v38::B2 | [reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:16:46 | v38::BASE | [reachable] [via-static] in v38::TUP; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `BASE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:17:24 | v38::B2 | [reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:17:50 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in v38::ARR; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:22:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(B2.h, &d);`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(B2.l, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:23:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(B2.l, &d);`; code: `B2`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:24:19 | v38::ALIAS | [reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(REF.l, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:25:19 | v38::REF | [reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(REF.l, &d);`; code: `REF`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:26:19 | v38::MADE | [reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE.h, &d);`; code: `MADE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `v38::make`; line: `let _ = digest(MADE.l, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:27:19 | v38::MADE | [reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE.l, &d);`; code: `MADE`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:28:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:29:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:30:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:31:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:32:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static v38::ARR`; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].l, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:9:40 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in v38::BASE; line: `const BASE: Cfg = Cfg { h: &SHA256, l: &SHA1 };`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:36 | v38::BASE | [reachable] [via-static] in v38::B2; v38::BASE -> ring::digest::SHA256; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `BASE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:19 | v38::B2 | [reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA256; line: `const ALIAS: Cfg = B2;`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:19 | v38::B2 | [reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA256; line: `const REF: &Cfg = &B2;`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:34 | v38::BASE | [reachable] [via-static] in v38::OUT; v38::BASE -> ring::digest::SHA256; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `BASE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:45 | v38::B2 | [reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA256; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:46 | v38::BASE | [reachable] [via-static] in v38::TUP; v38::BASE -> ring::digest::SHA256; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `BASE`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:24 | v38::B2 | [reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA256; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA256; line: `let _ = digest(B2.h, &d);`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA256; line: `let _ = digest(B2.l, &d);`; code: `B2`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:19 | v38::ALIAS | [reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA256; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:19 | v38::REF | [reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA256; line: `let _ = digest(REF.l, &d);`; code: `REF`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA256, stored in `const v38::OUT`; member: table, stored by `const v38::OUT`; line: `let _ = digest(OUT.inner.h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA256; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA256; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA256, stored in `const v38::TUP`; member: table, stored by `const v38::TUP`; line: `let _ = digest(TUP.0.h, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA256; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:31:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA256; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA256; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:33:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA256; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:9:28 | ring::digest::SHA256 | [reachable] [static] in v38::BASE; line: `const BASE: Cfg = Cfg { h: &SHA256, l: &SHA1 };`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:26 | ring::digest::SHA384 | [reachable] [static] in v38::B2; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:19 | v38::B2 | [reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA384; line: `const ALIAS: Cfg = B2;`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:12:19 | v38::B2 | [reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA384; line: `const REF: &Cfg = &B2;`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:45 | v38::B2 | [reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA384; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:16:63 | ring::digest::SHA384 | [reachable] [static] in v38::TUP; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:24 | v38::B2 | [reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA384; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(B2.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:22:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA384; line: `let _ = digest(B2.h, &d);`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:19 | v38::B2 | [reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA384; line: `let _ = digest(B2.l, &d);`; code: `B2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(ALIAS.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:19 | v38::ALIAS | [reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA384; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:19 | v38::REF | [reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA384; line: `let _ = digest(REF.l, &d);`; code: `REF`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:28:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA384; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::OUT`; member: table, stored by `const v38::OUT`; line: `let _ = digest(OUT.alt.h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:29:19 | v38::OUT | [reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA384; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:30:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA384; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::TUP`; member: table, stored by `const v38::TUP`; line: `let _ = digest(TUP.1.1, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA384; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm one of the 2 in `static v38::ARR` that may reach the call: ring::digest::SHA384; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].h, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:32:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA384; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:33:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA384; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:25 | ring::digest::SHA512 | [reachable] [static] in v38::MADE; line: `static MADE: Cfg = make(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:16:54 | ring::digest::SHA512 | [reachable] [static] in v38::TUP; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:17:38 | ring::digest::SHA512 | [reachable] [static] in v38::ARR; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `v38::make`; line: `let _ = digest(MADE.h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:19 | v38::MADE | [reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA512; line: `let _ = digest(MADE.h, &d);`; code: `MADE`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:27:19 | v38::MADE | [reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA512; line: `let _ = digest(MADE.l, &d);`; code: `MADE`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:30:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA512; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:31:19 | v38::TUP | [reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA512; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in v38::main; use: digest; algorithm one of the 2 in `static v38::ARR` that may reach the call: ring::digest::SHA512; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].h, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:32:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA512; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:33:19 | v38::ARR | [reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA512; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via v38 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via v38 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by v38 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=26
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=20
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=21
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=11
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/v38@0.1.0 -> pkg:cargo/ring@0.17.14
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+dependency pkg:cargo/v38@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/v38@0.1.0", "name": "v38", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v38@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=64
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

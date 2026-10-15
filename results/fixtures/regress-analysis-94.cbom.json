@@ -546,7 +546,7 @@
             "symbol": "a94::M2"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a94::M2` starts with, which the program may replace); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a94::M2` starts with, which the program may replace); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -588,7 +588,7 @@
             "symbol": "a94::M4"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a94::M4` starts with, which the program may replace); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a94::M4` starts with, which the program may replace); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
@@ -696,7 +696,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (a value `a94::main` puts in `static a94::ONCE`); line: `let _ = digest(ONCE.get().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a94::main` puts in `static a94::ONCE`); line: `let _ = digest(ONCE.get().unwrap().h, &d);`; code: `digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 12,
@@ -710,7 +710,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a94::main` puts in `static a94::M2`); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a94::main` puts in `static a94::M2`); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -724,7 +724,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a94::main` puts in `static a94::M4`); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: static, possible (a value `a94::main` puts in `static a94::M4`); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
@@ -853,8 +853,15 @@
             "symbol": "a94::TS"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: static, possible (the value `static a94::LAZY` holds); line: `let _ = digest(LAZY.h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: type-join, possible (a value `a94::Cfg::set` stores in the field); line: `let _ = digest(LAZY.h, &d);`; code: `digest`",
             "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a94::Cfg::set` stores in the field); line: `let _ = digest(ONCE.get().unwrap().h, &d);`; code: `digest`",
+            "line": 37,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -867,8 +874,15 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a94::main` puts in `static a94::M1`); line: `let _ = digest(M1.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a94::Cfg::set` stores in the field); line: `let _ = digest(M1.lock().unwrap().h, &d);`; code: `digest`",
             "line": 39,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a94::Cfg::set` stores in the field); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 41,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -883,6 +897,13 @@
           {
             "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a94::Cfg::set` puts in `static a94::M3`); line: `let _ = digest(M3.lock().unwrap().h, &d);`; code: `digest`",
             "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a94::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a94::Cfg::set` stores in the field); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 46,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -920,7 +941,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "16"
+          "value": "19"
         }
       ],
       "type": "cryptographic-asset"
@@ -1024,7 +1045,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d86b3cae-c798-80dd-971f-bb79c2e8c432",
+  "serialNumber": "urn:uuid:f424e67d-d5d4-84e4-be97-b376156ace68",
   "specVersion": "1.7",
   "version": 1
 }

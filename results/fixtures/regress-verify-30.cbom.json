@@ -1,0 +1,554 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via v30 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by v30 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via v30 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v30::b::sub::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `ring::digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "line": 1,
+            "location": "src/b/sub.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(KALG, &d);`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::b::sub::KALG -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(KALG, &d);`; code: `KALG`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::b::sub::KALG"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v30::a::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA256;`; code: `ring::digest::SHA256`",
+            "line": 2,
+            "location": "src/a/mod.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(a::KALG, &d);`; code: `digest`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::a::KALG -> ring::digest::SHA256; line: `let _ = digest(a::KALG, &d);`; code: `a::KALG`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::a::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::more; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `digest(KALG, d).as_ref().len()`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::more; v30::a::KALG -> ring::digest::SHA256; line: `digest(KALG, d).as_ref().len()`; code: `KALG`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "v30::a::KALG"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v30::a::sub::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
+            "line": 1,
+            "location": "src/a/sub.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v30::c::inner::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
+            "line": 2,
+            "location": "src/c.rs",
+            "offset": 48,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(a::sub::KALG, &d);`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::a::sub::KALG -> ring::digest::SHA384; line: `let _ = digest(a::sub::KALG, &d);`; code: `a::sub::KALG`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::a::sub::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(c::inner::KALG, &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::c::inner::KALG -> ring::digest::SHA384; line: `let _ = digest(c::inner::KALG, &d);`; code: `c::inner::KALG`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::c::inner::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::scoped; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(SUBK, d).as_ref().len() + digest(c::RENAMED, d).as_ref().len()`; code: `digest`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::scoped; v30::a::sub::KALG -> ring::digest::SHA384; line: `digest(SUBK, d).as_ref().len() + digest(c::RENAMED, d).as_ref().len()`; code: `SUBK`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "v30::a::sub::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::scoped; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(SUBK, d).as_ref().len() + digest(c::RENAMED, d).as_ref().len()`; code: `digest`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::scoped; v30::c::inner::KALG -> ring::digest::SHA384; line: `digest(SUBK, d).as_ref().len() + digest(c::RENAMED, d).as_ref().len()`; code: `c::RENAMED`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "v30::c::inner::KALG"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "10"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v30::b::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
+            "line": 2,
+            "location": "src/b.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v30::c::KALG; line: `pub const KALG: &ring::digest::Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
+            "line": 5,
+            "location": "src/c.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::glob_user; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(KALG, d).as_ref().len()`; code: `digest`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::glob_user; v30::c::KALG -> ring::digest::SHA512; line: `digest(KALG, d).as_ref().len()`; code: `KALG`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "v30::c::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(b::KALG, &d);`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::b::KALG -> ring::digest::SHA512; line: `let _ = digest(b::KALG, &d);`; code: `b::KALG`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::b::KALG"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v30::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(c::KALG, &d);`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v30::main; v30::c::KALG -> ring::digest::SHA512; line: `let _ = digest(c::KALG, &d);`; code: `c::KALG`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v30::c::KALG"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/v30@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/v30@0.1.0",
+      "name": "v30",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/v30@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "69"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:51b6948f-b6d2-821f-98cc-4128658283dc",
+  "specVersion": "1.7",
+  "version": 1
+}

@@ -1,0 +1,638 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a125 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a125 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a125 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a125::M5; line: `static M5: Mutex<C5> = Mutex::new(C5 { h: &SHA256, legacy: &SHA1 });`; code: `SHA1`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 60,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `if i == 1 { set5(&M5); }`; code: `M5`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a125::M5"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(M5.lock().unwrap().h, &d);`; code: `M5`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M5"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (the value `static a125::M5` starts with, which the program may replace); line: `let _ = digest(M5.lock().unwrap().legacy, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(M5.lock().unwrap().legacy, &d);`; code: `M5`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M5"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a125::M1; line: `static M1: Mutex<C1> = Mutex::new(C1 { h: &SHA256 });`; code: `SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::m1; a125::M1 -> ring::digest::SHA256; line: `fn m1() -> &'static Mutex<C1> { &M1 }`; code: `M1`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 33,
+            "symbol": "a125::M1"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::M2; line: `static M2: Mutex<C2> = Mutex::new(C2 { h: &SHA256 });`; code: `SHA256`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::M3; line: `static M3: Mutex<C3> = Mutex::new(C3 { h: &SHA256 });`; code: `SHA256`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::M4; line: `static M4: Mutex<C4> = Mutex::new(C4 { h: &SHA256 });`; code: `SHA256`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::M5; line: `static M5: Mutex<C5> = Mutex::new(C5 { h: &SHA256, legacy: &SHA1 });`; code: `SHA256`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a125::M1` holds); line: `let _ = digest(M1.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M1 -> ring::digest::SHA256; line: `let _ = digest(M1.lock().unwrap().h, &d);`; code: `M1`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M1"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M2 -> ring::digest::SHA256; line: `if i == 1 { set2(&M2); }`; code: `M2`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a125::M2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a125::M2` holds); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M2 -> ring::digest::SHA256; line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `M2`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M3 -> ring::digest::SHA256; line: `if i == 1 { M3.put(&SHA512); }`; code: `M3`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "a125::M3"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a125::M3` starts with, which the program may replace); line: `let _ = digest(M3.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M3 -> ring::digest::SHA256; line: `let _ = digest(M3.lock().unwrap().h, &d);`; code: `M3`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M3"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M4 -> ring::digest::SHA256; line: `if i == 1 { set4(&M4); }`; code: `M4`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a125::M4"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a125::M4` starts with, which the program may replace); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M4 -> ring::digest::SHA256; line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `M4`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M4"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA256; line: `if i == 1 { set5(&M5); }`; code: `M5`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a125::M5"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: static, possible (the value `static a125::M5` starts with, which the program may replace); line: `let _ = digest(M5.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA256; line: `let _ = digest(M5.lock().unwrap().h, &d);`; code: `M5`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M5"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a125::main; a125::M5 -> ring::digest::SHA256; line: `let _ = digest(M5.lock().unwrap().legacy, &d);`; code: `M5`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a125::M5"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "21"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a125::set4; instantiated by a125::main at src/main.rs:32:16 as `set4`; line: `fn set4<M: std::ops::Deref<Target = Mutex<C4>>>(m: M) { m.lock().unwrap().h = &SHA384; }`; code: `SHA384`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 79,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::set5; line: `fn set5(m: &Mutex<C5>) { let mut g = m.lock().unwrap(); g.h = &SHA512; g.legacy = &SHA384; }`; code: `SHA384`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 83,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::main::{closure#0}; instantiated by a125::main at src/main.rs:27:15 as `|m: &Mutex<C2>| m.lock().unwrap().h = &SHA384`; line: `let set2 = |m: &Mutex<C2>| m.lock().unwrap().h = &SHA384;`; code: `SHA384`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 54,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a125::main::{closure#0}` stores in the field); line: `let _ = digest(M2.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a125::set4` stores in the field); line: `let _ = digest(M4.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a125::set5` stores in the field); line: `let _ = digest(M5.lock().unwrap().legacy, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a125::set1; line: `fn set1(m: &Mutex<C1>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 48,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::set5; line: `fn set5(m: &Mutex<C5>) { let mut g = m.lock().unwrap(); g.h = &SHA512; g.legacy = &SHA384; }`; code: `SHA512`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 63,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a125::set1` stores in the field); line: `let _ = digest(M1.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a125::main; line: `if i == 1 { M3.put(&SHA512); }`; code: `SHA512`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `<std::sync::poison::mutex::Mutex<a125::C3> as a125::Store>::put` puts in `static a125::M3`); line: `let _ = digest(M3.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a125::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (a value `a125::set5` puts in `static a125::M5`); line: `let _ = digest(M5.lock().unwrap().h, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a125@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a125@0.1.0",
+      "name": "a125",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a125@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "134"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:7cd3e86c-0f20-8e79-8c1f-3d09df156cf8",
+  "specVersion": "1.7",
+  "version": 1
+}

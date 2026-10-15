@@ -116,7 +116,9 @@ def exact_among_several(occ):
         unknown = any(o[0] == "unknown" for o in group)
         if len(names) < 2 and not (names and unknown):
             continue
-        if not unknown and all("[macro " in o[6] for o in group):
+        exact = all(not re.search(r"; algorithm (one of|possibly|[^;]*selector)", o[6])
+                    for o in group if o[0] != "unknown")
+        if not unknown and exact and all("[macro " in o[6] for o in group):
             continue
         for o in group:
             if o[0] == "unknown":
@@ -128,10 +130,26 @@ def exact_among_several(occ):
     return sorted(out)
 
 
+def bare(code):
+    """A call's code without generic arguments (`decode::<C>` is `decode`)."""
+    out, depth = "", 0
+    for ch in code:
+        if ch == "<":
+            depth += 1
+        elif ch == ">" and depth:
+            depth -= 1
+        elif depth == 0:
+            out += ch
+    return out.replace("::::", "::").rstrip(":")
+
+
 def function_matches(site, occ):
-    """Does a reported use of a reachable occurrence agree with the labelled function?"""
+    """Does a reported use of a reachable occurrence agree with the labelled function? The
+    labelled call reported only as set-up (`new: setup, not a use`) does not."""
     uses = {u for o in occ if o[3] and o[5] for u in o[5].split(" or ")}
-    return not uses or site["function"] in uses
+    if not uses:
+        return not any(o[3] and not o[2] and bare(o[1]).endswith(site["callee"]) for o in occ)
+    return site["function"] in uses
 
 
 def main():
@@ -148,11 +166,23 @@ def main():
         cbom_path = out_dir / f"{pid}.cbom.json"
         at = occurrences(json.load(open(cbom_path))) if cbom_path.exists() else {}
         labelled_lines = collections.Counter((s["file"], s["line"]) for s in sites)
+        same_callee = collections.defaultdict(list)
+        for s in sites:
+            same_callee[(s["file"], s["line"], s["callee"])].append(s)
         for s in sites:
             occ = at.get((s["file"], s["line"]), [])
-            # two labelled calls on one line: only the occurrences naming this callee
-            if labelled_lines[(s["file"], s["line"])] > 1:
-                occ = [o for o in occ if o[1].endswith(s["callee"])]
+            # the occurrences naming the labelled callee, when any does (another call on the
+            # line, a constructor, an `update`, is not this site)
+            named = [o for o in occ if bare(o[1]).endswith(s["callee"])]
+            if named or labelled_lines[(s["file"], s["line"])] > 1:
+                occ = named
+            # several labelled calls of one callee on one line (`digest(a, digest(b, ..))`): the
+            # i-th in the labels is the i-th by column (outer first)
+            group = same_callee[(s["file"], s["line"], s["callee"])]
+            if len(group) > 1:
+                cols = sorted({o[7] for o in occ if o[7] is not None})
+                i = next(k for k, x in enumerate(group) if x is s)
+                occ = [o for o in occ if i < len(cols) and o[7] == cols[i]]
             v = verdict(s, occ) if cbom_path.exists() else "miss"
             exact = exact_among_several(occ)
             if exact:

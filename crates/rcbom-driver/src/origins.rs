@@ -43,6 +43,10 @@ const MAX_NODES: usize = 400;
 /// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
 /// path at each turn, and moves and borrows are free of the other limits.
 const MAX_PATH: usize = 16;
+/// Steps of one search for what a pointer points to: a pointer re-pointed in a loop into one
+/// of several parts (`t = match t { A(e) => &mut e.l, B(e) => &mut e.r, .. }`, syn's
+/// `stmt_expr`) branches at each turn, and the search is cut past this many places.
+const MAX_SEARCH: usize = 4096;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) enum Step {
@@ -289,10 +293,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     fn flow(&self) -> &Flow {
         self.flow.get_or_init(|| {
             Flow::new(
+                self.tcx,
                 self.body,
                 self.kind == BodyKind::Coroutine,
                 &|f| self.local_fn(f),
-                &|t| holds_mut_borrow(self.tcx, rustc_internal::internal(self.tcx, t), 0),
             )
         })
     }
@@ -300,14 +304,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
 impl Flow {
     /// `local_fn`: is a callee a function of the crate (whose writes through `&mut` its links
-    /// summarize, the value before included where it may not write)? `mut_holder`: does a value
-    /// of the type hold a `&mut` (`W<'a> { r: &'a mut T }`, `Option<&mut T>`)?
-    fn new(
+    /// summarize, the value before included where it may not write)?
+    fn new<'tcx>(
+        tcx: TyCtxt<'tcx>,
         body: &Body,
         coroutine: bool,
         local_fn: &dyn Fn(&Operand) -> bool,
-        mut_holder: &dyn Fn(Ty) -> bool,
     ) -> Self {
+        let internal = |t: Ty| rustc_internal::internal(tcx, t);
+        // does a value of the type (of a local, along a path) hold a `&mut` (`W<'a> { r: &'a mut
+        // T }`, `Option<&mut T>`)?
+        let mut_holder =
+            |t: rustc_middle::ty::Ty<'tcx>, p: &Path| holds_mut_borrow(tcx, walk_ty(tcx, t, p), 0);
         let nargs = body.arg_locals().len();
         let mut defs = Vec::new();
         for l in 1..=nargs {
@@ -365,16 +373,62 @@ impl Flow {
             }
             m
         };
+        let mut part_stores: HashMap<Local, Vec<(Path, At, Operand)>> = HashMap::new();
+        for (p, at, k) in &pending {
+            if !p.projection.is_empty()
+                && !p
+                    .projection
+                    .iter()
+                    .any(|e| matches!(e, ProjectionElem::Deref))
+                && let DefKind::Assign(Rvalue::Use(op, _), _) = k
+            {
+                part_stores
+                    .entry(p.local)
+                    .or_default()
+                    .push((path_of_place(p), *at, op.clone()));
+            }
+        }
+        // (with the compiler's own types: a local of an `async` closure's type, which
+        // `rustc_public` cannot convert, is read without converting it)
+        let holders: HashSet<Local> =
+            body.locals()
+                .iter()
+                .enumerate()
+                .filter(|(_, l)| match internal(l.ty).kind() {
+                    rustc_middle::ty::TyKind::Ref(_, i, _)
+                    | rustc_middle::ty::TyKind::RawPtr(i, _) => holds_mut_borrow(tcx, *i, 0),
+                    _ => false,
+                })
+                .map(|(i, _)| i)
+                .collect();
         let ptr = Pointees {
             body,
             direct: &direct,
             cut: Cell::new(false),
+            steps: Cell::new(0),
             lost: Cell::new(false),
             partly: pending
                 .iter()
                 .filter(|(p, ..)| !p.projection.is_empty())
                 .map(|(p, ..)| p.local)
                 .collect(),
+            part_stores,
+            cur_at: Cell::new(None),
+            holders,
+            lent_locals: body
+                .blocks
+                .iter()
+                .flat_map(|b| &b.statements)
+                .filter_map(|st| match &st.kind {
+                    StatementKind::Assign(
+                        _,
+                        Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
+                    ) if q.projection.is_empty() => Some(q.local),
+                    _ => None,
+                })
+                .collect(),
+            nargs,
         };
         // the places the body lends by `&mut` (`&mut a`, `&mut s.f`): where a write through a
         // pointer whose targets were cut may land
@@ -393,68 +447,87 @@ impl Flow {
                     }
                 }
             }
+            // and what the `&mut` parameters point to (`fn f(p: &mut T)`: `*p`)
+            for l in 1..=nargs {
+                if matches!(
+                    internal(body.locals()[l].ty).kind(),
+                    rustc_middle::ty::TyKind::Ref(_, _, rustc_middle::ty::Mutability::Mut)
+                        | rustc_middle::ty::TyKind::RawPtr(_, rustc_middle::ty::Mutability::Mut)
+                ) {
+                    v.push((l, vec![Step::Deref]));
+                }
+            }
             v
         };
-        // the places whose `&mut` the body puts in a value it builds (`Holder { r: &mut x }`,
-        // `vec![&mut x]`, a closure capturing `x` by `&mut`)
-        let escaping: Vec<(Local, Path)> = {
-            let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
-            let mut borrows: HashMap<Local, (Local, Path)> = HashMap::new();
-            for st in stmts() {
-                if let StatementKind::Assign(
-                    l,
-                    Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
-                    | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
-                ) = &st.kind
-                    && l.projection.is_empty()
-                    && !q
-                        .projection
-                        .iter()
-                        .any(|e| matches!(e, ProjectionElem::Deref))
+        // can a place of `lent` hold a value of type `written` (its type, a field, an element)?
+        // Where: the place itself (`Some(true)`, the same type), a part of it not known
+        // (`Some(false)`), not at all (`None`)
+        let fits = |l: Local, p: &Path, written: Option<rustc_middle::ty::Ty<'tcx>>| {
+            let lt = walk_ty(tcx, internal(body.locals()[l].ty), p);
+            match written {
+                None => Some(false),
+                Some(w)
+                    if tcx.erase_and_anonymize_regions(lt)
+                        == tcx.erase_and_anonymize_regions(w) =>
                 {
-                    borrows.insert(l.local, (q.local, path_of_place(q)));
+                    Some(true)
                 }
+                Some(w) => type_contains(tcx, lt, w, 0).then_some(false),
             }
-            let mut v: Vec<(Local, Path)> = Vec::new();
-            for st in stmts() {
-                if let StatementKind::Assign(_, Rvalue::Aggregate(_, ops)) = &st.kind {
-                    for op in ops {
-                        if let Operand::Copy(q) | Operand::Move(q) = op
-                            && q.projection.is_empty()
-                            && let Some(b) = borrows.get(&q.local)
-                            && !v.contains(b)
-                        {
-                            v.push(b.clone());
-                        }
-                    }
-                }
+        };
+        // the path a cut or lost write is defined at: the place, or a part of it not known
+        let at_part = |p: &Path, whole: bool| {
+            let mut p = p.clone();
+            if !whole {
+                p.push(Step::Part(String::new()));
             }
-            v
+            p
         };
         // (place, path, at, kind, single target, written by the call as its receiver)
         let mut extra = Vec::new();
-        // the statements whose pointer targets were cut, or not followed
-        let mut cut_at: Vec<At> = Vec::new();
-        let mut lost_at: Vec<At> = Vec::new();
-        let mut last: Option<At> = None;
-        for (place, at, kind) in &pending {
-            if let Some(a) = last {
-                if ptr.cut.replace(false) {
-                    cut_at.push(a);
-                }
-                if ptr.lost.replace(false) {
-                    lost_at.push(a);
-                }
+        // the writes whose pointer targets were cut, or not followed, with the type written
+        // (`None`: not known)
+        type Noted<'t> = Vec<(At, Option<rustc_middle::ty::Ty<'t>>)>;
+        let mut cut_at: Noted<'tcx> = Vec::new();
+        let mut lost_at: Noted<'tcx> = Vec::new();
+        let note = |at: At,
+                    ty: Option<rustc_middle::ty::Ty<'tcx>>,
+                    cut_at: &mut Noted<'tcx>,
+                    lost_at: &mut Noted<'tcx>| {
+            if ptr.cut.replace(false) {
+                cut_at.push((at, ty));
             }
-            last = Some(*at);
+            if ptr.lost.replace(false) {
+                lost_at.push((at, ty));
+            }
+        };
+        // the type a pointer points to (with the compiler's own types, as above)
+        let pointee =
+            |p: &Place| match walk_ty(tcx, internal(body.locals()[p.local].ty), &path_of_place(p))
+                .kind()
+            {
+                rustc_middle::ty::TyKind::Ref(_, i, _) | rustc_middle::ty::TyKind::RawPtr(i, _) => {
+                    Some(*i)
+                }
+                _ => None,
+            };
+        for (place, at, kind) in &pending {
+            ptr.cur_at.set(Some(*at));
             let path = path_of_place(place);
             if let Some(i) = path.iter().position(|s| *s == Step::Deref) {
                 // `*r = x`, `(*r).f = x`: defines what `r` points to (weakly), and the place
                 // through `r` for reads that go through it
                 // with a single possible target the write certainly lands there (a strong
-                // update); otherwise it may (weak)
-                let targets = ptr.targets(place.local, &path[..i], 0);
-                let single = sole_target(&targets);
+                // update); otherwise it may (weak), as through a pointer not all of whose
+                // targets are known
+                let targets = ptr.through_held(ptr.targets(place.local, &path[..i], 0));
+                let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
+                note(
+                    *at,
+                    Some(walk_ty(tcx, internal(body.locals()[place.local].ty), &path)),
+                    &mut cut_at,
+                    &mut lost_at,
+                );
                 for Target {
                     local: t, path: tp, ..
                 } in targets
@@ -486,6 +559,22 @@ impl Flow {
                         Rvalue::Use(args[1].clone(), rustc_public::mir::WithRetag::No),
                     )]
                 }
+                // a cell's value replaced through a shared borrow (`c.set(v)`, `c.replace(v)`):
+                // as `mem::replace` (what the borrow points to becomes `v`)
+                n if args.len() == 2
+                    && [
+                        "cell::Cell::<T>::set",
+                        "cell::Cell::<T>::replace",
+                        "cell::RefCell::<T>::replace",
+                    ]
+                    .iter()
+                    .any(|m| n.ends_with(m)) =>
+                {
+                    vec![(
+                        0,
+                        Rvalue::Use(args[1].clone(), rustc_public::mir::WithRetag::No),
+                    )]
+                }
                 "core::mem::swap" | "std::mem::swap" if args.len() == 2 => {
                     match (deref(&args[0]), deref(&args[1])) {
                         (Some(a), Some(b)) => vec![
@@ -507,7 +596,8 @@ impl Flow {
                 for (k, rv) in moved {
                     if let Some(Operand::Copy(p) | Operand::Move(p)) = args.get(k) {
                         let targets = ptr.targets(p.local, &path_of_place(p), 0);
-                        let single = sole_target(&targets);
+                        let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
+                        note(*at, pointee(p), &mut cut_at, &mut lost_at);
                         for Target {
                             local: t, path: tp, ..
                         } in targets
@@ -543,8 +633,26 @@ impl Flow {
             let local = local_fn(func);
             let through = !returns_mut_ref(body, place)
                 && holds_borrow(body, place)
-                && (!local || place.ty(body.locals()).is_ok_and(mut_holder))
+                && (!local
+                    || mut_holder(
+                        internal(body.locals()[place.local].ty),
+                        &path_of_place(place),
+                    ))
                 && !callee_name(body, func).is_some_and(|c| std_store(&c));
+            // (of a function of the crate, the arguments whose pointee the result holds a `&mut`
+            // of: `process(&mut x, &mut scratch) -> Out<'a>` borrows `scratch` only; all of them
+            // when none is seen)
+            let result_ty = Some(walk_ty(
+                tcx,
+                internal(body.locals()[place.local].ty),
+                &path_of_place(place),
+            ));
+            let held_arg = |p: &Place| {
+                pointee(p).is_some_and(|t| result_ty.is_some_and(|r| holds_mut_of(tcx, r, t, 0)))
+            };
+            let any_held = args.iter().any(|a| {
+                matches!(a, Operand::Copy(p) | Operand::Move(p) if is_mut_ptr(body, p) && held_arg(p))
+            });
             // a call that writes the whole buffer it is given (`rng.fill_bytes(nonce)`,
             // `read_exact(buf)`): what was there before is gone
             let whole = fills_whole(body, func);
@@ -564,8 +672,20 @@ impl Flow {
                     } else {
                         Vec::new()
                     };
+                    note(*at, pointee(p), &mut cut_at, &mut lost_at);
                     for h in holders {
-                        for (targets, single) in ptr.held(h) {
+                        let held = ptr.held(h);
+                        note(
+                            *at,
+                            if is_mut_ptr(body, p) {
+                                pointee(p)
+                            } else {
+                                None
+                            },
+                            &mut cut_at,
+                            &mut lost_at,
+                        );
+                        for (targets, single) in held {
                             for Target {
                                 local: t, path: tp, ..
                             } in targets
@@ -590,7 +710,9 @@ impl Flow {
                     && is_mut_ptr(body, p)
                 {
                     let targets = ptr.targets(p.local, &path_of_place(p), 0);
-                    let single = sole_target(&targets);
+                    let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
+                    note(*at, pointee(p), &mut cut_at, &mut lost_at);
+                    let through = through && (!local || !any_held || held_arg(p));
                     for Target {
                         local: t, path: tp, ..
                     } in targets
@@ -646,25 +768,21 @@ impl Flow {
                 }
             }
         }
-        if let Some(a) = last {
-            if ptr.cut.replace(false) {
-                cut_at.push(a);
-            }
-            if ptr.lost.replace(false) {
-                lost_at.push(a);
-            }
-        }
-        // a write through a pointer whose targets were cut: any place the body lends by
-        // `&mut` may hold what it wrote
-        for a in cut_at {
+        // a write through a pointer whose targets were cut, or not followed: any place the
+        // body lends by `&mut` (or a `&mut` parameter points to) that can hold what was written
+        // may hold it
+        for (a, ty) in cut_at {
             for (l, p) in &lent {
-                extra.push((*l, p.clone(), a, DefKind::Cut, false, false));
+                if let Some(whole) = fits(*l, p, ty) {
+                    extra.push((*l, at_part(p, whole), a, DefKind::Cut, false, false));
+                }
             }
         }
-        // through a pointer not followed: any place whose `&mut` went into a value
-        for a in lost_at {
-            for (l, p) in &escaping {
-                extra.push((*l, p.clone(), a, DefKind::Lost, false, false));
+        for (a, ty) in lost_at {
+            for (l, p) in &lent {
+                if let Some(whole) = fits(*l, p, ty) {
+                    extra.push((*l, at_part(p, whole), a, DefKind::Lost, false, false));
+                }
             }
         }
         // a write to an element (`key[31] = 1`, through `&mut key[3]`, or a fill of
@@ -939,6 +1057,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                                 field: *f,
                                 base: Box::new(o),
                                 args: crate::adt_args(tcx, args),
+                            };
+                        } else if variant == Some(1)
+                            && crate::path_of(tcx, adt.did()) == "core::result::Result"
+                        {
+                            // the error of a `Result` (`Err(e) => e` in a match): its error side
+                            o = Origin::Call {
+                                callee: "core::result::Result::<T, E>::unwrap_err".to_string(),
+                                krate: "core".to_string(),
+                                self_ty: Some("core::result::Result".to_string()),
+                                args: vec![o],
+                                span: None,
+                                runs: None,
                             };
                         }
                         ty = field.ty(tcx, args).skip_norm_wip();
@@ -1317,9 +1447,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 continue;
             } else if let Some(f) = part_overlap(&d.path, &path) {
                 // a write through a borrow a function returned (`*a.slot() = v`) where the read
-                // is of a part (`a.alg`): it may be the part written, or not
+                // is of a part (`a.alg`): it may be the part written, or not (an unnamed part:
+                // a cut or lost write, its own origin says so)
                 let o = self.def_origin(d, &[], depth, seen);
-                let o = Origin::Any(vec![o, Origin::Through { callee: f }]);
+                let o = if f.is_empty() {
+                    o
+                } else {
+                    Origin::Any(vec![o, Origin::Through { callee: f }])
+                };
                 if !alts.contains(&o) {
                     alts.push(o);
                 }
@@ -1347,6 +1482,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 && let Some(Step::Part(f)) = d.path[path.len()..]
                     .iter()
                     .find(|s| matches!(s, Step::Part(_)))
+                && !f.is_empty()
             {
                 o = Origin::Any(vec![o, Origin::Through { callee: f.clone() }]);
             }
@@ -1363,14 +1499,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 // values the field holds, beside the others
                 o = Origin::Set {
                     path: fields,
-                    value: Box::new(Origin::Any(vec![
-                        o,
-                        Origin::Through {
-                            callee: rcbom_facts::ELEMENT_WRITE.to_string(),
-                        },
-                    ])),
+                    value: Box::new(Origin::Any(vec![o, self.element_write()])),
                     strong: false,
                 };
+            } else if part
+                && matches!(
+                    d.path[path.len()..].first(),
+                    Some(Step::Elem | Step::Index(_))
+                )
+            {
+                // a write to an element of the list read itself (`l[0] = HS384` through a `&mut
+                // Vec` parameter, `v.algorithms` returned after `v.algorithms[1] = HS256`): the
+                // same, beside the others
+                o = Origin::Any(vec![o, self.element_write()]);
             }
             if !list.contains(&o) {
                 if list.len() >= MAX_WIDTH {
@@ -1395,6 +1536,18 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 parts.insert(0, w);
                 Origin::All(parts)
             }
+        }
+    }
+
+    /// The marker of a write into an element of a list, naming this body's function.
+    fn element_write(&self) -> Origin {
+        Origin::Through {
+            callee: rcbom_facts::element_write(
+                &self
+                    .def
+                    .map(|d| crate::path_of(self.tcx, d))
+                    .unwrap_or_default(),
+            ),
         }
     }
 
@@ -1755,6 +1908,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 p.extend_from_slice(&rest[1..]);
                 self.place(q.local, p, at, depth, seen)
             }
+            // `[BASE; 2]` read at a field of an element: that field of the constant
+            Rvalue::Repeat(op @ Operand::Constant(_), _)
+                if matches!(rest.first(), Some(Step::Elem | Step::Index(_)))
+                    && rest[1..].iter().any(|s| matches!(s, Step::Field(_))) =>
+            {
+                self.constant_part(op, &rest[1..], at, depth, seen)
+            }
             // `[0u8; 12]`
             Rvalue::Repeat(op, n) => match op {
                 Operand::Constant(c) => Origin::Const {
@@ -1881,6 +2041,23 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
             }
             AggregateKind::Tuple if ops.is_empty() => Origin::Unknown,
+            // `Err(e)`: the error side, kept apart from the value (`r.ok()`, `r?`, `unwrap_or`
+            // read the `Ok` side; `r.err()` this one)
+            AggregateKind::Adt(def, v, ..)
+                if ops.len() == 1 && variant_index(v) == 1 && {
+                    let adt = rustc_internal::internal(self.tcx, def.def_id());
+                    path_of(self.tcx, adt) == "core::result::Result"
+                } =>
+            {
+                Origin::Call {
+                    callee: rcbom_facts::RESULT_ERR.to_string(),
+                    krate: "core".to_string(),
+                    self_ty: Some("core::result::Result".to_string()),
+                    args: vec![self.operand(&ops[0], at, depth + 1, seen)],
+                    span: None,
+                    runs: None,
+                }
+            }
             // a struct literal read whole (`&Header { alg: HS384, ..Default::default() }`
             // passed on): each field's value at that field, so that a read of one field
             // elsewhere finds it, not every value the program stores in fields of its type
@@ -1904,7 +2081,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
                 Origin::All(parts)
             }
-            _ if !ops.is_empty() && ops.iter().all(|o| matches!(o, Operand::Constant(_))) => {
+            // literal data (`[0u8; 4]`, `(1, 2)`), not a value holding a descriptor or a static
+            // (`Some(&SHA1)`)
+            _ if !ops.is_empty()
+                && ops.iter().all(|o| {
+                    matches!(o, Operand::Constant(_))
+                        && matches!(self.operand(o, at, depth + 1, seen), Origin::Const { .. })
+                }) =>
+            {
                 let len = match kind {
                     AggregateKind::Array(t) => byte_len(t, Some(ops.len() as u64)),
                     _ => None,
@@ -2804,12 +2988,26 @@ struct Pointees<'a> {
     direct: &'a HashMap<Local, Vec<&'a DefKind>>,
     /// A search for targets went past the bound since it was last cleared.
     cut: Cell<bool>,
+    /// The places the current search has looked at (`MAX_SEARCH`).
+    steps: Cell<usize>,
     /// A search for targets met a pointer it does not follow (one taken out of a container or
     /// an iterator, `for r in vec![&mut x]`) since it was last cleared.
     lost: Cell<bool>,
     /// Locals some statement writes a part of (`h.r = &mut y`): their aggregates' fields are
     /// not all they hold.
     partly: HashSet<Local>,
+    /// The pointer stores into parts of locals (`h.r = &mut y`), by local: path, where, value.
+    part_stores: HashMap<Local, Vec<(Path, At, Operand)>>,
+    /// Where the write being followed is (the statement whose pointer is looked up).
+    cur_at: Cell<Option<At>>,
+    /// Pointers to values that hold a `&mut` (`&mut W` with `W { r: &mut T }`): a borrow a call
+    /// returns into one may point through it.
+    holders: HashSet<Local>,
+    /// Locals the body lends by `&mut` (`o.insert(..)` on `&mut o`): what a value built in one
+    /// holds may change through the loan.
+    lent_locals: HashSet<Local>,
+    /// The number of arguments.
+    nargs: usize,
 }
 
 /// A place a pointer may point to. `alias` marks the place through the pointer itself
@@ -2822,6 +3020,58 @@ struct Target {
 }
 
 impl Pointees<'_> {
+    /// Targets reached through a pointer held in a place (`*v[0] = x` on a `Vec<&mut T>`: the
+    /// element's pointer, `(v, [Elem, Deref])`): where that pointer points, as far as followed
+    /// (not followed: `lost`). An argument's (`*(*_1).0`, a closure's capture) stays as it is.
+    fn through_held(&self, targets: Vec<Target>) -> Vec<Target> {
+        self.through_held_at(targets, 0)
+    }
+
+    /// One more place looked at by the current search; false past `MAX_SEARCH`.
+    fn step(&self) -> bool {
+        self.steps.set(self.steps.get() + 1);
+        self.steps.get() <= MAX_SEARCH
+    }
+
+    fn through_held_at(&self, targets: Vec<Target>, depth: usize) -> Vec<Target> {
+        let mut out = Vec::new();
+        for t in targets {
+            let j = t.path.iter().position(|s| *s == Step::Deref);
+            // (at the start of the path only through a reference or raw pointer held in the
+            // local, `*_t` of `_t: &mut &mut D`; a box's `*b` is its own contents)
+            let through_ptr = |j: usize| {
+                j > 0
+                    || matches!(
+                        self.body.locals()[t.local].ty.kind().rigid(),
+                        Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
+                    )
+            };
+            match j {
+                Some(j)
+                    if !t.alias
+                        && !(1..=self.nargs).contains(&t.local)
+                        && through_ptr(j)
+                        && depth < 4 =>
+                {
+                    let found = self.targets(t.local, &t.path[..j], 1);
+                    if found.iter().all(|x| x.alias) {
+                        self.lost.set(true);
+                    }
+                    let found: Vec<Target> = found
+                        .into_iter()
+                        .map(|mut x| {
+                            x.path.extend_from_slice(&t.path[j + 1..]);
+                            x
+                        })
+                        .collect();
+                    out.extend(self.through_held_at(found, depth + 1));
+                }
+                _ => out.push(t),
+            }
+        }
+        out
+    }
+
     /// The boxes a box `local.path` is the same allocation as: itself, and, for a copy of a
     /// box read through a reference (`_28 = copy (*_4)`), the box the reference points to.
     fn same_box(&self, local: Local, path: Path, depth: usize) -> Vec<(Local, Path)> {
@@ -2857,7 +3107,10 @@ impl Pointees<'_> {
 
     /// Places that `local.path` (a reference or raw pointer) points to.
     fn targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<Target> {
-        if depth > MAX_PATH {
+        if depth == 0 {
+            self.steps.set(0);
+        }
+        if depth > MAX_PATH || !self.step() {
             self.cut.set(true);
             return Vec::new();
         }
@@ -2975,10 +3228,20 @@ impl Pointees<'_> {
                             Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) => def.name(),
                             _ => String::new(),
                         });
-                    for a in args {
+                    // the argument and part its body borrows (`&mut self.alg`, `&mut s.other`
+                    // of the second); else some part of any of them, and, through a holder's
+                    // pointer (`impl DerefMut for W { .. self.r }`), a place not followed
+                    let borrowed = inside.as_ref().and_then(|_| returned_part(self.body, func));
+                    for (k, a) in args.iter().enumerate() {
                         if let Operand::Copy(q) | Operand::Move(q) = a
                             && is_mut_ptr(self.body, q)
                         {
+                            if borrowed.as_ref().is_some_and(|(b, _)| *b != k) {
+                                continue;
+                            }
+                            if borrowed.is_none() && self.holders.contains(&q.local) {
+                                self.lost.set(true);
+                            }
                             for mut t in self.targets(q.local, &path_of_place(q), depth + 1) {
                                 if part && !partial(&t.path) {
                                     t.path.push(Step::Elem);
@@ -2986,10 +3249,8 @@ impl Pointees<'_> {
                                 if let Some(f) = &inside
                                     && !partial(&t.path)
                                 {
-                                    // the part its body borrows (`&mut self.alg`), else some
-                                    // part not known
-                                    match returned_part(self.body, func) {
-                                        Some(p) => t.path.extend(p),
+                                    match &borrowed {
+                                        Some((_, p)) => t.path.extend(p.iter().cloned()),
                                         None => t.path.push(Step::Part(f.clone())),
                                     }
                                 }
@@ -3012,11 +3273,35 @@ impl Pointees<'_> {
     /// written later, or a value not built here, is not followed (`lost`).
     fn field_targets(&self, local: Local, path: &[Step], depth: usize) -> Vec<Target> {
         let mut out = Vec::new();
-        if depth > MAX_PATH {
+        if depth > MAX_PATH || !self.step() {
             self.cut.set(true);
             return out;
         }
+        // a part stored later (`h.r = &mut b` after `Holder { r: &mut a }`): the last such store
+        // before the write in its block is what the part holds there; else any of them, not
+        // followed for sure
+        // (a value lent by `&mut` may be changed through the loan: `o.insert(&mut x)`)
+        if self.lent_locals.contains(&local) {
+            self.lost.set(true);
+        }
         if self.partly.contains(&local) {
+            let at = self.cur_at.get();
+            let last = self
+                .part_stores
+                .get(&local)
+                .into_iter()
+                .flatten()
+                .filter(|(p, a, _)| {
+                    at.is_some_and(|w| a.bb == w.bb && a.idx < w.idx) && is_prefix(p, path)
+                })
+                .max_by_key(|(_, a, _)| a.idx);
+            if let Some((p, _, Operand::Copy(q) | Operand::Move(q))) = last {
+                let mut qp = path_of_place(q);
+                if !qp.contains(&Step::Deref) {
+                    qp.extend_from_slice(&path[p.len()..]);
+                    return self.targets(q.local, &qp, depth + 1);
+                }
+            }
             self.lost.set(true);
         }
         let Some(defs) = self.direct.get(&local) else {
@@ -3181,17 +3466,18 @@ fn borrows_inside(body: &Body, func: &Operand, args: &[Operand], result: Local) 
     let Some(out) = pointee(body.locals()[result].ty) else {
         return false;
     };
+    // (of any pointer argument: `second(0, &mut s)` borrows from its second)
     !std && args
-        .first()
-        .and_then(|a| a.ty(body.locals()).ok())
-        .and_then(pointee)
-        .is_some_and(|inp| inp != out)
+        .iter()
+        .filter_map(|a| a.ty(body.locals()).ok().and_then(pointee))
+        .any(|inp| inp != out)
 }
 
-/// The part of what its first argument points to that a function returns a borrow of, when
-/// every return of its body borrows the same one (`fn slot(&mut self) -> &mut &Digest { &mut
-/// self.alg }`: `[Field(0)]`).
-fn returned_part(caller: &Body, func: &Operand) -> Option<Path> {
+/// The argument a function returns a borrow into, and the part of what it points to, when every
+/// return of its body borrows the same one (`fn slot(&mut self) -> &mut &Digest { &mut
+/// self.alg }`: argument 0, `[Field(0)]`; `fn second(_n: u8, s: &mut U) -> .. { &mut s.other }`:
+/// argument 1).
+fn returned_part(caller: &Body, func: &Operand) -> Option<(usize, Path)> {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
         func.ty(caller.locals()).ok().map(|t| t.kind())
     else {
@@ -3201,11 +3487,13 @@ fn returned_part(caller: &Body, func: &Operand) -> Option<Path> {
     let body = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| def.body()))
         .ok()
         .flatten()?;
-    fn resolve(body: &Body, local: Local, depth: usize) -> Option<Path> {
+    let nargs = body.arg_locals().len();
+    fn resolve(body: &Body, nargs: usize, local: Local, depth: usize) -> Option<(Local, Path)> {
         if depth > 8 {
             return None;
         }
-        let mut found: Option<Path> = None;
+        let arg = |l: Local| (1..=nargs).contains(&l);
+        let mut found: Option<(Local, Path)> = None;
         for b in &body.blocks {
             for st in &b.statements {
                 let StatementKind::Assign(lhs, rv) = &st.kind else {
@@ -3226,19 +3514,19 @@ fn returned_part(caller: &Body, func: &Operand) -> Option<Path> {
                         if rest.contains(&Step::Deref) {
                             return None;
                         }
-                        if q.local == 1 {
-                            rest.to_vec()
+                        if arg(q.local) {
+                            (q.local, rest.to_vec())
                         } else {
-                            let mut base = resolve(body, q.local, depth + 1)?;
+                            let (l, mut base) = resolve(body, nargs, q.local, depth + 1)?;
                             base.extend(rest.iter().cloned());
-                            base
+                            (l, base)
                         }
                     }
                     Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
                     | Rvalue::CopyForDeref(q)
-                        if q.projection.is_empty() && q.local != 1 =>
+                        if q.projection.is_empty() && !arg(q.local) =>
                     {
-                        resolve(body, q.local, depth + 1)?
+                        resolve(body, nargs, q.local, depth + 1)?
                     }
                     _ => return None,
                 };
@@ -3256,11 +3544,13 @@ fn returned_part(caller: &Body, func: &Operand) -> Option<Path> {
         }
         found
     }
-    resolve(&body, 0, 0).filter(|p| {
-        !p.is_empty()
-            && p.iter()
-                .all(|s| matches!(s, Step::Field(_) | Step::Variant(_)))
-    })
+    resolve(&body, nargs, 0, 0)
+        .filter(|(_, p)| {
+            !p.is_empty()
+                && p.iter()
+                    .all(|s| matches!(s, Step::Field(_) | Step::Variant(_)))
+        })
+        .map(|(l, p)| (l - 1, p))
 }
 
 fn is_ptr(body: &Body, p: &Place) -> bool {
@@ -3273,10 +3563,22 @@ fn is_ptr(body: &Body, p: &Place) -> bool {
 }
 
 fn is_mut_ptr(body: &Body, p: &Place) -> bool {
-    matches!(
+    // (a place whose own type `rustc_public` cannot convert, an `async` closure handed to a
+    // call, is no pointer: converting it panics, `crate::has_unconvertible`; any other panic is
+    // raised again)
+    let kind = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         p.ty(body.locals())
             .ok()
-            .and_then(|t| t.kind().rigid().cloned()),
+            .and_then(|t| t.kind().rigid().cloned())
+    }))
+    .unwrap_or_else(|e| {
+        if !crate::async_closure(&e) {
+            std::panic::resume_unwind(e)
+        }
+        None
+    });
+    matches!(
+        kind,
         Some(RigidTy::Ref(_, _, Mutability::Mut) | RigidTy::RawPtr(_, Mutability::Mut))
     )
 }
@@ -3322,11 +3624,81 @@ fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, dept
             holds_mut_borrow(tcx, *inner, depth + 1)
         }
         K::Tuple(ts) => ts.iter().any(|t| holds_mut_borrow(tcx, t, depth + 1)),
+        // a trait object with a borrowed lifetime (`Box<dyn DerefMut<..> + 'a>`), an opaque type
+        // (`impl FnMut + 'a`): what they hold is not known
+        K::Dynamic(_, r) => !r.is_static(),
+        K::Alias(..) => true,
         K::Adt(def, args) => {
             args.types().any(|t| holds_mut_borrow(tcx, t, depth + 1))
                 || (args.regions().next().is_some()
                     && def.all_fields().any(|f| {
                         holds_mut_borrow(tcx, f.ty(tcx, args).skip_normalization(), depth + 1)
+                    }))
+        }
+        _ => false,
+    }
+}
+
+/// Can a value of type `container` hold a value of type `t` (itself, a field, a variant's field,
+/// an element; not behind a pointer)?
+fn type_contains<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    container: rustc_middle::ty::Ty<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if tcx.erase_and_anonymize_regions(container) == tcx.erase_and_anonymize_regions(t) {
+        return true;
+    }
+    if depth > 4 {
+        return false;
+    }
+    match container.kind() {
+        K::Adt(def, args) => def
+            .all_fields()
+            .any(|f| type_contains(tcx, f.ty(tcx, args).skip_normalization(), t, depth + 1)),
+        K::Tuple(ts) => ts.iter().any(|c| type_contains(tcx, c, t, depth + 1)),
+        K::Array(e, _) | K::Slice(e) => type_contains(tcx, *e, t, depth + 1),
+        // a type parameter, an opaque type: anything
+        K::Param(_) | K::Alias(..) => true,
+        _ => false,
+    }
+}
+
+/// Does a value of type `t` hold a `&mut` to a value of type `pointee` (a field, an element, a
+/// type argument)?
+fn holds_mut_of<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    pointee: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 4 {
+        return false;
+    }
+    match t.kind() {
+        K::Ref(_, inner, rustc_middle::ty::Mutability::Mut)
+        | K::RawPtr(inner, rustc_middle::ty::Mutability::Mut) => {
+            tcx.erase_and_anonymize_regions(*inner) == tcx.erase_and_anonymize_regions(pointee)
+                || holds_mut_of(tcx, *inner, pointee, depth + 1)
+        }
+        K::Ref(_, inner, _) | K::Array(inner, _) | K::Slice(inner) => {
+            holds_mut_of(tcx, *inner, pointee, depth + 1)
+        }
+        K::Tuple(ts) => ts.iter().any(|x| holds_mut_of(tcx, x, pointee, depth + 1)),
+        K::Adt(def, args) => {
+            args.types()
+                .any(|x| holds_mut_of(tcx, x, pointee, depth + 1))
+                || (args.regions().next().is_some()
+                    && def.all_fields().any(|f| {
+                        holds_mut_of(
+                            tcx,
+                            f.ty(tcx, args).skip_normalization(),
+                            pointee,
+                            depth + 1,
+                        )
                     }))
         }
         _ => false,

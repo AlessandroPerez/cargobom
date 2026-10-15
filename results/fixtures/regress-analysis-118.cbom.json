@@ -1,0 +1,1076 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a118 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a118 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a118 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a118::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a118::FIX; line: `const FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA1`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ALIAS; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ALIAS2; a118::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS2: Cfg = ALIAS;`; code: `ALIAS`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::S_ALIAS; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static S_ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::CREF2; a118::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const CREF2: &Cfg = &ALIAS;`; code: `ALIAS`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[present] [static] in a118::make; line: `const fn make() -> Cfg { Cfg { h: &SHA256, legacy: &SHA1 } }`; code: `SHA1`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 52,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TAB; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static TAB: Table = Table { rows: [BASE, FIX] };`; code: `BASE`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TAB; a118::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static TAB: Table = Table { rows: [BASE, FIX] };`; code: `FIX`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 41,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TP; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static TP: (Cfg, Cfg) = (BASE, FIX);`; code: `BASE`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TP; a118::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static TP: (Cfg, Cfg) = (BASE, FIX);`; code: `FIX`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::UPD; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static UPD: Cfg = Cfg { h: &SHA256, ..BASE };`; code: `BASE`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::AREF; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static AREF: [&Cfg; 2] = [&BASE, &FIX];`; code: `BASE`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::AREF; a118::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static AREF: [&Cfg; 2] = [&BASE, &FIX];`; code: `FIX`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::Cfg::DEF; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `impl Cfg { const DEF: Cfg = BASE; }`; code: `BASE`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::NESTED2; a118::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const NESTED2: Outer = Outer { inner: ALIAS, n: 0 };`; code: `ALIAS`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ST_OF_ST; a118::S_ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static ST_OF_ST: &Cfg = &S_ALIAS;`; code: `S_ALIAS`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a118::S_ALIAS"
+          },
+          {
+            "additionalContext": "[present] [via-static] in a118::pick; a118::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const fn pick(i: usize) -> Cfg { if i == 0 { BASE } else { FIX } }`; code: `BASE`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[present] [via-static] in a118::pick; a118::FIX -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const fn pick(i: usize) -> Cfg { if i == 0 { BASE } else { FIX } }`; code: `FIX`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 59,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::ALIAS2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ALIAS2.h, &d);`; code: `ALIAS2`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::ALIAS2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::S_ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(S_ALIAS.h, &d);`; code: `S_ALIAS`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::S_ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::CREF2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(CREF2.h, &d);`; code: `CREF2`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::CREF2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::MADE2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE2.h, &d);`; code: `MADE2`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::MADE2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::MADE_C -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE_C.h, &d);`; code: `MADE_C`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::MADE_C"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TAB -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TAB.rows[i].h, &d);`; code: `TAB`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TP.1.h, &d);`; code: `TP`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(UPD.h, &d);`; code: `UPD`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static a118::UPD`; member: table, stored by `static a118::UPD`; line: `let _ = digest(UPD.legacy, &d);`; code: `digest`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(UPD.legacy, &d);`; code: `UPD`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::AREF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(AREF[i].h, &d);`; code: `AREF`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::AREF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::Cfg::DEF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(Cfg::DEF.h, &d);`; code: `Cfg::DEF`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::Cfg::DEF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::NESTED2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(NESTED2.inner.h, &d);`; code: `NESTED2`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::NESTED2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::ST_OF_ST -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ST_OF_ST.h, &d);`; code: `ST_OF_ST`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::ST_OF_ST"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::PICKED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(PICKED.h, &d);`; code: `PICKED`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::PICKED"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static a118::TP`; member: table, stored by `static a118::TP`; line: `let _ = digest(TP.0.legacy, &d);`; code: `digest`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TP.0.legacy, &d);`; code: `TP`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "36"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [static] in a118::make; line: `const fn make() -> Cfg { Cfg { h: &SHA256, legacy: &SHA1 } }`; code: `SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a118::UPD; line: `static UPD: Cfg = Cfg { h: &SHA256, ..BASE };`; code: `SHA256`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `a118::make`; line: `let _ = digest(MADE2.h, &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::MADE2 -> ring::digest::SHA256; line: `let _ = digest(MADE2.h, &d);`; code: `MADE2`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::MADE2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `a118::make`; line: `let _ = digest(MADE_C.h, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::MADE_C -> ring::digest::SHA256; line: `let _ = digest(MADE_C.h, &d);`; code: `MADE_C`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::MADE_C"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a118::make` stores in the field); line: `let _ = digest(TAB.rows[i].h, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA256, stored in `static a118::UPD`; member: table, stored by `static a118::UPD`; line: `let _ = digest(UPD.h, &d);`; code: `digest`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA256; line: `let _ = digest(UPD.h, &d);`; code: `UPD`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA256; line: `let _ = digest(UPD.legacy, &d);`; code: `UPD`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "10"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a118::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ALIAS; a118::BASE -> ring::digest::SHA384; line: `const ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ALIAS2; a118::ALIAS -> ring::digest::SHA384; line: `const ALIAS2: Cfg = ALIAS;`; code: `ALIAS`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::S_ALIAS; a118::BASE -> ring::digest::SHA384; line: `static S_ALIAS: Cfg = BASE;`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::CREF2; a118::ALIAS -> ring::digest::SHA384; line: `const CREF2: &Cfg = &ALIAS;`; code: `ALIAS`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TAB; a118::BASE -> ring::digest::SHA384; line: `static TAB: Table = Table { rows: [BASE, FIX] };`; code: `BASE`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 35,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TP; a118::BASE -> ring::digest::SHA384; line: `static TP: (Cfg, Cfg) = (BASE, FIX);`; code: `BASE`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::UPD; a118::BASE -> ring::digest::SHA384; line: `static UPD: Cfg = Cfg { h: &SHA256, ..BASE };`; code: `BASE`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::AREF; a118::BASE -> ring::digest::SHA384; line: `static AREF: [&Cfg; 2] = [&BASE, &FIX];`; code: `BASE`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::Cfg::DEF; a118::BASE -> ring::digest::SHA384; line: `impl Cfg { const DEF: Cfg = BASE; }`; code: `BASE`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::NESTED2; a118::ALIAS -> ring::digest::SHA384; line: `const NESTED2: Outer = Outer { inner: ALIAS, n: 0 };`; code: `ALIAS`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "a118::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::ST_OF_ST; a118::S_ALIAS -> ring::digest::SHA384; line: `static ST_OF_ST: &Cfg = &S_ALIAS;`; code: `S_ALIAS`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "a118::S_ALIAS"
+          },
+          {
+            "additionalContext": "[present] [via-static] in a118::pick; a118::BASE -> ring::digest::SHA384; line: `const fn pick(i: usize) -> Cfg { if i == 0 { BASE } else { FIX } }`; code: `BASE`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "a118::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::BASE`; member: table, stored by `const a118::BASE`; line: `let _ = digest(ALIAS2.h, &d);`; code: `digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::ALIAS2 -> ring::digest::SHA384; line: `let _ = digest(ALIAS2.h, &d);`; code: `ALIAS2`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::ALIAS2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::BASE`; member: table, stored by `const a118::BASE`; line: `let _ = digest(S_ALIAS.h, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::S_ALIAS -> ring::digest::SHA384; line: `let _ = digest(S_ALIAS.h, &d);`; code: `S_ALIAS`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::S_ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::BASE`; member: table, stored by `const a118::BASE`; line: `let _ = digest(CREF2.h, &d);`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::CREF2 -> ring::digest::SHA384; line: `let _ = digest(CREF2.h, &d);`; code: `CREF2`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::CREF2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `const a118::BASE` stores in the field); line: `let _ = digest(TAB.rows[i].h, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TAB -> ring::digest::SHA384; line: `let _ = digest(TAB.rows[i].h, &d);`; code: `TAB`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA384; line: `let _ = digest(TP.1.h, &d);`; code: `TP`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA384; line: `let _ = digest(UPD.h, &d);`; code: `UPD`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::UPD -> ring::digest::SHA384; line: `let _ = digest(UPD.legacy, &d);`; code: `UPD`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::UPD"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::AREF -> ring::digest::SHA384; line: `let _ = digest(AREF[i].h, &d);`; code: `AREF`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::AREF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::BASE`; member: table, stored by `const a118::BASE`; line: `let _ = digest(Cfg::DEF.h, &d);`; code: `digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::Cfg::DEF -> ring::digest::SHA384; line: `let _ = digest(Cfg::DEF.h, &d);`; code: `Cfg::DEF`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::Cfg::DEF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::NESTED2`; member: table, stored by `const a118::NESTED2`; line: `let _ = digest(NESTED2.inner.h, &d);`; code: `digest`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::NESTED2 -> ring::digest::SHA384; line: `let _ = digest(NESTED2.inner.h, &d);`; code: `NESTED2`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::NESTED2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a118::BASE`; member: table, stored by `const a118::BASE`; line: `let _ = digest(ST_OF_ST.h, &d);`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::ST_OF_ST -> ring::digest::SHA384; line: `let _ = digest(ST_OF_ST.h, &d);`; code: `ST_OF_ST`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::ST_OF_ST"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a118::BASE`; line: `let _ = digest(PICKED.h, &d);`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA384; line: `let _ = digest(TP.0.legacy, &d);`; code: `TP`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "33"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a118::FIX; line: `const FIX: Cfg = Cfg { h: &SHA512, legacy: &SHA1 };`; code: `SHA512`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TAB; a118::FIX -> ring::digest::SHA512; line: `static TAB: Table = Table { rows: [BASE, FIX] };`; code: `FIX`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 41,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::TP; a118::FIX -> ring::digest::SHA512; line: `static TP: (Cfg, Cfg) = (BASE, FIX);`; code: `FIX`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::AREF; a118::FIX -> ring::digest::SHA512; line: `static AREF: [&Cfg; 2] = [&BASE, &FIX];`; code: `FIX`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[present] [via-static] in a118::pick; a118::FIX -> ring::digest::SHA512; line: `const fn pick(i: usize) -> Cfg { if i == 0 { BASE } else { FIX } }`; code: `FIX`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 59,
+            "symbol": "a118::FIX"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `const a118::FIX` stores in the field); line: `let _ = digest(TAB.rows[i].h, &d);`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TAB -> ring::digest::SHA512; line: `let _ = digest(TAB.rows[i].h, &d);`; code: `TAB`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TAB"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a118::TP`; member: table, stored by `static a118::TP`; line: `let _ = digest(TP.1.h, &d);`; code: `digest`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA512; line: `let _ = digest(TP.1.h, &d);`; code: `TP`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::AREF -> ring::digest::SHA512; line: `let _ = digest(AREF[i].h, &d);`; code: `AREF`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::AREF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `const a118::FIX`; line: `let _ = digest(PICKED.h, &d);`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::PICKED -> ring::digest::SHA512; line: `let _ = digest(PICKED.h, &d);`; code: `PICKED`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::PICKED"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in a118::main; a118::TP -> ring::digest::SHA512; line: `let _ = digest(TP.0.legacy, &d);`; code: `TP`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "a118::TP"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "13"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm unresolved: a field of `a118::AREF` the analysis does not follow (the data holds several algorithms); line: `let _ = digest(AREF[i].h, &d);`; code: `digest`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a118@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a118@0.1.0",
+      "name": "a118",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a118@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "64"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:96a5d18e-1e6c-8356-8961-f16600f42356",
+  "specVersion": "1.7",
+  "version": 1
+}

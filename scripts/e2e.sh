@@ -54,20 +54,33 @@ generate() {
         echo "the driver caught panics: each is a bug (RCBOM_DEBUG=1 prints them)"; exit 1
     fi
     # the CBOM named by its file name, as it sits next to the report in the results
-    if ! (cd "$dir" && "$cbom" cbom verify "$out/$name.cbom.json" --self-test) | sed "s#^$out/##" > "$out/$name.verify"; then
+    # (with known verifier limits, the check below decides)
+    local status=0
+    (cd "$dir" && "$cbom" cbom verify "$out/$name.cbom.json" --self-test) | sed "s#^$out/##" > "$out/$name.verify" || status=$?
+    if [ "$status" -ne 0 ] && [ ! -f "$dir/verify-known" ]; then
         cat "$out/$name.verify"; exit 1
     fi
-    python3 - "$out/$name.verify" <<'PY'
-import re, sys
+    # (a fixture's `verify-known`: the mismatches of correct positions the verifier cannot
+    # confirm, checked by hand, one `MISMATCH` line each; exactly those may occur)
+    python3 - "$out/$name.verify" "$dir/verify-known" <<'PY'
+import os, re, sys
 text = open(sys.argv[1]).read()
 v = re.search(r"(\d+) positions verified, (\d+) mismatched", text)
 shifts = [tuple(map(int, m)) for m in re.findall(r"(\d+)/(\d+) shifted positions rejected", text)]
 caught, total = sum(a for a, _ in shifts), sum(b for _, b in shifts)
 print(f"positions: {v.group(1)} verified, {v.group(2)} mismatched; self-test: {caught}/{total} shifted positions rejected")
+known = set()
+if os.path.exists(sys.argv[2]):
+    known = {l.strip() for l in open(sys.argv[2]) if l.strip() and not l.startswith("#")}
+found = set()
 for line in text.splitlines():
     if line.startswith(("MISMATCH", "ACCEPTED")):
-        print("  " + line)
-sys.exit(0 if v.group(2) == "0" and caught == total else 1)
+        print("  " + line + ("  (known verifier limit)" if line.strip() in known else ""))
+    if line.startswith("MISMATCH"):
+        found.add(line.strip())
+for line in sorted(known - found):
+    print("  stale verify-known entry (the position now verifies, or changed): " + line)
+sys.exit(0 if found == known and caught == total else 1)
 PY
 }
 

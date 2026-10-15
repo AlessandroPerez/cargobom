@@ -24,6 +24,9 @@ pub struct LinkIndex {
     returns: HashMap<(String, Vec<usize>), Vec<Origin>>,
     /// By function called: its callers, with the arguments they pass.
     calls: HashMap<String, Vec<(String, Vec<Origin>)>>,
+    /// Calls between the program's functions whose arguments carry no algorithm
+    /// (`Links::arg_calls`), by callee: only for `callers_of`.
+    arg_calls: HashMap<String, Vec<(String, Vec<Origin>)>>,
     /// By def id: (contents change at run time, values put there).
     statics: HashMap<String, (bool, Vec<Origin>)>,
     /// By function and parameter: what it writes through the parameter.
@@ -227,6 +230,13 @@ impl LinkIndex {
             }
             for c in &f.links.calls {
                 let v = ix.calls.entry(c.callee.clone()).or_default();
+                let call = (c.caller.clone(), c.args.clone());
+                if !v.contains(&call) {
+                    v.push(call);
+                }
+            }
+            for c in &f.links.arg_calls {
+                let v = ix.arg_calls.entry(c.callee.clone()).or_default();
                 let call = (c.caller.clone(), c.args.clone());
                 if !v.contains(&call) {
                     v.push(call);
@@ -570,9 +580,9 @@ impl LinkIndex {
                 .map(|(w, _)| w)
                 .collect();
             if by.is_empty() {
-                // (a lazy static's: what its closure returns, which nothing replaces)
-                let held = writers.is_none_or(|w| w.is_empty())
-                    && matches!(v, Origin::Call { callee, .. } if callee == "<closure>");
+                // (a static no function of the program puts a value in: a lazy static, a
+                // thread-local nothing sets, a lock nothing writes by name)
+                let held = writers.is_none_or(|w| w.is_empty());
                 out.push((
                     v.clone(),
                     Via::Static(if held {
@@ -616,6 +626,24 @@ impl LinkIndex {
             .map(|vs| vs.into_iter().map(|(v, w, _)| (v, w)).collect())
     }
 
+    /// What function `func` returns, whole (its summaries' values, its parameters unresolved).
+    pub fn returned_values(&self, func: &str) -> Vec<Origin> {
+        self.returns
+            .get(&(func.to_string(), Vec::new()))
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    /// The program's calls of `func`: each caller with the arguments it passes, those that
+    /// can carry an algorithm or not.
+    pub fn callers_of(&self, func: &str) -> impl Iterator<Item = &(String, Vec<Origin>)> {
+        self.calls
+            .get(func)
+            .into_iter()
+            .chain(self.arg_calls.get(func))
+            .flatten()
+    }
+
     /// The functions an entry point reaches (by defining path), for `values_via_live`.
     pub fn set_reached(&self, reached: HashSet<String>) {
         *self.reached.borrow_mut() = Some(reached);
@@ -640,6 +668,18 @@ impl LinkIndex {
         self.instanced.contains(func)
             && instance_base(func) == func
             && !self.truncated.iter().any(|t| instance_base(t) == func)
+    }
+
+    /// Is `caller` a function no entry point reaches (once the reached functions are known)?
+    fn unreached_caller(&self, caller: &str) -> bool {
+        !caller.is_empty()
+            && !caller.contains(" for ")
+            && rcbom_facts::owner_static(caller).is_none()
+            && self
+                .reached
+                .borrow()
+                .as_ref()
+                .is_some_and(|r| !r.contains(caller))
     }
 
     /// Is `caller` a function no entry point reaches (in a `live_only` lookup)?
@@ -768,6 +808,48 @@ impl LinkIndex {
                             self.resolve(&part, path, &w, depth + 1, &via.then(by.clone()), out);
                         }
                     }
+                    // and what the program writes into that field through a reference anywhere
+                    // (a type-join, possible), but in a function known to write another static:
+                    // a value written through the lock where the static is not named (a helper
+                    // given the lock, its guard, a field holding it, another crate's code) is
+                    // one of them
+                    let key = (adt.clone(), fields(&p));
+                    // (functions naming another static they write, not a helper given a lock)
+                    let writers_elsewhere: HashSet<&String> = self
+                        .static_writers
+                        .iter()
+                        .filter(|(id, _)| **id != def.id)
+                        .flat_map(|(_, w)| {
+                            w.iter()
+                                .filter(|(_, v)| !matches!(v, Origin::Written { .. }))
+                                .map(|(f, _)| f)
+                        })
+                        .collect();
+                    let statik = rcbom_facts::static_owner(&def.path, &def.id);
+                    for s in self.fields.get(&key).into_iter().flatten() {
+                        if s.via_ref
+                            && !writers_elsewhere.contains(&s.func)
+                            && rcbom_facts::owner_static(&s.func).is_none()
+                            && !self.superseded(&s.func)
+                        {
+                            let by = via.then(Via::Join(s.func.clone()));
+                            let mut found = Vec::new();
+                            self.resolve(&s.value, &[], &s.func, depth + 1, &by, &mut found);
+                            for f in found {
+                                // (a value this function puts in this static, found above
+                                // however its write is recorded: through a helper's parameter,
+                                // into a field of a field: the static's, not a join)
+                                let counted = out.iter().any(|e| {
+                                    e.0 == f.0
+                                        && matches!(&e.2, Via::Store { writer, statik: st }
+                                            if *writer == s.func && *st == statik)
+                                });
+                                if !counted {
+                                    push(out, f);
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
                 if let Origin::Data { def, .. } = peel(base)
@@ -889,13 +971,24 @@ impl LinkIndex {
             // values the list holds, beside the others
             Origin::Any(alts)
                 if alts.iter().any(|a| {
-                    matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
+                    matches!(a, Origin::Through { callee }
+                        if rcbom_facts::element_writer(callee).is_some())
                 }) =>
             {
-                let by = via.then(Via::Container(owner.to_string()));
+                // (the function making the write, which the marker names)
+                let writer = alts
+                    .iter()
+                    .find_map(|a| match a {
+                        Origin::Through { callee } => rcbom_facts::element_writer(callee),
+                        _ => None,
+                    })
+                    .filter(|w| !w.is_empty())
+                    .unwrap_or(owner);
+                let by = via.then(Via::Container(writer.to_string()));
                 for a in alts {
                     // (the marker itself is no value)
-                    if !matches!(a, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE)
+                    if !matches!(a, Origin::Through { callee }
+                        if rcbom_facts::element_writer(callee).is_some())
                     {
                         self.resolve(a, path, owner, depth, &by, out);
                     }
@@ -946,6 +1039,13 @@ impl LinkIndex {
                             let by = via.then(Via::Caller(caller.clone()));
                             self.resolve(a, path, caller, depth + 1, &by, &mut found);
                         }
+                        // (through a caller no entry point reaches: that caller is how they
+                        // reach it, whatever they are further on)
+                        if self.unreached_caller(caller) {
+                            for v in found.iter_mut() {
+                                v.2 = Via::Caller(caller.clone());
+                            }
+                        }
                         unknown |= found.is_empty();
                         found.into_iter().for_each(|v| push(out, v));
                     }
@@ -992,9 +1092,7 @@ impl LinkIndex {
                     None => self_ty
                         .iter()
                         .map(|t| rcbom_facts::impl_key(callee, t))
-                        .chain(
-                            (!self.implemented.contains(callee)).then(|| callee.clone()),
-                        )
+                        .chain((!self.implemented.contains(callee)).then(|| callee.clone()))
                         .collect(),
                 };
                 if let Some((name, k)) = names

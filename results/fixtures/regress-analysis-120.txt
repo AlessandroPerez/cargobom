@@ -1,0 +1,109 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:11:78 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a120::WR::__RUST_STD_INTERNAL_INIT; line: `static WR: RefCell<Cfg> = const { RefCell::new(Cfg { h: &SHA256, legacy: &SHA1 }) };`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `a120::main` puts in `static a120::CELLT`); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:35:27 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a120::main; line: `if i == 0 { CELLT.set(&SHA1); }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `a120::main` puts in `static a120::CELLT`); line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:6:44 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a120::mk; line: `fn mk() -> Cfg { Cfg { h: &SHA384, legacy: &SHA1 } }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:7:0 | a120::WR::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a120::WR::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a120::WR::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `thread_local! {`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:8:73 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a120::LAZYT::__rust_std_internal_init_fn; line: `static LAZYT: RefCell<Cfg> = RefCell::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:61 | ring::digest::SHA256 | [reachable] [static] in a120::WR::__RUST_STD_INTERNAL_INIT; line: `static WR: RefCell<Cfg> = const { RefCell::new(Cfg { h: &SHA256, legacy: &SHA1 }) };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:4 | a120::local_key::INFN::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a120::local_key::INFN::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a120::local_key::INFN::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA256; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `thread_local! { static INFN: Cell<&'static Digest> = const { Cell::new(&SHA256) }; }`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:76 | ring::digest::SHA256 | [reachable] [static] in a120::local_key::INFN::__RUST_STD_INTERNAL_INIT; line: `thread_local! { static INFN: Cell<&'static Digest> = const { Cell::new(&SHA256) }; }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a120::LAZYT::__rust_std_internal_init_fn` stores in the field); line: `let _ = digest(a, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:33:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a120::LAZYT::__rust_std_internal_init_fn` stores in the field); line: `let _ = digest(via_helper(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: static, possible (the value `static a120::local_key::INFN` holds); line: `let _ = digest(local_key(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:0 | a120::WR::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a120::WR::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a120::WR::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA256; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `thread_local! {`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:8:56 | ring::digest::SHA256 | [reachable] [static] in a120::LAZYT::__rust_std_internal_init_fn; line: `static LAZYT: RefCell<Cfg> = RefCell::new(Cfg { h: &SHA256, legacy: &SHA1 });`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:102 | ring::digest::SHA384 | [reachable] [static] in a120::inner::MODT::__RUST_STD_INTERNAL_INIT; line: `mod inner { use super::*; thread_local! { pub static MODT: Cell<&'static Digest> = const { Cell::new(&SHA384) }; } }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:26 | a120::inner::MODT::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a120::inner::MODT::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a120::inner::MODT::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA384; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `mod inner { use super::*; thread_local! { pub static MODT: Cell<&'static Digest> = const { Cell::new(&SHA384) }; } }`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a120::mk` stores in the field); line: `let _ = digest(a, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static a120::inner::MODT` holds); line: `let _ = digest(inner::MODT.get(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:33:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a120::mk` stores in the field); line: `let _ = digest(via_helper(), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:6:27 | ring::digest::SHA384 | [reachable] [static] in a120::mk; line: `fn mk() -> Cfg { Cfg { h: &SHA384, legacy: &SHA1 } }`; code: `SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:50 | ring::digest::SHA512 | [reachable] [static] in a120::set_wr; line: `fn set_wr(c: &RefCell<Cfg>) { c.borrow_mut().h = &SHA512; }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a120::set_wr` stores in the field); line: `let _ = digest(a, &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: static, possible (the value `static a120::CELLT` starts with, which the program may replace); line: `let _ = digest(CELLT.get(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:33:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a120::set_wr` stores in the field); line: `let _ = digest(via_helper(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (the value `static a120::CELLT` starts with, which the program may replace); line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:7:0 | a120::CELLT::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a120::CELLT::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a120::CELLT::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA512; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `thread_local! {`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:61 | ring::digest::SHA512 | [reachable] [static] in a120::CELLT::__RUST_STD_INTERNAL_INIT; line: `static CELLT: Cell<&'static Digest> = const { Cell::new(&SHA512) };`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a120 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a120 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a120 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:28:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm unresolved: the result of `std::thread::local::LocalKey::<..>::with_borrow`; line: `let _ = digest(b, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm unresolved: the result of `std::thread::local::LocalKey::<..>::with_borrow`; line: `let _ = digest(w, &d);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in a120::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(CELLT.with(|c| c.get()), &d);`; code: `digest`
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=7
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=8
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=6
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=7
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a120@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
+dependency pkg:cargo/a120@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
+root {"bom-ref": "pkg:cargo/a120@0.1.0", "name": "a120", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a120@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=172
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

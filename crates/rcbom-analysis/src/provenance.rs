@@ -490,17 +490,19 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
             _ => {
                 out.insert(class(
                     "computed",
-                    format!("written by {}", short(&strip_generics(callee))),
+                    format!("written by {}", fn_display(callee)),
                 ));
             }
         },
         // written through a borrow the call returned (`key.chunks_mut(16)`, `split_at_mut`):
         // what was written is not followed
         Origin::Through { callee } => {
-            out.insert(class(
-                "computed",
-                format!("written through {}", short(&strip_generics(callee))),
-            ));
+            let how = match rcbom_facts::element_writer(callee) {
+                Some("") => "written into an element".to_string(),
+                Some(w) => format!("written into an element by {}", fn_display(w)),
+                None => format!("written through {}", fn_display(callee)),
+            };
+            out.insert(class("computed", how));
         }
         // a value updated from its own earlier value (`ctr += 1`): a counter, whose constant
         // alternatives are only where it starts
@@ -771,6 +773,10 @@ fn elsewhere_direct(kb: &Kb, o: &Origin, depth: usize) -> bool {
             alts.iter().any(|a| elsewhere_direct(kb, a, depth + 1))
         }
         Origin::Set { value, .. } => elsewhere_direct(kb, value, depth + 1),
+        // (the error side of a `Result` another function returns)
+        Origin::Call { callee, args, .. } if result_err_read(callee) => args
+            .iter()
+            .any(|a| from_elsewhere(kb, None, a) || elsewhere_direct(kb, a, depth + 1)),
         Origin::Field { .. } if static_root(o).is_some() => false,
         _ => from_elsewhere(kb, None, o),
     }
@@ -785,10 +791,14 @@ fn elsewhere_receiver(kb: &Kb, o: &Origin, depth: usize) -> bool {
         return true;
     }
     match o {
-        // (a function item a `map` calls with the value: `o.map(keep)` is `keep(..)`)
+        // (a function item a `map` calls with the value: `o.map(keep)` is `keep(..)`; a
+        // fallback function: `unwrap_or_else(fallback)`)
         Origin::Call { args, callee, .. } if std_map(callee) => mapped_values(args)
             .iter()
             .chain(args)
+            .any(|a| elsewhere_direct(kb, a, 0) || elsewhere_receiver(kb, a, depth + 1)),
+        Origin::Call { args, callee, .. } if std_choice(callee) => choice_values(args)
+            .iter()
             .any(|a| elsewhere_direct(kb, a, 0) || elsewhere_receiver(kb, a, depth + 1)),
         Origin::Call { args, .. } => args
             .iter()
@@ -880,6 +890,22 @@ fn direct_data(
     // (through std wrappers: `RwLock::new(&SHA256)`)
     let o = crate::links::peel_ix(links.map(|(ix, _)| ix), o);
     match o {
+        // a `Result`'s error value: not the value read
+        Origin::Call { callee, .. } if callee == rcbom_facts::RESULT_ERR => {}
+        // the value a place held before a call replaced it (`mem::take(&mut Some(&SHA1))`)
+        Origin::Call { args, callee, .. } if std_old_value(callee) => {
+            if let Some(a) = args.first() {
+                direct_data(kb, links, a, depth + 1, out, seen);
+            }
+        }
+        // the error side read (`r.err()`, `Err(e) => e`): the `Err` values
+        Origin::Call { args, callee, .. } if result_err_read(callee) => {
+            if let Some(r) = args.first() {
+                for e in err_sides(kb, links, r, seen) {
+                    direct_data(kb, links, &e, depth + 1, out, seen);
+                }
+            }
+        }
         Origin::Data { def, .. } => {
             if let Some((ix, owner)) = links {
                 ix.note(&def.id, owner);
@@ -984,35 +1010,130 @@ pub(crate) fn mapped_values(args: &[Origin]) -> Vec<Origin> {
     };
     args.iter()
         .skip(1)
-        .map(|a| match a {
-            Origin::Unit {
-                path, krate, value, ..
-            } => {
-                let std = matches!(krate.as_str(), "core" | "std" | "alloc");
-                let bare = strip_generics(path);
-                if std
-                    && (bare.ends_with("convert::identity")
-                        || bare.ends_with("::Some")
-                        || bare.ends_with("::Ok")
-                        || bare.ends_with("::Err"))
-                {
-                    receiver.clone()
-                } else if std || value.is_some() {
-                    Origin::Unknown
-                } else {
-                    Origin::Call {
-                        callee: path.clone(),
-                        krate: krate.clone(),
-                        self_ty: None,
-                        args: vec![receiver.clone()],
-                        span: None,
-                        runs: None,
+        .flat_map(|a| fn_values(a, Some(receiver)))
+        .collect()
+}
+
+/// What an argument given as a function makes (`map(keep)`, `unwrap_or_else(fallback)`): a
+/// function item called (with `input`, the value it is given, where it takes one), each of
+/// several a pointer may be (`let g = if c { keep } else { fixed }`); `identity`, `Some`, `Ok`:
+/// the input itself; any other argument: itself.
+pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
+    match a {
+        Origin::Unit {
+            path, krate, value, ..
+        } => {
+            let std = matches!(krate.as_str(), "core" | "std" | "alloc");
+            let bare = strip_generics(path);
+            if std
+                && (bare.ends_with("convert::identity")
+                    || bare.ends_with("::Some")
+                    || bare.ends_with("::Ok")
+                    || bare.ends_with("::Err"))
+            {
+                vec![input.cloned().unwrap_or(Origin::Unknown)]
+            } else if std || value.is_some() {
+                vec![Origin::Unknown]
+            } else {
+                vec![Origin::Call {
+                    callee: path.clone(),
+                    krate: krate.clone(),
+                    self_ty: None,
+                    args: input.cloned().into_iter().collect(),
+                    span: None,
+                    runs: None,
+                }]
+            }
+        }
+        Origin::Any(alts) if alts.iter().all(|x| matches!(x, Origin::Unit { .. })) => {
+            alts.iter().flat_map(|x| fn_values(x, input)).collect()
+        }
+        _ => vec![a.clone()],
+    }
+}
+
+/// The values a choice between an `Option`'s or a `Result`'s value and a fallback is made of
+/// (`std_choice`): its arguments, a fallback function called (`unwrap_or_else(fallback)`).
+pub(crate) fn choice_values(args: &[Origin]) -> Vec<Origin> {
+    args.iter()
+        .enumerate()
+        .flat_map(|(i, a)| {
+            if i == 0 {
+                vec![a.clone()]
+            } else {
+                fn_values(a, None)
+            }
+        })
+        .collect()
+}
+
+/// A call reading a `Result`'s error side (`r.err()`, `r.unwrap_err()`, `r.expect_err(..)`).
+pub(crate) fn result_err_read(callee: &str) -> bool {
+    let bare = strip_generics(callee);
+    bare.starts_with("core::result::")
+        && (bare.ends_with("::err")
+            || bare.ends_with("::unwrap_err")
+            || bare.ends_with("::expect_err"))
+}
+
+/// The error values of a `Result` (`Err(e)`: `e`), through the values that reach it from other
+/// functions (`res(i)`).
+fn err_sides(
+    kb: &Kb,
+    links: Option<(&LinkIndex, &str)>,
+    o: &Origin,
+    seen: &mut Seen,
+) -> Vec<Origin> {
+    fn walk(o: &Origin, out: &mut Vec<Origin>, depth: usize) {
+        if depth > 8 {
+            return;
+        }
+        match o {
+            Origin::Call { callee, args, .. } if callee == rcbom_facts::RESULT_ERR => {
+                out.extend(args.first().cloned())
+            }
+            // `map_err(f)`: what `f` makes of the error (a closure's result, a function item
+            // called with it)
+            Origin::Call { callee, args, .. }
+                if strip_generics(callee).starts_with("core::result::")
+                    && strip_generics(callee).ends_with("::map_err") =>
+            {
+                for f in args.iter().skip(1) {
+                    match f {
+                        Origin::Call { callee, args, .. } if callee == "<closure>" => {
+                            out.extend(args.iter().cloned())
+                        }
+                        Origin::Unit { path, krate, .. } => out.push(Origin::Call {
+                            callee: path.clone(),
+                            krate: krate.clone(),
+                            self_ty: None,
+                            args: vec![Origin::Unknown],
+                            span: None,
+                            runs: None,
+                        }),
+                        _ => out.push(Origin::Unknown),
                     }
                 }
             }
-            _ => a.clone(),
-        })
-        .collect()
+            Origin::Any(v) | Origin::All(v) => v.iter().for_each(|x| walk(x, out, depth + 1)),
+            _ => {
+                let p = crate::links::peel(o);
+                if p != o {
+                    walk(p, out, depth + 1)
+                }
+            }
+        }
+    }
+    let mut out = Vec::new();
+    walk(o, &mut out, 0);
+    if from_elsewhere(kb, links.map(|(ix, _)| ix), o)
+        && let Some((ix, owner)) = links
+    {
+        for (v, _, _) in elsewhere(ix, o, owner, true, seen) {
+            walk(&v, &mut out, 0);
+        }
+    }
+    out
 }
 
 /// A standard-library call whose result is the value its first argument held before
@@ -1020,9 +1141,11 @@ pub(crate) fn mapped_values(args: &[Origin]) -> Vec<Origin> {
 /// value it puts there.
 pub(crate) fn std_old_value(callee: &str) -> bool {
     let bare = strip_generics(callee);
-    (bare.starts_with("core::mem::") && (bare.ends_with("::replace") || bare.ends_with("::take")))
-        || (bare.starts_with("core::option::")
-            && (bare.ends_with("::replace") || bare.ends_with("::take")))
+    // (and a cell's: `c.replace(v)`, `c.take()`)
+    (bare.starts_with("core::mem::")
+        || bare.starts_with("core::option::")
+        || bare.starts_with("core::cell::"))
+        && (bare.ends_with("::replace") || bare.ends_with("::take"))
 }
 
 /// A crypto crate's getter for the algorithm a value was made with (`ctx.algorithm()`,
@@ -1133,6 +1256,23 @@ fn receiver_data(
         return;
     }
     match o {
+        // a `Result`'s error value: not what the value read is (`r.ok()`, `r?`, `unwrap_or`)
+        Origin::Call { callee, .. } if callee == rcbom_facts::RESULT_ERR => {}
+        // the error side of a `Result` (`r.err()`, `r.unwrap_err()`): its `Err` values
+        Origin::Call { args, callee, .. } if result_err_read(callee) => {
+            if let Some(r) = args.first() {
+                for e in err_sides(kb, links, r, seen) {
+                    let mut here = Vec::new();
+                    direct_data(kb, links, &e, 0, &mut here, seen);
+                    for d in here {
+                        if !out.contains(&d) {
+                            out.push(d);
+                        }
+                    }
+                    receiver_data(kb, links, &e, depth + 1, out, seen, lengths);
+                }
+            }
+        }
         // the value a place held before a call replaced it (`mem::replace(slot, &SHA1)`)
         Origin::Call { args, callee, .. } if std_old_value(callee) => {
             if let Some(a) = args.first() {
@@ -1169,7 +1309,7 @@ fn receiver_data(
         // a choice between an `Option`'s or a `Result`'s value and a fallback
         // (`v.first().copied().unwrap_or(&SHA512)`): either, each followed
         Origin::Call { args, callee, .. } if std_choice(callee) => {
-            for a in args {
+            for a in &choice_values(args) {
                 let mut here = Vec::new();
                 direct_data(kb, links, a, 0, &mut here, seen);
                 for d in here {
@@ -1349,6 +1489,32 @@ fn last(path: &str) -> &str {
     path.rsplit("::").next().unwrap_or(path)
 }
 
+/// A function's path for reading: its last segments, without generic arguments, an
+/// implementation's item named by its self type (`<a::X<T> as b::Tr>::f` -> `a::X::f`).
+fn fn_display(path: &str) -> String {
+    // (an instance's turbofish with its `::`: `app::fill::<app::X>` is `app::fill`)
+    let path = &path.replace("::<", "<");
+    if let Some(inner) = path.strip_prefix('<') {
+        let mut depth = 1usize;
+        for (i, c) in inner.char_indices() {
+            match c {
+                '<' => depth += 1,
+                '>' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        let qself = &inner[..i];
+                        let ty = strip_generics(qself);
+                        let ty = ty.split(" as ").next().unwrap_or(&ty);
+                        return short(&format!("{ty}{}", strip_generics(&inner[i + 1..])));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    short(&strip_generics(path))
+}
+
 fn short(path: &str) -> String {
     let parts: Vec<&str> = path.split("::").collect();
     if parts.len() > 3 {
@@ -1366,6 +1532,21 @@ mod tests {
     fn generics_are_stripped_from_paths() {
         assert_eq!(strip_generics("hkdf::Hkdf::<H, I>::new"), "hkdf::Hkdf::new");
         assert_eq!(strip_generics("<A as B<C>>::f"), "::f");
+    }
+
+    #[test]
+    fn writers_are_named_by_their_self_type() {
+        assert_eq!(
+            fn_display(
+                "<rustls::crypto::tls12::GcmMessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt"
+            ),
+            "tls12::GcmMessageDecrypter::decrypt"
+        );
+        assert_eq!(
+            fn_display("<app::W<app::A> as app::Gen<u8>>::set"),
+            "app::W::set"
+        );
+        assert_eq!(fn_display("app::fill::<app::X>"), "app::fill");
     }
 
     fn data(krate: &str, path: &str) -> Origin {

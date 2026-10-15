@@ -1838,14 +1838,14 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b\"m\".as_ref());`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b\"m\".as_ref());`; code: `encrypt`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 14,
@@ -1880,7 +1880,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b\"\", in_out);`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 78) or rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b\"\", in_out);`; code: `encrypt_in_place_detached`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 19,
@@ -3936,7 +3936,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:df08ab0b-5d31-834e-8449-6fbdea095af5",
+  "serialNumber": "urn:uuid:deb6d715-8b80-8b4a-a1ba-191c1fed4574",
   "specVersion": "1.7",
   "version": 1
 }

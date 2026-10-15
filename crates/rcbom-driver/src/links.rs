@@ -696,6 +696,22 @@ pub(crate) fn body_links(
                 })
             })
             .collect();
+        // between the program's own functions, with no argument that can carry an algorithm
+        // (`decode_token(&args)`): kept apart, for whether a value depends on the input
+        if !relevant.iter().any(|r| *r)
+            && !args.is_empty()
+            && cx.is_program(rustc_span::def_id::LOCAL_CRATE)
+            && cx.is_program(cdid.krate)
+        {
+            out.arg_calls.push(LocalCall {
+                callee: path_of(tcx, cdid),
+                caller: here.clone(),
+                args: args
+                    .iter()
+                    .map(|a| origins.operand_at(a, bb, idx))
+                    .collect(),
+            });
+        }
         if relevant.iter().any(|r| *r) {
             let args: Vec<Origin> = args
                 .iter()
@@ -741,6 +757,27 @@ pub(crate) fn body_links(
                 "",
             );
         }
+    } else if const_init
+        && tcx.item_name(did).as_str().contains("INTERNAL_INIT")
+        && let Some(key) = tcx.opt_parent(did)
+        && mutable_static_defs(cx).contains(&key)
+    {
+        // a `thread_local!` key's `const { .. }` initializer (`TA::__RUST_STD_INTERNAL_INIT`):
+        // the value the key starts with (not a struct's: a key's struct is read through a
+        // closure whose field read is not followed, `TA.with_borrow(|c| c.h)`, and its fields
+        // are what the program stores in them)
+        fn has_set(o: &Origin) -> bool {
+            match o {
+                Origin::Set { .. } => true,
+                Origin::All(v) | Origin::Any(v) => v.iter().any(has_set),
+                Origin::Call { args, .. } => args.iter().any(has_set),
+                _ => false,
+            }
+        }
+        let value = origins.returned_part(&[]);
+        if !has_set(&value) {
+            push_static(out, def_ref_internal(tcx, key), value, "");
+        }
     } else if static_init || const_init {
         // a static holding a function pointer (`static MY: HashFn = my`, `static B: &HashFn =
         // &A`): its value, for the calls through it
@@ -765,7 +802,7 @@ pub(crate) fn body_links(
     // the place it pointed to on entry holds at the returns is not followed, nor what the
     // other parameters' places hold (one of them may be written through it)
     // (or lends the parameter itself as `&mut`: `mem::swap(&mut slot, &mut other)`)
-    let redirected = mut_params.iter().any(|&index| {
+    let redirect = |index: usize| -> (bool, bool) {
         let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
         // the locals holding a copy of the parameter's pointer (`let s = slot;`), its own first
         let mut copies: HashSet<rustc_public::mir::Local> = HashSet::from([index + 1]);
@@ -798,25 +835,36 @@ pub(crate) fn body_links(
         }
         let copy =
             |q: &rustc_public::mir::Place| q.projection.is_empty() && copies.contains(&q.local);
-        stmts().any(|st| match &st.kind {
+        let repointed = stmts().any(|st| match &st.kind {
             StatementKind::Assign(p, rv) => {
                 (p.local == index + 1 && p.projection.is_empty())
                     || matches!(rv, Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
                         | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q) if copy(q))
-                    // or moved into an aggregate (`let (s, _o) = (slot, other)`)
-                    || matches!(rv, Rvalue::Aggregate(_, ops) if ops.iter().any(|o| matches!(o,
-                        Operand::Copy(q) | Operand::Move(q) if copy(q))))
-                    // or stored into a part of a place (`p.a = slot`)
-                    || (!p.projection.is_empty()
-                        && matches!(rv, Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
-                            if copy(q)))
             }
             _ => false,
-        })
-    });
+        });
+        // (moved into a closure, or into the value the function returns: written through
+        // where the body does not see; moved into a value it uses itself, `let (s, _o) = (slot,
+        // other)`, `p.a = slot`: followed, or lost, by the body's own pointer search)
+        let escapes = stmts().any(|st| match &st.kind {
+            StatementKind::Assign(p, Rvalue::Aggregate(kind, ops)) => {
+                (matches!(
+                    kind,
+                    AggregateKind::Closure(..) | AggregateKind::Coroutine(..)
+                ) || p.local == rustc_public::mir::RETURN_LOCAL)
+                    && ops
+                        .iter()
+                        .any(|o| matches!(o, Operand::Copy(q) | Operand::Move(q) if copy(q)))
+            }
+            _ => false,
+        });
+        (repointed, escapes)
+    };
+    // a parameter the body points elsewhere taints them all; one that escapes, only itself
+    let any_repointed = mut_params.iter().any(|&i| redirect(i).0);
     for &index in &mut_params {
         let entry = Origin::Param { index, owner: None };
-        let value = if redirected {
+        let value = if any_repointed || redirect(index).1 {
             Origin::Any(vec![entry.clone(), Origin::Unknown])
         } else {
             // a recursive call writing the same place (`rec(slot, n - 1)`) leaves what this
@@ -880,6 +928,11 @@ pub(crate) fn body_links(
 pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
     const MAX_INSTANCES: usize = 4096;
     let mut done = HashSet::new();
+    // the generic items (and closures in them) whose instances were summarised, and those one
+    // of whose instances was cut: the calls an item's own body records (for no type in
+    // particular: a trait method's call whose body is not known) are said by the instances
+    let mut summarised: HashSet<DefId> = HashSet::new();
+    let mut cut_items: HashSet<DefId> = HashSet::new();
     // the instances named but not summarised (past the bound, or whose analysis panicked):
     // a summary that is missing is a cut
     let cut = |name: String, out: &mut Links| {
@@ -896,12 +949,13 @@ pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
             if done.contains(&name) {
                 continue;
             }
+            let did = rustc_internal::internal(cx.tcx, inst.def.def_id());
             if done.len() >= MAX_INSTANCES {
+                cut_items.insert(did);
                 cut(name, out);
                 continue;
             }
             done.insert(name.clone());
-            let did = rustc_internal::internal(cx.tcx, inst.def.def_id());
             if cx.stop_crate(did.krate) {
                 continue;
             }
@@ -915,11 +969,22 @@ pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
                 l
             }));
             match r {
-                Ok(l) => out.merge(l),
-                Err(_) => cut(name, out),
+                Ok(l) => {
+                    summarised.insert(did);
+                    out.merge(l)
+                }
+                Err(_) => {
+                    cut_items.insert(did);
+                    cut(name, out)
+                }
             }
         }
     }
+    let items: HashSet<String> = summarised
+        .difference(&cut_items)
+        .map(|d| path_of(cx.tcx, *d))
+        .collect();
+    out.calls.retain(|c| !items.contains(&c.caller));
 }
 
 /// `x.a.f = v`: a store of `v` (or of each part of it that can carry an algorithm or a key) in

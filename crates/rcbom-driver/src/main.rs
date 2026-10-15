@@ -1021,6 +1021,11 @@ impl Cx<'_> {
         }
     }
 
+    /// Is this crate one of the program's own (a workspace member, a path dependency)?
+    pub(crate) fn is_program(&self, c: rustc_span::def_id::CrateNum) -> bool {
+        self.local.contains(&c)
+    }
+
     /// Is this crate one whose code the walk does not enter (an algorithm implementation)?
     pub(crate) fn stop_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
         self.in_set(&self.stop_crates, c)
@@ -1141,7 +1146,7 @@ struct Scanner<'a, 'tcx> {
 /// Is a caught panic `rustc_public`'s for an `async` closure's type, which it cannot convert
 /// yet ("FIXME(async_closures)"), wherever the type sits (a capture's field, a callee's
 /// generic argument)?
-fn async_closure(e: &Box<dyn std::any::Any + Send>) -> bool {
+pub(crate) fn async_closure(e: &Box<dyn std::any::Any + Send>) -> bool {
     let msg = e
         .downcast_ref::<String>()
         .map(String::as_str)
@@ -2206,6 +2211,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             cur: None,
             unconvertible: has_unconvertible(self.cx.tcx, &body),
             errors: 0,
+            dest: None,
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
@@ -2406,11 +2412,65 @@ struct Edges<'a, 'tcx> {
     /// As in `Scanner`: the body holds an `async` closure; panics that are bugs.
     unconvertible: bool,
     errors: usize,
+    /// The local the statement being visited assigns.
+    dest: Option<rustc_public::mir::Local>,
+}
+
+/// Is `local` used anywhere in `body` but where it is assigned whole, its storage marked or it
+/// is dropped (a closure built and never called, passed on, stored or returned is not)?
+fn local_used(body: &Body, local: rustc_public::mir::Local) -> bool {
+    struct Uses {
+        local: rustc_public::mir::Local,
+        used: bool,
+    }
+    impl MirVisitor for Uses {
+        fn visit_statement(&mut self, stmt: &rustc_public::mir::Statement, loc: Location) {
+            match &stmt.kind {
+                StatementKind::StorageLive(_)
+                | StatementKind::StorageDead(_)
+                | StatementKind::FakeRead(..)
+                | StatementKind::PlaceMention(_)
+                | StatementKind::AscribeUserType { .. } => {}
+                StatementKind::Assign(p, rv)
+                    if p.local == self.local && p.projection.is_empty() =>
+                {
+                    self.visit_rvalue(rv, loc)
+                }
+                _ => self.super_statement(stmt, loc),
+            }
+        }
+        fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
+            match &term.kind {
+                TerminatorKind::Drop { place, .. } if place.local == self.local => {}
+                _ => self.super_terminator(term, loc),
+            }
+        }
+        fn visit_local(
+            &mut self,
+            local: &rustc_public::mir::Local,
+            _: rustc_public::mir::visit::PlaceContext,
+            _: Location,
+        ) {
+            self.used |= *local == self.local;
+        }
+        // (a debugger's name for it, `_never`, is no use)
+        fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
+    }
+    if local == rustc_public::mir::RETURN_LOCAL {
+        return true;
+    }
+    let mut u = Uses { local, used: false };
+    u.visit_body(body);
+    u.used
 }
 
 impl MirVisitor for Edges<'_, '_> {
     fn visit_statement(&mut self, stmt: &rustc_public::mir::Statement, loc: Location) {
         self.cur = Some(stmt.source_info.span);
+        self.dest = match &stmt.kind {
+            StatementKind::Assign(p, _) if p.projection.is_empty() => Some(p.local),
+            _ => None,
+        };
         self.super_statement(stmt, loc);
     }
 
@@ -2476,7 +2536,12 @@ impl Edges<'_, '_> {
                 }
                 _ => None,
             };
-            if let Some((def, args)) = built {
+            // (a closure built and never used, `let _never = || ..;`: not run from here)
+            let unused = matches!(kind, rustc_public::mir::AggregateKind::Closure(..))
+                && self.dest.is_some_and(|d| !local_used(self.body, d));
+            if let Some((def, args)) = built
+                && !unused
+            {
                 let did = rustc_internal::internal(self.tcx, def);
                 let iargs = rustc_internal::internal(self.tcx, args);
                 if !iargs.has_non_region_param() {

@@ -1978,6 +1978,18 @@ functions = ["keyderive"]
 use = "keyderive"
 params = { curve = { arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } } }
 
+# `Hkdf::<Sha256>::new(salt, ikm)` runs HKDF-Extract (the PRK is computed there, RFC 5869
+# 2.2): a key derivation, not a set-up
+[[fn]]
+crate = "hkdf"
+path = "^Hkdf::new$"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+use = "keyderive"
+params = { hash = { arg = 0, asset = true } }
+
 # HKDF-Extract over an ECDH shared secret (`shared.extract::<Sha256>(salt)`): an `Hkdf` whose
 # `expand` derives the keys
 [[fn]]

@@ -136,28 +136,15 @@ pub(crate) fn site_matches(
             // verifies with, if any, is not known; in a single value (`Header.alg`) it is an
             // alternative, the call failing when it is chosen; a value only stored in the field
             // somewhere (a type-join) is not shown to be in this list
-            // (a value the program's own code puts there: a write into the list, by a function
-            // of the program or a container call; not one only stored in the field somewhere,
-            // nor what another crate's code returns, which reaches it as `Validation::new`'s
-            // argument: the list's one value)
+            // a variant is beside the others only when the program adds it to the list (a
+            // container call: `push`, `extend`, `fill`; an element write, in this function or
+            // another: the way is `Container`); the list's whole value, however it comes (a
+            // parameter, a helper's `vec![a]`, a static, `Validation::new(alg)`), is an
+            // alternative; a value not followed that the function's own code writes (a closure's
+            // write) may be one; `Header.alg`, a single value, takes none of this
             let list = b.algorithm.list;
-            let program_fn = |f: &str| {
-                let krate = f.trim_start_matches('<').split("::").next().unwrap_or("");
-                ctx.crates
-                    .iter()
-                    .any(|((name, _), pkg)| name == krate && ctx.local.contains(pkg))
-            };
-            // (a variant named in the function is put in the list by a container call
-            // (`push`, `fill`): named alone it is the list's value, an alternative (`if c {
-            // vec![RS384] } else { vec![HS256] }`); a value not followed there, a closure's
-            // write, is a write)
-            let in_list = |v: &Via, fixed: bool| match v {
-                Via::Container(_) => true,
-                _ if !list => false,
-                Via::Join(_) => false,
-                Via::Fixed => fixed,
-                Via::Object(f) | Via::Caller(f) => program_fn(f),
-                _ => true,
+            let in_list = |v: &Via, fixed: bool| {
+                list && (matches!(v, Via::Container(_)) || (fixed && matches!(v, Via::Fixed)))
             };
             let refused: Vec<String> = found
                 .names
@@ -248,7 +235,12 @@ pub(crate) fn site_matches(
     let beside = !found.unresolved.is_empty() && n < possible;
     // a function of the program called here with constants only (`alg_for(0)`): the program
     // fixes its choice, no input selects it
-    let fixed_by_program = constant_calls(arg_origins);
+    // a choice the program's input makes (arguments, the environment, a file read, a parsed
+    // configuration): a run-time selector; not one the program fixes (constants, a loop over
+    // them, a recursion, a constant struct)
+    let by_input = arg_origins
+        .get(b.algorithm.arg)
+        .is_some_and(|o| depends_on_input(ctx, o, &site.owner.path, 0, &mut BTreeSet::new()));
     let mut out = Vec::new();
     for (name, via) in &found.names {
         if !live(name) {
@@ -309,9 +301,7 @@ pub(crate) fn site_matches(
             // several that a function of the program returns (`translate_algorithm(&cli.alg)`):
             // it chooses at run time; not the modelled crate's own constructor, which only
             // passes its argument on (`Header::new(alg)`)
-            (Via::Object(f), true)
-                if !f.starts_with(&format!("{}::", b.krate)) && !fixed_by_program.contains(f) =>
-            {
+            (Via::Object(_) | Via::Caller(_) | Via::Fixed, true) if by_input => {
                 format!(
                     "algorithm one of {n} chosen at run time (selector: configuration) from {what}{}",
                     witness(via)
@@ -370,90 +360,201 @@ pub(crate) fn site_matches(
     Some(out)
 }
 
-/// The functions of the program a value tree calls with constant arguments only, at every
-/// call of them in it (`Header::new(alg_for(0))`).
-fn constant_calls(origins: &[Origin]) -> BTreeSet<String> {
-    // the iteration of a loop (`for i in 0..2u8`, `for i in [0u8, 1]`): each value in turn,
-    // not a choice
-    fn looped(o: &Origin) -> bool {
-        match o {
-            Origin::Loop => true,
-            Origin::Through { callee } => callee.ends_with("Iterator::next"),
-            Origin::Call { callee, krate, .. } => {
-                matches!(krate.as_str(), "core" | "std" | "alloc")
-                    && strip_generics(callee).ends_with("Iterator::next")
-            }
-            _ => false,
+/// A call reading the program's input: its arguments, its environment, standard input, a
+/// file, a command-line or configuration parser.
+fn input_source(callee: &str) -> bool {
+    const SOURCES: &[&str] = &[
+        "std::env::args",
+        "std::env::args_os",
+        "std::env::var",
+        "std::env::var_os",
+        "std::env::vars",
+        "std::io::stdin",
+        "std::io::Stdin::",
+        "std::io::Read::",
+        "std::io::BufRead::",
+        "std::fs::read",
+        "std::fs::read_to_string",
+        "std::fs::File::open",
+    ];
+    // (`clap::Parser` is `clap_builder::derive::Parser`)
+    const PARSERS: &[&str] = &[
+        "clap::",
+        "clap_builder::",
+        "structopt::",
+        "argh::",
+        "pico_args::",
+        "gumdrop::",
+    ];
+    // (a trait's method named through its implementation, `<App as clap_builder::derive::
+    // Parser>::parse`, in the path with its generic arguments)
+    let bare = strip_generics(callee);
+    SOURCES.iter().any(|s| bare.starts_with(s))
+        || PARSERS
+            .iter()
+            .any(|p| bare.starts_with(p) || callee.contains(&format!(" as {p}")))
+}
+
+/// `o` with the parameters of its function replaced by a call's arguments.
+fn with_args(o: &Origin, args: &[Origin]) -> Origin {
+    match o {
+        Origin::Param { index, owner: None } => {
+            args.get(*index).cloned().unwrap_or(Origin::Unknown)
         }
+        Origin::Call {
+            callee,
+            krate,
+            self_ty,
+            args: a,
+            span,
+            runs,
+        } => Origin::Call {
+            callee: callee.clone(),
+            krate: krate.clone(),
+            self_ty: self_ty.clone(),
+            args: a.iter().map(|x| with_args(x, args)).collect(),
+            span: span.clone(),
+            runs: runs.clone(),
+        },
+        Origin::Any(v) => Origin::Any(v.iter().map(|x| with_args(x, args)).collect()),
+        Origin::All(v) => Origin::All(v.iter().map(|x| with_args(x, args)).collect()),
+        Origin::Set {
+            path,
+            value,
+            strong,
+        } => Origin::Set {
+            path: path.clone(),
+            value: Box::new(with_args(value, args)),
+            strong: *strong,
+        },
+        Origin::Field {
+            adt,
+            field,
+            base,
+            args: fa,
+        } => Origin::Field {
+            adt: adt.clone(),
+            field: *field,
+            base: Box::new(with_args(base, args)),
+            args: fa.clone(),
+        },
+        _ => o.clone(),
     }
-    // several different values a branch picks between (`if arg(1).is_empty() { 0 } else
-    // { 1 }`), not a loop's: chosen at run time
-    fn branch(v: &[Origin]) -> bool {
-        v.iter().skip(1).any(|x| x != &v[0]) && !v.iter().any(looped)
+}
+
+/// A value the program computes from constants only (`0`, `HS256`, `alg_for(0)`), no loop's.
+fn const_expr(o: &Origin) -> bool {
+    match o {
+        Origin::Const { .. } | Origin::Unit { .. } | Origin::Data { .. } => true,
+        Origin::Call { callee, args, .. } => {
+            !args.is_empty()
+                && !strip_generics(callee).ends_with("Iterator::next")
+                && args.iter().all(const_expr)
+        }
+        Origin::All(v) => v.iter().all(const_expr),
+        Origin::Set { value, .. } => const_expr(value),
+        _ => false,
     }
-    fn constant(o: &Origin) -> bool {
-        match o {
-            Origin::Const { .. } | Origin::Unit { .. } | Origin::Data { .. } => true,
-            Origin::All(v) => v.iter().all(constant),
-            Origin::Any(v) => v.iter().all(constant) && !branch(v),
-            // an element of a literal the program iterates (`for i in [0u8, 1]`)
-            Origin::Call {
-                callee,
-                krate,
-                args,
-                ..
-            } if matches!(krate.as_str(), "core" | "std" | "alloc")
-                && [
-                    "Iterator::next",
-                    "::into_iter",
-                    "::iter",
-                    "::copied",
-                    "::cloned",
-                ]
+}
+
+/// Does `o`, read in `owner`, depend on the program's input (`input_source`), through the
+/// program's functions' returns and its callers' arguments?
+fn depends_on_input(
+    ctx: &Ctx<'_>,
+    o: &Origin,
+    owner: &str,
+    depth: usize,
+    seen: &mut BTreeSet<(String, String)>,
+) -> bool {
+    input_dep(ctx, o, owner, depth, seen, false)
+}
+
+/// `depends_on_input`; `returned`: inside what a function returns, where a branch is the
+/// function's own choice on its parameters, not the program's at run time.
+fn input_dep(
+    ctx: &Ctx<'_>,
+    o: &Origin,
+    owner: &str,
+    depth: usize,
+    seen: &mut BTreeSet<(String, String)>,
+    returned: bool,
+) -> bool {
+    if depth > 12 {
+        return false;
+    }
+    match o {
+        Origin::Call {
+            callee,
+            args,
+            krate,
+            ..
+        } => {
+            if input_source(callee) {
+                return true;
+            }
+            if args
                 .iter()
-                .any(|m| strip_generics(callee).ends_with(m)) =>
+                .any(|a| input_dep(ctx, a, owner, depth + 1, seen, returned))
             {
-                !args.is_empty() && args.iter().all(constant)
+                return true;
             }
-            // (the iterator advanced by the loop)
-            Origin::Through { callee } => callee.ends_with("Iterator::next"),
-            Origin::Loop => true,
-            _ => false,
+            // a function of the program: what it returns (one whose result the links do not
+            // record, a `String` from `env::args`, may read input: counted)
+            if matches!(krate.as_str(), "core" | "std" | "alloc") || krate.is_empty() {
+                return false;
+            }
+            if !seen.insert((callee.clone(), String::new())) {
+                return false;
+            }
+            // (its parameters this call's arguments, not every caller's; read where the call
+            // is: their parameters are `owner`'s)
+            let args: Vec<Origin> = args.iter().map(|a| a.clone().params_of(owner)).collect();
+            let returned: Vec<Origin> = ctx
+                .flow
+                .returned_values(callee)
+                .iter()
+                .map(|r| with_args(r, &args))
+                .collect();
+            (returned.is_empty()
+                && ctx
+                    .crates
+                    .iter()
+                    .any(|((n, _), pkg)| n == krate && ctx.local.contains(pkg)))
+                || returned
+                    .iter()
+                    .any(|r| input_dep(ctx, r, callee, depth + 1, seen, true))
         }
+        // a branch between different constant values (`if arg(1).is_empty() { 0 } else { 1 }`,
+        // `if c { alg_for(0) } else { alg_for(1) }`): what decides it is not followed, a choice
+        // made at run time; not a loop's values
+        Origin::Any(v)
+            if !returned
+                && v.len() > 1
+                && v.iter().all(const_expr)
+                && v.iter().skip(1).any(|x| x != &v[0]) =>
+        {
+            true
+        }
+        Origin::Param { index, owner: of } => {
+            let f = of.as_deref().unwrap_or(owner).to_string();
+            if !seen.insert((f.clone(), index.to_string())) {
+                return false;
+            }
+            ctx.flow.callers_of(&f).any(|(caller, args)| {
+                args.get(*index)
+                    .is_some_and(|a| input_dep(ctx, a, caller, depth + 1, seen, returned))
+            })
+        }
+        Origin::Any(v) | Origin::All(v) => v
+            .iter()
+            .any(|x| input_dep(ctx, x, owner, depth + 1, seen, returned)),
+        Origin::Set { value, .. } => input_dep(ctx, value, owner, depth + 1, seen, returned),
+        Origin::Field { base, .. } => input_dep(ctx, base, owner, depth + 1, seen, returned),
+        Origin::Written { args, .. } => args
+            .iter()
+            .any(|x| input_dep(ctx, x, owner, depth + 1, seen, returned)),
+        _ => false,
     }
-    // `chosen`: under a branch between different values (`if c { alg_for(0) } else {
-    // alg_for(1) }`): a call there is one the run picks
-    fn walk(o: &Origin, all: &mut BTreeMap<String, bool>, chosen: bool, depth: usize) {
-        if depth > 16 {
-            return;
-        }
-        match o {
-            Origin::Call { callee, args, .. } => {
-                let c = !chosen && !args.is_empty() && args.iter().all(constant);
-                all.entry(callee.clone())
-                    .and_modify(|v| *v &= c)
-                    .or_insert(c);
-                args.iter().for_each(|a| walk(a, all, chosen, depth + 1));
-            }
-            Origin::Any(v) => {
-                let chosen = chosen || branch(v);
-                v.iter().for_each(|a| walk(a, all, chosen, depth + 1))
-            }
-            Origin::All(v) => v.iter().for_each(|a| walk(a, all, chosen, depth + 1)),
-            Origin::Set { value, .. } => walk(value, all, chosen, depth + 1),
-            Origin::Field { base, .. } => walk(base, all, chosen, depth + 1),
-            Origin::Written { args, .. } => {
-                args.iter().for_each(|a| walk(a, all, chosen, depth + 1))
-            }
-            _ => {}
-        }
-    }
-    let mut all = BTreeMap::new();
-    origins.iter().for_each(|o| walk(o, &mut all, false, 0));
-    all.into_iter()
-        .filter(|(_, c)| *c)
-        .map(|(f, _)| f)
-        .collect()
 }
 
 /// `member: ..`: how a member of a set found across functions reaches the call, with its
@@ -862,11 +963,20 @@ fn collect(
         // a value written into an element of the list (`v.algorithms[0] = HS256`): in the list
         // beside the others
         Origin::Any(xs)
-            if xs.iter().any(
-                |x| matches!(x, Origin::Through { callee } if callee == rcbom_facts::ELEMENT_WRITE),
-            ) =>
+            if xs.iter().any(|x| {
+                matches!(x, Origin::Through { callee }
+                    if rcbom_facts::element_writer(callee).is_some())
+            }) =>
         {
-            let by = via.then(Via::Container(owner.to_string()));
+            let writer = xs
+                .iter()
+                .find_map(|x| match x {
+                    Origin::Through { callee } => rcbom_facts::element_writer(callee),
+                    _ => None,
+                })
+                .filter(|w| !w.is_empty())
+                .unwrap_or(owner);
+            let by = via.then(Via::Container(writer.to_string()));
             for x in xs {
                 if !matches!(x, Origin::Through { .. }) {
                     collect(ctx, x, owner, krate, accept, depth, in_std, &by, out);
@@ -996,8 +1106,26 @@ fn collect(
                     return;
                 }
             }
+            // (a predicate or an ordering a closure gives, `retain(|a| ..)`, `sort_by_key(..)`:
+            // no value of the list)
+            let predicate = [
+                "::retain",
+                "::retain_mut",
+                "::sort_by",
+                "::sort_by_key",
+                "::sort_unstable_by",
+                "::sort_unstable_by_key",
+                "::dedup_by",
+                "::dedup_by_key",
+                "::filter",
+            ]
+            .iter()
+            .any(|m| bare.ends_with(m));
             for (i, a) in args.iter().enumerate() {
                 if map && i == 1 {
+                    continue;
+                }
+                if predicate && i > 0 {
                     continue;
                 }
                 // a list extended with values the facts give as data (`extend_from_slice(&[

@@ -1,0 +1,70 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:49 | ring::digest::digest | [reachable] [call] in a137::sink1; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a137::A as a137::Pick>::alg`; line: `fn sink1(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:49 | ring::digest::digest | [reachable] [call] in a137::sink3; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a137::A as a137::Pick>::alg`; line: `fn sink3(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:4:49 | ring::digest::SHA256 | [reachable] [static] in a137::Pick::alg; instantiated by a137::pass1::<a137::A> at src/main.rs:12:45 as `alg`; instantiated by a137::main at src/main.rs:25:4 as `pass1`; line: `trait Pick { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:54 | ring::digest::SHA384 | [reachable] [static] in <a137::C as a137::Pick>::alg; line: `impl Pick for C { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:49 | ring::digest::digest | [reachable] [call] in a137::sink1; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a137::C as a137::Pick>::alg`; line: `fn sink1(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:49 | ring::digest::digest | [reachable] [call] in a137::sink2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a137::C as a137::Pick>::alg`; line: `fn sink2(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:49 | ring::digest::digest | [reachable] [call] in a137::sink3; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a137::C as a137::Pick>::alg`; line: `fn sink3(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:49 | ring::digest::digest | [reachable] [call] in a137::sink4; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a137::C as a137::Pick>::alg`; line: `fn sink4(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:13:49 | ring::digest::digest | [reachable] [call] in a137::sink2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a137::B as a137::Pick>::alg`; line: `fn sink2(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:49 | ring::digest::digest | [reachable] [call] in a137::sink4; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a137::B as a137::Pick>::alg`; line: `fn sink4(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:8:54 | ring::digest::SHA512 | [reachable] [static] in <a137::B as a137::Pick>::alg; line: `impl Pick for B { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a137 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a137 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a137 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=5
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=3
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a137@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/a137@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/a137@0.1.0", "name": "a137", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a137@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=80
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

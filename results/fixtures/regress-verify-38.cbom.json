@@ -1,0 +1,918 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via v38 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by v38 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via v38 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v38::BASE; line: `const BASE: Cfg = Cfg { h: &SHA256, l: &SHA1 };`; code: `SHA1`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::B2; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const ALIAS: Cfg = B2;`; code: `B2`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const REF: &Cfg = &B2;`; code: `B2`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[present] [static] in v38::make; line: `const fn make(x: &'static Algorithm) -> Cfg { Cfg { h: x, l: &SHA1 } }`; code: `SHA1`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 62,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::OUT; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `BASE`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::TUP; v38::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `BASE`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v38::ARR; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `SHA1`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 50,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(B2.h, &d);`; code: `B2`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(B2.l, &d);`; code: `digest`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(B2.l, &d);`; code: `B2`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(REF.l, &d);`; code: `digest`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(REF.l, &d);`; code: `REF`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::REF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE.h, &d);`; code: `MADE`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::MADE"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `v38::make`; line: `let _ = digest(MADE.l, &d);`; code: `digest`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(MADE.l, &d);`; code: `MADE`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::MADE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `static v38::ARR`; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].l, &d);`; code: `digest`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "26"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v38::BASE; line: `const BASE: Cfg = Cfg { h: &SHA256, l: &SHA1 };`; code: `SHA256`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 28,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::B2; v38::BASE -> ring::digest::SHA256; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `BASE`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA256; line: `const ALIAS: Cfg = B2;`; code: `B2`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA256; line: `const REF: &Cfg = &B2;`; code: `B2`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::OUT; v38::BASE -> ring::digest::SHA256; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `BASE`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA256; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::TUP; v38::BASE -> ring::digest::SHA256; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `BASE`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "v38::BASE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA256; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA256; line: `let _ = digest(B2.h, &d);`; code: `B2`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA256; line: `let _ = digest(B2.l, &d);`; code: `B2`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA256; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA256; line: `let _ = digest(REF.l, &d);`; code: `REF`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::REF"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA256, stored in `const v38::OUT`; member: table, stored by `const v38::OUT`; line: `let _ = digest(OUT.inner.h, &d);`; code: `digest`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA256; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA256; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA256, stored in `const v38::TUP`; member: table, stored by `const v38::TUP`; line: `let _ = digest(TUP.0.h, &d);`; code: `digest`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA256; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA256; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA256; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA256; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "20"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v38::B2; line: `const B2: Cfg = Cfg { h: &SHA384, ..BASE };`; code: `SHA384`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ALIAS; v38::B2 -> ring::digest::SHA384; line: `const ALIAS: Cfg = B2;`; code: `B2`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::REF; v38::B2 -> ring::digest::SHA384; line: `const REF: &Cfg = &B2;`; code: `B2`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::OUT; v38::B2 -> ring::digest::SHA384; line: `const OUT: Outer = Outer { inner: BASE, alt: B2 };`; code: `B2`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v38::TUP; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `SHA384`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 63,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::ARR; v38::B2 -> ring::digest::SHA384; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `B2`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(B2.h, &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA384; line: `let _ = digest(B2.h, &d);`; code: `B2`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::B2 -> ring::digest::SHA384; line: `let _ = digest(B2.l, &d);`; code: `B2`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::B2"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::B2`; member: table, stored by `const v38::B2`; line: `let _ = digest(ALIAS.h, &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ALIAS -> ring::digest::SHA384; line: `let _ = digest(ALIAS.h, &d);`; code: `ALIAS`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ALIAS"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::REF -> ring::digest::SHA384; line: `let _ = digest(REF.l, &d);`; code: `REF`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::REF"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA384; line: `let _ = digest(OUT.inner.h, &d);`; code: `OUT`",
+            "line": 28,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::OUT`; member: table, stored by `const v38::OUT`; line: `let _ = digest(OUT.alt.h, &d);`; code: `digest`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::OUT -> ring::digest::SHA384; line: `let _ = digest(OUT.alt.h, &d);`; code: `OUT`",
+            "line": 29,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::OUT"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA384; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA384, stored in `const v38::TUP`; member: table, stored by `const v38::TUP`; line: `let _ = digest(TUP.1.1, &d);`; code: `digest`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA384; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm one of the 2 in `static v38::ARR` that may reach the call: ring::digest::SHA384; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].h, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA384; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA384; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "21"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in v38::MADE; line: `static MADE: Cfg = make(&SHA512);`; code: `SHA512`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v38::TUP; line: `const TUP: (Cfg, (&Algorithm, &Algorithm)) = (BASE, (&SHA512, &SHA384));`; code: `SHA512`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 54,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in v38::ARR; line: `static ARR: [Cfg; 2] = [B2, Cfg { h: &SHA512, l: &SHA1 }];`; code: `SHA512`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `v38::make`; line: `let _ = digest(MADE.h, &d);`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA512; line: `let _ = digest(MADE.h, &d);`; code: `MADE`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::MADE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::MADE -> ring::digest::SHA512; line: `let _ = digest(MADE.l, &d);`; code: `MADE`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::MADE"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA512; line: `let _ = digest(TUP.0.h, &d);`; code: `TUP`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::TUP -> ring::digest::SHA512; line: `let _ = digest(TUP.1.1, &d);`; code: `TUP`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::TUP"
+          },
+          {
+            "additionalContext": "[reachable] [call] in v38::main; use: digest; algorithm one of the 2 in `static v38::ARR` that may reach the call: ring::digest::SHA512; member: table, stored by `static v38::ARR`; line: `let _ = digest(ARR[i].h, &d);`; code: `digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA512; line: `let _ = digest(ARR[i].h, &d);`; code: `ARR`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          },
+          {
+            "additionalContext": "[reachable] [via-static] in v38::main; v38::ARR -> ring::digest::SHA512; line: `let _ = digest(ARR[i].l, &d);`; code: `ARR`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "v38::ARR"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "11"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/v38@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/v38@0.1.0",
+      "name": "v38",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/v38@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "64"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:a7ccb759-5357-8468-8350-4f81c4afe8ca",
+  "specVersion": "1.7",
+  "version": 1
+}
