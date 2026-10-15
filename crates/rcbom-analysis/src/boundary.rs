@@ -36,7 +36,7 @@ impl Found {
             .or_default()
             .insert(via.clone());
         let e = self.names.entry(name).or_insert_with(|| via.clone());
-        if *via < *e {
+        if via.before(e) {
             *e = via.clone();
         }
     }
@@ -217,15 +217,26 @@ pub(crate) fn site_matches(
     // program's functions before the modelled crate's own (`translate_algorithm`, the choice
     // the program makes, not `Validation::new`, which passes it on)
     let own = format!("{}::", b.krate);
+    // (a path in the modelled crate, also a trait impl's: `<jsonwebtoken::algorithms::.. as
+    // serde::Deserialize>::deserialize`)
     let modelled = |v: &Via| match v {
-        Via::Caller(f) | Via::Object(f) | Via::Join(f) => f.starts_with(&own),
+        Via::Caller(f) | Via::Object(f) | Via::Join(f) => {
+            f.trim_start_matches('<').starts_with(&own)
+        }
         _ => false,
     };
     for (name, via) in found.names.iter_mut() {
         if let Some(best) = ways.get(name).and_then(|w| {
             w.iter()
                 .filter(|v| reached(v, reachable, reached_path))
-                .min_by_key(|v| (v.rank(), modelled(v), (*v).clone()))
+                .min_by_key(|v| {
+                    (
+                        v.rank(),
+                        matches!(v, Via::Join(_)),
+                        modelled(v),
+                        (*v).clone(),
+                    )
+                })
         }) {
             *via = best.clone();
         }

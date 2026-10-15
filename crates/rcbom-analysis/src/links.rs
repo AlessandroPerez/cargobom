@@ -220,6 +220,14 @@ impl Via {
             self.clone()
         }
     }
+
+    /// Is this a more specific way to the same value than `other`: the declaration order, a
+    /// type-join (any value stored in a field of that type) after every other (a static's own
+    /// value, or a store into it, before the join of another function's field store).
+    pub(crate) fn before(&self, other: &Via) -> bool {
+        let join = |v: &Via| matches!(v, Via::Join(_));
+        (join(self), self) < (join(other), other)
+    }
 }
 
 type Found = Vec<(Origin, String, Via)>;
@@ -404,7 +412,7 @@ impl LinkIndex {
             .borrow_mut()
             .entry(id.to_string())
             .and_modify(|v| {
-                if via < *v {
+                if via.before(v) {
                     *v = via.clone();
                 }
             })
@@ -1614,7 +1622,7 @@ fn names_param(o: &Origin) -> bool {
 /// a cut (`Truncated`) stands for the values refused.
 fn push(out: &mut Found, v: (Origin, String, Via)) {
     if let Some(e) = out.iter_mut().find(|e| e.0 == v.0 && e.1 == v.1) {
-        if v.2 < e.2 {
+        if v.2.before(&e.2) {
             e.2 = v.2;
         }
     } else if out.len() < MAX_VALUES {
