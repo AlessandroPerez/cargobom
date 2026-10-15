@@ -59,7 +59,9 @@
 //!   No other descriptor of the asset's primitive (nor a type the knowledge base gives one) is
 //!   read instead. A claim that the values found are all (no unknown beside them) is held to a
 //!   store through a pointer that replaces the place on every way to the call; a member found
-//!   beside others not followed may be the value before it;
+//!   beside others not followed may be the value before it; a container's element labelled
+//!   `member: container, possible` may be any the container holds (R4.3: one place), whatever a
+//!   store into an element replaced;
 //! - a member reaching the call from another function (`member: object`, `caller`, `fixed`,
 //!   `dyn`, `container`, and `type-join`, `impl` at a call reading no field): where the argument
 //!   carrying the algorithm holds no value from elsewhere (a parameter, a variable lent to a
@@ -3307,6 +3309,8 @@ impl Files<'_> {
             // the values the label says are all that reach the call (no unknown beside them):
             // a store through a pointer that replaces one on every way to the call excludes it
             let exact = !p.contains("beside others not followed") && !p.contains(" possibly ");
+            // (a container's elements, possible: any of them, whatever an element store replaced)
+            let smashed = re!(r"; member: container, possible\b").is_match(ctx.details);
             // the code the call reads names it (`Salt::new(hkdf::HKDF_SHA256, ..)` is no
             // `HKDF_SHA384`; `prk.expand(.., HKDF_SHA256)` with `prk` from `Salt::new(HKDF_SHA384,
             // ..)` may be either)
@@ -3324,7 +3328,7 @@ impl Files<'_> {
                     &members,
                     &o.component_ref,
                     ctx.tags.contains("[macro ").then_some(expanded.as_slice()),
-                    exact,
+                    (exact, smashed),
                 )?;
             }
             // a member reaching the call from another function, labelled as one that does
@@ -3346,7 +3350,7 @@ impl Files<'_> {
                     (line, offset),
                     &named,
                     &o.component_ref,
-                    exact,
+                    (exact, smashed),
                     join,
                 )?;
             }
@@ -3483,7 +3487,7 @@ impl Files<'_> {
         members: &[&str],
         component_ref: &str,
         expanded: Option<&[usize]>,
-        exact: bool,
+        (exact, smashed): (bool, bool),
     ) -> Result<(), String> {
         let s = &src.code;
         let lasts: Vec<String> = members
@@ -3512,7 +3516,9 @@ impl Files<'_> {
                 lasts.join(", ")
             ));
         }
-        let Some(mut call) = call_reads(src, self.kb, p, exact, &self.inst, self.alg_arg) else {
+        let Some(mut call) =
+            call_reads(src, self.kb, p, (exact, smashed), &self.inst, self.alg_arg)
+        else {
             return Ok(());
         };
         self.resolve_foreign(path, &mut call);
@@ -3925,11 +3931,17 @@ impl Files<'_> {
         at: (usize, usize),
         members: &[&str],
         component_ref: &str,
-        exact: bool,
+        (exact, smashed): (bool, bool),
         join: bool,
     ) -> Result<(), String> {
-        let Some(mut r) = call_reads(src, self.kb, src.idx(at), exact, &self.inst, self.alg_arg)
-        else {
+        let Some(mut r) = call_reads(
+            src,
+            self.kb,
+            src.idx(at),
+            (exact, smashed),
+            &self.inst,
+            self.alg_arg,
+        ) else {
             return Ok(());
         };
         if join && r.fields {
@@ -4555,8 +4567,14 @@ impl Files<'_> {
         // through the field it reads of it, the descriptor)
         let tie = |this: &mut Self| -> Result<(), String> {
             if let Some(at) = at
-                && let Some(mut r) =
-                    call_reads(src, this.kb, src.idx(at), false, &this.inst, this.alg_arg)
+                && let Some(mut r) = call_reads(
+                    src,
+                    this.kb,
+                    src.idx(at),
+                    (false, false),
+                    &this.inst,
+                    this.alg_arg,
+                )
             {
                 this.resolve_foreign(path, &mut r);
                 this.resolve_assoc(path, &mut r);
@@ -8410,6 +8428,11 @@ struct Reads {
     /// values found are all (no unknown beside them). Otherwise such a store may or may not be
     /// the one that reaches the read: both are read.
     strict: bool,
+    /// (an input) the claim's members are elements of a container, possible (`member:
+    /// container, possible`): one container's elements are one place (R4.3), so a store into an
+    /// element (`v[0] = x`) does not replace what the container's other stores and its literal
+    /// put there
+    smashed: bool,
     /// (an input) the type arguments of the generic function's instance the code is in (`T` ->
     /// `ilib::CFast` in `hash_c::<ilib::CFast>`)
     inst: Vec<(String, String)>,
@@ -9002,12 +9025,12 @@ fn split_top(t: &str) -> Vec<String> {
 
 /// What the call at `p` reads: its callee (a path, or an expression through a pointer), its
 /// arguments and its receiver, followed through variables, statics and the file's functions
-/// (`names_read`); `None` when no call starts there. `strict`: see `Reads::strict`.
+/// (`names_read`); `None` when no call starts there. `strict`, `smashed`: see `Reads`.
 fn call_reads(
     src: &Source,
     kb: &Kb,
     p: usize,
-    strict: bool,
+    (strict, smashed): (bool, bool),
     inst: &[(String, String)],
     alg: Option<usize>,
 ) -> Option<Reads> {
@@ -9015,6 +9038,7 @@ fn call_reads(
     let mut seen = HashSet::new();
     let mut call = Reads {
         strict,
+        smashed,
         inst: inst.to_vec(),
         ..Reads::default()
     };
@@ -9471,8 +9495,11 @@ fn names_read(
                     .iter()
                     .filter(|w| {
                         w.0 < start
-                            && assigned_place(src, (w.0, w.2))
-                                .is_some_and(|a| place == a || place.starts_with(&format!("{a}.")))
+                            && assigned_place(src, (w.0, w.2)).is_some_and(|a| {
+                                (place == a || place.starts_with(&format!("{a}.")))
+                                    // (an element's store, for a container's elements: R4.3)
+                                    && !(r.smashed && a.contains('['))
+                            })
                             && sc.as_ref().is_some_and(|sc| {
                                 let (o, c) = sc.block_of(w.0);
                                 o < start && start < c
