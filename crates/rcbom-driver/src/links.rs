@@ -222,29 +222,35 @@ pub(crate) fn body_links(
     };
     // the `&mut` parameters of a function (not a closure's): what each points to when the
     // function returns is recorded whole below
-    let mut_params: Vec<usize> = if func && !tcx.is_closure_like(did) {
-        body.arg_locals()
-            .iter()
-            .enumerate()
-            // (or a shared borrow of a value holding a cell, `set(c: &Cell<T>)`, written
-            // through it)
-            .filter(|(_, l)| {
+    // (or a shared borrow of a value holding a cell, `set(c: &Cell<T>)`, written through it;
+    // a lock's also by the stores through its guard, below)
+    let cell_param = |l: &rustc_public::mir::LocalDecl| {
+        matches!(rustc_internal::internal(tcx, l.ty).kind(),
+            rustc_middle::ty::Ref(_, inner, rustc_middle::ty::Mutability::Not)
+                if crate::origins::holds_cell(tcx, *inner, 0))
+    };
+    let (mut_params, cell_params): (Vec<usize>, Vec<usize>) = if func && !tcx.is_closure_like(did) {
+        let args = body.arg_locals();
+        let cells: Vec<usize> = (0..args.len()).filter(|&i| cell_param(&args[i])).collect();
+        let all = (0..args.len())
+            .filter(|&i| {
                 matches!(
-                    l.ty.kind().rigid(),
+                    args[i].ty.kind().rigid(),
                     Some(rustc_public::ty::RigidTy::Ref(
                         _,
                         _,
                         rustc_public::mir::Mutability::Mut
                     ))
-                ) || matches!(rustc_internal::internal(tcx, l.ty).kind(),
-                    rustc_middle::ty::Ref(_, inner, rustc_middle::ty::Mutability::Not)
-                        if crate::origins::holds_cell(tcx, *inner, 0))
+                ) || cells.contains(&i)
             })
-            .map(|(i, _)| i)
-            .collect()
+            .collect();
+        (all, cells)
     } else {
-        Vec::new()
+        (Vec::new(), Vec::new())
     };
+    // (a parameter the lock rules below read: not a `&mut` one, whose value at the returns is
+    // recorded whole)
+    let by_guard = |i: &usize| !mut_params.contains(i) || cell_params.contains(i);
     for (bb, block) in body.blocks.iter().enumerate() {
         for (idx, stmt) in block.statements.iter().enumerate() {
             let StatementKind::Assign(place, rv) = &stmt.kind else {
@@ -393,7 +399,7 @@ pub(crate) fn body_links(
                 };
                 let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
                 if let Some(index) = param_behind(&ptr)
-                    && !mut_params.contains(&index)
+                    && by_guard(&index)
                     && !matches!(ptr, Origin::Param { .. })
                 {
                     let mut value = origins.rvalue_part_at(rv, stmt.source_info.span, &[], bb, idx);
@@ -457,7 +463,7 @@ pub(crate) fn body_links(
                 };
                 let ptr = origins.operand_at(&rustc_public::mir::Operand::Copy(base), bb, idx);
                 if let Some(index) = param_behind(&ptr)
-                    && !mut_params.contains(&index)
+                    && by_guard(&index)
                 {
                     let v = value(&[]);
                     if !empty(&v) {
