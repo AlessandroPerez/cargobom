@@ -361,17 +361,11 @@ fn fn_entry_match_in(
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
         let v = match (p.const_arg, p.arg_len) {
-            (Some(i), _) => const_args
-                .get(i)
-                .copied()
-                .flatten()
-                .map(|v| (v * p.scale.unwrap_or(1) as i128).to_string())
-                .and_then(|v| mapped(p, v)),
-            (None, Some(i)) => arg_lens.get(i).copied().flatten().map(|v| v.to_string()),
-            _ => p
+            (None, None) => p
                 .value
                 .clone()
                 .or_else(|| eval_param(kb, p, args, parent, supported)),
+            _ => call_value(p, const_args, arg_lens),
         };
         if let Some(v) = v {
             params.insert(k.clone(), v);
@@ -760,6 +754,65 @@ fn eval_param(
             .map(|(m, _)| m.name);
     }
     None
+}
+
+/// A parameter a call gives by its value arguments: an integer constant (`const_arg`), the
+/// length of an array (`arg_len`), or the entry's fixed `value`.
+pub fn call_value(
+    p: &Param,
+    const_args: &[Option<i128>],
+    arg_lens: &[Option<u64>],
+) -> Option<String> {
+    match (p.const_arg, p.arg_len) {
+        (Some(i), _) => const_args
+            .get(i)
+            .copied()
+            .flatten()
+            .map(|v| (v * p.scale.unwrap_or(1) as i128).to_string())
+            .and_then(|v| mapped(p, v)),
+        (None, Some(i)) => arg_lens.get(i).copied().flatten().map(|v| v.to_string()),
+        _ => p.value.clone(),
+    }
+}
+
+/// The algorithms `outer` computes inside itself (`[[part]]` entries of its family), named by
+/// its parameters: Argon2's BLAKE2b-512, and the BLAKE2b of its tag length. A parameter that
+/// does not resolve leaves the name open, with the entry's reason.
+pub fn parts_of(kb: &Kb, outer: &Match) -> Vec<Match> {
+    kb.parts
+        .iter()
+        .filter(|p| p.of == outer.algo.family)
+        .map(|p| {
+            let vals: BTreeMap<String, String> = p
+                .params
+                .iter()
+                .filter_map(|(k, q)| {
+                    let v = outer.values.get(q.from.as_deref()?)?;
+                    let v = match q.scale {
+                        Some(n) => (v.parse::<u64>().ok()? * n).to_string(),
+                        None => v.clone(),
+                    };
+                    Some((k.clone(), mapped(q, v)?))
+                })
+                .collect();
+            let algo = filled_algo(&p.algo, &vals);
+            let mut params = BTreeMap::new();
+            if let Some(u) = &p.algo.unresolved
+                && !algo.open.is_empty()
+            {
+                params.insert("unresolved".to_string(), u.clone());
+            }
+            Match {
+                name: algo.asset.clone(),
+                algo,
+                params,
+                values: vals,
+                components: BTreeSet::new(),
+                providers: BTreeSet::new(),
+                provider_crates: Vec::new(),
+            }
+        })
+        .collect()
 }
 
 /// A value through the parameter's map, if it has one (`28` -> `512/224`); unmapped values of
