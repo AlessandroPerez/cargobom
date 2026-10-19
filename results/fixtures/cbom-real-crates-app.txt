@@ -89,6 +89,8 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:26:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in cbom_real_crates_app::main; new_from_slice: setup, not a use; key: environment (std::env::var) or hard-coded (literal at line 17); line: `let _ = Aes256Gcm::new_from_slice(&app_secret.as_bytes()[..32]);`; code: `Aes256Gcm::new_from_slice`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:36:12 | core::default::Default::default | [reachable] [call] in cbom_real_crates_app::main; default: setup, not a use; line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `Argon2::default`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:36:30 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in cbom_real_crates_app::main; use: keyderive; password: environment (std::env::var) or hard-coded (32 bytes, literal at line 17); salt: hard-coded (16 bytes, literal at line 35); line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:36:30 | password_hash::traits::PasswordHasher::hash_password | [reachable] [component] in cbom_real_crates_app::main; part of Argon2id-19456-2-1; line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:36:30 | password_hash::traits::PasswordHasher::hash_password | [reachable] [component] in cbom_real_crates_app::main; part of Argon2id-19456-2-1; line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`
   occ BLAKE3-256 | crypto:algorithm:BLAKE3-256 | src/main.rs:25:12 | blake3::hash | [reachable] [call] in cbom_real_crates_app::main; use: digest; line: `let _ = blake3::hash(app_secret.as_bytes());`; code: `blake3::hash`
   occ ChaCha20 | crypto:algorithm:ChaCha20 | rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:106:4 | rustls::crypto::aws_lc_rs::tls13::TLS13_CHACHA20_POLY1305_SHA256 | [reachable] [via-static] in rustls::crypto::aws_lc_rs::DEFAULT_CIPHER_SUITES; rustls::crypto::aws_lc_rs::tls13::TLS13_CHACHA20_POLY1305_SHA256 -> aws_lc_rs::aead::quic::CHACHA20; line: `tls13::TLS13_CHACHA20_POLY1305_SHA256,`; code: `tls13::TLS13_CHACHA20_POLY1305_SHA256`
   occ ChaCha20 | crypto:algorithm:ChaCha20 | rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:127:4 | rustls::crypto::aws_lc_rs::tls13::TLS13_CHACHA20_POLY1305_SHA256 | [present] [via-static] in rustls::crypto::aws_lc_rs::ALL_CIPHER_SUITES; rustls::crypto::aws_lc_rs::tls13::TLS13_CHACHA20_POLY1305_SHA256 -> aws_lc_rs::aead::quic::CHACHA20; line: `tls13::TLS13_CHACHA20_POLY1305_SHA256,`; code: `tls13::TLS13_CHACHA20_POLY1305_SHA256`
@@ -720,7 +722,7 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | rustls-webpki-0.103.13/src/lib.rs:196:4 | webpki::aws_lc_rs_algs::RSA_PKCS1_2048_8192_SHA512 | [present] [component] in webpki::ALL_VERIFICATION_ALGS; part of RSA-PKCS1-1.5-SHA-512 (aws_lc_rs::signature::RSA_PKCS1_2048_8192_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `aws_lc_rs::RSA_PKCS1_2048_8192_SHA512,`; code: `aws_lc_rs::RSA_PKCS1_2048_8192_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | rustls-webpki-0.103.13/src/lib.rs:202:4 | webpki::aws_lc_rs_algs::RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS | [present] [component] in webpki::ALL_VERIFICATION_ALGS; part of RSA-PKCS1-1.5-SHA-512 (aws_lc_rs::signature::RSA_PKCS1_2048_8192_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `aws_lc_rs::RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS,`; code: `aws_lc_rs::RSA_PKCS1_2048_8192_SHA512_ABSENT_PARAMS`
   occ SHA-512 | crypto:algorithm:SHA-512 | rustls-webpki-0.103.13/src/lib.rs:210:4 | webpki::aws_lc_rs_algs::RSA_PSS_2048_8192_SHA512_LEGACY_KEY | [present] [component] in webpki::ALL_VERIFICATION_ALGS; part of RSA-PSS-SHA-512 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `aws_lc_rs::RSA_PSS_2048_8192_SHA512_LEGACY_KEY,`; code: `aws_lc_rs::RSA_PSS_2048_8192_SHA512_LEGACY_KEY`
-  occ TLS | crypto:protocol:TLS | src/main.rs:38:12 | rustls::client::client_conn::ClientConfig::builder | [reachable] [call] in cbom_real_crates_app::main; line: `let _ = ClientConfig::builder();`; code: `ClientConfig::builder`
+  occ TLS | crypto:protocol:TLS | src/main.rs:38:12 | rustls::client::client_conn::ClientConfig::builder | [reachable] [call] in cbom_real_crates_app::main; builder: configuration, not a connection; line: `let _ = ClientConfig::builder();`; code: `ClientConfig::builder`
   occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:111:4 | rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 | [reachable] [via-static] in rustls::crypto::aws_lc_rs::DEFAULT_CIPHER_SUITES; rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 -> aws_lc_rs::tls_prf::P_SHA256; line: `tls12::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,`; code: `tls12::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256`
   occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:113:4 | rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 | [reachable] [via-static] in rustls::crypto::aws_lc_rs::DEFAULT_CIPHER_SUITES; rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 -> aws_lc_rs::tls_prf::P_SHA256; line: `tls12::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,`; code: `tls12::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256`
   occ TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | rustls-0.23.40/src/crypto/aws_lc_rs/mod.rs:117:4 | rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 | [reachable] [via-static] in rustls::crypto::aws_lc_rs::DEFAULT_CIPHER_SUITES; rustls::crypto::aws_lc_rs::tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 -> aws_lc_rs::tls_prf::P_SHA256; line: `tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,`; code: `tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`
@@ -851,14 +853,31 @@
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=observed
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=2
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:version=19
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=environment,hard-coded
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:occurrences=1
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:only-as-component=true
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:reachability=reachable
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=1
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:only-as-component=true
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:confidence=high
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:detection:method=type-resolved
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:functions:source=observed
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:kb:version=0.2.0
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:occurrences=1
+  prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:param:mode=unkeyed
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:reachability=reachable
   prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:confidence=high
   prop ChaCha20 | crypto:algorithm:ChaCha20 | rcbom:detection:method=type-resolved
@@ -1038,6 +1057,7 @@
   prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
   prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
   prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=1
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
   prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
   prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:confidence=high
   prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:detection:method=type-resolved
@@ -1282,6 +1302,8 @@ asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"alg
 asset AES-256 | crypto:algorithm:AES-256 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset BLAKE3-256 | crypto:algorithm:BLAKE3-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset ChaCha20 | crypto:algorithm:ChaCha20 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
@@ -1358,6 +1380,8 @@ component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 component library zeroize 1.8.2 | pkg:cargo/zeroize@1.8.2 | purl pkg:cargo/zeroize@1.8.2
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-256
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-256-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:ECDSA-P-256-SHA-512 -> crypto:algorithm:SHA-512
@@ -1439,6 +1463,8 @@ dependency crypto:algorithm:AES-128-GCM
 dependency crypto:algorithm:AES-256
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:Argon2id-19456-2-1
+dependency crypto:algorithm:BLAKE2b-256
+dependency crypto:algorithm:BLAKE2b-512
 dependency crypto:algorithm:BLAKE3-256
 dependency crypto:algorithm:ChaCha20
 dependency crypto:algorithm:ChaCha20-Poly1305
@@ -1561,6 +1587,8 @@ provides pkg:cargo/aws-lc-rs@1.17.0 -> crypto:algorithm:TLS12-PRF-SHA-256
 provides pkg:cargo/aws-lc-rs@1.17.0 -> crypto:algorithm:TLS12-PRF-SHA-384
 provides pkg:cargo/aws-lc-rs@1.17.0 -> crypto:algorithm:x25519
 provides pkg:cargo/aws-lc-rs@1.17.0 -> crypto:material:private-key:RSA
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-256
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512
 provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3-256
 provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:material:public-key:ECDSA

@@ -8,6 +8,10 @@
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:32:25 | core::default::Default::default | [reachable] [call] in a24::k2; default: setup, not a use; from: setup, not a use; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `Params::default`
   occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:25:17 | argon2::params::Params::new | [reachable] [call] in a24::k1; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`
   occ Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | src/main.rs:26:6 | password_hash::traits::PasswordHasher::hash_password_customized | [reachable] [call] in a24::k1; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`
+  occ BLAKE2b | crypto:algorithm:BLAKE2b | src/main.rs:26:6 | password_hash::traits::PasswordHasher::hash_password_customized | [reachable] [component] in a24::k1; part of Argon2id-65536-3-4; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`
+  occ BLAKE2b | crypto:algorithm:BLAKE2b | src/main.rs:32:44 | password_hash::traits::PasswordVerifier::verify_password | [reachable] [component] in a24::k2; part of Argon2; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:26:6 | password_hash::traits::PasswordHasher::hash_password_customized | [reachable] [component] in a24::k1; part of Argon2id-65536-3-4; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:32:44 | password_hash::traits::PasswordVerifier::verify_password | [reachable] [component] in a24::k2; part of Argon2; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`
   occ ECDSA | crypto:material:public-key:ECDSA | jsonwebtoken-9.3.1/src/decoding.rs:183:16 | jsonwebtoken::decoding::DecodingKey::from_ec_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ec_components: setup, not a use; line: `DecodingKey::from_ec_components(&params.x, &params.y)`; code: `DecodingKey::from_ec_components`
   occ ECDSA | crypto:material:public-key:ECDSA | src/main.rs:92:13 | jsonwebtoken::decoding::DecodingKey::from_ec_pem | [reachable] [call] in a24::k7; from_ec_pem: setup, not a use; line: `let ec = jsonwebtoken::DecodingKey::from_ec_pem(pem).unwrap();`; code: `jsonwebtoken::DecodingKey::from_ec_pem`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
@@ -200,12 +204,16 @@
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:functions:source=knowledge-base
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:occurrences=2
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:version=19
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=knowledge-base
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=1
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:version=19
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:confidence=high
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:detection:method=type-resolved
@@ -215,6 +223,22 @@
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:provenance:password=parameter
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:provenance:salt=rng
   prop Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | rcbom:reachability=reachable
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:confidence=high
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:detection:method=type-resolved
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:functions:source=knowledge-base
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:kb:version=0.2.0
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:occurrences=2
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:only-as-component=true
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:param:unresolved=digest length: not resolved to a registry length (the Argon2 tag's when it is at most 64 bytes)
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:reachability=reachable
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:registry-name=unmatched
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=2
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:only-as-component=true
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:algorithm-family=ECDSA
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:confidence=high
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:detection:method=type-resolved
@@ -388,6 +412,7 @@
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=4
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:only-as-component=true
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
@@ -530,6 +555,8 @@ asset Argon2 | crypto:algorithm:Argon2 | {"algorithmProperties": {"algorithmFami
 asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2id-65536-3-4 | crypto:algorithm:Argon2id-65536-3-4 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE2b | crypto:algorithm:BLAKE2b | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
 asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-384", "primitive": "signature"}, "assetType": "algorithm"}
@@ -590,6 +617,10 @@ component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:Argon2 -> crypto:algorithm:BLAKE2b
+dep crypto:algorithm:Argon2 -> crypto:algorithm:BLAKE2b-512
+dep crypto:algorithm:Argon2id-65536-3-4 -> crypto:algorithm:BLAKE2b
+dep crypto:algorithm:Argon2id-65536-3-4 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
@@ -677,6 +708,8 @@ dependency crypto:algorithm:Argon2
 dependency crypto:algorithm:Argon2i-19456-2-1
 dependency crypto:algorithm:Argon2id-19456-2-1
 dependency crypto:algorithm:Argon2id-65536-3-4
+dependency crypto:algorithm:BLAKE2b
+dependency crypto:algorithm:BLAKE2b-512
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
 dependency crypto:algorithm:Ed25519
@@ -745,6 +778,8 @@ provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i-19456-2-1
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-19456-2-1
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-65536-3-4
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512
 provides pkg:cargo/chacha20@0.9.1 -> crypto:algorithm:XChaCha20-Poly1305
 provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:algorithm:XChaCha20-Poly1305
 provides pkg:cargo/jsonwebtoken@9.3.1 -> crypto:algorithm:ECDSA-P-256-SHA-256

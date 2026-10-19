@@ -98,6 +98,28 @@ why = "Argon2::default().hash_password (argon2 0.5.3): Algorithm::default() is A
 provenance = { password = ["environment", "hard-coded"], salt = ["hard-coded"] }  # salt from SaltString::encode_b64(b"fixed-salt-value") at line 35
 
 [[asset]]
+name = "BLAKE2b-512"
+accept = ["BLAKE2b-512"]
+family = "BLAKE2"
+primitive = "hash"
+tier = "core"
+lines = []
+component_lines = [36]
+functions = ["digest"]
+why = "inside Argon2 (argon2 0.5.3 lib.rs initial_hash: H0; blake2b_long.rs: H' block fill), blake2 0.10.6"
+
+[[asset]]
+name = "BLAKE2b-256"
+accept = ["BLAKE2b-256"]
+family = "BLAKE2"
+primitive = "hash"
+tier = "core"
+lines = []
+component_lines = [36]
+functions = ["digest"]
+why = "inside Argon2: H' makes the 32-byte tag with one Blake2bVar(32) (blake2b_long.rs)"
+
+[[asset]]
 name = "HMAC secret key (jsonwebtoken)"
 accept = ["HMAC", "HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
 family = "HMAC"

@@ -7,6 +7,8 @@
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:153:12 | argon2::Argon2::<'key>::new_with_secret | [reachable] [call] in t9::argon2_secret; new_with_secret: setup, not a use; key: hard-coded (13 bytes, literal at line 153); line: `let a = Argon2::new_with_secret(b"pepper-pepper", Algorithm::Argon2id, Version::V0x13, Params::default()).unwrap();`; code: `Argon2::new_with_secret`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:153:91 | core::default::Default::default | [reachable] [call] in t9::argon2_secret; default: setup, not a use; line: `let a = Argon2::new_with_secret(b"pepper-pepper", Algorithm::Argon2id, Version::V0x13, Params::default()).unwrap();`; code: `Params::default`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t9::argon2_secret; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t9::argon2_secret; part of Argon2id-19456-2-1; line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t9::argon2_secret; part of Argon2id-19456-2-1; line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:143:16 | blake3::Hasher::new | [reachable] [call] in t9::verify_and_xof; new: setup, not a use; line: `let mut h = blake3::Hasher::new();`; code: `blake3::Hasher::new`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:144:6 | blake3::Hasher::update | [reachable] [call] in t9::verify_and_xof; use: digest; line: `h.update(d);`; code: `update`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:146:6 | blake3::Hasher::finalize_xof | [reachable] [call] in t9::verify_and_xof; use: digest; line: `h.finalize_xof().fill(&mut out);`; code: `finalize_xof`
@@ -269,15 +271,32 @@
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=observed
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=3
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:version=19
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:key=hard-coded
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=parameter
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=parameter
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:occurrences=1
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:only-as-component=true
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:reachability=reachable
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=1
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:only-as-component=true
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:confidence=high
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:detection:method=type-resolved
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:functions:source=observed
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:kb:version=0.2.0
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:occurrences=3
+  prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:param:mode=unkeyed
   prop BLAKE3 | crypto:algorithm:BLAKE3 | rcbom:reachability=reachable
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:algorithm-family=ECDSA
   prop ECDSA | crypto:material:public-key:ECDSA | rcbom:confidence=high
@@ -356,6 +375,7 @@
   prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
   prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
   prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=3
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
   prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:confidence=high
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:detection:method=type-resolved
@@ -476,6 +496,7 @@
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=1
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:only-as-component=true
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
@@ -712,6 +733,8 @@ asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"alg
 asset AES-192-CTR | crypto:algorithm:AES-192-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "192", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt"], "mode": "cbc", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:algorithm:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
@@ -793,6 +816,8 @@ component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library x25519-dalek 2.0.1 | pkg:cargo/x25519-dalek@2.0.1 | purl pkg:cargo/x25519-dalek@2.0.1
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-256
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
@@ -905,6 +930,8 @@ dependency crypto:algorithm:AES-128-CBC
 dependency crypto:algorithm:AES-192-CTR
 dependency crypto:algorithm:AES-256-CBC
 dependency crypto:algorithm:Argon2id-19456-2-1
+dependency crypto:algorithm:BLAKE2b-256
+dependency crypto:algorithm:BLAKE2b-512
 dependency crypto:algorithm:BLAKE3
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:ECDSA-P-384-SHA-384
@@ -994,6 +1021,8 @@ provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128-CBC
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-192-CTR
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2id-19456-2-1
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-256
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512
 provides pkg:cargo/blake3@1.8.5 -> crypto:algorithm:BLAKE3
 provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:block-cipher:blowfish+cbc
 provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:stream-cipher:blowfish+ctr
