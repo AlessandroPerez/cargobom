@@ -28,6 +28,7 @@
 #![feature(rustc_private)]
 
 extern crate rustc_abi;
+extern crate rustc_data_structures;
 extern crate rustc_driver;
 extern crate rustc_hir;
 extern crate rustc_interface;
@@ -38,6 +39,9 @@ extern crate rustc_span;
 
 mod links;
 mod origins;
+mod pta;
+mod pta_solve;
+mod pta_unify;
 mod statics;
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
@@ -261,6 +265,8 @@ pub(crate) struct Cx<'tcx> {
     /// (`links::mutable_static_defs`), computed once.
     pub(crate) mutable_statics: std::cell::OnceCell<HashSet<rustc_span::def_id::DefId>>,
     pub errors: usize,
+    /// The points-to analysis over the walked bodies (`RCBOM_PTA`), solved after the walk.
+    pub(crate) pta: Option<pta::Pta>,
 }
 
 fn analyze(tcx: TyCtxt<'_>) {
@@ -278,7 +284,18 @@ fn analyze(tcx: TyCtxt<'_>) {
         links: Default::default(),
         mutable_statics: std::cell::OnceCell::new(),
         errors: 0,
+        pta: None,
     };
+    if std::env::var_os("RCBOM_PTA").is_some() {
+        let stop = tcx
+            .crates(())
+            .iter()
+            .copied()
+            .chain(std::iter::once(rustc_span::def_id::LOCAL_CRATE))
+            .filter(|&c| cx.stop_crate(c))
+            .collect();
+        cx.pta = Some(pta::Pta::new(stop));
+    }
     // the crates whose generic items' instances the links may summarise: not the standard
     // library's, nor the stop crates' (`origins::body_name`)
     origins::set_summarised(
@@ -456,8 +473,14 @@ fn analyze(tcx: TyCtxt<'_>) {
     let generic_paths: Vec<String> = generic.iter().map(|d| path_of(cx.tcx, *d)).collect();
     let generic: Vec<String> = generic.iter().map(|d| def_hash(cx.tcx, *d)).collect();
     let reach = (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
+        if let Some(p) = cx.pta.as_mut() {
+            p.set_roots(&roots);
+        }
         let mut w = Walker::new(&mut cx);
         let mut r = w.run(roots, static_roots);
+        if let Some(p) = w.cx.pta.take() {
+            pta_dump(w.cx.tcx, p);
+        }
         let coercions = std::mem::take(&mut w.coercions);
         w.cx.links.coercions = coercions
             .into_iter()
@@ -565,6 +588,55 @@ fn analyze(tcx: TyCtxt<'_>) {
             facts.krate.name, cx.errors
         );
     }
+}
+
+/// Solves the points-to analysis and writes its answers beside the facts
+/// (`<crate>-pta.json`): per query (a call into a stop crate), what each argument may point to.
+fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) {
+    let t0 = std::time::Instant::now();
+    let (queries, answers, stats) = p.solve();
+    let mut why: Vec<(String, usize)> = stats
+        .havoc_why
+        .iter()
+        .map(|(k, v)| (k.clone(), *v))
+        .collect();
+    why.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+    let queries: Vec<serde_json::Value> = queries
+        .iter()
+        .zip(&answers)
+        .map(|(q, a)| {
+            serde_json::json!({
+                "file": q.at.file,
+                "line": q.at.line,
+                "col": q.at.col,
+                "callee": q.callee,
+                "live": q.live,
+                "args": a.iter().map(|x| x.as_ref().map(|x| serde_json::json!({
+                    "statics": x.statics.iter().map(|d| path_of(tcx, *d)).collect::<Vec<_>>(),
+                    "unknown": x.unknown,
+                    "others": x.others,
+                }))).collect::<Vec<_>>(),
+            })
+        })
+        .collect();
+    let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
+    let name = tcx.crate_name(rustc_span::def_id::LOCAL_CRATE);
+    let v = serde_json::json!({
+        "objects": stats.objects,
+        "instances": stats.instances,
+        "copies": stats.copies,
+        "vcalls_without_vtable": stats.vcalls_without_vtable,
+        "vcalls_without_vtable_in": stats.vcalls_without_vtable_in,
+        "failed": stats.failed,
+        "constraints": stats.constraints,
+        "solve_ms": t0.elapsed().as_millis() as u64,
+        "havoc": why.iter().take(200).map(|(k, v)| serde_json::json!([k, v])).collect::<Vec<_>>(),
+        "queries": queries,
+    });
+    let _ = std::fs::write(
+        out.join(format!("{name}-pta.json")),
+        serde_json::to_vec_pretty(&v).unwrap(),
+    );
 }
 
 pub(crate) fn crate_ref(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> CrateRef {
@@ -2251,6 +2323,12 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             eprintln!("rcbom-walk: {} ({:?})", inst.name(), inst.kind);
         }
         let stop = self.cx.stop_crate(did.krate);
+        if !usage
+            && !stop
+            && let Some(p) = self.cx.pta.as_mut()
+        {
+            p.add_body(self.cx.tcx, inst, &body);
+        }
         // a shim's body is the compiler's (a `dyn` method behind a function pointer, drop glue,
         // `<closure as FnOnce>::call_once`): what it calls is walked, but none of it is code
         // written at the span it carries (the trait method's declaration)
