@@ -797,7 +797,38 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                 }
             }
-            let matches = site_matches(&ctx, site, &closure, &edges, &reached_data, &reached_path);
+            let mut matches =
+                site_matches(&ctx, site, &closure, &edges, &reached_data, &reached_path);
+            // what an asset computes inside itself (`[[part]]`: Argon2's BLAKE2b), where it is
+            // used; its provider is the package under the asset's that implements it
+            let mut parts: Vec<SiteMatch> = Vec::new();
+            for (m, kind, function, symbol, _, unreached) in matches.iter_mut() {
+                if *kind != Kind::Call || function.is_none() {
+                    continue;
+                }
+                for mut p in matcher::parts_of(kb, m) {
+                    if p.key() == m.key() {
+                        continue;
+                    }
+                    m.components.insert(p.key());
+                    if parts.iter().any(|q| q.0.key() == p.key()) {
+                        continue;
+                    }
+                    for (n, v) in &m.providers {
+                        let deps = man
+                            .by_name_version(n, v)
+                            .into_iter()
+                            .flat_map(|o| &o.runtime_deps)
+                            .filter_map(|d| man.by_id(d));
+                        for d in deps.filter(|d| p.algo.implemented_by.contains(&d.name)) {
+                            p.providers.insert((d.name.clone(), d.version.to_string()));
+                        }
+                    }
+                    let d = vec![format!("part of {}", m.name)];
+                    parts.push((p, Kind::Component, None, symbol.clone(), d, *unreached));
+                }
+            }
+            matches.extend(parts);
             let protocol = kb
                 .crate_by_name(&site.owner.krate.name)
                 .is_some_and(|c| c.role == Role::Protocol);
@@ -956,7 +987,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                 }
                 // parameters that differ between occurrences are all listed
-                for (k, v) in &m.params {
+                for (k, v) in m.params.iter().chain(&m.algo.fixed) {
                     a.params.entry(k.clone()).or_default().insert(v.clone());
                 }
                 a.components.extend(m.components.iter().cloned());
@@ -1404,6 +1435,31 @@ fn fn_site_match<'a>(ctx: &Ctx<'a>, site: &Site) -> Option<(Match, Option<&'a Si
     )
 }
 
+/// Parameters a method fixes itself (`call_params`), over those of the constructor that built
+/// its receiver: one the call does not resolve is unknown, not the constructor's.
+fn fix_call_params(m: &mut Match, fixes: &BTreeMap<String, rcbom_kb::Param>, site: &Site) {
+    let Target::Call {
+        const_args,
+        arg_lens,
+        ..
+    } = &site.target
+    else {
+        return;
+    };
+    for (k, p) in fixes {
+        match matcher::call_value(p, const_args, arg_lens) {
+            Some(v) => {
+                m.values.insert(k.clone(), v.clone());
+                m.params.insert(k.clone(), v);
+            }
+            None => {
+                m.values.remove(k);
+                m.params.remove(k);
+            }
+        }
+    }
+}
+
 /// `named`'s asset and parameters, with what `entry` says the call does (its functions, use and
 /// note).
 fn adopt(named: Match, entry: Match) -> Match {
@@ -1627,6 +1683,9 @@ fn site_matches(
                     continue;
                 }
                 let providers = std::mem::take(&mut m.provider_crates);
+                // what the method fixes itself, whatever built its receiver
+                let fixes = m.algo.call_params.get(method).cloned().unwrap_or_default();
+                fix_call_params(&mut m, &fixes, site);
                 // the receiver's constructor may say more than its type: `Argon2::default()`
                 // is Argon2id-19456-2-1, `Hasher::new_keyed(k)` a keyed BLAKE3
                 // ..unless the method takes its parameters from elsewhere: `verify_password`
@@ -1665,6 +1724,7 @@ fn site_matches(
                         renamed.insert(m.name.clone(), c.name.clone());
                         m = c;
                         m.components = comps;
+                        fix_call_params(&mut m, &fixes, site);
                     }
                     if let Some(at) = at
                         && let Some(c) = ctx.calls.get(&(
@@ -1694,6 +1754,7 @@ fn site_matches(
                     renamed.insert(m.name.clone(), c.name.clone());
                     m = c;
                     m.components = comps;
+                    fix_call_params(&mut m, &fixes, site);
                 }
                 // the receiver of such a method is set up for what the method computes, unless
                 // the call fixes what the receiver's constructor chose (the variant of
@@ -2730,10 +2791,17 @@ fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                     if g.detail.iter().any(|d| d.ends_with(OWN_PARAMS)) {
                         continue;
                     }
+                    // two parts of one asset are two algorithms: the BLAKE2b of an Argon2 tag of
+                    // unknown length is not the BLAKE2b-512 of its H0
+                    let parts = |o: &Occurrence| {
+                        o.kind == Kind::Component
+                            && g.kind == Kind::Component
+                            && o.detail == g.detail
+                    };
                     if let Some(o) = s
                         .occurrences
                         .iter_mut()
-                        .find(|o| o.location == g.location && o.line == g.line)
+                        .find(|o| o.location == g.location && o.line == g.line && !parts(o))
                     {
                         if o.function.is_none() {
                             o.function = g.function;

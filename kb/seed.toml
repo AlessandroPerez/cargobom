@@ -514,8 +514,10 @@ asset = "SHA-1"
 family = "SHA-1"
 primitive = "hash"
 functions = ["digest"]
+fixed = { output_bytes = "20" }
 
-# md5 0.7's streaming API: `Context::new()`, `consume(data)`, `compute()`
+# md5 0.7's streaming API: `Context::new()`, `consume(data)`, `compute()`. The registry's names
+# of MD5 and SHA-1 say no digest length: it is a fixed parameter.
 [[type]]
 crate = "md5"
 name = "Context"
@@ -523,6 +525,7 @@ asset = "MD5"
 family = "MD5"
 primitive = "hash"
 functions = ["digest"]
+fixed = { output_bytes = "16" }
 
 # blake3: the constructor of a Hasher says its mode ([[fn]] entries below)
 [[type]]
@@ -538,7 +541,9 @@ functions = ["digest"]
 # without one the asset is the family name, which the registry has no pattern for. Two methods
 # do not use the receiver's: `verify_password` hashes with the algorithm and costs of the stored
 # hash, `hash_password_customized(pw, alg, version, params, salt)` with its arguments, and with
-# `Algorithm::default()` (Argon2id) when `alg` is `None` (argon2 0.5.3 lib.rs:607).
+# `Algorithm::default()` (Argon2id) when `alg` is `None` (argon2 0.5.3 lib.rs:607). The output
+# length of `hash_password` is the `Params`' (32 bytes by default, lib.rs:581); that of
+# `hash_password_into(pw, salt, out)` is `out`'s (argument 3, `self` counted).
 [[type]]
 crate = "argon2"
 name = "Argon2"
@@ -548,6 +553,7 @@ primitive = "kdf"
 functions = ["keyderive"]
 own_params = ["verify_password", "hash_password_customized"]
 own_defaults = { variant = "id" }
+call_params = { hash_password_into = { output_bytes = { arg_len = 3 } }, hash_password_into_with_memory = { output_bytes = { arg_len = 3 } } }
 
 # The password-hash API types. Their parameters are chosen per call: `hash_password` uses the
 # crate's defaults ([[fn]] entries below), `hash_password_customized` the caller's, and
@@ -880,6 +886,7 @@ asset = "MD5"
 family = "MD5"
 primitive = "hash"
 functions = ["digest"]
+fixed = { output_bytes = "16" }
 
 # ML-KEM: the parameter set is the type argument (`Kem<MlKem768Params>`, `EncapsulationKey<..>`)
 [[type]]
@@ -1197,6 +1204,7 @@ asset = "SHA-1"
 family = "SHA-1"
 primitive = "hash"
 functions = ["digest"]
+fixed = { output_bytes = "20" }
 
 [[static]]
 crate = "aws_lc_rs"
@@ -1570,9 +1578,11 @@ asset = "MD5"
 family = "MD5"
 primitive = "hash"
 functions = ["digest"]
+fixed = { output_bytes = "16" }
 
 # `blake3::hash` always returns 256 bits; a `Hasher`'s output length is chosen when it is
-# finalized (`finalize` or `finalize_xof`), so the type alone is plain BLAKE3.
+# finalized (`finalize` or `finalize_xof`), so the type alone is plain BLAKE3. The entry point
+# says the mode: unkeyed (`hash`, `Hasher::new`), keyed, or key derivation.
 [[fn]]
 crate = "blake3"
 path = "^hash$"
@@ -1580,6 +1590,16 @@ asset = "BLAKE3-256"
 family = "BLAKE3"
 primitive = "hash"
 functions = ["digest"]
+fixed = { mode = "unkeyed" }
+
+[[fn]]
+crate = "blake3"
+path = "^Hasher::new$"
+asset = "BLAKE3"
+family = "BLAKE3"
+primitive = "hash"
+functions = ["digest"]
+fixed = { mode = "unkeyed" }
 
 # BLAKE3's keyed mode is a MAC and its key-derivation mode a KDF; the registry names BLAKE3 as
 # a hash only, so the name stays BLAKE3 with the primitive telling the modes apart.
@@ -1591,6 +1611,7 @@ family = "BLAKE3"
 primitive = "mac"
 functions = ["tag"]
 note = "keyed mode"
+fixed = { mode = "keyed" }
 
 [[fn]]
 crate = "blake3"
@@ -1600,6 +1621,7 @@ family = "BLAKE3"
 primitive = "mac"
 functions = ["tag"]
 note = "keyed mode"
+fixed = { mode = "keyed" }
 
 [[fn]]
 crate = "blake3"
@@ -1609,6 +1631,7 @@ family = "BLAKE3"
 primitive = "kdf"
 functions = ["keyderive"]
 note = "key derivation mode"
+fixed = { mode = "derive-key" }
 
 [[fn]]
 crate = "blake3"
@@ -1618,6 +1641,7 @@ family = "BLAKE3"
 primitive = "kdf"
 functions = ["keyderive"]
 note = "key derivation mode"
+fixed = { mode = "derive-key" }
 
 [[fn]]
 crate = "pbkdf2"
@@ -1672,7 +1696,8 @@ primitive = "kdf"
 functions = ["keyderive"]
 
 # A std trait implemented by the crypto type: `self_type` names it, `path` matches the callee.
-# argon2 0.5: Algorithm::default() = Argon2id, Params::default() = m 19 MiB, t 2, p 1 (params.rs).
+# argon2 0.5: Algorithm::default() = Argon2id, Params::default() = m 19 MiB, t 2, p 1, no output
+# length (`hash_password` then makes 32 bytes) (params.rs); Version::default() = 0x13 (19).
 [[fn]]
 crate = "argon2"
 self_type = "Argon2"
@@ -1681,11 +1706,12 @@ asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = { value = "id" }, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" } }
+params = { variant = { value = "id" }, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" }, version = { value = "19" }, output_bytes = { value = "32" } }
 
 # Argon2::new(algorithm, version, params): the variant is argument 0 (Argon2d = 0, Argon2i = 1,
-# Argon2id = 2, argon2 0.5 algorithm.rs); the costs are in the Params value, named where it is
-# built (`Params::new(m_cost, t_cost, p_cost, output_len)`, below).
+# Argon2id = 2, argon2 0.5 algorithm.rs), the version argument 1 (V0x10 = 16, V0x13 = 19,
+# version.rs); the costs are in the Params value, named where it is built
+# (`Params::new(m_cost, t_cost, p_cost, output_len)`, below).
 [[fn]]
 crate = "argon2"
 path = "Argon2::new$"
@@ -1693,10 +1719,11 @@ asset = "Argon2{variant}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = { const_arg = 0, map = { "0" = "d", "1" = "i", "2" = "id" } } }
+params = { variant = { const_arg = 0, map = { "0" = "d", "1" = "i", "2" = "id" } }, version = { const_arg = 1 } }
 
-# argon2 0.5 `Params::new(m_cost, t_cost, p_cost, output_len)`: the costs; the variant is the
-# `Argon2` value's, or the `hash_password_customized` call's it is passed to
+# argon2 0.5 `Params::new(m_cost, t_cost, p_cost, output_len)`: the costs; the variant and the
+# version are the `Argon2` value's, or the `hash_password_customized` call's it is passed to (the
+# output length, an `Option`, is not read)
 [[fn]]
 crate = "argon2"
 path = "Params::new$"
@@ -1704,10 +1731,11 @@ asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = {}, m_cost = { const_arg = 0 }, t_cost = { const_arg = 1 }, p_cost = { const_arg = 2 } }
+params = { variant = {}, version = {}, m_cost = { const_arg = 0 }, t_cost = { const_arg = 1 }, p_cost = { const_arg = 2 } }
 
-# argon2 0.5 `Params::default()` (`Params::DEFAULT`, params.rs): m 19456 KiB, t 2, p 1; the
-# variant is the `Argon2` value's it is used with
+# argon2 0.5 `Params::default()` (`Params::DEFAULT`, params.rs): m 19456 KiB, t 2, p 1, no
+# output length (32 bytes for `hash_password`); the variant and the version are the `Argon2`
+# value's it is used with
 [[fn]]
 crate = "argon2"
 self_type = "Params"
@@ -1716,10 +1744,10 @@ asset = "Argon2{variant}-{m_cost}-{t_cost}-{p_cost}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = {}, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" } }
+params = { variant = {}, version = {}, m_cost = { value = "19456" }, t_cost = { value = "2" }, p_cost = { value = "1" }, output_bytes = { value = "32" } }
 
 # `Argon2::from(params)` (lib.rs: `Self::new(Algorithm::default(), Version::default(), params)`):
-# Argon2id with those costs
+# Argon2id version 19 with those costs
 [[fn]]
 crate = "argon2"
 self_type = "Argon2"
@@ -1728,9 +1756,10 @@ asset = "Argon2{variant}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = { value = "id" } }
+params = { variant = { value = "id" }, version = { value = "19" } }
 
-# Argon2::new_with_secret(secret, algorithm, version, params): the variant is argument 1
+# Argon2::new_with_secret(secret, algorithm, version, params): the variant is argument 1, the
+# version argument 2
 [[fn]]
 crate = "argon2"
 path = "Argon2::new_with_secret$"
@@ -1738,7 +1767,30 @@ asset = "Argon2{variant}"
 family = "Argon2"
 primitive = "kdf"
 functions = ["keyderive"]
-params = { variant = { const_arg = 1, map = { "0" = "d", "1" = "i", "2" = "id" } } }
+params = { variant = { const_arg = 1, map = { "0" = "d", "1" = "i", "2" = "id" } }, version = { const_arg = 2 } }
+
+# Argon2 computes BLAKE2b inside itself (RFC 9106 3.2-3.3; argon2 0.5.3 lib.rs `initial_hash`,
+# blake2b_long.rs): H0 hashes the inputs with BLAKE2b-512, H' fills each lane's first blocks
+# with a chain of BLAKE2b-512 and makes the tag, with one BLAKE2b of the tag's length when it is
+# at most 64 bytes (else a chain ending in a BLAKE2b of the last block's). The blake2 package
+# under argon2 implements them. Components where Argon2 is used, not where it is only set up.
+[[part]]
+of = "Argon2"
+asset = "BLAKE2b-512"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+implemented_by = ["blake2"]
+
+[[part]]
+of = "Argon2"
+asset = "BLAKE2b-{bits}"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+implemented_by = ["blake2"]
+unresolved = "digest length: not resolved to a registry length (the Argon2 tag's when it is at most 64 bytes)"
+params = { bits = { from = "output_bytes", map = { "20" = "160", "32" = "256", "48" = "384", "64" = "512" } } }
 
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]

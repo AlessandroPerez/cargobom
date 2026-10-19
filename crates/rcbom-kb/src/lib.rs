@@ -45,6 +45,8 @@ struct Raw {
     boundaries: Vec<BoundaryRaw>,
     #[serde(rename = "enum", default)]
     enums: Vec<EnumRaw>,
+    #[serde(rename = "part", default)]
+    parts: Vec<PartEntry>,
     #[serde(default)]
     unmodelled: UnmodelledRaw,
 }
@@ -330,6 +332,29 @@ pub struct Algo {
     /// build has them as that package's dependencies.
     #[serde(default)]
     pub implemented_by: Vec<String>,
+    /// Parameters the algorithm has whatever the call: MD5's digest is 16 bytes
+    /// (`{ output_bytes = "16" }`), `blake3::hash` is BLAKE3's unkeyed mode. Reported as
+    /// parameters, never part of the name.
+    #[serde(default)]
+    pub fixed: BTreeMap<String, String>,
+    /// (`[[type]]` entries) Parameters a method fixes itself, over those of the constructor
+    /// that built its receiver: `hash_password_into(pw, salt, out)` derives `out.len()` bytes
+    /// whatever the `Params` say. One the call does not resolve is unknown, not the
+    /// constructor's.
+    #[serde(default)]
+    pub call_params: BTreeMap<String, BTreeMap<String, Param>>,
+}
+
+/// An algorithm another computes inside itself (`[[part]]`): the BLAKE2b of Argon2. A component
+/// of each asset of family `of` where it is used (not where it is only set up).
+#[derive(Debug, Deserialize)]
+pub struct PartEntry {
+    pub of: String,
+    #[serde(flatten)]
+    pub algo: Algo,
+    /// The parameters of its name, from the outer asset's (`from`).
+    #[serde(default)]
+    pub params: BTreeMap<String, Param>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -347,7 +372,7 @@ pub struct TypeEntry {
     pub params: BTreeMap<String, Param>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Param {
     #[serde(default)]
@@ -382,6 +407,10 @@ pub struct Param {
     /// output length of `scrypt(.., &params, out)`).
     #[serde(default)]
     pub value: Option<String>,
+    /// (`[[part]]` entries) The value of this parameter of the asset the part is inside:
+    /// `from = "output_bytes"` for the BLAKE2b that makes an Argon2 tag.
+    #[serde(default)]
+    pub from: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -504,6 +533,7 @@ pub struct Kb {
     pub operations: Vec<OperationEntry>,
     pub boundaries: Vec<BoundaryEntry>,
     pub enums: Vec<EnumEntry>,
+    pub parts: Vec<PartEntry>,
     /// Packages without `[[crate]]` entries that are cryptographic although their metadata does
     /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
     pub unmodelled_crypto: Vec<String>,
@@ -737,6 +767,7 @@ impl Kb {
                     variants: e.variants,
                 })
                 .collect(),
+            parts: raw.parts,
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
             not_crypto: raw.unmodelled.not_crypto,
@@ -775,7 +806,8 @@ impl Kb {
                 self.enums
                     .iter()
                     .flat_map(|e| e.variants.values().map(|v| &v.algo)),
-            );
+            )
+            .chain(self.parts.iter().map(|p| &p.algo));
         for a in algos {
             // a family of the 1.7 enum, or one the registry has added since (written as a
             // property); key material has no algorithmProperties, its family is a property
@@ -826,6 +858,50 @@ impl Kb {
                     "{}: a fixed `value` is for [[fn]] parameters (a constructor's defaults)",
                     t.algo.asset
                 );
+            }
+        }
+        // the asset templates of each family: a parameter a part reads, or a call fixes, is not
+        // one of its name
+        let templates = |family: &str| -> Vec<&str> {
+            self.types
+                .iter()
+                .map(|t| &t.algo)
+                .chain(self.fns.iter().map(|f| &f.algo))
+                .filter(|a| a.family == family)
+                .map(|a| a.asset.as_str())
+                .collect()
+        };
+        for p in &self.parts {
+            if templates(&p.of).is_empty() {
+                bail!("[[part]] {}: no entry of family {:?}", p.algo.asset, p.of);
+            }
+            if p.params.values().any(|q| q.from.is_none()) {
+                bail!(
+                    "[[part]] {}: a parameter is read `from` the outer asset's",
+                    p.algo.asset
+                );
+            }
+        }
+        for a in self
+            .types
+            .iter()
+            .map(|t| &t.algo)
+            .chain(self.fns.iter().map(|f| &f.algo))
+        {
+            for k in a
+                .fixed
+                .keys()
+                .chain(a.call_params.values().flat_map(|m| m.keys()))
+            {
+                if templates(&a.family)
+                    .iter()
+                    .any(|t| t.contains(&format!("{{{k}}}")))
+                {
+                    bail!(
+                        "{}: parameter {k:?} is part of a name of its family",
+                        a.asset
+                    );
+                }
             }
         }
         for u in &self.uses {
