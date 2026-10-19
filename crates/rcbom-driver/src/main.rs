@@ -88,6 +88,21 @@ fn main() {
             .expect("running rustc");
         exit(status.code().unwrap_or(1));
     }
+    // The standard library's own crates under `-Zbuild-std` (cargo marks them
+    // `force-unstable-if-unmarked`): compiled, not analysed, with every body's MIR kept for the
+    // points-to engine.
+    if args
+        .iter()
+        .any(|a| a.ends_with("force-unstable-if-unmarked"))
+    {
+        let rustc = rustc.unwrap_or_else(|| "rustc".into());
+        let status = Command::new(rustc)
+            .args(&args[1..])
+            .arg("-Zalways-encode-mir")
+            .status()
+            .expect("running rustc");
+        exit(status.code().unwrap_or(1));
+    }
     if !args
         .iter()
         .any(|a| a == "--sysroot" || a.starts_with("--sysroot="))

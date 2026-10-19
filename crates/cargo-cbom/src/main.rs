@@ -267,11 +267,16 @@ fn run_driver(
         entries(&mut seen.into_iter().filter_map(|id| man.by_id(id)))
     };
 
+    // The standard library built from source with every body's MIR (`RCBOM_BUILD_STD`), as
+    // Rupta's `PTA_BUILD_STD` does: the shipped one has MIR only for generic and inline
+    // functions, and the points-to engine havocs calls into the others.
+    let build_std = std::env::var_os("RCBOM_BUILD_STD").is_some();
     // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any
     // input of the driver other than the sources (the driver itself, the compiler, the crate
     // lists, features, profile) invalidates both.
     let stamp = format!(
-        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n",
+        "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n\
+         build-std={}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -284,7 +289,8 @@ fn run_driver(
         a.features,
         a.profile,
         local_dirs,
-        std::env::var("RCBOM_MAX_INSTANCES").ok()
+        std::env::var("RCBOM_MAX_INSTANCES").ok(),
+        build_std
     );
     let stamp_path = dir.join("stamp");
     if std::fs::read_to_string(&stamp_path).ok().as_deref() != Some(stamp.as_str()) {
@@ -321,6 +327,11 @@ fn run_driver(
         .env("LD_LIBRARY_PATH", ld);
     if !a.features.is_empty() {
         cmd.arg("--features").arg(a.features.join(","));
+    }
+    if build_std {
+        cmd.arg("-Zbuild-std")
+            .arg("--target")
+            .arg(rcbom_manifest::host_triple()?);
     }
     // cargo's JSON messages on stdout, its diagnostics rendered on stderr as usual
     let out = cmd
