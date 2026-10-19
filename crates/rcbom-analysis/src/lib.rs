@@ -747,7 +747,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     macro_tag: None,
                     line_text: site.line_text.clone(),
                     code: site.text.clone(),
-                    detail: vec![],
+                    // a `[[protocol]]` call configures the stack; it makes no connection
+                    detail: vec![format!(
+                        "{}: configuration, not a connection",
+                        callee.path.rsplit("::").next().unwrap_or(&callee.path)
+                    )],
                     package: pkg.clone(),
                     provenance: Vec::new(),
                     note: None,
