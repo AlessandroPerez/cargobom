@@ -13,6 +13,10 @@
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:60 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2d-19456-2-1; line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2d-19456-2-1; line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:32:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o3; use: generate; line: `OsRng.fill_bytes(&mut key);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:72:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o7; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:80:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o8; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
@@ -78,6 +82,8 @@
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:functions:source=observed
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:occurrences=3
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:param:version=19
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:password=parameter
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:reachability=reachable
@@ -87,9 +93,25 @@
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:functions:source=observed
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:occurrences=3
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:version=19
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:occurrences=2
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:only-as-component=true
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:reachability=reachable
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=knowledge-base
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=2
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:only-as-component=true
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
@@ -243,6 +265,8 @@
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
@@ -282,6 +306,10 @@ component library spki 0.7.3 | pkg:cargo/spki@0.7.3 | purl pkg:cargo/spki@0.7.3
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
 component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:Argon2d-19456-2-1 -> crypto:algorithm:BLAKE2b-256
+dep crypto:algorithm:Argon2d-19456-2-1 -> crypto:algorithm:BLAKE2b-512
+dep crypto:algorithm:Argon2i-19456-2-1 -> crypto:algorithm:BLAKE2b-256
+dep crypto:algorithm:Argon2i-19456-2-1 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:PBKDF2-SHA-256-100000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-210000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:SHA-256
@@ -352,6 +380,8 @@ dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
 dependency crypto:algorithm:AES-256-GCM
 dependency crypto:algorithm:Argon2d-19456-2-1
 dependency crypto:algorithm:Argon2i-19456-2-1
+dependency crypto:algorithm:BLAKE2b-256
+dependency crypto:algorithm:BLAKE2b-512
 dependency crypto:algorithm:OS-RNG
 dependency crypto:algorithm:PBKDF2-SHA-256-100000-32
 dependency crypto:algorithm:PBKDF2-SHA-256-210000-32
@@ -399,6 +429,8 @@ provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2d-19456-2-1
 provides pkg:cargo/argon2@0.5.3 -> crypto:algorithm:Argon2i-19456-2-1
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-256
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512
 provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-100000-32
 provides pkg:cargo/pbkdf2@0.12.2 -> crypto:algorithm:PBKDF2-SHA-256-210000-32

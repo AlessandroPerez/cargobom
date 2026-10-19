@@ -1306,6 +1306,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:output_bytes",
+          "value": "32"
+        },
+        {
+          "name": "rcbom:param:version",
+          "value": "19"
+        },
+        {
           "name": "rcbom:provenance:password",
           "value": "parameter"
         },
@@ -1384,6 +1392,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:output_bytes",
+          "value": "32"
+        },
+        {
+          "name": "rcbom:param:version",
+          "value": "19"
+        },
+        {
           "name": "rcbom:provenance:password",
           "value": "parameter"
         },
@@ -1398,6 +1414,132 @@
         {
           "name": "rcbom:occurrences",
           "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2b-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
+            "line": 110,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "argon2::Argon2::<'key>::hash_password_into"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t13::n3; part of Argon2d-19456-2-1; line: `b.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
+            "line": 112,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "argon2::Argon2::<'key>::hash_password_into"
+          }
+        ]
+      },
+      "name": "BLAKE2b-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2b-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
+            "line": 110,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "argon2::Argon2::<'key>::hash_password_into"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t13::n3; part of Argon2d-19456-2-1; line: `b.hash_password_into(pw, b\"saltsaltsalt\", &mut out).unwrap();`; code: `hash_password_into`",
+            "line": 112,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "argon2::Argon2::<'key>::hash_password_into"
+          }
+        ]
+      },
+      "name": "BLAKE2b-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -1829,6 +1971,10 @@
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
       ],
+      "provides": [
+        "crypto:algorithm:BLAKE2b-256",
+        "crypto:algorithm:BLAKE2b-512"
+      ],
       "ref": "pkg:cargo/blake2@0.10.6"
     },
     {
@@ -2035,6 +2181,20 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:BLAKE2b-256",
+        "crypto:algorithm:BLAKE2b-512"
+      ],
+      "ref": "crypto:algorithm:Argon2d-19456-2-1"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:BLAKE2b-256",
+        "crypto:algorithm:BLAKE2b-512"
+      ],
+      "ref": "crypto:algorithm:Argon2i-19456-2-1"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:PBKDF2-SHA-256-100000-32"
@@ -2063,11 +2223,11 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Argon2d-19456-2-1"
+      "ref": "crypto:algorithm:BLAKE2b-256"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Argon2i-19456-2-1"
+      "ref": "crypto:algorithm:BLAKE2b-512"
     },
     {
       "dependsOn": [],
@@ -2136,7 +2296,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:31f4e7f2-5455-85ad-834c-8644d0b5227d",
+  "serialNumber": "urn:uuid:456a3093-9822-8dcb-b51d-a9c8f7ad4ced",
   "specVersion": "1.7",
   "version": 1
 }

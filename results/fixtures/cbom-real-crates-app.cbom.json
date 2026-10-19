@@ -2085,6 +2085,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:output_bytes",
+          "value": "32"
+        },
+        {
+          "name": "rcbom:param:version",
+          "value": "19"
+        },
+        {
           "name": "rcbom:provenance:password",
           "value": "environment,hard-coded"
         },
@@ -2103,6 +2111,118 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2b-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in cbom_real_crates_app::main; part of Argon2id-19456-2-1; line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "password_hash::traits::PasswordHasher::hash_password"
+          }
+        ]
+      },
+      "name": "BLAKE2b-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2b-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in cbom_real_crates_app::main; part of Argon2id-19456-2-1; line: `let _ = Argon2::default().hash_password(app_secret.as_bytes(), &app_salt);`; code: `hash_password`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "password_hash::traits::PasswordHasher::hash_password"
+          }
+        ]
+      },
+      "name": "BLAKE2b-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -2151,6 +2271,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:mode",
+          "value": "unkeyed"
         },
         {
           "name": "rcbom:occurrences",
@@ -5528,6 +5652,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
         },
         {
           "name": "rcbom:occurrences",
@@ -8998,7 +9126,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; line: `let _ = ClientConfig::builder();`; code: `ClientConfig::builder`",
+            "additionalContext": "[reachable] [call] in cbom_real_crates_app::main; builder: configuration, not a connection; line: `let _ = ClientConfig::builder();`; code: `ClientConfig::builder`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 12,
@@ -9136,6 +9264,10 @@
     {
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:BLAKE2b-256",
+        "crypto:algorithm:BLAKE2b-512"
       ],
       "ref": "pkg:cargo/blake2@0.10.6"
     },
@@ -9345,6 +9477,13 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:BLAKE2b-256",
+        "crypto:algorithm:BLAKE2b-512"
+      ],
+      "ref": "crypto:algorithm:Argon2id-19456-2-1"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
@@ -9489,7 +9628,11 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Argon2id-19456-2-1"
+      "ref": "crypto:algorithm:BLAKE2b-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE2b-512"
     },
     {
       "dependsOn": [],
@@ -9638,7 +9781,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:646fd6e2-304b-86f1-bdb6-f3083f0b253a",
+  "serialNumber": "urn:uuid:69d07bd3-e6e0-801d-8093-2938c88d8761",
   "specVersion": "1.7",
   "version": 1
 }
