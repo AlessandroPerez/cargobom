@@ -273,10 +273,10 @@ fn run_driver(
     let build_std = std::env::var_os("RCBOM_BUILD_STD").is_some();
     // Facts live next to the build cache: a crate cargo does not rebuild keeps its facts. Any
     // input of the driver other than the sources (the driver itself, the compiler, the crate
-    // lists, features, profile) invalidates both.
+    // lists, features, profile, whether the points-to analysis runs) invalidates both.
     let stamp = format!(
         "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n\
-         build-std={}\n",
+         build-std={}\npta={:?}\n",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -290,7 +290,8 @@ fn run_driver(
         a.profile,
         local_dirs,
         std::env::var("RCBOM_MAX_INSTANCES").ok(),
-        build_std
+        build_std,
+        std::env::var("RCBOM_PTA").ok()
     );
     let stamp_path = dir.join("stamp");
     if std::fs::read_to_string(&stamp_path).ok().as_deref() != Some(stamp.as_str()) {

@@ -79,8 +79,15 @@ enum Callee {
 /// A question asked at a call into a stop crate: what each argument may point to.
 #[derive(Clone)]
 pub(crate) struct Query {
+    /// Where the call is, at its callee expression (as the walk's sites are placed).
     pub(crate) at: rcbom_facts::Loc,
     pub(crate) callee: String,
+    /// The defining path of the function called (not of the instance it resolves to).
+    pub(crate) callee_path: String,
+    /// The instance whose body holds the call (its mangled name, as the walk's sites name
+    /// their owner) and its item's def-path hash (as the per-item scan's do).
+    pub(crate) owner: String,
+    pub(crate) owner_def: String,
     pub(crate) args: Vec<Option<(u32, u32, u32)>>,
     /// Whether the copy holding the call is reached from the roots through bound calls (set
     /// when solved): an empty answer in a reached copy is a gap, in another dead code.
@@ -90,6 +97,16 @@ pub(crate) struct Query {
     /// The type each argument's first word points to, when it is a struct or enum: a static of
     /// another type is not an answer (merged objects mix what different types held).
     pointees: Vec<Option<rustc_span::def_id::DefId>>,
+    /// Whether the argument is itself a pointer to that type (`&Algorithm`), not a value holding
+    /// one (ring's `pbkdf2::Algorithm`, passed by value, points to an `hmac::Algorithm`).
+    pub(crate) direct: Vec<bool>,
+}
+
+impl Query {
+    /// The struct or enum argument `k` points to.
+    pub(crate) fn pointee(&self, k: usize) -> Option<rustc_span::def_id::DefId> {
+        self.pointees.get(k).copied().flatten()
+    }
 }
 
 /// The constraints of one translated body, instantiated once (program code) or once per
@@ -574,10 +591,14 @@ impl Pta {
                 st.queries.push(Query {
                     at: q.at.clone(),
                     callee: q.callee.clone(),
+                    callee_path: q.callee_path.clone(),
+                    owner: q.owner.clone(),
+                    owner_def: q.owner_def.clone(),
                     args,
                     live: false,
                     copy: (f, c),
                     pointees: q.pointees.clone(),
+                    direct: q.direct.clone(),
                 });
             }
             for (k, call) in t.calls.iter().enumerate() {
@@ -832,6 +853,7 @@ impl Pta {
             copies: st.done.len(),
             failed: self.failed,
             constraints: self.constraints,
+            static_types: Vec::new(),
         };
         let mut queries = std::mem::take(&mut st.queries);
         let mut edges = std::mem::take(&mut st.edges);
@@ -1248,6 +1270,14 @@ impl Pta {
             })
             .collect();
         stats.vcalls_without_vtable = vcalls_without_vtable;
+        let mut types: Vec<_> = self
+            .static_adts
+            .iter()
+            .filter(|(d, _)| self.kb_static(**d))
+            .filter_map(|(d, a)| Some((*d, *a.first()?)))
+            .collect();
+        types.sort_by_key(|(d, _)| (d.krate.as_u32(), d.index.as_u32()));
+        stats.static_types = types;
         stats.vcalls_without_vtable_in = missing_in;
         (queries, answers, stats)
     }
@@ -1406,6 +1436,8 @@ pub(crate) struct Stats {
     pub(crate) copies: usize,
     pub(crate) failed: usize,
     pub(crate) constraints: usize,
+    /// The struct or enum each knowledge-base static or constant read is.
+    pub(crate) static_types: Vec<(rustc_span::def_id::DefId, rustc_span::def_id::DefId)>,
 }
 
 /// Offsets at or past this many bytes into an object share one location (the object's tail):
@@ -2001,7 +2033,16 @@ impl<'tcx> Tr<'_, 'tcx> {
                     _ => {
                         let krate = rustc_internal::internal(self.tcx, inst.def.def_id()).krate;
                         if self.p.stop.contains(&krate) {
-                            let (at, _) = crate::locate_stable(self.tcx, span);
+                            // at the callee expression, as the walk places the call's site:
+                            // a function item's own span (`UnboundKey::new`, `.encrypt`)
+                            let at = match func {
+                                Operand::Constant(c) => crate::locate_stable(self.tcx, c.span).0,
+                                _ => {
+                                    let call = rustc_internal::internal(self.tcx, span);
+                                    let callee = crate::callee_span(self.tcx, call).unwrap_or(call);
+                                    crate::locate(self.tcx, callee).0
+                                }
+                            };
                             let pointees = args
                                 .iter()
                                 .map(|a| {
@@ -2012,13 +2053,34 @@ impl<'tcx> Tr<'_, 'tcx> {
                                     }
                                 })
                                 .collect();
+                            let direct = args
+                                .iter()
+                                .map(|a| {
+                                    a.ty(self.body.locals())
+                                        .ok()
+                                        .is_some_and(|t| self.ity(t).builtin_deref(true).is_some())
+                                })
+                                .collect();
                             self.t.queries.push(Query {
                                 at,
                                 callee: inst.name(),
+                                callee_path: crate::path_of(
+                                    self.tcx,
+                                    rustc_internal::internal(self.tcx, def.def_id()),
+                                ),
+                                owner: self.p.insts[self.f as usize].mangled_name(),
+                                owner_def: crate::def_hash(
+                                    self.tcx,
+                                    rustc_internal::internal(
+                                        self.tcx,
+                                        self.p.insts[self.f as usize].def.def_id(),
+                                    ),
+                                ),
                                 args: arg_locs.clone(),
                                 live: false,
                                 copy: (0, 0),
                                 pointees,
+                                direct,
                             });
                         }
                         // the allocator's other entry points: freeing writes nothing a pointer can be
