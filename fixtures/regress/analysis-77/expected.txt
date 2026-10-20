@@ -1,6 +1,8 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:9:50 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [present] [static] in a77::Local::alg; line: `trait Local { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`
   occ SHA-256 | crypto:algorithm:SHA-256 | picklib/src/lib.rs:2:56 | ring::digest::SHA256 | [reachable] [static] in picklib::Pick::alg; line: `pub trait Pick { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:58 | ring::digest::SHA256 | [reachable] [static] in <a77::Over as a77::Local>::alg; line: `impl Local for Over { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest((h.f)(&Over), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest(v[0], &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a77::Over`, the only type coerced to `dyn a77::Local` at src/main.rs:28); line: `let _ = digest(lo.alg(), &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | picklib/src/lib.rs:8:60 | ring::digest::SHA384 | [reachable] [static] in <picklib::L384 as picklib::Pick>::alg; line: `impl Pick for L384 { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `picklib::W<picklib::L384>` is coerced to `dyn picklib::Gen` at picklib/src/lib.rs:6); line: `let _ = digest(g.alg(), &d);`; code: `digest`
@@ -14,8 +16,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a77 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | picklib/Cargo.toml:7:0 | ring | [manifest] declared by picklib (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm unresolved: the result of `<indirect>`; line: `let _ = digest((h.f)(&Over), &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in a77::main; use: digest; algorithm unresolved: the result of `core::ops::index::Index::index`; line: `let _ = digest(v[0], &d);`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=knowledge-base
@@ -27,7 +27,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
@@ -50,18 +50,10 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=2
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library picklib 0.1.0 | pkg:cargo/picklib@0.1.0 | purl pkg:cargo/picklib@0.1.0
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
@@ -73,7 +65,6 @@ dependency crypto:algorithm:SHA-1
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
-dependency crypto:algorithm:unknown:hash:ring
 dependency pkg:cargo/a77@0.1.0
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/picklib@0.1.0
@@ -85,7 +76,6 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
-provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
 root {"bom-ref": "pkg:cargo/a77@0.1.0", "name": "a77", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a77@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=
