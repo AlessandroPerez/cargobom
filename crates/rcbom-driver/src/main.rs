@@ -487,8 +487,9 @@ fn analyze(tcx: TyCtxt<'_>) {
         // others; the facts are written without its answers
         if let Some(p) = w.cx.pta.take() {
             let tcx = w.cx.tcx;
-            if catch_unwind(AssertUnwindSafe(|| pta_dump(tcx, p))).is_err() {
-                w.cx.errors += 1;
+            match catch_unwind(AssertUnwindSafe(|| pta_dump(tcx, p))) {
+                Ok(pt) => r.points_to = Some(pt),
+                Err(_) => w.cx.errors += 1,
             }
         }
         let coercions = std::mem::take(&mut w.coercions);
@@ -600,9 +601,9 @@ fn analyze(tcx: TyCtxt<'_>) {
     }
 }
 
-/// Solves the points-to analysis and writes its answers beside the facts
-/// (`<crate>-pta.json`): per query (a call into a stop crate), what each argument may point to.
-fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) {
+/// Solves the points-to analysis: its answers for the facts (per call into a stop crate, what
+/// each argument may point to), and its statistics beside them (`<crate>-pta.json`).
+fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) -> rcbom_facts::PointsTo {
     let t0 = std::time::Instant::now();
     let (queries, answers, stats) = p.solve();
     let mut why: Vec<(String, usize)> = stats
@@ -611,7 +612,7 @@ fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) {
         .map(|(k, v)| (k.clone(), *v))
         .collect();
     why.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
-    let queries: Vec<serde_json::Value> = queries
+    let listed: Vec<serde_json::Value> = queries
         .iter()
         .zip(&answers)
         .map(|(q, a)| {
@@ -641,12 +642,49 @@ fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) {
         "constraints": stats.constraints,
         "solve_ms": t0.elapsed().as_millis() as u64,
         "havoc": why.iter().take(200).map(|(k, v)| serde_json::json!([k, v])).collect::<Vec<_>>(),
-        "queries": queries,
+        "queries": listed,
     });
     let _ = std::fs::write(
         out.join(format!("{name}-pta.json")),
         serde_json::to_vec_pretty(&v).unwrap(),
     );
+    let calls = queries
+        .iter()
+        .zip(&answers)
+        .map(|(q, a)| rcbom_facts::PtaCall {
+            at: q.at.clone(),
+            callee: q.callee_path.clone(),
+            owner: q.owner.clone(),
+            owner_def: q.owner_def.clone(),
+            live: q.live,
+            args: a
+                .iter()
+                .enumerate()
+                .map(|(k, x)| {
+                    x.as_ref().map(|x| rcbom_facts::PtaArg {
+                        statics: x
+                            .statics
+                            .iter()
+                            .map(|d| def_ref_internal(tcx, *d))
+                            .collect(),
+                        unknown: x.unknown,
+                        others: x.others,
+                        pointee: q.pointee(k).map(|d| path_of(tcx, d)),
+                        direct: q.direct.get(k).copied().unwrap_or(false),
+                    })
+                })
+                .collect(),
+        })
+        .collect();
+    let static_types = stats
+        .static_types
+        .iter()
+        .map(|(d, t)| (def_ref_internal(tcx, *d), path_of(tcx, *t)))
+        .collect();
+    rcbom_facts::PointsTo {
+        calls,
+        static_types,
+    }
 }
 
 pub(crate) fn crate_ref(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> CrateRef {
@@ -1524,7 +1562,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
 /// `get()` of `get()(x)`, `fs[0]` of `fs[0](x)`): what precedes the argument list, the last
 /// parenthesised group of the call's text; `None` when the call is not written as one (a
 /// macro's, an operator's).
-fn callee_span(tcx: TyCtxt<'_>, call: rustc_span::Span) -> Option<rustc_span::Span> {
+pub(crate) fn callee_span(tcx: TyCtxt<'_>, call: rustc_span::Span) -> Option<rustc_span::Span> {
     if call.from_expansion() {
         return None;
     }
@@ -2161,6 +2199,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             paths,
             crates,
             crates_complete: !truncated && usage_complete,
+            points_to: None,
         }
     }
 

@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 23;
+pub const FACTS_VERSION: u32 = 24;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -755,4 +755,51 @@ pub struct Reach {
     /// `crates` is complete (no walk limit was hit).
     #[serde(default)]
     pub crates_complete: bool,
+    /// What the points-to analysis (`RCBOM_PTA`) found, when it ran.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub points_to: Option<PointsTo>,
+}
+
+/// The points-to analysis' answers at the calls into the knowledge-base crates: what each
+/// argument may point to, in every copy of the calling body it solved.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct PointsTo {
+    pub calls: Vec<PtaCall>,
+    /// The struct or enum each knowledge-base static or constant the analysis read is
+    /// (`ring::digest::SHA256`: `ring::digest::Algorithm`): an argument that points to a value
+    /// of one of these types can carry that descriptor.
+    pub static_types: Vec<(DefRef, String)>,
+}
+
+/// A call into a knowledge-base crate, at its callee expression (as `Site::span` places it).
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PtaCall {
+    pub at: Loc,
+    /// Defining path of the function called.
+    pub callee: String,
+    /// The instance whose body holds the call: its mangled name (`Owner::id` of the walk's
+    /// sites) and its item's def-path hash (`Owner::id` of the per-item scan's).
+    pub owner: String,
+    pub owner_def: String,
+    /// The copy holding the call is reached from the roots through bound calls: an empty
+    /// answer there is a value not followed, elsewhere dead code.
+    pub live: bool,
+    /// Per argument (`None`: not one that can hold a pointer the analysis follows).
+    pub args: Vec<Option<PtaArg>>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PtaArg {
+    /// The knowledge-base statics and constants it may point to.
+    pub statics: Vec<DefRef>,
+    /// It may point to what code not translated reaches.
+    pub unknown: bool,
+    /// Other objects it may point to (locals, heap, constant memory).
+    pub others: usize,
+    /// The struct or enum it points to (`ring::digest::Algorithm`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pointee: Option<String>,
+    /// It is itself a pointer to that type (`&Algorithm`), not a value holding one.
+    #[serde(default)]
+    pub direct: bool,
 }
