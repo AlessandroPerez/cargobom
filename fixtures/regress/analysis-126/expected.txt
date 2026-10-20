@@ -1,6 +1,6 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.map(f).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:13:39 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a126::main; line: `let _ = digest(o.map(f).unwrap_or(&SHA1), &d);`; code: `SHA1`
-  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.map(k).unwrap_or(&SHA1), &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.map(k).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:39 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a126::main; line: `let _ = digest(o.map(k).unwrap_or(&SHA1), &d);`; code: `SHA1`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:17:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.map(c).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:17:39 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a126::main; line: `let _ = digest(o.map(c).unwrap_or(&SHA1), &d);`; code: `SHA1`
@@ -12,6 +12,7 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:23:38 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a126::main::{closure#3}; instantiated by a126::main at src/main.rs:23:33 as `|_| &SHA1`; line: `let _ = digest(r.map_or_else(|_| &SHA1, fixed), &d);`; code: `SHA1`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:80 | ring::digest::SHA256 | [reachable] [static] in a126::main; line: `let o: Option<&'static Digest> = if arg(1).is_empty() { None } else { Some(&SHA256) };`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a126::keep`; line: `let _ = digest(o.map(f).unwrap_or(&SHA1), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(o.map(k).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a126::keep`; line: `let _ = digest(o.map(g).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(o.or_else(fb_opt).unwrap_or(&SHA1), &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(r.unwrap_or_else(|_| fallback()), &d);`; code: `digest`
@@ -30,7 +31,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a126 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a126 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:15:12 | ring::digest::digest | [reachable] [call] in a126::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(o.map(k).unwrap_or(&SHA1), &d);`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
@@ -42,7 +42,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=7
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
@@ -64,18 +64,10 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep pkg:cargo/a126@0.1.0 -> pkg:cargo/ring@0.17.14
@@ -84,7 +76,6 @@ dependency crypto:algorithm:SHA-1
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
-dependency crypto:algorithm:unknown:hash:ring
 dependency pkg:cargo/a126@0.1.0
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
@@ -95,7 +86,6 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
-provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
 root {"bom-ref": "pkg:cargo/a126@0.1.0", "name": "a126", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a126@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=

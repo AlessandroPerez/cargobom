@@ -1,7 +1,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:26 | ring::digest::SHA256 | [reachable] [static] in a150::p1; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b"1"); }`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:74 | ring::digest::digest | [reachable] [call] in a150::p1; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b"1"); }`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:26 | ring::digest::SHA256 | [reachable] [static] in a150::p3; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:64 | ring::digest::digest | [reachable] [call] in a150::p3; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:64 | ring::digest::digest | [reachable] [call] in a150::p3; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:29 | ring::digest::SHA256 | [reachable] [static] in a150::p4; line: `fn p4() { let c = Cell::new(&SHA256 as A); set4(&c); let _ = digest(c.get(), b"4"); }`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:32 | ring::digest::SHA256 | [reachable] [static] in a150::p5; line: `fn p5() { let c = RefCell::new(&SHA256 as A); set5(&c); let a = *c.borrow(); let _ = digest(a, b"5"); }`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:85 | ring::digest::digest | [reachable] [call] in a150::p5; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a150::set5`; line: `fn p5() { let c = RefCell::new(&SHA256 as A); set5(&c); let a = *c.borrow(); let _ = digest(a, b"5"); }`; code: `digest`
@@ -20,6 +20,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:76:60 | ring::digest::digest | [reachable] [call] in a150::p14; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a150::apply14`; line: `fn p14() { let mut a: A = &SHA256; apply14(&mut a); let _ = digest(a, b"14"); }`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:25 | ring::digest::SHA512 | [reachable] [static] in a150::set1; line: `fn set1(w: W1) { *w.r = &SHA512; }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:47 | ring::digest::SHA512 | [reachable] [static] in a150::p3::{closure#0}; instantiated by a150::p3 at src/main.rs:19:39 as `|| a = &SHA512`; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:64 | ring::digest::digest | [reachable] [call] in a150::p3; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:22:30 | ring::digest::SHA512 | [reachable] [static] in a150::set4; line: `fn set4(c: &Cell<A>) { c.set(&SHA512) }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:61 | ring::digest::digest | [reachable] [call] in a150::p4; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `a150::set4`; line: `fn p4() { let c = Cell::new(&SHA256 as A); set4(&c); let _ = digest(c.get(), b"4"); }`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:45 | ring::digest::SHA512 | [reachable] [static] in a150::set5; line: `fn set5(c: &RefCell<A>) { *c.borrow_mut() = &SHA512 }`; code: `SHA512`
@@ -38,7 +39,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a150 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:15:74 | ring::digest::digest | [reachable] [call] in a150::p1; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b"1"); }`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:19:64 | ring::digest::digest | [reachable] [call] in a150::p3; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `a150::run3` is not followed; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b"3"); }`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:27:85 | ring::digest::digest | [reachable] [call] in a150::p5; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::cell::RefCell::<T>::borrow_mut` is not followed; line: `fn p5() { let c = RefCell::new(&SHA256 as A); set5(&c); let a = *c.borrow(); let _ = digest(a, b"5"); }`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a150::p6; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x, b"6x");`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:41:12 | ring::digest::digest | [reachable] [call] in a150::p6; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(y, b"6y");`; code: `digest`
@@ -55,7 +55,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=15
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=16
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -70,7 +70,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=8
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=7
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}

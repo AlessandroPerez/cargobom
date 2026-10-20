@@ -11,6 +11,7 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:73:26 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a91::main; line: `let oldc = c.replace(&SHA1);`; code: `SHA1`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:76:27 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a91::main; line: `let oldr = rc.replace(&SHA1);`; code: `SHA1`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:82:25 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a91::main; line: `let t2 = o2.replace(&SHA1).unwrap_or(&SHA256);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:84:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o2.unwrap_or(&SHA384), &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:27 | ring::digest::SHA256 | [reachable] [static] in a91::main; line: `let mut a1 = A { alg: &SHA256 };`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:33:27 | ring::digest::SHA256 | [reachable] [static] in a91::main; line: `let mut a2 = A { alg: &SHA256 };`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:65 | ring::digest::SHA256 | [reachable] [static] in a91::main; line: `let (mut x1, mut y1): (&'static Digest, &'static Digest) = (&SHA256, &SHA1);`; code: `SHA256`
@@ -49,7 +50,7 @@
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:77:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(oldr, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:79:32 | ring::digest::SHA384 | [reachable] [static] in a91::main; line: `let t = o.take().unwrap_or(&SHA384);`; code: `SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:80:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(t, &d);`; code: `digest`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:84:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `let _ = digest(o2.unwrap_or(&SHA384), &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:84:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(o2.unwrap_or(&SHA384), &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:84:33 | ring::digest::SHA384 | [reachable] [static] in a91::main; line: `let _ = digest(o2.unwrap_or(&SHA384), &d);`; code: `SHA384`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:195 | ring::digest::SHA512 | [reachable] [static] in a91::reborrow_tuple; line: `fn reborrow_tuple(slot: &mut &'static Digest, other: &mut &'static Digest) { let s: &mut &'static Digest = &mut *slot; let (x, _y) = if arg(1).len() > 1 { (s, other) } else { (other, s) }; *x = &SHA512; }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:16:83 | ring::digest::SHA512 | [reachable] [static] in a91::ident; line: `fn ident(slot: &mut &'static Digest) { let s = std::convert::identity(slot); *s = &SHA512; }`; code: `SHA512`
@@ -73,12 +74,11 @@
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a91::B as a91::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b1.alg, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:56:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x6, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:59:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x7, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:84:12 | ring::digest::digest | [reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::option::Option::<T>::replace` is not followed; line: `let _ = digest(o2.unwrap_or(&SHA384), &d);`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
-  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=13
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=14
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
@@ -112,7 +112,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=4
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=3
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
