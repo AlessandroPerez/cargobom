@@ -58,7 +58,7 @@ fn indirect() {
     let mut fill = || OsRng.fill_bytes(&mut k1);
     fill();
     let _ = Aes256Gcm::new_from_slice(&k1);
-    // filled through a struct's `&mut`: computed (the program's fill_out)
+    // filled through a struct's `&mut`: rng (OsRng, in the program's fill_out)
     let mut k2 = [0u8; 32];
     fill_out(Out { buf: &mut k2 });
     let _ = Aes256Gcm::new_from_slice(&k2);
