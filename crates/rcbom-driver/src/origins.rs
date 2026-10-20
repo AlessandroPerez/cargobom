@@ -3246,13 +3246,21 @@ impl Pointees<'_> {
                         Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
                     )
             };
+            // (an argument's own pointer stays what it was on entry; one held in a part of it
+            // that the body stores into, `w.slot = other` in `fn f(mut w: W, other: ..)`, is what
+            // was stored there)
+            let followed = |j: usize| {
+                !(1..=self.nargs).contains(&t.local)
+                    || (j > 0
+                        && !t.path[..j].contains(&Step::Deref)
+                        && self.part_stores.get(&t.local).is_some_and(|v| {
+                            v.iter().any(|(p, ..)| {
+                                is_prefix(p, &t.path[..j]) || is_prefix(&t.path[..j], p)
+                            })
+                        }))
+            };
             match j {
-                Some(j)
-                    if !t.alias
-                        && !(1..=self.nargs).contains(&t.local)
-                        && through_ptr(j)
-                        && depth < 4 =>
-                {
+                Some(j) if !t.alias && followed(j) && through_ptr(j) && depth < 4 => {
                     let found = self.targets(t.local, &t.path[..j], 1);
                     if found.iter().all(|x| x.alias) {
                         self.lost.set(true);
@@ -3266,7 +3274,7 @@ impl Pointees<'_> {
                         .collect();
                     out.extend(self.through_held_at(found, depth + 1));
                 }
-                Some(j) if !t.alias && !(1..=self.nargs).contains(&t.local) && through_ptr(j) => {
+                Some(j) if !t.alias && followed(j) && through_ptr(j) => {
                     // (past the bound: where the held pointer points is not followed)
                     self.cut.set(true);
                     out.push(t);
