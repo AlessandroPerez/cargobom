@@ -527,7 +527,9 @@ impl Solver {
             if !self.smashed.contains(&o) {
                 let cs = self.copies_over(o, off, off.saturating_add(8));
                 self.scans[1] += cs.len() as u64;
-                for c in cs {
+                // (a copy starting after the location's offset, inside its word, does not carry
+                // it: as in `apply`, a copy moves the locations at or after its start)
+                for c in cs.into_iter().filter(|c| c.soff <= off) {
                     let d = self.loc(c.d, c.doff.saturating_add(off - c.soff));
                     self.add_edge(l, d);
                 }
