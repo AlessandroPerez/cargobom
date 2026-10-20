@@ -417,6 +417,13 @@
             "symbol": "a81::TABLE"
           },
           {
+            "additionalContext": "[reachable] [call] in a81::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a81::main` stores in the field); line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in a81::main; a81::TABLE -> ring::digest::SHA256; line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `TABLE`",
             "line": 24,
             "location": "src/main.rs",
@@ -568,7 +575,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "26"
+          "value": "27"
         }
       ],
       "type": "cryptographic-asset"
@@ -623,7 +630,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a81::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a81::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
@@ -843,6 +850,13 @@
             "symbol": "a81::TABLE"
           },
           {
+            "additionalContext": "[reachable] [call] in a81::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a81::LAZY::{closure#0}` stores in the field); line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in a81::main; a81::TABLE -> ring::digest::SHA512; line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `TABLE`",
             "line": 24,
             "location": "src/main.rs",
@@ -931,62 +945,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "17"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a81::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(TABLE.get(i).map(|x| x.h).unwrap_or(&SHA384), &d);`; code: `digest`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "18"
         }
       ],
       "type": "cryptographic-asset"
@@ -1011,8 +970,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1031,10 +989,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -1095,7 +1049,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c3045174-c46f-838e-bdba-b52ee31e8f24",
+  "serialNumber": "urn:uuid:187b616f-55ec-8944-86ce-9e91d52e1701",
   "specVersion": "1.7",
   "version": 1
 }

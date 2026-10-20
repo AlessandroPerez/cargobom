@@ -207,14 +207,14 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
@@ -315,14 +315,14 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
@@ -409,6 +409,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[present] [call] in a85::h; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[present] [static] in a85::dead::{closure#0}; line: `fn dead(d: &[u8]) { let mut x: &'static Digest = &SHA1; (0..arg(9).len()).for_each(|_| x = &SHA512); h(x, d); }`; code: `SHA512`",
             "line": 11,
             "location": "src/main.rs",
@@ -421,6 +428,20 @@
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 34,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a85::main; line: `if let Some(s) = v.first_mut().as_mut() { **s = &SHA512; }`; code: `SHA512`",
@@ -447,7 +468,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -455,7 +476,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -473,20 +494,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
-            "line": 19,
-            "location": "src/main.rs",
-            "offset": 34,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(arr[0], &d);`; code: `digest`",
-            "line": 20,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
           {
             "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; line: `for a in &v { let _ = digest(a, &d); }`; code: `digest`",
             "line": 23,
@@ -538,7 +545,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -647,7 +654,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7f626db9-c391-85f9-afe4-18117ebee148",
+  "serialNumber": "urn:uuid:dccea653-d72f-8440-aa55-4d1ce6046eca",
   "specVersion": "1.7",
   "version": 1
 }

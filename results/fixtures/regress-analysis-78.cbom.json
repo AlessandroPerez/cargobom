@@ -179,6 +179,27 @@
             "symbol": "ring::digest::digest"
           },
           {
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(apply(lpick::<Over>, &Over), &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(apply_gen(lpick::<Over>, &Over), &d);`; code: `digest`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(TABLE[0](&Over), &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a78::Over`, the only type coerced to `dyn a78::Local` at src/main.rs:14); line: `let _ = digest(boxed(Over).alg(), &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
@@ -195,6 +216,13 @@
           {
             "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(g(&Over), &d);`; code: `digest`",
             "line": 28,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
+            "line": 32,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -225,7 +253,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "9"
         }
       ],
       "type": "cryptographic-asset"
@@ -250,74 +278,9 @@
             "location": "src/main.rs",
             "offset": 102,
             "symbol": "ring::digest::SHA384"
-          }
-        ]
-      },
-      "name": "SHA-384",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm unresolved: the result of `a78::apply`; line: `let _ = digest(apply(lpick::<Over>, &Over), &d);`; code: `digest`",
-            "line": 22,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm unresolved: the result of `a78::apply_gen`; line: `let _ = digest(apply_gen(lpick::<Over>, &Over), &d);`; code: `digest`",
-            "line": 23,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm unresolved: the result of `<indirect>`; line: `let _ = digest(TABLE[0](&Over), &d);`; code: `digest`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm unresolved: the result of `<indirect>`; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: fixed; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -325,7 +288,7 @@
           }
         ]
       },
-      "name": "unknown",
+      "name": "SHA-384",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -348,12 +311,8 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -377,8 +336,7 @@
       "provides": [
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
-        "crypto:algorithm:SHA-384",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-384"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -393,10 +351,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-384"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -457,7 +411,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e7b39a05-e295-81ef-8633-a2cb00f23f4e",
+  "serialNumber": "urn:uuid:77505b79-27fb-8354-846e-1a9d3cee72b2",
   "specVersion": "1.7",
   "version": 1
 }

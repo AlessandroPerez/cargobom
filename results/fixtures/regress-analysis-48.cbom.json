@@ -214,7 +214,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 12,
@@ -427,6 +427,13 @@
             "symbol": "ring::digest::SHA384"
           },
           {
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in m1::main; line: `let mut c3 = Ctx { alg: &SHA384, n: 0 };`; code: `SHA384`",
             "line": 44,
             "location": "src/main.rs",
@@ -501,7 +508,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "11"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -649,13 +656,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::ops::function::FnMut::call_mut`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
-            "line": 38,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `m1::opt_set` is not followed; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 70,
             "location": "src/main.rs",
@@ -706,7 +706,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -815,7 +815,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:bf1156c0-f4af-81f8-a7bc-48513cc8d08d",
+  "serialNumber": "urn:uuid:1f26f397-bf20-849c-a35c-11c462d3c11e",
   "specVersion": "1.7",
   "version": 1
 }

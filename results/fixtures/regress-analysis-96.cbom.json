@@ -116,7 +116,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(OPT.lock().unwrap().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(OPT.lock().unwrap().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -262,6 +262,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a96::main` puts in `static a96::OPT`); line: `let _ = digest(OPT.lock().unwrap().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a96::main` stores in the field); line: `let _ = digest(LIST.lock().unwrap()[0].h, &d);`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
@@ -308,7 +315,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -327,7 +334,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(OPT.lock().unwrap().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a96::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(OPT.lock().unwrap().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -467,7 +474,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e83e6cae-8ee9-84b6-a3f2-33fd55efee81",
+  "serialNumber": "urn:uuid:4ccd7d5e-bd40-8e3d-a8c5-5884dd575199",
   "specVersion": "1.7",
   "version": 1
 }

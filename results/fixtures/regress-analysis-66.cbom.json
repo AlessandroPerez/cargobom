@@ -197,7 +197,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
@@ -225,7 +225,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 12,
@@ -361,6 +361,13 @@
             "symbol": "ring::digest::SHA384"
           },
           {
+            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`",
+            "line": 35,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a66::main; line: `let a7 = pick(&arg(7)).unwrap_or(&SHA384);`; code: `SHA384`",
             "line": 38,
             "location": "src/main.rs",
@@ -442,7 +449,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "12"
+          "value": "13"
         }
       ],
       "type": "cryptographic-asset"
@@ -474,6 +481,13 @@
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [component] in a66::main; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, b\"placeholder-not-a-key\");`; code: `hmac::HMAC_SHA512`",
@@ -529,7 +543,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -548,22 +562,8 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x1, &d);`; code: `digest`",
-            "line": 21,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm unresolved: the result of `ring::hmac::Algorithm::digest_algorithm`; line: `let _ = digest(a4, &d);`; code: `digest`",
             "line": 30,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a66::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::ops::function::FnMut::call_mut`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x5, &d);`; code: `digest`",
-            "line": 35,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -598,7 +598,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -709,7 +709,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:110f3229-c098-884c-910f-0c1bf58d9879",
+  "serialNumber": "urn:uuid:b717c5a6-cf8a-8c66-9476-caf2fb9e094d",
   "specVersion": "1.7",
   "version": 1
 }

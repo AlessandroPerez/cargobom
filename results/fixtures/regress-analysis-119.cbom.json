@@ -606,7 +606,7 @@
             "symbol": "a119::M9"
           },
           {
-            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm one of 3 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 12,
@@ -782,6 +782,13 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `a119::inner` stores in the field); line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -809,7 +816,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "17"
+          "value": "18"
         }
       ],
       "type": "cryptographic-asset"
@@ -932,6 +939,13 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `a119::init` stores in the field); line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -959,7 +973,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
+          "value": "16"
         }
       ],
       "type": "cryptographic-asset"
@@ -1048,7 +1062,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a119::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(OL.get().map(|c| c.h).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 12,
@@ -1193,7 +1207,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:514f56cd-d152-8ee0-861d-e9e95e5ef20e",
+  "serialNumber": "urn:uuid:07fe01e9-b406-8fed-932b-d9cb86b96f17",
   "specVersion": "1.7",
   "version": 1
 }
