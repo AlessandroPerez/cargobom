@@ -9867,6 +9867,74 @@ fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(String, String, 
     None
 }
 
+/// Methods of the standard library's containers that put their arguments in them.
+const CONTAINER_STORES: &[&str] = &[
+    "push",
+    "push_back",
+    "push_front",
+    "insert",
+    "replace",
+    "get_or_insert",
+];
+
+/// A pointer to the variable `name` (`&mut name..`, `is` telling its binding), or one of the
+/// `aliases` already found, handed to a method of binding `b` that stores it
+/// (`CONTAINER_STORES`: `v.push(&mut x)`, `o.insert(r)`): `b` may hold it, as an alias of no
+/// known path (`*`) and the variable's part it points to.
+fn lent_into(
+    src: &Source,
+    b: &Bind,
+    name: &str,
+    is_var: &dyn Fn(usize) -> bool,
+    aliases: &[(Bind, String, String, bool)],
+    is: &dyn Fn(usize, &Bind) -> bool,
+) -> Option<(String, String, bool)> {
+    let s = &src.code;
+    let mut i = b.scope.0;
+    while i < b.scope.1.min(s.len()) {
+        if !kw(s, i, &b.name)
+            || !is(i, b)
+            || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
+        {
+            i += 1;
+            continue;
+        }
+        let dot = skip_blank(s, i + b.name.chars().count());
+        i += b.name.chars().count();
+        if s.get(dot) != Some(&'.') {
+            continue;
+        }
+        let m = skip_blank(s, dot + 1);
+        let method = word_of(s, m);
+        let open = skip_blank(s, m + method.chars().count());
+        if !CONTAINER_STORES.contains(&method.as_str()) || s.get(open) != Some(&'(') {
+            continue;
+        }
+        let Some(close) = close_of_at(s, open) else {
+            continue;
+        };
+        for k in open + 1..close {
+            if !word_start(s, k) || before_blank(s, k).is_some_and(|p| s[p] == '.' || s[p] == ':') {
+                continue;
+            }
+            if kw(s, k, name) && is_var(k) {
+                let borrowed = word_before_at(s, k) == "mut"
+                    && before_blank(s, k)
+                        .and_then(|m| before_blank(s, m + 1 - 3))
+                        .is_some_and(|a| s[a] == '&');
+                if borrowed {
+                    let (pl, _) = read_place(s, k);
+                    return Some(("*".into(), pl[name.len()..].to_string(), false));
+                }
+            }
+            if let Some(a) = aliases.iter().find(|a| kw(s, k, &a.0.name) && is(k, &a.0)) {
+                return Some(("*".into(), a.2.clone(), false));
+            }
+        }
+    }
+    None
+}
+
 /// The stores through other bindings of the function that may point to the variable bound by
 /// `bd` (or a part of it): `let r = &mut a; *r = v;`, reborrows and copies of such a pointer
 /// (`let r1 = &mut *r0;`, `let r2 = r1;`), values holding one (`Holder { r: &mut x }`, `(&mut x,
@@ -9951,7 +10019,8 @@ fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
             {
                 continue;
             }
-            let Some((x, y)) = b.init else { continue };
+            // (one bound without a value, `let mut v;`, by what is put in it below)
+            let (x, y) = b.init.unwrap_or((0, 0));
             let simple = b.kind == BindKind::Let && {
                 let p = src.text(b.pat.0, b.pat.1);
                 let p = p.split(':').next().unwrap_or("").trim();
@@ -10031,6 +10100,12 @@ fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
                     }
                     _ => found = Some(("*".into(), a.2.clone(), false)),
                 }
+            }
+            // a container the variable's borrow, or a pointer already found, is put in by one
+            // of its methods (`v.push(&mut x)`, `o.insert(&mut x)`, `o.replace(r)`): what it
+            // holds, or hands out, may point there
+            if found.is_none() {
+                found = lent_into(src, b, &bd.name, &|k| is(k, bd), &aliases, &is);
             }
             if let Some((path, sub, def)) = found {
                 let path = if simple { path } else { "*".to_string() };
@@ -10372,7 +10447,10 @@ fn swapping_call(src: &Source, i: usize) -> bool {
             .items
             .iter()
             .any(|x| x.kind == ItemKind::Fn && x.name == f);
-    matches!(f.as_str(), "swap" | "take" | "replace") && !own
+    // (another value's `replace` or `take` method, `o.replace(&mut a)`, stores the borrow or
+    // hands one back: `a` is not replaced)
+    let method = before_blank(s, fb).is_some_and(|p| s[p] == '.');
+    matches!(f.as_str(), "swap" | "take" | "replace") && !own && !(method && f != "swap")
 }
 
 /// A call before the read at `start`, in a block around it, that replaces the place read on
