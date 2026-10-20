@@ -826,6 +826,8 @@ pub(crate) fn body_links(
     // the place it pointed to on entry holds at the returns is not followed, nor what the
     // other parameters' places hold (one of them may be written through it)
     // (or lends the parameter itself as `&mut`: `mem::swap(&mut slot, &mut other)`)
+    // (a result whose borrows its callers follow, `returned_pointers`)
+    let returns_followed = crate::origins::returned_pointers(tcx, body).is_some();
     let redirect = |index: usize| -> (bool, bool) {
         let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
         // the locals holding a copy of the parameter's pointer (`let s = slot;`), its own first
@@ -872,8 +874,10 @@ pub(crate) fn body_links(
         // other)`, `p.a = slot`: followed, or lost, by the body's own pointer search)
         // (or returned itself, `fn id(s: &mut T) -> &mut T { s }`, or stored through another
         // pointer, `(*o).r = slot`: written through outside the body)
+        // (into a result its callers follow, `returned_pointers`: written through there, by
+        // them; a caller that does not keeps it not followed)
         let outside = |p: &rustc_public::mir::Place| {
-            p.local == rustc_public::mir::RETURN_LOCAL
+            (p.local == rustc_public::mir::RETURN_LOCAL && !returns_followed)
                 || p.projection
                     .iter()
                     .any(|e| matches!(e, rustc_public::mir::ProjectionElem::Deref))

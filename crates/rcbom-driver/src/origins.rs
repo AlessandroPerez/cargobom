@@ -419,6 +419,7 @@ impl Flow {
             body,
             bags: closed_bags(body),
             bag_stack: RefCell::new(Vec::new()),
+            returns: callee_returns(tcx, body),
             direct: &direct,
             cut: Cell::new(false),
             steps: Cell::new(0),
@@ -868,7 +869,11 @@ impl Flow {
                     let targets = ptr.targets(p.local, &path_of_place(p), 0);
                     let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
                     note(*at, pointee(p), &mut cut_at, &mut lost_at);
-                    let through = through && (!local || !any_held || held_arg(p));
+                    // (a result the body follows, per its function's summary, `let w =
+                    // wrap(&mut x)`: written through where it is used, not unknown here)
+                    let through = through
+                        && (!local || !any_held || held_arg(p))
+                        && ptr.returns_of(func).is_none();
                     for Target {
                         local: t, path: tp, ..
                     } in targets
@@ -3222,6 +3227,9 @@ struct Pointees<'a> {
     bags: Bags,
     /// The containers whose contents are being looked up (one fed from itself adds nothing).
     bag_stack: RefCell<Vec<Local>>,
+    /// What the results of the functions the body calls hold of the borrows they are given, by
+    /// function (`returned_pointers`).
+    returns: HashMap<rustc_public::DefId, Returns>,
 }
 
 /// What `closed_bags` finds in a body.
@@ -3631,6 +3639,15 @@ impl Pointees<'_> {
                     qp.extend_from_slice(path);
                     out.extend(self.targets(q.local, &qp, depth + 1));
                 }
+                // the result of the program's function holding a borrow it was given (`let w =
+                // wrap(&mut x)`, `let (r, _) = guard(&mut x)`): where that borrow points
+                DefKind::Call { func, args } => match self
+                    .returns_of(func)
+                    .and_then(|r| self.returned(r, args, Some(path), depth))
+                {
+                    Some(t) => out.extend(t),
+                    None => self.lost.set(true),
+                },
                 _ => self.lost.set(true),
             }
         }
@@ -3999,6 +4016,55 @@ impl Pointees<'_> {
         bag_content(self.body.locals()[local].ty).filter(|c| self.bags.closed.contains(c))
     }
 
+    /// What a call's result holds of the borrows it is given (`returned_pointers`).
+    fn returns_of(&self, func: &Operand) -> Option<&Returns> {
+        match func.ty(self.body.locals()).ok()?.kind() {
+            TyKind::RigidTy(RigidTy::FnDef(def, _)) => self.returns.get(&def.def_id()),
+            _ => None,
+        }
+    }
+
+    /// The places the pointers a call's result holds at `at` point to (all of them for `None`),
+    /// per its function's summary `r`: into what an argument points to, or where a pointer an
+    /// argument holds points. `None` when the summary has none there, or an argument is not a
+    /// place.
+    fn returned(
+        &self,
+        r: &Returns,
+        args: &[Operand],
+        at: Option<&[Step]>,
+        depth: usize,
+    ) -> Option<Vec<Target>> {
+        let mut out = Vec::new();
+        let mut any = false;
+        for (p, src) in &r.ptrs {
+            if at.is_some_and(|a| a != p.as_slice()) {
+                continue;
+            }
+            any = true;
+            let (k, rest, held) = match src {
+                Returned::Borrow(k, rest) => (*k, rest, false),
+                Returned::Held(k, rest) => (*k, rest, true),
+            };
+            let (Operand::Copy(q) | Operand::Move(q)) = args.get(k)? else {
+                return None;
+            };
+            let mut qp = path_of_place(q);
+            if held {
+                qp.extend(rest.iter().cloned());
+                out.extend(self.targets(q.local, &qp, depth + 1));
+            } else {
+                for mut t in self.targets(q.local, &qp, depth + 1) {
+                    if !partial(&t.path) {
+                        t.path.extend(rest.iter().cloned());
+                    }
+                    out.push(t);
+                }
+            }
+        }
+        (any || at.is_none()).then_some(out)
+    }
+
     /// Is `local` a pointer a `moves_only` call returns of a closed type, or into a container
     /// of one?
     fn taken_from_bag(&self, func: &Operand, local: Local) -> bool {
@@ -4134,6 +4200,14 @@ impl Pointees<'_> {
                         DefKind::Call { func, args } if moves_only(self.body, func) => {
                             out.extend(self.level_sources(args, q, depth))
                         }
+                        // (`opt_mut(&mut x)` returning `Some(x)`: what it was given)
+                        DefKind::Call { func, args } => match self
+                            .returns_of(func)
+                            .and_then(|r| self.returned(r, args, None, depth))
+                        {
+                            Some(t) => out.extend(t),
+                            None => self.lost.set(true),
+                        },
                         _ => self.lost.set(true),
                     }
                 }
@@ -4228,14 +4302,31 @@ impl Pointees<'_> {
     /// `by_borrow`: the call takes it by `&mut` (one borrow of it is this call's).
     fn held(&self, local: Local, by_borrow: bool) -> Vec<(Vec<Target>, bool, Option<usize>)> {
         let mut out = Vec::new();
+        // (a value of a type holding no `&mut`: nothing)
+        if !self.mut_holding.contains(&local) {
+            return out;
+        }
+        // (moved into a temporary for the call, `set1(w)`: the value it was moved from)
+        let mut chain = vec![local];
+        let mut src = local;
+        while chain.len() < 8
+            && let Some([DefKind::Assign(Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _), _)]) =
+                self.direct.get(&src).map(|d| d.as_slice())
+            && q.projection.is_empty()
+            && !chain.contains(&q.local)
+        {
+            src = q.local;
+            chain.push(src);
+        }
         // a value holding a `&mut` that this body does not build here (a parameter, a call's
         // result, a copy of another): what it points to is not followed
-        let defs = self.direct.get(&local);
-        if self.mut_holding.contains(&local)
-            && defs.is_none_or(|d| {
-                d.iter()
-                    .any(|k| !matches!(k, DefKind::Assign(Rvalue::Aggregate(..), _)))
-            })
+        let defs = self.direct.get(&src);
+        let followed = |k: &DefKind| match k {
+            DefKind::Assign(Rvalue::Aggregate(..), _) => true,
+            DefKind::Call { func, .. } => self.returns_of(func).is_some(),
+            _ => false,
+        };
+        if self.mut_holding.contains(&local) && defs.is_none_or(|d| !d.iter().all(|k| followed(k)))
         {
             self.lost.set(true);
         }
@@ -4244,25 +4335,46 @@ impl Pointees<'_> {
         let once = defs.is_some_and(|d| d.len() == 1);
         // a value with a part stored later (`h.r = &mut b`) or lent by `&mut` to another call
         // (`repoint(&mut h, ..)`): what it holds at the call is not only what it was built with
-        let lends = self
-            .body
-            .blocks
-            .iter()
-            .flat_map(|b| &b.statements)
-            .filter(|st| {
-                matches!(&st.kind, StatementKind::Assign(
-                    _,
-                    Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
-                    | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
-                ) if q.local == local
-                    && !q.projection.iter().any(|e| matches!(e, ProjectionElem::Deref)))
-            })
-            .count();
-        let changed = self.partly.contains(&local) || lends > usize::from(by_borrow);
+        let lends = |l: Local| {
+            self.body
+                .blocks
+                .iter()
+                .flat_map(|b| &b.statements)
+                .filter(|st| {
+                    matches!(&st.kind, StatementKind::Assign(
+                        _,
+                        Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
+                    ) if q.local == l
+                        && !q.projection.iter().any(|e| matches!(e, ProjectionElem::Deref)))
+                })
+                .count()
+        };
+        let changed = chain.iter().any(|l| self.partly.contains(l))
+            || lends(local) > usize::from(by_borrow)
+            || chain[1..].iter().any(|&l| lends(l) > 0);
         if changed {
             self.lost.set(true);
         }
         for k in defs.into_iter().flatten() {
+            // (a holder the program's function returned, `let w = wrap1(&mut a)`: its pointers,
+            // per its summary)
+            if let DefKind::Call { func, args } = k
+                && let Some(r) = self.returns_of(func)
+            {
+                for (p, _) in &r.ptrs {
+                    let Some(t) = self.returned(r, args, Some(p), 0) else {
+                        self.lost.set(true);
+                        continue;
+                    };
+                    let single = sole_target(&t) && once && r.once && !changed;
+                    let field = match p.as_slice() {
+                        [Step::Field(i)] => Some(*i),
+                        _ => None,
+                    };
+                    out.push((t, single, field));
+                }
+            }
             if let DefKind::Assign(Rvalue::Aggregate(kind, ops), _) = k {
                 // (where the borrow sits: a struct's field, a tuple's element)
                 let fields = match kind {
@@ -4480,6 +4592,257 @@ fn borrows_inside(body: &Body, func: &Operand, args: &[Operand], result: Local) 
         .any(|inp| inp != out)
 }
 
+/// The argument local and the part of what it points to that `local` borrows, when every
+/// assignment of it in `body` borrows the same (`&mut (*_1).alg`, a copy of such a local).
+fn resolve(body: &Body, nargs: usize, local: Local, depth: usize) -> Option<(Local, Path)> {
+    if depth > 8 {
+        return None;
+    }
+    let arg = |l: Local| (1..=nargs).contains(&l);
+    let mut found: Option<(Local, Path)> = None;
+    for b in &body.blocks {
+        for st in &b.statements {
+            let StatementKind::Assign(lhs, rv) = &st.kind else {
+                continue;
+            };
+            if lhs.local != local {
+                continue;
+            }
+            if !lhs.projection.is_empty() {
+                return None;
+            }
+            let p = match rv {
+                Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) => {
+                    let qp = path_of_place(q);
+                    let (Some(Step::Deref), rest) = (qp.first(), qp.get(1..)?) else {
+                        return None;
+                    };
+                    if rest.contains(&Step::Deref) {
+                        return None;
+                    }
+                    if arg(q.local) {
+                        (q.local, rest.to_vec())
+                    } else {
+                        let (l, mut base) = resolve(body, nargs, q.local, depth + 1)?;
+                        base.extend(rest.iter().cloned());
+                        (l, base)
+                    }
+                }
+                Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _) | Rvalue::CopyForDeref(q)
+                    if q.projection.is_empty() && !arg(q.local) =>
+                {
+                    resolve(body, nargs, q.local, depth + 1)?
+                }
+                _ => return None,
+            };
+            if found.as_ref().is_some_and(|f| *f != p) {
+                return None;
+            }
+            found = Some(p);
+        }
+        // a call's result assigned to the local: not known
+        if let TerminatorKind::Call { destination, .. } = &b.terminator.kind
+            && destination.local == local
+        {
+            return None;
+        }
+    }
+    found
+}
+
+/// Where a pointer a function's result holds points (`returned_pointers`).
+#[derive(Clone, Debug, PartialEq)]
+enum Returned {
+    /// Into what argument `k` points to, at a part of it (`W { r: x }`: `(0, [])`; `(&mut
+    /// self.a, ..)`: `(0, [Field(0)])`).
+    Borrow(usize, Path),
+    /// Where the pointer argument `k`'s value holds at these fields points (`fn pass(h: W) -> W {
+    /// h }`).
+    Held(usize, Path),
+}
+
+/// The pointers a function's result holds (a struct, a tuple, an `Option`; not a pointer
+/// itself), by where they sit in it, and where each points; `once`: the result is built once.
+#[derive(Clone, Debug)]
+pub(crate) struct Returns {
+    ptrs: Vec<(Path, Returned)>,
+    once: bool,
+}
+
+/// What the result of a function (`body`) holds of the borrows it was given (`fn wrap(x: &mut
+/// T) -> W { W { r: x } }`, `fn slots(&mut self) -> (&mut A, &mut B)`, `Some(x)`, a holder
+/// handed back): built in the body from them, each such pointer's place known. `None` when it may
+/// hold another (made by a call, a part assigned later, a type not seen into).
+pub(crate) fn returned_pointers(tcx: TyCtxt<'_>, body: &Body) -> Option<Returns> {
+    // (a body with a type `rustc_public` cannot convert, an `async` closure's: not known)
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        returned_pointers_in(tcx, body)
+    }))
+    .unwrap_or_else(|e| {
+        if !crate::async_closure(&e) {
+            std::panic::resume_unwind(e)
+        }
+        None
+    })
+}
+
+fn returned_pointers_in(tcx: TyCtxt<'_>, body: &Body) -> Option<Returns> {
+    let locals = body.locals();
+    let ret = rustc_public::mir::RETURN_LOCAL;
+    if !holds_mut_borrow(tcx, rustc_internal::internal(tcx, locals[ret].ty), 0)
+        || matches!(
+            locals[ret].ty.kind().rigid(),
+            Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
+        )
+    {
+        return None;
+    }
+    let nargs = body.arg_locals().len();
+    let arg = |l: Local| (1..=nargs).contains(&l);
+    // a local's assignments, none of a part of it nor by a call
+    let defs = |l: Local| -> Option<Vec<&Rvalue>> {
+        let mut out = Vec::new();
+        for b in &body.blocks {
+            for st in &b.statements {
+                if let StatementKind::Assign(p, rv) = &st.kind
+                    && p.local == l
+                {
+                    if !p.projection.is_empty() {
+                        return None;
+                    }
+                    out.push(rv);
+                }
+            }
+            if let TerminatorKind::Call { destination, .. } = &b.terminator.kind
+                && destination.local == l
+            {
+                return None;
+            }
+        }
+        Some(out)
+    };
+    // where a pointer the body has points: an argument's own, one an argument holds, a borrow
+    // into what an argument points to, through copies
+    fn pointer<'b>(
+        body: &'b Body,
+        nargs: usize,
+        defs: &dyn Fn(Local) -> Option<Vec<&'b Rvalue>>,
+        q: &Place,
+        depth: usize,
+    ) -> Option<Returned> {
+        let arg = |l: Local| (1..=nargs).contains(&l);
+        let qp = path_of_place(q);
+        if arg(q.local) {
+            return match qp.as_slice() {
+                [] => Some(Returned::Borrow(q.local - 1, Vec::new())),
+                fs if fs.iter().all(|s| matches!(s, Step::Field(_))) => {
+                    Some(Returned::Held(q.local - 1, qp))
+                }
+                _ => None,
+            };
+        }
+        if !qp.is_empty() || depth > 8 {
+            return None;
+        }
+        if let [Rvalue::Use(Operand::Copy(r) | Operand::Move(r), _)] = defs(q.local)?.as_slice() {
+            return pointer(body, nargs, defs, &r.clone(), depth + 1);
+        }
+        resolve(body, nargs, q.local, 0).map(|(l, p)| Returned::Borrow(l - 1, p))
+    }
+    let holds = |t: Ty| holds_mut_borrow(tcx, rustc_internal::internal(tcx, t), 0);
+    let mut out = Vec::new();
+    let mut once = true;
+    let mut work: Vec<(&Rvalue, usize)> = Vec::new();
+    let top = defs(ret)?;
+    once &= top.len() == 1;
+    work.extend(top.into_iter().map(|rv| (rv, 0)));
+    while let Some((rv, depth)) = work.pop() {
+        if depth > 8 {
+            return None;
+        }
+        match rv {
+            Rvalue::Aggregate(kind, ops) => {
+                let prefix = match kind {
+                    AggregateKind::Tuple => Vec::new(),
+                    AggregateKind::Adt(def, ..) if def.kind().is_struct() => Vec::new(),
+                    AggregateKind::Adt(def, v, ..) if def.kind().is_enum() => {
+                        vec![Step::Variant(variant_index(v))]
+                    }
+                    _ => return None,
+                };
+                for (i, op) in ops.iter().enumerate() {
+                    let t = op.ty(locals).ok()?;
+                    let mut at = prefix.clone();
+                    at.push(Step::Field(i));
+                    match (op, t.kind().rigid()) {
+                        (
+                            Operand::Copy(q) | Operand::Move(q),
+                            Some(
+                                RigidTy::Ref(_, _, Mutability::Mut)
+                                | RigidTy::RawPtr(_, Mutability::Mut),
+                            ),
+                        ) => out.push((at, pointer(body, nargs, &defs, q, 0)?)),
+                        _ if holds(t) => return None,
+                        _ => {}
+                    }
+                }
+            }
+            Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _) if q.projection.is_empty() => {
+                if arg(q.local) {
+                    // a holder given and handed back: its own pointers
+                    let ty = rustc_internal::internal(tcx, locals[q.local].ty);
+                    let fields = holder_paths(tcx, ty);
+                    if fields.is_empty() {
+                        return None;
+                    }
+                    for f in fields {
+                        out.push((
+                            vec![Step::Field(f)],
+                            Returned::Held(q.local - 1, vec![Step::Field(f)]),
+                        ));
+                    }
+                } else {
+                    let ds = defs(q.local)?;
+                    once &= ds.len() == 1;
+                    work.extend(ds.into_iter().map(|rv| (rv, depth + 1)));
+                }
+            }
+            _ => return None,
+        }
+    }
+    Some(Returns { ptrs: out, once })
+}
+
+/// The summaries (`returned_pointers`) of the program's functions a body calls whose result
+/// holds a borrow, by function.
+fn callee_returns(tcx: TyCtxt<'_>, body: &Body) -> HashMap<rustc_public::DefId, Returns> {
+    let mut out = HashMap::new();
+    for b in &body.blocks {
+        let TerminatorKind::Call { func, .. } = &b.terminator.kind else {
+            continue;
+        };
+        let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
+            func.ty(body.locals()).ok().map(|t| t.kind())
+        else {
+            continue;
+        };
+        if out.contains_key(&def.def_id())
+            || matches!(def.krate().name.as_str(), "core" | "std" | "alloc")
+        {
+            continue;
+        }
+        // (a body `rustc_public` cannot convert, one with an `async` closure's type: none)
+        let summary = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| def.body()))
+            .ok()
+            .flatten()
+            .and_then(|callee| returned_pointers(tcx, &callee));
+        if let Some(r) = summary {
+            out.insert(def.def_id(), r);
+        }
+    }
+    out
+}
+
 /// The argument a function returns a borrow into, and the part of what it points to, when every
 /// return of its body borrows the same one (`fn slot(&mut self) -> &mut &Digest { &mut
 /// self.alg }`: argument 0, `[Field(0)]`; `fn second(_n: u8, s: &mut U) -> .. { &mut s.other }`:
@@ -4495,62 +4858,6 @@ fn returned_part(caller: &Body, func: &Operand) -> Option<(usize, Path)> {
         .ok()
         .flatten()?;
     let nargs = body.arg_locals().len();
-    fn resolve(body: &Body, nargs: usize, local: Local, depth: usize) -> Option<(Local, Path)> {
-        if depth > 8 {
-            return None;
-        }
-        let arg = |l: Local| (1..=nargs).contains(&l);
-        let mut found: Option<(Local, Path)> = None;
-        for b in &body.blocks {
-            for st in &b.statements {
-                let StatementKind::Assign(lhs, rv) = &st.kind else {
-                    continue;
-                };
-                if lhs.local != local {
-                    continue;
-                }
-                if !lhs.projection.is_empty() {
-                    return None;
-                }
-                let p = match rv {
-                    Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) => {
-                        let qp = path_of_place(q);
-                        let (Some(Step::Deref), rest) = (qp.first(), qp.get(1..)?) else {
-                            return None;
-                        };
-                        if rest.contains(&Step::Deref) {
-                            return None;
-                        }
-                        if arg(q.local) {
-                            (q.local, rest.to_vec())
-                        } else {
-                            let (l, mut base) = resolve(body, nargs, q.local, depth + 1)?;
-                            base.extend(rest.iter().cloned());
-                            (l, base)
-                        }
-                    }
-                    Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
-                    | Rvalue::CopyForDeref(q)
-                        if q.projection.is_empty() && !arg(q.local) =>
-                    {
-                        resolve(body, nargs, q.local, depth + 1)?
-                    }
-                    _ => return None,
-                };
-                if found.as_ref().is_some_and(|f| *f != p) {
-                    return None;
-                }
-                found = Some(p);
-            }
-            // a call's result assigned to the local: not known
-            if let TerminatorKind::Call { destination, .. } = &b.terminator.kind
-                && destination.local == local
-            {
-                return None;
-            }
-        }
-        found
-    }
     resolve(&body, nargs, 0, 0)
         .filter(|(_, p)| {
             !p.is_empty()
