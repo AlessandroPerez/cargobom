@@ -951,7 +951,8 @@ pub(crate) fn body_links(
                     } else {
                         Vec::new()
                     };
-                    path.extend([Step::Field(f), Step::Deref]);
+                    path.extend(crate::origins::holder_steps(tcx, ty, f));
+                    path.push(Step::Deref);
                     unrecurse(origins.behind_at_returns(index + 1, &path), &here)
                 } else {
                     Origin::Any(vec![entry.clone(), Origin::Unknown])
@@ -1686,8 +1687,14 @@ fn holder_kept(
                 }
             };
             match rest {
-                // one of the pointers: not assigned nor borrowed itself
-                [ProjectionElem::Field(f, _), tail @ ..] if self.fields.contains(f) => {
+                // one of the pointers (`Some`'s, of an `Option`): not assigned nor borrowed
+                // itself
+                [ProjectionElem::Field(f, _), tail @ ..]
+                | [
+                    ProjectionElem::Downcast(_),
+                    ProjectionElem::Field(f, _),
+                    tail @ ..,
+                ] if self.fields.contains(f) => {
                     if tail.is_empty() && ptx.is_mutating() {
                         self.kept = false;
                     }
@@ -1698,6 +1705,15 @@ fn holder_kept(
         }
         // (a debugger's name for it is no use)
         fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
+        // (nor which variant it is, `if let Some(s) = o`)
+        fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+            if let Rvalue::Discriminant(p) = rv
+                && p.local == self.local
+            {
+                return;
+            }
+            self.super_rvalue(rv, loc)
+        }
     }
     let mut v = V {
         local,
@@ -1711,9 +1727,16 @@ fn holder_kept(
     let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
     let pointer = |q: &rustc_public::mir::Place| match (behind, q.projection.as_slice()) {
         (false, [ProjectionElem::Field(f, _)])
-        | (true, [ProjectionElem::Deref, ProjectionElem::Field(f, _)]) => {
-            q.local == local && fields.contains(f)
-        }
+        | (false, [ProjectionElem::Downcast(_), ProjectionElem::Field(f, _)])
+        | (true, [ProjectionElem::Deref, ProjectionElem::Field(f, _)])
+        | (
+            true,
+            [
+                ProjectionElem::Deref,
+                ProjectionElem::Downcast(_),
+                ProjectionElem::Field(f, _),
+            ],
+        ) => q.local == local && fields.contains(f),
         _ => false,
     };
     let mut copies: HashSet<rustc_public::mir::Local> = HashSet::new();
