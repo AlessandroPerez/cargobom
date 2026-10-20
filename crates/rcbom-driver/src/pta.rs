@@ -1179,6 +1179,27 @@ impl Pta {
                 }
             }
         }
+        if std::env::var_os("RCBOM_PTA_DEBUG").is_some() {
+            // where the unknowns of `dyn` calls' vtable words come from (such a call returns
+            // anything)
+            for (site, o, off) in prog.vcall_sites() {
+                let chain = prog.explain_unknown(o, off);
+                if chain.is_empty() {
+                    continue;
+                }
+                eprintln!(
+                    "rcbom-pta: unknown vtable of dyn call {site} in {} +{off}",
+                    self.describe(o)
+                );
+                for (o, off, havocked) in chain.iter().take(40) {
+                    eprintln!(
+                        "rcbom-pta:   from {} +{off}{}",
+                        self.describe(*o),
+                        if *havocked { " (havocked)" } else { "" }
+                    );
+                }
+            }
+        }
         // answers
         let answers = queries
             .iter()
@@ -1767,8 +1788,12 @@ impl<'tcx> Tr<'_, 'tcx> {
                         return;
                     }
                     CastKind::PointerCoercion(PointerCoercion::Unsize) => {
+                        // (a `dyn` coerced to the same principal trait, as MIR does again at a
+                        // function's return, `Box<dyn Tr>` to `Box<dyn Tr>`, or an auto trait
+                        // dropped: the vtable is the source's, which the copy below carries)
                         if let Ok(src) = op.ty(self.body.locals())
                             && let Some((c, d)) = unsize_pair(self.tcx, self.ity(src), dty)
+                            && !same_principal(c, d)
                             && let Some(vt) = self.p.coerced(self.tcx, c, d)
                         {
                             // the data pointer, then the vtable in the metadata word
@@ -2463,6 +2488,19 @@ fn unsize_pair<'tcx>(
 ) -> Option<(ITy<'tcx>, ITy<'tcx>)> {
     let (s, d) = tail_pair(tcx, src, dst, 0)?;
     matches!(d.kind(), rustc_middle::ty::Dynamic(..)).then_some((s, d))
+}
+
+/// Whether `c` and `d` are `dyn` types of the same principal trait (their vtables are one).
+fn same_principal<'tcx>(c: ITy<'tcx>, d: ITy<'tcx>) -> bool {
+    let (rustc_middle::ty::Dynamic(cp, ..), rustc_middle::ty::Dynamic(dp, ..)) =
+        (c.kind(), d.kind())
+    else {
+        return false;
+    };
+    match (cp.principal(), dp.principal()) {
+        (Some(a), Some(b)) => a.skip_binder() == b.skip_binder(),
+        _ => false,
+    }
 }
 
 fn tail_pair<'tcx>(
