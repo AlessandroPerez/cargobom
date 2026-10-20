@@ -629,6 +629,30 @@ impl LinkIndex {
         self.static_fields(id)
             || self.mutable_static(id).is_some()
             || matches!(self.static_alias(id), Some(Origin::Call { .. }))
+            // a table of references to statics or constants whose fields are answered
+            || self.static_table(id).is_some_and(|v| {
+                v.iter().all(|e| matches!(e, Origin::Data { def, .. }
+                    if def.id != id && self.static_fields(&def.id)))
+            })
+    }
+
+    /// The statics or constants a table of references that never changes points to (`static
+    /// AREF: [&Cfg; 2] = [&S1, &S2]`, `static AREF: &[&Cfg] = &[&C1, &C2]`): a field read of an
+    /// element at any index is that field of one of them.
+    fn static_table(&self, id: &str) -> Option<&[Origin]> {
+        match self.statics.get(id) {
+            Some((false, v)) => match v.as_slice() {
+                [Origin::All(e) | Origin::Any(e)]
+                    if !e.is_empty()
+                        && e.iter()
+                            .all(|x| matches!(x, Origin::Data { def, .. } if def.id != id)) =>
+                {
+                    Some(e)
+                }
+                _ => None,
+            },
+            _ => None,
+        }
     }
 
     /// The static or constant a static or constant that never changes refers to (`static REF:
@@ -838,6 +862,65 @@ impl LinkIndex {
         self.active.borrow_mut().remove(&key);
     }
 
+    /// What a call through the pointer `p` with `args` runs, read in `owner`: a call of each
+    /// function named as a value the pointer may be (its body as the driver resolved it), and
+    /// the values a closure made a pointer returns (in its function); `None` when the pointer may
+    /// be anything else (a value not followed, a cut).
+    fn pointer_runs(
+        &self,
+        p: &Origin,
+        args: &[Origin],
+        owner: &str,
+        depth: usize,
+        via: &Via,
+    ) -> Option<Vec<(Origin, String)>> {
+        let mut values = Vec::new();
+        self.resolve(p, &[], owner, depth + 1, via, &mut values);
+        let mut out = Vec::new();
+        let mut stack: Vec<(Origin, String, usize)> =
+            values.into_iter().map(|(v, w, _)| (v, w, 0)).collect();
+        while let Some((v, w, n)) = stack.pop() {
+            if n > 4 {
+                return None;
+            }
+            match v {
+                Origin::Unit {
+                    path,
+                    krate,
+                    value: None,
+                    span: Some(_),
+                    runs,
+                } => out.push((
+                    Origin::Call {
+                        callee: path,
+                        krate,
+                        self_ty: None,
+                        args: args.to_vec(),
+                        span: None,
+                        runs,
+                        pointer: None,
+                    },
+                    owner.to_string(),
+                )),
+                Origin::Call {
+                    callee, args: r, ..
+                } if callee == "<closure>" => {
+                    out.extend(r.into_iter().map(|x| (x, w.clone())));
+                }
+                Origin::Any(alts) => stack.extend(alts.into_iter().map(|a| (a, w.clone(), n + 1))),
+                Origin::Data { def, .. } if self.mutable_static(&def.id).is_none() => {
+                    let vs = self.static_values(&def.id);
+                    if vs.is_empty() {
+                        return None;
+                    }
+                    stack.extend(vs.iter().map(|a| (a.clone(), w.clone(), n + 1)));
+                }
+                _ => return None,
+            }
+        }
+        (!out.is_empty()).then_some(out)
+    }
+
     /// One step of `resolve`, within its bounds.
     fn resolve_step(
         &self,
@@ -960,6 +1043,19 @@ impl LinkIndex {
                                 via.then(Via::Table(s.func.clone()))
                             };
                             self.resolve(&s.value, &[], &s.func, depth + 1, &by, out);
+                        }
+                        return;
+                    }
+                    // a table of references to others (`[&S1, &S2]`): that field of each
+                    if let Some(elems) = self.static_table(&def.id) {
+                        for e in elems {
+                            let o = Origin::Field {
+                                adt: adt.clone(),
+                                field: *field,
+                                base: Box::new(e.clone()),
+                                args: args.clone(),
+                            };
+                            self.resolve(&o, path, owner, depth + 1, via, out);
                         }
                         return;
                     }
@@ -1179,6 +1275,27 @@ impl LinkIndex {
                 found.into_iter().for_each(|v| push(out, v));
                 if all {
                     return;
+                }
+            }
+            // a call through a function pointer the driver did not resolve in its body (a
+            // parameter, a field, a table's element): each function the pointer may be, run with
+            // the call's arguments, and what a closure made a pointer returns; where the pointer
+            // may be anything else, the call stays as it is (a gap)
+            Origin::Call {
+                callee,
+                args,
+                pointer: Some(p),
+                ..
+            } if callee == "<indirect>" => {
+                if let Some(runs) = self.pointer_runs(p, args, owner, depth, via) {
+                    let mut found = Vec::new();
+                    for (v, w) in runs {
+                        self.resolve(&v, path, &w, depth + 1, via, &mut found);
+                    }
+                    if !found.is_empty() {
+                        found.into_iter().for_each(|v| push(out, v));
+                        return;
+                    }
                 }
             }
             Origin::Call {
@@ -1670,6 +1787,7 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             args: inner,
             span,
             runs,
+            pointer,
         } => Origin::Call {
             callee: callee.clone(),
             krate: krate.clone(),
@@ -1677,6 +1795,7 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             args: inner.iter().map(|a| substitute(a, args)).collect(),
             span: span.clone(),
             runs: runs.clone(),
+            pointer: pointer.as_ref().map(|p| Box::new(substitute(p, args))),
         },
         Origin::Any(v) => Origin::Any(v.iter().map(|a| substitute(a, args)).collect()),
         Origin::All(v) => Origin::All(v.iter().map(|a| substitute(a, args)).collect()),

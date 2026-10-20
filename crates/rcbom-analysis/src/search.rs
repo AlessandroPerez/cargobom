@@ -1293,6 +1293,7 @@ mod tests {
             args,
             span: None,
             runs: None,
+            pointer: None,
         }
     }
 
