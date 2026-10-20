@@ -130,6 +130,11 @@ enum DefKind {
         args: Vec<Operand>,
         /// The argument that points at the place (`None`: a value holding a pointer to it).
         index: Option<usize>,
+        /// With `index`, the fields of that argument's value (behind it, for a borrow of the
+        /// value) where the borrow pointing at the place sits, which the function's summary
+        /// follows (`wset(W { slot: &mut x })`: `[0]`, `holder_param`); empty: the argument
+        /// itself points at it.
+        path: Vec<usize>,
     },
     /// The place was mutably borrowed by this call, which returned a value holding the borrow
     /// (`key.chunks_mut(16)`, `split_at_mut`): later writes go through that value.
@@ -794,6 +799,7 @@ impl Flow {
                                             func: func.clone(),
                                             args: args.clone(),
                                             index: None,
+                                            path: Vec::new(),
                                         },
                                         single,
                                         false,
@@ -802,7 +808,7 @@ impl Flow {
                             }
                             continue;
                         }
-                        let held = ptr.held(h);
+                        let held = ptr.held(h, is_mut_ptr(body, p));
                         let lost = ptr.lost.get();
                         note(
                             *at,
@@ -823,7 +829,12 @@ impl Flow {
                                 None => lost_at.push((*at, None)),
                             }
                         }
-                        for (targets, single) in held {
+                        for (targets, single, field) in held {
+                            // (at a field of a holder the program's function takes as such, `fn
+                            // wset(w: W)`: what its summary says it writes there, the value
+                            // before where it may not)
+                            let summarized =
+                                field.and_then(|f| holder_param(tcx, body, func, k, f));
                             for Target {
                                 local: t, path: tp, ..
                             } in targets
@@ -835,10 +846,11 @@ impl Flow {
                                     DefKind::OutParam {
                                         func: func.clone(),
                                         args: args.clone(),
-                                        index: None,
+                                        index: summarized.as_ref().map(|_| k),
+                                        path: summarized.clone().unwrap_or_default(),
                                     },
                                     single,
-                                    false,
+                                    summarized.is_some(),
                                 ));
                             }
                         }
@@ -871,6 +883,7 @@ impl Flow {
                                         func: func.clone(),
                                         args: args.clone(),
                                         index: Some(k),
+                                        path: Vec::new(),
                                     },
                                     false,
                                     false,
@@ -903,6 +916,7 @@ impl Flow {
                                     func: func.clone(),
                                     args: args.clone(),
                                     index: Some(k),
+                                    path: Vec::new(),
                                 },
                                 single,
                                 k == 0 || whole || local_fn(func),
@@ -1094,6 +1108,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     /// What the function returns, or the part `rest` of it: the return place at each `return`.
     pub(crate) fn returned_part(&self, rest: &[Step]) -> Origin {
         self.at_returns(rustc_public::mir::RETURN_LOCAL, rest)
+    }
+
+    /// What the place `path` of parameter `local` holds when the function returns (`*w.slot` of
+    /// `fn wset(w: W)`, through a borrow the parameter holds): what the function wrote there, its
+    /// value on entry (`Param`) where it may not have.
+    pub(crate) fn behind_at_returns(&self, local: Local, path: &[Step]) -> Origin {
+        self.at_returns(local, path)
     }
 
     /// What a `&mut` parameter (argument `index`) points to when the function returns: what
@@ -1717,6 +1738,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             func,
             args,
             index: Some(index),
+            path,
         } = &d.kind
         else {
             return None;
@@ -1741,8 +1763,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             .map(|a| self.operand(a, d.at, depth + 1, seen))
             .collect();
         // the value before is the place's own (`u.up()` with `u` pointing to `a1` or `b3`: for
-        // `a1`, `a1`'s value, not the pointer's either), when the pointer may point to several
-        if !d.sole
+        // `a1`, `a1`'s value, not the pointer's either), when the pointer may point to several,
+        // or sits in a holder (`wset(W { slot: &mut x })`: `x`'s, not the holder's)
+        if (!d.sole || !path.is_empty())
             && let Some(a) = args.get_mut(*index)
         {
             *a = self.place(d.local, d.path.clone(), d.at, depth + 1, seen);
@@ -1774,6 +1797,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             args,
             self_ty,
             place_ty,
+            path: path.clone(),
         })
     }
 
@@ -2969,10 +2993,16 @@ fn clone_kind(k: &DefKind) -> DefKind {
             func: func.clone(),
             args: args.clone(),
         },
-        DefKind::OutParam { func, args, index } => DefKind::OutParam {
+        DefKind::OutParam {
+            func,
+            args,
+            index,
+            path,
+        } => DefKind::OutParam {
             func: func.clone(),
             args: args.clone(),
             index: *index,
+            path: path.clone(),
         },
         DefKind::Through { func } => DefKind::Through { func: func.clone() },
         DefKind::Cut => DefKind::Cut,
@@ -3547,9 +3577,18 @@ impl Pointees<'_> {
             self.lost.set(true);
         }
         let Some(defs) = self.direct.get(&local) else {
-            // an argument, or a place no statement of this body defines
+            // an argument's field holding a pointer (`*w.slot = v` in `fn wset(w: W)`): what it
+            // pointed to on entry; another place no statement of this body defines, not followed
             if !(1..=self.body.arg_locals().len()).contains(&local) {
                 self.lost.set(true);
+            } else if !path.is_empty() && path.iter().all(|s| matches!(s, Step::Field(_))) {
+                let mut p = path.to_vec();
+                p.push(Step::Deref);
+                out.push(Target {
+                    local,
+                    path: p,
+                    alias: false,
+                });
             }
             return out;
         };
@@ -4186,7 +4225,8 @@ impl Pointees<'_> {
         Some((def.def_id(), caps))
     }
 
-    fn held(&self, local: Local) -> Vec<(Vec<Target>, bool)> {
+    /// `by_borrow`: the call takes it by `&mut` (one borrow of it is this call's).
+    fn held(&self, local: Local, by_borrow: bool) -> Vec<(Vec<Target>, bool, Option<usize>)> {
         let mut out = Vec::new();
         // a value holding a `&mut` that this body does not build here (a parameter, a call's
         // result, a copy of another): what it points to is not followed
@@ -4199,15 +4239,44 @@ impl Pointees<'_> {
         {
             self.lost.set(true);
         }
+        // (one place only when the value is built once: `if c { W { r: &mut a } } else { W {
+        // r: &mut b } }` holds either)
+        let once = defs.is_some_and(|d| d.len() == 1);
+        // a value with a part stored later (`h.r = &mut b`) or lent by `&mut` to another call
+        // (`repoint(&mut h, ..)`): what it holds at the call is not only what it was built with
+        let lends = self
+            .body
+            .blocks
+            .iter()
+            .flat_map(|b| &b.statements)
+            .filter(|st| {
+                matches!(&st.kind, StatementKind::Assign(
+                    _,
+                    Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                    | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
+                ) if q.local == local
+                    && !q.projection.iter().any(|e| matches!(e, ProjectionElem::Deref)))
+            })
+            .count();
+        let changed = self.partly.contains(&local) || lends > usize::from(by_borrow);
+        if changed {
+            self.lost.set(true);
+        }
         for k in defs.into_iter().flatten() {
-            if let DefKind::Assign(Rvalue::Aggregate(_, ops), _) = k {
-                for op in ops {
+            if let DefKind::Assign(Rvalue::Aggregate(kind, ops), _) = k {
+                // (where the borrow sits: a struct's field, a tuple's element)
+                let fields = match kind {
+                    AggregateKind::Tuple => true,
+                    AggregateKind::Adt(def, ..) => def.kind().is_struct(),
+                    _ => false,
+                };
+                for (i, op) in ops.iter().enumerate() {
                     if let Operand::Copy(q) | Operand::Move(q) = op
                         && is_mut_ptr(self.body, q)
                     {
                         let t = self.targets(q.local, &path_of_place(q), 0);
-                        let single = sole_target(&t);
-                        out.push((t, single));
+                        let single = sole_target(&t) && once && !changed;
+                        out.push((t, single, fields.then_some(i)));
                     }
                 }
             }
@@ -4591,6 +4660,78 @@ fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, dept
         }
         _ => false,
     }
+}
+
+/// The fields where a value of type `t` holds a `&mut` (`[0]` of `W<'a> { slot: &'a mut T }`, of
+/// `(&mut T, u8)`): a struct of the program without a destructor, or a tuple, with no type
+/// parameter in it; one field deep.
+pub(crate) fn holder_paths<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> Vec<usize> {
+    use rustc_middle::ty::TyKind as K;
+    use rustc_middle::ty::TypeVisitableExt;
+    let is_mut = |f: rustc_middle::ty::Ty<'tcx>| {
+        matches!(f.kind(), K::Ref(_, _, rustc_middle::ty::Mutability::Mut))
+    };
+    if t.has_param() {
+        return Vec::new();
+    }
+    match t.kind() {
+        K::Adt(def, args) if def.is_struct() && def.did().is_local() && !def.has_dtor(tcx) => def
+            .all_fields()
+            .enumerate()
+            .filter(|(_, f)| is_mut(f.ty(tcx, args).skip_normalization()))
+            .map(|(i, _)| i)
+            .collect(),
+        K::Tuple(ts) => ts
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| is_mut(*f))
+            .map(|(i, _)| i)
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
+/// The fields where a parameter of type `t` holds a `&mut` (`holder_paths`): of its value, or
+/// of the value behind it for a `&mut` (`fn write_hm(h: &mut H)`).
+pub(crate) fn holder_of<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> Vec<usize> {
+    match t.kind() {
+        rustc_middle::ty::TyKind::Ref(_, i, rustc_middle::ty::Mutability::Mut) => {
+            holder_paths(tcx, *i)
+        }
+        _ => holder_paths(tcx, t),
+    }
+}
+
+/// The path (`[f]`) at which a call's argument `k` holds the borrow at field `f`, when the callee
+/// is a function of the program, not generic nor a trait's, whose parameter `k` holds a `&mut`
+/// there (`holder_of`): its summary says what it writes through it (`ParamWrite::path`).
+fn holder_param(
+    tcx: TyCtxt<'_>,
+    body: &Body,
+    func: &Operand,
+    k: usize,
+    f: usize,
+) -> Option<Vec<usize>> {
+    let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
+        func.ty(body.locals()).ok().map(|t| t.kind())
+    else {
+        return None;
+    };
+    let did = rustc_internal::internal(tcx, def.def_id());
+    if !did.is_local()
+        || tcx.trait_of_assoc(did).is_some()
+        || tcx.trait_impl_of_assoc(did).is_some()
+        || tcx.generics_of(did).requires_monomorphization(tcx)
+    {
+        return None;
+    }
+    let input = *tcx
+        .fn_sig(did)
+        .instantiate_identity()
+        .skip_binder()
+        .inputs()
+        .get(k)?;
+    holder_of(tcx, input).contains(&f).then(|| vec![f])
 }
 
 /// The types the `&mut` borrows a value of type `t` holds point to (`&D` of a `Vec<&mut &D>`,

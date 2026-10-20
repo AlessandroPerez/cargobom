@@ -425,6 +425,7 @@ pub(crate) fn body_links(
                         func: here.clone(),
                         index,
                         value,
+                        path: Vec::new(),
                     };
                     if !empty(&w.value) && !out.writes.contains(&w) {
                         out.writes.push(w);
@@ -471,6 +472,7 @@ pub(crate) fn body_links(
                             func: here.clone(),
                             index,
                             value: v,
+                            path: Vec::new(),
                         };
                         if !out.writes.contains(&w) {
                             out.writes.push(w);
@@ -599,6 +601,7 @@ pub(crate) fn body_links(
                         .collect(),
                     self_ty,
                     place_ty: None,
+                    path: Vec::new(),
                 })
             } else {
                 None
@@ -694,6 +697,7 @@ pub(crate) fn body_links(
                             args: all.clone(),
                             self_ty: None,
                             place_ty: None,
+                            path: Vec::new(),
                         },
                         &callee,
                     );
@@ -910,9 +914,53 @@ pub(crate) fn body_links(
                 func: here.clone(),
                 index,
                 value,
+                path: Vec::new(),
             };
             if !out.writes.contains(&w) {
                 out.writes.push(w);
+            }
+        }
+    }
+    // what it writes through a borrow a parameter holds, by field (`fn wset(w: W) { *w.slot = v
+    // }`, `fn write_hm(h: &mut H) { *h.r = v }`: `origins::holder_of`, the fields its callers
+    // follow): what is behind it at the returns; through a holder the body uses otherwise (hands
+    // on whole, re-points or lends a field), not followed
+    if func && !tcx.is_closure_like(did) {
+        for (index, decl) in body.arg_locals().iter().enumerate() {
+            let ty = rustc_internal::internal(tcx, decl.ty);
+            let fields = crate::origins::holder_of(tcx, ty);
+            if fields.is_empty() {
+                continue;
+            }
+            let behind = matches!(
+                ty.kind(),
+                rustc_middle::ty::Ref(_, _, rustc_middle::ty::Mutability::Mut)
+            );
+            let kept = holder_kept(body, index + 1, behind, &fields);
+            let entry = Origin::Param { index, owner: None };
+            for f in fields {
+                let value = if kept {
+                    let mut path = if behind {
+                        vec![Step::Deref]
+                    } else {
+                        Vec::new()
+                    };
+                    path.extend([Step::Field(f), Step::Deref]);
+                    unrecurse(origins.behind_at_returns(index + 1, &path), &here)
+                } else {
+                    Origin::Any(vec![entry.clone(), Origin::Unknown])
+                };
+                if value != entry {
+                    let w = ParamWrite {
+                        func: here.clone(),
+                        index,
+                        value,
+                        path: vec![f],
+                    };
+                    if !out.writes.contains(&w) {
+                        out.writes.push(w);
+                    }
+                }
             }
         }
     }
@@ -1229,12 +1277,14 @@ fn unrecurse(o: Origin, here: &str) -> Origin {
             args,
             self_ty,
             place_ty,
+            path,
         } => Origin::Written {
             callee,
             index,
             args: go(args),
             self_ty,
             place_ty,
+            path,
         },
         Origin::Any(v) => Origin::Any(go(v)),
         Origin::All(v) => Origin::All(go(v)),
@@ -1583,6 +1633,130 @@ fn local_key<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> bool {
         }
         _ => false,
     }
+}
+
+/// Does the body use parameter `local`, a value holding `&mut`s at `fields` (behind it when
+/// `behind`), only through its fields: reading those pointers (copied, moved, reborrowed) and
+/// writing or reading through them (`*w.slot = v`), and its other fields; not handing it on
+/// whole, nor assigning or borrowing one of those pointers?
+fn holder_kept(
+    body: &Body,
+    local: rustc_public::mir::Local,
+    behind: bool,
+    fields: &[usize],
+) -> bool {
+    use rustc_public::mir::MirVisitor;
+    use rustc_public::mir::visit::{Location, PlaceContext};
+    struct V<'a> {
+        local: rustc_public::mir::Local,
+        behind: bool,
+        fields: &'a [usize],
+        kept: bool,
+    }
+    impl MirVisitor for V<'_> {
+        fn visit_place(
+            &mut self,
+            place: &rustc_public::mir::Place,
+            ptx: PlaceContext,
+            _: Location,
+        ) {
+            if place.local != self.local {
+                return;
+            }
+            let rest = match (self.behind, place.projection.as_slice()) {
+                (false, p) => p,
+                (true, [ProjectionElem::Deref, p @ ..]) => p,
+                _ => {
+                    self.kept = false;
+                    return;
+                }
+            };
+            match rest {
+                // one of the pointers: not assigned nor borrowed itself
+                [ProjectionElem::Field(f, _), tail @ ..] if self.fields.contains(f) => {
+                    if tail.is_empty() && ptx.is_mutating() {
+                        self.kept = false;
+                    }
+                }
+                [ProjectionElem::Field(..), ..] => {}
+                _ => self.kept = false,
+            }
+        }
+        // (a debugger's name for it is no use)
+        fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
+    }
+    let mut v = V {
+        local,
+        behind,
+        fields,
+        kept: true,
+    };
+    v.visit_body(body);
+    // (nor one of the pointers, or a copy of it, moved into a closure, the value returned, or a
+    // place through a pointer: written through where the body does not see)
+    let stmts = || body.blocks.iter().flat_map(|b| &b.statements);
+    let pointer = |q: &rustc_public::mir::Place| match (behind, q.projection.as_slice()) {
+        (false, [ProjectionElem::Field(f, _)])
+        | (true, [ProjectionElem::Deref, ProjectionElem::Field(f, _)]) => {
+            q.local == local && fields.contains(f)
+        }
+        _ => false,
+    };
+    let mut copies: HashSet<rustc_public::mir::Local> = HashSet::new();
+    loop {
+        let before = copies.len();
+        for st in stmts() {
+            if let StatementKind::Assign(p, rv) = &st.kind
+                && p.projection.is_empty()
+                && match rv {
+                    Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
+                    | Rvalue::CopyForDeref(q) => {
+                        pointer(q) || (q.projection.is_empty() && copies.contains(&q.local))
+                    }
+                    Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q) => {
+                        matches!(q.projection.last(), Some(ProjectionElem::Deref)) && {
+                            let mut base = q.clone();
+                            base.projection.pop();
+                            pointer(&base)
+                                || (base.projection.is_empty() && copies.contains(&base.local))
+                        }
+                    }
+                    _ => false,
+                }
+            {
+                copies.insert(p.local);
+            }
+        }
+        if copies.len() == before {
+            break;
+        }
+    }
+    let held = |o: &Operand| {
+        matches!(o, Operand::Copy(q) | Operand::Move(q)
+            if pointer(q) || (q.projection.is_empty() && copies.contains(&q.local)))
+    };
+    let outside = |p: &rustc_public::mir::Place| {
+        p.local == rustc_public::mir::RETURN_LOCAL
+            || p.projection
+                .iter()
+                .any(|e| matches!(e, ProjectionElem::Deref))
+    };
+    let escapes = stmts().any(|st| match &st.kind {
+        StatementKind::Assign(p, Rvalue::Aggregate(kind, ops)) => {
+            (matches!(
+                kind,
+                AggregateKind::Closure(..)
+                    | AggregateKind::Coroutine(..)
+                    | AggregateKind::CoroutineClosure(..)
+            ) || outside(p))
+                && ops.iter().any(held)
+        }
+        StatementKind::Assign(p, Rvalue::Use(o, _) | Rvalue::Cast(_, o, _)) => {
+            outside(p) && held(o)
+        }
+        _ => false,
+    });
+    v.kept && !escapes
 }
 
 /// Does `body` name a mutable static (a constant pointing at one, of any crate)?

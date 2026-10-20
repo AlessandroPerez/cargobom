@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 26;
+pub const FACTS_VERSION: u32 = 27;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -153,6 +153,11 @@ pub struct ParamWrite {
     pub func: String,
     pub index: usize,
     pub value: Origin,
+    /// Written through a borrow the parameter holds, not through the parameter itself: the
+    /// fields from its value (behind it, for a `&mut` parameter) to that borrow (`fn wset(w: W) {
+    /// *w.slot = v }`: `[0]`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub path: Vec<usize>,
 }
 
 impl Links {
@@ -542,6 +547,10 @@ pub enum Origin {
         /// calls inside write with that type's implementation.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         place_ty: Option<String>,
+        /// Through a borrow the argument holds at these fields (`ParamWrite::path`): `wset(W {
+        /// slot: &mut x })` writing `x`.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        path: Vec<usize>,
     },
     /// A write of `value` into field `path` of the value it is a part of (`h.alg =
     /// Algorithm::HS384` after `let mut h = Header::default()`), as a part of an `All`. `strong`:
@@ -612,12 +621,14 @@ impl Origin {
                 args,
                 self_ty,
                 place_ty,
+                path,
             } => Origin::Written {
                 callee,
                 index,
                 args: args.into_iter().map(|a| a.params_of(owner)).collect(),
                 self_ty,
                 place_ty,
+                path,
             },
             Origin::Any(v) => Origin::Any(v.into_iter().map(|a| a.params_of(owner)).collect()),
             Origin::All(v) => Origin::All(v.into_iter().map(|a| a.params_of(owner)).collect()),
@@ -679,12 +690,14 @@ impl Origin {
                 args,
                 self_ty,
                 place_ty,
+                path,
             } => Origin::Written {
                 callee,
                 index,
                 args: cap(args),
                 self_ty,
                 place_ty,
+                path,
             },
             Origin::Any(v) => Origin::Any(cap(v)),
             Origin::All(v) => Origin::All(cap(v)),
