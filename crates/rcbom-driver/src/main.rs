@@ -134,6 +134,11 @@ fn main() {
         struct Restore(Option<Hook>);
         impl Drop for Restore {
             fn drop(&mut self) {
+                // (not while a panic unwinds out of `analyze`: setting the hook then panics
+                // again, and the process aborts without a message)
+                if std::thread::panicking() {
+                    return;
+                }
                 if let Some(h) = self.0.take() {
                     std::panic::set_hook(h);
                 }
@@ -478,8 +483,13 @@ fn analyze(tcx: TyCtxt<'_>) {
         }
         let mut w = Walker::new(&mut cx);
         let mut r = w.run(roots, static_roots);
+        // a panic in the points-to analysis is counted as an item not analysed, like the
+        // others; the facts are written without its answers
         if let Some(p) = w.cx.pta.take() {
-            pta_dump(w.cx.tcx, p);
+            let tcx = w.cx.tcx;
+            if catch_unwind(AssertUnwindSafe(|| pta_dump(tcx, p))).is_err() {
+                w.cx.errors += 1;
+            }
         }
         let coercions = std::mem::take(&mut w.coercions);
         w.cx.links.coercions = coercions
