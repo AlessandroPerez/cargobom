@@ -439,6 +439,13 @@ impl Flow {
                 .filter(|(_, l)| holds_mut_borrow(tcx, internal(l.ty), 0))
                 .map(|(i, _)| i)
                 .collect(),
+            options: body
+                .locals()
+                .iter()
+                .enumerate()
+                .filter(|(_, l)| option_holder(tcx, internal(l.ty)))
+                .map(|(i, _)| i)
+                .collect(),
             // (all of it or a part of it, `&mut s.f`; not a place reached through a pointer)
             lent_locals: body
                 .blocks
@@ -731,8 +738,9 @@ impl Flow {
                             .filter(|t| t.path.is_empty())
                             .map(|t| t.local)
                             .collect()
-                    } else if p.projection.is_empty() {
-                        vec![p.local]
+                    } else if let Some(h) = ptr.part_source(p) {
+                        // (or a part of one built here, `set13(o.w)`: the value put there)
+                        vec![h]
                     } else {
                         // a part of a value handed over (`f(s.holder)`, `f(t.0)`) that holds a
                         // `&mut`: what it points to is not followed
@@ -3218,6 +3226,8 @@ struct Pointees<'a> {
     /// Locals whose value holds a `&mut` (`W { r: &mut x }`, a closure capturing one, a type
     /// parameter's): handed to a call, it may be written through.
     mut_holding: HashSet<Local>,
+    /// The locals of type `Option<&mut T>` (`option_holder`): a holder at `Some`'s field.
+    options: HashSet<Local>,
     /// The number of arguments.
     nargs: usize,
     /// The pointer types whose standard-library containers the body only moves pointers into
@@ -3589,7 +3599,11 @@ impl Pointees<'_> {
             // pointed to on entry; another place no statement of this body defines, not followed
             if !(1..=self.body.arg_locals().len()).contains(&local) {
                 self.lost.set(true);
-            } else if !path.is_empty() && path.iter().all(|s| matches!(s, Step::Field(_))) {
+            } else if matches!(path.last(), Some(Step::Field(_)))
+                && path
+                    .iter()
+                    .all(|s| matches!(s, Step::Field(_) | Step::Variant(_)))
+            {
                 let mut p = path.to_vec();
                 p.push(Step::Deref);
                 out.push(Target {
@@ -4187,6 +4201,14 @@ impl Pointees<'_> {
         }
         self.bag_stack.borrow_mut().push(local);
         match self.direct.get(&local) {
+            // a parameter (`fn opt_set(o: Option<&mut T>)`): what its `Some` pointed to on entry
+            None if (1..=self.nargs).contains(&local) && self.options.contains(&local) => {
+                out.push(Target {
+                    local,
+                    path: vec![Step::Variant(1), Step::Field(0), Step::Deref],
+                    alias: false,
+                })
+            }
             None => self.lost.set(true),
             Some(defs) => {
                 for k in defs {
@@ -4299,6 +4321,36 @@ impl Pointees<'_> {
         Some((def.def_id(), caps))
     }
 
+    /// The local whose value place `p` holds: itself, or for a part (`o.w`) of a value this
+    /// body builds once by a struct or tuple literal (`Outer13 { w: W13 { .. } }`) and neither
+    /// lends nor stores into, the local the literal moved or copied there.
+    fn part_source(&self, p: &Place) -> Option<Local> {
+        let mut l = p.local;
+        for e in &p.projection {
+            let ProjectionElem::Field(i, _) = e else {
+                return None;
+            };
+            if self.partly.contains(&l) || self.lent_locals.contains(&l) {
+                return None;
+            }
+            let [DefKind::Assign(Rvalue::Aggregate(kind, ops), _)] =
+                self.direct.get(&l)?.as_slice()
+            else {
+                return None;
+            };
+            if !matches!(kind, AggregateKind::Tuple)
+                && !matches!(kind, AggregateKind::Adt(def, ..) if def.kind().is_struct())
+            {
+                return None;
+            }
+            match ops.get(*i) {
+                Some(Operand::Copy(q) | Operand::Move(q)) if q.projection.is_empty() => l = q.local,
+                _ => return None,
+            }
+        }
+        Some(l)
+    }
+
     /// `by_borrow`: the call takes it by `&mut` (one borrow of it is this call's).
     fn held(&self, local: Local, by_borrow: bool) -> Vec<(Vec<Target>, bool, Option<usize>)> {
         let mut out = Vec::new();
@@ -4312,10 +4364,10 @@ impl Pointees<'_> {
         while chain.len() < 8
             && let Some([DefKind::Assign(Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _), _)]) =
                 self.direct.get(&src).map(|d| d.as_slice())
-            && q.projection.is_empty()
-            && !chain.contains(&q.local)
+            && let Some(l) = self.part_source(q)
+            && !chain.contains(&l)
         {
-            src = q.local;
+            src = l;
             chain.push(src);
         }
         // a value holding a `&mut` that this body does not build here (a parameter, a call's
@@ -4376,10 +4428,13 @@ impl Pointees<'_> {
                 }
             }
             if let DefKind::Assign(Rvalue::Aggregate(kind, ops), _) = k {
-                // (where the borrow sits: a struct's field, a tuple's element)
+                // (where the borrow sits: a struct's field, a tuple's element, `Some`'s)
                 let fields = match kind {
                     AggregateKind::Tuple => true,
-                    AggregateKind::Adt(def, ..) => def.kind().is_struct(),
+                    AggregateKind::Adt(def, v, ..) => {
+                        def.kind().is_struct()
+                            || (variant_index(v) == 1 && self.options.contains(&src))
+                    }
                     _ => false,
                 };
                 for (i, op) in ops.iter().enumerate() {
@@ -4796,10 +4851,8 @@ fn returned_pointers_in(tcx: TyCtxt<'_>, body: &Body) -> Option<Returns> {
                         return None;
                     }
                     for f in fields {
-                        out.push((
-                            vec![Step::Field(f)],
-                            Returned::Held(q.local - 1, vec![Step::Field(f)]),
-                        ));
+                        let steps = holder_steps(tcx, ty, f);
+                        out.push((steps.clone(), Returned::Held(q.local - 1, steps)));
                     }
                 } else {
                     let ds = defs(q.local)?;
@@ -4970,8 +5023,8 @@ fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, dept
 }
 
 /// The fields where a value of type `t` holds a `&mut` (`[0]` of `W<'a> { slot: &'a mut T }`, of
-/// `(&mut T, u8)`): a struct of the program without a destructor, or a tuple, with no type
-/// parameter in it; one field deep.
+/// `(&mut T, u8)`, of `Some` in `Option<&mut T>`: `holder_steps`): a struct of the program
+/// without a destructor, a tuple or an `Option`, with no type parameter in it; one field deep.
 pub(crate) fn holder_paths<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> Vec<usize> {
     use rustc_middle::ty::TyKind as K;
     use rustc_middle::ty::TypeVisitableExt;
@@ -4994,7 +5047,39 @@ pub(crate) fn holder_paths<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx
             .filter(|(_, f)| is_mut(*f))
             .map(|(i, _)| i)
             .collect(),
+        K::Adt(..) if option_holder(tcx, t) => vec![0],
         _ => Vec::new(),
+    }
+}
+
+/// Is `t` an `Option<&mut T>` (`T` with no type parameter)?
+fn option_holder<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> bool {
+    use rustc_middle::ty::TypeVisitableExt;
+    matches!(t.kind(), rustc_middle::ty::TyKind::Adt(def, args)
+        if tcx.is_diagnostic_item(rustc_span::sym::Option, def.did())
+            && matches!(args.type_at(0).kind(),
+                rustc_middle::ty::TyKind::Ref(_, _, rustc_middle::ty::Mutability::Mut)))
+        && !t.has_param()
+}
+
+/// The steps from a holder of type `t` (behind a `&mut` or not, `holder_of`) to its pointer at
+/// field `f`: the field, or `Some`'s (variant 1 of `Option`).
+pub(crate) fn holder_steps<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    f: usize,
+) -> Vec<Step> {
+    let t = match t.kind() {
+        rustc_middle::ty::TyKind::Ref(_, i, rustc_middle::ty::Mutability::Mut) => *i,
+        _ => t,
+    };
+    match t.kind() {
+        rustc_middle::ty::TyKind::Adt(def, _)
+            if tcx.is_diagnostic_item(rustc_span::sym::Option, def.did()) =>
+        {
+            vec![Step::Variant(1), Step::Field(f)]
+        }
+        _ => vec![Step::Field(f)],
     }
 }
 
