@@ -136,6 +136,11 @@ enum DefKind {
     Through {
         func: Operand,
     },
+    /// A closure built here that assigns to the place through a capture it holds, handed to a
+    /// call that may run it (`[0].iter().for_each(|_| a = &SHA384)`, `run(|| a = x)`, `f()`):
+    /// the place may hold one of these values, or what it held (a weak definition). While the
+    /// closure holds the borrow nothing else reads or writes the place.
+    Value(Origin),
     /// The place may have been written through a pointer whose targets were followed past
     /// the bound (`MAX_PATH` reborrows): the write is a cut, not dropped.
     Cut,
@@ -716,6 +721,71 @@ impl Flow {
                     };
                     note(*at, pointee(p), &mut cut_at, &mut lost_at);
                     for h in holders {
+                        // a closure built here that assigns through a capture, handed to what
+                        // may run it (`for_each(|_| a = &SHA384)`, `run(f)`): the place holds
+                        // what it held, or what the closure assigns (`DefKind::Value`)
+                        if let Some((cdef, caps)) = ptr.held_closure(h) {
+                            // (as for any holder: a pointer search cut or not followed on the
+                            // way is noted)
+                            note(
+                                *at,
+                                if is_mut_ptr(body, p) {
+                                    pointee(p)
+                                } else {
+                                    None
+                                },
+                                &mut cut_at,
+                                &mut lost_at,
+                            );
+                            let mut rest = Vec::new();
+                            for (k, targets, single) in caps {
+                                match capture_writes(tcx, cdef, k) {
+                                    Some(values) => {
+                                        let value = match values.len() {
+                                            0 => continue,
+                                            1 => values.into_iter().next().unwrap(),
+                                            _ => Origin::Any(values),
+                                        };
+                                        for Target {
+                                            local: t, path: tp, ..
+                                        } in targets
+                                        {
+                                            extra.push((
+                                                t,
+                                                tp,
+                                                *at,
+                                                DefKind::Value(value.clone()),
+                                                false,
+                                                false,
+                                            ));
+                                        }
+                                    }
+                                    None => rest.push((targets, single)),
+                                }
+                            }
+                            // (as for any holder: what the call writes through it, the pointer's
+                            // one place replaced)
+                            for (targets, single) in rest {
+                                for Target {
+                                    local: t, path: tp, ..
+                                } in targets
+                                {
+                                    extra.push((
+                                        t,
+                                        tp,
+                                        *at,
+                                        DefKind::OutParam {
+                                            func: func.clone(),
+                                            args: args.clone(),
+                                            index: None,
+                                        },
+                                        single,
+                                        false,
+                                    ));
+                                }
+                            }
+                            continue;
+                        }
                         let held = ptr.held(h);
                         note(
                             *at,
@@ -1802,6 +1872,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             },
             DefKind::Cut => Origin::Truncated,
             DefKind::Lost => Origin::Unknown,
+            DefKind::Value(o) => o.clone(),
         }
     }
 
@@ -2880,6 +2951,7 @@ fn clone_kind(k: &DefKind) -> DefKind {
         DefKind::Through { func } => DefKind::Through { func: func.clone() },
         DefKind::Cut => DefKind::Cut,
         DefKind::Lost => DefKind::Lost,
+        DefKind::Value(o) => DefKind::Value(o.clone()),
     }
 }
 
@@ -3476,6 +3548,32 @@ fn holds_mut_arg(t: Ty, depth: usize) -> bool {
 impl Pointees<'_> {
     /// What the `&mut` borrows a closure or a struct built in `local` holds point to (its
     /// captures, its fields), each with whether it points at one place.
+    /// A closure this body builds into `local` (its only definition): its item, and each
+    /// capture that is a `&mut` with what it points to.
+    fn held_closure(&self, local: Local) -> Option<(rustc_public::DefId, Vec<Capture>)> {
+        let [DefKind::Assign(Rvalue::Aggregate(kind, ops), _)] =
+            self.direct.get(&local)?.as_slice()
+        else {
+            return None;
+        };
+        let AggregateKind::Closure(def, _) = kind else {
+            return None;
+        };
+        let caps = ops
+            .iter()
+            .enumerate()
+            .filter_map(|(i, op)| match op {
+                Operand::Copy(q) | Operand::Move(q) if is_mut_ptr(self.body, q) => {
+                    let t = self.targets(q.local, &path_of_place(q), 0);
+                    let single = sole_target(&t);
+                    Some((i, t, single))
+                }
+                _ => None,
+            })
+            .collect();
+        Some((def.def_id(), caps))
+    }
+
     fn held(&self, local: Local) -> Vec<(Vec<Target>, bool)> {
         let mut out = Vec::new();
         // a value holding a `&mut` that this body does not build here (a parameter, a call's
@@ -3505,6 +3603,119 @@ impl Pointees<'_> {
         out
     }
 }
+
+/// What a closure (`did`) assigns through its capture `k`, a `&mut` (`|_| a = &SHA384`:
+/// `*((*_1).k) = ..`, or `*(_1.k)` for a closure taking itself by value): the values' origins,
+/// its own parameters not followed. `None` when it does more with the capture than assign
+/// through it and read it: lends or moves it, writes a part of what it points to.
+fn capture_writes(tcx: TyCtxt<'_>, did: rustc_public::DefId, k: usize) -> Option<Vec<Origin>> {
+    let body = rustc_public::CrateItem(did).body()?;
+    let mut inner = Origins::new(tcx, &body, Some(rustc_internal::internal(tcx, did)));
+    inner.followed = true;
+    let stmts = || {
+        body.blocks.iter().enumerate().flat_map(|(bb, b)| {
+            b.statements
+                .iter()
+                .enumerate()
+                .map(move |(idx, st)| (bb, idx, st))
+        })
+    };
+    // the locals holding a copy of the capture's pointer (`_6 = copy (*_1).k`), and how much of
+    // a place's projection is that pointer (`(*_1).k`, `_1.k`, or such a local)
+    let mut copies: HashSet<Local> = HashSet::new();
+    let pointer = |q: &Place, copies: &HashSet<Local>| -> Option<usize> {
+        if copies.contains(&q.local) {
+            return Some(0);
+        }
+        if q.local != 1 {
+            return None;
+        }
+        match q.projection.as_slice() {
+            [ProjectionElem::Deref, ProjectionElem::Field(f, _), ..] if *f == k => Some(2),
+            [ProjectionElem::Field(f, _), ..] if *f == k => Some(1),
+            _ => None,
+        }
+    };
+    let whole = |o: &Operand, copies: &HashSet<Local>| {
+        matches!(o, Operand::Copy(q) | Operand::Move(q)
+            if pointer(q, copies).is_some_and(|n| q.projection.len() == n))
+    };
+    loop {
+        let before = copies.len();
+        for (_, _, st) in stmts() {
+            if let StatementKind::Assign(p, Rvalue::Use(o, _) | Rvalue::Cast(_, o, _)) = &st.kind
+                && p.projection.is_empty()
+                && whole(o, &copies)
+            {
+                copies.insert(p.local);
+            }
+            if let StatementKind::Assign(p, Rvalue::CopyForDeref(q)) = &st.kind
+                && p.projection.is_empty()
+                && pointer(q, &copies).is_some_and(|n| q.projection.len() == n)
+            {
+                copies.insert(p.local);
+            }
+        }
+        if copies.len() == before {
+            break;
+        }
+    }
+    let mut values = Vec::new();
+    for (bb, idx, st) in stmts() {
+        let StatementKind::Assign(p, rv) = &st.kind else {
+            continue;
+        };
+        if let Some(n) = pointer(p, &copies) {
+            // a copy of the pointer itself (above); otherwise what it points to, whole: not a
+            // part of it, nor the pointer re-pointed
+            if p.projection.len() == n && copies.contains(&p.local) {
+                continue;
+            }
+            if p.projection.len() != n + 1 || !matches!(p.projection[n], ProjectionElem::Deref) {
+                return None;
+            }
+            let o = inner.rvalue(
+                rv,
+                st.source_info.span,
+                &[],
+                At { bb, idx },
+                1,
+                &mut HashSet::new(),
+            );
+            if !values.contains(&o) {
+                values.push(o);
+            }
+        }
+        match rv {
+            Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+            | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q)
+                if pointer(q, &copies).is_some() =>
+            {
+                return None;
+            }
+            // (the pointer copied somewhere other than a local: escapes)
+            Rvalue::Use(o, _) | Rvalue::Cast(_, o, _)
+                if whole(o, &copies) && !(p.projection.is_empty() && copies.contains(&p.local)) =>
+            {
+                return None;
+            }
+            Rvalue::Aggregate(_, ops) if ops.iter().any(|o| whole(o, &copies)) => return None,
+            _ => {}
+        }
+    }
+    for b in &body.blocks {
+        if let TerminatorKind::Call { args, .. } = &b.terminator.kind
+            && args.iter().any(|o| whole(o, &copies))
+        {
+            return None;
+        }
+    }
+    Some(values)
+}
+
+/// A closure's capture that is a `&mut`: its index, what it points to, and whether that is
+/// one place.
+type Capture = (usize, Vec<Target>, bool);
 
 /// Does a pointer with these targets point at one place? The aliases stand for the place they
 /// point at, not for another one.

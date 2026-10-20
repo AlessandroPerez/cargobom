@@ -9559,6 +9559,7 @@ fn names_read(
                     .iter()
                     .filter(|w| {
                         w.0 < start
+                            && !closure_store(s, w.0)
                             && assigned_place(src, (w.0, w.2)).is_some_and(|a| {
                                 (place == a || place.starts_with(&format!("{a}.")))
                                     // (an element's store, for a container's elements: R4.3)
@@ -11213,8 +11214,19 @@ fn variant_parts(src: &Source, bd: &Bind) -> Option<Vec<(usize, usize)>> {
     (!out.is_empty()).then_some(out)
 }
 
+/// Is the store at `i` a closure's body without braces (`|_| v = ..`)? It runs if and when the
+/// closure does: it replaces nothing on the way to a read.
+fn closure_store(s: &[char], i: usize) -> bool {
+    let mut p = before_blank(s, i);
+    if p.is_some_and(|p| s[p] == '*') {
+        p = before_blank(s, p.unwrap_or(0));
+    }
+    p.is_some_and(|p| s[p] == '|')
+}
+
 /// The statements of its scope that store into a variable: those that start with it
-/// (`v = ..;`, `v.f = ..;`, `*v = ..;`, `m.insert(k, ..);`, `m.entry(k).or_insert(..);`), the
+/// (`v = ..;`, `v.f = ..;`, `*v = ..;`, `m.insert(k, ..);`, `m.entry(k).or_insert(..);`), or
+/// a closure's body without braces (`|_| v = ..`, run when the closure is: `closure_store`), the
 /// variable read there being this binding: where each starts, where what it stores starts
 /// (the value assigned, the method's arguments), and its end.
 fn writes_to(src: &Source, bd: &Bind) -> Vec<(usize, usize, usize)> {
@@ -11231,7 +11243,7 @@ fn writes_to(src: &Source, bd: &Bind) -> Vec<(usize, usize, usize)> {
         if p.is_some_and(|p| s[p] == '*') {
             p = before_blank(s, p.unwrap_or(0));
         }
-        let starts = p.is_none_or(|p| matches!(s[p], ';' | '{' | '}'));
+        let starts = p.is_none_or(|p| matches!(s[p], ';' | '{' | '}' | '|'));
         if starts && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt) {
             let e = scan_to(s, i, to, |k| s[k] == ';');
             // what it stores: an assignment's value, a method's arguments
