@@ -9,7 +9,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:27:18 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `s3::Sealer::bump`; nonce: hard-coded (12 bytes, literal at line 27); line: `let _ = c.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([3; 12]), Aad::empty(), &mut buf); // after the program's &mut self method`; code: `seal_in_place_append_tag`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:28:47 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in s3::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args); line: `let mut d = Sealer { key: LessSafeKey::new(UnboundKey::new(&AES_256_GCM, &k).unwrap()), counter: 0 };`; code: `UnboundKey::new`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:28:64 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in s3::main; line: `let mut d = Sealer { key: LessSafeKey::new(UnboundKey::new(&AES_256_GCM, &k).unwrap()), counter: 0 };`; code: `AES_256_GCM`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:30:18 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in s3::main; use: encrypt; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::aead::algorithm::AES_256_GCM; member: object, from `s3::touch`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:30:18 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `s3::touch`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`
   occ ECDSA | crypto:material:public-key:ECDSA | jsonwebtoken-9.3.1/src/decoding.rs:183:16 | jsonwebtoken::decoding::DecodingKey::from_ec_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ec_components: setup, not a use; line: `DecodingKey::from_ec_components(&params.x, &params.y)`; code: `DecodingKey::from_ec_components`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:12:29 | ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:21:29 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING | [present] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`
@@ -103,7 +103,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:213:0 | ring | [manifest] locked ring 0.17.14; reached via s3 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:10:0 | ring | [manifest] declared by s3 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:ae:ring | src/main.rs:30:18 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in s3::main; use: encrypt; algorithm unresolved: other algorithms than these may reach the call: what `s3::touch::<s3::Sealer>` writes through its parameter (no summary of it) is not followed; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
@@ -276,15 +275,6 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:finding=hard-coded-nonce
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:provenance:nonce=hard-coded
-  prop unknown | crypto:algorithm:unknown:ae:ring | rcbom:reachability=reachable
 asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset ECDSA | crypto:material:public-key:ECDSA | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"type": "public-key"}}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
@@ -306,7 +296,6 @@ asset RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | {"algorithmProperties
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:ae:ring | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library jsonwebtoken 9.3.1 | pkg:cargo/jsonwebtoken@9.3.1 | purl pkg:cargo/jsonwebtoken@9.3.1
 component library pem 3.0.6 | pkg:cargo/pem@3.0.6 | purl pkg:cargo/pem@3.0.6
@@ -343,7 +332,6 @@ dependency crypto:algorithm:RSA-PSS-SHA-512
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
-dependency crypto:algorithm:unknown:ae:ring
 dependency crypto:material:private-key:RSA
 dependency crypto:material:public-key:ECDSA
 dependency crypto:material:public-key:Ed25519
@@ -377,7 +365,6 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:RSA-PSS-SHA-512
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
-provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:ae:ring
 provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
 root {"bom-ref": "pkg:cargo/s3@0.1.0", "name": "s3", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/s3@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
