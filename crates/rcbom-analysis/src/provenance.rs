@@ -701,18 +701,165 @@ pub(crate) fn std_choice(callee: &str) -> bool {
     )
 }
 
-/// What a `map`-like call's value is made of (`search::Std::Map`): the closure's result or the default
-/// (`map_or(&SHA512, |x| ..)`); a function item given instead of a closure is called with the
-/// receiver's value (`o.map(keep)` is `keep(o's value)`; `identity`, `Some`, `Ok`: the value
-/// itself).
-pub(crate) fn mapped_values(args: &[Origin]) -> Vec<Origin> {
+/// What a combinator makes of its receiver's value with the functions it is given (`map(f)`,
+/// `map_or(d, f)`, an iterator's `map(f)`, a thread-local key's `with(f)`): each function's
+/// result, the one the combinator passes the receiver's value (`fed_argument`) given it: a
+/// function item called with it, a closure's own parameter bound to it (`Call::fed`); another
+/// argument (`map_or`'s default) as it is.
+pub(crate) fn mapped_values(callee: &str, args: &[Origin]) -> Vec<Origin> {
     let Some(receiver) = args.first() else {
         return Vec::new();
     };
+    let fed = fed_argument(callee);
+    let err = error_of(callee, receiver);
     args.iter()
+        .enumerate()
         .skip(1)
-        .flat_map(|a| fn_values(a, Some(receiver)))
+        .flat_map(|(i, a)| {
+            let input = match &err {
+                Some((n, e)) if *n == i => Some(e),
+                _ => (fed == Some(i)).then_some(receiver),
+            };
+            fn_values(a, input)
+        })
         .collect()
+}
+
+/// The callee of an origin the analysis makes for the error side of a `Result` (its argument),
+/// given to the function a combinator calls with it: what `search` reads as the error.
+pub(crate) const ERROR_OF: &str = "<error of>";
+
+/// The argument of a `Result`'s combinator that is a function given the receiver's error
+/// (`unwrap_or_else(|e| e)`, `or_else(f)`, `map_or_else(d, f)`'s `d`), with that error as an
+/// origin.
+fn error_of(callee: &str, receiver: &Origin) -> Option<(usize, Origin)> {
+    let bare = strip_generics(callee);
+    [
+        "result::Result::unwrap_or_else",
+        "result::Result::or_else",
+        "result::Result::map_or_else",
+    ]
+    .iter()
+    .any(|m| bare.ends_with(m))
+    .then(|| {
+        (
+            1,
+            Origin::Call {
+                callee: ERROR_OF.to_string(),
+                krate: String::new(),
+                self_ty: None,
+                args: vec![receiver.clone()],
+                span: None,
+                runs: None,
+                pointer: None,
+                fed: None,
+            },
+        )
+    })
+}
+
+/// The argument of a combinator that is a function given the receiver's value: an `Option`'s
+/// or a `Result`'s value (`map(f)`, `and_then(f)`, `map_or(d, f)`, `map_or_else(d, f)`, whose
+/// default `d` is given nothing, or a `Result`'s error), an iterator's elements (`map(f)`,
+/// `filter_map(f)`, `find_map(f)`, `flat_map(f)`). Not a thread-local key's `with(f)`: its
+/// value is a static with interior mutability, whose fields are read with a gap (writes through
+/// its borrows are not attributed to it), where the field of a value not followed is what the
+/// program stores in that field anywhere (`with(|c| c.borrow().h)`), a complete answer.
+fn fed_argument(callee: &str) -> Option<usize> {
+    let bare = strip_generics(callee);
+    let ends = |m: &str| bare.ends_with(m);
+    if ends("option::Option::map")
+        || ends("option::Option::and_then")
+        || ends("result::Result::map")
+        || ends("result::Result::and_then")
+        || ends("iterator::Iterator::map")
+        || ends("iterator::Iterator::filter_map")
+        || ends("iterator::Iterator::find_map")
+        || ends("iterator::Iterator::flat_map")
+    {
+        Some(1)
+    } else if ends("option::Option::map_or")
+        || ends("option::Option::map_or_else")
+        || ends("result::Result::map_or")
+        || ends("result::Result::map_or_else")
+    {
+        Some(2)
+    } else {
+        None
+    }
+}
+
+/// `o` with a followed closure's own parameters (`Param { owner: Some(CLOSURE_INPUT) }`) given
+/// the value `input` (the first) or `Unknown` (any other).
+fn bind_input(o: &Origin, input: &Origin) -> Origin {
+    let go = |x: &Origin| bind_input(x, input);
+    match o {
+        Origin::Param {
+            index,
+            owner: Some(w),
+        } if w == rcbom_facts::CLOSURE_INPUT => {
+            if *index == 0 {
+                input.clone()
+            } else {
+                Origin::Unknown
+            }
+        }
+        Origin::Call {
+            callee,
+            krate,
+            self_ty,
+            args,
+            span,
+            runs,
+            pointer,
+            fed,
+        } => Origin::Call {
+            callee: callee.clone(),
+            krate: krate.clone(),
+            self_ty: self_ty.clone(),
+            args: args.iter().map(go).collect(),
+            span: span.clone(),
+            runs: runs.clone(),
+            pointer: pointer.as_ref().map(|p| Box::new(go(p))),
+            fed: fed.clone(),
+        },
+        Origin::Field {
+            adt,
+            field,
+            base,
+            args,
+        } => Origin::Field {
+            adt: adt.clone(),
+            field: *field,
+            base: Box::new(go(base)),
+            args: args.clone(),
+        },
+        Origin::Written {
+            callee,
+            index,
+            args,
+            self_ty,
+            place_ty,
+        } => Origin::Written {
+            callee: callee.clone(),
+            index: *index,
+            args: args.iter().map(go).collect(),
+            self_ty: self_ty.clone(),
+            place_ty: place_ty.clone(),
+        },
+        Origin::Any(v) => Origin::Any(v.iter().map(go).collect()),
+        Origin::All(v) => Origin::All(v.iter().map(go).collect()),
+        Origin::Set {
+            path,
+            value,
+            strong,
+        } => Origin::Set {
+            path: path.clone(),
+            value: Box::new(go(value)),
+            strong: *strong,
+        },
+        other => other.clone(),
+    }
 }
 
 /// What an argument given as a function makes (`map(keep)`, `unwrap_or_else(fallback)`): a
@@ -755,11 +902,28 @@ pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
                     span: None,
                     runs: runs.clone(),
                     pointer: None,
+                    fed: None,
                 }]
             }
         }
         Origin::Any(alts) if alts.iter().all(|x| matches!(x, Origin::Unit { .. })) => {
             alts.iter().flat_map(|x| fn_values(x, input)).collect()
+        }
+        // a closure given the value (`o.map(|x| x)`, `get(i).map(|e| e.h)`): what it returns,
+        // its parameter that value
+        Origin::Call {
+            callee,
+            fed: Some(f),
+            ..
+        } if callee == "<closure>"
+            && let Some(i) = input =>
+        {
+            let mut c = a.clone();
+            if let Origin::Call { args, fed, .. } = &mut c {
+                *args = vec![bind_input(f, i)];
+                *fed = None;
+            }
+            vec![c]
         }
         _ => vec![a.clone()],
     }
@@ -767,14 +931,17 @@ pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
 
 /// The values a choice between an `Option`'s or a `Result`'s value and a fallback is made of
 /// (`std_choice`): its arguments, a fallback function called (`unwrap_or_else(fallback)`).
-pub(crate) fn choice_values(args: &[Origin]) -> Vec<Origin> {
+pub(crate) fn choice_values(callee: &str, args: &[Origin]) -> Vec<Origin> {
+    let err = args.first().and_then(|r| error_of(callee, r));
     args.iter()
         .enumerate()
         .flat_map(|(i, a)| {
             if i == 0 {
                 vec![a.clone()]
             } else {
-                fn_values(a, None)
+                // (a `Result`'s fallback function is given its error: `unwrap_or_else(|e| e)`)
+                let input = err.as_ref().filter(|(n, _)| *n == i).map(|(_, e)| e);
+                fn_values(a, input)
             }
         })
         .collect()
@@ -991,6 +1158,7 @@ mod tests {
             span: None,
             runs: None,
             pointer: None,
+            fed: None,
         };
         let mut out = BTreeSet::new();
         classify(&kb, &LinkIndex::default(), &key, 0, &mut out);
@@ -1075,6 +1243,7 @@ mod tests {
             span: None,
             runs: None,
             pointer: None,
+            fed: None,
         }
     }
 

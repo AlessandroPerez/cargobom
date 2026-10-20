@@ -562,6 +562,7 @@ pub(crate) fn body_links(
                         span: None,
                         runs: None,
                         pointer: None,
+                        fed: None,
                     };
                     push_static(out, def, call, &here);
                 }
@@ -1526,6 +1527,7 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
                             span: None,
                             runs: None,
                             pointer: None,
+                            fed: None,
                         },
                         "",
                     );

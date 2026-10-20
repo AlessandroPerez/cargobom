@@ -630,6 +630,13 @@ impl<'a> Search<'a> {
         if callee == rcbom_facts::RESULT_ERR {
             return out;
         }
+        // the error side of a `Result`, given to a closure (`r.unwrap_or_else(|e| e)`)
+        if callee == crate::provenance::ERROR_OF {
+            if let Some(r) = args.first() {
+                out.merge(self.err_side(r, owner, depth + 1, mode));
+            }
+            return out;
+        }
         // what a closure of this function returns
         if callee == "<closure>" {
             for a in args {
@@ -796,12 +803,12 @@ impl<'a> Search<'a> {
                 }
             }
             Std::Choice => {
-                for a in &crate::provenance::choice_values(args) {
+                for a in &crate::provenance::choice_values(callee, args) {
                     out.merge(self.search(a, owner, depth + 1, mode));
                 }
             }
             Std::Map => {
-                for a in &crate::provenance::mapped_values(args) {
+                for a in &crate::provenance::mapped_values(callee, args) {
                     out.merge(self.search(a, owner, depth + 1, mode));
                 }
             }
@@ -950,7 +957,10 @@ impl<'a> Search<'a> {
                 self_ty,
                 ..
             } => {
-                if callee == "<closure>" || callee == rcbom_facts::RESULT_ERR {
+                if callee == "<closure>"
+                    || callee == rcbom_facts::RESULT_ERR
+                    || callee == crate::provenance::ERROR_OF
+                {
                     false
                 } else if is_std(krate) {
                     self_ty.as_deref().is_some_and(|t| {
@@ -1294,6 +1304,7 @@ mod tests {
             span: None,
             runs: None,
             pointer: None,
+            fed: None,
         }
     }
 

@@ -899,6 +899,7 @@ impl LinkIndex {
                         span: None,
                         runs,
                         pointer: None,
+                        fed: None,
                     },
                     owner.to_string(),
                 )),
@@ -1285,6 +1286,7 @@ impl LinkIndex {
                 callee,
                 args,
                 pointer: Some(p),
+                fed: None,
                 ..
             } if callee == "<indirect>" => {
                 if let Some(runs) = self.pointer_runs(p, args, owner, depth, via) {
@@ -1788,6 +1790,7 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             span,
             runs,
             pointer,
+            fed,
         } => Origin::Call {
             callee: callee.clone(),
             krate: krate.clone(),
@@ -1796,6 +1799,7 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             span: span.clone(),
             runs: runs.clone(),
             pointer: pointer.as_ref().map(|p| Box::new(substitute(p, args))),
+            fed: fed.as_ref().map(|f| Box::new(substitute(f, args))),
         },
         Origin::Any(v) => Origin::Any(v.iter().map(|a| substitute(a, args)).collect()),
         Origin::All(v) => Origin::All(v.iter().map(|a| substitute(a, args)).collect()),
