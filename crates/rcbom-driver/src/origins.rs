@@ -412,6 +412,8 @@ impl Flow {
                 .collect();
         let ptr = Pointees {
             body,
+            bags: closed_bags(body),
+            bag_stack: RefCell::new(Vec::new()),
             direct: &direct,
             cut: Cell::new(false),
             steps: Cell::new(0),
@@ -698,11 +700,25 @@ impl Flow {
             let std_callee = ["core::", "std::", "alloc::"]
                 .iter()
                 .any(|c| name.starts_with(c));
+            // a call of the standard library that only moves pointers into and out of closed
+            // containers (`v.push(&mut x)`, `Box::new(&mut x)`, `v.into_iter()`): it writes
+            // through none of them; a write through one taken out is followed to what was put in
+            let moves = moves_only(body, func);
             for (k, a) in args.iter().enumerate() {
+                let (stored, lent_bag) = match a {
+                    Operand::Copy(p) | Operand::Move(p) if moves => ptr.moved(p),
+                    _ => (false, false),
+                };
+                if stored {
+                    continue;
+                }
                 // a closure or a struct handed over (by value or `&mut`) that holds a `&mut` to
                 // a place (`|| rng.fill_bytes(&mut k1)` called, `fill_out(Out { buf: &mut k2 })`):
                 // the call may write that place through it
-                if !through && let Operand::Copy(p) | Operand::Move(p) = a {
+                if !through
+                    && !lent_bag
+                    && let Operand::Copy(p) | Operand::Move(p) = a
+                {
                     let holders: Vec<Local> = if is_mut_ptr(body, p) {
                         ptr.targets(p.local, &path_of_place(p), 0)
                             .into_iter()
@@ -3169,6 +3185,23 @@ struct Pointees<'a> {
     mut_holding: HashSet<Local>,
     /// The number of arguments.
     nargs: usize,
+    /// The pointer types whose standard-library containers the body only moves pointers into
+    /// and out of (`Vec<&mut T>` by `push`, `pop`, `into_iter`, `next`; `vec![&mut x]`,
+    /// `Box::new`, `Option::insert`), never re-pointing one they hold nor handing them to other
+    /// code (`Bags`): what such a container holds is what was put in it (`bag_targets`).
+    bags: Bags,
+    /// The containers whose contents are being looked up (one fed from itself adds nothing).
+    bag_stack: RefCell<Vec<Local>>,
+}
+
+/// What `closed_bags` finds in a body.
+#[derive(Default)]
+struct Bags {
+    closed: HashSet<Ty>,
+    /// The calls that move pointers (`moves_only`), by function and arguments.
+    moves: Vec<(Operand, Vec<Operand>)>,
+    /// What `vec![..]` stores in its box's allocation: the box and the value.
+    box_inits: Vec<(Local, Rvalue)>,
 }
 
 /// A place a pointer may point to. `alias` marks the place through the pointer itself
@@ -3197,7 +3230,13 @@ impl Pointees<'_> {
     fn through_held_at(&self, targets: Vec<Target>, depth: usize) -> Vec<Target> {
         let mut out = Vec::new();
         for t in targets {
-            let j = t.path.iter().position(|s| *s == Step::Deref);
+            // (a box of followed pointers: `**b` goes through the pointer in it)
+            let j = match t.path.split_first() {
+                Some((Step::Deref, rest)) if self.boxed(t.local) => {
+                    rest.iter().position(|s| *s == Step::Deref).map(|i| i + 1)
+                }
+                _ => t.path.iter().position(|s| *s == Step::Deref),
+            };
             // (at the start of the path only through a reference or raw pointer held in the
             // local, `*_t` of `_t: &mut &mut D`; a box's `*b` is its own contents)
             let through_ptr = |j: usize| {
@@ -3383,6 +3422,11 @@ impl Pointees<'_> {
                         });
                     }
                 }
+                // a pointer a call takes out of a closed container, or a pointer into one
+                // (`o.unwrap()`, `&mut v[0]`, `o.insert(&mut x)`): what the container holds
+                DefKind::Call { func, args } if self.taken_from_bag(func, local) => {
+                    out.extend(self.level_sources(args, self.body.locals()[local].ty, depth));
+                }
                 // `index_mut(&mut buf, ..)`, `as_mut()`: a borrow into the argument, all of it
                 // (`as_mut`, `deref_mut`, `&mut buf[..]`) or a part (`&mut buf[..16]`,
                 // `get_mut(i)`)
@@ -3455,6 +3499,17 @@ impl Pointees<'_> {
         if depth > MAX_PATH || !self.step() {
             self.cut.set(true);
             return out;
+        }
+        // a closed container (`bag`) filled or built by calls, or lent to them: any pointer put
+        // in it (one only built, `[&mut a, &mut b]`, by the element below)
+        if self.bag(local).is_some()
+            && (self.lent_locals.contains(&local)
+                || self.direct.get(&local).is_none_or(|d| {
+                    d.iter()
+                        .any(|k| !matches!(k, DefKind::Assign(Rvalue::Aggregate(..), _)))
+                }))
+        {
+            return self.bag_targets(local, depth + 1);
         }
         // a part stored later (`h.r = &mut b` after `Holder { r: &mut a }`): the last such store
         // before the write in its block is what the part holds there; else any of them, not
@@ -3551,6 +3606,533 @@ fn holds_mut_arg(t: Ty, depth: usize) -> bool {
                     || holds_mut_arg(*t, depth + 1))
         }),
         Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| holds_mut_arg(*t, depth + 1)),
+        _ => false,
+    }
+}
+
+/// The standard library's containers whose pointers `bag_content` follows (by the type's last
+/// path segment): they only store what they are given and hand it back.
+const BAG_TYPES: &[&str] = &[
+    "Vec",
+    "VecDeque",
+    "Option",
+    "Box",
+    "MaybeUninit",
+    "ManuallyDrop",
+    "IntoIter",
+    "Once",
+    "Unique",
+    "NonNull",
+];
+
+/// The pointer type a standard-library container of pointers holds: `&mut T` of `Vec<&mut T>`,
+/// `Option<&mut T>`, `Box<&mut T>`, `[&mut T; 2]`, `vec::IntoIter<&mut T>`, `iter::Once<&mut T>`,
+/// `Box<MaybeUninit<[&mut T; 1]>>` (`vec![..]`'s allocation); none when it holds another
+/// borrow besides.
+fn bag_content(t: Ty) -> Option<Ty> {
+    fn walk(t: Ty, depth: usize, found: &mut Option<Ty>) -> bool {
+        if depth > 6 {
+            return false;
+        }
+        match t.kind().rigid() {
+            Some(RigidTy::Ref(_, _, Mutability::Mut)) => {
+                if found.is_some_and(|f| f != t) {
+                    return false;
+                }
+                *found = Some(t);
+                true
+            }
+            Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => walk(*e, depth + 1, found),
+            Some(RigidTy::Adt(def, args))
+                if matches!(def.krate().name.as_str(), "core" | "std" | "alloc")
+                    && BAG_TYPES.contains(&def.name().rsplit("::").next().unwrap_or("")) =>
+            {
+                args.0.iter().all(|a| match a {
+                    rustc_public::ty::GenericArgKind::Type(t) => walk(*t, depth + 1, found),
+                    _ => true,
+                })
+            }
+            _ => !holds_mut_arg(t, 1),
+        }
+    }
+    if !matches!(
+        t.kind().rigid(),
+        Some(RigidTy::Adt(..) | RigidTy::Array(..) | RigidTy::Slice(_))
+    ) {
+        return None;
+    }
+    let mut found = None;
+    (walk(t, 0, &mut found)).then_some(found).flatten()
+}
+
+/// Does a value of type `t` hold, or point to, a container of `p` pointers (`bag_content`), or
+/// point to a `p` (`&mut p`, through which a held pointer is re-pointed)? A `p` itself does not.
+fn risky(t: Ty, p: Ty) -> bool {
+    fn walk(t: Ty, p: Ty, depth: usize) -> bool {
+        if t == p || depth > 6 {
+            return false;
+        }
+        if bag_content(t) == Some(p) {
+            return true;
+        }
+        match t.kind().rigid() {
+            Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => *i == p || walk(*i, p, depth + 1),
+            Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => walk(*e, p, depth + 1),
+            Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| walk(*t, p, depth + 1)),
+            Some(
+                RigidTy::Adt(_, args)
+                | RigidTy::Closure(_, args)
+                | RigidTy::Coroutine(_, args)
+                | RigidTy::CoroutineClosure(_, args),
+            ) => args.0.iter().any(|a| {
+                matches!(a, rustc_public::ty::GenericArgKind::Type(t) if walk(*t, p, depth + 1))
+            }),
+            _ => false,
+        }
+    }
+    walk(t, p, 0)
+}
+
+/// Does a value of type `t` hold a trait object (what it holds is not seen in its type)?
+fn holds_dyn(t: Ty, depth: usize) -> bool {
+    match t.kind().rigid() {
+        _ if depth > 6 => true,
+        Some(RigidTy::Dynamic(..)) => true,
+        Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => holds_dyn(*i, depth + 1),
+        Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => holds_dyn(*e, depth + 1),
+        Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| holds_dyn(*t, depth + 1)),
+        Some(RigidTy::Adt(_, args)) => args.0.iter().any(
+            |a| matches!(a, rustc_public::ty::GenericArgKind::Type(t) if holds_dyn(*t, depth + 1)),
+        ),
+        _ => false,
+    }
+}
+
+/// Standard-library functions (by their last two path segments) that only move pointers into
+/// and out of containers, or read their length: they write through none of the pointers they
+/// are given, nor hand them to code of the program.
+const MOVES: &[&str] = &[
+    "Vec::new",
+    "Vec::with_capacity",
+    "Vec::push",
+    "Vec::pop",
+    "Vec::insert",
+    "Vec::remove",
+    "Vec::swap_remove",
+    "Vec::truncate",
+    "Vec::clear",
+    "Vec::len",
+    "Vec::is_empty",
+    "Option::unwrap",
+    "Option::expect",
+    "Option::take",
+    "Option::replace",
+    "Option::insert",
+    "Option::get_or_insert",
+    "Option::as_mut",
+    "Option::is_some",
+    "Option::is_none",
+    "Box::new",
+    "Box::new_uninit",
+    "boxed::box_assume_init_into_vec_unsafe",
+    "slice::into_vec",
+    "iter::once",
+];
+
+/// Trait methods that do the same when their `Self` is such a container and their other type
+/// arguments are containers, pointers or numbers (`<vec::IntoIter<_> as Iterator>::next`, `<Vec<_>
+/// as IndexMut<usize>>::index_mut`, `<Option<_> as From<_>>::from`): not an implementation by the
+/// program (`impl From<Mine> for Vec<&mut T>`).
+const MOVES_OF: &[&str] = &[
+    "Iterator::next",
+    "IntoIterator::into_iter",
+    "IndexMut::index_mut",
+    "Index::index",
+    "From::from",
+];
+
+/// Is the callee one of `MOVES`, or of `MOVES_OF` for a container?
+fn moves_only(body: &Body, func: &Operand) -> bool {
+    let Some(TyKind::RigidTy(RigidTy::FnDef(def, args))) =
+        func.ty(body.locals()).ok().map(|t| t.kind())
+    else {
+        return false;
+    };
+    if !matches!(def.krate().name.as_str(), "core" | "std" | "alloc") {
+        return false;
+    }
+    let name = def.name();
+    let segs: Vec<&str> = name.split("::").filter(|s| !s.starts_with('<')).collect();
+    let Some(last) = segs.len().checked_sub(2).map(|i| segs[i..].join("::")) else {
+        return false;
+    };
+    let plain = |t: &Ty| {
+        bag_content(*t).is_some()
+            || matches!(
+                t.kind().rigid(),
+                Some(
+                    RigidTy::Ref(_, _, Mutability::Mut)
+                        | RigidTy::Int(_)
+                        | RigidTy::Uint(_)
+                        | RigidTy::Bool
+                        | RigidTy::Char
+                )
+            )
+    };
+    let types = || {
+        args.0.iter().filter_map(|a| match a {
+            rustc_public::ty::GenericArgKind::Type(t) => Some(t),
+            _ => None,
+        })
+    };
+    MOVES.contains(&last.as_str())
+        || (MOVES_OF.contains(&last.as_str())
+            && types().next().is_some_and(|s| bag_content(*s).is_some())
+            && types().all(plain))
+}
+
+/// The pointer types whose containers (`bag_content`) the body builds, fills and empties only by
+/// `moves_only` calls, `vec![..]`'s store in its box, aggregates (`Some(&mut x)`, `[&mut x]`)
+/// and moves between locals: it re-points no pointer such a container holds (no store of one
+/// through a pointer, no borrow into a container), and hands no container, borrow of one or
+/// borrow of such a pointer to other code (a call, a closure's capture, a struct, a trait
+/// object). Then what a container holds is what was put in it.
+fn closed_bags(body: &Body) -> Bags {
+    let locals = body.locals();
+    let cands: HashSet<Ty> = locals.iter().filter_map(|l| bag_content(l.ty)).collect();
+    if cands.is_empty() {
+        return Bags::default();
+    }
+    let mut open: HashSet<Ty> = HashSet::new();
+    let mut bags = Bags::default();
+    let mut box_inits = Vec::new();
+    // the box a raw pointer is the allocation of (`_65 = copy (_35.0) as *const _
+    // (BoxDerefTransmute)`), for `vec![..]`'s store in it
+    let box_of = |l: Local| {
+        let mut found = None;
+        for st in body.blocks.iter().flat_map(|b| &b.statements) {
+            if let StatementKind::Assign(lhs, rv) = &st.kind
+                && lhs.local == l
+                && lhs.projection.is_empty()
+            {
+                match rv {
+                    Rvalue::Cast(_, Operand::Copy(q) | Operand::Move(q), _)
+                    | Rvalue::Use(Operand::Copy(q) | Operand::Move(q), _)
+                        if found.is_none() && box_field(body, q) == Some(q.projection.len()) =>
+                    {
+                        found = Some(q.local)
+                    }
+                    _ => return None,
+                }
+            }
+        }
+        found
+    };
+    // a store into a place: through a pointer, of what holds such a pointer or the pointer itself
+    // (re-pointing it); into a part of a container, or of a container or pointer into one into a
+    // part of a value
+    let mut store = |place: &Place, rv: Option<&Rvalue>, open: &mut HashSet<Ty>| {
+        let Ok(pt) = place.ty(locals) else {
+            open.extend(cands.iter().copied());
+            return;
+        };
+        let deref = place
+            .projection
+            .iter()
+            .any(|e| matches!(e, ProjectionElem::Deref));
+        if deref
+            && let (Some(ProjectionElem::Deref), Some(b), Some(rv)) =
+                (place.projection.first(), box_of(place.local), rv)
+            && !place.projection[1..]
+                .iter()
+                .any(|e| matches!(e, ProjectionElem::Deref))
+            && bag_content(locals[b].ty).is_some()
+        {
+            box_inits.push((b, rv.clone()));
+            return;
+        }
+        for &p in &cands {
+            if (deref && (pt == p || risky(pt, p)))
+                || (!place.projection.is_empty()
+                    && (risky(locals[place.local].ty, p) || risky(pt, p)))
+            {
+                open.insert(p);
+            }
+        }
+    };
+    for block in &body.blocks {
+        for st in &block.statements {
+            let StatementKind::Assign(place, rv) = &st.kind else {
+                continue;
+            };
+            store(place, Some(rv), &mut open);
+            let Ok(pt) = place.ty(locals) else {
+                continue;
+            };
+            for &p in &cands {
+                let risky_op = |o: &Operand| o.ty(locals).is_ok_and(|t| risky(t, p));
+                let opens = match rv {
+                    // (a container built with the pointers is followed; anything else holding a
+                    // container or a pointer into one is not)
+                    Rvalue::Aggregate(_, ops) => {
+                        bag_content(pt) != Some(p) && ops.iter().any(risky_op)
+                    }
+                    // a borrow into a container (`&mut v[0]`, `&mut (*r).0`; a reborrow of a
+                    // pointer, `&mut (*r)`, is the pointer again)
+                    Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) => {
+                        q.projection
+                            .iter()
+                            .any(|e| !matches!(e, ProjectionElem::Deref))
+                            && risky(locals[q.local].ty, p)
+                    }
+                    // made from something else (a pointer forged from an address), or turned
+                    // into a trait object
+                    Rvalue::Cast(_, o, t) => {
+                        let from = o.ty(locals).is_ok_and(|f| risky(f, p));
+                        (risky(*t, p) && !from) || (from && holds_dyn(*t, 0))
+                    }
+                    _ => false,
+                };
+                if opens {
+                    open.insert(p);
+                }
+            }
+        }
+        match &block.terminator.kind {
+            TerminatorKind::Call {
+                func,
+                args,
+                destination,
+                ..
+            } => {
+                if !destination.projection.is_empty() {
+                    store(destination, None, &mut open);
+                }
+                if moves_only(body, func) {
+                    bags.moves.push((func.clone(), args.clone()));
+                } else {
+                    for &p in &cands {
+                        if args.iter().any(|a| match a.ty(locals) {
+                            Ok(t) => risky(t, p),
+                            Err(_) => true,
+                        }) {
+                            open.insert(p);
+                        }
+                    }
+                }
+            }
+            TerminatorKind::InlineAsm { .. } => open.extend(cands.iter().copied()),
+            _ => {}
+        }
+    }
+    bags.box_inits = box_inits;
+    bags.closed = cands.difference(&open).copied().collect();
+    if bags.closed.is_empty() {
+        return Bags::default();
+    }
+    bags
+}
+
+impl Pointees<'_> {
+    /// The pointer type a container local holds, when the body's containers of it are closed
+    /// (`closed_bags`).
+    fn bag(&self, local: Local) -> Option<Ty> {
+        bag_content(self.body.locals()[local].ty).filter(|c| self.bags.closed.contains(c))
+    }
+
+    /// Is `local` a pointer a `moves_only` call returns of a closed type, or into a container
+    /// of one?
+    fn taken_from_bag(&self, func: &Operand, local: Local) -> bool {
+        let t = self.body.locals()[local].ty;
+        moves_only(self.body, func)
+            && (self.bags.closed.contains(&t)
+                || matches!(t.kind().rigid(),
+                    Some(RigidTy::Ref(_, i, _)) if self.bags.closed.contains(i)))
+    }
+
+    /// Is `local` a box of pointers whose contents are followed?
+    fn boxed(&self, local: Local) -> bool {
+        self.bag(local).is_some()
+            && matches!(self.body.locals()[local].ty.kind().rigid(),
+                Some(RigidTy::Adt(def, _)) if def.name().rsplit("::").next() == Some("Box"))
+    }
+
+    /// For an argument of a `moves_only` call: is it a pointer of a closed type or a container of
+    /// them (stored or handed on, written through by nothing), or a borrow of such a container?
+    fn moved(&self, p: &Place) -> (bool, bool) {
+        let Ok(t) = p.ty(self.body.locals()) else {
+            return (false, false);
+        };
+        let closed = |c: Option<Ty>| c.is_some_and(|c| self.bags.closed.contains(&c));
+        match t.kind().rigid() {
+            _ if closed(Some(t)) || closed(bag_content(t)) => (true, false),
+            Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) if closed(bag_content(*i)) => {
+                (false, true)
+            }
+            _ => (false, false),
+        }
+    }
+
+    /// The places the pointers of type `q` that a `moves_only` call's arguments give it may
+    /// point to: an argument's pointer of that type itself (`Box::new(&mut x)`), those a
+    /// container of them holds, by value or borrowed (`v.into_iter()`, `v.pop()`), and, for
+    /// a pointer into a container (`&mut v[0]`, `o.insert(..)`, `o.as_mut()`), any of the
+    /// container's elements. An argument of another type holding such pointers, or a borrow of
+    /// another kind, is not followed.
+    fn level_sources(&self, args: &[Operand], q: Ty, depth: usize) -> Vec<Target> {
+        let mut out = Vec::new();
+        for a in args {
+            let (Operand::Copy(p) | Operand::Move(p)) = a else {
+                continue;
+            };
+            let Ok(t) = p.ty(self.body.locals()) else {
+                self.lost.set(true);
+                continue;
+            };
+            let held = match t.kind().rigid() {
+                Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => bag_content(*i),
+                _ => None,
+            };
+            let slot = held.is_some_and(
+                |c| matches!(q.kind().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == c),
+            );
+            if t == q {
+                out.extend(self.targets(p.local, &path_of_place(p), depth + 1));
+            } else if bag_content(t) == Some(q) {
+                if p.projection.is_empty() {
+                    out.extend(self.bag_targets(p.local, depth + 1));
+                } else {
+                    self.lost.set(true);
+                }
+            } else if held == Some(q) || slot {
+                let mut found = false;
+                for x in self.targets(p.local, &path_of_place(p), depth + 1) {
+                    if x.alias {
+                        continue;
+                    }
+                    found = true;
+                    if slot {
+                        let mut path = x.path;
+                        path.push(Step::Elem);
+                        out.push(Target {
+                            local: x.local,
+                            path,
+                            alias: false,
+                        });
+                    } else if x.path.is_empty() && self.bag(x.local).is_some() {
+                        out.extend(self.bag_targets(x.local, depth + 1));
+                    } else {
+                        self.lost.set(true);
+                    }
+                }
+                if !found {
+                    self.lost.set(true);
+                }
+            } else if mentions(t, q, 0)
+                || (matches!(
+                    t.kind().rigid(),
+                    Some(RigidTy::Ref(_, _, Mutability::Mut) | RigidTy::RawPtr(_, Mutability::Mut))
+                ) && !matches!(q.kind().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == t))
+            {
+                // (another argument of that type in it, or a borrow it may hand out a borrow
+                // into, `Option<&mut T>::from(&mut Option<T>)`; not the pointer stored where a
+                // borrow of the slot it is put in is handed out, `o.get_or_insert(&mut x)`)
+                self.lost.set(true);
+            }
+        }
+        out
+    }
+
+    /// The places the pointers a closed container (`bag`) holds may point to: those it was built
+    /// with or moved from, those `moves_only` calls lending it put in it (`v.push(&mut x)`), and
+    /// those `vec![..]` stored in its allocation. One built otherwise (an argument, a call of
+    /// the program's) is not followed (`lost`).
+    fn bag_targets(&self, local: Local, depth: usize) -> Vec<Target> {
+        let mut out = Vec::new();
+        let Some(q) = self.bag(local) else {
+            self.lost.set(true);
+            return out;
+        };
+        if depth > MAX_PATH || !self.step() {
+            self.cut.set(true);
+            return out;
+        }
+        if self.bag_stack.borrow().contains(&local) {
+            return out;
+        }
+        self.bag_stack.borrow_mut().push(local);
+        match self.direct.get(&local) {
+            None => self.lost.set(true),
+            Some(defs) => {
+                for k in defs {
+                    match k {
+                        DefKind::Assign(Rvalue::Aggregate(_, ops), _) => {
+                            out.extend(self.level_sources(ops, q, depth))
+                        }
+                        DefKind::Assign(Rvalue::Use(op, _), _) => {
+                            out.extend(self.level_sources(std::slice::from_ref(op), q, depth))
+                        }
+                        DefKind::Call { func, args } if moves_only(self.body, func) => {
+                            out.extend(self.level_sources(args, q, depth))
+                        }
+                        _ => self.lost.set(true),
+                    }
+                }
+            }
+        }
+        for (_, args) in &self.bags.moves {
+            let lends = args.iter().any(|a| match a {
+                Operand::Copy(p) | Operand::Move(p) if is_mut_ptr(self.body, p) => {
+                    matches!(p.ty(self.body.locals()).ok().map(|t| t.kind()),
+                        Some(TyKind::RigidTy(RigidTy::Ref(_, i, _))) if bag_content(i) == Some(q))
+                        && self
+                            .targets(p.local, &path_of_place(p), depth + 1)
+                            .iter()
+                            .any(|t| t.local == local && t.path.is_empty())
+                }
+                _ => false,
+            });
+            if lends {
+                out.extend(self.level_sources(args, q, depth));
+            }
+        }
+        for (b, rv) in &self.bags.box_inits {
+            if *b == local {
+                match rv {
+                    Rvalue::Aggregate(_, ops) => out.extend(self.level_sources(ops, q, depth)),
+                    Rvalue::Use(op, _) => {
+                        out.extend(self.level_sources(std::slice::from_ref(op), q, depth))
+                    }
+                    _ => self.lost.set(true),
+                }
+            }
+        }
+        self.bag_stack.borrow_mut().pop();
+        out
+    }
+}
+
+/// Does a value of type `t` hold a value of type `q` (itself, behind a pointer, an element, a
+/// type argument)? A type not known (a parameter, an opaque type, a trait object) may.
+fn mentions(t: Ty, q: Ty, depth: usize) -> bool {
+    if t == q {
+        return true;
+    }
+    match t.kind().rigid() {
+        _ if depth > 6 => true,
+        Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => mentions(*i, q, depth + 1),
+        Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => mentions(*e, q, depth + 1),
+        Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| mentions(*t, q, depth + 1)),
+        Some(
+            RigidTy::Adt(_, args)
+            | RigidTy::Closure(_, args)
+            | RigidTy::Coroutine(_, args)
+            | RigidTy::CoroutineClosure(_, args),
+        ) => args.0.iter().any(|a| {
+            matches!(a, rustc_public::ty::GenericArgKind::Type(t) if mentions(*t, q, depth + 1))
+        }),
+        Some(RigidTy::Dynamic(..)) => true,
+        None => true,
         _ => false,
     }
 }
