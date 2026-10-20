@@ -35,7 +35,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a152 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:37:12 | ring::digest::digest | [reachable] [call] in a152::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(b, &d); // SHA-256, SHA-384`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a152::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(e, &d); // SHA-384 (+ may SHA-1)`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a152::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::mem::drop`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(e, &d); // SHA-384 (+ may SHA-1)`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed

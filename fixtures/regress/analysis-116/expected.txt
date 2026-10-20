@@ -1,7 +1,7 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:41:43 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a116::main; line: `let mut s1 = S { alg: &SHA256, other: &SHA1 };`; code: `SHA1`
-  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:44:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(s1.other, &d);`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:44:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `a116::S::holder`; line: `let _ = digest(s1.other, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x1: &'static Digest = &SHA256;`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a116::wrap_impl`; line: `let _ = digest(x1, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x2: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a116::setter`; line: `let _ = digest(x2, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x3: &'static Digest = &SHA256;`; code: `SHA256`
@@ -11,17 +11,17 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x5: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x5, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:35:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x6: &'static Digest = &SHA256;`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:37:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x6, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:38:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x7: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x7, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:41:27 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut s1 = S { alg: &SHA256, other: &SHA1 };`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:43:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(s1.alg, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:45:35 | ring::digest::SHA256 | [reachable] [static] in a116::main; line: `let mut x8: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a116::dyn_deref`; line: `let _ = digest(x8, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:38 | ring::digest::SHA384 | [reachable] [static] in a116::main; line: `{ let mut f = setter(&mut x2); f(&SHA384); }`; code: `SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:30:66 | ring::digest::SHA384 | [reachable] [static] in a116::main; line: `if let Ok(Some(b)) = deep(&mut x4) { let (w, _) = *b; *w.r = &SHA384; }`; code: `SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:36:46 | ring::digest::SHA384 | [reachable] [static] in a116::main; line: `{ let w = pass(W { r: &mut x6 }); *w.r = &SHA384; }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:37:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(x6, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:42:35 | ring::digest::SHA384 | [reachable] [static] in a116::main; line: `{ let h = s1.holder(); *h.r = &SHA384; }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:43:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(s1.alg, &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:21:44 | ring::digest::SHA512 | [reachable] [static] in a116::main; line: `{ let mut w = wrap_impl(&mut x1); *w = &SHA512; }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:27:37 | ring::digest::SHA512 | [reachable] [static] in a116::main; line: `{ let mut f = boxed(&mut x3); f(&SHA512); }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:33:37 | ring::digest::SHA512 | [reachable] [static] in a116::main; line: `for r in vec_of(&mut x5) { *r = &SHA512; }`; code: `SHA512`
@@ -36,10 +36,7 @@
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:28:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x3, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:31:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x4, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:34:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x5, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:37:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x6, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x7, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:43:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a116::S::holder` is not followed; line: `let _ = digest(s1.alg, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:44:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a116::S::holder` is not followed; line: `let _ = digest(s1.other, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:47:12 | ring::digest::digest | [reachable] [call] in a116::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x8, &d);`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
@@ -52,13 +49,13 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=18
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=16
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
-  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
-  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=4
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=6
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
@@ -79,7 +76,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=10
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=7
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
