@@ -722,27 +722,39 @@ pub(crate) fn mapped_values(args: &[Origin]) -> Vec<Origin> {
 pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
     match a {
         Origin::Unit {
-            path, krate, value, ..
+            path,
+            krate,
+            value,
+            runs,
+            ..
         } => {
             let std = matches!(krate.as_str(), "core" | "std" | "alloc");
             let bare = strip_generics(path);
+            // (a standard-library function whose value is its argument's: `identity`, `Some`,
+            // `Clone::clone` of a reference)
             if std
                 && (bare.ends_with("convert::identity")
                     || bare.ends_with("::Some")
                     || bare.ends_with("::Ok")
-                    || bare.ends_with("::Err"))
+                    || bare.ends_with("::Err")
+                    || matches!(
+                        crate::search::std_semantics(path),
+                        Some(crate::search::Std::Arg(0))
+                    ))
             {
                 vec![input.cloned().unwrap_or(Origin::Unknown)]
             } else if std || value.is_some() {
                 vec![Origin::Unknown]
             } else {
+                // the body it runs, as the driver resolved it (`map(Pick::alg)` on a `Fast`)
                 vec![Origin::Call {
                     callee: path.clone(),
                     krate: krate.clone(),
                     self_ty: None,
                     args: input.cloned().into_iter().collect(),
                     span: None,
-                    runs: None,
+                    runs: runs.clone(),
+                    pointer: None,
                 }]
             }
         }
@@ -978,6 +990,7 @@ mod tests {
             ],
             span: None,
             runs: None,
+            pointer: None,
         };
         let mut out = BTreeSet::new();
         classify(&kb, &LinkIndex::default(), &key, 0, &mut out);
@@ -1061,6 +1074,7 @@ mod tests {
             args,
             span: None,
             runs: None,
+            pointer: None,
         }
     }
 

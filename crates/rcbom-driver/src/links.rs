@@ -561,6 +561,7 @@ pub(crate) fn body_links(
                             .collect(),
                         span: None,
                         runs: None,
+                        pointer: None,
                     };
                     push_static(out, def, call, &here);
                 }
@@ -800,7 +801,15 @@ pub(crate) fn body_links(
             // (`static MADE: Cfg = make()`): a field read of it is that one's
             let local_call = matches!(&value, Origin::Call { krate, .. }
                 if *krate == tcx.crate_name(rustc_span::def_id::LOCAL_CRATE).as_str());
-            if holds_fn_ptr(tcx, ty, 0) || matches!(value, Origin::Data { .. }) || local_call {
+            // (or a table of references to statics or constants, `[&S1, &S2]`, `&[&C1, &C2]`: a
+            // field read of an element is that field of any of them)
+            let ref_table = matches!(&value, Origin::All(v) | Origin::Any(v)
+                if !v.is_empty() && v.iter().all(|e| matches!(e, Origin::Data { .. })));
+            if holds_fn_ptr(tcx, ty, 0)
+                || matches!(value, Origin::Data { .. })
+                || local_call
+                || ref_table
+            {
                 push_static(out, def_ref_internal(tcx, did), value, "");
             }
         }
@@ -1516,6 +1525,7 @@ pub(crate) fn mutable_statics(cx: &Cx<'_>, out: &mut Links) {
                             args: Vec::new(),
                             span: None,
                             runs: None,
+                            pointer: None,
                         },
                         "",
                     );

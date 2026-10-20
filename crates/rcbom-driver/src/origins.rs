@@ -585,13 +585,17 @@ impl Flow {
                         Rvalue::Use(args[1].clone(), rustc_public::mir::WithRetag::No),
                     )]
                 }
-                // a cell's value replaced through a shared borrow (`c.set(v)`, `c.replace(v)`):
-                // as `mem::replace` (what the borrow points to becomes `v`)
+                // a cell's value replaced through a shared borrow (`c.set(v)`, `c.replace(v)`),
+                // an `Option` set to `Some(v)` (`o.replace(v)`, `o.insert(v)`; `Some(v)` is the
+                // value `v` to the origins): as `mem::replace` (what the borrow points to becomes
+                // `v`)
                 n if args.len() == 2
                     && [
                         "cell::Cell::<T>::set",
                         "cell::Cell::<T>::replace",
                         "cell::RefCell::<T>::replace",
+                        "option::Option::<T>::replace",
+                        "option::Option::<T>::insert",
                     ]
                     .iter()
                     .any(|m| n.ends_with(m)) =>
@@ -1036,6 +1040,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 args: Vec::new(),
                 span: None,
                 runs: None,
+                pointer: None,
             };
         }
         match self.operand_at(op, bb, idx) {
@@ -1052,6 +1057,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     args: Vec::new(),
                     span: None,
                     runs: None,
+                    pointer: None,
                 }
             }
             o => o,
@@ -1109,6 +1115,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                                 args: vec![o],
                                 span: None,
                                 runs: None,
+                                pointer: None,
                             };
                         }
                         ty = field.ty(tcx, args).skip_norm_wip();
@@ -1830,14 +1837,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     let gargs = rustc_internal::internal(self.tcx, gargs);
                     // a generic function made a pointer (`let f = pick::<Fast>; f(..)`): its
                     // instance
-                    runs = runs_of(self.tcx, did, gargs).or_else(|| {
-                        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
-                        rustc_middle::ty::Instance::try_resolve(self.tcx, env, did, gargs)
-                            .ok()
-                            .flatten()
-                            .and_then(|i| body_name(self.tcx, i))
-                            .filter(|n| *n != path_of(self.tcx, did))
-                    });
+                    runs = item_runs(self.tcx, did, gargs);
                     (
                         path_of(self.tcx, did),
                         self.tcx.crate_name(did.krate).to_string(),
@@ -1886,6 +1886,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             .or_else(|| self.callee_through_pointer(func).map(|(_, _, s)| s))
             .map(|s| crate::locate_stable(self.tcx, s).0)
             .filter(|l| l.line > 0);
+        // a pointer not resolved here (a parameter, a field, a table's element): where it comes
+        // from, for the analysis to follow across functions
+        let pointer =
+            (callee == "<indirect>").then(|| Box::new(self.operand(func, at, depth + 1, seen)));
         Origin::Call {
             callee,
             krate,
@@ -1893,6 +1897,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             args: out,
             span,
             runs,
+            pointer,
         }
     }
 
@@ -2078,6 +2083,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     krate: self.tcx.crate_name(did.krate).to_string(),
                     value,
                     span: None,
+                    runs: None,
                 }
             }
             AggregateKind::Tuple if ops.is_empty() => Origin::Unknown,
@@ -2096,6 +2102,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     args: vec![self.operand(&ops[0], at, depth + 1, seen)],
                     span: None,
                     runs: None,
+                    pointer: None,
                 }
             }
             // a struct literal read whole (`&Header { alg: HS384, ..Default::default() }`
@@ -2245,6 +2252,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             args: vec![ret],
             span: None,
             runs: None,
+            pointer: None,
         }
     }
 
@@ -2370,13 +2378,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 return self.follow_closure(did, Some(Vec::new()), depth);
             }
             // a function passed as a value is code, not data: a value without data
-            Some(RigidTy::FnDef(def, _)) => {
+            Some(RigidTy::FnDef(def, gargs)) => {
                 let did = rustc_internal::internal(self.tcx, def.def_id());
+                let gargs = rustc_internal::internal(self.tcx, gargs);
                 return Origin::Unit {
                     path: path_of(self.tcx, did),
                     krate: self.tcx.crate_name(did.krate).to_string(),
                     value: None,
                     span: Some(self.loc(c.span)),
+                    runs: item_runs(self.tcx, did, gargs),
                 };
             }
             Some(RigidTy::Tuple(ts)) if ts.is_empty() => return Origin::Unknown,
@@ -2800,6 +2810,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 krate: tcx.crate_name(adt.did().krate).to_string(),
                 value: i128::try_from(d.val).ok(),
                 span: None,
+                runs: None,
             });
         }
         Some(Origin::All(out))
@@ -2818,6 +2829,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             krate: self.tcx.crate_name(did.krate).to_string(),
             value: None,
             span: None,
+            runs: None,
         })
     }
 
@@ -4007,6 +4019,7 @@ impl Origins<'_, '_> {
             krate: tcx.crate_name(adt.did().krate).to_string(),
             value: discriminant(tcx, *adt, v),
             span: None,
+            runs: None,
         })
     }
 }
@@ -4170,6 +4183,24 @@ pub(crate) fn runs_of<'tcx>(
     let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
     let inst = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args).ok()??;
     body_name(tcx, inst).filter(|n| *n != path_of(tcx, did))
+}
+
+/// The body a function item of `did` with `args` runs when it is named as a value or made a
+/// pointer (`map(Pick::alg)`, `let f = pick::<Fast>`): as `runs_of`, and also a generic
+/// function's instance when it is not a method.
+fn item_runs<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Option<String> {
+    runs_of(tcx, did, args).or_else(|| {
+        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+        rustc_middle::ty::Instance::try_resolve(tcx, env, did, args)
+            .ok()
+            .flatten()
+            .and_then(|i| body_name(tcx, i))
+            .filter(|n| *n != path_of(tcx, did))
+    })
 }
 
 /// The function a call of `did` with `args` writes through, as `Links::writes` names it: a

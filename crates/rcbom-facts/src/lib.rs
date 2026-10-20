@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 24;
+pub const FACTS_VERSION: u32 = 25;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -474,6 +474,11 @@ pub enum Origin {
         /// under that name.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         runs: Option<String>,
+        /// For a call through a function pointer the driver does not resolve in this body
+        /// (`callee` is `<indirect>`: a parameter, a field, a table's element), where the
+        /// pointer comes from: the functions named as values it may be run there.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pointer: Option<Box<Origin>>,
     },
     /// A value of a type without fields (`rand::rngs::OsRng`, `Option::None`): no data, but the
     /// type itself may say where values come from.
@@ -486,6 +491,12 @@ pub enum Origin {
         /// For a function item used as a value, where it is named (as its `Call::value` site).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         span: Option<Loc>,
+        /// For a function item used as a value, the body it runs when that is another than
+        /// `path`'s item, as for `Call::runs`: a trait method's implementation for a known
+        /// `Self` (`map(Pick::alg)` on a `Fast`: `<app::Fast as app::Pick>::alg`), an instance of
+        /// a generic function of the program (`map(alg_of)`: `app::alg_of::<app::Fast>`).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        runs: Option<String>,
     },
     /// A buffer written through a borrow that `callee` returned (`for c in key.chunks_mut(16) {
     /// rng.fill_bytes(c) }`, a lock guard): what was written is not followed.
@@ -562,6 +573,7 @@ impl Origin {
                 args,
                 span,
                 runs,
+                pointer,
             } => Origin::Call {
                 callee,
                 krate,
@@ -569,6 +581,7 @@ impl Origin {
                 args: args.into_iter().map(|a| a.params_of(owner)).collect(),
                 span,
                 runs,
+                pointer: pointer.map(|p| Box::new(p.params_of(owner))),
             },
             Origin::Field {
                 adt,
@@ -625,6 +638,7 @@ impl Origin {
                 args,
                 span,
                 runs,
+                pointer,
             } => Origin::Call {
                 callee,
                 krate,
@@ -632,6 +646,7 @@ impl Origin {
                 args: cap(args),
                 span,
                 runs,
+                pointer: pointer.map(|p| Box::new(p.capped(depth - 1))),
             },
             Origin::Field {
                 adt,

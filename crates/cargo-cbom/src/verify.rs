@@ -9357,6 +9357,28 @@ fn names_read(
                 .all(|c| c.is_uppercase() || c.is_ascii_digit() || c == '_');
         if first.is_uppercase() && !upper {
             r.types.insert(w);
+            // a method named as a value (`o.map(Pick::alg)`): what the file's methods of that
+            // name return (the implementation the value's type picks is one of them)
+            let k = skip_blank(s, n + 2);
+            let m = word_of(s, k);
+            let after = skip_blank(s, k + m.chars().count());
+            if path_head
+                && !call
+                && m.starts_with(|c: char| c.is_lowercase())
+                && !matches!(s.get(after), Some('(' | ':'))
+            {
+                for f in src
+                    .items
+                    .iter()
+                    .filter(|it| it.kind == ItemKind::Fn && it.name == m)
+                {
+                    let sp = src.span(f);
+                    if depth > 0 && seen.insert((sp.0, sp.1, String::new())) {
+                        names_read(src, kb, sp.0, sp.1, depth - 1, seen, r, false);
+                    }
+                }
+                i = k + m.chars().count();
+            }
             continue;
         }
         if upper {
@@ -9470,7 +9492,13 @@ fn names_read(
             r.names.insert(item);
             continue;
         }
-        if after_colons || path_head || is_keyword(&w) || !(first.is_lowercase() || first == '_') {
+        // (a generic function named with its arguments, `pick::<Fast>`, is no module path)
+        let turbofish = path_head && s.get(skip_blank(s, n + 2)) == Some(&'<');
+        if after_colons
+            || (path_head && !turbofish)
+            || is_keyword(&w)
+            || !(first.is_lowercase() || first == '_')
+        {
             continue;
         }
         // a variable whose value a combinator's function ignores (`o.map(fixed)` with `fixed`
@@ -9609,8 +9637,12 @@ fn names_read(
                         o < start && dom.is_none_or(|d| o > d.0) && around(o) && whole_or_same(at)
                     })
                     .cloned();
-                // the other argument: `swap`'s other place, `replace`'s value
+                // the other argument: `swap`'s other place, `replace`'s value, an `Option`'s
+                // own `replace`'s or `insert`'s argument
                 let other = |o: usize, c: usize, f: &str, at: usize| {
+                    if f == "set" {
+                        return (o + 1, c);
+                    }
                     let comma = scan_to(s, o + 1, c, |k| s[k] == ',');
                     if f == "replace" || at < comma {
                         (comma + 1, c)
@@ -10236,6 +10268,14 @@ fn cfg_before(s: &[char], at: usize) -> bool {
 fn swaps_of(src: &Source, bd: &Bind, place: &str) -> Vec<(usize, usize, String, usize)> {
     let s = &src.code;
     let mut out = Vec::new();
+    // (a variable that is an `Option`: made `None` or `Some(..)`, or annotated so)
+    let option_like = bd.init.is_some_and(|(a, b)| {
+        let t = src.text(a, b);
+        let t = t.trim_start();
+        t.starts_with("None") || t.starts_with("Some(")
+    }) || src
+        .text(bd.stmt.0, bd.init.map_or(bd.stmt.1, |(a, _)| a))
+        .contains("Option<");
     for i in bd.scope.0..bd.scope.1.min(s.len()) {
         let lent = || {
             let next = s.get(skip_blank(s, i + bd.name.chars().count()));
@@ -10250,6 +10290,28 @@ fn swaps_of(src: &Source, bd: &Bind, place: &str) -> Vec<(usize, usize, String, 
                 _ => true,
             }
         };
+        // an `Option` set by its own method (`o.replace(v)`, `o.insert(v)`): `v` replaces what
+        // it held, as `mem::replace(&mut o, v)` (the whole argument list is the value)
+        if option_like
+            && kw(s, i, &bd.name)
+            && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
+            && s.get(skip_blank(s, i + bd.name.chars().count())) == Some(&'.')
+        {
+            let k = skip_blank(s, skip_blank(s, i + bd.name.chars().count()) + 1);
+            let m = word_of(s, k);
+            let open = skip_blank(s, k + m.chars().count());
+            if matches!(m.as_str(), "replace" | "insert")
+                && s.get(open) == Some(&'(')
+                && !src
+                    .items
+                    .iter()
+                    .any(|it| it.kind == ItemKind::Fn && it.name == m)
+                && let Some(c) = close_of_at(s, open)
+                && scan_to(s, open + 1, c, |x| s[x] == ',') >= c
+            {
+                out.push((open, c, "set".to_string(), i));
+            }
+        }
         if kw(s, i, &bd.name)
             && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
             && word_before_at(s, i) == "mut"
