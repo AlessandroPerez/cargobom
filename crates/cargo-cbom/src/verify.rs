@@ -9788,6 +9788,14 @@ fn names_read(
                         }
                     }
                 }
+                // and the file's functions a value holding a pointer to it is handed to (`let w =
+                // wrap1(&mut a); set1(w);`): what they may write through it
+                for fi in alias_lends(src, &bd, start) {
+                    let sp = src.span(fi);
+                    if seen.insert((sp.0, sp.1, String::new())) {
+                        names_read(src, kb, sp.0, sp.1, depth - 1, seen, r, false);
+                    }
+                }
             }
             Some(Found::Param(_)) => r.open |= own,
             Some(Found::Item(k)) => {
@@ -9858,22 +9866,41 @@ fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(String, String, 
     {
         return Some(("?".into(), String::new(), definite));
     }
-    // `W { r: x, .. }`, `Self { r: x }`
+    // `W { r: x, .. }`, `Self { r: x }`, `W { r: &mut self.alg }`, `W1 { r }`
     if let Some(m) = Regex::new(&format!(
-        r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*(\w+)\s*:\s*{p}\s*(?:,[^{{}}]*)?\}}$"
+        r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*(\w+)\s*:\s*(&\s*mut\s+\**\s*)?{p}((?:\s*\.\s*\w+)*)\s*(?:,[^{{}}]*)?\}}$"
     ))
     .ok()?
     .captures(tail)
     {
-        return Some((format!(".{}", &m[1]), String::new(), definite));
+        let sub: String = m[3].chars().filter(|c| !c.is_whitespace()).collect();
+        if !sub.is_empty() && m.get(2).is_none() {
+            return None;
+        }
+        return Some((format!(".{}", &m[1]), sub, definite));
     }
-    // `(x, ..)`
+    if Regex::new(&format!(
+        r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*{p}\s*(?:,[^{{}}]*)?\}}$"
+    ))
+    .ok()?
+    .is_match(tail)
+    {
+        return Some((format!(".{param}"), String::new(), definite));
+    }
+    // `(x, ..)`, `(&mut self.a, &mut self.b)`
     if tail.starts_with('(') && tail.ends_with(')') {
         let parts = split_top(&tail[1..tail.len() - 1]);
-        if parts.len() > 1
-            && let Some(k) = parts.iter().position(|e| e.trim() == param)
-        {
-            return Some((format!(".{k}"), String::new(), definite));
+        let elem = Regex::new(&format!(r"^(&\s*mut\s+\**\s*)?{p}((?:\s*\.\s*\w+)*)$")).ok()?;
+        if parts.len() > 1 {
+            for (k, e) in parts.iter().enumerate() {
+                if let Some(m) = elem.captures(e.trim()) {
+                    let sub: String = m[2].chars().filter(|c| !c.is_whitespace()).collect();
+                    if !sub.is_empty() && m.get(1).is_none() {
+                        continue;
+                    }
+                    return Some((format!(".{k}"), sub, definite));
+                }
+            }
         }
     }
     None
@@ -9892,7 +9919,8 @@ const CONTAINER_STORES: &[&str] = &[
 /// A pointer to the variable `name` (`&mut name..`, `is` telling its binding), or one of the
 /// `aliases` already found, handed to a method of binding `b` that stores it
 /// (`CONTAINER_STORES`: `v.push(&mut x)`, `o.insert(r)`): `b` may hold it, as an alias of no
-/// known path (`*`) and the variable's part it points to.
+/// known path (`*`) and the variable's part it points to; or a borrow of it assigned to a field
+/// of `b` (`w.slot = &mut x`): at that field.
 fn lent_into(
     src: &Source,
     b: &Bind,
@@ -9919,6 +9947,24 @@ fn lent_into(
         let m = skip_blank(s, dot + 1);
         let method = word_of(s, m);
         let open = skip_blank(s, m + method.chars().count());
+        // (or a field of it pointed there: `w.slot = &mut x;`)
+        if s.get(open) == Some(&'=') && s.get(open + 1) != Some(&'=') {
+            let e = scan_to(s, open + 1, b.scope.1.min(s.len()), |q| s[q] == ';');
+            let rhs = skip_blank(s, open + 1);
+            if s.get(rhs) == Some(&'&') {
+                let k = skip_blank(s, rhs + 1);
+                let k = if kw(s, k, "mut") {
+                    skip_blank(s, k + 3)
+                } else {
+                    k
+                };
+                if k < e && kw(s, k, name) && is_var(k) {
+                    let (pl, _) = read_place(s, k);
+                    return Some((format!(".{method}"), pl[name.len()..].to_string(), false));
+                }
+            }
+            continue;
+        }
         if !CONTAINER_STORES.contains(&method.as_str()) || s.get(open) != Some(&'(') {
             continue;
         }
@@ -9953,7 +9999,71 @@ fn lent_into(
 /// ..)`, `Some(&mut x)`, `[&mut x]`, and the patterns and loops binding what they hold), a
 /// pointer the file's function or method returns (`let r = s.slot();`, `let w = wrap(&mut x);`,
 /// `*slot_of(&mut s) = v;`), and a field written through a pointer (`r.alg = v`).
-fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
+/// The file's functions a binding that may hold a pointer to the variable bound by `bd`
+/// (`ptr_aliases`) is handed to before the read at `start` (`set1(w)`, `set1(&mut w)`).
+fn alias_lends<'a>(src: &'a Source, bd: &Bind, start: usize) -> Vec<&'a Item> {
+    let s = &src.code;
+    let is = |k: usize, b: &Bind| matches!(lookup(src, k, &b.name), Some(Found::Bind(x)) if x.stmt == b.stmt && x.name == b.name);
+    let mut out: Vec<&Item> = Vec::new();
+    for (b, ..) in ptr_aliases(src, bd, start) {
+        let mut i = b.scope.0;
+        while i < b.scope.1.min(start).min(s.len()) {
+            if !kw(s, i, &b.name) || !is(i, &b) {
+                i += 1;
+                continue;
+            }
+            // an argument (`f(w)`, `f(&mut w)`): the bracket it is in
+            let mut a = before_blank(s, i);
+            if a.is_some_and(|p| s[p] == 't') && word_before_at(s, i) == "mut" {
+                a = before_blank(s, i).and_then(|m| before_blank(s, m + 1 - 3));
+            }
+            if a.is_some_and(|p| s[p] == '&') {
+                a = a.and_then(|p| before_blank(s, p));
+            }
+            let after = skip_blank(s, i + b.name.chars().count());
+            if a.is_some_and(|p| matches!(s[p], '(' | ','))
+                && matches!(s.get(after), Some(',' | ')'))
+            {
+                let mut depth = 0;
+                let mut j = i;
+                let open = loop {
+                    if j == 0 {
+                        break None;
+                    }
+                    j -= 1;
+                    match s[j] {
+                        ')' | ']' | '}' => depth += 1,
+                        '(' if depth == 0 => break Some(j),
+                        '(' | '[' | '{' => {
+                            if depth == 0 {
+                                break None;
+                            }
+                            depth -= 1;
+                        }
+                        ';' if depth == 0 => break None,
+                        _ => {}
+                    }
+                };
+                if let Some(open) = open {
+                    let head = word_before_at(s, open);
+                    let head_at = open - head.chars().count();
+                    if let Some(fi) = free_fn_called(src, head_at, &head, &path_before(s, head_at))
+                        && !out.iter().any(|o| o.start == fi.start)
+                    {
+                        out.push(fi);
+                    }
+                }
+            }
+            i += b.name.chars().count();
+        }
+    }
+    out
+}
+
+/// The bindings of the function that may hold a pointer to the variable bound by `bd` (or a part
+/// of it), as `pointer_stores` finds them: each with the path in it to the pointer, the
+/// variable's part it points to, and whether it points there on every way.
+fn ptr_aliases(src: &Source, bd: &Bind, start: usize) -> Vec<(Bind, String, String, bool)> {
     let s = &src.code;
     let Some(f) = src.enclosing(src.pos(start), &[ItemKind::Fn]) else {
         return Vec::new();
@@ -10129,6 +10239,16 @@ fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
             break;
         }
     }
+    aliases
+}
+
+fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
+    let s = &src.code;
+    if src.enclosing(src.pos(start), &[ItemKind::Fn]).is_none() {
+        return Vec::new();
+    }
+    let is = |k: usize, b: &Bind| matches!(lookup(src, k, &b.name), Some(Found::Bind(x)) if x.stmt == b.stmt && x.name == b.name);
+    let aliases = ptr_aliases(src, bd, start);
     let mut out = Vec::new();
     let assign_at = |end: usize| {
         let j = skip_blank(s, end);
@@ -10159,6 +10279,10 @@ fn pointer_stores(src: &Source, bd: &Bind, start: usize) -> Vec<PtrStore> {
             let Some(eq) = assign_at(end) else { continue };
             let e = scan_to(s, eq + 1, b.scope.1, |m| s[m] == ';');
             let place = if derefs == 0 && acc.is_empty() {
+                retargeted = true;
+                continue;
+            } else if derefs == 0 && !path.is_empty() && path != "*" && acc == *path {
+                // (its pointer field pointed elsewhere: `w.slot = &mut other`)
                 retargeted = true;
                 continue;
             } else if path == "*" || path.starts_with('?') || path.starts_with("[]") {
