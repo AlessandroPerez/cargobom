@@ -417,6 +417,7 @@ fn with_args(o: &Origin, args: &[Origin]) -> Origin {
             span,
             runs,
             pointer,
+            fed,
         } => Origin::Call {
             callee: callee.clone(),
             krate: krate.clone(),
@@ -425,6 +426,7 @@ fn with_args(o: &Origin, args: &[Origin]) -> Origin {
             span: span.clone(),
             runs: runs.clone(),
             pointer: pointer.as_ref().map(|p| Box::new(with_args(p, args))),
+            fed: fed.as_ref().map(|f| Box::new(with_args(f, args))),
         },
         Origin::Any(v) => Origin::Any(v.iter().map(|x| with_args(x, args)).collect()),
         Origin::All(v) => Origin::All(v.iter().map(|x| with_args(x, args)).collect()),
@@ -878,6 +880,7 @@ fn struct_bases(
                     span: None,
                     runs: None,
                     pointer: None,
+                    fed: None,
                 };
                 struct_bases(ctx, &default, adt, field, out, depth + 1);
             }

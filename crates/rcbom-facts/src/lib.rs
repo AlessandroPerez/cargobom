@@ -6,8 +6,11 @@
 
 use serde::{Deserialize, Serialize};
 
+/// The owner of a followed closure's own parameters in `Origin::Call::fed`.
+pub const CLOSURE_INPUT: &str = "<input>";
+
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 25;
+pub const FACTS_VERSION: u32 = 26;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -479,6 +482,13 @@ pub enum Origin {
         /// pointer comes from: the functions named as values it may be run there.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pointer: Option<Box<Origin>>,
+        /// For a closure followed to what it returns (`callee` is `<closure>`, whose `args` read
+        /// its own parameters as `Unknown`): the same value with its parameters as
+        /// `Param { owner: Some(CLOSURE_INPUT) }`, for the analysis to give them the value a
+        /// combinator passes the closure (`o.map(|x| x)`: the `Option`'s value), where it knows
+        /// it.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fed: Option<Box<Origin>>,
     },
     /// A value of a type without fields (`rand::rngs::OsRng`, `Option::None`): no data, but the
     /// type itself may say where values come from.
@@ -574,6 +584,7 @@ impl Origin {
                 span,
                 runs,
                 pointer,
+                fed,
             } => Origin::Call {
                 callee,
                 krate,
@@ -582,6 +593,7 @@ impl Origin {
                 span,
                 runs,
                 pointer: pointer.map(|p| Box::new(p.params_of(owner))),
+                fed: fed.map(|f| Box::new(f.params_of(owner))),
             },
             Origin::Field {
                 adt,
@@ -639,6 +651,7 @@ impl Origin {
                 span,
                 runs,
                 pointer,
+                fed,
             } => Origin::Call {
                 callee,
                 krate,
@@ -647,6 +660,7 @@ impl Origin {
                 span,
                 runs,
                 pointer: pointer.map(|p| Box::new(p.capped(depth - 1))),
+                fed: fed.map(|f| Box::new(f.capped(depth - 1))),
             },
             Origin::Field {
                 adt,

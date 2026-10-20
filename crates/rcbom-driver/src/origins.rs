@@ -182,6 +182,9 @@ pub(crate) struct Origins<'a, 'tcx> {
     /// Followed from a caller (a closure passed as an argument): its own parameters are not
     /// the caller's.
     followed: bool,
+    /// Followed for `Origin::Call::fed`: a closure's own parameters are
+    /// `Param { owner: Some(CLOSURE_INPUT) }`, not `Unknown`.
+    inputs: bool,
     /// Origins of the captures, when known (a closure followed from the place it is built).
     captures: Option<Vec<Origin>>,
     /// Captures looked up in the parent body (capture, what is read of it), computed once.
@@ -230,6 +233,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             kind,
             flow: OnceCell::new(),
             followed: false,
+            inputs: false,
             captures: None,
             parent_captures: RefCell::new(HashMap::new()),
             nodes: Cell::new(0),
@@ -1041,6 +1045,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 span: None,
                 runs: None,
                 pointer: None,
+                fed: None,
             };
         }
         match self.operand_at(op, bb, idx) {
@@ -1058,6 +1063,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     span: None,
                     runs: None,
                     pointer: None,
+                    fed: None,
                 }
             }
             o => o,
@@ -1116,6 +1122,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                                 span: None,
                                 runs: None,
                                 pointer: None,
+                                fed: None,
                             };
                         }
                         ty = field.ty(tcx, args).skip_norm_wip();
@@ -1898,6 +1905,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             span,
             runs,
             pointer,
+            fed: None,
         }
     }
 
@@ -2103,6 +2111,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     span: None,
                     runs: None,
                     pointer: None,
+                    fed: None,
                 }
             }
             // a struct literal read whole (`&Header { alg: HS384, ..Default::default() }`
@@ -2218,33 +2227,43 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let Some(body) = rustc_public::CrateItem(def).body() else {
             return Origin::Unknown;
         };
-        let mut inner = Origins::new(self.tcx, &body, Some(did));
-        inner.followed = true;
-        inner.captures = captures;
-        let mut alts = Vec::new();
-        for (bb, block) in body.blocks.iter().enumerate() {
-            if matches!(block.terminator.kind, TerminatorKind::Return) {
-                let at = At {
-                    bb,
-                    idx: block.statements.len(),
-                };
-                let o = inner.place(
-                    rustc_public::mir::RETURN_LOCAL,
-                    Vec::new(),
-                    at,
-                    depth + 1,
-                    &mut HashSet::new(),
-                );
-                if !alts.contains(&o) {
-                    alts.push(o);
+        // what it returns, its own parameters `Unknown`; and, for a closure taking some, with
+        // them as the input the analysis gives it where a combinator says (`fed`)
+        let returned = |inputs: bool| {
+            let mut inner = Origins::new(self.tcx, &body, Some(did));
+            inner.followed = true;
+            inner.inputs = inputs;
+            inner.captures = captures.clone();
+            let mut alts = Vec::new();
+            for (bb, block) in body.blocks.iter().enumerate() {
+                if matches!(block.terminator.kind, TerminatorKind::Return) {
+                    let at = At {
+                        bb,
+                        idx: block.statements.len(),
+                    };
+                    let o = inner.place(
+                        rustc_public::mir::RETURN_LOCAL,
+                        Vec::new(),
+                        at,
+                        depth + 1,
+                        &mut HashSet::new(),
+                    );
+                    if !alts.contains(&o) {
+                        alts.push(o);
+                    }
                 }
             }
-        }
-        let ret = match alts.len() {
-            0 => Origin::Unknown,
-            1 => alts.pop().unwrap(),
-            _ => Origin::Any(alts),
+            match alts.len() {
+                0 => Origin::Unknown,
+                1 => alts.pop().unwrap(),
+                _ => Origin::Any(alts),
+            }
         };
+        let ret = returned(false);
+        let fed = (body.arg_locals().len() > 1)
+            .then(|| returned(true))
+            .filter(|f| *f != ret)
+            .map(Box::new);
         Origin::Call {
             callee: "<closure>".into(),
             krate: String::new(),
@@ -2253,6 +2272,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             span: None,
             runs: None,
             pointer: None,
+            fed,
         }
     }
 
@@ -2285,6 +2305,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             }
             // a coroutine's other argument is its resume value
             BodyKind::Coroutine => Origin::Unknown,
+            BodyKind::Closure if self.followed && self.inputs => Origin::Param {
+                index: local - 2,
+                owner: Some(rcbom_facts::CLOSURE_INPUT.to_string()),
+            },
             BodyKind::Closure if self.followed => Origin::Unknown,
             BodyKind::Closure => Origin::Param {
                 index: local - 2,
