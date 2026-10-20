@@ -3275,8 +3275,10 @@ impl Files<'_> {
             .captures(p)
             {
                 // (a member beside others not followed may be the value a write the analysis
-                // does not follow replaces: kept by a writer that replaces it)
-                let beside = ctx.details.contains("beside others not followed");
+                // does not follow replaces: kept by a writer that replaces it; so may one the
+                // flow-insensitive points-to analysis says only possibly reaches the call)
+                let beside = ctx.details.contains("beside others not followed")
+                    || ctx.details.contains("may possibly reach the call");
                 for d in &descriptors {
                     self.check_witness(&path, &m[1], &m[2], d, &o.component_ref, beside)?;
                 }
