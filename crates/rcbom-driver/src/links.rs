@@ -929,6 +929,7 @@ pub(crate) fn body_links(
     // }`, `fn write_hm(h: &mut H) { *h.r = v }`: `origins::holder_of`, the fields its callers
     // follow): what is behind it at the returns; through a holder the body uses otherwise (hands
     // on whole, re-points or lends a field), not followed
+    let mut holders = false;
     if func && !tcx.is_closure_like(did) {
         for (index, decl) in body.arg_locals().iter().enumerate() {
             let ty = rustc_internal::internal(tcx, decl.ty);
@@ -936,6 +937,7 @@ pub(crate) fn body_links(
             if fields.is_empty() {
                 continue;
             }
+            holders = true;
             let behind = matches!(
                 ty.kind(),
                 rustc_middle::ty::Ref(_, _, rustc_middle::ty::Mutability::Mut)
@@ -967,6 +969,14 @@ pub(crate) fn body_links(
                 }
             }
         }
+    }
+    // one taking a `&mut` (or a holder of one) that writes nothing through it (`fn up(&mut
+    // self) {}`): summarised all the same, so its callers' values are left as they were
+    if (!mut_params.is_empty() || holders)
+        && !out.writes.iter().any(|w| w.func == here)
+        && !out.summarised.contains(&here)
+    {
+        out.summarised.push(here.clone());
     }
     // what a function returns, and each part of it that can carry an algorithm or a key; a
     // method implementing a trait's also as `<trait method> for <Self>`, the name its calls

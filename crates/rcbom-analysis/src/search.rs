@@ -1687,23 +1687,31 @@ mod tests {
             assert_eq!(names(&f), ["ring::digest::SHA256"], "{o:?}");
             assert_eq!(unknowns(&f), 1, "{o:?}");
         }
-        // a function the facts show was summarised (here: it calls another of the program's),
-        // with no write recorded, leaves the value as it was
-        let ix = index(Links {
-            arg_calls: vec![rcbom_facts::LocalCall {
-                callee: "app::log".into(),
-                caller: "app::touch".into(),
-                args: Vec::new(),
-            }],
-            ..Default::default()
-        });
-        let f = Search::new(&kb, &ix, true, LIVE).value(
-            &written("app::touch", None),
-            "app::main",
-            Mode::Value,
-        );
-        assert_eq!(names(&f), ["ring::digest::SHA256"]);
-        assert_eq!(unknowns(&f), 0);
+        // a function the facts show was summarised (here: it calls another of the program's, or
+        // is listed as summarised with no write), with no write recorded, leaves the value as
+        // it was
+        for ix in [
+            index(Links {
+                arg_calls: vec![rcbom_facts::LocalCall {
+                    callee: "app::log".into(),
+                    caller: "app::touch".into(),
+                    args: Vec::new(),
+                }],
+                ..Default::default()
+            }),
+            index(Links {
+                summarised: vec!["app::touch".into()],
+                ..Default::default()
+            }),
+        ] {
+            let f = Search::new(&kb, &ix, true, LIVE).value(
+                &written("app::touch", None),
+                "app::main",
+                Mode::Value,
+            );
+            assert_eq!(names(&f), ["ring::digest::SHA256"]);
+            assert_eq!(unknowns(&f), 0);
+        }
     }
 
     /// A trait method called where the body it runs is not resolved takes the trait's default

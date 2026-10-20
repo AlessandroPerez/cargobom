@@ -38,7 +38,8 @@ pub struct LinkIndex {
     /// The instances whose summaries the driver's bound left unrecorded (`Links::truncated`).
     truncated: HashSet<String>,
     /// The functions (and instances) the facts show the driver summarised: those some record
-    /// names as its maker (a call it makes, a value it stores or returns, what it writes). The
+    /// names as its maker (a call it makes, a value it stores or returns, what it writes), or
+    /// lists as summarised with nothing else recorded (`Links::summarised`). The
     /// driver merges a body's records only once its whole summary is made, the writes through
     /// its `&mut` parameters included, and records a write only where the value changes: for
     /// these, no write recorded is a parameter left as it was; for another, it is not known.
@@ -322,7 +323,8 @@ impl LinkIndex {
                             .statics
                             .iter()
                             .flat_map(|s| s.writers.iter().map(|(w, _)| w.clone())),
-                    ),
+                    )
+                    .chain(f.links.summarised.iter().cloned()),
             );
             for name in f
                 .links

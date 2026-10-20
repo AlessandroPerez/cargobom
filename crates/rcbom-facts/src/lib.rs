@@ -126,6 +126,11 @@ pub struct Links {
     /// origins, read only to tell whether a value depends on the program's input.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub arg_calls: Vec<LocalCall>,
+    /// The functions (and instances) taking a `&mut` (or a value holding one) whose summaries
+    /// record no write through it: the value left as it was (`fn up(&mut self) {}`), not a
+    /// function the driver did not see.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub summarised: Vec<String>,
 }
 
 /// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn <trait>`
@@ -209,6 +214,11 @@ impl Links {
         for t in other.truncated {
             if !self.truncated.contains(&t) {
                 self.truncated.push(t);
+            }
+        }
+        for f in other.summarised {
+            if !self.summarised.contains(&f) {
+                self.summarised.push(f);
             }
         }
     }
