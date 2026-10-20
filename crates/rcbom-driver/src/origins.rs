@@ -3798,6 +3798,18 @@ fn moves_only(body: &Body, func: &Operand) -> bool {
 /// borrow of such a pointer to other code (a call, a closure's capture, a struct, a trait
 /// object). Then what a container holds is what was put in it.
 fn closed_bags(body: &Body) -> Bags {
+    // (a body with a type `rustc_public` cannot convert, an `async` closure's: none followed)
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| closed_bags_in(body))).unwrap_or_else(
+        |e| {
+            if !crate::async_closure(&e) {
+                std::panic::resume_unwind(e)
+            }
+            Bags::default()
+        },
+    )
+}
+
+fn closed_bags_in(body: &Body) -> Bags {
     let locals = body.locals();
     let cands: HashSet<Ty> = locals.iter().filter_map(|l| bag_content(l.ty)).collect();
     if cands.is_empty() {
