@@ -251,11 +251,22 @@ pub(crate) fn body_links(
     // (a parameter the lock rules below read: not a `&mut` one, whose value at the returns is
     // recorded whole)
     let by_guard = |i: &usize| !mut_params.contains(i) || cell_params.contains(i);
+    // the closures and functions of the program run where their calls are not recorded (handed
+    // to the standard library, a closure made a trait object or a function pointer): each is
+    // recorded as called with values not followed (a closure returned is called by its callers
+    // as itself, their bodies' types revealed: recorded there)
+    let mut escaped: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
     for (bb, block) in body.blocks.iter().enumerate() {
         for (idx, stmt) in block.statements.iter().enumerate() {
             let StatementKind::Assign(place, rv) = &stmt.kind else {
                 continue;
             };
+            // (`&f as &dyn Fn(D)`, `Box<dyn Fn(D)>`, `let p: fn(D) = |a| ..`)
+            if let Rvalue::Cast(rustc_public::mir::CastKind::PointerCoercion(_), op, _) = rv
+                && let Ok(t) = op.ty(locals)
+            {
+                escaped.extend(runnables(cx, rustc_internal::internal(tcx, t), false).concat());
+            }
             // `S { f: v }`, `E::V(v)`: what each part of `v` that can carry an algorithm or a key
             // is, in the struct or in the enum's variant (`KeyPairKind::Ec(kp)`), as
             // `Origin::Field` names them
@@ -505,7 +516,12 @@ pub(crate) fn body_links(
                 .iter()
                 .map(|a| origins.operand_at(a, bb, idx))
                 .collect();
-            if cargs_o.iter().any(|o| !empty(o)) {
+            // (one passing only values not followed too: its parameters may be anything)
+            if args.iter().any(|a| {
+                a.ty(locals).ok().is_some_and(|t| {
+                    !carrying_parts(cx, rustc_internal::internal(tcx, t)).is_empty()
+                })
+            }) {
                 out.calls.push(LocalCall {
                     callee: path_of(tcx, target),
                     caller: here.clone(),
@@ -638,16 +654,19 @@ pub(crate) fn body_links(
         {
             push_static(out, def, origins.closure_value(f, bb, idx), "");
         }
-        // a call of a closure of this crate (`f(&SHA512, d)` is `Fn::call(&f, (&SHA512, d))`):
-        // its parameters receive the tuple's elements, numbered from its first declared one
-        // (as `Origin::Param` numbers them in a closure's body)
+        // a call of a closure of this crate (`f(&SHA512, d)` is `Fn::call(&f, (&SHA512, d))`),
+        // or of the program's function given as a value of a type parameter (`fn run<F:
+        // Fn(D)>(f: F) { f(&SHA1) }` run with `hash`): its parameters receive the tuple's
+        // elements, numbered from its first declared one (as `Origin::Param` numbers them in a
+        // closure's body)
         if matches!(method, "call" | "call_mut" | "call_once")
             && cx.is_std(&krate)
             && let (Some(f), Some(tuple)) = (args.first(), args.get(1))
             && let Ok(fty) = f.ty(locals)
-            && let rustc_middle::ty::Closure(cl, _) =
-                *rustc_internal::internal(tcx, fty).peel_refs().kind()
-            && cl.is_local()
+            && let rustc_middle::ty::Closure(..) | rustc_middle::ty::FnDef(..) =
+                rustc_internal::internal(tcx, fty).peel_refs().kind()
+            && let [names] =
+                runnables(cx, rustc_internal::internal(tcx, fty).peel_refs(), true).as_slice()
             && let Ok(tty) = tuple.ty(locals)
             && let rustc_middle::ty::Tuple(ts) = *rustc_internal::internal(tcx, tty).kind()
         {
@@ -659,14 +678,60 @@ pub(crate) fn body_links(
                     origins.operand_part_at(tuple, &[Step::Field(i)], bb, idx)
                 });
             }
-            if cargs_o.iter().any(|o| !empty(o)) {
-                out.calls.push(LocalCall {
-                    callee: path_of(tcx, cl),
-                    caller: here.clone(),
-                    args: cargs_o,
-                });
+            // (one passing only values not followed too: its parameters may be anything)
+            if ts.iter().any(|t| !carrying_parts(cx, t).is_empty()) {
+                for callee in names {
+                    out.calls.push(LocalCall {
+                        callee: callee.clone(),
+                        caller: here.clone(),
+                        args: cargs_o.clone(),
+                    });
+                }
             }
             continue;
+        }
+        // a closure of this crate built here and handed only to a combinator of the standard
+        // library that runs it on the receiver's value or elements (`algs.iter().map(|a|
+        // digest(a, d))`, `o.map(|a| ..)`): its parameter receives that value (a closure
+        // value used otherwise, `map(f)` of a copy of `f`, may be run elsewhere: not recorded)
+        // (or the program's function named there, `map(hash)`: each time)
+        let mut fed = None;
+        if cx.is_std(&krate)
+            && let Some(i) = fed_argument(tcx, cdid)
+            && let (Some(r), Some(a)) = (args.first(), args.get(i))
+            && let Ok(aty) = a.ty(locals)
+            && let aty = rustc_internal::internal(tcx, aty)
+            && match (a, aty.kind()) {
+                (rustc_public::mir::Operand::Move(c), rustc_middle::ty::Closure(..)) => {
+                    c.projection.is_empty() && closure_moved_once(body, c.local)
+                }
+                (rustc_public::mir::Operand::Constant(_), rustc_middle::ty::FnDef(..)) => true,
+                _ => false,
+            }
+            && let [names] = runnables(cx, aty, true).as_slice()
+        {
+            fed = Some(i);
+            let input = origins.operand_at(r, bb, idx);
+            for callee in names {
+                out.calls.push(LocalCall {
+                    callee: callee.clone(),
+                    caller: here.clone(),
+                    args: vec![input.clone()],
+                });
+            }
+        }
+        // a closure or a function of the program handed as a value to code whose calls of it
+        // are not recorded, the standard library's (a combinator above aside: `map(f)` of a
+        // copy of `f`, `sort_by(f)`; not one only storing it, `Box::new(f)`) or a stop crate's:
+        // it may be run there with any value
+        if (cx.is_std(&krate) && !stores_only(&path_of(tcx, cdid))) || cx.stop_crate(cdid.krate) {
+            for (i, a) in args.iter().enumerate() {
+                if Some(i) != fed
+                    && let Ok(t) = a.ty(locals)
+                {
+                    escaped.extend(runnables(cx, rustc_internal::internal(tcx, t), true).concat());
+                }
+            }
         }
         // a call of a function whose code is analysed (not the standard library's, nor a stop
         // crate's), passing values that can carry an algorithm or a key
@@ -754,6 +819,16 @@ pub(crate) fn body_links(
                 caller: here.clone(),
                 args,
             });
+        }
+    }
+    for callee in escaped {
+        let c = LocalCall {
+            callee,
+            caller: here.clone(),
+            args: vec![Origin::Unknown],
+        };
+        if !out.calls.contains(&c) {
+            out.calls.push(c);
         }
     }
     // a static whose contents change at run time starts with its initializer's value (a
@@ -1648,6 +1723,148 @@ fn local_key<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> bool {
         }
         _ => false,
     }
+}
+
+/// The argument of a standard-library combinator that is a function it runs on the receiver
+/// taken by value: on an `Option`'s or a `Result`'s value (`map(f)`, `and_then(f)`,
+/// `is_some_and(f)`, `map_or(d, f)`'s `f`), on each of an iterator's elements (`map(f)`,
+/// `filter_map(f)`, `find_map(f)`, `flat_map(f)`, `for_each(f)`).
+fn fed_argument(tcx: rustc_middle::ty::TyCtxt<'_>, did: DefId) -> Option<usize> {
+    use rustc_span::sym;
+    let iterator = tcx
+        .trait_of_assoc(did)
+        .is_some_and(|t| tcx.is_diagnostic_item(sym::Iterator, t));
+    let of = |s| {
+        tcx.impl_of_assoc(did)
+            .and_then(|i| {
+                tcx.type_of(i)
+                    .instantiate_identity()
+                    .skip_norm_wip()
+                    .ty_adt_def()
+            })
+            .is_some_and(|a| tcx.is_diagnostic_item(s, a.did()))
+    };
+    let value = || of(sym::Option) || of(sym::Result);
+    match tcx.item_name(did).as_str() {
+        "map" | "filter_map" | "find_map" | "flat_map" | "for_each" if iterator => Some(1),
+        "map" | "and_then" if value() => Some(1),
+        "is_some_and" if of(sym::Option) => Some(1),
+        "is_ok_and" if of(sym::Result) => Some(1),
+        "map_or" | "map_or_else" if value() => Some(2),
+        _ => None,
+    }
+}
+
+/// Functions of the standard library that store a value given them, or hand it back, without
+/// running it (`Box::new(f)`, `v.push(f)`): a closure or a function there is run where it is
+/// called later, as itself (`v[0](x)`, recorded there) or as a trait object made of it.
+const STORES: &[&str] = &[
+    "Box::new",
+    "Box::pin",
+    "Rc::new",
+    "Arc::new",
+    "Pin::new",
+    "Cell::new",
+    "RefCell::new",
+    "Mutex::new",
+    "RwLock::new",
+    "Vec::push",
+    "Vec::insert",
+    "VecDeque::push_back",
+    "VecDeque::push_front",
+    "HashMap::insert",
+    "BTreeMap::insert",
+    "Option::insert",
+    "Option::replace",
+    "Option::get_or_insert",
+    "mem::replace",
+    "mem::swap",
+    "mem::drop",
+    "mem::forget",
+    "iter::once",
+    "convert::identity",
+];
+
+/// Is the standard library's function at `path` (`alloc::boxed::Box::<T>::new`) one of `STORES`?
+fn stores_only(path: &str) -> bool {
+    let segs: Vec<&str> = path.split("::").filter(|s| !s.starts_with('<')).collect();
+    segs.len() >= 2 && STORES.contains(&segs[segs.len() - 2..].join("::").as_str())
+}
+
+/// The closure of this crate a value of type `ty` is (behind references or a `Box`), and with
+/// `fns` the program's function it names (`FnDef`: not the standard library's nor a stop
+/// crate's): the names its calls are recorded under (a generic function's instance too). Not
+/// one held in another value: an adaptor a combinator makes of it (`Map<I, F>`) runs it only on
+/// what it was given there, and one in a value of the program's is called where that value is
+/// used (`(s.f)(x)`, as itself).
+fn runnables<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>, fns: bool) -> Vec<Vec<String>> {
+    use rustc_middle::ty::TyKind as K;
+    let tcx = cx.tcx;
+    let mut out = Vec::new();
+    let mut work = vec![(ty, 0)];
+    while let Some((t, depth)) = work.pop() {
+        if depth > 4 {
+            continue;
+        }
+        match *t.kind() {
+            K::Closure(cl, _) if cl.is_local() => out.push(vec![path_of(tcx, cl)]),
+            K::FnDef(fd, args)
+                if fns
+                    && !cx.stop_crate(fd.krate)
+                    && !cx.is_std(tcx.crate_name(fd.krate).as_str()) =>
+            {
+                let mut names = vec![path_of(tcx, fd)];
+                names.extend(crate::origins::runs_of(tcx, fd, args.skip_binder()));
+                out.push(names);
+            }
+            K::Ref(_, i, _) | K::RawPtr(i, _) => work.push((i, depth + 1)),
+            K::Adt(def, args) if def.is_box() => work.push((args.type_at(0), depth + 1)),
+            _ => {}
+        }
+    }
+    out
+}
+
+/// Is `local` defined once, by a closure literal, and used once besides (`move _6` into the
+/// call that takes it)?
+fn closure_moved_once(body: &Body, local: rustc_public::mir::Local) -> bool {
+    use rustc_public::mir::MirVisitor;
+    use rustc_public::mir::visit::{Location, PlaceContext};
+    struct V {
+        local: rustc_public::mir::Local,
+        defs: usize,
+        uses: usize,
+    }
+    impl MirVisitor for V {
+        fn visit_place(
+            &mut self,
+            place: &rustc_public::mir::Place,
+            ptx: PlaceContext,
+            _: Location,
+        ) {
+            if place.local == self.local {
+                if ptx.is_mutating() && place.projection.is_empty() {
+                    self.defs += 1;
+                } else {
+                    self.uses += 1;
+                }
+            }
+        }
+        // (a debugger's name for it is no use)
+        fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
+    }
+    let mut v = V {
+        local,
+        defs: 0,
+        uses: 0,
+    };
+    v.visit_body(body);
+    v.defs == 1
+        && v.uses == 1
+        && body.blocks.iter().flat_map(|b| &b.statements).any(|st| {
+            matches!(&st.kind, StatementKind::Assign(p, Rvalue::Aggregate(AggregateKind::Closure(..), _))
+                if p.local == local && p.projection.is_empty())
+        })
 }
 
 /// Does the body use parameter `local`, a value holding `&mut`s at `fields` (behind it when
