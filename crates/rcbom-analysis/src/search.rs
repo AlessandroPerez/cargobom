@@ -1659,6 +1659,7 @@ mod tests {
             args: vec![data("ring", "ring::digest::SHA256")],
             self_ty: self_ty.map(str::to_string),
             place_ty: None,
+            path: Vec::new(),
         }
     }
 
@@ -1672,6 +1673,7 @@ mod tests {
             func: format!("<app::{v} as app::Up>::up"),
             index: 0,
             value: data("ring", &format!("ring::digest::{v}")),
+            path: Vec::new(),
         };
         let ix = index(Links {
             writes: vec![w("SHA384"), w("SHA512")],

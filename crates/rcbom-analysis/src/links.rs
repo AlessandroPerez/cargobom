@@ -29,8 +29,9 @@ pub struct LinkIndex {
     arg_calls: HashMap<String, Vec<(String, Vec<Origin>)>>,
     /// By def id: (contents change at run time, values put there).
     statics: HashMap<String, (bool, Vec<Origin>)>,
-    /// By function and parameter: what it writes through the parameter.
-    writes: HashMap<(String, usize), Vec<Origin>>,
+    /// By function, parameter and the fields of a borrow it holds (none: the parameter
+    /// itself): what it writes through it.
+    writes: HashMap<(String, usize, Vec<usize>), Vec<Origin>>,
     /// By trait: the types coerced to a trait object of it, with where, and the body each
     /// method runs for them.
     coerced: HashMap<String, Vec<Coerced>>,
@@ -336,7 +337,10 @@ impl LinkIndex {
                 }
             }
             for w in &f.links.writes {
-                let v = ix.writes.entry((w.func.clone(), w.index)).or_default();
+                let v = ix
+                    .writes
+                    .entry((w.func.clone(), w.index, w.path.clone()))
+                    .or_default();
                 if !v.contains(&w.value) {
                     v.push(w.value.clone());
                 }
@@ -370,7 +374,7 @@ impl LinkIndex {
             .returns
             .keys()
             .map(|(f, _)| f.clone())
-            .chain(ix.writes.keys().map(|(f, _)| f.clone()))
+            .chain(ix.writes.keys().map(|(f, ..)| f.clone()))
             .collect();
         ix.implemented = bodies
             .iter()
@@ -554,6 +558,7 @@ impl LinkIndex {
             index,
             args,
             self_ty,
+            path: part,
             ..
         } = w
         else {
@@ -588,7 +593,7 @@ impl LinkIndex {
         };
         let mut out = Vec::new();
         for b in bodies {
-            match self.writes.get(&(b, *index)) {
+            match self.writes.get(&(b, *index, part.clone())) {
                 Some(ws) => {
                     for s in ws {
                         project(&substitute(s, args), adt, field, &mut out);
@@ -1085,6 +1090,7 @@ impl LinkIndex {
                 args,
                 self_ty,
                 place_ty,
+                path: part,
             } => {
                 let mut found = Vec::new();
                 let before = |found: &mut Found, via: &Via| {
@@ -1102,7 +1108,7 @@ impl LinkIndex {
                 match bodies {
                     Some(bodies) => {
                         for (f, by) in bodies {
-                            match self.writes.get(&(f.clone(), *index)) {
+                            match self.writes.get(&(f.clone(), *index, part.clone())) {
                                 Some(ws) => {
                                     for w in ws {
                                         // the object written is of a known type: the
@@ -1396,6 +1402,7 @@ impl LinkIndex {
                 args,
                 self_ty,
                 place_ty,
+                path,
             } => {
                 let args: Vec<Origin> =
                     args.iter().map(|a| self.specialize(a, param, ty)).collect();
@@ -1406,6 +1413,7 @@ impl LinkIndex {
                         args,
                         self_ty: self_ty.clone(),
                         place_ty: place_ty.clone(),
+                        path: path.clone(),
                     };
                 }
                 match self_ty.as_deref().and_then(|t| t.strip_prefix("dyn ")) {
@@ -1431,6 +1439,7 @@ impl LinkIndex {
                             args,
                             self_ty: None,
                             place_ty: None,
+                            path: path.clone(),
                         }
                     }
                     // a function the object is passed on to
@@ -1440,6 +1449,7 @@ impl LinkIndex {
                         args,
                         self_ty: self_ty.clone(),
                         place_ty: Some(ty.to_string()),
+                        path: path.clone(),
                     },
                 }
             }
@@ -1775,12 +1785,14 @@ pub(crate) fn substitute(r: &Origin, args: &[Origin]) -> Origin {
             args: inner,
             self_ty,
             place_ty,
+            path,
         } => Origin::Written {
             callee: callee.clone(),
             index: *index,
             args: inner.iter().map(|a| substitute(a, args)).collect(),
             self_ty: self_ty.clone(),
             place_ty: place_ty.clone(),
+            path: path.clone(),
         },
         Origin::Call {
             callee,
