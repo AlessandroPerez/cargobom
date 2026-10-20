@@ -787,6 +787,7 @@ impl Flow {
                             continue;
                         }
                         let held = ptr.held(h);
+                        let lost = ptr.lost.get();
                         note(
                             *at,
                             if is_mut_ptr(body, p) {
@@ -797,6 +798,15 @@ impl Flow {
                             &mut cut_at,
                             &mut lost_at,
                         );
+                        // (lent by `&mut`, `pset(&mut v)` of a `vec![&mut x]`: a write not
+                        // followed through what it holds lands where its borrows point, a place
+                        // of their pointee's type, not of the holder's)
+                        if lost && is_mut_ptr(body, p) {
+                            match pointee(p).and_then(|t| mut_pointees(tcx, t)) {
+                                Some(ts) => lost_at.extend(ts.into_iter().map(|t| (*at, Some(t)))),
+                                None => lost_at.push((*at, None)),
+                            }
+                        }
                         for (targets, single) in held {
                             for Target {
                                 local: t, path: tp, ..
@@ -3718,9 +3728,16 @@ fn capture_writes(tcx: TyCtxt<'_>, did: rustc_public::DefId, k: usize) -> Option
 type Capture = (usize, Vec<Target>, bool);
 
 /// Does a pointer with these targets point at one place? The aliases stand for the place they
-/// point at, not for another one.
+/// point at, not for another one; a place found twice (a copy of a parameter's pointer, which
+/// points where the parameter does) is one.
 fn sole_target(targets: &[Target]) -> bool {
-    targets.iter().filter(|t| !t.alias).count() == 1
+    let mut places = targets
+        .iter()
+        .filter(|t| !t.alias)
+        .map(|t| (t.local, &t.path));
+    places
+        .next()
+        .is_some_and(|first| places.all(|other| other == first))
 }
 
 /// The defining path of the function a call operand names.
@@ -3972,6 +3989,59 @@ fn holds_mut_borrow<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, dept
         }
         _ => false,
     }
+}
+
+/// The types the `&mut` borrows a value of type `t` holds point to (`&D` of a `Vec<&mut &D>`,
+/// `T` of a `W<'a> { r: &'a mut T }`, a closure's capture's); none when what it holds is not
+/// known (a type parameter, an opaque type, a trait object with a borrowed lifetime).
+fn mut_pointees<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+) -> Option<Vec<rustc_middle::ty::Ty<'tcx>>> {
+    fn walk<'tcx>(
+        tcx: TyCtxt<'tcx>,
+        t: rustc_middle::ty::Ty<'tcx>,
+        depth: usize,
+        out: &mut Vec<rustc_middle::ty::Ty<'tcx>>,
+    ) -> bool {
+        use rustc_middle::ty::TyKind as K;
+        if depth > 6 {
+            return false;
+        }
+        match t.kind() {
+            K::Ref(_, i, rustc_middle::ty::Mutability::Mut)
+            | K::RawPtr(i, rustc_middle::ty::Mutability::Mut) => {
+                out.push(*i);
+                walk(tcx, *i, depth + 1, out)
+            }
+            K::Ref(_, i, _) | K::RawPtr(i, _) | K::Array(i, _) | K::Slice(i) => {
+                walk(tcx, *i, depth + 1, out)
+            }
+            K::Tuple(ts) => ts.iter().all(|t| walk(tcx, t, depth + 1, out)),
+            K::Closure(_, args) => walk(tcx, args.as_closure().tupled_upvars_ty(), depth + 1, out),
+            K::Coroutine(_, args) => {
+                walk(tcx, args.as_coroutine().tupled_upvars_ty(), depth + 1, out)
+            }
+            K::CoroutineClosure(_, args) => walk(
+                tcx,
+                args.as_coroutine_closure().tupled_upvars_ty(),
+                depth + 1,
+                out,
+            ),
+            K::Param(_) | K::Alias(..) => false,
+            K::Dynamic(_, r) => r.is_static(),
+            K::Adt(def, args) => {
+                args.types().all(|x| walk(tcx, x, depth + 1, out))
+                    && (args.regions().next().is_none()
+                        || def.all_fields().all(|f| {
+                            walk(tcx, f.ty(tcx, args).skip_normalization(), depth + 1, out)
+                        }))
+            }
+            _ => true,
+        }
+    }
+    let mut out = Vec::new();
+    walk(tcx, t, 0, &mut out).then_some(out)
 }
 
 /// Standard-library methods taking a shared borrow of a cell and returning a guard through
