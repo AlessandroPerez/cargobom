@@ -686,6 +686,13 @@
             "symbol": "a118::UPD"
           },
           {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a118::BASE`; line: `let _ = digest(AREF[i].h, &d);`; code: `digest`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in a118::main; a118::AREF -> ring::digest::SHA384; line: `let _ = digest(AREF[i].h, &d);`; code: `AREF`",
             "line": 40,
             "location": "src/main.rs",
@@ -774,7 +781,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "33"
+          "value": "34"
         }
       ],
       "type": "cryptographic-asset"
@@ -857,6 +864,13 @@
             "symbol": "a118::TP"
           },
           {
+            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `const a118::FIX`; line: `let _ = digest(AREF[i].h, &d);`; code: `digest`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in a118::main; a118::AREF -> ring::digest::SHA512; line: `let _ = digest(AREF[i].h, &d);`; code: `AREF`",
             "line": 40,
             "location": "src/main.rs",
@@ -910,62 +924,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a118::main; use: digest; algorithm unresolved: a field of `a118::AREF` the analysis does not follow (the data holds several algorithms); line: `let _ = digest(AREF[i].h, &d);`; code: `digest`",
-            "line": 40,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "14"
         }
       ],
       "type": "cryptographic-asset"
@@ -990,8 +949,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1010,10 +968,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -1074,7 +1028,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:145d14f4-db63-8af1-91e2-f5bceeac09e5",
+  "serialNumber": "urn:uuid:30c8f310-71f0-89b8-bc4a-e632f0b55ea5",
   "specVersion": "1.7",
   "version": 1
 }

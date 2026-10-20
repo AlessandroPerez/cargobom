@@ -123,7 +123,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a150::p3; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a150::p3; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 64,
@@ -301,6 +301,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a150::p3; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 64,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a150::set4; line: `fn set4(c: &Cell<A>) { c.set(&SHA512) }`; code: `SHA512`",
             "line": 22,
             "location": "src/main.rs",
@@ -417,7 +424,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
+          "value": "16"
         }
       ],
       "type": "cryptographic-asset"
@@ -440,13 +447,6 @@
             "line": 15,
             "location": "src/main.rs",
             "offset": 74,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a150::p3; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `a150::run3` is not followed; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `digest`",
-            "line": 19,
-            "location": "src/main.rs",
-            "offset": 64,
             "symbol": "ring::digest::digest"
           },
           {
@@ -521,7 +521,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -620,7 +620,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c8fa57af-fd87-8c38-b32e-6818333ece11",
+  "serialNumber": "urn:uuid:1320e9f9-adb7-8c52-be9c-8682154d7024",
   "specVersion": "1.7",
   "version": 1
 }

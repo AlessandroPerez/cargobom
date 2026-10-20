@@ -144,7 +144,7 @@
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a105::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `a105::live_unknown`; line: `let _ = digest(live_unknown(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a105::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `a105::live_unknown`; line: `let _ = digest(live_unknown(), &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
@@ -287,6 +287,20 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[present] [call] in a105::ha; use: digest; algorithm ring::digest::SHA384 only through code or data no entry point reaches; line: `fn ha(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "line": 4,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[present] [call] in a105::hb; use: digest; algorithm ring::digest::SHA384 only through code or data no entry point reaches; line: `fn hb(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "line": 5,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a105::live_unknown::{closure#0}; instantiated by a105::live_unknown at src/main.rs:7:97 as `|_| a = &SHA384`; line: `fn live_unknown() -> &'static Digest { let mut a: &'static Digest = &SHA1; [0u8].iter().for_each(|_| a = &SHA384); a }`; code: `SHA384`",
             "line": 7,
             "location": "src/main.rs",
@@ -299,6 +313,13 @@
             "location": "src/main.rs",
             "offset": 89,
             "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a105::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `a105::live_unknown`; line: `let _ = digest(live_unknown(), &d);`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -318,7 +339,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -326,7 +347,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -345,6 +366,13 @@
       },
       "evidence": {
         "occurrences": [
+          {
+            "additionalContext": "[present] [call] in a105::hc; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; line: `fn hc(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::digest"
+          },
           {
             "additionalContext": "[present] [static] in a105::dead_unknown::{closure#0}; line: `fn dead_unknown() -> &'static Digest { let mut a: &'static Digest = &SHA1; [0u8].iter().for_each(|_| a = &SHA512); a }`; code: `SHA512`",
             "line": 9,
@@ -370,57 +398,6 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a105::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(live_unknown(), &d);`; code: `digest`",
-            "line": 22,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
           "value": "observed"
         },
         {
@@ -428,12 +405,8 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -458,8 +431,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -478,10 +450,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -542,7 +510,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:05af2fb5-2876-8ef9-8d45-57debff0b384",
+  "serialNumber": "urn:uuid:08c87c87-050d-8c36-ba3c-118661f24464",
   "specVersion": "1.7",
   "version": 1
 }

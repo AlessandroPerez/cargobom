@@ -496,6 +496,13 @@
             "symbol": "ring::digest::digest"
           },
           {
+            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v.get(i).map_or(&SHA512, |a| *a), &d);`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `let _ = digest(v.get(i).copied().or(Some(&SHA512)).unwrap(), &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
@@ -598,7 +605,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
+          "value": "14"
         }
       ],
       "type": "cryptographic-asset"
@@ -740,7 +747,7 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA512 in the arguments; line: `let _ = digest(v.get(i).map_or(&SHA512, |a| *a), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(v.get(i).map_or(&SHA512, |a| *a), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
@@ -895,61 +902,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a83::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(v.get(i).map_or(&SHA512, |a| *a), &d);`; code: `digest`",
-            "line": 18,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -974,8 +926,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1008,10 +959,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -1072,7 +1019,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:64289558-4db2-8337-b9e2-1fd41ad297b1",
+  "serialNumber": "urn:uuid:dc03b680-87b3-88a7-9db9-3952099f1ec9",
   "specVersion": "1.7",
   "version": 1
 }

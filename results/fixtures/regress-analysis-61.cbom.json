@@ -312,7 +312,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 105,
             "location": "src/main.rs",
             "offset": 12,
@@ -326,7 +326,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x12, &d); // SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(x12, &d); // SHA-384`; code: `digest`",
             "line": 109,
             "location": "src/main.rs",
             "offset": 12,
@@ -488,6 +488,13 @@
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(x12, &d); // SHA-384`; code: `digest`",
+            "line": 109,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -515,7 +522,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "16"
+          "value": "17"
         }
       ],
       "type": "cryptographic-asset"
@@ -638,6 +645,13 @@
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
+            "line": 105,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -665,7 +679,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
+          "value": "16"
         }
       ],
       "type": "cryptographic-asset"
@@ -738,20 +752,6 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `core::iter::traits::iterator::Iterator::for_each`, a standard-library call the analysis does not model is not followed; line: `let _ = digest(x11, &d); // SHA-256, SHA-512`; code: `digest`",
-            "line": 105,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a61::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `a61::run` is not followed; line: `let _ = digest(x12, &d); // SHA-384`; code: `digest`",
-            "line": 109,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -783,7 +783,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "10"
+          "value": "8"
         }
       ],
       "type": "cryptographic-asset"
@@ -892,7 +892,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0e39247a-5113-86cc-9efa-f03728166545",
+  "serialNumber": "urn:uuid:bd68a523-5c33-8eda-943f-0dcafa7e8d87",
   "specVersion": "1.7",
   "version": 1
 }

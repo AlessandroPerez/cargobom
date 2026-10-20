@@ -20,7 +20,9 @@
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:27 | a124::C1 | [reachable] [via-static] in a124::AREF3; a124::C1 -> ring::digest::SHA384; line: `static AREF3: &[&Cfg] = &[&C1, &C2];`; code: `C1`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:12:42 | a124::S1 | [reachable] [via-static] in a124::NAMED; a124::S1 -> ring::digest::SHA384; line: `static NAMED: [(&str, &Cfg); 2] = [("a", &S1), ("b", &S2)];`; code: `S1`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:15:50 | ring::digest::SHA384 | [reachable] [static] in a124::CN::__rust_std_internal_init_fn; line: `static CN: Cell<&'static Digest> = Cell::new(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `static a124::S1`; line: `let _ = digest(AREF2[i].h, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:19 | a124::AREF2 | [reachable] [via-static] in a124::main; a124::AREF2 -> ring::digest::SHA384; line: `let _ = digest(AREF2[i].h, &d);`; code: `AREF2`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `const a124::C1`; line: `let _ = digest(AREF3[i].h, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:19 | a124::AREF3 | [reachable] [via-static] in a124::main; a124::AREF3 -> ring::digest::SHA384; line: `let _ = digest(AREF3[i].h, &d);`; code: `AREF3`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: table, stored by `static a124::S1`; line: `let _ = digest(NAMED[i].1.h, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:19 | a124::NAMED | [reachable] [via-static] in a124::main; a124::NAMED -> ring::digest::SHA384; line: `let _ = digest(NAMED[i].1.h, &d);`; code: `NAMED`
@@ -35,7 +37,9 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:54 | a124::S2 | [reachable] [via-static] in a124::NAMED; a124::S2 -> ring::digest::SHA512; line: `static NAMED: [(&str, &Cfg); 2] = [("a", &S1), ("b", &S2)];`; code: `S2`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:13:0 | a124::RK::__RUST_STD_INTERNAL_INIT | [reachable] [via-static] [macro thread_local!] in a124::RK::{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL; a124::RK::__RUST_STD_INTERNAL_INIT -> ring::digest::SHA512; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:67; expanded from /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/std/src/sys/thread_local/native/mod.rs:74; line: `thread_local! {`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:16:64 | ring::digest::SHA512 | [reachable] [static] in a124::RK::__RUST_STD_INTERNAL_INIT; line: `static RK: RefCell<&'static Digest> = const { RefCell::new(&SHA512) };`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `static a124::S2`; line: `let _ = digest(AREF2[i].h, &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:19 | a124::AREF2 | [reachable] [via-static] in a124::main; a124::AREF2 -> ring::digest::SHA512; line: `let _ = digest(AREF2[i].h, &d);`; code: `AREF2`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `const a124::C2`; line: `let _ = digest(AREF3[i].h, &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:19 | a124::AREF3 | [reachable] [via-static] in a124::main; a124::AREF3 -> ring::digest::SHA512; line: `let _ = digest(AREF3[i].h, &d);`; code: `AREF3`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: table, stored by `static a124::S2`; line: `let _ = digest(NAMED[i].1.h, &d);`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:25:19 | a124::NAMED | [reachable] [via-static] in a124::main; a124::NAMED -> ring::digest::SHA512; line: `let _ = digest(NAMED[i].1.h, &d);`; code: `NAMED`
@@ -45,8 +49,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a124 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a124 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm unresolved: a field of `a124::AREF2` the analysis does not follow (the data holds several algorithms); line: `let _ = digest(AREF2[i].h, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm unresolved: a field of `a124::AREF3` the analysis does not follow (the data holds several algorithms); line: `let _ = digest(AREF3[i].h, &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:26:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(CK.get(), &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm unresolved: the result of `std::thread::local::LocalKey::<T>::with`; line: `let _ = digest(CK.with(|c| c.get()), &d);`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:28:12 | ring::digest::digest | [reachable] [call] in a124::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(CN.get(), &d);`; code: `digest`
@@ -69,13 +71,13 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
-  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=13
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=15
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=11
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=13
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -90,7 +92,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=7
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=5
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}

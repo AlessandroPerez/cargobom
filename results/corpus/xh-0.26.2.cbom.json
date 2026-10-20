@@ -4761,6 +4761,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "1"
         }
@@ -7813,21 +7817,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in reqwest::async_impl::client::ClientBuilder::build; line: `rustls::ClientConfig::builder_with_provider(provider.clone())`; code: `rustls::ClientConfig::builder_with_provider`",
+            "additionalContext": "[reachable] [call] in reqwest::async_impl::client::ClientBuilder::build; builder_with_provider: configuration, not a connection; line: `rustls::ClientConfig::builder_with_provider(provider.clone())`; code: `rustls::ClientConfig::builder_with_provider`",
             "line": 726,
             "location": "reqwest-0.13.4/src/async_impl/client.rs",
             "offset": 24,
             "symbol": "rustls::client::client_conn::ClientConfig::builder_with_provider"
           },
           {
-            "additionalContext": "[reachable] [call] in reqwest::async_impl::client::default_rustls_crypto_provider; line: `Arc::new(rustls::crypto::aws_lc_rs::default_provider())`; code: `rustls::crypto::aws_lc_rs::default_provider`",
+            "additionalContext": "[reachable] [call] in reqwest::async_impl::client::default_rustls_crypto_provider; default_provider: configuration, not a connection; line: `Arc::new(rustls::crypto::aws_lc_rs::default_provider())`; code: `rustls::crypto::aws_lc_rs::default_provider`",
             "line": 2493,
             "location": "reqwest-0.13.4/src/async_impl/client.rs",
             "offset": 13,
             "symbol": "rustls::crypto::aws_lc_rs::default_provider"
           },
           {
-            "additionalContext": "[present] [call] in <rustls::client::client_conn::ClientConfig as rustls_platform_verifier::ConfigVerifierExt>::with_platform_verifier; line: `Ok(ClientConfig::builder()`; code: `ClientConfig::builder`",
+            "additionalContext": "[present] [call] in <rustls::client::client_conn::ClientConfig as rustls_platform_verifier::ConfigVerifierExt>::with_platform_verifier; builder: configuration, not a connection; line: `Ok(ClientConfig::builder()`; code: `ClientConfig::builder`",
             "line": 88,
             "location": "rustls-platform-verifier-0.7.0/src/lib.rs",
             "offset": 11,
@@ -8357,7 +8361,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cb936779-6707-88b3-acbe-6a7e77c785ed",
+  "serialNumber": "urn:uuid:531ed222-4330-8ce5-96aa-414bbd4a422c",
   "specVersion": "1.7",
   "version": 1
 }
