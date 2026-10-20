@@ -4203,10 +4203,16 @@ impl Files<'_> {
                         .params
                         .iter()
                         .any(|p| !body_assigns(&src, f, p, 3).is_empty());
-                    let writes = sig
-                        .params
-                        .iter()
-                        .any(|(p, ty)| (p == "self" || ty.contains("&mut")) && !neutral_type(ty));
+                    // (or a value of the file's type holding a `&mut`: `fn wset(w: W)` with `W {
+                    // slot: &mut D }`, writing the caller's variable through it)
+                    let holder = |ty: &str| {
+                        struct_fields(&src, &type_name(ty)).is_some_and(|(a, b)| {
+                            re!(r"&\s*(?:'\w+\s+)?mut\b").is_match(&src.text(a, b))
+                        })
+                    };
+                    let writes = sig.params.iter().any(|(p, ty)| {
+                        (p == "self" || ty.contains("&mut") || holder(ty)) && !neutral_type(ty)
+                    });
                     if (!replaced && carrying) || (beside && writes) {
                         return Ok(());
                     }
@@ -8100,8 +8106,8 @@ fn impl_of<'a>(src: &'a Source, f: &Item) -> Option<&'a Item> {
         .max_by_key(|b| b.start)
 }
 
-/// The declared type of field `field` (a name, or a tuple index) of the file's struct `ty`.
-fn field_type(src: &Source, ty: &str, field: &str) -> Option<String> {
+/// The brackets around the fields of the file's struct `ty` (`{ .. }` or `( .. )`).
+fn struct_fields(src: &Source, ty: &str) -> Option<(usize, usize)> {
     let s = &src.code;
     let def = src.items.iter().find(|it| {
         it.kind == ItemKind::TypeDef && it.name == ty && kw(s, src.idx(it.start), "struct")
@@ -8114,7 +8120,13 @@ fn field_type(src: &Source, ty: &str, field: &str) -> Option<String> {
         i = skip_blank(s, i + skip_angle(&s[i..], &cls, 0)?);
     }
     let open = scan_to(s, i, s.len(), |k| matches!(s[k], '{' | '(' | ';'));
-    let close = close_of_at(s, open)?;
+    Some((open, close_of_at(s, open)?))
+}
+
+/// The declared type of field `field` (a name, or a tuple index) of the file's struct `ty`.
+fn field_type(src: &Source, ty: &str, field: &str) -> Option<String> {
+    let s = &src.code;
+    let (open, close) = struct_fields(src, ty)?;
     let fields = split_top(&src.text(open + 1, close));
     if s[open] == '(' {
         let k: usize = field.parse().ok()?;
