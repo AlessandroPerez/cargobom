@@ -112,6 +112,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             fns: Vec::new(),
             paths: Vec::new(),
             coercions: BTreeMap::new(),
+            dyn_used: HashSet::new(),
+            pending: HashMap::new(),
+            dyn_cache: HashMap::new(),
             limit,
         }
     }
@@ -122,6 +125,18 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         static_roots: Vec<rustc_span::def_id::DefId>,
     ) -> Reach {
         for root in roots {
+            // (a trait object a root takes or returns: its caller, not walked, may call it)
+            let tcx = self.cx.tcx;
+            let i = rustc_internal::internal(tcx, root);
+            if !tcx.is_closure_like(i.def_id()) {
+                let sig = tcx
+                    .fn_sig(i.def_id())
+                    .instantiate(tcx, i.args)
+                    .skip_binder();
+                for t in sig.inputs_and_output {
+                    self.use_dyn(t);
+                }
+            }
             self.enqueue(root, None);
         }
         for s in static_roots {
@@ -164,6 +179,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             statics,
             fns,
             paths,
+            generic: Vec::new(),
             crates,
             crates_complete: !truncated && usage_complete,
             points_to: None,
@@ -310,6 +326,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let Some(body) = inst.body().map(|b| live_body(self.cx.tcx, &b)) else {
             return;
         };
+        let stop = self.cx.stop_crate(did.krate);
+        let shim = matches!(inst.kind, InstanceKind::Shim);
+        let program = !usage
+            && !stop
+            && !shim
+            && !self.cx.is_std(self.cx.tcx.crate_name(did.krate).as_str())
+            && !self.cx.impl_crate(did.krate);
         let mut edges = Edges {
             tcx: self.cx.tcx,
             body: &body,
@@ -319,6 +342,10 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             unconvertible: has_unconvertible(self.cx.tcx, &body),
             errors: 0,
             dest: None,
+            program,
+            deferred: Vec::new(),
+            used: Vec::new(),
+            calls: Vec::new(),
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
@@ -342,7 +369,6 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         if debug.is_some() {
             eprintln!("rcbom-walk: {} ({:?})", inst.name(), inst.kind);
         }
-        let stop = self.cx.stop_crate(did.krate);
         if !usage
             && !stop
             && let Some(p) = self.cx.pta.as_mut()
@@ -352,7 +378,6 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // a shim's body is the compiler's (a `dyn` method behind a function pointer, drop glue,
         // `<closure as FnOnce>::call_once`): what it calls is walked, but none of it is code
         // written at the span it carries (the trait method's declaration)
-        let shim = matches!(inst.kind, InstanceKind::Shim);
         if usage {
             let mut v = AllocStatics(Vec::new());
             v.visit_body(&body);
@@ -427,7 +452,62 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 self.reach_static(rustc_internal::internal(self.cx.tcx, s.def_id()));
             }
         }
-        for (callee, span) in edges.found {
+        // the trait objects this body uses: called through one (anywhere walked); handed by the
+        // program's code to code not walked as the program's (the standard library's, a stop
+        // crate's, through a pointer), or returned by it, where it may be called
+        let tcx = self.cx.tcx;
+        let mut used: Vec<rustc_middle::ty::Ty<'tcx>> = Vec::new();
+        for (callee, tys) in std::mem::take(&mut edges.calls) {
+            let virtual_call =
+                callee.is_some_and(|c| matches!(c.kind, InstanceKind::Virtual { .. }));
+            let handed = program
+                && callee.is_none_or(|c| {
+                    let d = rustc_internal::internal(tcx, c.def.def_id());
+                    !drops_only(tcx, d)
+                        && (self.cx.is_std(tcx.crate_name(d.krate).as_str())
+                            || self.cx.stop_crate(d.krate)
+                            || self.cx.impl_crate(d.krate)
+                            || tcx.is_foreign_item(d))
+                });
+            if virtual_call {
+                used.extend(tys.first().map(|t| rustc_internal::internal(tcx, *t)));
+            } else if handed {
+                used.extend(tys.iter().map(|t| rustc_internal::internal(tcx, *t)));
+            }
+        }
+        if program && let Some(r) = body.locals().first() {
+            used.push(rustc_internal::internal(tcx, r.ty));
+        }
+        let mut newly: Vec<String> = std::mem::take(&mut edges.used)
+            .into_iter()
+            .filter(|k| self.dyn_used.insert(k.clone()))
+            .collect();
+        for t in used {
+            newly.extend(self.use_dyn(t));
+        }
+        // (a coercion or a closure made a trait object here: an edge now if such an object is
+        // used, else when one is)
+        let mut found = std::mem::take(&mut edges.found);
+        for (key, methods, span) in std::mem::take(&mut edges.deferred) {
+            if self.dyn_used.contains(&key) {
+                found.extend(methods.into_iter().map(|m| (m, span)));
+            } else {
+                let p = self.pending.entry(key).or_default();
+                p.extend(methods.into_iter().map(|m| (m, inst, span)));
+            }
+        }
+        for k in newly {
+            for (callee, from, span) in self.pending.remove(&k).unwrap_or_default() {
+                let loc = locate_stable(tcx, span).0;
+                let internal = rustc_internal::internal(tcx, span);
+                let text = callee_span(tcx, internal)
+                    .is_none()
+                    .then(|| span_text(tcx, internal))
+                    .flatten();
+                self.enqueue(callee, Some((from, loc, text)));
+            }
+        }
+        for (callee, span) in found {
             if debug.is_some() {
                 eprintln!("rcbom-walk:   -> {} ({:?})", callee.name(), callee.kind);
             }
@@ -447,6 +527,56 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 .flatten();
             self.enqueue(callee, Some((inst, loc, text)));
         }
+    }
+
+    /// The trait objects a value of type `t` holds may be called: those not used before.
+    fn use_dyn(&mut self, t: rustc_middle::ty::Ty<'tcx>) -> Vec<String> {
+        let keys = self.dyn_keys(t, 0);
+        keys.into_iter()
+            .filter(|k| self.dyn_used.insert(k.clone()))
+            .collect()
+    }
+
+    /// The trait objects (`dyn_key`) a value of type `t` may hold: in its type, and in the
+    /// fields of the structs and enums of other crates than the standard library's in it
+    /// (`Hold { cb: Box<dyn Fn()> }`).
+    fn dyn_keys(&mut self, t: rustc_middle::ty::Ty<'tcx>, depth: usize) -> Vec<String> {
+        // (only a whole answer is kept: one a level down does not look at its fields' fields)
+        if depth == 0
+            && let Some(k) = self.dyn_cache.get(&t)
+        {
+            return k.clone();
+        }
+        let tcx = self.cx.tcx;
+        let mut out: Vec<String> = Vec::new();
+        for g in t.walk() {
+            let Some(t) = g.as_type() else { continue };
+            match t.kind() {
+                rustc_middle::ty::Dynamic(preds, ..) => {
+                    if let Some(k) = dyn_key(tcx, preds)
+                        && !out.contains(&k)
+                    {
+                        out.push(k);
+                    }
+                }
+                rustc_middle::ty::Adt(adt, args)
+                    if depth < 3 && !self.cx.is_std(tcx.crate_name(adt.did().krate).as_str()) =>
+                {
+                    for f in adt.all_fields() {
+                        for k in self.dyn_keys(f.ty(tcx, args).skip_norm_wip(), depth + 1) {
+                            if !out.contains(&k) {
+                                out.push(k);
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+        if depth == 0 {
+            self.dyn_cache.insert(t, out.clone());
+        }
+        out
     }
 
     /// A type is coerced to a trait object at `at` (in a function's body, a constant's or a
@@ -516,49 +646,61 @@ impl MirVisitor for AllocStatics {
 /// Is `local` used anywhere in `body` but where it is assigned whole, its storage marked or it
 /// is dropped (a closure built and never called, passed on, stored or returned is not)?
 pub(super) fn local_used(body: &Body, local: rustc_public::mir::Local) -> bool {
-    struct Uses {
-        local: rustc_public::mir::Local,
-        used: bool,
-    }
-    impl MirVisitor for Uses {
-        fn visit_statement(&mut self, stmt: &rustc_public::mir::Statement, loc: Location) {
-            match &stmt.kind {
-                StatementKind::StorageLive(_)
-                | StatementKind::StorageDead(_)
-                | StatementKind::FakeRead(..)
-                | StatementKind::PlaceMention(_)
-                | StatementKind::AscribeUserType { .. } => {}
-                StatementKind::Assign(p, rv)
-                    if p.local == self.local && p.projection.is_empty() =>
-                {
-                    self.visit_rvalue(rv, loc)
-                }
-                _ => self.super_statement(stmt, loc),
-            }
-        }
-        fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
-            match &term.kind {
-                TerminatorKind::Drop { place, .. } if place.local == self.local => {}
-                _ => self.super_terminator(term, loc),
-            }
-        }
-        fn visit_local(
-            &mut self,
-            local: &rustc_public::mir::Local,
-            _: rustc_public::mir::visit::PlaceContext,
-            _: Location,
-        ) {
-            self.used |= *local == self.local;
-        }
-        // (a debugger's name for it, `_never`, is no use)
-        fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
-    }
     if local == rustc_public::mir::RETURN_LOCAL {
         return true;
     }
     let mut u = Uses { local, used: false };
     u.visit_body(body);
     u.used
+}
+
+/// Whether `local` is used (as `local_used` counts uses) in what is visited.
+struct Uses {
+    local: rustc_public::mir::Local,
+    used: bool,
+}
+impl MirVisitor for Uses {
+    fn visit_statement(&mut self, stmt: &rustc_public::mir::Statement, loc: Location) {
+        match &stmt.kind {
+            StatementKind::StorageLive(_)
+            | StatementKind::StorageDead(_)
+            | StatementKind::FakeRead(..)
+            | StatementKind::PlaceMention(_)
+            | StatementKind::AscribeUserType { .. } => {}
+            StatementKind::Assign(p, rv) if p.local == self.local && p.projection.is_empty() => {
+                self.visit_rvalue(rv, loc)
+            }
+            _ => self.super_statement(stmt, loc),
+        }
+    }
+    fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
+        match &term.kind {
+            TerminatorKind::Drop { place, .. } if place.local == self.local => {}
+            // (the result of a call put in it whole: assigned)
+            TerminatorKind::Call {
+                func,
+                args,
+                destination,
+                ..
+            } if destination.local == self.local && destination.projection.is_empty() => {
+                self.visit_operand(func, loc);
+                for a in args {
+                    self.visit_operand(a, loc);
+                }
+            }
+            _ => self.super_terminator(term, loc),
+        }
+    }
+    fn visit_local(
+        &mut self,
+        local: &rustc_public::mir::Local,
+        _: rustc_public::mir::visit::PlaceContext,
+        _: Location,
+    ) {
+        self.used |= *local == self.local;
+    }
+    // (a debugger's name for it, `_never`, is no use)
+    fn visit_var_debug_info(&mut self, _: &rustc_public::mir::VarDebugInfo) {}
 }
 impl MirVisitor for Edges<'_, '_> {
     fn visit_statement(&mut self, stmt: &rustc_public::mir::Statement, loc: Location) {
@@ -591,7 +733,12 @@ impl Edges<'_, '_> {
     pub(super) fn edges_of_terminator(&mut self, term: &Terminator, loc: Location) {
         self.cur = Some(term.source_info.span);
         match &term.kind {
-            TerminatorKind::Call { func, .. } => {
+            TerminatorKind::Call { func, args, .. } => {
+                let tys = args
+                    .iter()
+                    .filter_map(|a| a.ty(self.body.locals()).ok())
+                    .collect();
+                let mut callee = None;
                 if let Ok(ty) = func.ty(self.body.locals())
                     && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
                     && let Ok(i) = Instance::resolve(*def, args)
@@ -601,7 +748,9 @@ impl Edges<'_, '_> {
                         _ => term.source_info.span,
                     };
                     self.found.push((i, span));
+                    callee = Some(i);
                 }
+                self.calls.push((callee, tys));
             }
             TerminatorKind::Drop { place, .. } => {
                 if let Ok(ty) = place.ty(self.body.locals()) {
@@ -632,8 +781,14 @@ impl Edges<'_, '_> {
                 _ => None,
             };
             // (a closure built and never used, `let _never = || ..;`: not run from here)
-            let unused = matches!(kind, rustc_public::mir::AggregateKind::Closure(..))
-                && self.dest.is_some_and(|d| !local_used(self.body, d));
+            let closure = matches!(kind, rustc_public::mir::AggregateKind::Closure(..));
+            let unused = closure && self.dest.is_some_and(|d| !local_used(self.body, d));
+            // (in the program's code, one only made a closure trait object, `Box::new(|..| ..)
+            // as Box<dyn Fn(..)>`: run when such an object is called)
+            let object = self
+                .dest
+                .filter(|_| closure && self.program)
+                .and_then(|d| only_coerced(self.tcx, self.body, d));
             if let Some((def, args)) = built
                 && !unused
             {
@@ -642,7 +797,12 @@ impl Edges<'_, '_> {
                 if !iargs.has_non_region_param() {
                     let i = rustc_middle::ty::Instance::new_raw(did, iargs);
                     let span = self.cur.unwrap_or(self.body.span);
-                    self.found.push((rustc_internal::stable(i), span));
+                    if let Some(key) = object {
+                        self.deferred
+                            .push((key, vec![rustc_internal::stable(i)], span));
+                    } else {
+                        self.found.push((rustc_internal::stable(i), span));
+                    }
                 }
             }
         }
@@ -668,14 +828,39 @@ impl Edges<'_, '_> {
                     CastKind::PointerCoercion(PointerCoercion::Unsize) => {
                         if let Some((concrete, dynamic)) = unsize_tails(&src, target) {
                             let c = rustc_internal::internal(self.tcx, concrete);
-                            if let rustc_middle::ty::Dynamic(preds, ..) =
-                                rustc_internal::internal(self.tcx, dynamic).kind()
+                            let d = rustc_internal::internal(self.tcx, dynamic);
+                            if let rustc_middle::ty::Dynamic(preds, ..) = d.kind()
                                 && let Some(c) = coercion(self.tcx, c, preds)
                             {
                                 self.coerced.push((c, span, false));
                             }
-                            for i in vtable_methods(self.tcx, concrete, dynamic) {
-                                self.found.push((i, span));
+                            // in the program's code, the methods a type coerced to a trait
+                            // object runs are reached once such an object is used; an upcast
+                            // (`&dyn Sub` to `&dyn Super`) uses what was made a `dyn Sub`
+                            match (c.kind(), d.kind()) {
+                                (rustc_middle::ty::Dynamic(sub, ..), _) if self.program => {
+                                    self.used.extend(dyn_key(self.tcx, sub));
+                                    self.found.extend(
+                                        vtable_methods(self.tcx, concrete, dynamic)
+                                            .into_iter()
+                                            .map(|i| (i, span)),
+                                    );
+                                }
+                                (_, rustc_middle::ty::Dynamic(preds, ..))
+                                    if self.program
+                                        && let Some(key) = dyn_key(self.tcx, preds) =>
+                                {
+                                    let methods = vtable_methods_internal(self.tcx, c, preds);
+                                    self.deferred.push((key, methods, span));
+                                    // (its drop glue runs when the object is dropped)
+                                    self.found
+                                        .push((Instance::resolve_drop_in_place(concrete), span));
+                                }
+                                _ => {
+                                    for i in vtable_methods(self.tcx, concrete, dynamic) {
+                                        self.found.push((i, span));
+                                    }
+                                }
                             }
                         }
                     }
@@ -866,4 +1051,122 @@ pub(super) fn vtable_methods_internal<'tcx>(
             _ => None,
         })
         .collect()
+}
+
+/// The key of a trait object in `Walker::dyn_used`: its trait with the trait's arguments,
+/// lifetimes left out (`core::ops::function::Fn<(&[u8],)>`); none for one of no trait (`dyn
+/// Send`), which has no methods.
+pub(super) fn dyn_key<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    preds: &'tcx rustc_middle::ty::List<rustc_middle::ty::PolyExistentialPredicate<'tcx>>,
+) -> Option<String> {
+    let p = preds.principal()?;
+    let p = tcx.instantiate_bound_regions_with_erased(p);
+    let args: Vec<String> = p.args.types().map(|t| t.to_string()).collect();
+    Some(format!("{}<{}>", path_of(tcx, p.def_id), args.join(", ")))
+}
+
+/// Does a call of `did` only drop its argument (`drop(x)`, a `Drop::drop`, `drop_in_place`):
+/// never calls a trait object it holds?
+fn drops_only(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> bool {
+    tcx.trait_of_assoc(did)
+        .is_some_and(|t| tcx.lang_items().drop_trait() == Some(t))
+        || matches!(
+            path_of(tcx, did).as_str(),
+            "core::mem::drop" | "core::ptr::drop_in_place"
+        )
+}
+
+/// The trait object (`dyn_key`) the closure in `local` is only made: borrowed or boxed (`&c`,
+/// `Box::new(c)`), and that alone coerced to one (`as &dyn Fn(..)`, `as Box<dyn Fn(..)>`).
+fn only_coerced(tcx: TyCtxt<'_>, body: &Body, local: rustc_public::mir::Local) -> Option<String> {
+    enum Use<'b> {
+        Stmt(&'b rustc_public::mir::Statement),
+        Term(&'b Terminator),
+    }
+    // the one place `l` is used (not where it is assigned whole, its storage marked or it is
+    // dropped), if one
+    let one_use = |l: rustc_public::mir::Local| -> Option<Use<'_>> {
+        let mut found = None;
+        let mut n = 0;
+        for (bb, block) in body.blocks.iter().enumerate() {
+            for (i, st) in block.statements.iter().enumerate() {
+                let mut u = Uses {
+                    local: l,
+                    used: false,
+                };
+                u.visit_statement(
+                    st,
+                    rustc_public::mir::visit::statement_location(body, &bb, i),
+                );
+                if u.used {
+                    n += 1;
+                    found = Some(Use::Stmt(st));
+                }
+            }
+            let mut u = Uses {
+                local: l,
+                used: false,
+            };
+            u.visit_terminator(
+                &block.terminator,
+                rustc_public::mir::visit::terminator_location(body, &bb),
+            );
+            if u.used {
+                n += 1;
+                found = Some(Use::Term(&block.terminator));
+            }
+        }
+        (n == 1).then_some(found).flatten()
+    };
+    let whole = |o: &Operand, l: rustc_public::mir::Local| matches!(o, Operand::Move(q) | Operand::Copy(q) if q.local == l && q.projection.is_empty());
+    // what holds it next: a borrow of it, or the box it is moved into
+    let next = match one_use(local) {
+        Some(Use::Stmt(st)) => match &st.kind {
+            StatementKind::Assign(p, Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q))
+                if q.local == local && q.projection.is_empty() && p.projection.is_empty() =>
+            {
+                p.local
+            }
+            _ => return None,
+        },
+        Some(Use::Term(t)) => match &t.kind {
+            TerminatorKind::Call {
+                func,
+                args,
+                destination,
+                ..
+            } if args.len() == 1
+                && whole(&args[0], local)
+                && destination.projection.is_empty()
+                && let Ok(fty) = func.ty(body.locals())
+                && let Some(RigidTy::FnDef(def, _)) = fty.kind().rigid()
+                && path_of(tcx, rustc_internal::internal(tcx, def.def_id()))
+                    == "alloc::boxed::Box::<T>::new" =>
+            {
+                destination.local
+            }
+            _ => return None,
+        },
+        None => return None,
+    };
+    // and that coerced to a trait object
+    let Some(Use::Stmt(st)) = one_use(next) else {
+        return None;
+    };
+    let StatementKind::Assign(
+        _,
+        Rvalue::Cast(CastKind::PointerCoercion(PointerCoercion::Unsize), o, target),
+    ) = &st.kind
+    else {
+        return None;
+    };
+    if !whole(o, next) {
+        return None;
+    }
+    let (_, d) = unsize_tails(&o.ty(body.locals()).ok()?, target)?;
+    match rustc_internal::internal(tcx, d).kind() {
+        rustc_middle::ty::Dynamic(preds, ..) => dyn_key(tcx, preds),
+        _ => None,
+    }
 }

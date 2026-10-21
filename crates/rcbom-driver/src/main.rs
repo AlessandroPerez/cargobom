@@ -485,6 +485,8 @@ fn analyze(tcx: TyCtxt<'_>) {
         r.fns.extend(generic);
         r.fns.sort();
         r.fns.dedup();
+        r.generic = generic_paths.clone();
+        r.generic.sort();
         r.paths.extend(generic_paths);
         r.paths.sort();
         r.paths.dedup();
@@ -711,6 +713,14 @@ struct Walker<'a, 'tcx> {
     /// Types coerced to trait objects in the walked code: first position seen (in a static's
     /// value or not), and the body each method of the object runs for the type.
     coercions: BTreeMap<(String, String), CoercedAt>,
+    /// The trait objects (`dyn_key`) some walked code may call: called through one, handed by
+    /// the program's code to code it does not walk, in a root's signature or a result.
+    dyn_used: HashSet<String>,
+    /// What waits for a trait object to be used (`dyn_key`): the methods a type coerced to it
+    /// in the program's code runs, and a closure made one there; with the body and position.
+    pending: HashMap<String, Vec<(Instance, Instance, Span)>>,
+    /// The trait objects each type holds (`Walker::dyn_keys`).
+    dyn_cache: HashMap<rustc_middle::ty::Ty<'tcx>, Vec<String>>,
     limit: usize,
 }
 
@@ -731,6 +741,16 @@ struct Edges<'a, 'tcx> {
     errors: usize,
     /// The local the statement being visited assigns.
     dest: Option<rustc_public::mir::Local>,
+    /// The body is the program's code (not the standard library's, a stop crate's or a
+    /// shim): its coercions to trait objects wait for one to be used (`deferred`).
+    program: bool,
+    /// Methods of trait objects made here, by `dyn_key`, and a closure made one, with where:
+    /// edges once such an object is used.
+    deferred: Vec<(String, Vec<Instance>, Span)>,
+    /// Trait objects this body uses without a call (`dyn_key`): an upcast.
+    used: Vec<String>,
+    /// The calls (the instance, none through a pointer) and their arguments' types.
+    calls: Vec<(Option<Instance>, Vec<rustc_public::ty::Ty>)>,
 }
 
 /// A type coerced to a trait object: the trait's path, the type's, and for each trait method
