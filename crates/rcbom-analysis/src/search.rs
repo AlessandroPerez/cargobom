@@ -247,6 +247,8 @@ pub(crate) const STD: &[(&str, Std)] = &[
     ("iterator::Iterator::cycle", Std::Arg(0)),
     ("iterator::Iterator::by_ref", Std::Arg(0)),
     ("iterator::Iterator::chain", Std::Args(&[0, 1])),
+    ("repeat::repeat", Std::Arg(0)),
+    ("repeat_n::repeat_n", Std::Arg(0)),
     ("slice::get", Std::Arg(0)),
     ("slice::get_mut", Std::Arg(0)),
     ("slice::get_unchecked", Std::Arg(0)),
@@ -269,8 +271,12 @@ pub(crate) const STD: &[(&str, Std)] = &[
     ("slice::sort_unstable_by", Std::Arg(0)),
     ("slice::sort_unstable_by_key", Std::Arg(0)),
     ("slice::reverse", Std::Arg(0)),
+    ("slice::rotate_left", Std::Arg(0)),
+    ("slice::rotate_right", Std::Arg(0)),
     ("slice::swap", Std::Arg(0)),
     ("slice::fill", Std::Store(1)),
+    ("slice::copy_from_slice", Std::Store(1)),
+    ("slice::clone_from_slice", Std::Store(1)),
     ("boxed::box_assume_init_into_vec_unsafe", Std::Arg(0)),
     ("vec::from_elem", Std::Arg(0)),
     ("vec::Vec::pop", Std::Arg(0)),
@@ -501,6 +507,12 @@ impl<'a> Search<'a> {
         })
     }
 
+    /// Is `d` a static or constant that is no descriptor but leads to some (`const RC: Result<..>
+    /// = Err(&SHA1)`, a table)? Its data is known, not which variant of it holds what.
+    fn leads_only(&self, d: &DefRef) -> bool {
+        !crate::provenance::is_descriptor(self.kb, d) && self.leads.is_some_and(|l| l(d))
+    }
+
     /// The descriptors value `o`, read in function `owner`, can be, read as `mode` says.
     pub fn value(&mut self, o: &Origin, owner: &str, mode: Mode) -> Found {
         self.search(o, owner, 0, mode)
@@ -524,6 +536,17 @@ impl<'a> Search<'a> {
             && ix.mutable_static(&def.id).is_some()
         {
             return self.mutable_static(def, depth, mode);
+        }
+        // (one read through a static or constant referring to it: `REF1.lock()` with `static
+        // REF1: &Mutex<..> = &M1`, a table of such references)
+        if let Origin::Data { def, .. } = peel_ix(Some(ix), o) {
+            let targets = ix.mutable_statics_of(def);
+            if !targets.is_empty() {
+                for t in &targets {
+                    out.merge(self.mutable_static(t, depth, mode));
+                }
+                return out;
+            }
         }
         // a field read of a static (`TABLE.alg`, `TABLE[i].h`, `LAZY.h`): what the static's
         // initializer, or the program at run time, stores in that field
@@ -760,6 +783,27 @@ impl<'a> Search<'a> {
             return out;
         };
         let ix = self.ix;
+        // one side of a `Result` constant or static (`RC.unwrap_or(x)`, `RS.ok()`): which side
+        // holds what it leads to is not recorded (an `Option`'s data is all in `Some`)
+        let mut args = args.clone();
+        if sem != Std::ErrRead
+            && strip_generics(callee).contains("result::Result::")
+            && let Some(Origin::Data { def, .. }) = args.first().map(peel)
+            && self.leads_only(def)
+        {
+            out.gap(
+                GapKind::Unknown,
+                format!("the side of `{}` read, not followed", short(&def.path)),
+                self.dead,
+            );
+            args[0] = Origin::Const {
+                value: None,
+                len: None,
+                span: None,
+                zero: false,
+            };
+        }
+        let args = &args;
         // an element of a container a standard-library call reads (`vec![a, b][0]`, `[a,
         // b].get(i)`): one of the values it holds
         let element = |s: &mut Search<'_>, a: &Origin| {
@@ -997,6 +1041,13 @@ impl<'a> Search<'a> {
         self.steps -= 1;
         let ix = self.ix;
         match o {
+            // a `Result` constant or static (`const RC: Result<..> = Err(&SHA1)`): which side holds
+            // what it leads to is not recorded
+            Origin::Data { def, .. } if self.leads_only(def) => out.gap(
+                GapKind::Unknown,
+                format!("the error side of `{}`, not followed", short(&def.path)),
+                self.dead,
+            ),
             // an `Ok` value, `None`, literal data: no error value
             Origin::Data { .. } | Origin::Const { .. } | Origin::Unit { .. } => {}
             Origin::Any(v) | Origin::All(v) => {

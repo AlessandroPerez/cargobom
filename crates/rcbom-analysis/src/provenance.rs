@@ -935,10 +935,14 @@ pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
 /// (`std_choice`): its arguments, a fallback function called (`unwrap_or_else(fallback)`).
 pub(crate) fn choice_values(callee: &str, args: &[Origin]) -> Vec<Origin> {
     let err = args.first().and_then(|r| error_of(callee, r));
+    // (a fallback value, `unwrap_or(Algorithm::HS384)`, is no function: only the `_else` and
+    // `_with` choices, and `get_or_init`, are given one)
+    let bare = strip_generics(callee);
+    let given_fn = bare.ends_with("_else") || bare.ends_with("_with") || bare.ends_with("_init");
     args.iter()
         .enumerate()
         .flat_map(|(i, a)| {
-            if i == 0 {
+            if i == 0 || !given_fn {
                 vec![a.clone()]
             } else {
                 // (a `Result`'s fallback function is given its error: `unwrap_or_else(|e| e)`)

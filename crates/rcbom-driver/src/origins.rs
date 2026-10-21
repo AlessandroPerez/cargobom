@@ -227,6 +227,9 @@ struct Flow {
     entry: Vec<BitSet>,
     /// Block of each terminator, by address: the scanner asks about the call it is visiting.
     term_bb: HashMap<*const Terminator, usize>,
+    /// Locals whose cells may change through an alias the definitions do not follow
+    /// (`open_cells`): a read of their cell is also the unknown.
+    open_cells: HashSet<Local>,
 }
 
 impl<'a, 'tcx> Origins<'a, 'tcx> {
@@ -866,13 +869,13 @@ impl Flow {
                     }
                 }
                 // (or a shared borrow of a value with a cell inside, `set(&cell)`, which the
-                // function may write through; of the standard library's own cell methods, those
-                // handing out a guard written through later, `borrow_mut`, `lock`, `write`: the
-                // others are modelled above or only read)
+                // function may write through; so may a standard-library function, `swap`,
+                // `take`, `OnceCell::set`, a guard written through later, unless it only reads
+                // the cell, `CELL_READS`: the modelled writes are above)
                 if let Operand::Copy(p) | Operand::Move(p) = a
                     && (is_mut_ptr(body, p)
                         || (cell_ptr(p)
-                            && (!std_callee || WRITE_GUARDS.iter().any(|g| name.ends_with(g)))))
+                            && (!std_callee || !CELL_READS.iter().any(|g| name.ends_with(g)))))
                 {
                     let targets = ptr.targets(p.local, &path_of_place(p), 0);
                     let single = sole_target(&targets) && !ptr.lost.get() && !ptr.cut.get();
@@ -998,6 +1001,7 @@ impl Flow {
                     Some(RigidTy::Ref(_, _, Mutability::Mut))
                 )
         };
+        let open_cells = open_cells(tcx, body, &ptr);
         for (place, at, kind) in pending {
             let path = path_of_place(&place);
             // a coroutine's saved local (`((*_44) as variant#3).0`, a local of an `async` body
@@ -1054,6 +1058,7 @@ impl Flow {
             by_local,
             entry,
             term_bb,
+            open_cells,
         }
     }
 }
@@ -1703,6 +1708,30 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     break;
                 }
                 list.push(o);
+            }
+        }
+        // a cell (in the value, or in what it owns) whose borrow escaped where its writes are
+        // not followed (`open_cells`): what it holds may have been changed through that alias
+        // (not one read through a borrow: the place it points to is its own)
+        if self.flow().open_cells.contains(&local)
+            && owns_cell(self.tcx, walk_ty(self.tcx, self.local_ty(local), &path))
+            && !(0..path.len()).any(|i| {
+                path[i] == Step::Deref
+                    && matches!(
+                        walk_ty(self.tcx, self.local_ty(local), &path[..i]).kind(),
+                        rustc_middle::ty::TyKind::Ref(..) | rustc_middle::ty::TyKind::RawPtr(..)
+                    )
+            })
+        {
+            let o = Origin::Through {
+                callee: format!(
+                    "{} what a cell holds once a borrow of it went where its writes are not \
+                     followed",
+                    rcbom_facts::NOT_FOLLOWED
+                ),
+            };
+            if !alts.contains(&o) {
+                alts.push(o);
             }
         }
         seen.remove(&key);
@@ -3869,6 +3898,201 @@ fn moves_only(body: &Body, func: &Operand) -> bool {
             && types().all(plain))
 }
 
+/// The locals whose cells (`reaches_cell`) may change through an alias the body's definitions
+/// do not follow. Aliases are borrows of them and what is copied, cast or returned from them (a
+/// call given one may return one: an `Rc` clone, a `deref`, an accessor). Such an alias may only
+/// go to a standard-library function that reads (`CELL_READS`), to a call whose pointer argument
+/// is resolved to its place where the cell is in it (a write there is a definition, or the
+/// callee's summary), or to another alias. Anywhere else (into a value: a struct, a closure's
+/// capture, a coroutine; a cast: a trait object; a store through a pointer or into a part; a call
+/// given a cell only behind a pointer, or an alias it cannot resolve; inline assembly) the cell
+/// may be written where nothing records it, whenever: every read of it is also the unknown.
+fn open_cells<'tcx>(tcx: TyCtxt<'tcx>, body: &Body, ptr: &Pointees) -> HashSet<Local> {
+    let internal = |t: Ty| rustc_internal::internal(tcx, t);
+    let n = body.locals().len();
+    let cells: Vec<bool> = (0..n)
+        .map(|l| reaches_cell(tcx, internal(body.locals()[l].ty), 0))
+        .collect();
+    if !cells.iter().any(|c| *c) {
+        return HashSet::new();
+    }
+    fn find(parent: &mut [usize], mut x: usize) -> usize {
+        while parent[x] != x {
+            parent[x] = parent[parent[x]];
+            x = parent[x];
+        }
+        x
+    }
+    fn union(parent: &mut [usize], a: usize, b: usize) {
+        let (a, b) = (find(parent, a), find(parent, b));
+        if a != b {
+            parent[a] = b;
+        }
+    }
+    let place_of = |o: &Operand| match o {
+        Operand::Copy(p) | Operand::Move(p) => Some(p.clone()),
+        _ => None,
+    };
+    let ty_of = |p: &Place| walk_ty(tcx, internal(body.locals()[p.local].ty), &path_of_place(p));
+    // first, the aliases: what a borrow, copy, cast or call result of a cell's place is
+    let mut parent: Vec<usize> = (0..n).collect();
+    for block in &body.blocks {
+        for st in &block.statements {
+            let StatementKind::Assign(lhs, rv) = &st.kind else {
+                continue;
+            };
+            let from = match rv {
+                Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) | Rvalue::CopyForDeref(q) => {
+                    Some(q.clone())
+                }
+                Rvalue::Use(o, _) | Rvalue::Cast(_, o, _) => place_of(o),
+                _ => None,
+            };
+            if let Some(q) = from
+                && lhs.projection.is_empty()
+                && cells[q.local]
+            {
+                union(&mut parent, lhs.local, q.local);
+            }
+        }
+        // (not a guard a lock or a `RefCell` hands out: a write through it is the call's own,
+        // `Through` at the call)
+        if let TerminatorKind::Call {
+            func,
+            args,
+            destination,
+            ..
+        } = &block.terminator.kind
+            && destination.projection.is_empty()
+            && reaches_cell(tcx, ty_of(destination), 0)
+            && !callee_name(body, func).is_some_and(|n| GUARDS.iter().any(|g| n.ends_with(g)))
+        {
+            for q in args.iter().filter_map(place_of) {
+                if cells[q.local] {
+                    union(&mut parent, destination.local, q.local);
+                }
+            }
+        }
+    }
+    let mut has_cell = vec![false; n];
+    for (l, _) in cells.iter().enumerate().filter(|(_, c)| **c) {
+        let r = find(&mut parent, l);
+        has_cell[r] = true;
+    }
+    let in_cell = |parent: &mut [usize], l: Local| {
+        let r = find(parent, l);
+        has_cell[r]
+    };
+    // then where the aliases go (the pointer search's state is the scan's: kept as it was)
+    let saved = (ptr.lost.get(), ptr.cut.get(), ptr.cur_at.get());
+    let mut open: HashSet<usize> = HashSet::new();
+    for (bb, block) in body.blocks.iter().enumerate() {
+        for st in &block.statements {
+            let StatementKind::Assign(lhs, rv) = &st.kind else {
+                continue;
+            };
+            let used: Vec<Place> = match rv {
+                Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) | Rvalue::CopyForDeref(q) => {
+                    vec![q.clone()]
+                }
+                Rvalue::Use(o, _) => place_of(o).into_iter().collect(),
+                Rvalue::Cast(_, o, _) => {
+                    // a cast of one: a trait object, a raw pointer
+                    if let Some(q) = place_of(o)
+                        && in_cell(&mut parent, q.local)
+                    {
+                        open.insert(find(&mut parent, q.local));
+                    }
+                    Vec::new()
+                }
+                Rvalue::Aggregate(_, ops) => {
+                    for q in ops.iter().filter_map(place_of) {
+                        if in_cell(&mut parent, q.local) {
+                            open.insert(find(&mut parent, q.local));
+                        }
+                    }
+                    Vec::new()
+                }
+                _ => Vec::new(),
+            };
+            // stored into a part or through a pointer
+            if !lhs.projection.is_empty() {
+                for q in used {
+                    if in_cell(&mut parent, q.local) {
+                        open.insert(find(&mut parent, q.local));
+                    }
+                }
+            }
+        }
+        match &block.terminator.kind {
+            TerminatorKind::Call { func, args, .. } => {
+                let name = callee_name(body, func).unwrap_or_default();
+                let std_callee = ["core::", "std::", "alloc::"]
+                    .iter()
+                    .any(|c| name.starts_with(c));
+                if std_callee && CELL_READS.iter().any(|g| name.ends_with(g)) {
+                    continue;
+                }
+                for q in args.iter().filter_map(place_of) {
+                    if !in_cell(&mut parent, q.local) {
+                        continue;
+                    }
+                    // a pointer to a place the cell is in, resolved: the call's write is a
+                    // definition there (modelled, or the callee's summary, or the unknown)
+                    let inline = match ty_of(&q).kind() {
+                        rustc_middle::ty::TyKind::Ref(_, i, _)
+                        | rustc_middle::ty::TyKind::RawPtr(i, _) => cell_inline(tcx, *i),
+                        _ => false,
+                    };
+                    // (a parameter's pointer: what the callers pass, as the summary says)
+                    let param =
+                        q.projection.is_empty() && (1..=body.arg_locals().len()).contains(&q.local);
+                    let resolved = inline
+                        && (param || {
+                            ptr.lost.set(false);
+                            ptr.cut.set(false);
+                            ptr.cur_at.set(Some(At {
+                                bb,
+                                idx: block.statements.len(),
+                            }));
+                            let t = ptr.targets(q.local, &path_of_place(&q), 0);
+                            !t.is_empty() && !ptr.lost.get() && !ptr.cut.get()
+                        });
+                    if !resolved {
+                        open.insert(find(&mut parent, q.local));
+                    }
+                }
+            }
+            TerminatorKind::InlineAsm { .. } => {
+                for (l, _) in cells.iter().enumerate().filter(|(_, c)| **c) {
+                    open.insert(find(&mut parent, l));
+                }
+            }
+            _ => {}
+        }
+    }
+    ptr.lost.set(saved.0);
+    ptr.cut.set(saved.1);
+    ptr.cur_at.set(saved.2);
+    let out: HashSet<Local> = (0..n)
+        .filter(|&l| cells[l] && open.contains(&find(&mut parent, l)))
+        .collect();
+    if std::env::var_os("RCBOM_DEBUG_CELLS").is_some() && !out.is_empty() {
+        let mut v: Vec<_> = out.iter().copied().collect();
+        v.sort();
+        let tys: Vec<String> = v
+            .iter()
+            .map(|l| format!("_{l}: {}", internal(body.locals()[*l].ty)))
+            .collect();
+        eprintln!(
+            "rcbom-driver: open cells {:?}: {}",
+            body.span,
+            tys.join(", ")
+        );
+    }
+    out
+}
+
 /// The pointer types whose containers (`bag_content`) the body builds, fills and empties only by
 /// `moves_only` calls, `vec![..]`'s store in its box, aggregates (`Some(&mut x)`, `[&mut x]`)
 /// and moves between locals: it re-points no pointer such a container holds (no store of one
@@ -5179,17 +5403,44 @@ fn mut_pointees<'tcx>(
     walk(tcx, t, 0, &mut out).then_some(out)
 }
 
-/// Standard-library methods taking a shared borrow of a cell and returning a guard through
-/// which the cell's value is written (`*c.borrow_mut() = v`, `*m.lock().unwrap() = v`).
-const WRITE_GUARDS: &[&str] = &[
+/// Standard-library methods handing out a guard through which a cell's value is written
+/// (`*c.borrow_mut() = v`, `*m.lock().unwrap() = v`): the write is `Through` at the call.
+const GUARDS: &[&str] = &[
     "RefCell::<T>::borrow_mut",
     "RefCell::<T>::try_borrow_mut",
     "Mutex::<T>::lock",
     "Mutex::<T>::try_lock",
     "RwLock::<T>::write",
     "RwLock::<T>::try_write",
-    "UnsafeCell::<T>::get",
-    "Cell::<T>::as_ptr",
+];
+
+/// Standard-library functions taking a shared borrow of a cell that only read it (its value, a
+/// read guard, its formatting or comparison). Any other may write the cell (`Cell::swap`,
+/// `take`, `OnceCell::set`, `get_or_init`, an atomic's `store`, the guards of `borrow_mut`,
+/// `lock`, `write`): what it holds after the call is not known. A lazy value's first access
+/// (`deref`, `force`) stores its initializer's value, which is what it is known to hold.
+const CELL_READS: &[&str] = &[
+    "::deref",
+    "::force",
+    "Cell::<T>::get",
+    "RefCell::<T>::borrow",
+    "RefCell::<T>::try_borrow",
+    "OnceCell::<T>::get",
+    "OnceLock::<T>::get",
+    "RwLock::<T>::read",
+    "RwLock::<T>::try_read",
+    "Mutex::<T>::is_poisoned",
+    "RwLock::<T>::is_poisoned",
+    "::load",
+    "::fmt",
+    "::clone",
+    "::eq",
+    "::ne",
+    "::partial_cmp",
+    "::cmp",
+    "::hash",
+    "::new_debug",
+    "::new_display",
 ];
 
 /// Does a value of type `t` hold a cell (`UnsafeCell`, inside `Cell`, `RefCell`, `Mutex`,
@@ -5212,6 +5463,99 @@ pub(crate) fn holds_cell<'tcx>(
         K::Array(inner, _) | K::Slice(inner) => holds_cell(tcx, *inner, depth + 1),
         K::Tuple(ts) => ts.iter().any(|t| holds_cell(tcx, t, depth + 1)),
         _ => false,
+    }
+}
+
+/// Can a value of type `t` reach a cell that holds more than a plain number (`Cell<&Algorithm>`,
+/// a `RefCell`'s, a lock's or a `OnceLock`'s value; not a reference count or an atomic integer),
+/// in itself or through pointers (`Rc<RefCell<..>>`, `Box<Cell<..>>`, `&Cell<..>`, a `Vec` of
+/// cells)?
+pub(crate) fn reaches_cell<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+) -> bool {
+    cell_in(tcx, t, depth, Through::All)
+}
+
+/// The same, not behind a borrow: in the value itself or in what it owns (a `Box`, an `Rc`, a
+/// `Vec`, whose pointers are raw). A borrow's value is an address, which no alias changes.
+fn owns_cell<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> bool {
+    cell_in(tcx, t, 0, Through::Owned)
+}
+
+/// The same, not behind any pointer (the cell is in the value itself).
+fn cell_inline<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>) -> bool {
+    cell_in(tcx, t, 0, Through::None)
+}
+
+/// Which pointers a search for a cell looks through.
+#[derive(Clone, Copy, PartialEq)]
+enum Through {
+    None,
+    Owned,
+    All,
+}
+
+fn cell_in<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+    through: Through,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 10 {
+        return false;
+    }
+    match t.kind() {
+        K::Adt(def, args) if def.is_unsafe_cell() => not_plain(tcx, args.type_at(0), 0),
+        // (`Vec<T>` names its elements only in a marker)
+        K::Adt(def, args) if def.is_phantom_data() => {
+            through != Through::None && cell_in(tcx, args.type_at(0), depth + 1, through)
+        }
+        K::Adt(def, args) => def.all_fields().any(|f| {
+            cell_in(
+                tcx,
+                f.ty(tcx, args).skip_normalization(),
+                depth + 1,
+                through,
+            )
+        }),
+        K::RawPtr(i, _) => through != Through::None && cell_in(tcx, *i, depth + 1, through),
+        K::Ref(_, i, _) => through == Through::All && cell_in(tcx, *i, depth + 1, through),
+        K::Array(i, _) | K::Slice(i) => cell_in(tcx, *i, depth + 1, through),
+        K::Tuple(ts) => ts.iter().any(|t| cell_in(tcx, t, depth + 1, through)),
+        _ => false,
+    }
+}
+
+/// Does a value of type `t` hold more than numbers (a reference, a pointer, a type parameter)?
+fn not_plain<'tcx>(tcx: TyCtxt<'tcx>, t: rustc_middle::ty::Ty<'tcx>, depth: usize) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 6 {
+        return true;
+    }
+    // (an atomic's storage is a projection, `<usize as AtomicPrimitive>::Storage`)
+    let t = if matches!(t.kind(), K::Alias(..)) {
+        match tcx.try_normalize_erasing_regions(
+            rustc_middle::ty::TypingEnv::fully_monomorphized(),
+            rustc_middle::ty::Unnormalized::new_wip(t),
+        ) {
+            Ok(n) => n,
+            Err(_) => return true,
+        }
+    } else {
+        t
+    };
+    match t.kind() {
+        K::Bool | K::Char | K::Int(_) | K::Uint(_) | K::Float(_) | K::Never => false,
+        K::Adt(def, _) if def.is_phantom_data() => false,
+        K::Adt(def, args) => def
+            .all_fields()
+            .any(|f| not_plain(tcx, f.ty(tcx, args).skip_normalization(), depth + 1)),
+        K::Array(i, _) | K::Slice(i) => not_plain(tcx, *i, depth + 1),
+        K::Tuple(ts) => ts.iter().any(|t| not_plain(tcx, t, depth + 1)),
+        _ => true,
     }
 }
 
