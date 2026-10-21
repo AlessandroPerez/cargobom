@@ -1250,12 +1250,12 @@ fn field_store(
         return;
     }
     let proj = &field_place.projection;
-    // the trailing fields and dereferences
+    // the trailing fields, dereferences and variants
     let mut start = proj.len();
     while start > 0
         && matches!(
             proj[start - 1],
-            ProjectionElem::Field(..) | ProjectionElem::Deref
+            ProjectionElem::Field(..) | ProjectionElem::Deref | ProjectionElem::Downcast(_)
         )
     {
         start -= 1;
@@ -1272,6 +1272,8 @@ fn field_store(
     // a reference)
     let mut chains: Vec<(String, Option<String>, Vec<usize>, bool)> = Vec::new();
     let mut behind_ref = start > 0;
+    // the variant of the enum a field is read from (`if let E::V(a) = e { *a = v }`)
+    let mut variant: Option<usize> = None;
     for e in &proj[start..] {
         match e {
             ProjectionElem::Deref => {
@@ -1280,6 +1282,39 @@ fn field_store(
                 };
                 ty = t;
                 behind_ref = true;
+            }
+            // a store in the variant's field, as `E::V(v)` records it (by the variant's path);
+            // the structs before it record no path through an enum (nor do their literals)
+            ProjectionElem::Downcast(v) => {
+                if !matches!(ty.kind(), rustc_middle::ty::Adt(adt, _) if adt.is_enum()) {
+                    return;
+                }
+                variant = Some(crate::origins::variant_index(v));
+                chains.clear();
+            }
+            ProjectionElem::Field(f, _) if variant.is_some() => {
+                let rustc_middle::ty::Adt(adt, args) = ty.kind() else {
+                    return;
+                };
+                let Some(v) = adt.variants().get(rustc_abi::VariantIdx::from_usize(
+                    variant.take().unwrap_or_default(),
+                )) else {
+                    return;
+                };
+                if cx.is_std(tcx.crate_name(adt.did().krate).as_str()) {
+                    return;
+                }
+                chains.push((
+                    path_of(tcx, v.def_id),
+                    crate::adt_args(tcx, args),
+                    vec![*f],
+                    behind_ref,
+                ));
+                ty = match v.fields.get(rustc_abi::FieldIdx::from_usize(*f)) {
+                    Some(fd) => fd.ty(tcx, args).skip_norm_wip(),
+                    None => return,
+                };
+                behind_ref = false;
             }
             ProjectionElem::Field(f, _) => {
                 if let Some(adt) = named_struct(cx, ty) {
