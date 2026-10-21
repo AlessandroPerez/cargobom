@@ -413,7 +413,12 @@ pub(super) fn names_read(
                     .map(|f| src.fn_scope(f));
                 let place = read_place(s, start).0;
                 let field = field_read(s, i);
-                r.fields |= field.is_some();
+                // (or a part a pattern binds of a struct or a variant, `let E::V(a) = e`, `if let
+                // S { a, .. } = s`: a field of it)
+                let head = src.text(bd.stmt.0, bd.stmt.1);
+                let head = head.split('=').next().unwrap_or("");
+                let part = re!(r"[A-Za-z_]\w*\s*[({]").is_match(head);
+                r.fields |= field.is_some() || (bd.kind != BindKind::Closure && part);
                 let in_loop = |w: usize| {
                     sc.as_ref().is_some_and(|sc| {
                         sc.loops
@@ -427,23 +432,54 @@ pub(super) fn names_read(
                     .into_iter()
                     .filter(|w| (w.0 < start || in_loop(w.0)) && !(w.0 <= start && start < w.2))
                     .collect();
+                // (a cell: what it holds is replaced by `c.set(v)`, `*c.borrow_mut() = v`, ..;
+                // written otherwise, or lent, it holds what code not read put there)
+                let cell = cell_binding(src, &bd);
+                if cell && cell_lent(src, &bd, start) {
+                    r.lent = true;
+                }
+                let cell_sets: Vec<(usize, (usize, usize))> = if cell {
+                    cell_stores(src, &bd, start)
+                } else {
+                    Vec::new()
+                };
+                // (one replaces what the cell held for a claim that the values are all, as a
+                // store through a pointer does; else the value before may be read beside it)
+                let cell_dom = cell_sets
+                    .iter()
+                    .filter(|c| {
+                        r.strict
+                            && place == bd.name
+                            && sc.as_ref().is_some_and(|sc| sc.every_way(s, c.0, start))
+                    })
+                    .max()
+                    .copied();
                 let dom = writes
                     .iter()
                     .filter(|w| {
                         w.0 < start
                             && !closure_store(s, w.0)
-                            && assigned_place(src, (w.0, w.2)).is_some_and(|a| {
-                                (place == a || place.starts_with(&format!("{a}.")))
+                            && (assigned_place(src, (w.0, w.2)).is_some_and(|a| {
+                                (place == a
+                                    || place.starts_with(&format!("{a}."))
+                                    || place.starts_with(&format!("{a}[")))
                                     // (an element's store, for a container's elements: R4.3)
                                     && !(r.smashed && a.contains('['))
-                            })
-                            && sc.as_ref().is_some_and(|sc| {
-                                let (o, c) = sc.block_of(w.0);
-                                o < start && start < c
-                            })
+                            }))
+                            && sc.as_ref().is_some_and(|sc| sc.every_way(s, w.0, start))
                     })
                     .map(|w| (w.0, (w.1, w.2)))
                     .max();
+                let dom = match cell_dom {
+                    Some(c) if dom.is_none_or(|d| c.0 > d.0) => Some(c),
+                    _ => dom,
+                };
+                // (the cell's other stores before the read: values it may hold)
+                for (at, (x, y)) in &cell_sets {
+                    if dom.is_none_or(|d| *at > d.0) && seen.insert((*x, *y, String::new())) {
+                        names_read(src, kb, *x, *y, depth - 1, seen, r, own);
+                    }
+                }
                 // or a call of the file's function that replaces it on every way through it
                 let dom = match sc
                     .as_ref()
@@ -452,12 +488,7 @@ pub(super) fn names_read(
                     Some(k) if dom.is_none_or(|d| k.0 > d.0) => Some(k),
                     _ => dom,
                 };
-                let around = |o: usize| {
-                    sc.as_ref().is_some_and(|sc| {
-                        let (bo, bc) = sc.block_of(o);
-                        bo < start && start < bc
-                    })
-                };
+                let around = |o: usize| sc.as_ref().is_some_and(|sc| sc.every_way(s, o, start));
                 // stores through another binding pointing to it (`let r = &mut a; *r = v;`):
                 // of the place read or of what holds it; one on every way to the read replaces
                 // it for a claim that the values are all (`strict`), else it may or may not
@@ -634,12 +665,18 @@ pub(super) fn names_read(
                 }
                 // what the file's functions it is lent to (`maybe(&mut z, c)`, `b.up()`) may
                 // write there; lent to another crate's function, it may hold what that puts
+                // (what it stores through the parameter the variable is lent as, when that is
+                // all it does with it; else whatever its body names)
                 for (i, f) in lent_to(src, &bd, start) {
                     match f {
                         Some(fi) => {
-                            let sp = src.span(fi);
-                            if seen.insert((sp.0, sp.1, String::new())) {
-                                names_read(src, kb, sp.0, sp.1, depth - 1, seen, r, false);
+                            let stores =
+                                param_at(src, i, fi).and_then(|p| param_stores(src, fi, &p));
+                            let spans = stores.unwrap_or_else(|| vec![src.span(fi)]);
+                            for (x, y) in spans {
+                                if seen.insert((x, y, String::new())) {
+                                    names_read(src, kb, x, y, depth - 1, seen, r, false);
+                                }
                             }
                         }
                         None => {

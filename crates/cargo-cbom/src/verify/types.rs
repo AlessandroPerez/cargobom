@@ -387,11 +387,42 @@ pub(super) fn call_type_args(src: &Source, ci: usize, name: &str) -> Option<Vec<
                     .iter()
                     .position(|(_, t)| type_name(&deref_type(t)) == *g && deref_type(t) == *g)?;
                 let &(x, y) = args.get(p)?;
-                let t = type_name(&deref_type(&expr_type(src, x, y, 4)?));
+                // (`expr_type` reads through the argument's borrows, `&mut a`: put back; a
+                // dereference, `*r`, leaves which references are left unknown)
+                let mut borrows = String::new();
+                let mut k = skip_blank(s, x);
+                while s.get(k) == Some(&'&') {
+                    borrows.push('&');
+                    k = skip_blank(s, k + 1);
+                    if kw(s, k, "mut") {
+                        borrows.push_str("mut ");
+                        k = skip_blank(s, k + 3);
+                    }
+                }
+                if s.get(k) == Some(&'*') {
+                    return None;
+                }
+                let raw = format!("{borrows}{}", expr_type(src, x, y, 4)?);
+                let t = type_name(&deref_type(&raw));
+                // (with its path, `m::K`, which says which alias of the name it is, and the
+                // references the parameter's type does not take: `t: T` given `&mut a` is a
+                // `&mut A`, `t: &T` given `&a` an `A`)
+                let refs = |t: &str| {
+                    re!(r"^(?:&\s*(?:'\w+\s+)?(?:mut\s+)?)*")
+                        .find(t.trim())
+                        .map_or(0, |m| m.as_str().matches('&').count())
+                };
+                let mut inner = raw.trim().to_string();
+                for _ in 0..refs(&sig.params[p].1) {
+                    inner = re!(r"^&\s*(?:'\w+\s+)?(?:mut\s+)?")
+                        .replace(&inner, "")
+                        .trim()
+                        .to_string();
+                }
                 src.items
                     .iter()
                     .any(|it| it.kind == ItemKind::TypeDef && it.name == t)
-                    .then_some(t)
+                    .then_some(inner)
             })
             .collect(),
     )
@@ -401,6 +432,29 @@ pub(super) fn call_type_args(src: &Source, ci: usize, name: &str) -> Option<Vec<
 /// segment with its arguments (`&'a mut Box<m::Vec<E2>>` -> `Vec<E2>`). A trait object (`dyn`,
 /// `impl`) is no type of the file: empty.
 pub(super) fn deref_type(t: &str) -> String {
+    let t = deref_path(t);
+    if t.is_empty() {
+        return t;
+    }
+    // the last segment of the path, outside its arguments
+    let chars: Vec<char> = t.chars().collect();
+    let (mut depth, mut cut) = (0i32, 0);
+    for (k, &c) in chars.iter().enumerate() {
+        match c {
+            '<' | '(' | '[' => depth += 1,
+            '>' | ')' | ']' => depth -= 1,
+            ':' if depth == 0 && chars.get(k + 1) == Some(&':') => cut = k + 2,
+            _ => {}
+        }
+    }
+    chars[cut.min(chars.len())..]
+        .iter()
+        .collect::<String>()
+        .trim()
+        .to_string()
+}
+/// `deref_type` with the path kept whole (`&m::K` -> `m::K`).
+pub(super) fn deref_path(t: &str) -> String {
     let mut t = t.trim().to_string();
     loop {
         let before = t.clone();
@@ -419,22 +473,7 @@ pub(super) fn deref_type(t: &str) -> String {
     if t.starts_with("dyn ") || t.starts_with("impl ") {
         return String::new();
     }
-    // the last segment of the path, outside its arguments
-    let chars: Vec<char> = t.chars().collect();
-    let (mut depth, mut cut) = (0i32, 0);
-    for (k, &c) in chars.iter().enumerate() {
-        match c {
-            '<' | '(' | '[' => depth += 1,
-            '>' | ')' | ']' => depth -= 1,
-            ':' if depth == 0 && chars.get(k + 1) == Some(&':') => cut = k + 2,
-            _ => {}
-        }
-    }
-    chars[cut.min(chars.len())..]
-        .iter()
-        .collect::<String>()
-        .trim()
-        .to_string()
+    t
 }
 /// The arguments of a type (`Vec<E2>`: `[E2]`; `HashMap<K, V>`: `[K, V]`).
 pub(super) fn type_args(t: &str) -> Vec<String> {
@@ -1377,4 +1416,88 @@ pub(super) fn call_dyn_receivers(src: &Source, p: usize) -> Option<Vec<String>> 
         out.extend(dyn_traits_src(src, &t));
     }
     any.then_some(out)
+}
+
+/// Whether an impl block's self type, as written (`impl Put for &mut A`), is the type a context
+/// names in full (`<&mut &'static ring::digest::Algorithm as Put>`): its references and type
+/// arguments kept, the aliases it names replaced (the one in scope at the block first, else the
+/// package's): `None` where that is not to be compared so (a type of the impl's own parameters,
+/// no full type in the context, a bare name naming no alias of the file), left to `same_type`.
+pub(super) fn written_self(
+    src: &Source,
+    block: &Item,
+    full: Option<&str>,
+    aliases: &mut dyn FnMut(&str) -> Vec<String>,
+) -> Option<bool> {
+    // (a context that elides the type's arguments, `Builder::<..>`, says no more than its name)
+    let full = full.filter(|f| !f.contains(".."))?;
+    let (ty, own) = impl_self(src, block)?;
+    let ty = ty.as_str();
+    let names: Vec<&str> = re!(r"\b[A-Za-z_]\w*\b")
+        .find_iter(ty)
+        .map(|m| m.as_str())
+        .collect();
+    if names.iter().any(|n| own.iter().any(|o| o == n)) {
+        return None;
+    }
+    let at = src.idx(block.start);
+    // the file's aliases in scope at the block, by their paths whole (`m::K`)
+    let local = std::cell::Cell::new(false);
+    let resolved =
+        re!(r"\b[A-Za-z_]\w*(?:\s*::\s*[A-Za-z_]\w*)*").replace_all(ty, |m: &regex::Captures| {
+            match src.alias_at(at, &m[0]) {
+                Some(d) => {
+                    local.set(true);
+                    d
+                }
+                None => imported_as(src, &m[0]),
+            }
+        });
+    let shaped = ty.contains(['&', '<', '(', '[', '*']);
+    if !local.get() && !shaped {
+        return None;
+    }
+    // (then the package's, by name)
+    let expanded = expand_aliases(&resolved, aliases, 3);
+    Some(fold_typenum(&norm_path(&expanded)) == fold_typenum(&norm_path(full)))
+}
+
+/// An impl block's self type as written (`m::K`, `&mut A`, the `where` clause left out), and
+/// the impl's own type and const parameters.
+pub(super) fn impl_self(src: &Source, block: &Item) -> Option<(String, Vec<String>)> {
+    let s = &src.code;
+    let (a, b) = src.span(block);
+    let open = scan_to(s, a, b, |k| s[k] == '{');
+    let header = src.text(a, open);
+    let header = header.trim().strip_prefix("impl")?.trim_start();
+    let (params, rest) = if header.starts_with('<') {
+        let hc: Vec<char> = header.chars().collect();
+        let cls = vec![Class::Code; hc.len()];
+        let e = skip_angle(&hc, &cls, 0)?;
+        (
+            hc[1..e - 1].iter().collect::<String>(),
+            hc[e..].iter().collect::<String>(),
+        )
+    } else {
+        (String::new(), header.to_string())
+    };
+    let ty = rest.split_once(" for ").map_or(rest.as_str(), |(_, y)| y);
+    let ty = ty.split(" where ").next().unwrap_or(ty).trim().to_string();
+    let own = re!(r"(?:^|,)\s*(?:const\s+)?([A-Za-z_]\w*)")
+        .captures_iter(&params)
+        .filter_map(|m| m.get(1).map(|g| g.as_str().to_string()))
+        .collect();
+    Some((ty, own))
+}
+
+/// A name as the file's `use` items import it under another name (`use ring::digest::Algorithm
+/// as Digest`: `Digest` is `Algorithm`); any other name as it is.
+pub(super) fn imported_as(src: &Source, name: &str) -> String {
+    src.binds
+        .iter()
+        .find(|b| b.name == name)
+        .and_then(|b| b.path.last())
+        .filter(|l| *l != "self")
+        .cloned()
+        .unwrap_or_else(|| name.to_string())
 }

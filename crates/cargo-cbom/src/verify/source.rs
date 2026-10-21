@@ -8,6 +8,99 @@ impl Item {
     }
 }
 impl Source {
+    /// What a type alias written `written` at `at` (an index in `code`) stands for, by the
+    /// scopes around `at`: a block's own `type K = ..;` (the innermost), else the module's (an
+    /// inline module's, the file's), for `m::K` the one in module `m` of the module around
+    /// `at`, `crate::m::K` from the file's top; `None` when the file defines none visible there
+    /// (an impl's or a trait's associated type is no alias).
+    pub(super) fn alias_at(&self, at: usize, written: &str) -> Option<String> {
+        let written = written.trim();
+        let segs: Vec<&str> = written.split("::").map(str::trim).collect();
+        let (name, mods) = segs.split_last()?;
+        if name.is_empty() || name.contains(['<', '&', '(', '[', ' ']) {
+            return None;
+        }
+        let p = self.pos(at);
+        // the modules and functions around a position, outermost first
+        let chain = |q: (usize, usize)| -> Vec<&Item> {
+            let mut v: Vec<&Item> = self
+                .items
+                .iter()
+                .filter(|i| matches!(i.kind, ItemKind::Mod | ItemKind::Fn) && i.contains(q))
+                .collect();
+            v.sort_by_key(|i| i.start);
+            v
+        };
+        let mod_names = |v: &[&Item]| -> Vec<String> {
+            v.iter()
+                .filter(|i| i.kind == ItemKind::Mod)
+                .map(|i| i.name.clone())
+                .collect()
+        };
+        let here = chain(p);
+        let here_mods = mod_names(&here);
+        let mut best: Option<(usize, String)> = None;
+        for d in self
+            .items
+            .iter()
+            .filter(|i| i.kind == ItemKind::TypeDef && i.name == *name)
+        {
+            if self
+                .items
+                .iter()
+                .any(|o| matches!(o.kind, ItemKind::Impl | ItemKind::Trait) && o.contains(d.start))
+            {
+                continue;
+            }
+            let a = self.idx(d.start);
+            let e = scan_to(&self.code, a, self.code.len(), |k| {
+                matches!(self.code[k], ';' | '{')
+            });
+            let text = self.text(a, e);
+            let Some(m) = re!(r"^type\s+(\w+)\s*=\s*(.+)$").captures(text.trim()) else {
+                continue;
+            };
+            let def = norm_path(&m[2]);
+            let theirs = chain(d.start);
+            let local = theirs.iter().any(|i| i.kind == ItemKind::Fn);
+            let visible = if mods.is_empty() {
+                // in a module or function around `at`: in a function, in a block around it
+                theirs.len() <= here.len()
+                    && theirs.iter().zip(&here).all(|(x, y)| x.start == y.start)
+                    && (!local
+                        || theirs.last().is_some_and(|f| {
+                            let sc = self.fn_scope(f);
+                            let (o, c) = sc.block_of(a);
+                            o < at && at < c
+                        }))
+            } else {
+                let want: Vec<String> = match mods.first() {
+                    Some(&"crate") => mods[1..].iter().map(|m| m.to_string()).collect(),
+                    Some(&"self") => here_mods
+                        .iter()
+                        .cloned()
+                        .chain(mods[1..].iter().map(|m| m.to_string()))
+                        .collect(),
+                    _ => here_mods
+                        .iter()
+                        .cloned()
+                        .chain(mods.iter().map(|m| m.to_string()))
+                        .collect(),
+                };
+                !local && mod_names(&theirs) == want
+            };
+            // (the innermost: the longest chain, the latest block)
+            if visible
+                && best
+                    .as_ref()
+                    .is_none_or(|(k, _)| theirs.len() * 1_000_000 + a > *k)
+            {
+                best = Some((theirs.len() * 1_000_000 + a, def));
+            }
+        }
+        best.map(|(_, d)| d)
+    }
+
     pub(super) fn new(text: &str, rust: bool, toml: bool) -> Source {
         // a CRLF file: the `\r` is not part of the line
         let lines: Vec<String> = text
@@ -1449,6 +1542,31 @@ impl FnScope {
             .max()
             .copied()
             .unwrap_or(self.body)
+    }
+
+    /// Does the code at `at` run on every way to `read` after it: in a block that holds `read`,
+    /// or in blocks run whole wherever they are reached (`{ .. }`, `unsafe { .. }`, `let x = {
+    /// .. };`; not a branch, a loop's or a closure's body, a labelled block) up to one that does?
+    pub(super) fn every_way(&self, s: &[char], at: usize, read: usize) -> bool {
+        let mut b = self.block_of(at);
+        while !(b.0 < read && read < b.1) {
+            if b == self.body {
+                return false;
+            }
+            let whole = match before_blank(s, b.0) {
+                Some(p) => match s[p] {
+                    ';' | '{' | '}' => true,
+                    '=' => p == 0 || !matches!(s[p - 1], '=' | '!' | '<' | '>'),
+                    _ => word_before_at(s, b.0) == "unsafe",
+                },
+                None => false,
+            };
+            if !whole {
+                return false;
+            }
+            b = self.block_of(b.0);
+        }
+        true
     }
 }
 /// The names a pattern binds (`(a, b)`, `Some(f)`, `S { f, g: h }`, `ref mut x`, `x @ ..`),
