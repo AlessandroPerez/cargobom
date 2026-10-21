@@ -30,7 +30,7 @@ cargo cbom
  |                             values move between functions, and the instances reachable from
  |                             the entry points; written as JSON facts
  |- Layer 2b (rcbom-analysis)  stable: matches the facts against the knowledge base
- |                             (kb/seed.toml), follows values across functions, applies boundary
+ |                             (rcbom-kb), follows values across functions, applies boundary
  |                             models (jsonwebtoken), classifies key provenance, labels sets
  |- CycloneDX 1.7 JSON, validated against the vendored schemas on every run
 ```
@@ -54,7 +54,7 @@ cargo cbom
   algorithm comes from elsewhere (a field, a parameter, a trait object, a container, a static
   table), it follows the links and labels each member of the set with how it reaches the call
   and a witness. Key-material arguments are classified by the knowledge base's sources.
-- **The knowledge base** (`kb/seed.toml`) is data: crates and their roles, types, statics and
+- **The knowledge base** (`crates/rcbom-kb/data/seed.toml`) is data: crates and their roles, types, statics and
   functions that are algorithms, operations, uses, argument roles, provenance sources, and
   boundary models.
 - **The verifier** reopens every cited file and checks each position and detail against the
@@ -78,9 +78,11 @@ cd <cargo project>
 <repo>/target/debug/cargo-cbom cbom --manifest-only -o ...  # Layer 1 only, nothing compiled
 <repo>/target/debug/cargo-cbom cbom --features f1,f2 ...    # the artifact other features build
 <repo>/target/debug/cargo-cbom cbom verify cbom.json --self-test
-python3 <repo>/scripts/summary.py cbom.json                 # the CBOM as one line per occurrence
 RCBOM_DEBUG=1 <repo>/target/debug/cargo-cbom cbom -o ...    # also print the driver's caught panics
 ```
+
+In the repository, `cargo xtask summary <path>/cbom.json` prints a CBOM as one sorted line per fact
+(the form of the golden files).
 
 The CBOM describes the built artifact: the host target, the selected features and the
 `release` profile (`--profile` to change it). Tests and build scripts are not in it.
@@ -90,15 +92,22 @@ trust, or inside a container.
 
 ## Tests and evaluation
 
+The project's tasks are an `xtask` crate (`cargo xtask <task>`, run in the repository):
+
 ```
-scripts/check.sh                              # rustfmt, clippy -D warnings, unit tests (enforced)
-scripts/e2e.sh --realapp --regress --suite    # every fixture: whole-CBOM golden files, every
-                                              # position verified and every shift rejected,
-                                              # labelled scores; RCBOM_BLESS=1 rewrites goldens
-scripts/suite.py <out> fixtures/suite/*       # the ground-truth suite: 53 programs, 107 call
-                                              # sites labelled from source before any tool run
-scripts/corpus_score.py <out> fixtures/corpus/*.toml   # six real projects
-scripts/score.py fixtures/rusi/<fixture>/labels.toml <cbom.json>   # any tool's CBOM
+cargo xtask check                                    # rustfmt, clippy -D warnings, unit tests
+                                                     # (enforced), both workspaces
+cargo xtask e2e --realapp --regress --suite          # every fixture: whole-CBOM golden files,
+                                                     # every position verified and every shift
+                                                     # rejected, labelled scores; fixtures in
+                                                     # parallel; RCBOM_BLESS=1 rewrites goldens
+cargo xtask suite <out> tests/fixtures/suite/*       # the ground-truth suite: 53 programs, 107
+                                                     # call sites labelled from source before
+                                                     # any tool run
+cargo xtask corpus-score <out> tests/fixtures/corpus/*.toml          # six real projects
+cargo xtask score tests/fixtures/rusi/<fixture>/labels.toml <cbom>   # any tool's CBOM
+cargo xtask rusi-to-cbom <rusi report>               # a rusi report as a CBOM, for `score`
+cargo xtask review-sheet <fixture>...                # labels next to their source lines
 ```
 
 Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is zero);
@@ -108,14 +117,13 @@ Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is ze
 
 | path | content |
 |---|---|
-| `crates/cargo-cbom` | CLI, schema validation, `verify` |
+| `crates/cargo-cbom` | CLI, schema validation (`schema/`: CycloneDX 1.7, Apache-2.0), `verify` |
 | `crates/rcbom-manifest` | Layer 1 |
 | `crates/rcbom-driver` | the nightly `rustc_public` driver: sites, origins, links, walk |
 | `crates/rcbom-facts` | the facts exchanged between driver and analysis |
-| `crates/rcbom-kb`, `kb/seed.toml` | knowledge base loader and data |
+| `crates/rcbom-kb` | knowledge base loader and data (`data/`: the seed, and the Cryptography Registry, Apache-2.0) |
 | `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, CycloneDX assembly |
-| `fixtures/` | designed cases (`micro`, `libonly`, `threads`), labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects); each with its golden `expected.txt` |
-| `phase0/` | the realapp corpus program, and the algorithms the Phase 0 spike found in it (`cbom-realapp.json`), which the e2e checks are still reported |
+| `xtask` | the project's tasks: checks, e2e, scorers, summaries |
+| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects); each with its golden `expected.txt` |
+| `tests/external/` | inputs from an external reference case (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
-| `schema/` | CycloneDX 1.7 schemas and the Cryptography Registry (Apache-2.0) |
-| `scripts/` | checks, e2e, scorers, summaries |
