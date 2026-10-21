@@ -923,6 +923,13 @@
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
+            "additionalContext": "[reachable] [call] in a139::main; use: verify; algorithm one of 1 that may reach the call from `Validation.algorithms`, beside others not followed (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Rsa) allows these; line: `let _ = decode::<C>(&t, &dk, &v10);`; code: `decode::<C>`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "jsonwebtoken::decoding::decode"
+          },
+          {
             "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
@@ -994,7 +1001,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "11"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -1942,7 +1949,7 @@
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [call] in a139::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (`Validation.algorithms` may list HS256, of another family than the key's (Rsa): jsonwebtoken then refuses the token before any verification, else it verifies with one of PS256, PS384, RS256, RS384, RS512; `a139::MIX`, which leads to no single algorithm); line: `let _ = decode::<C>(&t, &dk, &v10);`; code: `decode::<C>`",
+            "additionalContext": "[reachable] [call] in a139::main; use: verify; algorithm unresolved: `Validation.algorithms` takes values the analysis does not follow (what `a139::main::{closure#0}`, the program's code a call runs, leaves in the struct); line: `let _ = decode::<C>(&t, &dk, &v10);`; code: `decode::<C>`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 12,
@@ -2211,7 +2218,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:17d384c0-595f-8290-a077-7d7d9a275c68",
+  "serialNumber": "urn:uuid:14e303c8-623b-800c-9cde-2c59a7d29d0a",
   "specVersion": "1.7",
   "version": 1
 }
