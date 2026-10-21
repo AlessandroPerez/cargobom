@@ -431,11 +431,24 @@ impl Flow {
                     && let Operand::Copy(p) | Operand::Move(p) = a
                 {
                     let holders: Vec<Local> = if is_mut_ptr(body, p) {
-                        ptr.targets(p.local, &path_of_place(p), 0)
+                        let (whole, parts): (Vec<Target>, Vec<Target>) = ptr
+                            .targets(p.local, &path_of_place(p), 0)
                             .into_iter()
-                            .filter(|t| t.path.is_empty())
-                            .map(|t| t.local)
-                            .collect()
+                            .partition(|t| t.path.is_empty());
+                        // a part of a value lent (`set_ref(&mut o.w)`, by fields and elements,
+                        // not what another pointer points to) that holds a `&mut`: what it
+                        // points to is not followed, a write through it lands where such
+                        // borrows point
+                        if parts.iter().any(|t| {
+                            !t.path.contains(&Step::Deref)
+                                && mut_holder(internal(body.locals()[t.local].ty), &t.path)
+                        }) {
+                            match pointee(p).and_then(|t| mut_pointees(tcx, t)) {
+                                Some(ts) => lost_at.extend(ts.into_iter().map(|t| (*at, Some(t)))),
+                                None => lost_at.push((*at, None)),
+                            }
+                        }
+                        whole.into_iter().map(|t| t.local).collect()
                     } else if let Some(h) = ptr.part_source(p) {
                         // (or a part of one built here, `set13(o.w)`: the value put there)
                         vec![h]
