@@ -35,6 +35,13 @@ pub struct LinkIndex {
     /// By trait: the types coerced to a trait object of it, with where, and the body each
     /// method runs for them.
     coerced: HashMap<String, Vec<Coerced>>,
+    /// By body: the calls on trait objects that may run it (`Links::dyn_calls`), each caller
+    /// with the arguments it passes (the receiver unknown) and the coercion it runs through.
+    dyn_calls: HashMap<String, Vec<(String, Vec<Origin>, Via)>>,
+    /// The trait methods called on a trait object whose bodies are not known (no type of the
+    /// call's coerced to it, a call whose type is not known): the parameters of their
+    /// implementations are not all followed.
+    dyn_open: HashSet<String>,
     /// The instances whose summaries the driver's bound left unrecorded (`Links::truncated`).
     truncated: HashSet<String>,
     /// The functions (and instances) the facts show the driver summarised: those some record
@@ -255,12 +262,12 @@ const MAX_STEPS: usize = 4096;
 type FieldPath = [(String, usize, Option<String>)];
 
 /// A type coerced to a trait object: the type, where (in a static's value or not), and the
-/// body each method of the object runs for it.
+/// body each method of the object runs for it, with its type past the receiver.
 type Coerced = (
     String,
     Option<rcbom_facts::Loc>,
     bool,
-    Vec<(String, String)>,
+    Vec<(String, String, String)>,
 );
 
 /// A read being resolved: the value, the fields read from it, the function it is read in.
@@ -408,6 +415,43 @@ impl LinkIndex {
         for v in ix.coerced.values_mut() {
             v.retain(|(ty, ..)| !ty.starts_with("dyn "));
         }
+        // a call on a trait object: of the body each type coerced to it runs where that body is
+        // of the call's type (a member each, labelled with its coercion); with no type coerced
+        // to it, or a call whose type is not known, the implementations' parameters are not all
+        // followed
+        let mut dyn_calls: HashMap<String, Vec<(String, Vec<Origin>, Via)>> = HashMap::new();
+        for c in facts.iter().flat_map(|f| &f.links.dyn_calls) {
+            let fits = |s: &str| s == c.sig || s == "*";
+            let bodies: Vec<(&String, &Coerced)> = ix
+                .coerced
+                .get(&c.trait_path)
+                .filter(|_| c.sig != "*")
+                .into_iter()
+                .flatten()
+                .filter_map(|t| {
+                    let (_, body, sig) = t.3.iter().find(|(m, ..)| *m == c.call.callee)?;
+                    fits(sig).then_some((body, t))
+                })
+                .collect();
+            if bodies.is_empty() {
+                ix.dyn_open.insert(c.call.callee.clone());
+            }
+            for (body, (ty, at, in_static, _)) in &bodies {
+                let via = Via::Dyn {
+                    trait_path: c.trait_path.clone(),
+                    ty: ty.clone(),
+                    at: at.clone(),
+                    in_static: *in_static,
+                    only: bodies.len() == 1,
+                };
+                let v = dyn_calls.entry((*body).clone()).or_default();
+                let call = (c.call.caller.clone(), c.call.args.clone(), via);
+                if !v.contains(&call) {
+                    v.push(call);
+                }
+            }
+        }
+        ix.dyn_calls = dyn_calls;
         ix
     }
 
@@ -1237,12 +1281,32 @@ impl LinkIndex {
             // (of the function it names: a closure reads its parent's through a capture)
             Origin::Param { index, owner: of } => {
                 let owner = of.as_deref().unwrap_or(owner);
-                if let Some(callers) = self.calls.get(owner) {
-                    let mut unknown = false;
-                    for (caller, args) in callers {
+                // (and the calls on trait objects running it, through the type's coercion)
+                let callers: Vec<(&String, &Vec<Origin>, Via)> = self
+                    .calls
+                    .get(owner)
+                    .into_iter()
+                    .flatten()
+                    .map(|(c, a)| (c, a, Via::Caller(c.clone())))
+                    .chain(
+                        self.dyn_calls
+                            .get(owner)
+                            .into_iter()
+                            .flatten()
+                            .map(|(c, a, v)| (c, a, v.clone())),
+                    )
+                    .collect();
+                if !callers.is_empty() {
+                    // (an implementation of a method called on a trait object whose bodies
+                    // are not known, or the trait's default body: run with values not
+                    // followed)
+                    let method = implemented_method(owner);
+                    let mut unknown = self.dyn_open.contains(method.as_deref().unwrap_or(owner));
+                    for (caller, args, way) in callers {
                         if self.superseded(caller) {
                             continue;
                         }
+                        let direct = matches!(way, Via::Caller(_));
                         let mut found = Vec::new();
                         // a caller passing on what is being resolved (`rec(a, n - 1)` inside
                         // `rec`): a cycle, which adds nothing and leaves nothing unknown
@@ -1256,12 +1320,13 @@ impl LinkIndex {
                             continue;
                         }
                         if let Some(a) = args.get(*index) {
-                            let by = via.then(Via::Caller(caller.clone()));
+                            let by = via.then(way);
                             self.resolve(a, path, caller, depth + 1, &by, &mut found);
                         }
                         // (through a caller no entry point reaches: that caller is how they
-                        // reach it, whatever they are further on)
-                        if self.unreached_caller(caller) {
+                        // reach it, whatever they are further on; not a call on a trait
+                        // object, whose bodies are reached through the types coerced to it)
+                        if direct && self.unreached_caller(caller) {
                             for v in found.iter_mut() {
                                 v.2 = Via::Caller(caller.clone());
                             }
@@ -1428,8 +1493,8 @@ impl LinkIndex {
                             .and_then(|(.., methods)| {
                                 methods
                                     .iter()
-                                    .find(|(m, _)| m == callee)
-                                    .map(|(_, b)| b.clone())
+                                    .find(|(m, ..)| m == callee)
+                                    .map(|(_, b, _)| b.clone())
                             })
                             .unwrap_or_else(|| {
                                 let (t, m) = callee.rsplit_once("::").unwrap_or(("", callee));
@@ -1485,8 +1550,8 @@ impl LinkIndex {
         if let Some(t) = self_ty.strip_prefix("dyn ") {
             let types = self.coerced.get(t)?;
             for (ty, at, in_static, methods) in types {
-                let name = match methods.iter().find(|(m, _)| m == callee) {
-                    Some((_, body)) => body.clone(),
+                let name = match methods.iter().find(|(m, ..)| m == callee) {
+                    Some((_, body, _)) => body.clone(),
                     // a body the driver could not name (another crate's generic impl): the
                     // type's own method, as an impl's item
                     None => format!("<{ty} as {tr}>::{method}"),
@@ -1530,8 +1595,8 @@ impl LinkIndex {
             // the body the method runs for the type (its implementation, or the trait's
             // default body), as the driver resolved it; else the type's own method (by its
             // type's path, or as an impl's item: `<u8 as app::Pick>::alg`)
-            let names = match methods.iter().find(|(m, _)| m == callee) {
-                Some((_, body)) => vec![body.clone()],
+            let names = match methods.iter().find(|(m, ..)| m == callee) {
+                Some((_, body, _)) => vec![body.clone()],
                 None => {
                     let (tr, method) = callee.rsplit_once("::").unwrap_or(("", callee));
                     vec![

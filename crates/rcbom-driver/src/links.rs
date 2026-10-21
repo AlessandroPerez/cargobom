@@ -261,11 +261,19 @@ pub(crate) fn body_links(
             let StatementKind::Assign(place, rv) = &stmt.kind else {
                 continue;
             };
-            // (`&f as &dyn Fn(D)`, `Box<dyn Fn(D)>`, `let p: fn(D) = |a| ..`)
+            // (`&f as &dyn Fn(D)`, `Box<dyn Fn(D)>`, `let p: fn(D) = |a| ..`); the program's
+            // function made so (`h as fn(D)`, `&h as &dyn Fn(D)`) runs where the calls through
+            // the pointer are followed, and wherever one is not
             if let Rvalue::Cast(rustc_public::mir::CastKind::PointerCoercion(_), op, _) = rv
                 && let Ok(t) = op.ty(locals)
             {
-                escaped.extend(runnables(cx, rustc_internal::internal(tcx, t), false).concat());
+                let t = rustc_internal::internal(tcx, t);
+                escaped.extend(runnables(cx, t, false).concat());
+                for a in named_functions(cx, t) {
+                    if !out.named.contains(&a) {
+                        out.named.push(a);
+                    }
+                }
             }
             // `S { f: v }`, `E::V(v)`: what each part of `v` that can carry an algorithm or a key
             // is, in the struct or in the enum's variant (`KeyPairKind::Ec(kp)`), as
@@ -724,12 +732,36 @@ pub(crate) fn body_links(
         // are not recorded, the standard library's (a combinator above aside: `map(f)` of a
         // copy of `f`, `sort_by(f)`; not one only storing it, `Box::new(f)`) or a stop crate's:
         // it may be run there with any value
+        // (and a function pointer or a trait object of functions handed there, where its type
+        // says the callee may call it: `for_each(p)`, `set_hook(b)`; any function of the
+        // program made one may be it)
         if (cx.is_std(&krate) && !stores_only(&path_of(tcx, cdid))) || cx.stop_crate(cdid.krate) {
+            let declared = tcx.fn_sig(cdid).instantiate_identity().skip_binder();
             for (i, a) in args.iter().enumerate() {
                 if Some(i) != fed
                     && let Ok(t) = a.ty(locals)
                 {
-                    escaped.extend(runnables(cx, rustc_internal::internal(tcx, t), true).concat());
+                    let t = rustc_internal::internal(tcx, t);
+                    escaped.extend(runnables(cx, t, true).concat());
+                    // (a call through it, `Fn::call(&b, (..))`, is a pointer call of its own)
+                    let may_call = cx.stop_crate(cdid.krate)
+                        || !matches!(method, "call" | "call_mut" | "call_once")
+                            && declared
+                                .inputs()
+                                .get(i)
+                                .is_none_or(|d| callable_in(tcx, cdid, *d, 0));
+                    if may_call {
+                        for (arity, sig) in pointer_shapes(tcx, t, 0) {
+                            let a = rcbom_facts::FnShape {
+                                func: here.clone(),
+                                arity,
+                                sig,
+                            };
+                            if !out.opaque.contains(&a) {
+                                out.opaque.push(a);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -812,6 +844,27 @@ pub(crate) fn body_links(
                     callee: runs,
                     caller: here.clone(),
                     args: args.clone(),
+                });
+            }
+            // (a trait's method called on a trait object: the body of each type coerced to it,
+            // on a receiver of its own type, not the values another type's are made of)
+            if tcx.trait_of_assoc(cdid).is_some()
+                && let Some(rustc_middle::ty::Dynamic(preds, ..)) =
+                    cargs.skip_binder().types().next().map(|t| t.kind())
+                && let Some(principal) = preds.principal_def_id()
+            {
+                let mut args = args.clone();
+                if let Some(r) = args.first_mut() {
+                    *r = Origin::Unknown;
+                }
+                out.dyn_calls.push(rcbom_facts::DynCall {
+                    call: LocalCall {
+                        callee: path_of(tcx, cdid),
+                        caller: here.clone(),
+                        args,
+                    },
+                    trait_path: path_of(tcx, principal),
+                    sig: method_sig(tcx, cdid, cargs.skip_binder()),
                 });
             }
             out.calls.push(LocalCall {
@@ -1489,6 +1542,27 @@ pub(crate) fn promoted_links(cx: &Cx<'_>, did: DefId, out: &mut Links) {
     if cx.stop_crate(did.krate) {
         return;
     }
+    // the program's functions a promoted constant makes pointers or trait objects of (`run(&[h
+    // as fn(D)])`, `&[&h as &dyn Fn(D)]`)
+    for p in crate::statics::used_promoted(tcx, did) {
+        for bb in tcx.promoted_mir(did)[p].basic_blocks.iter() {
+            for st in &bb.statements {
+                if let rustc_middle::mir::StatementKind::Assign(a) = &st.kind
+                    && let rustc_middle::mir::Rvalue::Cast(
+                        rustc_middle::mir::CastKind::PointerCoercion(..),
+                        op,
+                        _,
+                    ) = &a.1
+                {
+                    for n in named_functions(cx, op.ty(&tcx.promoted_mir(did)[p], tcx)) {
+                        if !out.named.contains(&n) {
+                            out.named.push(n);
+                        }
+                    }
+                }
+            }
+        }
+    }
     // only a promoted constant that builds a struct stores anything
     let builds_struct = |b: &rustc_middle::mir::Body<'_>| {
         b.basic_blocks.iter().any(|bb| {
@@ -1591,6 +1665,8 @@ fn holds_fn_ptr<'tcx>(tcx: rustc_middle::ty::TyCtxt<'tcx>, ty: Ty<'tcx>, depth: 
     }
     match ty.kind() {
         K::FnPtr(..) => true,
+        // (or a trait object of a function: `static D: &dyn Fn(D) = &h`)
+        K::Dynamic(preds, ..) => preds.principal_def_id().is_some_and(|t| extends_fn(tcx, t)),
         K::Ref(_, t, _) | K::RawPtr(t, _) | K::Array(t, _) | K::Slice(t) => {
             holds_fn_ptr(tcx, *t, depth + 1)
         }
@@ -1783,6 +1859,9 @@ const STORES: &[&str] = &[
     "mem::forget",
     "iter::once",
     "convert::identity",
+    // a pointer to it handed on (`rc.clone()`, `*rc` of an `Rc` of a closure)
+    "Clone::clone",
+    "Deref::deref",
 ];
 
 /// Is the standard library's function at `path` (`alloc::boxed::Box::<T>::new`) one of `STORES`?
@@ -1818,11 +1897,237 @@ fn runnables<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>, fns: bool) -> Vec<Vec<String>> {
                 out.push(names);
             }
             K::Ref(_, i, _) | K::RawPtr(i, _) => work.push((i, depth + 1)),
-            K::Adt(def, args) if def.is_box() => work.push((args.type_at(0), depth + 1)),
+            K::Adt(def, args) if def.is_box() || shared_pointer(tcx, def.did()) => {
+                work.push((args.type_at(0), depth + 1))
+            }
             _ => {}
         }
     }
     out
+}
+
+/// Can a callee (`did`) call a value of its declared parameter type `t`: a function pointer, a
+/// trait object of `Fn`, `FnMut` or `FnOnce` (or of a trait extending one), a type parameter
+/// bound by one of them, or a type holding one (`Box<dyn Fn(D)>`, `Option<F>`)? A projection is
+/// taken to be one.
+fn callable_in<'tcx>(
+    tcx: rustc_middle::ty::TyCtxt<'tcx>,
+    did: DefId,
+    t: Ty<'tcx>,
+    depth: usize,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 6 {
+        return true;
+    }
+    let fn_family = |trait_did: DefId| extends_fn(tcx, trait_did);
+    match *t.kind() {
+        K::FnPtr(..) => true,
+        K::Dynamic(preds, ..) => preds.principal_def_id().is_some_and(fn_family),
+        K::Param(p) => tcx.param_env(did).caller_bounds().any(|c| {
+            c.as_trait_clause().is_some_and(|tc| {
+                matches!(tc.self_ty().skip_binder().kind(), K::Param(q) if q.index == p.index)
+                    && fn_family(tc.def_id())
+            })
+        }),
+        K::Alias(..) => true,
+        K::Ref(_, i, _) | K::RawPtr(i, _) | K::Slice(i) | K::Array(i, _) => {
+            callable_in(tcx, did, i, depth + 1)
+        }
+        K::Tuple(ts) => ts.iter().any(|i| callable_in(tcx, did, i, depth + 1)),
+        K::Adt(_, args) => args.types().any(|i| callable_in(tcx, did, i, depth + 1)),
+        _ => false,
+    }
+}
+
+/// Is trait `did` `Fn`, `FnMut` or `FnOnce`, or a trait extending one (`trait Handler:
+/// Fn(D)`)?
+fn extends_fn(tcx: rustc_middle::ty::TyCtxt<'_>, did: DefId) -> bool {
+    let mut seen = HashSet::new();
+    let mut stack = vec![did];
+    while let Some(t) = stack.pop() {
+        if !seen.insert(t) {
+            continue;
+        }
+        if tcx.fn_trait_kind_from_def_id(t).is_some() {
+            return true;
+        }
+        for (c, _) in tcx.explicit_super_clauses_of(t).skip_binder() {
+            if let Some(tc) = c.as_trait_clause() {
+                stack.push(tc.def_id());
+            }
+        }
+    }
+    false
+}
+
+/// The pointers and trait objects of functions a value of type `t` holds (`fn(D)`, `Box<dyn
+/// Fn(D, &[u8])>`, `Vec<fn(D)>`), as `pointer_sig` gives them.
+fn pointer_shapes<'tcx>(
+    tcx: rustc_middle::ty::TyCtxt<'tcx>,
+    t: Ty<'tcx>,
+    depth: usize,
+) -> Vec<(usize, String)> {
+    use rustc_middle::ty::TyKind as K;
+    if depth > 6 {
+        return Vec::new();
+    }
+    if let Some(s) = pointer_sig(tcx, t) {
+        return vec![s];
+    }
+    match *t.kind() {
+        K::Ref(_, i, _) | K::RawPtr(i, _) | K::Slice(i) | K::Array(i, _) => {
+            pointer_shapes(tcx, i, depth + 1)
+        }
+        K::Tuple(ts) => ts
+            .iter()
+            .flat_map(|i| pointer_shapes(tcx, i, depth + 1))
+            .collect(),
+        K::Adt(_, args) => args
+            .types()
+            .flat_map(|i| pointer_shapes(tcx, i, depth + 1))
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
+/// `Rc`, `Arc` or `Pin`: a pointer to the value it is given, as a `Box` is (`Rc::new(f)` made a
+/// `Rc<dyn Fn(D)>` still runs `f`).
+fn shared_pointer(tcx: rustc_middle::ty::TyCtxt<'_>, did: DefId) -> bool {
+    use rustc_span::sym;
+    tcx.is_diagnostic_item(sym::Rc, did)
+        || tcx.is_diagnostic_item(sym::Arc, did)
+        || path_of(tcx, did).ends_with("pin::Pin")
+}
+
+/// The program's functions a value of type `ty` is, behind pointers (`h`, `&h`, `Box<h>`,
+/// `Rc<h>`), with their instances (as `runnables` names them) and the type of a pointer to
+/// them: what a function pointer or a trait object made of it runs.
+fn named_functions<'tcx>(cx: &Cx<'tcx>, ty: Ty<'tcx>) -> Vec<rcbom_facts::FnShape> {
+    use rustc_middle::ty::TyKind as K;
+    let tcx = cx.tcx;
+    let mut out = Vec::new();
+    let mut t = ty;
+    for _ in 0..5 {
+        match *t.kind() {
+            K::FnDef(fd, args)
+                if !cx.stop_crate(fd.krate) && !cx.is_std(tcx.crate_name(fd.krate).as_str()) =>
+            {
+                let sig = tcx.instantiate_bound_regions_with_erased(
+                    tcx.fn_sig(fd)
+                        .instantiate(tcx, args.skip_binder())
+                        .skip_normalization(),
+                );
+                let key = sig_key(tcx, sig.inputs(), sig.output());
+                let mut names = vec![path_of(tcx, fd)];
+                names.extend(crate::origins::runs_of(tcx, fd, args.skip_binder()));
+                for func in names {
+                    out.push(rcbom_facts::FnShape {
+                        func,
+                        arity: sig.inputs().len(),
+                        sig: key.clone(),
+                    });
+                }
+                break;
+            }
+            K::Ref(_, i, _) | K::RawPtr(i, _) => t = i,
+            K::Adt(def, args) if def.is_box() || shared_pointer(tcx, def.did()) => {
+                t = args.type_at(0)
+            }
+            _ => break,
+        }
+    }
+    out
+}
+
+/// The type of a function taking `inputs` and returning `output`, regions erased, paths printed
+/// as `path_of` prints them, the same whichever crate prints it (`fn(&ring::digest::Algorithm,
+/// &[u8]) -> ring::digest::Digest`): what pairs a function made a pointer with the calls
+/// through pointers of its type; `*` with a type parameter in it (a generic body scanned
+/// without its instance), which pairs with any.
+pub(crate) fn sig_key<'tcx>(
+    tcx: rustc_middle::ty::TyCtxt<'tcx>,
+    inputs: &[Ty<'tcx>],
+    output: Ty<'tcx>,
+) -> String {
+    let all = || inputs.iter().copied().chain([output]);
+    if all().any(|t| t.has_param() || t.has_aliases()) {
+        return "*".into();
+    }
+    let e = |t: Ty<'tcx>| {
+        use rustc_middle::ty::print::{
+            with_crate_prefix, with_no_trimmed_paths, with_no_visible_paths,
+        };
+        let t = tcx.erase_and_anonymize_regions(t);
+        with_crate_prefix!(with_no_visible_paths!(with_no_trimmed_paths!(format!(
+            "{t}"
+        ))))
+    };
+    crate::local_crate_name(
+        tcx,
+        format!(
+            "fn({}) -> {}",
+            inputs.iter().map(|t| e(*t)).collect::<Vec<_>>().join(", "),
+            e(output)
+        ),
+    )
+}
+
+/// The type (`sig_key`) of method `did` instantiated with `args` past its receiver, which a
+/// call on a trait object shares with the bodies it may run (`*` for one with a type
+/// parameter).
+pub(crate) fn method_sig<'tcx>(
+    tcx: rustc_middle::ty::TyCtxt<'tcx>,
+    did: DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> String {
+    let sig = tcx.instantiate_bound_regions_with_erased(
+        tcx.fn_sig(did).instantiate(tcx, args).skip_normalization(),
+    );
+    if sig.has_non_region_param() {
+        return "*".into();
+    }
+    let sig = tcx.normalize_erasing_regions(
+        rustc_middle::ty::TypingEnv::fully_monomorphized(),
+        rustc_middle::ty::Unnormalized::new_wip(sig),
+    );
+    sig_key(tcx, sig.inputs().get(1..).unwrap_or_default(), sig.output())
+}
+
+/// The type (`sig_key`) of the functions a pointer or a trait object of `Fn`, `FnMut` or
+/// `FnOnce` of type `t` runs (`*` for a trait extending one, or an output not known), with
+/// their number of parameters (`usize::MAX` when not known).
+pub(crate) fn pointer_sig<'tcx>(
+    tcx: rustc_middle::ty::TyCtxt<'tcx>,
+    t: Ty<'tcx>,
+) -> Option<(usize, String)> {
+    use rustc_middle::ty::TyKind as K;
+    match *t.kind() {
+        K::FnPtr(sig, _) => {
+            let sig = tcx.instantiate_bound_regions_with_erased(sig);
+            Some((sig.inputs().len(), sig_key(tcx, sig.inputs(), sig.output())))
+        }
+        K::Dynamic(preds, ..) => {
+            let p = preds.principal()?;
+            if tcx.fn_trait_kind_from_def_id(p.def_id()).is_none() {
+                return extends_fn(tcx, p.def_id()).then(|| (usize::MAX, "*".into()));
+            }
+            let K::Tuple(ins) = *p.skip_binder().args.type_at(0).kind() else {
+                return Some((usize::MAX, "*".into()));
+            };
+            let out = preds
+                .projection_bounds()
+                .find_map(|b| b.skip_binder().term.as_type());
+            Some((
+                ins.len(),
+                match out {
+                    Some(o) => sig_key(tcx, ins.as_slice(), o),
+                    None => "*".into(),
+                },
+            ))
+        }
+        _ => None,
+    }
 }
 
 /// Is `local` defined once, by a closure literal, and used once besides (`move _6` into the

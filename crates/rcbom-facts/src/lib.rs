@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 27;
+pub const FACTS_VERSION: u32 = 28;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -131,6 +131,42 @@ pub struct Links {
     /// function the driver did not see.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub summarised: Vec<String>,
+    /// The functions of the crate (and instances) made a function pointer or a trait object
+    /// (`h as fn(D)`, `&h as &dyn Fn(D)`, `Box<dyn Fn(D)>` of `Box::new(h)`), with their type: a
+    /// call through a pointer of that type that is not followed may run any of them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub named: Vec<FnShape>,
+    /// Function pointers and trait objects of functions handed where the code that may call
+    /// them is not followed (the standard library's `for_each(p)`, `set_hook(b)`, a stop crate's
+    /// function), by the function handing them and their type: whatever functions they are may
+    /// run there with values not followed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub opaque: Vec<FnShape>,
+    /// Calls of a trait's method on a trait object (`t.run(&SHA1)` with `t: &dyn Alg`): the
+    /// body each type coerced to it runs (`coercions`) may run.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub dyn_calls: Vec<DynCall>,
+}
+
+/// A call of a trait's method on a trait object of `trait_path` (as `Coercion::trait_path`
+/// names it), by the trait method's path, and the method's type past the receiver (a `sig` as
+/// `FnShape`'s), which the bodies it may run share. The receiver is unknown: it is of whichever
+/// type the object holds, made of values another type's are not.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct DynCall {
+    pub call: LocalCall,
+    pub trait_path: String,
+    pub sig: String,
+}
+
+/// A function (or the function handing a pointer on) and the type of a pointer to it: its
+/// number of parameters and `sig` (`fn(&ring::digest::Algorithm) -> ()`, regions erased; `*`
+/// for a type not known, which pairs with any).
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct FnShape {
+    pub func: String,
+    pub arity: usize,
+    pub sig: String,
 }
 
 /// Type `ty` (an ADT's defining path with its type arguments, `app::W<app::A>`; `dyn <trait>`
@@ -139,7 +175,8 @@ pub struct Links {
 /// static whose value holds the vtable (none for a span without a position). `methods`: for
 /// each method of the trait object (the trait's, its supertraits'), by defining path, the body a
 /// call through it runs for `ty`, as the links name it (the type's implementation, or the
-/// trait's default body: `Origin::Call::runs`).
+/// trait's default body: `Origin::Call::runs`), and its type past the receiver (a `sig` as
+/// `FnShape`'s).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Coercion {
     pub trait_path: String,
@@ -149,7 +186,7 @@ pub struct Coercion {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub in_static: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub methods: Vec<(String, String)>,
+    pub methods: Vec<(String, String, String)>,
 }
 
 /// Function `func` writes `value` through its parameter `index`; `value` names its parameters.
@@ -219,6 +256,21 @@ impl Links {
         for f in other.summarised {
             if !self.summarised.contains(&f) {
                 self.summarised.push(f);
+            }
+        }
+        for a in other.named {
+            if !self.named.contains(&a) {
+                self.named.push(a);
+            }
+        }
+        for a in other.opaque {
+            if !self.opaque.contains(&a) {
+                self.opaque.push(a);
+            }
+        }
+        for c in other.dyn_calls {
+            if !self.dyn_calls.contains(&c) {
+                self.dyn_calls.push(c);
             }
         }
     }
@@ -431,6 +483,9 @@ pub enum Target {
         const_args: Vec<Option<i128>>,
         arg_origins: Vec<Origin>,
         arg_lens: Vec<Option<u64>>,
+        /// The pointer's type, as `FnShape::sig` gives it.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        sig: Option<String>,
     },
     /// A reference to a named `const` item, e.g. `&aws_lc_rs::aead::AES_256_GCM`: aws-lc-rs
     /// defines its algorithms as consts, which are copied by value and have no allocation.
