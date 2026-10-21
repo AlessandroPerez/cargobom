@@ -1,0 +1,145 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:12:23 | ring::digest::digest | [reachable] [call] in a157::h3; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a157::main`; line: `fn h3(a: D) -> usize { digest(a, b"h3").as_ref().len() } // SHA-1, SHA-256`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:26:20 | ring::digest::digest | [reachable] [call] in a157::main::{closure#2}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a157::other`; instantiated by a157::main at src/main.rs:26:12; line: `let f = |a: &D| digest(a, &d).as_ref().len(); // SHA-256, SHA-384, SHA-1`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:16 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let _ = gd(&SHA1);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:46:16 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let _ = hb(&SHA1);`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:54:40 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let mut sv: Vec<D> = vec![&SHA256, &SHA1];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:59:23 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let a3: [D; 1] = [&SHA1];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:64:42 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let cs = [Cfg { alg: &SHA384, other: &SHA1 }, Cfg { alg: &SHA512, other: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:64:78 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `let cs = [Cfg { alg: &SHA384, other: &SHA1 }, Cfg { alg: &SHA512, other: &SHA1 }];`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:66:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#12}; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: type-join, possible (a value `a157::main` stores in the field); instantiated by a157::main at src/main.rs:66:33; line: `let _: usize = cs.iter().map(|c| digest(c.other, &d).as_ref().len()).sum(); // SHA-1`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:75:76 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main::{closure#16}; instantiated by a157::main at src/main.rs:75:33; line: `let _: usize = a1.iter().map(|a| { let mut b: D = a; if n(4) > 0 { b = &SHA1; } digest(b, &d).as_ref().len() }).sum(); // SHA-256, SHA-384, SHA-1`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:75:84 | ring::digest::digest | [reachable] [call] in a157::main::{closure#16}; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; instantiated by a157::main at src/main.rs:75:33; line: `let _: usize = a1.iter().map(|a| { let mut b: D = a; if n(4) > 0 { b = &SHA1; } digest(b, &d).as_ref().len() }).sum(); // SHA-256, SHA-384, SHA-1`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:78:26 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::main; line: `if n(5) > 0 { v.push(&SHA1); } else { v.push(&SHA512); }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:79:41 | ring::digest::digest | [reachable] [call] in a157::main::{closure#17}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: container, possible (a value `alloc::vec::Vec::push` puts in it); instantiated by a157::main at src/main.rs:79:27; line: `v.into_iter().for_each(|a| { let _ = digest(a, &d); }); // SHA-1, SHA-512`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:8:51 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a157::other; instantiated by a157::main at src/main.rs:28:12 as `other`; line: `fn other<F: Fn(&D) -> usize>(f: F) -> usize { f(&(&SHA1 as D)) }`; code: `SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:24 | ring::digest::digest | [reachable] [call] in a157::h1; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: container, possible (a value `core::slice::iter` puts in it); line: `fn h1(a: &D) -> usize { digest(a, b"h1").as_ref().len() } // SHA-512, SHA-256, SHA-384`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:23 | ring::digest::digest | [reachable] [call] in a157::h3; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a157::main`; line: `fn h3(a: D) -> usize { digest(a, b"h3").as_ref().len() } // SHA-1, SHA-256`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:23 | ring::digest::SHA256 | [reachable] [static] in a157::main; line: `let a1: [D; 2] = [&SHA256, &SHA384];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:21:33; line: `let _: usize = a1.iter().map(|a| digest(a, &d).as_ref().len()).sum(); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:19 | ring::digest::digest | [reachable] [call] in a157::main::{closure#3}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:30:12; line: `let g = |a: D| digest(a, &d).as_ref().len(); // SHA-256, SHA-1`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:31:15 | ring::digest::SHA256 | [reachable] [static] in a157::main; line: `let _ = g(&SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:16 | ring::digest::SHA256 | [reachable] [static] in a157::main; line: `let _ = h3(&SHA256);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:31 | ring::digest::SHA256 | [reachable] [static] in a157::main; line: `let mut sv: Vec<D> = vec![&SHA256, &SHA1];`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:62:71 | ring::digest::digest | [reachable] [call] in a157::main::{closure#10}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:62:67; line: `let _: usize = a1.iter().filter(|a| a.output_len() > n(1)).map(|a| digest(a, &d).as_ref().len()).sum(); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:75:84 | ring::digest::digest | [reachable] [call] in a157::main::{closure#16}; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:75:33; line: `let _: usize = a1.iter().map(|a| { let mut b: D = a; if n(4) > 0 { b = &SHA1; } digest(b, &d).as_ref().len() }).sum(); // SHA-256, SHA-384, SHA-1`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:10:24 | ring::digest::digest | [reachable] [call] in a157::h1; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::slice::iter` puts in it); line: `fn h1(a: &D) -> usize { digest(a, b"h1").as_ref().len() } // SHA-512, SHA-256, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:11:23 | ring::digest::digest | [reachable] [call] in a157::h2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `a157::main`; line: `fn h2(a: D) -> usize { digest(a, b"h2").as_ref().len() } // SHA-512, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:37 | ring::digest::digest | [reachable] [call] in a157::mk::{closure#0}; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:51:12; line: `fn mk() -> impl Fn(D) -> usize { |a| digest(a, b"mk").as_ref().len() } // SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:20:32 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let a1: [D; 2] = [&SHA256, &SHA384];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:21:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:21:33; line: `let _: usize = a1.iter().map(|a| digest(a, &d).as_ref().len()).sum(); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:37:18 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let _ = Some(&SHA384 as D).map(k);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:42:18 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let _ = Some(&SHA384 as D).map(h2);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:51:18 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let _ = mk()(&SHA384);`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:62:71 | ring::digest::digest | [reachable] [call] in a157::main::{closure#10}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:62:67; line: `let _: usize = a1.iter().filter(|a| a.output_len() > n(1)).map(|a| digest(a, &d).as_ref().len()).sum(); // SHA-256, SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:64:26 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let cs = [Cfg { alg: &SHA384, other: &SHA1 }, Cfg { alg: &SHA512, other: &SHA1 }];`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:65:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#11}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a157::main` stores in the field); instantiated by a157::main at src/main.rs:65:33; line: `let _: usize = cs.iter().map(|c| digest(c.alg, &d).as_ref().len()).sum(); // SHA-384, SHA-512`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:68:43 | ring::digest::SHA384 | [reachable] [static] in a157::main; line: `let o: Option<D> = if n(2) > 0 { Some(&SHA384) } else { None };`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:69:22 | ring::digest::digest | [reachable] [call] in a157::main::{closure#13}; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:69:18; line: `let _ = o.map(|a| digest(a, &d)); // SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:70:28 | ring::digest::digest | [reachable] [call] in a157::main::{closure#14}; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:70:24; line: `let _ = o.map_or(0, |a| digest(a, &d).as_ref().len()); // SHA-384`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:75:84 | ring::digest::digest | [reachable] [call] in a157::main::{closure#16}; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::slice::iter` puts in it); instantiated by a157::main at src/main.rs:75:33; line: `let _: usize = a1.iter().map(|a| { let mut b: D = a; if n(4) > 0 { b = &SHA1; } digest(b, &d).as_ref().len() }).sum(); // SHA-256, SHA-384, SHA-1`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:10:24 | ring::digest::digest | [reachable] [call] in a157::h1; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `a157::main`; line: `fn h1(a: &D) -> usize { digest(a, b"h1").as_ref().len() } // SHA-512, SHA-256, SHA-384`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:23 | ring::digest::digest | [reachable] [call] in a157::h2; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `a157::main`; line: `fn h2(a: D) -> usize { digest(a, b"h2").as_ref().len() } // SHA-512, SHA-384`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:77 | ring::digest::digest | [reachable] [call] in a157::algs::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; instantiated by a157::algs at src/main.rs:14:73; line: `fn algs(xs: &'static [D]) -> impl Iterator<Item = usize> { xs.iter().map(|a| digest(a, b"it").as_ref().len()) } // SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:22 | ring::digest::SHA512 | [reachable] [static] in a157::XS; line: `static XS: [D; 1] = [&SHA512];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:22 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let a2: &[D] = &[&SHA512];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#1}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:24:23; line: `a2.iter().for_each(|a| { let _ = digest(a, &d); }); // SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:35:19 | ring::digest::digest | [reachable] [call] in a157::main::{closure#4}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:35:12; line: `let k = |a: D| digest(a, &d).as_ref().len(); // SHA-512, SHA-384`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:36:15 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let _ = k(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:39:18 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let _ = h1(&(&SHA512 as D));`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:41:16 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let _ = h2(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:49:16 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let _ = cb(&SHA512);`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:52:25 | a157::XS | [reachable] [via-static] in a157::main; a157::XS -> ring::digest::SHA512; line: `let _: usize = algs(&XS).sum();`; code: `XS`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:64:62 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let cs = [Cfg { alg: &SHA384, other: &SHA1 }, Cfg { alg: &SHA512, other: &SHA1 }];`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:65:37 | ring::digest::digest | [reachable] [call] in a157::main::{closure#11}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: type-join, possible (a value `a157::main` stores in the field); instantiated by a157::main at src/main.rs:65:33; line: `let _: usize = cs.iter().map(|c| digest(c.alg, &d).as_ref().len()).sum(); // SHA-384, SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:72:45 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `let r: Result<D, ()> = if n(3) > 0 { Ok(&SHA512) } else { Err(()) };`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:73:22 | ring::digest::digest | [reachable] [call] in a157::main::{closure#15}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:73:18; line: `let _ = r.map(|a| digest(a, &d)); // SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:78:50 | ring::digest::SHA512 | [reachable] [static] in a157::main; line: `if n(5) > 0 { v.push(&SHA1); } else { v.push(&SHA512); }`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:79:41 | ring::digest::digest | [reachable] [call] in a157::main::{closure#17}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: container, possible (a value `alloc::vec::Vec::push` puts in it); instantiated by a157::main at src/main.rs:79:27; line: `v.into_iter().for_each(|a| { let _ = digest(a, &d); }); // SHA-1, SHA-512`; code: `digest`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a157 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a157 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a157 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:26:20 | ring::digest::digest | [reachable] [call] in a157::main::{closure#2}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a157::main at src/main.rs:26:12; line: `let f = |a: &D| digest(a, &d).as_ref().len(); // SHA-256, SHA-384, SHA-1`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:30:19 | ring::digest::digest | [reachable] [call] in a157::main::{closure#3}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a157::main at src/main.rs:30:12; line: `let g = |a: D| digest(a, &d).as_ref().len(); // SHA-256, SHA-1`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:35:19 | ring::digest::digest | [reachable] [call] in a157::main::{closure#4}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a157::main at src/main.rs:35:12; line: `let k = |a: D| digest(a, &d).as_ref().len(); // SHA-512, SHA-384`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:48:51 | ring::digest::digest | [reachable] [call] in a157::main::{closure#5}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:48:47; line: `let cb: Box<dyn Fn(D) -> usize> = Box::new(|a| digest(a, b"cb").as_ref().len()); // SHA-512`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:55:22 | ring::digest::digest | [reachable] [call] in a157::main::{closure#6}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:55:15; line: `sv.sort_by(|x, y| digest(x, b"x").as_ref().len().cmp(&digest(y, b"y").as_ref().len())); // SHA-256, SHA-1`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:55:58 | ring::digest::digest | [reachable] [call] in a157::main::{closure#6}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:55:15; line: `sv.sort_by(|x, y| digest(x, b"x").as_ref().len().cmp(&digest(y, b"y").as_ref().len())); // SHA-256, SHA-1`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:57:58 | ring::digest::digest | [reachable] [call] in a157::main::{closure#7}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:57:45; line: `let _: usize = a1.iter().enumerate().map(|(i, a)| i + digest(a, &d).as_ref().len()).sum(); // SHA-256, SHA-384`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:60:57 | ring::digest::digest | [reachable] [call] in a157::main::{closure#8}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:60:48; line: `let _: usize = a1.iter().zip(a3.iter()).map(|(a, b)| digest(a, &d).as_ref().len() + digest(b, &d).as_ref().len()).sum(); // SHA-256, SHA-384 / SHA-1`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:60:88 | ring::digest::digest | [reachable] [call] in a157::main::{closure#8}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:60:48; line: `let _: usize = a1.iter().zip(a3.iter()).map(|(a, b)| digest(a, &d).as_ref().len() + digest(b, &d).as_ref().len()).sum(); // SHA-256, SHA-384 / SHA-1`; code: `digest`
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=14
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=10
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=15
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=18
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=9
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a157@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:ring
+dependency pkg:cargo/a157@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
+root {"bom-ref": "pkg:cargo/a157@0.1.0", "name": "a157", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a157@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=317
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
