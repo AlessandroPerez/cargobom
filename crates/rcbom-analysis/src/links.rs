@@ -14,7 +14,7 @@
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 
-use rcbom_facts::{CrateFacts, Origin};
+use rcbom_facts::{CrateFacts, NOT_FOLLOWED, Origin};
 
 #[derive(Default)]
 pub struct LinkIndex {
@@ -109,10 +109,6 @@ fn instance_base(name: &str) -> String {
 }
 
 type Values = Option<Vec<(Origin, String)>>;
-
-/// The prefix of the `Origin::Through::callee` the links give for a value they do not follow
-/// (`marker`): never a value of the read, a gap beside the values found.
-const NOT_FOLLOWED: &str = "<not followed>";
 
 /// A value the links do not follow, with why (`what `f` writes: no summary of it`): the value
 /// search reports it as a gap, never as the value before or as another part of the value.
@@ -718,6 +714,49 @@ impl LinkIndex {
             },
             _ => None,
         }
+    }
+
+    /// The statics whose contents change at run time that static or constant `id` is, or refers
+    /// to (`static REF1: &Mutex<..> = &M1`, `const CREF: &Mutex<..> = &M2`), or holds references
+    /// to (`static TAB: [&Mutex<..>; 1] = [&M1]`): a read through it reads them.
+    pub fn mutable_statics_of(&self, def: &rcbom_facts::DefRef) -> Vec<rcbom_facts::DefRef> {
+        fn walk(
+            ix: &LinkIndex,
+            def: &rcbom_facts::DefRef,
+            depth: usize,
+            out: &mut Vec<rcbom_facts::DefRef>,
+        ) {
+            if depth > 4 || out.iter().any(|d| d.id == def.id) {
+                return;
+            }
+            if ix.mutable_static(&def.id).is_some() {
+                out.push(def.clone());
+                return;
+            }
+            let values: Vec<&Origin> = match ix.statics.get(&def.id) {
+                Some((false, v)) => v.iter().collect(),
+                _ => return,
+            };
+            fn datas<'o>(o: &'o Origin, acc: &mut Vec<&'o rcbom_facts::DefRef>) {
+                match o {
+                    Origin::Data { def, .. } => acc.push(def),
+                    Origin::Any(v) | Origin::All(v) => v.iter().for_each(|x| datas(x, acc)),
+                    _ => {}
+                }
+            }
+            let mut targets = Vec::new();
+            for v in values {
+                datas(v, &mut targets);
+            }
+            for t in targets {
+                if t.id != def.id {
+                    walk(ix, t, depth + 1, out);
+                }
+            }
+        }
+        let mut out = Vec::new();
+        walk(self, def, 0, &mut out);
+        out
     }
 
     /// The values a static whose contents change at run time holds, each with how: its

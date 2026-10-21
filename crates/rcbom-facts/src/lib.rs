@@ -40,6 +40,10 @@ pub fn element_writer(callee: &str) -> Option<&str> {
     callee.strip_prefix(ELEMENT_WRITE).map(|w| w.trim_start())
 }
 
+/// The prefix of an `Origin::Through::callee` that stands for a value not followed, with why
+/// after it (`<not followed> a cell ..`): never a value of the read, a gap beside the values found.
+pub const NOT_FOLLOWED: &str = "<not followed>";
+
 /// The `FieldStore::adt` and `Origin::Field::adt` of a tuple's element, recorded only in a
 /// static's or a constant's initializer and read only from that static (`PAIRS[i].0`).
 pub const TUPLE: &str = "(tuple)";

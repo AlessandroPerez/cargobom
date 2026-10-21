@@ -24,6 +24,8 @@
 //!                      and each site dropped for having no source position
 //!   RCBOM_DEBUG_WALK   a substring of instance names: print the walk's edges out of the
 //!                      matching instances
+//!   RCBOM_DEBUG_CELLS  print each body's open cells (locals whose cells may change through an
+//!                      alias the definitions do not follow)
 
 #![feature(rustc_private)]
 

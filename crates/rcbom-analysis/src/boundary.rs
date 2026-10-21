@@ -1133,6 +1133,50 @@ fn collect(
             ]
             .iter()
             .any(|m| bare.ends_with(m));
+            // a call that is no container's: what the search's table says its value is made of
+            // (`r.ok()`: the value, never an `Err`'s; `o.unwrap_or(x)`: either; `x.clone()`);
+            // `Some(x)`, `Ok(x)` hold `x`, `Err(e)` no value read here; an error side read
+            // (`unwrap_err`) and a call the table does not model are not followed
+            let chosen: Option<Vec<Origin>> = if store || read || extend || predicate {
+                None
+            } else if callee == rcbom_facts::RESULT_ERR {
+                return;
+            } else {
+                use crate::search::Std;
+                match crate::search::std_semantics(callee) {
+                    Some(Std::Arg(n)) => Some(args.get(n).cloned().into_iter().collect()),
+                    Some(Std::Args(ns)) => {
+                        Some(ns.iter().filter_map(|n| args.get(*n).cloned()).collect())
+                    }
+                    Some(Std::Choice) => Some(crate::provenance::choice_values(callee, args)),
+                    Some(Std::Map) => Some(crate::provenance::mapped_values(callee, args)),
+                    Some(Std::Nothing) => return,
+                    Some(Std::Old | Std::OrDefault | Std::Store(_)) => None,
+                    Some(Std::ErrRead) => {
+                        out.unresolved.push((
+                            format!("the error side read by `{}`", short_fn(callee)),
+                            via.clone(),
+                        ));
+                        return;
+                    }
+                    None if bare.ends_with("::Some") || bare.ends_with("::Ok") => {
+                        Some(args.first().cloned().into_iter().collect())
+                    }
+                    None => {
+                        out.unresolved.push((
+                            format!("the value of `{}`, a call not followed", short_fn(callee)),
+                            via.clone(),
+                        ));
+                        return;
+                    }
+                }
+            };
+            if let Some(vals) = chosen {
+                for a in &vals {
+                    collect(ctx, a, owner, krate, accept, depth + 1, true, via, out);
+                }
+                return;
+            }
             for (i, a) in args.iter().enumerate() {
                 if map && i == 1 {
                     continue;
