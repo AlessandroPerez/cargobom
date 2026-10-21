@@ -1,5 +1,6 @@
-//! Validation against the vendored CycloneDX 1.7 schemas (offline; the registry enums for
-//! algorithm families and curves come with `cryptography-defs.schema.json`).
+//! Validation against the vendored CycloneDX 1.7 schemas (offline, `schema/`; the registry enums
+//! for algorithm families and curves come with `cryptography-defs.schema.json`, vendored with the
+//! registry in `rcbom-kb`).
 
 use anyhow::{Result, anyhow};
 use serde_json::Value;
@@ -7,20 +8,17 @@ use serde_json::Value;
 const SCHEMAS: &[(&str, &str)] = &[
     (
         "bom-1.7.schema.json",
-        include_str!("../../../schema/bom-1.7.schema.json"),
+        include_str!("../schema/bom-1.7.schema.json"),
     ),
     (
         "spdx.schema.json",
-        include_str!("../../../schema/spdx.schema.json"),
+        include_str!("../schema/spdx.schema.json"),
     ),
     (
         "jsf-0.82.schema.json",
-        include_str!("../../../schema/jsf-0.82.schema.json"),
+        include_str!("../schema/jsf-0.82.schema.json"),
     ),
-    (
-        "cryptography-defs.schema.json",
-        include_str!("../../../schema/cryptography-defs.schema.json"),
-    ),
+    ("cryptography-defs.schema.json", rcbom_kb::REGISTRY_SCHEMA),
 ];
 
 struct Vendored;

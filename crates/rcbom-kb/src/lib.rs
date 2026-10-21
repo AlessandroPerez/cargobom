@@ -1,5 +1,5 @@
 //! The knowledge base: which crates are cryptographic (Layer 1) and how their types, statics
-//! and functions map to registry-named algorithms (Layer 2). It is data (`kb/seed.toml`); this
+//! and functions map to registry-named algorithms (Layer 2). It is data (`data/seed.toml`); this
 //! crate loads and validates it.
 
 pub mod registry;
@@ -11,7 +11,11 @@ use regex::Regex;
 use serde::Deserialize;
 
 /// The seed shipped with the tool.
-pub const SEED: &str = include_str!("../../../kb/seed.toml");
+pub const SEED: &str = include_str!("../data/seed.toml");
+
+/// The CycloneDX 1.7 schema of the Cryptography Registry's enums (algorithm families, curves),
+/// vendored with the registry (`data/NOTICE`).
+pub const REGISTRY_SCHEMA: &str = include_str!("../data/cryptography-defs.schema.json");
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -585,10 +589,8 @@ const PRIMITIVES: &[&str] = &[
 /// `algorithmFamily` values CycloneDX 1.7 accepts (the enum of `cryptography-defs.schema.json`,
 /// which lags the registry: it has no `TLS-PRF`).
 static FAMILY_ENUM: std::sync::LazyLock<Vec<String>> = std::sync::LazyLock::new(|| {
-    let schema: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../schema/cryptography-defs.schema.json"
-    ))
-    .expect("cryptography-defs.schema.json");
+    let schema: serde_json::Value =
+        serde_json::from_str(REGISTRY_SCHEMA).expect("cryptography-defs.schema.json");
     schema["definitions"]["algorithmFamiliesEnum"]["enum"]
         .as_array()
         .into_iter()

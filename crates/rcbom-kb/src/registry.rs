@@ -1,11 +1,11 @@
-//! The CycloneDX Cryptography Registry's name patterns (`schema/cryptography-defs.json`), to
+//! The CycloneDX Cryptography Registry's name patterns (`data/cryptography-defs.json`), to
 //! check asset names: the JSON schema only enforces families.
 //!
 //! Pattern notation: `[x]` is optional, `(a|b)` a choice, `{name}` a parameter value.
 
 use std::sync::LazyLock;
 
-const DEFS: &str = include_str!("../../../schema/cryptography-defs.json");
+const DEFS: &str = include_str!("../data/cryptography-defs.json");
 
 /// A pattern's parts: text, a bracketed or parenthesised group of alternatives (optional when
 /// in `[..]`), a parameter.
