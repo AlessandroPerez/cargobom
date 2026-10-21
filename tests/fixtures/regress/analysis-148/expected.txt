@@ -1,8 +1,9 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:38:58 | ring::digest::SHA256 | [reachable] [static] in a148::main; line: `let mut root = Node::A(Box::new(Pair { l: Node::Leaf(&SHA256), r: Node::Leaf(&SHA384) }));`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a148::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a148::deepest`; line: `let _ = digest::digest(first(&root), b"data");`; code: `digest::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a148::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `a148::deepest`; line: `let _ = digest::digest(first(&root), b"data");`; code: `digest::digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:38:82 | ring::digest::SHA384 | [reachable] [static] in a148::main; line: `let mut root = Node::A(Box::new(Pair { l: Node::Leaf(&SHA256), r: Node::Leaf(&SHA384) }));`; code: `SHA384`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a148::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `a148::main` stores in the field); line: `let _ = digest::digest(first(&root), b"data");`; code: `digest::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a148::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `a148::main` stores in the field); line: `let _ = digest::digest(first(&root), b"data");`; code: `digest::digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:25:14 | ring::digest::SHA512 | [reachable] [static] in a148::deepest; line: `*a = &SHA512;`; code: `SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:40:12 | ring::digest::digest | [reachable] [call] in a148::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `a148::deepest` stores in the field); line: `let _ = digest::digest(first(&root), b"data");`; code: `digest::digest`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a148 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a148 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a148 (dependencies)
@@ -22,9 +23,9 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
