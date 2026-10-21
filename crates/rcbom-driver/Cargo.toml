@@ -15,3 +15,11 @@ rustc_private = true
 
 # Standalone: built with the pinned nightly, not part of the stable workspace.
 [workspace]
+
+# The e2e and regression runs (scripts/e2e.sh): optimised, with the checks of a debug build
+# (overflow, debug assertions), so a run is fast and an arithmetic overflow still panics.
+[profile.e2e]
+inherits = "release"
+debug-assertions = true
+overflow-checks = true
+incremental = true
