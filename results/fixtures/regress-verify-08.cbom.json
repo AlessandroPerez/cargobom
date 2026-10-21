@@ -102,6 +102,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in vp4::main::{closure#0}; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:22:20; instantiated by vp4::main at src/main.rs:23:27; line: `let _ = [r].iter().map(|h| h(&digest::SHA1_FOR_LEGACY_USE_ONLY, &d)).count();`; code: `h`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in vp4::main::{closure#0}; instantiated by vp4::main at src/main.rs:23:27; line: `let _ = [r].iter().map(|h| h(&digest::SHA1_FOR_LEGACY_USE_ONLY, &d)).count();`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 23,
             "location": "src/main.rs",
@@ -126,7 +133,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -138,7 +145,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -319,61 +326,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in vp4::main; use: digest; algorithm unresolved: named as a function value; the calls through it are not followed; line: `let r: HashFn = digest::digest;`; code: `digest::digest`",
-            "line": 22,
-            "location": "src/main.rs",
-            "offset": 20,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -389,8 +341,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -415,10 +366,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -479,7 +426,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1a4c2edb-abd6-8a9c-90c0-f80f04ef1a1f",
+  "serialNumber": "urn:uuid:750b63a1-da5f-8125-ad22-2022263b3749",
   "specVersion": "1.7",
   "version": 1
 }

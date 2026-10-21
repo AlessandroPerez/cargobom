@@ -256,7 +256,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::aead::algorithm::AES_256_GCM; member: object, from `s3::touch`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `s3::touch`; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 18,
@@ -1910,69 +1910,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:ae:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "encrypt"
-          ],
-          "primitive": "ae"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in s3::main; use: encrypt; algorithm unresolved: other algorithms than these may reach the call: what `s3::touch::<s3::Sealer>` writes through its parameter (no summary of it) is not followed; nonce: hard-coded (12 bytes, literal at line 30); line: `let _ = d.key.seal_in_place_append_tag(Nonce::assume_unique_for_key([4; 12]), Aad::empty(), &mut buf); // after the program's generic fn writing nothing`; code: `seal_in_place_append_tag`",
-            "line": 30,
-            "location": "src/main.rs",
-            "offset": 18,
-            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:nonce",
-          "value": "hard-coded"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-nonce"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -2018,7 +1955,6 @@
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
         "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:ae:ring",
         "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
@@ -2135,10 +2071,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:ae:ring"
     }
   ],
   "metadata": {
@@ -2199,7 +2131,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:dce90a96-2f99-8e1c-8ebe-b82d2b357140",
+  "serialNumber": "urn:uuid:c8656416-6ea7-85f7-9b9c-04d0b190140b",
   "specVersion": "1.7",
   "version": 1
 }
