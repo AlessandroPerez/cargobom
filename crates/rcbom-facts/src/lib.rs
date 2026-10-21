@@ -44,8 +44,9 @@ pub fn element_writer(callee: &str) -> Option<&str> {
 /// after it (`<not followed> a cell ..`): never a value of the read, a gap beside the values found.
 pub const NOT_FOLLOWED: &str = "<not followed>";
 
-/// The `FieldStore::adt` and `Origin::Field::adt` of a tuple's element, recorded only in a
-/// static's or a constant's initializer and read only from that static (`PAIRS[i].0`).
+/// The `FieldStore::adt` and `Origin::Field::adt` of a tuple's element: stored only in a
+/// static's or a constant's initializer (`PAIRS[i].0`); read from any tuple, where the analysis
+/// projects it (that static, `Option::zip`'s pair) or says it does not follow it.
 pub const TUPLE: &str = "(tuple)";
 
 /// How the links name a named constant's initializer as the owner of what it stores, as

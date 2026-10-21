@@ -1044,6 +1044,28 @@ impl LinkIndex {
             } => {
                 let mut p = vec![(adt.clone(), *field, args.clone())];
                 p.extend_from_slice(path);
+                // an element of a tuple built in this function and passed on by the standard
+                // library (`let (alg, key) = keyring["2024"]`, `a.zip(b).unwrap().0`): that
+                // element of each tuple built; what is not followed so, a field of it as below
+                if adt == rcbom_facts::TUPLE {
+                    let (mut found, mut rest) = (Vec::new(), Vec::new());
+                    project_tuple(base, *field, 0, &mut found, &mut rest);
+                    if !found.is_empty() {
+                        for v in &found {
+                            self.resolve(v, path, owner, depth + 1, via, out);
+                        }
+                        for r in rest {
+                            let o = Origin::Field {
+                                adt: adt.clone(),
+                                field: *field,
+                                base: Box::new(r),
+                                args: args.clone(),
+                            };
+                            self.resolve(&o, path, owner, depth + 1, via, out);
+                        }
+                        return;
+                    }
+                }
                 // a field of a static that changes at run time (`CFG.lock().unwrap().h`): that
                 // field of each value it holds (its initializer's, what functions put there)
                 if let Origin::Data { def, .. } = peel(base)
@@ -1478,6 +1500,20 @@ impl LinkIndex {
             if matches!(o, Origin::Through { .. }) {
                 push(out, (o.clone(), owner.to_string(), via.clone()));
             }
+            // an element of a tuple that is no static's (`z.unwrap().0`, `p.0` of a map's value):
+            // tuples' stores are recorded only in statics' initializers, so the join over them
+            // says nothing of this one
+            if path[0].0 == rcbom_facts::TUPLE {
+                push(
+                    out,
+                    (
+                        marker("an element of a tuple the analysis does not follow".into()),
+                        owner.to_string(),
+                        via.clone(),
+                    ),
+                );
+                return;
+            }
             if !self.stored(path, depth, via, out) && !matches!(o, Origin::Truncated) {
                 // no code the facts record stores in the field: not known
                 push(
@@ -1703,6 +1739,99 @@ impl LinkIndex {
             }
         }
         true
+    }
+}
+
+/// Element `field` of a tuple read from `o`, followed through the standard library's calls that
+/// pass values on (`m[k]`, `get`, `unwrap`, `clone`, `unwrap_or(x)`, a container's stores and the
+/// list it was built from) down to the tuples built (their parts at their positions, `Set`), and
+/// through `Option::zip`'s pair (its arguments): those elements in `found`; what is not followed
+/// so in `rest`.
+fn project_tuple(
+    o: &Origin,
+    field: usize,
+    depth: usize,
+    found: &mut Vec<Origin>,
+    rest: &mut Vec<Origin>,
+) {
+    use crate::search::Std;
+    if depth > 8 {
+        rest.push(o.clone());
+        return;
+    }
+    match o {
+        Origin::All(parts) => {
+            for p in parts {
+                match p {
+                    Origin::Set { path, value, .. } if path.as_slice() == [field] => {
+                        found.push((**value).clone())
+                    }
+                    Origin::Set { .. } => {}
+                    // (the elements of a list of tuples, `HashMap::from([(k, v), ..])`)
+                    other => project_tuple(other, field, depth + 1, found, rest),
+                }
+            }
+        }
+        Origin::Any(alts) => {
+            for a in alts {
+                project_tuple(a, field, depth + 1, found, rest);
+            }
+        }
+        Origin::Call {
+            callee,
+            krate,
+            self_ty,
+            args,
+            ..
+        } if matches!(krate.as_str(), "core" | "std" | "alloc") => {
+            let bare = crate::matcher::strip_generics(callee);
+            if bare.ends_with("Option::zip") {
+                match args.get(field) {
+                    Some(a) => found.push(a.clone()),
+                    None => rest.push(o.clone()),
+                }
+                return;
+            }
+            // a map built from (key, value) pairs (`HashMap::from([("a", (x, y))])`): what it
+            // holds, and a read of it gives, is each pair's value
+            if self_ty.as_deref().is_some_and(|t| t.ends_with("Map"))
+                && (bare.ends_with("From::from") || bare.ends_with("FromIterator::from_iter"))
+            {
+                let (mut values, mut other) = (Vec::new(), Vec::new());
+                for a in args.iter().take(1) {
+                    project_tuple(a, 1, depth + 1, &mut values, &mut other);
+                }
+                for v in &values {
+                    project_tuple(v, field, depth + 1, found, rest);
+                }
+                if !other.is_empty() {
+                    rest.push(o.clone());
+                }
+                return;
+            }
+            let mut on = |a: Option<&Origin>| match a {
+                Some(a) => project_tuple(a, field, depth + 1, found, rest),
+                None => rest.push(o.clone()),
+            };
+            match crate::search::std_semantics(callee) {
+                Some(Std::Arg(n)) => on(args.get(n)),
+                Some(Std::Args(ns)) => ns.iter().for_each(|n| on(args.get(*n))),
+                Some(Std::Store(n)) => {
+                    on(args.get(n));
+                    on(args.first());
+                }
+                Some(Std::Old) => on(args.first()),
+                Some(Std::Choice) => {
+                    for a in crate::provenance::choice_values(callee, args) {
+                        on(Some(&a));
+                    }
+                }
+                // an empty container (`HashMap::new()`): no element
+                Some(Std::Nothing) => {}
+                _ => rest.push(o.clone()),
+            }
+        }
+        _ => rest.push(o.clone()),
     }
 }
 

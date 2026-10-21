@@ -927,6 +927,20 @@ pub(crate) fn fn_values(a: &Origin, input: Option<&Origin>) -> Vec<Origin> {
             }
             vec![c]
         }
+        // a function another call returns (`unwrap_or_else(get_fb())`): a call through that
+        // pointer, run with the value, followed to the functions it may be (or a gap)
+        Origin::Call { callee, .. } if callee != "<closure>" && callee != "<indirect>" => {
+            vec![Origin::Call {
+                callee: "<indirect>".into(),
+                krate: String::new(),
+                self_ty: None,
+                args: input.cloned().into_iter().collect(),
+                span: None,
+                runs: None,
+                pointer: Some(Box::new(a.clone())),
+                fed: None,
+            }]
+        }
         _ => vec![a.clone()],
     }
 }
