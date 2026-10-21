@@ -6,7 +6,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:57:0 | ring | [manifest] locked ring 0.17.14; reached via t24 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t24 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:13:22 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:13:22 | ring::digest::digest | [reachable] [call] in t24::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `std::sync::once::Once::call_once`, a standard-library call the analysis does not model is not followed; line: `println!("{} {}", digest(*LS, &d).as_ref().len(), digest(*OC, &d).as_ref().len());`; code: `digest`
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
