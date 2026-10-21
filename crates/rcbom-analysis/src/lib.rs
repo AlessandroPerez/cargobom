@@ -656,9 +656,20 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 }
                 OwnerKind::Fn => site.tier,
             };
-            let Some(owner_pkg) = man.owner_of(&path) else {
+            // code a build script generated (`OUT_DIR`, inside the target directory wherever
+            // that is), and any file outside every package's directory, belongs to the package
+            // of the crate that includes it; the standard library's has none
+            let by_path = if path.starts_with(&man.target_directory) {
+                None
+            } else {
+                man.owner_of(&path)
+            };
+            let Some(owner_pkg) = by_path.or_else(|| {
+                ctx.package_of_crate(&site.owner.krate.name, &site.owner.krate.stable_id)
+                    .and_then(|(n, v)| man.by_name_version(&n, &v))
+            }) else {
                 continue;
-            }; // std, generated code
+            };
             let pkg = (owner_pkg.name.clone(), owner_pkg.version.to_string());
             // Composition between descriptor statics (ECDSA_P256_SHA256_FIXED -> SHA256) holds
             // wherever it is written, including inside the implementing crate.

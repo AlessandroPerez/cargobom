@@ -97,11 +97,17 @@ impl Manifest {
     }
 
     /// How a file is named in the CBOM: relative to the workspace root for workspace files,
-    /// `<package>-<version>/<path>` inside a dependency, unchanged otherwise.
+    /// `<package>-<version>/<path>` inside a dependency, `target/<path>` inside the target
+    /// directory, unchanged otherwise.
     pub fn location(&self, path: &Path) -> String {
         // `src/crypto/aws_lc_rs/../ring/kx.rs` (a `#[path]` include) is `src/crypto/ring/kx.rs`
         let normalized = normalize(path);
         let path = normalized.as_path();
+        // code a build script generated (`OUT_DIR`): named as under the default target
+        // directory, wherever it is (`CARGO_TARGET_DIR`)
+        if let Ok(rel) = path.strip_prefix(&self.target_directory) {
+            return format!("target/{}", rel.display());
+        }
         if let Some(p) = self.owner_of(path)
             && !p.member
         {
@@ -121,6 +127,9 @@ impl Manifest {
             if let Some(rest) = location.strip_prefix(&prefix) {
                 return p.manifest_dir.join(rest);
             }
+        }
+        if let Some(rest) = location.strip_prefix("target/") {
+            return self.target_directory.join(rest);
         }
         let path = Path::new(location);
         if path.is_absolute() {
