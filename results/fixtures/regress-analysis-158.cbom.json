@@ -1,0 +1,1290 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a158 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a158 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a158 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a158::h1; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h1(a: &'static Digest) { let _ = digest(a, b\"h1\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h2; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h2(a: &'static Digest) { let _ = digest(a, b\"h2\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h3; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h3(a: &'static Digest) { let _ = digest(a, b\"h3\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h4; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::run`; line: `fn h4(a: &'static Digest) { let _ = digest(a, b\"h4\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h5; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::gen`; line: `fn h5(a: &'static Digest) { let _ = digest(a, b\"h5\"); } // SHA-384, SHA-1`; code: `digest`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h6; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::run2`; line: `fn h6(a: &'static Digest) { let _ = digest(a, b\"h6\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h7; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::runb`; line: `fn h7(a: &'static Digest) { let _ = digest(a, b\"h7\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h8; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::runp`; line: `fn h8(a: &'static Digest) { let _ = digest(a, b\"h8\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h9; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h9(a: &'static Digest) { let _ = digest(a, b\"h9\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h10; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::rund`; line: `fn h10(a: &'static Digest) { let _ = digest(a, b\"h10\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h11; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h11(a: &'static Digest) { let _ = digest(a, b\"h11\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h14; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h14(a: &'static Digest) { let _ = digest(a, b\"h14\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h15; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h15(a: &'static Digest) { let _ = digest(a, b\"h15\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h16; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; line: `fn h16(a: &'static Digest) { let _ = digest(a, b\"h16\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h19; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::runh`; line: `fn h19(a: &'static Digest) { let _ = digest(a, b\"h19\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::X as a158::Alg>::run; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: dyn, possible (dyn: `a158::X` is coerced to `dyn a158::Alg` at src/main.rs:98); line: `impl Alg for X { fn run(&self, a: &'static Digest) { let _ = digest(a, b\"x\"); } } // SHA-256, SHA-1 (SHA-512 possible: `W<u8>` is coerced to `dyn Alg` too)`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 61,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::GA as a158::G<a158::A1>>::g; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: dyn (dyn: `a158::GA`, the only type coerced to `dyn a158::G` at src/main.rs:100); line: `impl G<A1> for GA { fn g(&self, a: A1) { let _ = digest(a.0, b\"ga\"); } } // SHA-256, SHA-1`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::run; line: `fn run(fs: &[&dyn Fn(&'static Digest)]) { for f in fs { f(&SHA1); } }`; code: `SHA1`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 59,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::run2; line: `fn run2(fs: &[H]) { for f in fs { f(&SHA1); } }`; code: `SHA1`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::runb; line: `fn runb(b: Box<dyn Fn(&'static Digest)>) { b(&SHA1) }`; code: `SHA1`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::runp; line: `fn runp(p: &P) { (p.f)(&SHA1) }`; code: `SHA1`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::rund; line: `fn rund(f: &dyn Fn(&'static Digest)) { f(&SHA1) }`; code: `SHA1`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 42,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::runh; line: `fn runh(f: &dyn Handler) { f(&SHA1) }`; code: `SHA1`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 30,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::gen; instantiated by a158::main at src/main.rs:83:17 as `gen`; line: `fn gen<F: Fn(&'static Digest)>(f: Rc<F>) { f(&SHA1) }`; code: `SHA1`",
+            "line": 52,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `r(&SHA1);`; code: `SHA1`",
+            "line": 58,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h1(&SHA256); let r1: Rc<dyn Fn(&'static Digest)> = Rc::new(h1); r1(&SHA1);`; code: `SHA1`",
+            "line": 79,
+            "location": "src/main.rs",
+            "offset": 72,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h2(&SHA256); let a2: Arc<dyn Fn(&'static Digest)> = Arc::new(h2); a2(&SHA1);`; code: `SHA1`",
+            "line": 80,
+            "location": "src/main.rs",
+            "offset": 74,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h3(&SHA256); let b3: Box<dyn Fn(&'static Digest)> = Box::new(h3); b3(&SHA1);`; code: `SHA1`",
+            "line": 81,
+            "location": "src/main.rs",
+            "offset": 74,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h9(&SHA256); let v: Vec<H> = vec![h9]; for f in &v { f(&SHA1); }`; code: `SHA1`",
+            "line": 87,
+            "location": "src/main.rs",
+            "offset": 60,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h11(&SHA256); let o: Option<H> = Some(h11); if let Some(f) = o { f(&SHA1) }`; code: `SHA1`",
+            "line": 89,
+            "location": "src/main.rs",
+            "offset": 72,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h14(&SHA256); D14(&SHA1);`; code: `SHA1`",
+            "line": 92,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h15(&SHA256); P15(&SHA1);`; code: `SHA1`",
+            "line": 93,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h16(&SHA256); T16[0](&SHA1);`; code: `SHA1`",
+            "line": 94,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `X.run(&SHA256); let t: &dyn Alg = &X; t.run(&SHA1);`; code: `SHA1`",
+            "line": 98,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `GA.g(A1(&SHA256)); let ga: &dyn G<A1> = &GA; ga.g(A1(&SHA1));`; code: `SHA1`",
+            "line": 100,
+            "location": "src/main.rs",
+            "offset": 58,
+            "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          }
+        ]
+      },
+      "name": "SHA-1",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "20"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "35"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a158::h1; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h1(a: &'static Digest) { let _ = digest(a, b\"h1\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h2; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h2(a: &'static Digest) { let _ = digest(a, b\"h2\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h3; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h3(a: &'static Digest) { let _ = digest(a, b\"h3\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h4; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h4(a: &'static Digest) { let _ = digest(a, b\"h4\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h6; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h6(a: &'static Digest) { let _ = digest(a, b\"h6\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h7; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h7(a: &'static Digest) { let _ = digest(a, b\"h7\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h8; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h8(a: &'static Digest) { let _ = digest(a, b\"h8\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h9; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h9(a: &'static Digest) { let _ = digest(a, b\"h9\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h10; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h10(a: &'static Digest) { let _ = digest(a, b\"h10\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h11; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h11(a: &'static Digest) { let _ = digest(a, b\"h11\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h14; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h14(a: &'static Digest) { let _ = digest(a, b\"h14\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h15; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h15(a: &'static Digest) { let _ = digest(a, b\"h15\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h16; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h16(a: &'static Digest) { let _ = digest(a, b\"h16\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h19; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `fn h19(a: &'static Digest) { let _ = digest(a, b\"h19\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::X as a158::Alg>::run; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `impl Alg for X { fn run(&self, a: &'static Digest) { let _ = digest(a, b\"x\"); } } // SHA-256, SHA-1 (SHA-512 possible: `W<u8>` is coerced to `dyn Alg` too)`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 61,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::GA as a158::G<a158::A1>>::g; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a158::main`; line: `impl G<A1> for GA { fn g(&self, a: A1) { let _ = digest(a.0, b\"ga\"); } } // SHA-256, SHA-1`; code: `digest`",
+            "line": 43,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#0}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:55:12; line: `let c = |a: &'static Digest| { let _ = digest(a, b\"1\"); };`; code: `digest`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `c(&SHA256);`; code: `SHA256`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#4}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:74:12; line: `let n = |a: &'static Digest| { let _ = digest(a, b\"5\"); };`; code: `digest`",
+            "line": 74,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `rn2(&SHA256);`; code: `SHA256`",
+            "line": 78,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h1(&SHA256); let r1: Rc<dyn Fn(&'static Digest)> = Rc::new(h1); r1(&SHA1);`; code: `SHA256`",
+            "line": 79,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h2(&SHA256); let a2: Arc<dyn Fn(&'static Digest)> = Arc::new(h2); a2(&SHA1);`; code: `SHA256`",
+            "line": 80,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h3(&SHA256); let b3: Box<dyn Fn(&'static Digest)> = Box::new(h3); b3(&SHA1);`; code: `SHA256`",
+            "line": 81,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h4(&SHA256); run(&[&h4]);`; code: `SHA256`",
+            "line": 82,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h6(&SHA256); run2(&[h6]);`; code: `SHA256`",
+            "line": 84,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h7(&SHA256); runb(Box::new(h7));`; code: `SHA256`",
+            "line": 85,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h8(&SHA256); runp(&P { f: h8 });`; code: `SHA256`",
+            "line": 86,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h9(&SHA256); let v: Vec<H> = vec![h9]; for f in &v { f(&SHA1); }`; code: `SHA256`",
+            "line": 87,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h10(&SHA256); rund(&h10);`; code: `SHA256`",
+            "line": 88,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h11(&SHA256); let o: Option<H> = Some(h11); if let Some(f) = o { f(&SHA1) }`; code: `SHA256`",
+            "line": 89,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h14(&SHA256); D14(&SHA1);`; code: `SHA256`",
+            "line": 92,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h15(&SHA256); P15(&SHA1);`; code: `SHA256`",
+            "line": 93,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h16(&SHA256); T16[0](&SHA1);`; code: `SHA256`",
+            "line": 94,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h19(&SHA256); runh(&h19);`; code: `SHA256`",
+            "line": 97,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `X.run(&SHA256); let t: &dyn Alg = &X; t.run(&SHA1);`; code: `SHA256`",
+            "line": 98,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "ring::digest::SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `GA.g(A1(&SHA256)); let ga: &dyn G<A1> = &GA; ga.g(A1(&SHA1));`; code: `SHA256`",
+            "line": 100,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "36"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a158::h5; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `a158::main`; line: `fn h5(a: &'static Digest) { let _ = digest(a, b\"h5\"); } // SHA-384, SHA-1`; code: `digest`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h12; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; line: `fn h12(a: &'static Digest) { let _ = digest(a, b\"h12\"); } // SHA-384, SHA-512 (the standard library runs it)`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h17; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; line: `fn h17(a: &'static Digest) { let _ = digest(a, b\"h17\"); } // SHA-384, SHA-512 (`map` runs the pointer)`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h18; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `a158::main`; line: `fn h18(a: &'static Digest) { let _ = digest(a, b\"h18\"); } // SHA-384, SHA-512`; code: `digest`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::GB as a158::G<a158::A2>>::g; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `a158::main`; line: `impl G<A2> for GB { fn g(&self, a: A2) { let _ = digest(a.0, b\"gb\"); } } // SHA-384, SHA-512`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#1}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:60:12; line: `let k = |a: &'static Digest| { let _ = digest(a, b\"2\"); };`; code: `digest`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `k(&SHA384);`; code: `SHA384`",
+            "line": 61,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#2}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:65:12; line: `let q = |a: &'static Digest| { let _ = digest(a, b\"3\"); };`; code: `digest`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `q(&SHA384);`; code: `SHA384`",
+            "line": 66,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#3}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:70:12; line: `let m = |a: &'static Digest| { let _ = digest(a, b\"4\"); };`; code: `digest`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `m(&SHA384);`; code: `SHA384`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h5(&SHA384); gen(Rc::new(h5));`; code: `SHA384`",
+            "line": 83,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h12(&SHA384); let p12: H = h12; [&SHA512].into_iter().for_each(p12);`; code: `SHA384`",
+            "line": 91,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h17(&SHA384); let p17: H = h17; let _ = Some(&SHA512).map(p17);`; code: `SHA384`",
+            "line": 95,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h18(&SHA384); let _ = Some(&SHA512).map(h18);`; code: `SHA384`",
+            "line": 96,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `let w = W(1u8); w.run(&SHA384); let tw: &dyn Alg = &w; tw.run(&SHA512);`; code: `SHA384`",
+            "line": 99,
+            "location": "src/main.rs",
+            "offset": 27,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `GB.g(A2(&SHA384)); let gb: &dyn G<A2> = &GB; gb.g(A2(&SHA512));`; code: `SHA384`",
+            "line": 101,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::digest::SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "17"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a158::h13; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: caller, passed by `a158::main`; line: `fn h13(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); } // SHA-512: no pointer of its type is called`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h18; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `a158::main`; line: `fn h18(a: &'static Digest) { let _ = digest(a, b\"h18\"); } // SHA-384, SHA-512`; code: `digest`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::X as a158::Alg>::run; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `a158::X` is coerced to `dyn a158::Alg` at src/main.rs:98); line: `impl Alg for X { fn run(&self, a: &'static Digest) { let _ = digest(a, b\"x\"); } } // SHA-256, SHA-1 (SHA-512 possible: `W<u8>` is coerced to `dyn Alg` too)`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 61,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::GB as a158::G<a158::A2>>::g; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn (dyn: `a158::GB`, the only type coerced to `dyn a158::G` at src/main.rs:101); line: `impl G<A2> for GB { fn g(&self, a: A2) { let _ = digest(a.0, b\"gb\"); } } // SHA-384, SHA-512`; code: `digest`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 49,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `s(&SHA512);`; code: `SHA512`",
+            "line": 63,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `p(&SHA512);`; code: `SHA512`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#4}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:74:12; line: `let n = |a: &'static Digest| { let _ = digest(a, b\"5\"); };`; code: `digest`",
+            "line": 74,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `rn(&SHA512);`; code: `SHA512`",
+            "line": 76,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h12(&SHA384); let p12: H = h12; [&SHA512].into_iter().for_each(p12);`; code: `SHA512`",
+            "line": 91,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h17(&SHA384); let p17: H = h17; let _ = Some(&SHA512).map(p17);`; code: `SHA512`",
+            "line": 95,
+            "location": "src/main.rs",
+            "offset": 50,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h18(&SHA384); let _ = Some(&SHA512).map(h18);`; code: `SHA512`",
+            "line": 96,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `let w = W(1u8); w.run(&SHA384); let tw: &dyn Alg = &w; tw.run(&SHA512);`; code: `SHA512`",
+            "line": 99,
+            "location": "src/main.rs",
+            "offset": 67,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `GB.g(A2(&SHA384)); let gb: &dyn G<A2> = &GB; gb.g(A2(&SHA512));`; code: `SHA512`",
+            "line": 101,
+            "location": "src/main.rs",
+            "offset": 58,
+            "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a158::main; line: `h13(&SHA512, b\"13\"); let _p13: fn(&'static Digest, &[u8]) = h13;`; code: `SHA512`",
+            "line": 102,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::digest::SHA512"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "14"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:hash:ring",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a158::h1; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h1(a: &'static Digest) { let _ = digest(a, b\"h1\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h2; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h2(a: &'static Digest) { let _ = digest(a, b\"h2\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h3; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h3(a: &'static Digest) { let _ = digest(a, b\"h3\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h4; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h4(a: &'static Digest) { let _ = digest(a, b\"h4\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h6; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h6(a: &'static Digest) { let _ = digest(a, b\"h6\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h7; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h7(a: &'static Digest) { let _ = digest(a, b\"h7\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h8; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h8(a: &'static Digest) { let _ = digest(a, b\"h8\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h9; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h9(a: &'static Digest) { let _ = digest(a, b\"h9\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h10; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h10(a: &'static Digest) { let _ = digest(a, b\"h10\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h11; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h11(a: &'static Digest) { let _ = digest(a, b\"h11\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h12; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h12(a: &'static Digest) { let _ = digest(a, b\"h12\"); } // SHA-384, SHA-512 (the standard library runs it)`; code: `digest`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h14; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h14(a: &'static Digest) { let _ = digest(a, b\"h14\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h15; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h15(a: &'static Digest) { let _ = digest(a, b\"h15\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h16; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h16(a: &'static Digest) { let _ = digest(a, b\"h16\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h17; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h17(a: &'static Digest) { let _ = digest(a, b\"h17\"); } // SHA-384, SHA-512 (`map` runs the pointer)`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::h19; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn h19(a: &'static Digest) { let _ = digest(a, b\"h19\"); } // SHA-256, SHA-1`; code: `digest`",
+            "line": 26,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <a158::W<u8> as a158::Alg>::run; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a158::main at src/main.rs:99:22 as `run`; line: `impl<T: Copy> Alg for W<T> { fn run(&self, a: &'static Digest) { let _ = digest(a, b\"w\"); } } // SHA-384, SHA-512`; code: `digest`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 73,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#0}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a158::main at src/main.rs:55:12; line: `let c = |a: &'static Digest| { let _ = digest(a, b\"1\"); };`; code: `digest`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a158::main at src/main.rs:60:12; line: `let k = |a: &'static Digest| { let _ = digest(a, b\"2\"); };`; code: `digest`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#2}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a158::main at src/main.rs:65:12; line: `let q = |a: &'static Digest| { let _ = digest(a, b\"3\"); };`; code: `digest`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#3}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a158::main at src/main.rs:70:12; line: `let m = |a: &'static Digest| { let _ = digest(a, b\"4\"); };`; code: `digest`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "21"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a158@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-1",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512",
+        "crypto:algorithm:unknown:hash:ring"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:hash:ring"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a158@0.1.0",
+      "name": "a158",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a158@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "211"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:d7942cc2-3649-8835-a3c1-c94212221e08",
+  "specVersion": "1.7",
+  "version": 1
+}
