@@ -395,7 +395,22 @@ impl Files<'_> {
             let in_block = |kind: ItemKind, name: &str, tr: Option<&str>, f: &Item| {
                 src.items.iter().any(|b| {
                     b.kind == kind
-                        && (b.name == name || dealias(&b.name) == dealias(name))
+                        // (the impl's type written in full, with its references and type
+                        // arguments, where it says more than its name: `impl Put for &mut A`
+                        // is no `<&'static Algorithm as Put>`'s)
+                        && (kind != ItemKind::Impl
+                            || written_self(&src, b, n.self_full.as_deref(), &mut |a| {
+                                aliases
+                                    .iter()
+                                    .find_map(|m| m.get(a).cloned())
+                                    .unwrap_or_default()
+                            })
+                            .unwrap_or(true))
+                        && (b.name == name
+                            || impl_self(&src, b)
+                                .and_then(|(t, _)| src.alias_at(src.idx(b.start), &t))
+                                .map_or_else(|| dealias(&b.name), |d| type_name(&d))
+                                == dealias(name))
                         && b.contains(f.start)
                         && b.start != f.start
                         && tr.is_none_or(|t| {

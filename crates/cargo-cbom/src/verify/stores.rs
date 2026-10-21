@@ -818,8 +818,7 @@ pub(super) fn call_kills(
                 at = m;
             }
         }
-        let (o, c) = sc.block_of(at);
-        if o < start && start < c {
+        if sc.every_way(s, at, start) {
             for (k, v) in kills {
                 if place == k || place.starts_with(&format!("{k}.")) {
                     best = Some((at, v));
@@ -979,6 +978,91 @@ pub(super) fn body_assigns(
 }
 /// The place a read at `start` reads: the variable and the fields and literal indexes after it
 /// (`c9.alg`, `t.0`, `v10[0]`), and where it ends.
+/// The values the body of the file's function `f` may store through its parameter `param`,
+/// anywhere in it (`*slot = v`, `slot.alg = v`, `slot[0] = v`): `None` when the body does more
+/// with the parameter than store through it and read what it points to (hands it on, borrows
+/// it, calls a method on it, points it elsewhere), where what reaches the caller's place is not
+/// read so.
+pub(super) fn param_stores(src: &Source, f: &Item, param: &str) -> Option<Vec<(usize, usize)>> {
+    let s = &src.code;
+    let sc = src.fn_scope(f);
+    let (b0, b1) = sc.body;
+    let mut out = Vec::new();
+    let mut i = b0;
+    while i < b1.min(s.len()) {
+        if !kw(s, i, param)
+            || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
+            || !matches!(lookup(src, i, param), Some(Found::Param(_)))
+        {
+            i += 1;
+            continue;
+        }
+        let deref = before_blank(s, i).is_some_and(|p| s[p] == '*');
+        let (place, end) = read_place(s, i);
+        let next = skip_blank(s, end);
+        let assign = s.get(next) == Some(&'=') && !matches!(s.get(next + 1), Some('=' | '>'));
+        // (a store through it, at a statement's start)
+        let at = if deref {
+            before_blank(s, i).unwrap_or(i)
+        } else {
+            i
+        };
+        let stmt_start = before_blank(s, at).is_none_or(|p| matches!(s[p], ';' | '{' | '}'));
+        // (borrowed again, `&mut *p`, `&p.alg`: handed on)
+        let borrowed = before_blank(s, at).is_some_and(|p| s[p] == '&')
+            || (word_before_at(s, at) == "mut"
+                && before_blank(s, at)
+                    .and_then(|m| before_blank(s, m + 1 - 3))
+                    .is_some_and(|a| s[a] == '&'));
+        if borrowed {
+            return None;
+        }
+        if assign && stmt_start && (deref || place != param) {
+            let e = scan_to(s, next + 1, b1, |m| s[m] == ';');
+            out.push((next + 1, e));
+        } else if assign
+            || !(deref || place != param)
+            || matches!(s.get(next), Some('.' | '['))
+            || (place != param && s.get(next) == Some(&'('))
+        {
+            // pointed elsewhere, handed on whole, a method called on it, an index not read
+            return None;
+        }
+        i = end.max(i + 1);
+    }
+    Some(out)
+}
+/// The parameter of the file's function `fi` a variable at `at` is handed to: its argument's
+/// (`f(&mut x)`: by the commas before it), or the receiver, `self` (`x.m()`).
+pub(super) fn param_at(src: &Source, at: usize, fi: &Item) -> Option<String> {
+    let s = &src.code;
+    let params = &src.fn_scope(fi).params;
+    let after = skip_blank(s, at + word_of(s, at).chars().count());
+    if s.get(after) == Some(&'.') {
+        return params.first().filter(|p| *p == "self").cloned();
+    }
+    let mut depth = 0;
+    let mut j = at;
+    let mut commas = 0;
+    while j > 0 {
+        j -= 1;
+        match s[j] {
+            ')' | ']' | '}' => depth += 1,
+            '(' if depth == 0 => {
+                let f = word_before_at(s, j);
+                let fb = j - f.chars().count();
+                let method = before_blank(s, fb).is_some_and(|p| s[p] == '.');
+                let k = commas + usize::from(method && params.first().is_some_and(|p| p == "self"));
+                return params.get(k).cloned();
+            }
+            '(' | '[' | '{' => depth -= 1,
+            ',' if depth == 0 => commas += 1,
+            ';' if depth == 0 => return None,
+            _ => {}
+        }
+    }
+    None
+}
 pub(super) fn read_place(s: &[char], start: usize) -> (String, usize) {
     let mut out = word_of(s, start);
     let mut j = start + out.len();
@@ -1549,6 +1633,121 @@ pub(super) fn variant_parts(src: &Source, bd: &Bind) -> Option<Vec<(usize, usize
         }
     }
     (!out.is_empty()).then_some(out)
+}
+/// Does the variable bound by `bd` hold a cell (`Cell::new(..)`, `RefCell`, `Mutex`, `RwLock`,
+/// a once-cell, an atomic; behind an `Rc` or `Arc` too): what it holds changes through shared
+/// borrows of it?
+pub(super) fn cell_binding(src: &Source, bd: &Bind) -> bool {
+    let cell = re!(
+        r"\b(?:Cell|RefCell|OnceCell|OnceLock|LazyCell|LazyLock|Mutex|RwLock|UnsafeCell|Atomic\w+)\b"
+    );
+    let made = re!(
+        r"\b(?:Cell|RefCell|OnceCell|OnceLock|Mutex|RwLock|UnsafeCell|Atomic\w+)\s*::\s*(?:new|default)\b"
+    );
+    bd.init.is_some_and(|(x, y)| made.is_match(&src.text(x, y)))
+        || src
+            .text(bd.pat.0, bd.pat.1)
+            .split_once(':')
+            .is_some_and(|(_, t)| cell.is_match(t))
+}
+/// A store at `i` (the cell variable's name) replacing what a cell holds: `c.set(v)`,
+/// `c.replace(v)` (also inside an expression, `let old = c.replace(v)`), a statement `*c.
+/// borrow_mut() = v`, `*m.lock().unwrap() = v`, `*l.write().unwrap() = v`, `*c.get_mut() = v`:
+/// where the value is.
+pub(super) fn cell_set(src: &Source, bd: &Bind, i: usize) -> Option<(usize, usize)> {
+    let s = &src.code;
+    let end = i + bd.name.chars().count();
+    let deref = before_blank(s, i).is_some_and(|p| s[p] == '*');
+    if !deref {
+        let d = skip_blank(s, end);
+        let m = skip_blank(s, d + 1);
+        let name = word_of(s, m);
+        let open = skip_blank(s, m + name.chars().count());
+        if s.get(d) != Some(&'.') || !matches!(name.as_str(), "set" | "replace") {
+            return None;
+        }
+        let close = close_of_at(s, open)?;
+        return Some((open + 1, close));
+    }
+    let at = before_blank(s, i)?;
+    if !before_blank(s, at).is_none_or(|p| matches!(s[p], ';' | '{' | '}')) {
+        return None;
+    }
+    let e = scan_to(s, i, s.len(), |k| s[k] == ';');
+    let stmt = src.text(end, e);
+    let stmt = stmt.trim();
+    re!(r"^\.\s*(?:borrow_mut\s*\(\s*\)|get_mut\s*\(\s*\)|(?:lock|write)\s*\(\s*\)\s*\.\s*(?:unwrap\s*\(\s*\)|expect\s*\([^)]*\)))\s*=[^=]")
+        .is_match(stmt)
+        .then(|| {
+            let eq = scan_to(s, i, e, |k| s[k] == '=');
+            (eq + 1, e)
+        })
+}
+/// The stores into the cell variable bound by `bd` before `start` (`cell_set`): where each is,
+/// and its value.
+pub(super) fn cell_stores(src: &Source, bd: &Bind, start: usize) -> Vec<(usize, (usize, usize))> {
+    let s = &src.code;
+    let mut out = Vec::new();
+    let mut i = bd.scope.0;
+    while i < start.min(s.len()) {
+        if kw(s, i, &bd.name)
+            && !before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
+            && matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
+            && let Some(v) = cell_set(src, bd, i)
+        {
+            out.push((i, v));
+        }
+        i += 1;
+    }
+    out
+}
+/// Is the cell variable bound by `bd` written before `start` in a way the stores read do not
+/// say: a method that may write it (not one that reads it: `get`, `borrow`, `read`, `load`,
+/// `clone`, nor a `cell_set`), a guard taken and kept (`let g = m.lock()..`), a shared borrow of
+/// it handed on (`set(&c)`)?
+pub(super) fn cell_lent(src: &Source, bd: &Bind, start: usize) -> bool {
+    let s = &src.code;
+    let mut i = bd.scope.0;
+    while i < start.min(s.len()) {
+        if !kw(s, i, &bd.name)
+            || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
+            || !matches!(lookup(src, i, &bd.name), Some(Found::Bind(b)) if b.stmt == bd.stmt)
+        {
+            i += 1;
+            continue;
+        }
+        let end = i + bd.name.chars().count();
+        let next = skip_blank(s, end);
+        if cell_set(src, bd, i).is_some() {
+            i = end;
+            continue;
+        }
+        if s.get(next) == Some(&'.') {
+            let m = skip_blank(s, next + 1);
+            let name = word_of(s, m);
+            let reads = [
+                "get",
+                "borrow",
+                "try_borrow",
+                "read",
+                "load",
+                "clone",
+                "get_ref",
+            ];
+            // (a guard only read through, `*m.lock().unwrap()` in an expression)
+            let read_through = before_blank(s, i).is_some_and(|p| s[p] == '*')
+                && !src
+                    .text(m, scan_to(s, m, s.len(), |k| s[k] == ';'))
+                    .contains(" = ");
+            if !reads.contains(&name.as_str()) && !read_through {
+                return true;
+            }
+        } else if before_blank(s, i).is_some_and(|p| s[p] == '&') {
+            return true;
+        }
+        i = end;
+    }
+    false
 }
 /// Is the store at `i` a closure's body without braces (`|_| v = ..`)? It runs if and when the
 /// closure does: it replaces nothing on the way to a read.

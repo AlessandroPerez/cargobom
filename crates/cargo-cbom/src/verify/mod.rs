@@ -38,8 +38,12 @@
 //!   field read, `mem::swap(&mut s.a, &mut s.b)`, one on some ways only as a value beside the one
 //!   before, a store through another binding that may point to the variable: `let r = &mut a; *r
 //!   = v`, reborrows, copies, holders, `*f(&mut v) = x`, a method's returned borrow, `*s.a_mut()
-//!   = x` into the field it borrows), a store or a call of the file's function that replaces the
-//!   place read on every way to it; an `Option` combinator's function (`o.map_or(&SHA512, |_|
+//!   = x` into the field it borrows, `v = ..` for a read of `v[0]`), a store or a call of the
+//!   file's function that replaces the place read on every way to it (in the read's block, or in
+//!   blocks run whole around the store, `{ .. }`, `unsafe { .. }`, `let x = { .. }`); a variable
+//!   lent as `&mut` to the file's function, what that function stores through the parameter (all
+//!   its body names, where it does more with the parameter than store through it and read what
+//!   it points to); an `Option` combinator's function (`o.map_or(&SHA512, |_|
 //!   &SHA1)`, `o.map(fixed)`: the default and the function's value, not `o`'s unless the closure
 //!   or the file's function reads its parameter); a `replace` or `take` method's value is the
 //!   receiver's old one, not its argument; the file's functions and methods it calls, the method of a
@@ -58,12 +62,14 @@
 //!   function at least.
 //!   No other descriptor of the asset's primitive (nor a type the knowledge base gives one) is
 //!   read instead. A claim that the values found are all (no unknown beside them) is held to a
-//!   store through a pointer that replaces the place on every way to the call; a member found
-//!   beside others not followed may be the value before it; a container's element labelled
-//!   `member: container, possible` may be any the container holds (R4.3: one place), whatever a
-//!   store into an element replaced;
+//!   store through a pointer, or into a cell (`c.set(v)`, `c.replace(v)`, `*c.borrow_mut() =
+//!   v`, `*m.lock().unwrap() = v`), that replaces the place on every way to the call; a member
+//!   found beside others not followed may be the value before it; a
+//!   container's element labelled `member: container, possible` (of several, `one of N`) may be
+//!   any the container holds (R4.3: one place), whatever a store into an element replaced;
 //! - a member reaching the call from another function (`member: object`, `caller`, `fixed`,
-//!   `dyn`, `container`, and `type-join`, `impl` at a call reading no field): where the argument
+//!   `dyn`, `container`, and `type-join`, `impl` at a call reading no field; one with no `member:`
+//!   label as an `object` one): where the argument
 //!   carrying the algorithm holds no value from elsewhere (a parameter, a variable lent to a
 //!   call not followed, a constant of a crate not at hand, a static the program may change), it
 //!   names no other descriptor of the primitive (nor a type the knowledge base gives one)
@@ -118,6 +124,11 @@
 //!   invoked in the function
 //!   makes is cited at the invocation, one through a variable bound to a function item running
 //!   the chain's body at the variable's call (not at the `let` binding it);
+//! - a type alias is the one in scope where it is written: a block's own `type K = ..;`, else the
+//!   module's (`m::K`: module `m`'s), else the package's; an impl's self type (of a context, of a
+//!   witness) and a generic instance's type argument are compared whole, with their references
+//!   and type arguments, where the code writes more than a name (`impl Put for &mut A` is no
+//!   `<&'static Algorithm as Put>`'s, `apply(&mut a)` no `apply::<&Algorithm>`);
 //! - a macro's body line cited is in the rule the invocation matches (rustc's first; repetitions
 //!   `$(..)sep*+?` matched), and uses the metavariable that rule binds to the symbol; of several
 //!   invocations of one macro, the one inside the modules the item's path names and naming most
@@ -136,8 +147,9 @@
 //!
 //! Known limits:
 //! - A cell handed to a function by a shared borrow (`set(&c)` with `fn set(c: &Cell<A>)`,
-//!   `RefCell`, `Mutex`) is read as its initializer: stores through it are not followed, so a
-//!   claim that the function's value is the only one is rejected (R4.12).
+//!   `RefCell`, `Mutex`), or written through a guard kept in a variable, is lent to code whose
+//!   stores are not read: a member from another function read from it is not checked (R4.12),
+//!   and a claim that a value of its initializer is the only one is not held to those stores.
 //! - The check of "in the arguments" follows stores by the file's functions and inherent
 //!   methods named in the function, not trait methods dispatched on a type the code does not
 //!   say (`u.up()` on a `&mut dyn`, `t.up()` in a generic function): a value such a call
@@ -164,6 +176,11 @@
 //!   counted against the closures of its parent's body.
 //! - A standard-library macro's line is checked against the symbol or a metavariable, not
 //!   against the rule the invocation matches (the standard library's `macro` items are not read).
+//! - That a claim without an unknown lists every value that may reach the call is not checked,
+//!   only that no store the verifier reads replaced the claimed value on every way: a value
+//!   stored at a constant index before a read at a variable index (`a[0] = &SHA512; digest(a[i],
+//!   ..)`), or by code the verifier does not read (another crate's function given `&mut v`, a
+//!   cell's guard kept in a variable), may be left out.
 //! - The jsonwebtoken boundary model's members (`Validation.algorithms`, `Header.alg`) are not
 //!   checked against the call's code (open plan item 10).
 //! - Coercions not read: a `match` arm whose type only another arm gives (`E::B =>

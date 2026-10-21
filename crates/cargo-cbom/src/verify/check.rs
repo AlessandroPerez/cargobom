@@ -658,8 +658,10 @@ impl Files<'_> {
             // the values the label says are all that reach the call (no unknown beside them):
             // a store through a pointer that replaces one on every way to the call excludes it
             let exact = !p.contains("beside others not followed") && !p.contains(" possibly ");
-            // (a container's elements, possible: any of them, whatever an element store replaced)
-            let smashed = re!(r"; member: container, possible\b").is_match(ctx.details);
+            // (a container's elements, possible: any of them, whatever an element store replaced;
+            // said of several, `one of N`, never of one value the claim says is all)
+            let smashed = re!(r"; member: container, possible\b").is_match(ctx.details)
+                && p.starts_with("algorithm one of ");
             // the code the call reads names it (`Salt::new(hkdf::HKDF_SHA256, ..)` is no
             // `HKDF_SHA384`; `prk.expand(.., HKDF_SHA256)` with `prk` from `Salt::new(HKDF_SHA384,
             // ..)` may be either)
@@ -681,14 +683,16 @@ impl Files<'_> {
                 )?;
             }
             // a member reaching the call from another function, labelled as one that does
-            // (`object`, `caller`, `fixed`): the code the call reads does not name another
-            // descriptor of its primitive instead, where it reads no value from elsewhere
+            // (`object`, `caller`, `fixed`), or with no label (checked as an `object` one): the
+            // code the call reads does not name another descriptor of its primitive instead,
+            // where it reads no value from elsewhere
             if !p.ends_with(" in the arguments")
                 && kind == "call"
                 && !ctx.tags.contains("[macro ")
                 && re!(r"reaching the call from another function|from other functions").is_match(p)
-                && re!(r"; member: (?:object|caller|fixed|dyn|container|type-join|impl)\b")
+                && (re!(r"; member: (?:object|caller|fixed|dyn|container|type-join|impl)\b")
                     .is_match(ctx.details)
+                    || !ctx.details.contains("; member: "))
             {
                 // (a `type-join` or `impl` member is any value stored in a field of that type,
                 // or that a function writes: only a call that reads no field is checked)
@@ -1497,22 +1501,37 @@ impl Files<'_> {
                         let owner = man.owner_of(&path);
                         for (k, t) in found.iter().enumerate() {
                             // (through the file's type aliases: `apply(&mut a)` with `a: A`,
-                            // `type A = &'static Algorithm`)
-                            if let (Some(w), Some(t)) = (want_args.get(k), t)
-                                && type_name(w) != type_name(t)
-                                && type_name(w)
-                                    != type_name(&expand_aliases(
-                                        &type_name(t),
-                                        &mut |a| self.alias_targets(&src, owner, a),
-                                        3,
-                                    ))
-                            {
+                            // `type A = &'static Algorithm`; the one in scope at the call, else
+                            // the package's)
+                            let at = src.idx((line, c0));
+                            let Some(t) = t else { continue };
+                            let Some(w) = want_args.get(k) else { continue };
+                            // the type written, its aliases replaced: the file's in scope at
+                            // the call by their paths whole (`m::K`), then the package's
+                            let resolved = re!(r"\b[A-Za-z_]\w*(?:\s*::\s*[A-Za-z_]\w*)*")
+                                .replace_all(t, |m: &regex::Captures| {
+                                    src.alias_at(at, &m[0])
+                                        .unwrap_or_else(|| imported_as(&src, &m[0]))
+                                })
+                                .to_string();
+                            let full = expand_aliases(
+                                &resolved,
+                                &mut |a| self.alias_targets(&src, owner, a),
+                                3,
+                            );
+                            // (by name; whole where either has references, or the code writes
+                            // the type's arguments)
+                            let name = |x: &str| type_name(&deref_type(x));
+                            let named = name(w) == name(t) || name(w) == name(&full);
+                            let refs = !(w.contains('&') || full.contains(['&', '<']))
+                                || fold_typenum(&norm_path(&full)) == fold_typenum(&norm_path(w));
+                            if !(named && refs) {
                                 return Err(format!(
                                     "`{part}`: the call at {line}:{c0} instantiates `{}` with `{}`, \
                                      not `{}`",
                                     n.name,
-                                    type_name(t),
-                                    type_name(w)
+                                    norm_path(t),
+                                    norm_path(w)
                                 ));
                             }
                         }
@@ -1836,14 +1855,15 @@ pub(super) fn check_item(
             // its type, and the trait it implements: `impl TryFrom<&PrivateKeyDer<'_>> for
             // KeyPair` is not `impl TryFrom<&[u8]> for KeyPair`
             ItemKind::Impl => {
-                same_type(&block.name, ty, want.self_full.as_deref(), aliases)
-                    && match (&block.trait_name, &want.trait_name) {
-                        // (a trait imported under another name: `use m::Pick as Chooser`)
-                        (Some(a), Some(b)) => {
-                            trait_of(a, b, aliases) || trait_of(&trait_alias(src, a), b, aliases)
-                        }
-                        _ => true,
+                written_self(src, block, want.self_full.as_deref(), aliases).unwrap_or_else(|| {
+                    same_type(&block.name, ty, want.self_full.as_deref(), aliases)
+                }) && match (&block.trait_name, &want.trait_name) {
+                    // (a trait imported under another name: `use m::Pick as Chooser`)
+                    (Some(a), Some(b)) => {
+                        trait_of(a, b, aliases) || trait_of(&trait_alias(src, a), b, aliases)
                     }
+                    _ => true,
+                }
             }
             ItemKind::Trait => {
                 block.name == *ty
