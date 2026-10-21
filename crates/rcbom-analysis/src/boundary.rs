@@ -860,6 +860,28 @@ fn struct_bases(
         // the error a `?` returns, a field-less enum's value (an `ErrorKind`): no struct
         Origin::Call { callee, .. } if callee.ends_with("FromResidual::from_residual") => {}
         Origin::Unit { .. } => {}
+        // a standard-library call running the program's code (a closure called, `f(&mut v)`,
+        // which is `Fn::call(&f, (&mut v,))`): what that code leaves in the struct, written
+        // through the pointer or returned, is not followed, never its arguments handed on
+        Origin::Call {
+            krate,
+            self_ty,
+            runs: Some(r),
+            ..
+        } if std_call(krate, self_ty.as_deref())
+            && !matches!(
+                r.trim_start_matches('<').split("::").next(),
+                Some("core" | "std" | "alloc")
+            ) =>
+        {
+            out.push(Base::Field(
+                crate::links::marker(format!(
+                    "what `{}`, the program's code a call runs, leaves in the struct",
+                    short_fn(r)
+                )),
+                r.clone(),
+            ))
+        }
         Origin::Call {
             callee,
             krate,
