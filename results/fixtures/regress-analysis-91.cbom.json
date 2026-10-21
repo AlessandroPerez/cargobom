@@ -305,13 +305,6 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
-            "line": 49,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a91::main; line: `let mut x5: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 50,
             "location": "src/main.rs",
@@ -326,13 +319,6 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x6, &d);`; code: `digest`",
-            "line": 56,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a91::main; line: `let mut x7: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 57,
             "location": "src/main.rs",
@@ -340,7 +326,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x7, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a91::opt_mut`; line: `let _ = digest(x7, &d);`; code: `digest`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 12,
@@ -435,7 +421,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "23"
+          "value": "21"
         }
       ],
       "type": "cryptographic-asset"
@@ -483,7 +469,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<a91::B as a91::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a91::B as a91::Up>::up`; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -516,6 +502,13 @@
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(x7, &d);`; code: `digest`",
+            "line": 59,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a91::main; line: `*slot_of(&mut s2) = &SHA384;`; code: `SHA384`",
@@ -599,7 +592,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "17"
+          "value": "18"
         }
       ],
       "type": "cryptographic-asset"
@@ -668,7 +661,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `a91::ident`; line: `let _ = digest(x4, &d);`; code: `digest`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 12,
@@ -680,6 +673,13 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(x6, &d);`; code: `digest`",
+            "line": 56,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a91::main; line: `*r = &SHA512;`; code: `SHA512`",
@@ -749,76 +749,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<a91::B as a91::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b1.alg, &d);`; code: `digest`",
-            "line": 32,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x6, &d);`; code: `digest`",
-            "line": 56,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a91::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x7, &d);`; code: `digest`",
-            "line": 59,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "16"
         }
       ],
       "type": "cryptographic-asset"
@@ -843,8 +774,7 @@
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -863,10 +793,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     }
   ],
   "metadata": {
@@ -927,7 +853,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9ee1da27-a3dd-809b-9b1d-4d627967ee75",
+  "serialNumber": "urn:uuid:35184c98-98c8-85d7-9a49-de09a88b7d9b",
   "specVersion": "1.7",
   "version": 1
 }

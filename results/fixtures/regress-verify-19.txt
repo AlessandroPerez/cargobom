@@ -1,12 +1,12 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:27 | ring::digest::SHA256 | [reachable] [static] in v19::main; line: `let mut b2 = B { alg: &SHA256 };`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `v19::B::reset`; line: `let _ = digest(b2.alg, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `v19::B::reset`; line: `let _ = digest(b2.alg, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:28:17 | ring::digest::SHA256 | [reachable] [static] in v19::main; line: `let mut x = &SHA256;`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `v19::fill`; line: `let _ = digest(x, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `v19::fill`; line: `let _ = digest(x, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:17 | ring::digest::SHA256 | [reachable] [static] in v19::main; line: `let mut z = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `v19::maybe`; line: `let _ = digest(z, &d);`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:37:26 | ring::digest::SHA256 | [reachable] [static] in v19::main; line: `let mut a = A { alg: &SHA256 };`; code: `SHA256`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:22:26 | ring::digest::SHA384 | [reachable] [static] in v19::main; line: `let mut b = B { alg: &SHA384 };`; code: `SHA384`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: object, from `<v19::B as v19::Up>::up`; line: `let _ = digest(b.alg, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<v19::B as v19::Up>::up`; line: `let _ = digest(b.alg, &d);`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:17 | ring::digest::SHA384 | [reachable] [static] in v19::main; line: `let mut y = &SHA384;`; code: `SHA384`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:43 | ring::digest::SHA512 | [present] [static] in v19::A::reset; line: `impl A { fn reset(&mut self) { self.alg = &SHA512; } }`; code: `SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:66 | ring::digest::SHA512 | [reachable] [static] in v19::other::fill; line: `pub fn fill(s: &mut &'static ring::digest::Algorithm) { *s = &ring::digest::SHA512; }`; code: `ring::digest::SHA512`
@@ -19,9 +19,6 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via v19 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by v19 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `<v19::B as v19::Up>::up` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b.alg, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:27:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `v19::B::reset` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(b2.alg, &d);`; code: `digest`
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:30:12 | ring::digest::digest | [reachable] [call] in v19::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: what `v19::fill` writes through its parameter (no summary of it) is not followed; line: `let _ = digest(x, &d);`; code: `digest`
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
@@ -48,17 +45,9 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=3
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
@@ -66,7 +55,6 @@ dep pkg:cargo/v19@0.1.0 -> pkg:cargo/ring@0.17.14
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
-dependency crypto:algorithm:unknown:hash:ring
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/v19@0.1.0
@@ -76,7 +64,6 @@ doc version=1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
-provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:unknown:hash:ring
 root {"bom-ref": "pkg:cargo/v19@0.1.0", "name": "v19", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v19@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:features=

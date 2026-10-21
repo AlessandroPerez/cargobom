@@ -179,25 +179,11 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
-            "line": 20,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a92::main; line: `let mut s = S { a: &SHA256, b: &SHA1 };`; code: `SHA256`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 24,
             "symbol": "ring::digest::SHA256"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(s.a, &d);`; code: `digest`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a92::main; line: `let mut v: Vec<D> = vec![&SHA256];`; code: `SHA256`",
@@ -233,13 +219,6 @@
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "ring::digest::SHA256"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x2, &d);`; code: `digest`",
-            "line": 34,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a92::main; line: `let (mut x3, mut y3): (D, D) = (&SHA256, &SHA1);`; code: `SHA256`",
@@ -288,7 +267,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
+          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -320,6 +299,13 @@
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(s.a, &d);`; code: `digest`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a92::main; line: `if let Some(f) = first(&mut w) { *f = &SHA384; }`; code: `SHA384`",
@@ -361,7 +347,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -395,6 +381,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a92::main; line: `for e in iter_of(&mut v) { *e = &SHA512; }`; code: `SHA512`",
             "line": 26,
             "location": "src/main.rs",
@@ -407,6 +400,13 @@
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(x2, &d);`; code: `digest`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -426,7 +426,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -434,7 +434,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -453,20 +453,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x1, &d);`; code: `digest`",
-            "line": 20,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `a92::S::slots` is not followed; line: `let _ = digest(s.a, &d);`; code: `digest`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::iter_mut` is not followed; line: `let _ = digest(v[0], &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
@@ -476,13 +462,6 @@
           {
             "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; line: `let _ = digest(w[0], &d);`; code: `digest`",
             "line": 30,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a92::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x2, &d);`; code: `digest`",
-            "line": 34,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -524,7 +503,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -633,7 +612,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e8ab3cb9-1e3e-81c4-8fc8-28a4005099b8",
+  "serialNumber": "urn:uuid:6f965dd5-bd24-8af7-a750-bf4703bb8c45",
   "specVersion": "1.7",
   "version": 1
 }

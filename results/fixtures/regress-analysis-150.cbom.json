@@ -109,13 +109,6 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a150::p1; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b\"1\"); }`; code: `digest`",
-            "line": 15,
-            "location": "src/main.rs",
-            "offset": 74,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a150::p3; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `SHA256`",
             "line": 19,
             "location": "src/main.rs",
@@ -221,25 +214,11 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a150::p13; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `fn p13() { let mut a: A = &SHA256; { let o = Outer13 { w: W13 { r: &mut a } }; set13(o.w); } let _ = digest(a, b\"13\"); }`; code: `digest`",
-            "line": 70,
-            "location": "src/main.rs",
-            "offset": 101,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a150::p14; line: `fn p14() { let mut a: A = &SHA256; apply14(&mut a); let _ = digest(a, b\"14\"); }`; code: `SHA256`",
             "line": 76,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "ring::digest::SHA256"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a150::p14; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a150::apply14`; line: `fn p14() { let mut a: A = &SHA256; apply14(&mut a); let _ = digest(a, b\"14\"); }`; code: `digest`",
-            "line": 76,
-            "location": "src/main.rs",
-            "offset": 60,
-            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -267,7 +246,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "20"
+          "value": "17"
         }
       ],
       "type": "cryptographic-asset"
@@ -292,6 +271,13 @@
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a150::p1; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `a150::set1`; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b\"1\"); }`; code: `digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 74,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a150::p3::{closure#0}; instantiated by a150::p3 at src/main.rs:19:39 as `|| a = &SHA512`; line: `fn p3() { let mut a: A = &SHA256; run3(|| a = &SHA512); let _ = digest(a, b\"3\"); }`; code: `SHA512`",
@@ -385,6 +371,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a150::p13; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `a150::set13`; line: `fn p13() { let mut a: A = &SHA256; { let o = Outer13 { w: W13 { r: &mut a } }; set13(o.w); } let _ = digest(a, b\"13\"); }`; code: `digest`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 101,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in <&mut &'static ring::digest::Algorithm as a150::Put>::put; instantiated by a150::apply14::<&mut &ring::digest::Algorithm> at src/main.rs:75:29 as `put`; instantiated by a150::p14 at src/main.rs:76:35 as `apply14`; line: `impl Put for &mut A { fn put(self) { *self = &SHA512; } }`; code: `SHA512`",
             "line": 74,
             "location": "src/main.rs",
@@ -392,7 +385,7 @@
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a150::p14; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<&mut &'static ring::digest::Algorithm as a150::Put>::put`; line: `fn p14() { let mut a: A = &SHA256; apply14(&mut a); let _ = digest(a, b\"14\"); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a150::p14; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<&mut &'static ring::digest::Algorithm as a150::Put>::put`; line: `fn p14() { let mut a: A = &SHA256; apply14(&mut a); let _ = digest(a, b\"14\"); }`; code: `digest`",
             "line": 76,
             "location": "src/main.rs",
             "offset": 60,
@@ -424,7 +417,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "16"
+          "value": "18"
         }
       ],
       "type": "cryptographic-asset"
@@ -442,13 +435,6 @@
       },
       "evidence": {
         "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a150::p1; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn p1() { let mut a: A = &SHA256; let w = wrap1(&mut a); set1(w); let _ = digest(a, b\"1\"); }`; code: `digest`",
-            "line": 15,
-            "location": "src/main.rs",
-            "offset": 74,
-            "symbol": "ring::digest::digest"
-          },
           {
             "additionalContext": "[reachable] [call] in a150::p5; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::cell::RefCell::<T>::borrow_mut` is not followed; line: `fn p5() { let c = RefCell::new(&SHA256 as A); set5(&c); let a = *c.borrow(); let _ = digest(a, b\"5\"); }`; code: `digest`",
             "line": 27,
@@ -483,13 +469,6 @@
             "location": "src/main.rs",
             "offset": 100,
             "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a150::p13; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `fn p13() { let mut a: A = &SHA256; { let o = Outer13 { w: W13 { r: &mut a } }; set13(o.w); } let _ = digest(a, b\"13\"); }`; code: `digest`",
-            "line": 70,
-            "location": "src/main.rs",
-            "offset": 101,
-            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -521,7 +500,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "7"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -620,7 +599,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1320e9f9-adb7-8c52-be9c-8682154d7024",
+  "serialNumber": "urn:uuid:1474db8e-5ce2-8de5-b1ec-26176f84e5a7",
   "specVersion": "1.7",
   "version": 1
 }

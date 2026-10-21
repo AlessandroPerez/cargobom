@@ -17,7 +17,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:60:35 | ring::digest::SHA256 | [reachable] [static] in m1::main; line: `let mut a7: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:64:44 | ring::digest::SHA256 | [reachable] [static] in m1::main; line: `let mut o8 = Outer { inner: Ctx { alg: &SHA256, n: 0 }, tag: 1 };`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:68:35 | ring::digest::SHA256 | [reachable] [static] in m1::main; line: `let mut a9: &'static Digest = &SHA256;`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:72:36 | ring::digest::SHA256 | [reachable] [static] in m1::main; line: `let mut a10: &'static Digest = &SHA256;`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:74:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::loop_set`; line: `let _ = digest(a10, &d); // SHA-256, SHA-384`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:76:30 | ring::digest::SHA256 | [reachable] [static] in m1::main; line: `let mut c11 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`
@@ -49,13 +49,13 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:50:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c4.alg, &d); // SHA-256, SHA-512`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:54:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::gen_set`; line: `let _ = digest(a5, &d); // SHA-384, SHA-512`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:58:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::rec`; line: `let _ = digest(a6, &d); // SHA-512`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::opt_set`; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:78:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::Ctx::try_set`; line: `let _ = digest(c11.alg, &d); // SHA-256, SHA-512`; code: `digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:65 | ring::digest::SHA512 | [reachable] [static] in <m1::Ctx as m1::Up>::up; line: `impl Up for Ctx { fn up(&mut self, b: bool) { if b { self.alg = &SHA512; } } }`; code: `SHA512`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via m1 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via m1 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by m1 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:70:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: the result of `m1::opt_set` is not followed; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:95:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(a15, &d); // SHA-256, SHA-512`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:96:12 | ring::digest::digest | [reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(b15, &d); // SHA-1, SHA-512`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
@@ -81,7 +81,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=12
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=13
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -96,7 +96,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=2
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}

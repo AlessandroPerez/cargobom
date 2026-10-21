@@ -643,6 +643,13 @@
             "symbol": "ring::digest::SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: container, possible (a value `core::slice::iter` puts in it); instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in t1::p4::<&[u8; 1]>; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t1::main at src/main.rs:51:65 as `p4`; line: `digest::digest(ALG, d.as_ref()).as_ref().len()`; code: `digest::digest`",
             "line": 46,
             "location": "src/main.rs",
@@ -682,7 +689,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "10"
+          "value": "11"
         }
       ],
       "type": "cryptographic-asset"
@@ -801,6 +808,13 @@
             "location": "src/main.rs",
             "offset": 42,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: container, possible (a value `core::slice::iter` puts in it); instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`",
+            "line": 32,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "ring::digest::digest"
           }
         ]
       },
@@ -828,62 +842,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in t1::p2::{closure#0}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by t1::p2 at src/main.rs:32:20; line: `algs.iter().map(|a| digest::digest(a, d).as_ref().len()).sum()`; code: `digest::digest`",
-            "line": 32,
-            "location": "src/main.rs",
-            "offset": 24,
-            "symbol": "ring::digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -1080,8 +1039,7 @@
       "provides": [
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
-        "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring"
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -1125,10 +1083,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
     },
     {
       "dependsOn": [],
@@ -1197,7 +1151,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:58b89733-8f11-8706-b050-a4cbd8acfe87",
+  "serialNumber": "urn:uuid:6fced6a9-ad28-8dfd-8668-f2997685efd5",
   "specVersion": "1.7",
   "version": 1
 }

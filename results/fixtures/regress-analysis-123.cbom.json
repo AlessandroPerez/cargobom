@@ -339,13 +339,6 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
-            "line": 21,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [static] in a123::main; line: `let mut s = clib::S { alg: &SHA256, other: &SHA1 };`; code: `SHA256`",
             "line": 22,
             "location": "src/main.rs",
@@ -399,7 +392,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -583,6 +576,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(x1, &d);`; code: `digest`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in clib::set_cfg; line: `pub fn set_cfg(m: &Mutex<Cfg>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
             "line": 6,
             "location": "clib/src/lib.rs",
@@ -622,7 +622,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "7"
+          "value": "8"
         }
       ],
       "type": "cryptographic-asset"
@@ -657,13 +657,6 @@
           {
             "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(clib::TL.get(), &d);`; code: `digest`",
             "line": 18,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "ring::digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a123::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(x1, &d);`; code: `digest`",
-            "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
@@ -705,7 +698,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -821,7 +814,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:476b00fa-b104-867f-b4b0-f98815167bb1",
+  "serialNumber": "urn:uuid:be72e9ce-43d8-84a9-838a-50d60bb7a737",
   "specVersion": "1.7",
   "version": 1
 }
