@@ -1298,6 +1298,7 @@ pub(crate) fn unresolved_kind(o: &Origin) -> String {
                 .into()
         }
         Origin::Call { callee, .. } => format!("the result of `{}`", short(callee)),
+        Origin::Field { adt, .. } if adt == rcbom_facts::TUPLE => "an element of a tuple".into(),
         Origin::Field { adt, .. } => format!("a field of `{}`", short(adt)),
         Origin::Written { callee, .. } => format!("what `{}` writes", short(callee)),
         Origin::Through { callee } if rcbom_facts::element_writer(callee).is_some() => {

@@ -21,8 +21,8 @@ use rcbom_facts::{Loc, MAX_ORIGIN_DEPTH, Origin};
 use rustc_middle::ty::{GenericArgsRef, TyCtxt};
 use rustc_public::mir::alloc::GlobalAlloc;
 use rustc_public::mir::{
-    AggregateKind, Body, Local, Mutability, Operand, Place, ProjectionElem, Rvalue, StatementKind,
-    Terminator, TerminatorKind,
+    AggregateKind, Body, BorrowKind, Local, MutBorrowKind, Mutability, Operand, Place,
+    ProjectionElem, Rvalue, StatementKind, Terminator, TerminatorKind,
 };
 use rustc_public::ty::{ConstantKind, IntTy, RigidTy, Span, Ty, TyKind, UintTy};
 use rustc_public::{CrateDef, rustc_internal};
@@ -449,16 +449,26 @@ impl Flow {
                 .filter(|(_, l)| option_holder(tcx, internal(l.ty)))
                 .map(|(i, _)| i)
                 .collect(),
-            // (all of it or a part of it, `&mut s.f`; not a place reached through a pointer)
+            // (all of it or a part of it, `&mut s.f`; not a place reached through a pointer, nor a
+            // closure's capture of a variable it only writes through, `s.n = 1` on `s: &mut S` in
+            // an edition 2015 closure, which cannot change the variable itself)
             lent_locals: body
                 .blocks
                 .iter()
                 .flat_map(|b| &b.statements)
                 .filter_map(|st| match &st.kind {
+                    StatementKind::Assign(_, Rvalue::Ref(_, BorrowKind::Mut { kind }, q))
+                        if *kind != MutBorrowKind::ClosureCapture
+                            && !q
+                                .projection
+                                .iter()
+                                .any(|e| matches!(e, ProjectionElem::Deref)) =>
+                    {
+                        Some(q.local)
+                    }
                     StatementKind::Assign(
                         _,
-                        Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
-                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
+                        Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
                     ) if !q
                         .projection
                         .iter()
@@ -469,6 +479,7 @@ impl Flow {
                     _ => None,
                 })
                 .collect(),
+            repointed: repointed(body),
             nargs,
         };
         // the places the body lends by `&mut` (`&mut a`, `&mut s.f`): where a write through a
@@ -1245,6 +1256,21 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                                 base: Box::new(o),
                                 args: crate::adt_args(tcx, args),
                             };
+                        } else if variant == Some(0)
+                            && crate::path_of(tcx, adt.did()) == "core::result::Result"
+                        {
+                            // the value of a `Result` (`Ok(a) => a` in a match): its `Ok` side,
+                            // which a constant's data does not say
+                            o = Origin::Call {
+                                callee: "core::result::Result::<T, E>::unwrap".to_string(),
+                                krate: "core".to_string(),
+                                self_ty: Some("core::result::Result".to_string()),
+                                args: vec![o],
+                                span: None,
+                                runs: None,
+                                pointer: None,
+                                fed: None,
+                            };
                         } else if variant == Some(1)
                             && crate::path_of(tcx, adt.did()) == "core::result::Result"
                         {
@@ -1265,16 +1291,15 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     }
                     rustc_middle::ty::Tuple(ts) => match ts.get(*f) {
                         Some(t) => {
-                            // an element of a tuple held by a static or a constant
-                            // (`PAIRS[i].0`, `NEST.0.1`): what its initializer puts there
-                            if on_data(&o) {
-                                o = Origin::Field {
-                                    adt: rcbom_facts::TUPLE.to_string(),
-                                    field: *f,
-                                    base: Box::new(o),
-                                    args: None,
-                                };
-                            }
+                            // an element of a tuple (held by a static or a constant, `PAIRS[i].0`,
+                            // `NEST.0.1`: what its initializer puts there; a call's, a
+                            // parameter's: the analysis projects it or says it does not)
+                            o = Origin::Field {
+                                adt: rcbom_facts::TUPLE.to_string(),
+                                field: *f,
+                                base: Box::new(o),
+                                args: None,
+                            };
                             ty = *t
                         }
                         None => break,
@@ -1636,13 +1661,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 continue;
             } else if let Some(f) = part_overlap(&d.path, &path) {
                 // a write through a borrow a function returned (`*a.slot() = v`) where the read
-                // is of a part (`a.alg`): it may be the part written, or not (an unnamed part:
-                // a cut or lost write, its own origin says so)
-                let o = self.def_origin(d, &[], depth, seen);
+                // is of a part (`a.alg`): which part it wrote is not known, so not its value
+                // either, only that this part may have changed (an unnamed part: a cut or lost
+                // write, its own origin says so)
                 let o = if f.is_empty() {
-                    o
+                    self.def_origin(d, &[], depth, seen)
                 } else {
-                    Origin::Any(vec![o, Origin::Through { callee: f }])
+                    Origin::Through { callee: f }
                 };
                 if !alts.contains(&o) {
                     alts.push(o);
@@ -2171,6 +2196,26 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         })
     }
 
+    /// A value built of parts read whole: each part's value at its position (`Set`).
+    fn parts_at(&self, ops: &[Operand], at: At, depth: usize, seen: &mut HashSet<Key>) -> Origin {
+        if depth >= MAX_DEPTH {
+            return Origin::Truncated;
+        }
+        let mut parts = Vec::new();
+        for (f, o) in ops.iter().enumerate() {
+            if f >= MAX_FIELDS {
+                parts.push(Origin::Truncated);
+                break;
+            }
+            parts.push(Origin::Set {
+                path: vec![f],
+                value: Box::new(self.operand(o, at, depth + 1, seen)),
+                strong: true,
+            });
+        }
+        Origin::All(parts)
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn aggregate(
         &self,
@@ -2283,22 +2328,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             AggregateKind::Adt(def, ..)
                 if rest.is_empty() && !ops.is_empty() && self.program_struct(def.def_id()) =>
             {
-                if depth >= MAX_DEPTH {
-                    return Origin::Truncated;
-                }
-                let mut parts = Vec::new();
-                for (f, o) in ops.iter().enumerate() {
-                    if f >= MAX_FIELDS {
-                        parts.push(Origin::Truncated);
-                        break;
-                    }
-                    parts.push(Origin::Set {
-                        path: vec![f],
-                        value: Box::new(self.operand(o, at, depth + 1, seen)),
-                        strong: true,
-                    });
-                }
-                Origin::All(parts)
+                self.parts_at(ops, at, depth, seen)
+            }
+            // (and a tuple's elements at their positions: `(Algorithm::HS512, secret)` put in a
+            // map and read back as `.0`; not literal data, below)
+            AggregateKind::Tuple
+                if rest.is_empty()
+                    && ops.len() > 1
+                    && !ops.iter().all(|o| {
+                        matches!(o, Operand::Constant(_))
+                            && matches!(self.operand(o, at, depth + 1, seen), Origin::Const { .. })
+                    }) =>
+            {
+                self.parts_at(ops, at, depth, seen)
             }
             // literal data (`[0u8; 4]`, `(1, 2)`), not a value holding a descriptor or a static
             // (`Some(&SHA1)`)
@@ -3099,15 +3141,6 @@ fn walk_ty<'tcx>(
     ty
 }
 
-/// A static's or a constant's value, or a field of it (`NEST.0`).
-fn on_data(o: &Origin) -> bool {
-    match o {
-        Origin::Data { .. } => true,
-        Origin::Field { base, .. } => on_data(base),
-        _ => false,
-    }
-}
-
 /// Does a write to `def` (a place with an unknown part, `Step::Part`) overlap the read of
 /// `read` beyond their common prefix: the function whose borrow points there.
 fn part_overlap(def: &[Step], read: &[Step]) -> Option<String> {
@@ -3252,6 +3285,8 @@ struct Pointees<'a> {
     /// Locals the body lends by `&mut` (`o.insert(..)` on `&mut o`): what a value built in one
     /// holds may change through the loan.
     lent_locals: HashSet<Local>,
+    /// Pointers whose own place a loan may change (`repointed`).
+    repointed: HashSet<Local>,
     /// Locals whose value holds a `&mut` (`W { r: &mut x }`, a closure capturing one, a type
     /// parameter's): handed to a call, it may be written through.
     mut_holding: HashSet<Local>,
@@ -3408,6 +3443,13 @@ impl Pointees<'_> {
         // Holder { r: &mut x }`, `*t.0 = v`)
         if !path.is_empty() {
             return self.field_targets(local, path, depth);
+        }
+        // a pointer whose own place the body lends by `&mut` (`repoint(&mut r, ..)`,
+        // `mem::swap(&mut r, &mut s)`, `mem::replace(&mut r, ..)`): what the loan makes it point
+        // to is no definition here, not followed
+        if self.repointed.contains(&local) {
+            self.lost.set(true);
+            return Vec::new();
         }
         // a pointer no statement of this body defines: an argument's, what it points to on
         // entry; any other, not followed
@@ -4668,6 +4710,13 @@ impl Pointees<'_> {
                         let t = self.targets(q.local, &path_of_place(q), 0);
                         let single = sole_target(&t) && once && !changed;
                         out.push((t, single, fields.then_some(i)));
+                    } else if let Operand::Copy(q) | Operand::Move(q) = op
+                        && self.mut_holding.contains(&q.local)
+                    {
+                        // a holder inside it (`Outer { w: W { r: &mut a } }`, `Some(w)`, `(w, 0)`,
+                        // `[w1, w2]`): a summary describes the fields of the value handed over,
+                        // not what they hold, so what it points to is not followed
+                        self.lost.set(true);
                     }
                 }
             }
@@ -5142,6 +5191,84 @@ fn returned_part(caller: &Body, func: &Operand) -> Option<(usize, Path)> {
                     .all(|s| matches!(s, Step::Field(_) | Step::Variant(_)))
         })
         .map(|(l, p)| (l - 1, p))
+}
+
+/// The pointers whose own place the body lends by `&mut` (or `&raw mut`) where the loan may
+/// change it: handed on, stored, copied, lent again or written through (`repoint(&mut r, ..)`,
+/// `mem::swap(&mut r, &mut s)`, `*l = &mut y`). Not a loan only read through (`f(&mut r)` with
+/// `f` taking `&mut T`, coerced to `f(&mut *r)`: `_5 = &mut _1; _6 = copy (*_5)`), nor a closure's
+/// capture of a variable it only writes through (`MutBorrowKind::ClosureCapture`).
+fn repointed(body: &Body) -> HashSet<Local> {
+    use rustc_public::mir::visit::{Location, PlaceContext};
+    use rustc_public::mir::{MirVisitor, VarDebugInfo};
+    let mut out = HashSet::new();
+    // the local holding each loan: the pointer lent
+    let mut loans: HashMap<Local, Local> = HashMap::new();
+    for st in body.blocks.iter().flat_map(|b| &b.statements) {
+        let StatementKind::Assign(lhs, rv) = &st.kind else {
+            continue;
+        };
+        let q = match rv {
+            Rvalue::Ref(_, BorrowKind::Mut { kind }, q)
+                if *kind != MutBorrowKind::ClosureCapture =>
+            {
+                q
+            }
+            Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q) => q,
+            _ => continue,
+        };
+        if !q.projection.is_empty() || !is_ptr(body, q) {
+            continue;
+        }
+        if lhs.projection.is_empty() {
+            loans.insert(lhs.local, q.local);
+        } else {
+            out.insert(q.local);
+        }
+    }
+    struct V<'a> {
+        loans: &'a HashMap<Local, Local>,
+        out: &'a mut HashSet<Local>,
+    }
+    impl MirVisitor for V<'_> {
+        fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+            // the loan lent itself (`&mut _5`)
+            if let Rvalue::Ref(_, _, q) | Rvalue::AddressOf(_, q) | Rvalue::Reborrow(_, _, q) = rv
+                && q.projection.is_empty()
+                && let Some(p) = self.loans.get(&q.local)
+            {
+                self.out.insert(*p);
+            }
+            self.super_rvalue(rv, loc);
+        }
+        fn visit_place(&mut self, place: &Place, ptx: PlaceContext, _: Location) {
+            let Some(p) = self.loans.get(&place.local) else {
+                return;
+            };
+            let kept = match place.projection.as_slice() {
+                // the loan's local defined (lent, above)
+                [] => ptx.is_mutating(),
+                // the pointer read through the loan (`copy (*_5)`), not written nor lent again
+                [ProjectionElem::Deref] => !ptx.is_mutating(),
+                // what the pointer points to
+                [ProjectionElem::Deref, ProjectionElem::Deref, ..] => true,
+                _ => false,
+            };
+            if !kept {
+                self.out.insert(*p);
+            }
+        }
+        // (a debugger's name for it is no use)
+        fn visit_var_debug_info(&mut self, _: &VarDebugInfo) {}
+    }
+    if !loans.is_empty() {
+        V {
+            loans: &loans,
+            out: &mut out,
+        }
+        .visit_body(body);
+    }
+    out
 }
 
 fn is_ptr(body: &Body, p: &Place) -> bool {
