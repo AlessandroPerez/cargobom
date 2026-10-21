@@ -1,3 +1,4 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:11:46 | ring::digest::digest | [reachable] [call] in a70::my3; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: caller, passed by `a70::main`; line: `fn my3(a: &'static Digest, d: &[u8]) -> Out { digest(a, d) }`; code: `digest`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:29:7 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a70::main; line: `A(&SHA1, &d);`; code: `SHA1`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:9 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in a70::main; line: `DYN(&SHA1, &d);`; code: `SHA1`
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:40:4 | ring::digest::digest | [reachable] [call] in a70::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:39:63; line: `r(&SHA1, &d);`; code: `r`
@@ -26,13 +27,12 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a70 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a70 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:11:46 | ring::digest::digest | [reachable] [call] in a70::my3; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; line: `fn my3(a: &'static Digest, d: &[u8]) -> Out { digest(a, d) }`; code: `digest`
   occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:42:60 | ring::digest::digest | [reachable] [call] in a70::main::{closure#1}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
-  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=5
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=6
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
@@ -66,7 +66,7 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
