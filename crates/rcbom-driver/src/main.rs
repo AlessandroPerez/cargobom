@@ -1379,6 +1379,37 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         });
     }
 
+    /// A call through a pointer or a trait object of a function: at its callee, with where the
+    /// pointer comes from; an unknown pointer when that is not known or the call has no callee
+    /// to place it at (the analysis takes it as a call of any function made a pointer).
+    fn push_pointer(
+        &mut self,
+        origin: Origin,
+        const_args: Vec<Option<i128>>,
+        arg_origins: Vec<Origin>,
+        arg_lens: Vec<Option<u64>>,
+        sig: Option<String>,
+        term: &Terminator,
+    ) {
+        let tcx = self.cx.tcx;
+        let at = rustc_internal::internal(tcx, term.source_info.span);
+        let (call, origin) = match callee_span(tcx, at) {
+            Some(call) if !matches!(origin, Origin::Truncated) => (call, origin),
+            Some(call) => (call, Origin::Unknown),
+            None => (at, Origin::Unknown),
+        };
+        self.push_internal(
+            call,
+            Target::Pointer {
+                origin,
+                const_args,
+                arg_origins,
+                arg_lens,
+                sig,
+            },
+        );
+    }
+
     /// Is a call (or a function used as a value) of `def::<args>` a crypto fact?
     fn interesting(&self, def: &rustc_public::ty::FnDef, args: &GenericArgs) -> bool {
         let tcx = self.cx.tcx;
@@ -1897,49 +1928,51 @@ impl Scanner<'_, '_> {
                 // a pointer whose function is named elsewhere (`(h.f)(..)`, a parameter, a
                 // returned pointer): where it comes from, for the analysis to follow to the
                 // functions named as values
+                // (one whose pointer is not known, or without a callee to place it at, too: a
+                // call that may run any function made a pointer)
                 let origin = self.origins.of_arg(func, term);
+                let (const_args, arg_origins, arg_lens) = self.call_values(call_args, term);
                 let tcx = self.cx.tcx;
-                if !matches!(origin, Origin::Unknown | Origin::Truncated)
-                    && let Some(call) =
-                        callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span))
-                {
-                    let (const_args, arg_origins, arg_lens) = self.call_values(call_args, term);
-                    self.push_internal(
-                        call,
-                        Target::Pointer {
-                            origin,
-                            const_args,
-                            arg_origins,
-                            arg_lens,
-                        },
-                    );
-                }
+                let sig = links::pointer_sig(tcx, rustc_internal::internal(tcx, ty)).map(|s| s.1);
+                self.push_pointer(origin, const_args, arg_origins, arg_lens, sig, term);
             } else if let Ok(ty) = func.ty(self.body.locals())
                 && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
                 && dyn_fn_call(self.cx.tcx, def, args)
                 && let [recv, tuple] = call_args.as_slice()
-                && let Some(untupled) = untuple(self.body, tuple)
             {
                 // a call through a closure or function boxed as a trait object (`b(&SHA1, d)`
                 // with `b: Box<dyn Fn(..)>`): as through a pointer, the object's origin and the
-                // call's own arguments
+                // call's own arguments (not known when the tuple is not built here)
                 let origin = self.origins.of_arg(recv, term);
+                let (const_args, arg_origins, arg_lens) = match untuple(self.body, tuple) {
+                    Some(untupled) => self.call_values(&untupled, term),
+                    None => {
+                        let n = match tuple
+                            .ty(self.body.locals())
+                            .ok()
+                            .and_then(|t| t.kind().rigid().cloned())
+                        {
+                            Some(RigidTy::Tuple(ts)) => ts.len(),
+                            _ => 0,
+                        };
+                        (vec![None; n], vec![Origin::Unknown; n], vec![None; n])
+                    }
+                };
                 let tcx = self.cx.tcx;
-                if !matches!(origin, Origin::Unknown | Origin::Truncated)
-                    && let Some(call) =
-                        callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span))
-                {
-                    let (const_args, arg_origins, arg_lens) = self.call_values(&untupled, term);
-                    self.push_internal(
-                        call,
-                        Target::Pointer {
-                            origin,
-                            const_args,
-                            arg_origins,
-                            arg_lens,
-                        },
-                    );
-                }
+                let sig = match args.0.first() {
+                    Some(GenericArgKind::Type(t)) => {
+                        let mut t = rustc_internal::internal(tcx, *t);
+                        while let rustc_middle::ty::Ref(_, i, _) = *t.kind() {
+                            t = i;
+                        }
+                        if t.is_box() {
+                            t = t.boxed_ty().unwrap_or(t);
+                        }
+                        links::pointer_sig(tcx, t).map(|s| s.1)
+                    }
+                    _ => None,
+                };
+                self.push_pointer(origin, const_args, arg_origins, arg_lens, sig, term);
             }
             for a in call_args {
                 self.function_value(a);
@@ -2803,11 +2836,11 @@ fn unsize_tails(src: &Ty, dst: &Ty) -> Option<(Ty, Ty)> {
 
 /// A type coerced to a trait object: the trait's path, the type's, and for each trait method
 /// the body the type's vtable holds (`origins::body_name`).
-type Coerced = (String, String, Vec<(String, String)>);
+type Coerced = (String, String, Vec<(String, String, String)>);
 
 /// Where a type was first seen coerced (in a static's value or not), and the bodies its
 /// methods run.
-type CoercedAt = (Option<Loc>, bool, Vec<(String, String)>);
+type CoercedAt = (Option<Loc>, bool, Vec<(String, String, String)>);
 
 /// An ADT as coercions name it: its defining path with its type arguments (`app::W<app::A>`);
 /// `None` for another type, or one still generic.
@@ -2869,7 +2902,11 @@ fn coercion<'tcx>(
                 } else {
                     tcx.trait_item_of(d)?
                 };
-                Some((path_of(tcx, item), crate::origins::body_name(tcx, i)?))
+                Some((
+                    path_of(tcx, item),
+                    crate::origins::body_name(tcx, i)?,
+                    crate::links::method_sig(tcx, i.def_id(), i.args),
+                ))
             })
             .collect()
     };

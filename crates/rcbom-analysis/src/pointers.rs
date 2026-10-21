@@ -8,7 +8,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use rcbom_facts::{CrateFacts, Loc, Origin, OwnerKind, Site, Target};
+use rcbom_facts::{CrateFacts, FnShape, Loc, Origin, OwnerKind, Site, Target};
 
 use crate::links::LinkIndex;
 
@@ -48,6 +48,13 @@ pub(crate) fn resolve(
     let mut out = vec![Vec::new(); facts.len()];
     let mut used = HashSet::new();
     let mut calls = Vec::new();
+    // the pointer calls that may run functions not named where the pointer comes from, and the
+    // pointers handed to code not followed: (function, number of parameters)
+    let mut opened: Vec<(String, usize, String)> = facts
+        .iter()
+        .flat_map(|f| &f.links.opaque)
+        .map(|a| (a.func.clone(), a.arity, a.sig.clone()))
+        .collect();
     for (i, f) in facts.iter().enumerate() {
         for s in &f.sites {
             match &s.target {
@@ -64,16 +71,45 @@ pub(crate) fn resolve(
                     const_args,
                     arg_origins,
                     arg_lens,
+                    sig,
                 } => {
                     let found = flow
                         .values(origin, &s.owner.path)
                         .unwrap_or_else(|| vec![(origin.clone(), s.owner.path.clone())]);
                     let mut named = Vec::new();
-                    for (v, _) in &found {
-                        functions(v, &in_statics, flow, 0, &mut named);
+                    let mut open = false;
+                    for (v, w) in &found {
+                        open |= !functions(v, w, &in_statics, flow, 0, Walk::default(), &mut named);
                     }
                     named.sort();
                     named.dedup();
+                    // a pointer that may be a function not named here: any function of the
+                    // program made a pointer of its type may run with these values (not one
+                    // in the standard library's own code, `<Box<F> as Fn<A>>::call`: what it
+                    // calls is what the program's call through the box calls, or what the
+                    // program handed it, followed there)
+                    if open && !is_std(&s.owner.krate.name) {
+                        if std::env::var_os("RCBOM_DEBUG").is_some() {
+                            eprintln!(
+                                "analysis: pointer call in {} at {}:{} not all followed: {}",
+                                s.owner.path,
+                                s.span.line,
+                                s.span.col,
+                                serde_json::to_string(
+                                    &found.iter().map(|f| &f.0).collect::<Vec<_>>()
+                                )
+                                .unwrap_or_default()
+                                .chars()
+                                .take(1500)
+                                .collect::<String>()
+                            );
+                        }
+                        opened.push((
+                            s.owner.path.clone(),
+                            arg_origins.len(),
+                            sig.clone().unwrap_or_else(|| "*".into()),
+                        ));
+                    }
                     for (at, path) in named {
                         // a function no value site names (the program's own): its parameters
                         // receive the call's arguments
@@ -112,6 +148,22 @@ pub(crate) fn resolve(
             }
         }
     }
+    // each of the program's functions made a pointer is called there with values not followed
+    opened.sort();
+    opened.dedup();
+    let named: HashSet<&FnShape> = facts.iter().flat_map(|f| &f.links.named).collect();
+    for (caller, n, sig) in &opened {
+        for f in &named {
+            let typed = sig == "*" || f.sig == "*" || *sig == f.sig;
+            if typed && (*n == usize::MAX || *n == f.arity) {
+                calls.push((
+                    f.func.clone(),
+                    caller.clone(),
+                    vec![Origin::Unknown; f.arity],
+                ));
+            }
+        }
+    }
     (out, used, calls)
 }
 
@@ -119,54 +171,134 @@ pub(crate) fn resolve(
 /// standard library's containers and wrappers (`vec![f][0]`, `Some(f)`), what a closure
 /// returns (`(|| digest::digest as HashFn)()`), and statics holding one (`static H: fn(..) =
 /// digest::digest`, the program's `static MY: HashFn = my`, `static B: &HashFn = &A`).
+///
+/// Whether that is all it can be: `false` when it meets a value not followed (`Unknown`, a
+/// parameter or a field not resolved, a call whose code is not followed), which may be any
+/// function made a pointer. A closure is one (its parameters get values not followed where it
+/// is made a pointer: the driver's escape); what it returns counts only where it is called
+/// (`returns`, under `Fn::call`).
 fn functions(
     o: &Origin,
+    owner: &str,
     in_statics: &HashMap<&str, Vec<(Loc, String)>>,
     flow: &LinkIndex,
     depth: usize,
+    walk: Walk,
     out: &mut Vec<(Loc, String)>,
-) {
+) -> bool {
     if depth > 8 {
-        return;
+        return false;
     }
-    let go =
-        |o: &Origin, out: &mut Vec<(Loc, String)>| functions(o, in_statics, flow, depth + 1, out);
+    let go = |o: &Origin, walk: Walk, out: &mut Vec<(Loc, String)>| {
+        functions(o, owner, in_statics, flow, depth + 1, walk, out)
+    };
+    let alts = Walk {
+        returns: false,
+        alternatives: true,
+    };
     match o {
         Origin::Unit {
             path,
             span: Some(at),
             ..
-        } => out.push((at.clone(), path.clone())),
-        Origin::Any(alts) | Origin::All(alts) => {
-            for a in alts {
-                go(a, out);
-            }
+        } => {
+            out.push((at.clone(), path.clone()));
+            true
         }
-        Origin::Set { value, .. } => go(value, out),
+        // a variant or a field-less value, a constant: no function
+        Origin::Unit { span: None, .. } | Origin::Const { .. } => true,
+        // as the value search reads them: an iterator advanced by `next`, the marker of a value
+        // written into an element (the elements are followed beside it), the value's own
+        // earlier value among alternatives
+        Origin::Through { callee }
+            if callee.ends_with("Iterator::next")
+                || rcbom_facts::element_writer(callee).is_some() =>
+        {
+            true
+        }
+        Origin::Loop => walk.alternatives,
+        Origin::Any(vs) | Origin::All(vs) => {
+            let mut all = true;
+            for a in vs {
+                all &= go(a, alts, out);
+            }
+            all
+        }
+        Origin::Set { value, .. } => go(value, walk, out),
         Origin::Call { callee, args, .. } if callee == "<closure>" => {
+            let mut all = true;
             for a in args {
-                go(a, out);
+                all &= go(
+                    a,
+                    Walk {
+                        returns: false,
+                        ..walk
+                    },
+                    out,
+                );
             }
+            all || !walk.returns
         }
-        Origin::Call { krate, args, .. } if matches!(krate.as_str(), "core" | "std" | "alloc") => {
+        Origin::Call {
+            callee,
+            krate,
+            args,
+            ..
+        } if matches!(krate.as_str(), "core" | "std" | "alloc") => {
+            let calls = callee.ends_with("::call")
+                || callee.ends_with("::call_mut")
+                || callee.ends_with("::call_once");
+            let mut all = true;
             for a in args {
-                go(a, out);
+                all &= go(
+                    a,
+                    Walk {
+                        returns: calls,
+                        ..walk
+                    },
+                    out,
+                );
             }
+            all
         }
+        // (one whose value is not recorded, `static D: &dyn Fn(D) = &h`, may be any)
         Origin::Data { def, .. } => {
-            out.extend(
-                in_statics
-                    .get(def.id.as_str())
-                    .into_iter()
-                    .flatten()
-                    .cloned(),
-            );
-            for v in flow.static_values(&def.id) {
-                go(v, out);
+            let named = in_statics.get(def.id.as_str());
+            out.extend(named.into_iter().flatten().cloned());
+            let values = flow.static_values(&def.id);
+            let mut all = flow.mutable_static(&def.id).is_none()
+                && (named.is_some_and(|n| !n.is_empty()) || !values.is_empty());
+            for v in values {
+                all &= go(v, Walk::default(), out);
             }
+            all
         }
-        _ => {}
+        // a parameter, a field, a call of the program's function inside the value (`next(&mut
+        // into_iter(fs))`): what it is where it comes from, each read in its own function
+        _ => match flow.values(o, owner) {
+            Some(vs) if !vs.is_empty() => {
+                let mut all = true;
+                for (v, w) in &vs {
+                    all &= functions(v, w, in_statics, flow, depth + 1, Walk::default(), out);
+                }
+                all
+            }
+            _ => false,
+        },
     }
+}
+
+/// Where `functions` is in a value: under a call of it (what a closure returns is the
+/// pointer), among alternatives (a loop's own earlier value is one of them, as the value
+/// search counts them: inside calls too).
+#[derive(Clone, Copy, Default)]
+struct Walk {
+    returns: bool,
+    alternatives: bool,
+}
+
+fn is_std(krate: &str) -> bool {
+    matches!(krate, "core" | "std" | "alloc")
 }
 
 /// Is `site` a naming that a call through a pointer accounts for?
