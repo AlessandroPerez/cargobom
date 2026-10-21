@@ -6,10 +6,11 @@ members = [
     "crates/rcbom-manifest",
     "crates/rcbom-analysis",
     "crates/cargo-cbom",
+    "xtask",
 ]
 # The driver links rustc_private and builds only on the pinned nightly (see its rust-toolchain.toml).
-# phase0/ and fixtures/ hold standalone target crates.
-exclude = ["crates/rcbom-driver", "phase0", "fixtures"]
+# tests/fixtures/ holds standalone target crates.
+exclude = ["crates/rcbom-driver", "tests/fixtures"]
 
 [workspace.package]
 version = "0.1.0"
@@ -28,7 +29,7 @@ regex = "1"
 semver = "1"
 toml = "0.9"
 
-# The e2e and regression runs (scripts/e2e.sh): optimised, with the checks of a debug build
+# The e2e and regression runs (`cargo xtask e2e`): optimised, with the checks of a debug build
 # (overflow, debug assertions), so a run is fast and an arithmetic overflow still panics.
 [profile.e2e]
 inherits = "release"
