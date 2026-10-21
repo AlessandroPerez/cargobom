@@ -255,6 +255,18 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         .collect();
     ctx.flow.set_reached(reached_paths.clone());
     let reached_path = |p: &str| reached_paths.contains(p);
+    // the functions the walk itself went through (an instance of each; not a library's generic
+    // function no instance walks)
+    let walked_paths: HashSet<&str> = facts
+        .iter()
+        .filter_map(|f| f.reach.as_ref())
+        .flat_map(|r| {
+            r.paths
+                .iter()
+                .filter(|p| r.generic.binary_search(p).is_err())
+                .map(String::as_str)
+        })
+        .collect();
     if truncated {
         notes.push(
             "reachability walk hit its instance limit; the reachable tier is incomplete".into(),
@@ -348,8 +360,14 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 OwnerKind::Fn if reached_fns.contains(site.owner.id.as_str()) => Tier::Reachable,
                 // a closure or `async` body is reached with the function that writes it: in a
                 // library's generic public function, which no instance walks, the per-item
-                // scan sees it alone (`serialize_der_with_signer::{closure#1}`)
-                OwnerKind::Fn if enclosing_fn(&site.owner.path).is_some_and(&reached_path) => {
+                // scan sees it alone (`serialize_der_with_signer::{closure#1}`); in a function
+                // the walk went through, as the walk says (a closure only made a trait object
+                // no code calls is not reached), unless the walk hit its bound
+                OwnerKind::Fn
+                    if enclosing_fn(&site.owner.path).is_some_and(|e| {
+                        reached_path(e) && (truncated || !walked_paths.contains(e))
+                    }) =>
+                {
                     Tier::Reachable
                 }
                 OwnerKind::Fn => site.tier,

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 28;
+pub const FACTS_VERSION: u32 = 29;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -860,6 +860,10 @@ pub struct Reach {
     /// one of them reaches a call at run time.
     #[serde(default)]
     pub paths: Vec<String>,
+    /// Of those, a library's generic functions its users may call, which no instance walks
+    /// (only a caller has their type arguments): reached, but not walked.
+    #[serde(default)]
+    pub generic: Vec<String>,
     /// The crates whose code the walk reached, inside the algorithm crates too (followed there
     /// for this only): the packages that run.
     #[serde(default)]
