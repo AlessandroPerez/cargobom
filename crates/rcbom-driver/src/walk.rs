@@ -23,6 +23,12 @@ pub(super) fn roots(
         && let Ok(i) = Instance::try_from(entry)
     {
         fns.push(i);
+        // and what the standard library runs with `main`'s result (`lang_start`, whose closure
+        // reaches it through a pointer the walk does not follow): `report`, which prints an
+        // `Err` with its `Debug`
+        if let Some(r) = termination_report(tcx, rustc_internal::internal(tcx, entry.def_id())) {
+            fns.push(r);
+        }
     }
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn)
@@ -91,6 +97,26 @@ pub(super) fn roots(
     }
     (fns, statics, generic)
 }
+/// `<T as std::process::Termination>::report` for the result type `T` of the entry function.
+fn termination_report(tcx: TyCtxt<'_>, main: rustc_span::def_id::DefId) -> Option<Instance> {
+    use rustc_middle::ty;
+    let term = tcx.lang_items().termination()?;
+    let report = tcx
+        .associated_item_def_ids(term)
+        .iter()
+        .copied()
+        .find(|d| tcx.item_name(*d).as_str() == "report")?;
+    let ret = tcx
+        .fn_sig(main)
+        .instantiate_identity()
+        .skip_binder()
+        .output();
+    let env = ty::TypingEnv::fully_monomorphized();
+    let ret = tcx.normalize_erasing_regions(env, ty::Unnormalized::new_wip(ret));
+    let args = tcx.mk_args(&[ret.into()]);
+    let i = ty::Instance::try_resolve(tcx, env, report, args).ok()??;
+    Some(rustc_internal::stable(i))
+}
 impl<'a, 'tcx> Walker<'a, 'tcx> {
     pub(super) fn new(cx: &'a mut Cx<'tcx>) -> Self {
         let limit = std::env::var("RCBOM_MAX_INSTANCES")
@@ -111,6 +137,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             sites: Vec::new(),
             fns: Vec::new(),
             paths: Vec::new(),
+            shims: Vec::new(),
             coercions: BTreeMap::new(),
             dyn_used: HashSet::new(),
             pending: HashMap::new(),
@@ -166,6 +193,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut paths = std::mem::take(&mut self.paths);
         paths.sort();
         paths.dedup();
+        let mut shims = std::mem::take(&mut self.shims);
+        shims.sort();
+        shims.dedup();
         let tcx = self.cx.tcx;
         let crates = self
             .crates
@@ -174,11 +204,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             .map(|c| crate_ref(tcx, c.as_def_id()))
             .collect();
         Reach {
+            artifact: String::new(),
             instances: self.seen.len(),
             truncated,
             statics,
             fns,
             paths,
+            shims,
             generic: Vec::new(),
             crates,
             crates_complete: !truncated && usage_complete,
@@ -377,7 +409,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
         // a shim's body is the compiler's (a `dyn` method behind a function pointer, drop glue,
         // `<closure as FnOnce>::call_once`): what it calls is walked, but none of it is code
-        // written at the span it carries (the trait method's declaration)
+        // written at the span it carries (the trait method's declaration); its symbol is kept
+        // for the check against the linker (`Reach::shims`)
+        if shim && !usage && !stop {
+            self.shims.push(inst.mangled_name());
+        }
         if usage {
             let mut v = AllocStatics(Vec::new());
             v.visit_body(&body);

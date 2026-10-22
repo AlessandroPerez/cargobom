@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 29;
+pub const FACTS_VERSION: u32 = 30;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -846,6 +846,10 @@ pub struct ViaStep {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Reach {
+    /// The artifact walked: `bin <name>` for a binary (cargo's target name), `lib <package>` for
+    /// a library of the workspace (its public API).
+    #[serde(default)]
+    pub artifact: String,
     pub instances: usize,
     /// The walk stopped at the instance limit; the reachable tier is incomplete.
     pub truncated: bool,
@@ -860,6 +864,11 @@ pub struct Reach {
     /// one of them reaches a call at run time.
     #[serde(default)]
     pub paths: Vec<String>,
+    /// The symbols of the compiler's shims the walk went through (drop glue, a closure's
+    /// `call_once`, a tuple's `clone`): with `fns`, what the walk reached, for the check against
+    /// the linker (`cargo cbom --check-walk`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub shims: Vec<String>,
     /// Of those, a library's generic functions its users may call, which no instance walks
     /// (only a caller has their type arguments): reached, but not walked.
     #[serde(default)]

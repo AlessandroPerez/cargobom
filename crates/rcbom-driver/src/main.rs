@@ -459,6 +459,13 @@ fn analyze(tcx: TyCtxt<'_>) {
         }
         let mut w = Walker::new(&mut cx);
         let mut r = w.run(roots, static_roots);
+        // which artifact this walk is of: a binary by cargo's name for it (`rage-keygen`), a
+        // library by its package's
+        r.artifact = match std::env::var("CARGO_BIN_NAME") {
+            Ok(b) if rustc_public::entry_fn().is_some() => format!("bin {b}"),
+            _ if rustc_public::entry_fn().is_some() => format!("bin {}", krate.name),
+            _ => format!("lib {}", krate.package),
+        };
         // a panic in the points-to analysis is counted as an item not analysed, like the
         // others; the facts are written without its answers
         if let Some(p) = w.cx.pta.take() {
@@ -710,6 +717,8 @@ struct Walker<'a, 'tcx> {
     fns: Vec<String>,
     /// Defining paths of the walked functions.
     paths: Vec<String>,
+    /// Symbols of the shims walked (drop glue, a closure's `call_once`, a tuple's `clone`).
+    shims: Vec<String>,
     /// Types coerced to trait objects in the walked code: first position seen (in a static's
     /// value or not), and the body each method of the object runs for the type.
     coercions: BTreeMap<(String, String), CoercedAt>,
