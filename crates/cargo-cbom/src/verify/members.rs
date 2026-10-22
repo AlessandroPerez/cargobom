@@ -289,6 +289,133 @@ impl Files<'_> {
     /// returning or writing it, does not replace on every way what it writes with other
     /// descriptors only. Witnesses that are no function (a static's initializer, a constant
     /// expression, an element write, `vec![..]`, the standard library's) are not checked here.
+    /// A member of a boundary model (`algorithm one of 12 .. from `Header.alg` (object: from
+    /// `F`)`; the key's family (Hmac) allows these`): the call is one the knowledge base models,
+    /// whose algorithm is the field cited; the asset is a variant of the model's enum, of a key
+    /// family the detail lists; and where the code says it comes from (the function the label
+    /// cites, the static of a table, or else the code the call reads) can give that variant:
+    /// names it, or passes on a value from elsewhere, and names no other variant only.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn check_model(
+        &mut self,
+        src: &Source,
+        path: &Path,
+        o: &Occ,
+        (adt, field): (&str, &str),
+        witness: Option<(&str, &str)>,
+        families: Option<&[String]>,
+        (call_at, beside): (Option<(usize, usize)>, bool),
+    ) -> Result<(), String> {
+        let kb = self.kb;
+        let sym = strip_generics(&o.symbol);
+        let (krate, rest) = sym.split_once("::").unwrap_or((&sym, ""));
+        let Some(b) = kb
+            .boundaries
+            .iter()
+            .find(|b| b.krate == krate && b.pattern.is_match(rest))
+        else {
+            return Err(format!(
+                "`{}` is no call the knowledge base models",
+                o.symbol
+            ));
+        };
+        if b.algorithm.adt.as_deref().is_some_and(|a| a != adt)
+            || b.algorithm.field.as_deref().is_some_and(|f| f != field)
+        {
+            return Err(format!(
+                "`{}` takes its algorithm from {}, not `{adt}.{field}`",
+                o.symbol,
+                match (&b.algorithm.adt, &b.algorithm.field) {
+                    (Some(a), Some(f)) => format!("`{a}.{f}`"),
+                    _ => format!("argument {}", b.algorithm.arg),
+                }
+            ));
+        }
+        let Some(e) = kb
+            .enums
+            .iter()
+            .find(|e| e.krate == b.krate && e.name == b.enumeration)
+        else {
+            return Err(format!("no enum `{}` in the knowledge base", b.enumeration));
+        };
+        let variants: Vec<&String> = e
+            .variants
+            .iter()
+            .filter(|(_, v)| v.algo.asset == o.component)
+            .filter(|(_, v)| {
+                families.is_none_or(|fs| v.key.as_ref().is_none_or(|k| fs.contains(k)))
+            })
+            .map(|(n, _)| n)
+            .collect();
+        let Some(v) = variants.first() else {
+            return Err(format!(
+                "{} is no variant of `{}`{}",
+                o.component,
+                e.name,
+                families.map_or(String::new(), |fs| format!(
+                    " for a key of family {}",
+                    fs.join(", ")
+                ))
+            ));
+        };
+        let d = format!("{}::{}::{v}", e.krate, e.name);
+        let rivals: Vec<String> = e
+            .variants
+            .keys()
+            .filter(|n| !variants.contains(n))
+            .cloned()
+            .collect();
+        match witness {
+            Some(("table: stored by", t)) => self.check_table(src, path, t, &d, call_at),
+            Some((kind, w)) => {
+                let kind = match kind {
+                    "object: from" => "object, from",
+                    "type-join: a value" => "type-join, possible (a value",
+                    // a value a function passes, or puts in the list
+                    _ => "caller, passed by",
+                };
+                self.check_witness_of(path, kind, w, &d, &o.component_ref, beside, &rivals)
+            }
+            // (named in the code the call reads)
+            None => match call_at {
+                Some(at) => {
+                    self.check_args(src, path, at, &[&d], &o.component_ref, None, (false, false))
+                }
+                None => Ok(()),
+            },
+        }
+    }
+
+    /// A call that is an operation, whose algorithm may be unknown: one the knowledge base
+    /// lists (`[[operation]]`, `[[boundary]]`), or a use (a method of `[[use]]`) of the API of
+    /// a crypto package it does not model, or of an algorithm crate's it does not name.
+    pub(super) fn is_operation(&self, symbol: &str) -> bool {
+        let sym = strip_generics(symbol);
+        let Some((krate, rest)) = sym.split_once("::") else {
+            return false;
+        };
+        let kb = self.kb;
+        if kb.operation(krate, rest).is_some()
+            || kb
+                .boundaries
+                .iter()
+                .any(|b| b.krate == krate && b.pattern.is_match(rest))
+        {
+            return true;
+        }
+        let method = rest.rsplit("::").next().unwrap_or(rest);
+        let crypto = self.man.packages.iter().any(|p| {
+            p.lib_name.as_deref() == Some(krate)
+                && (p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)
+                    || p.role == Some(rcbom_kb::Role::Algorithm))
+        });
+        crypto
+            && kb
+                .uses
+                .iter()
+                .any(|u| u.methods.iter().any(|m| m == method))
+    }
+
     pub(super) fn check_witness(
         &mut self,
         path: &Path,
@@ -297,6 +424,22 @@ impl Files<'_> {
         d: &str,
         component_ref: &str,
         beside: bool,
+    ) -> Result<(), String> {
+        self.check_witness_of(path, kind, w, d, component_ref, beside, &[])
+    }
+
+    /// `check_witness`, where the names in `rivals` (the other variants of a model's enum) are
+    /// other values of the primitive too.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn check_witness_of(
+        &mut self,
+        path: &Path,
+        kind: &str,
+        w: &str,
+        d: &str,
+        component_ref: &str,
+        beside: bool,
+        rivals: &[String],
     ) -> Result<(), String> {
         // (an instance's name printed with an empty turbofish, `m1::gen_set::`: its function;
         // a trait's method of a type printed as `a::Tr::m for a::T`: `<a::T as a::Tr>::m`)
@@ -446,14 +589,20 @@ impl Files<'_> {
                 let a = scan_to(&src.code, a, b, |k| src.code[k] == '{');
                 let mut r = Reads::default();
                 names_read(&src, self.kb, a, b, 3, &mut HashSet::new(), &mut r, true);
-                if r.names.contains(&last) || r.foreign {
+                // (a model enum's variants are its values, not constants not read)
+                let foreign = r.foreign
+                    && (rivals.is_empty()
+                        || r.foreign_items
+                            .iter()
+                            .any(|k| k.1 != last && !rivals.contains(&k.1)));
+                if r.names.contains(&last) || foreign {
                     return Ok(());
                 }
                 let others = r.names.iter().any(|x| {
-                    self.kb
-                        .statics
-                        .iter()
-                        .any(|e| e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref())
+                    rivals.contains(x)
+                        || self.kb.statics.iter().any(|e| {
+                            e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref()
+                        })
                 });
                 // a parameter it reads that can hold the algorithm (not an integer, a string,
                 // bytes): a value from its caller it passes on or keeps

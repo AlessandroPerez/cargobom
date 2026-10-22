@@ -84,6 +84,18 @@ impl Files<'_> {
                 .captures(ctx.tags)
                 .map(|m| m[1].to_string())
                 .ok_or("no tier and evidence kind among the tags")?;
+        // an unknown algorithm is an operation's: the call is one the knowledge base lists (an
+        // operation, a boundary model), or a use of a crypto package's API it does not model or
+        // name (`p256::SecretKey::random`, age's `Identity::generate`)
+        if o.component_ref.starts_with("crypto:algorithm:unknown:")
+            && kind == "call"
+            && !self.is_operation(&o.symbol)
+        {
+            return Err(format!(
+                "`{}` is no operation the knowledge base lists, nor a crypto package's use",
+                o.symbol
+            ));
+        }
         let starts_token = token_start(&src, line, offset);
         // the instance of a generic function the occurrence is in (`in tlib::hash_c::<ilib::
         // CFast>`, or a closure in it): its function's type parameters' arguments
@@ -553,6 +565,29 @@ impl Files<'_> {
         // the call a table member is read at (not a macro's: its code is the macro's)
         let call_at = (kind == "call" && !ctx.tags.contains("[macro ")).then_some((line, offset));
         for p in parts(ctx.details) {
+            // a member of a boundary model (jsonwebtoken's `Header.alg`)
+            if let Some(m) = re!(
+                r"^algorithm (?:from|one of \d+ (?:chosen at run time \(selector: \w+\) |that may reach the call )?from) `(\w+)\.(\w+)`(?:: possible)?(?: \((object: from|caller: passed by|container: a value|container: in the list|type-join: a value|table: stored by) `(?:static |const )?([^`]+)`[^)]*\))?$"
+            )
+            .captures(p)
+            {
+                let witness = m.get(3).zip(m.get(4)).map(|(k, w)| (k.as_str(), w.as_str()));
+                let families = re!(r"(?:^|; )the key's family \(([^)]*)\) allows these")
+                    .captures(ctx.details)
+                    .map(|f| f[1].split(", ").map(str::to_string).collect::<Vec<_>>());
+                let beside = ctx.details.contains("beside others not followed")
+                    || p.contains(": possible");
+                self.check_model(
+                    &src,
+                    &path,
+                    o,
+                    (&m[1], &m[2]),
+                    witness,
+                    families.as_deref(),
+                    (call_at, beside),
+                )?;
+                continue;
+            }
             // a static a member is stored by holds it (`member: table, stored by `static T``);
             // one a member is a value of exists (`member: static, possible (a value `static T`
             // holds ..)`)
