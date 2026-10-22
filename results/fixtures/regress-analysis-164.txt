@@ -1,0 +1,127 @@
+  occ Poly1305 | crypto:algorithm:Poly1305 | src/main.rs:10:14 | universal_hash::UniversalHash::finalize | [reachable] [call] in a164::main; use: tag; line: `let _ = p.finalize(); // Poly1305`; code: `finalize`
+  occ Poly1305 | crypto:algorithm:Poly1305 | src/main.rs:7:12 | crypto_common::KeyInit::new | [reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `poly1305::Poly1305::new`
+  occ Poly1305 | crypto:algorithm:Poly1305 | src/main.rs:7:47 | poly1305::Poly1305::compute_unpadded | [reachable] [call] in a164::main; use: tag; line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `compute_unpadded`
+  occ Poly1305 | crypto:algorithm:Poly1305 | src/main.rs:8:16 | crypto_common::KeyInit::new | [reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let mut p = poly1305::Poly1305::new(&k.into());`; code: `poly1305::Poly1305::new`
+  occ Poly1305 | crypto:algorithm:Poly1305 | src/main.rs:9:6 | universal_hash::UniversalHash::update_padded | [reachable] [call] in a164::main; use: tag; line: `p.update_padded(&d); // Poly1305`; code: `update_padded`
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a164 -> poly1305 -> universal-hash -> crypto-common
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:50:0 | ghash | [manifest] locked ghash 0.5.1; reached via a164 -> ghash
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.toml:10:0 | ghash | [manifest] declared by a164 (dependencies)
+  occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:72:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via a164 -> poly1305
+  occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.toml:9:0 | poly1305 | [manifest] declared by a164 (dependencies)
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:83:0 | polyval | [manifest] locked polyval 0.6.2; reached via a164 -> polyval
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.toml:11:0 | polyval | [manifest] declared by a164 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:95:0 | subtle | [manifest] locked subtle 2.6.1; reached via a164 -> poly1305 -> universal-hash -> subtle
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:107:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via a164 -> poly1305 -> universal-hash
+  occ unknown | crypto:algorithm:unknown:mac:ghash | src/main.rs:13:6 | universal_hash::UniversalHash::update_padded | [reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; line: `g.update_padded(&d); // an unknown MAC (GHASH)`; code: `update_padded`
+  occ unknown | crypto:algorithm:unknown:mac:ghash | src/main.rs:14:14 | universal_hash::UniversalHash::finalize | [reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; line: `let _ = g.finalize(); // an unknown MAC (GHASH)`; code: `finalize`
+  occ unknown | crypto:algorithm:unknown:mac:polyval | src/main.rs:16:6 | universal_hash::UniversalHash::update_padded | [reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; line: `v.update_padded(&d); // an unknown MAC (POLYVAL)`; code: `update_padded`
+  occ unknown | crypto:algorithm:unknown:mac:polyval | src/main.rs:17:14 | universal_hash::UniversalHash::verify | [reachable] [call] in a164::main; use: verify; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; line: `let _ = v.verify(&[0u8; 16].into()); // an unknown MAC (POLYVAL)`; code: `verify`
+  occ unknown | crypto:algorithm:unknown:unknown:ghash | src/main.rs:12:16 | crypto_common::KeyInit::new | [reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); line: `let mut g = ghash::GHash::new(&h.into());`; code: `ghash::GHash::new`
+  occ unknown | crypto:algorithm:unknown:unknown:polyval | src/main.rs:15:16 | crypto_common::KeyInit::new | [reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); line: `let mut v = polyval::Polyval::new(&h.into());`; code: `polyval::Polyval::new`
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:confidence=high
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:detection:method=type-resolved
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:finding=hard-coded-key
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:functions:source=observed
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:kb:version=0.2.0
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:occurrences=5
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:provenance:key=hard-coded
+  prop Poly1305 | crypto:algorithm:Poly1305 | rcbom:reachability=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:mac:ghash | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:mac:polyval | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:unknown:ghash | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:finding=hard-coded-key
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:functions:source=knowledge-base
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:provenance:key=hard-coded
+  prop unknown | crypto:algorithm:unknown:unknown:polyval | rcbom:reachability=reachable
+asset Poly1305 | crypto:algorithm:Poly1305 | {"algorithmProperties": {"algorithmFamily": "Poly1305", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:mac:ghash | {"algorithmProperties": {"cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:mac:polyval | {"algorithmProperties": {"cryptoFunctions": ["tag", "verify"], "primitive": "mac"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:ghash | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:polyval | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/a164@0.1.0 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/a164@0.1.0 -> pkg:cargo/poly1305@0.8.0
+dep pkg:cargo/a164@0.1.0 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
+dependency crypto:algorithm:Poly1305
+dependency crypto:algorithm:unknown:mac:ghash
+dependency crypto:algorithm:unknown:mac:polyval
+dependency crypto:algorithm:unknown:unknown:ghash
+dependency crypto:algorithm:unknown:unknown:polyval
+dependency pkg:cargo/a164@0.1.0
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/poly1305@0.8.0
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ghash@0.5.1 -> crypto:algorithm:unknown:mac:ghash
+provides pkg:cargo/ghash@0.5.1 -> crypto:algorithm:unknown:unknown:ghash
+provides pkg:cargo/poly1305@0.8.0 -> crypto:algorithm:Poly1305
+provides pkg:cargo/polyval@0.6.2 -> crypto:algorithm:unknown:mac:polyval
+provides pkg:cargo/polyval@0.6.2 -> crypto:algorithm:unknown:unknown:polyval
+root {"bom-ref": "pkg:cargo/a164@0.1.0", "name": "a164", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a164@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a164
+run rcbom:run:features=
+run rcbom:run:packages=13
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=72
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

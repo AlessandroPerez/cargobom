@@ -1,0 +1,289 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via d29 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via d29 -> sha2 -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via d29 -> sha2 -> digest",
+            "line": 47,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by d29 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via d29 -> sha2",
+            "line": 73,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in d29::main; use: digest; line: `let _ = Sha256::digest(&v[..n]); // SHA-256`; code: `Sha256::digest`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/d29@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/d29@0.1.0",
+      "name": "d29",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/d29@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "10"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "145"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin d29"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:4ae0ec5f-b8b0-84a7-b9d1-d75f9b5e4629",
+  "specVersion": "1.7",
+  "version": 1
+}
