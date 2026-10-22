@@ -96,6 +96,7 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                         if o.function.is_none() {
                             o.function = g.function;
                         }
+                        o.artifacts.extend(g.artifacts);
                         for d in g.detail {
                             if !o.detail.contains(&d) {
                                 o.detail.push(d);

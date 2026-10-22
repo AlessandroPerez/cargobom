@@ -51,8 +51,23 @@ fn tier_str(t: Tier) -> &'static str {
 /// `[tier] [kind] [macro m!] in owner; use: f; details; line: `..`; code: `..``. The bracketed
 /// tags come first and the source text last, so tools (and `cargo cbom verify`) can read them
 /// back.
-fn context(o: &Occurrence) -> String {
+/// The artifacts whose walks reach any of these occurrences.
+fn artifacts_of(occurrences: &[Occurrence]) -> BTreeSet<&str> {
+    occurrences
+        .iter()
+        .flat_map(|o| o.artifacts.iter().map(String::as_str))
+        .collect()
+}
+
+/// The text after an occurrence's position: its tags (tier, kind, the artifacts reaching it
+/// where the run has several, the macro), where it is, its details, and last its source line
+/// and text.
+fn context(o: &Occurrence, several_artifacts: bool) -> String {
     let mut s = format!("[{}] [{}]", tier_str(o.tier), o.kind.as_str());
+    if several_artifacts && !o.artifacts.is_empty() {
+        let a: Vec<&str> = o.artifacts.iter().map(String::as_str).collect();
+        s.push_str(&format!(" [artifacts: {}]", a.join(", ")));
+    }
     match &o.macro_tag {
         Some((rcbom_facts::MacroKind::Derive, name)) => s.push_str(&format!(" [derive {name}]")),
         Some((rcbom_facts::MacroKind::Attr, name)) => s.push_str(&format!(" [attribute {name}]")),
@@ -121,7 +136,7 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
         .collect()
 }
 
-fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
+fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str, several_artifacts: bool) -> Value {
     let observed = a.observed_functions();
     let (functions, source): (Vec<String>, &str) = if observed.is_empty() {
         (a.algo.functions.clone(), "knowledge-base")
@@ -154,7 +169,7 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
                 "line": o.line,
                 "offset": o.offset,
                 "symbol": o.symbol,
-                "additionalContext": context(o),
+                "additionalContext": context(o, several_artifacts),
             })
         })
         .collect();
@@ -175,6 +190,12 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str) -> Value {
     ];
     if !direct && !a.occurrences.is_empty() {
         props.push(prop("rcbom:only-as-component", "true"));
+    }
+    // the artifacts using it, where the run has several (one `rage-keygen` uses alone)
+    if several_artifacts {
+        for art in artifacts_of(&a.occurrences) {
+            props.push(prop("rcbom:artifact", art));
+        }
     }
     for (k, vs) in &a.params {
         let v: Vec<&str> = vs.iter().map(String::as_str).collect();
@@ -261,7 +282,7 @@ pub(crate) fn protocol_ref(p: &crate::Protocol) -> String {
 /// enables (`rcbom:protocol:versions`) and all their cipher suites. CycloneDX gives a protocol
 /// one `version`: it is stated only when one version is enabled, so that suites of another
 /// version are never listed under it.
-fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
+fn protocol_component(kb: &Kb, p: &crate::Protocol, several_artifacts: bool) -> Value {
     let occurrences: Vec<Value> = p
         .occurrences
         .iter()
@@ -271,7 +292,7 @@ fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
                 "line": o.line,
                 "offset": o.offset,
                 "symbol": o.symbol,
-                "additionalContext": context(o),
+                "additionalContext": context(o, several_artifacts),
             })
         })
         .collect();
@@ -302,6 +323,11 @@ fn protocol_component(kb: &Kb, p: &crate::Protocol) -> Value {
     ];
     if let Some(b) = &p.backend {
         props.push(prop("rcbom:backend", b));
+    }
+    if several_artifacts {
+        for art in artifacts_of(&p.occurrences) {
+            props.push(prop("rcbom:artifact", art));
+        }
     }
     json!({
         "type": "cryptographic-asset",
@@ -531,9 +557,13 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
     components.extend(
         an.assets
             .values()
-            .map(|a| asset_component(kb, a, &refs[&a.key])),
+            .map(|a| asset_component(kb, a, &refs[&a.key], an.artifacts.len() > 1)),
     );
-    components.extend(an.protocols.values().map(|p| protocol_component(kb, p)));
+    components.extend(
+        an.protocols
+            .values()
+            .map(|p| protocol_component(kb, p, an.artifacts.len() > 1)),
+    );
     let mut candidates = candidate_assets(kb, man, an);
 
     // Dependencies: package graph reduced to the included packages, providers, composition.
@@ -632,6 +662,10 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         prop("rcbom:kb:version", &kb.version),
         prop("rcbom:run:reachable-instances", an.instances),
     ];
+    // the artifacts walked (each binary, a workspace library's public API)
+    for a in &an.artifacts {
+        run_props.push(prop("rcbom:run:artifact", a));
+    }
     for n in &an.notes {
         run_props.push(prop("rcbom:run:note", n));
     }

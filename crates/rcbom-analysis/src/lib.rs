@@ -82,6 +82,9 @@ pub struct Occurrence {
     /// The calls that created the generic instance it is in, innermost first (location, line,
     /// 0-based column), as the `instantiated by` details cite them.
     pub via: Vec<(String, usize, usize)>,
+    /// The artifacts whose walk reaches it (`bin rage-keygen`, `lib rcgen`); none when it is
+    /// not reachable.
+    pub artifacts: BTreeSet<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -138,6 +141,8 @@ pub struct Analysis {
     pub usage: HashMap<(String, String), Usage>,
     pub notes: Vec<String>,
     pub instances: usize,
+    /// The artifacts walked (`bin rage`, `bin rage-keygen`, `lib rcgen`), sorted.
+    pub artifacts: Vec<String>,
     /// Layer 2 ran: without it (`--manifest-only`) nothing is known about use.
     pub layer2: bool,
 }

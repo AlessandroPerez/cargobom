@@ -196,47 +196,80 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             }
         }
     }
-    let mut reachable_statics: HashSet<String> = HashSet::new();
-    for d in &seeds {
-        if !reachable_statics.contains(&d.id) {
-            reachable_statics.extend(closure(&d.id).into_iter().map(|d| d.id));
+    // the data reachable from these seeds: what they name in turn, and the internals of the
+    // `thread_local!`s among them
+    let data_reached = |seeds: &[rcbom_facts::DefRef]| -> HashSet<String> {
+        let mut reachable_statics: HashSet<String> = HashSet::new();
+        for d in seeds {
+            if !reachable_statics.contains(&d.id) {
+                reachable_statics.extend(closure(&d.id).into_iter().map(|d| d.id));
+            }
         }
-    }
-    // a `thread_local!`'s own items (its initializer `__RUST_STD_INTERNAL_INIT`, its storage
-    // `{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL`) are reached when its key is: the
-    // key's `with` runs them through a pointer the walk does not follow
-    let key_of = |path: &str| -> Option<String> {
-        let i = path
-            .find("::__RUST_STD_INTERNAL")
-            .or_else(|| path.find("::__rust_std_internal"))?;
-        let head = &path[..i];
-        Some(head.find("::{").map_or(head, |j| &head[..j]).to_string())
+        // a `thread_local!`'s own items (its initializer `__RUST_STD_INTERNAL_INIT`, its storage
+        // `{constant#0}::{closure#0}::__RUST_STD_INTERNAL_VAL`) are reached when its key is: the
+        // key's `with` runs them through a pointer the walk does not follow
+        let key_of = |path: &str| -> Option<String> {
+            let i = path
+                .find("::__RUST_STD_INTERNAL")
+                .or_else(|| path.find("::__rust_std_internal"))?;
+            let head = &path[..i];
+            Some(head.find("::{").map_or(head, |j| &head[..j]).to_string())
+        };
+        let keys: HashSet<String> = reachable_statics
+            .iter()
+            .filter_map(|id| static_defs.get(id))
+            .map(|d| d.path.clone())
+            .collect();
+        let internals: Vec<String> = static_defs
+            .values()
+            .map(|d| (d.id.clone(), d.path.clone()))
+            .chain(
+                facts
+                    .iter()
+                    .flat_map(|f| &f.sites)
+                    .filter(|s| s.owner.kind == OwnerKind::Static)
+                    .map(|s| (s.owner.id.clone(), s.owner.path.clone())),
+            )
+            .filter(|(id, path)| {
+                !reachable_statics.contains(id) && key_of(path).is_some_and(|k| keys.contains(&k))
+            })
+            .map(|(id, _)| id)
+            .collect();
+        for id in internals {
+            reachable_statics.insert(id.clone());
+            reachable_statics.extend(closure(&id).into_iter().map(|d| d.id));
+        }
+        reachable_statics
     };
-    let keys: HashSet<String> = reachable_statics
-        .iter()
-        .filter_map(|id| static_defs.get(id))
-        .map(|d| d.path.clone())
-        .collect();
-    let internals: Vec<String> = static_defs
-        .values()
-        .map(|d| (d.id.clone(), d.path.clone()))
-        .chain(
-            facts
-                .iter()
-                .flat_map(|f| &f.sites)
-                .filter(|s| s.owner.kind == OwnerKind::Static)
-                .map(|s| (s.owner.id.clone(), s.owner.path.clone())),
-        )
-        .filter(|(id, path)| {
-            !reachable_statics.contains(id) && key_of(path).is_some_and(|k| keys.contains(&k))
-        })
-        .map(|(id, _)| id)
-        .collect();
-    for id in internals {
-        reachable_statics.insert(id.clone());
-        reachable_statics.extend(closure(&id).into_iter().map(|d| d.id));
-    }
+    let reachable_statics = data_reached(&seeds);
     let reached_data = |id: &str| reachable_statics.contains(id);
+    // each artifact's walk: the functions it reaches and the data they name, the artifacts an
+    // occurrence is tagged with (`rcbom:artifact`); together they are what is reachable
+    let walks: Vec<ArtifactWalk> = facts
+        .iter()
+        .filter_map(|f| f.reach.as_ref())
+        .map(|r| {
+            let fns: HashSet<&str> = r.fns.iter().map(String::as_str).collect();
+            let mut seeds = r.statics.clone();
+            for s in facts.iter().flat_map(|f| &f.sites) {
+                if let (OwnerKind::Fn, Target::Static { def } | Target::Const { def }) =
+                    (&s.owner.kind, &s.target)
+                    && fns.contains(s.owner.id.as_str())
+                {
+                    seeds.push(def.clone());
+                }
+            }
+            ArtifactWalk {
+                name: r.artifact.clone(),
+                statics: data_reached(&seeds),
+                paths: r.paths.iter().map(String::as_str).collect(),
+                fns,
+            }
+        })
+        .collect();
+    let mut artifacts: Vec<String> = walks.iter().map(|w| w.name.clone()).collect();
+    artifacts.sort();
+    artifacts.dedup();
     // the functions reachable from an entry point, by defining path (as links name them)
     let reached_paths: HashSet<String> = facts
         .iter()
@@ -371,6 +404,34 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     Tier::Reachable
                 }
                 OwnerKind::Fn => site.tier,
+            };
+            // the artifacts whose walk reaches the site: of a function, those reaching its
+            // instance, else (a closure reached with its function) those reaching that function
+            let artifacts: BTreeSet<String> = if tier == Tier::Reachable {
+                let mut a: BTreeSet<String> = walks
+                    .iter()
+                    .filter(|w| match site.owner.kind {
+                        OwnerKind::Static => w.statics.contains(&site.owner.id),
+                        OwnerKind::Fn => w.fns.contains(site.owner.id.as_str()),
+                    })
+                    .map(|w| w.name.clone())
+                    .collect();
+                if a.is_empty()
+                    && let Some(e) = enclosing_fn(&site.owner.path)
+                {
+                    a = walks
+                        .iter()
+                        .filter(|w| w.paths.contains(e))
+                        .map(|w| w.name.clone())
+                        .collect();
+                }
+                // (never untagged: reachable is what some walk reaches)
+                if a.is_empty() {
+                    a = artifacts.iter().cloned().collect();
+                }
+                a
+            } else {
+                BTreeSet::new()
             };
             // code a build script generated (`OUT_DIR`, inside the target directory wherever
             // that is), and any file outside every package's directory, belongs to the package
@@ -519,6 +580,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     note: None,
                     generic_body: false,
                     via: Vec::new(),
+                    artifacts: artifacts.clone(),
                 });
             }
             // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age); so
@@ -604,6 +666,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let prov = provenance::of_call(kb, &ctx.flow, &site.target, protocol);
             for (m, kind, function, symbol, detail, unreached) in matches {
                 let tier = if unreached { Tier::Present } else { tier };
+                let artifacts = if unreached {
+                    BTreeSet::new()
+                } else {
+                    artifacts.clone()
+                };
                 for prov in &m.providers {
                     let u = usage.entry(prov.clone()).or_insert(Usage::Present);
                     if tier == Tier::Reachable {
@@ -723,6 +790,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                             (man.location(&vp), v.span.line, v.span.col.saturating_sub(1))
                         })
                         .collect(),
+                    artifacts,
                 };
                 let a = assets.entry(m.key()).or_insert_with(|| Asset {
                     key: m.key(),
@@ -773,6 +841,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     if occ.tier == Tier::Reachable {
                         o.tier = Tier::Reachable;
                     }
+                    o.artifacts.extend(occ.artifacts);
                     if o.function.is_none() {
                         o.function = occ.function;
                     }
@@ -891,6 +960,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             if same && later.tier == Tier::Reachable {
                 kept.tier = Tier::Reachable;
             }
+            if same {
+                kept.artifacts.append(&mut later.artifacts);
+            }
             same
         });
     }
@@ -1008,6 +1080,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         usage,
         notes,
         instances,
+        artifacts,
         layer2: true,
     }
+}
+
+/// One artifact's walk: the functions it reaches (owner ids, defining paths) and the data they
+/// name, for the artifacts an occurrence is tagged with.
+struct ArtifactWalk<'f> {
+    name: String,
+    fns: HashSet<&'f str>,
+    paths: HashSet<&'f str>,
+    statics: HashSet<String>,
 }
