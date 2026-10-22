@@ -105,6 +105,7 @@ cargo xtask suite <out> tests/fixtures/suite/*       # the ground-truth suite: 5
                                                      # call sites labelled from source before
                                                      # any tool run
 cargo xtask corpus-score <out> tests/fixtures/corpus/*.toml          # six real projects
+cargo xtask corpus-score <out> tests/fixtures/heldout/*.toml         # seven held-out crates
 cargo xtask score tests/fixtures/rusi/<fixture>/labels.toml <cbom>   # any tool's CBOM
 cargo xtask rusi-to-cbom <rusi report>               # a rusi report as a CBOM, for `score`
 cargo xtask review-sheet <fixture>...                # labels next to their source lines
@@ -112,6 +113,55 @@ cargo xtask review-sheet <fixture>...                # labels next to their sour
 
 Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is zero);
 **less-specific**; **honest-unknown** (`unknown` reported, nothing wrong); **miss**.
+
+## Results
+
+Every number comes from the outputs in `results/`, which the commands above regenerate. Labels
+were written from source by agents that never saw tool output (`docs/suite/RULES.md`): two
+independent labellers per set, compared, and adjudicated by the rules. The held-out crates were chosen after development,
+and their labels were frozen before the first run.
+
+| set | what | result |
+|---|---|---|
+| ground-truth suite | 53 programs, 107 call sites | 104 correct, 3 less-specific, 0 wrong, 0 miss |
+| corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 38 sites: 28 correct, 4 honest-unknown, 6 miss, 0 wrong |
+| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 sites: 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
+| rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
+| evidence | every cited position, `verify --self-test` | fixtures: 19,153 positions, all verified but 4 the verifier cannot confirm (each checked correct by hand); corpus 1,808 and held-out 1,259, all verified; every one of 89,086 positions shifted by a line or a column rejected |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs |
+| cost | one cold run per project on 6 cores: compilation, analysis, walk check | 5 s (minisign, totp-rs) to 173 s (xh); peak memory of the process tree 0.3 to 3.4 GB; reruns reproduce each CBOM exactly |
+
+Where it is not exact, the CBOM says so instead of guessing:
+- **Misses.** The corpus misses are calls into crates the knowledge base does not model at their
+  boundary: rage's calls into age, xh's into digest_auth. Their algorithms are reported and cited
+  inside those crates, not at the program's call. In the held-out set, three are dufs's
+  `Uuid::new_v4` (the draw is reported at uuid's own call), and one is ssh-key's RSA key
+  generation, which is reported as RSA private-key material, not as the scheme the label names.
+- **Honest unknowns.** In the held-out set these are mostly crates at versions the knowledge base
+  does not cover: the newer RustCrypto generation (sha2 0.11, hmac 0.13, rand 0.10, scrypt 0.12,
+  md5 0.8, ed25519-dalek 3, blake2 0.11). They are reported as operations of unknown
+  algorithm, with the package and the reason. The others are types a library's callers choose.
+
+## Limitations
+
+- **The built artifact only:** one target, one feature set, the `release` profile. Tests, build
+  scripts, and code that other features or targets would compile are not covered.
+- **Out of scope by decision:** hand-rolled algorithms, unsafe code, certificates loaded at run
+  time, and security configuration.
+- **Knowledge-base coverage:** the RustCrypto 0.10 generation, ring 0.17, aws-lc-rs 1, rustls
+  0.23, jsonwebtoken 9 and rand 0.8 to 0.9. Other versions and unmodelled crypto packages are
+  reported, with their operations as unknown.
+- **Unmodelled boundaries:** crates the knowledge base does not model at their boundary are
+  walked into, so their calls are cited there.
+- **Values:** values are followed through def-use origins, links across functions and standard
+  library summaries, not through a points-to analysis. Where a value is not followed, the CBOM
+  says unknown; the opt-in points-to engine only removes doubt.
+- **Generic library code:** in a library, a generic function's type parameters belong to its
+  callers, so an operation on one is unknown.
+- **The verifier:** it is text-based. It does not read writes made by code it does not see, and
+  it confirms some identical adjacent candidates only within a range of lines.
+- **Toolchain:** the driver needs its pinned nightly. Layer 2 compiles the project, so the
+  project's build scripts and procedural macros run.
 
 ## Layout
 
@@ -124,6 +174,7 @@ Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is ze
 | `crates/rcbom-kb` | knowledge base loader and data (`data/`: the seed, and the Cryptography Registry, Apache-2.0) |
 | `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, CycloneDX assembly |
 | `xtask` | the project's tasks: checks, e2e, scorers, summaries |
-| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects); each with its golden `expected.txt` |
+| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run); each fixture with its golden `expected.txt` |
 | `tests/external/` | inputs from an external reference case (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
+| `docs/` | `poc_workflow.md` (the tool, its five layers, related tools), `in-too-deep.md` (how each stage works), `suite/RULES.md` (the labelling rules every label file follows) |
