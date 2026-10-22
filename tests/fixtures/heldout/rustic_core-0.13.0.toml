@@ -1,0 +1,304 @@
+# Ground truth for rustic_core-0.13.0 (held-out set): Layer 1 crypto packages and Layer 2 operation
+# sites in the package's own source, written from source by two independent labellers (agents,
+# blind to each other and to any tool output), differences adjudicated by the rules (22 October
+# 2026). The labellers agreed on every package and site; they differed only on the name of the
+# AES-256-CTR + Poly1305-AES AEAD at src/crypto/aespoly1305.rs:98 and :127 (a: its two components,
+# b: none). R2 asks for one name, the outermost scheme, and an empty `must` and `may` is a dead
+# site, so as corpus G8 builds the HPKE names it is one name in registry spelling,
+# `AES-256-CTR-Poly1305-AES`, in the form of the registry's `AES-256-CTR-HMAC-SHA1`.
+
+# Ground-truth labels: rustic_core 0.13.0 (/var/tmp/rcbom-validate/heldout/rustic_core-0.13.0)
+# Library-only package: analysed as its public API (R14: pub items reachable from lib.rs, e.g.
+# Repository::{init, open, add_key, check, ...}, Id::{random, random_from_rng}, repofile::KeyFile and
+# MasterKey), default features (default = []: cli, clap and merge are off), host
+# x86_64-unknown-linux-gnu, release profile. No site lies in feature- or target-gated code.
+# Package set from `cargo tree -e normal --target x86_64-unknown-linux-gnu`; Cargo.lock also holds
+# dev-dependency packages (rustic_backend, rustic_testing, proptest: sha2 0.10.9, scrypt 0.11.0,
+# rand 0.8.7/0.9.5, ...) that are not in the build. #[cfg(test)] modules and doc examples are out of
+# scope.
+# Repository crypto: AES256-CTR + Poly1305-AES AEAD (aes256ctr_poly1305aes), scrypt for key files,
+# SHA-256 ids, rand 0.10 ThreadRng (ChaCha12 core, seeded from the OS) for keys, nonces, salts, ids,
+# the chunker polynomial and the random read-data subset. The AEAD has no registry name as a whole;
+# its sites carry the constructed name AES-256-CTR-Poly1305-AES (adjudicated, above).
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aead"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto AEAD traits (Aead, AeadInPlace) implemented by aes256ctr_poly1305aes"
+
+[[package]]
+name = "aes"
+version = "0.8.4"
+kind = "algorithm"
+why = "AES block cipher: AES-256 keystream for the CTR mode and AES-128 nonce encryption inside Poly1305-AES"
+
+[[package]]
+name = "aes256ctr_poly1305aes"
+version = "0.2.1"
+kind = "algorithm"
+why = "AES256-CTR + Poly1305-AES authenticated encryption used for all repository files and key files"
+
+[[package]]
+name = "block-buffer"
+version = "0.12.1"
+kind = "support"
+why = "RustCrypto block buffering for SHA-256 and the salsa20 stream wrapper"
+
+[[package]]
+name = "chacha20"
+version = "0.10.1"
+kind = "rng"
+why = "ChaCha block core of rand 0.10's ThreadRng/StdRng (only feature rng; the cipher API is off)"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits used by aes, ctr and aes256ctr_poly1305aes"
+
+[[package]]
+name = "cipher"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto stream cipher traits used by salsa20 0.11 (inside scrypt)"
+
+[[package]]
+name = "cmov"
+version = "0.5.4"
+kind = "support"
+why = "constant-time conditional move intrinsics under ctutils"
+
+[[package]]
+name = "const-oid"
+version = "0.10.2"
+kind = "support"
+why = "object identifiers for digest algorithms (digest/sha2 feature oid)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, sizes) for aead, cipher 0.4 and universal-hash"
+
+[[package]]
+name = "crypto-common"
+version = "0.2.2"
+kind = "trait"
+why = "common RustCrypto traits for digest 0.11 and cipher 0.5"
+
+[[package]]
+name = "ctr"
+version = "0.9.2"
+kind = "algorithm"
+why = "CTR mode (Ctr64BE<Aes256>) of the AES256-CTR keystream"
+
+[[package]]
+name = "ctutils"
+version = "0.4.2"
+kind = "support"
+why = "constant-time selection and equality utilities used by digest 0.11 (mac feature)"
+
+[[package]]
+name = "digest"
+version = "0.11.3"
+kind = "trait"
+why = "RustCrypto hash and MAC traits (Digest for SHA-256, Mac for the HMAC inside scrypt's PBKDF2)"
+
+[[package]]
+name = "getrandom"
+version = "0.4.3"
+kind = "rng"
+why = "OS random source (SysRng) seeding and reseeding rand's ThreadRng; also used by tempfile under cachedir"
+
+[[package]]
+name = "hmac"
+version = "0.13.0"
+kind = "algorithm"
+why = "HMAC-SHA-256 PRF of the PBKDF2 inside scrypt"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types for cipher 0.4"
+
+[[package]]
+name = "inout"
+version = "0.2.2"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types for cipher 0.5"
+
+[[package]]
+name = "pbkdf2"
+version = "0.13.0"
+kind = "algorithm"
+why = "PBKDF2-HMAC-SHA-256 (one iteration) inside scrypt"
+
+[[package]]
+name = "poly1305"
+version = "0.8.0"
+kind = "algorithm"
+why = "Poly1305 universal hash of the Poly1305-AES MAC"
+
+[[package]]
+name = "rand"
+version = "0.10.2"
+kind = "rng"
+why = "ThreadRng (rand::rng()) used for master keys, nonces, salts, ids, the chunker polynomial and pack sampling"
+
+[[package]]
+name = "rand_core"
+version = "0.10.1"
+kind = "rng"
+why = "RNG traits (Rng::fill_bytes, TryRng) used by rand, chacha20 and getrandom's SysRng"
+
+[[package]]
+name = "salsa20"
+version = "0.11.0"
+kind = "algorithm"
+why = "Salsa20/8 core used by scrypt's BlockMix"
+
+[[package]]
+name = "scrypt"
+version = "0.12.0"
+kind = "algorithm"
+why = "scrypt password-based KDF of the repository key files"
+
+[[package]]
+name = "sha2"
+version = "0.11.0"
+kind = "algorithm"
+why = "SHA-256 ids of blobs, packs and repository files; also inside scrypt's PBKDF2"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time tag comparison in aes256ctr_poly1305aes"
+
+[[package]]
+name = "universal-hash"
+version = "0.5.1"
+kind = "trait"
+why = "RustCrypto universal hash traits implemented by poly1305"
+
+[[package]]
+name = "zeroize"
+version = "1.9.0"
+kind = "support"
+why = "secure zeroing of AEAD key halves and the derived Poly1305 key in aes256ctr_poly1305aes"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/chunker/rabin.rs"
+line = 205
+callee = "random"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand 0.10 RngExt::random::<u64>() on rand::rng() (ThreadRng, ChaCha12 core) draws a candidate Rabin polynomial in random_poly; reached from Repository::init via commands::init"
+
+[[site]]
+file = "src/commands/check.rs"
+line = 90
+callee = "shuffle"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand SliceRandom::shuffle randomly permutes the packs for a Percentage/Size read-data subset; rng is the ThreadRng that ReadSubsetOption::apply passes (only non-test caller), reached from Repository::check"
+
+[[site]]
+file = "src/crypto/aespoly1305.rs"
+line = 33
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand_core Rng::fill_bytes on rand::rng() (ThreadRng) fills the 64-byte AES256-CTR/Poly1305-AES master key in Key::new; reached from MasterKey::new and Repository::init"
+
+[[site]]
+file = "src/crypto/aespoly1305.rs"
+line = 98
+callee = "decrypt"
+function = "decrypt"
+must = ["AES-256-CTR-Poly1305-AES"]
+may = []
+note = "aead Aead::decrypt on Aes256CtrPoly1305Aes: checks the Poly1305-AES tag, then AES-256-CTR decrypts; no registry name for the whole AEAD, so a name is constructed in registry spelling; reached from Repository::open (key files) and every repository read"
+
+[[site]]
+file = "src/crypto/aespoly1305.rs"
+line = 121
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand_core Rng::fill_bytes on rand::rng() (ThreadRng) draws the 16-byte AEAD nonce in Key::encrypt_data"
+
+[[site]]
+file = "src/crypto/aespoly1305.rs"
+line = 127
+callee = "encrypt_in_place_detached"
+function = "encrypt"
+must = ["AES-256-CTR-Poly1305-AES"]
+may = []
+note = "aead AeadInPlace::encrypt_in_place_detached on Aes256CtrPoly1305Aes: AES-256-CTR encryption and Poly1305-AES tag; no registry name for the whole AEAD, so a name is constructed in registry spelling; reached from KeyFile::generate and every repository write"
+
+[[site]]
+file = "src/crypto/hasher.rs"
+line = 18
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256::digest (one-shot Digest::digest) in crypto::hasher::hash: ids of blobs, trees, key and repository files"
+
+[[site]]
+file = "src/crypto/hasher.rs"
+line = 33
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Digest::finalize of the streaming Sha256 in Hasher::finalize, reached from hash_reader (Id::blob_matches_reader, packer) and check's pack id; Sha256::default and update are not sites"
+
+[[site]]
+file = "src/id.rs"
+line = 140
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand_core Rng::fill_bytes in pub Id::random_from_rng; the crate's only (non-test) instantiation is the ThreadRng from Id::random (repository id in init); external callers may pass their own Rng"
+
+[[site]]
+file = "src/repofile/keyfile.rs"
+line = 122
+callee = "scrypt"
+function = "keyderive"
+must = ["scrypt"]
+may = []
+params = { length = "64" }
+note = "scrypt::scrypt in pub KeyFile::kdf_key derives the 64-byte key-file key; N, r, p and salt come from the key file (or from KeyFile::generate's Params::RECOMMENDED); reached from Repository::open"
+
+[[site]]
+file = "src/repofile/keyfile.rs"
+line = 209
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+note = "rand_core Rng::fill_bytes on rand::rng() (ThreadRng) draws the 64-byte scrypt salt in pub KeyFile::generate"
+
+[[site]]
+file = "src/repofile/keyfile.rs"
+line = 212
+callee = "scrypt"
+function = "keyderive"
+must = ["scrypt"]
+may = []
+params = { length = "64" }
+note = "scrypt::scrypt in pub KeyFile::generate derives the 64-byte key-file key with Params::RECOMMENDED (library constant, log_n 17, r 8, p 1, not a program literal, so not in params); reached from Repository::init and add_key"
