@@ -10,8 +10,11 @@
 //! - `corpus-score CBOM_DIR LABELS.toml... [--json] [--against OLD_CBOM_DIR]`: the six real
 //!   projects' labels;
 //! - `rusi-to-cbom RUSI_REPORT.json`: a rusi report as a CycloneDX document, for `score`;
-//! - `review-sheet FIXTURE_DIR...`: the labels next to their source lines, for review.
+//! - `review-sheet FIXTURE_DIR...`: the labels next to their source lines, for review;
+//! - `pta-candidates OUT_DIR... [--against OLD.txt]`: what a run with the points-to engine
+//!   finds against the default run's answers (`candidates.rs`).
 
+mod candidates;
 mod check;
 mod corpus;
 mod e2e;
@@ -47,7 +50,7 @@ fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let (task, rest) = args
         .split_first()
-        .context("usage: cargo xtask <check|e2e|summary|suite|score|corpus-score|rusi-to-cbom|review-sheet> ..")?;
+        .context("usage: cargo xtask <check|e2e|summary|suite|score|corpus-score|rusi-to-cbom|review-sheet|pta-candidates> ..")?;
     match task.as_str() {
         "check" => check::run(),
         "e2e" => e2e::run(rest),
@@ -66,6 +69,7 @@ fn main() -> Result<()> {
         "corpus-score" => corpus::run(rest),
         "rusi-to-cbom" => rusi::run(rest),
         "review-sheet" => review::run(rest),
+        "pta-candidates" => candidates::run(rest),
         other => bail!("unknown task {other}"),
     }
 }
