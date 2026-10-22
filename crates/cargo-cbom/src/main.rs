@@ -5,6 +5,7 @@
 
 mod validate;
 mod verify;
+mod walkcheck;
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -64,6 +65,10 @@ struct GenArgs {
     /// `cfg(debug_assertions)` code is not compiled.
     #[arg(long, default_value = "release")]
     profile: String,
+    /// Also link each binary unoptimised and count the code the linker keeps that the walk from
+    /// its entry points did not reach, by class (`rcbom:run:walk-check`; gaps on stderr).
+    #[arg(long)]
+    check_walk: bool,
 }
 
 #[derive(Subcommand)]
@@ -103,10 +108,10 @@ fn generate(a: &GenArgs) -> Result<()> {
     eprintln!("cbom: layer 1 (cargo metadata)");
     let man = rcbom_manifest::load(&a.manifest_path, &target, &a.features, &kb)?;
 
+    let dir = man.target_directory.join("rcbom");
     let facts = if a.manifest_only {
         Vec::new()
     } else {
-        let dir = man.target_directory.join("rcbom");
         let facts_dir = dir.join("facts");
         let units = run_driver(a, &man, &dir, &facts_dir)?;
         load_facts(&facts_dir, &units)?
@@ -114,6 +119,11 @@ fn generate(a: &GenArgs) -> Result<()> {
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &facts);
     an.layer2 = !a.manifest_only;
+    let walk_check = if a.check_walk && !a.manifest_only {
+        walkcheck::run(a, &man, &facts, &dir)?
+    } else {
+        Vec::new()
+    };
     let run = RunInfo {
         tool_version: env!("CARGO_PKG_VERSION").into(),
         toolchain: if a.manifest_only {
@@ -130,6 +140,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         },
         packages: man.packages.len(),
         sandbox: "none (draft: run only on trusted code)".into(),
+        walk_check: walk_check.iter().map(walkcheck::Report::summary).collect(),
     };
     let bom = to_cyclonedx(&kb, &man, &an, &run);
     let errors = validate::validate(&bom)?;
@@ -148,6 +159,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         None => print!("{text}"),
     }
     summary(&an);
+    walkcheck::print(&walk_check);
     Ok(())
 }
 
