@@ -2180,11 +2180,12 @@ methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_diges
 function = "keygen"
 methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
 
-# a draw from a random generator
+# a draw from a random generator; rand's `seq` traits draw from the one they are given
+# (`v.shuffle(&mut rng)`, `v.choose(&mut rng)`)
 [[use]]
 function = "generate"
 primitives = ["drbg"]
-methods = ["fill_bytes", "try_fill_bytes", "next_u32", "next_u64", "fill", "try_fill", "gen", "gen_range", "gen_bool", "gen_ratio", "random", "random_range", "random_bool", "random_ratio", "random_iter", "sample", "sample_iter", "sample_string"]
+methods = ["fill_bytes", "try_fill_bytes", "next_u32", "next_u64", "fill", "try_fill", "gen", "gen_range", "gen_bool", "gen_ratio", "random", "random_range", "random_bool", "random_ratio", "random_iter", "sample", "sample_iter", "sample_string", "shuffle", "partial_shuffle", "choose", "choose_mut", "choose_iter", "choose_stable", "choose_multiple", "choose_multiple_array", "choose_multiple_fill", "choose_multiple_weighted", "choose_weighted", "choose_weighted_mut", "choose_weighted_iter", "sample_array", "sample_fill", "sample_weighted"]
 
 # x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom);
 # rsa's `pkcs1v15::SigningKey::random(rng, bits)`

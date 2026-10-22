@@ -199,6 +199,16 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             if uses.is_empty() {
                 return None;
             }
+            // a draw from a generator that computes no cryptography (`v.shuffle(&mut small_rng)`)
+            // is no operation; a key made with one still is
+            if uses.iter().all(|u| *u == "generate")
+                && self_ty
+                    .iter()
+                    .chain(args.iter())
+                    .any(|t| names_not_crypto(ctx, t))
+            {
+                return None;
+            }
             let primitive = match (scoped.is_empty(), primitives.len()) {
                 (false, 1) => primitives.first().copied().unwrap_or("unknown"),
                 _ => "unknown",
@@ -256,6 +266,21 @@ pub(super) fn gaps_reason(gaps: &[search::Gap]) -> Option<String> {
             g.reason
         )
     })
+}
+/// Whether a type names a type of a modelled crate that computes no cryptography (rand's
+/// `SmallRng`, at any version).
+fn names_not_crypto(ctx: &Ctx<'_>, t: &rcbom_facts::TyTree) -> bool {
+    use rcbom_facts::TyTree;
+    match t {
+        TyTree::Adt { krate, path, args } => {
+            let name = path.rsplit("::").next().unwrap_or(path);
+            (ctx.kb.not_crypto.iter().any(|n| n == name) && ctx.kb_entry(krate).is_some())
+                || args.iter().any(|a| names_not_crypto(ctx, a))
+        }
+        TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => names_not_crypto(ctx, t),
+        TyTree::Tuple(ts) => ts.iter().any(|t| names_not_crypto(ctx, t)),
+        _ => false,
+    }
 }
 /// The packages of the algorithm crates a type names (modelled or not), outside the program.
 pub(super) fn crypto_packages(ctx: &Ctx<'_>, t: &rcbom_facts::TyTree) -> Vec<(String, String)> {
