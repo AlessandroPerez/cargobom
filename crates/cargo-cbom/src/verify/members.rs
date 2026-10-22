@@ -388,7 +388,8 @@ impl Files<'_> {
 
     /// A call that is an operation, whose algorithm may be unknown: one the knowledge base
     /// lists (`[[operation]]`, `[[boundary]]`), or a use (a method of `[[use]]`) of the API of
-    /// a crypto package it does not model, or of an algorithm crate's it does not name.
+    /// a crypto package it does not model, of an algorithm crate's it does not name, or of an
+    /// algorithm or trait crate at a version it does not cover (password-hash 0.6).
     pub(super) fn is_operation(&self, symbol: &str) -> bool {
         let sym = strip_generics(symbol);
         let Some((krate, rest)) = sym.split_once("::") else {
@@ -406,8 +407,12 @@ impl Files<'_> {
         let method = rest.rsplit("::").next().unwrap_or(rest);
         let crypto = self.man.packages.iter().any(|p| {
             p.lib_name.as_deref() == Some(krate)
+                && !p.local
                 && (p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)
-                    || p.role == Some(rcbom_kb::Role::Algorithm))
+                    || matches!(
+                        p.role,
+                        Some(rcbom_kb::Role::Algorithm | rcbom_kb::Role::Trait)
+                    ))
         });
         crypto
             && kb
