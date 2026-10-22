@@ -20,6 +20,8 @@ pub struct RunInfo {
     /// Packages in the build Layer 1 resolved (normal and build edges, host platform).
     pub packages: usize,
     pub sandbox: String,
+    /// The walk against the linker, per binary (`cargo cbom --check-walk`).
+    pub walk_check: Vec<String>,
 }
 
 /// Roles whose value must not be a constant: a literal key, nonce, IV, salt or password is a
@@ -668,6 +670,9 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
     }
     for n in &an.notes {
         run_props.push(prop("rcbom:run:note", n));
+    }
+    for w in &run.walk_check {
+        run_props.push(prop("rcbom:run:walk-check", w));
     }
     // the root package is the BOM's subject: `metadata.component`, the same bom-ref the
     // dependency graph starts from, and not also among the components
