@@ -1,0 +1,88 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/bin/one.rs:7:26 | ring::digest::digest | [reachable] [call] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `write!(f, "{:?}", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/bin/one.rs:7:34 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; line: `write!(f, "{:?}", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `SHA1_FOR_LEGACY_USE_ONLY`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/bin/one.rs:12:25 | ring::digest::SHA256 | [reachable] [static] [artifacts: bin one] in one::main; line: `let _ = d27::shared(&SHA256, &d);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:5:58 | ring::digest::digest | [reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `one::main`; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/bin/two.rs:4:25 | ring::digest::SHA384 | [reachable] [static] [artifacts: bin two] in two::main; line: `let _ = d27::shared(&ring::digest::SHA384, &d);`; code: `ring::digest::SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/lib.rs:5:58 | ring::digest::digest | [reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `two::main`; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:6:37 | ring::digest::digest | [reachable] [call] [artifacts: lib d27] in d27::only_lib; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:6:45 | ring::digest::SHA512 | [reachable] [static] [artifacts: lib d27] in d27::only_lib; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via d27 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via d27 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by d27 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:artifact=bin one
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin one
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin two
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=lib d27
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=bin one
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=bin two
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=lib d27
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:artifact=lib d27
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/d27@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/d27@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/d27@0.1.0", "name": "d27", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d27@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin one
+run rcbom:run:artifact=bin two
+run rcbom:run:artifact=lib d27
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=144
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

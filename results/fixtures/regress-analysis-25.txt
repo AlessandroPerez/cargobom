@@ -1,11 +1,11 @@
-  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
-  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in lib1::derive; use: keyderive; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
-  occ SHA-256 | crypto:algorithm:SHA-256 | app/src/main.rs:8:12 | digest::digest::Digest::digest | [reachable] [call] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b"x");`; code: `hashing::Sha256::digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
-  occ SHA-256 | crypto:algorithm:SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
-  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | lib1/src/lib.rs:9:4 | digest::digest::Digest::digest | [reachable] [call] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
+  occ SHA-256 | crypto:algorithm:SHA-256 | app/src/main.rs:8:12 | digest::digest::Digest::digest | [reachable] [call] [artifacts: bin app] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b"x");`; code: `hashing::Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | lib1/src/lib.rs:9:4 | digest::digest::Digest::digest | [reachable] [call] [artifacts: lib lib1] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:72:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via app -> sha2 -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:131:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via app -> sha2 -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:141:0 | digest | [manifest] locked digest 0.10.7; reached via app -> sha2 -> digest
@@ -18,6 +18,8 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | app/Cargo.toml:23:0 | hashing | [manifest] declared by app (build-dependencies)
   occ sha2 | pkg:cargo/sha2@0.10.9 | lib1/Cargo.toml:11:0 | sha2 | [manifest] declared by lib1 (dependencies)
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:306:0 | subtle | [manifest] locked subtle 2.6.1; reached via app -> sha2 -> digest -> subtle
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:artifact=bin app
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:artifact=lib lib1
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
@@ -25,6 +27,8 @@
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=2
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=parameter
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:artifact=bin app
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:artifact=lib lib1
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
@@ -32,12 +36,15 @@
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=2
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin app
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=lib lib1
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:artifact=lib lib1
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:confidence=high
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:detection:method=type-resolved
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
@@ -114,10 +121,12 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/256
 root {"bom-ref": "pkg:cargo/app@0.1.0", "name": "app", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/app@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin app
+run rcbom:run:artifact=lib lib1
 run rcbom:run:features=
 run rcbom:run:packages=14
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=51
+run rcbom:run:reachable-instances=52
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

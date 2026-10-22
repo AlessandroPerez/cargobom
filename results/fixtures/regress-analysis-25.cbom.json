@@ -288,14 +288,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in lib1::derive; use: keyderive; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -326,6 +326,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin app"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib lib1"
+        },
+        {
           "name": "rcbom:provenance:ikm",
           "value": "parameter"
         },
@@ -351,14 +359,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -393,6 +401,14 @@
           "value": "true"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin app"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib lib1"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "2"
         }
@@ -414,21 +430,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b\"x\");`; code: `hashing::Sha256::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b\"x\");`; code: `hashing::Sha256::digest`",
             "line": 8,
             "location": "app/src/main.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -459,6 +475,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin app"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib lib1"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "3"
         }
@@ -480,7 +504,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: lib lib1] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`",
             "line": 9,
             "location": "lib1/src/lib.rs",
             "offset": 4,
@@ -509,6 +533,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib lib1"
         },
         {
           "name": "rcbom:occurrences",
@@ -649,7 +677,15 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "51"
+        "value": "52"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin app"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib lib1"
       }
     ],
     "tools": {
@@ -662,7 +698,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d67ad934-953d-8bab-b3f5-882fc744df9d",
+  "serialNumber": "urn:uuid:5e374489-8520-8d61-879f-2ea7dc4b44a7",
   "specVersion": "1.7",
   "version": 1
 }
