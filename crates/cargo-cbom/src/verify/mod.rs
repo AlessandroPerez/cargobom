@@ -67,6 +67,15 @@
 //!   found beside others not followed may be the value before it; a
 //!   container's element labelled `member: container, possible` (of several, `one of N`) may be
 //!   any the container holds (R4.3: one place), whatever a store into an element replaced;
+//! - a member of a boundary model (`.. from `Header.alg` (object: from `F`); the key's family
+//!   (Hmac) allows these`): the call is one the knowledge base models (`[[boundary]]`) with its
+//!   algorithm in the field cited; the asset is a variant of the model's enum whose key family
+//!   is among those listed; the function the label cites (as a member's witness below, with the
+//!   enum's other variants as the other values), the static of a table, or else the code the
+//!   call reads, names it;
+//! - an unknown algorithm's call is an operation the knowledge base lists (`[[operation]]`,
+//!   `[[boundary]]`), or a use (`[[use]]`) of the API of a crypto package it does not model, or
+//!   of an algorithm crate's it does not name;
 //! - a member reaching the call from another function (`member: object`, `caller`, `fixed`,
 //!   `dyn`, `container`, and `type-join`, `impl` at a call reading no field; one with no `member:`
 //!   label as an `object` one): where the argument
@@ -181,8 +190,10 @@
 //!   stored at a constant index before a read at a variable index (`a[0] = &SHA512; digest(a[i],
 //!   ..)`), or by code the verifier does not read (another crate's function given `&mut v`, a
 //!   cell's guard kept in a variable), may be left out.
-//! - The jsonwebtoken boundary model's members (`Validation.algorithms`, `Header.alg`) are not
-//!   checked against the call's code (open plan item 10).
+//! - A boundary model's member is checked as its variant (`Algorithm::HS256` for HMAC-SHA-256)
+//!   named where the label says, by the variant's last segment: a function's body naming it, or
+//!   a parameter it passes on, is enough, as for descriptors; a value built by the model's crate
+//!   (`Header::default()`, a `FromStr` of a string) is not checked.
 //! - Coercions not read: a `match` arm whose type only another arm gives (`E::B =>
 //!   Box::new(U)` with `E::A(p) => p`); the closure-parameter rule takes the type named on the
 //!   line before the closure for the parameter's.
