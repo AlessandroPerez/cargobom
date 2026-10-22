@@ -1,0 +1,365 @@
+{
+ "boringtun-0.7.1": {
+  "layer1": {
+   "crypto_found": 15,
+   "crypto_labelled": 15,
+   "crypto_missed": [],
+   "reported": 15,
+   "reported_correct": 15,
+   "reported_not_crypto": [],
+   "support_agree": 3,
+   "support_labelled": 4,
+   "support_listed": 3
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "finalize",
+     "line": "src/noise/handshake.rs:44",
+     "may": [],
+     "must": [
+      "BLAKE2s-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize_fixed",
+     "line": "src/noise/handshake.rs:54",
+     "may": [],
+     "must": [
+      "HMAC-BLAKE2s-256"
+     ],
+     "reported": [
+      "HMAC"
+     ],
+     "verdict": "less-specific"
+    },
+    {
+     "callee": "finalize_fixed",
+     "line": "src/noise/handshake.rs:65",
+     "may": [],
+     "must": [
+      "HMAC-BLAKE2s-256"
+     ],
+     "reported": [
+      "HMAC"
+     ],
+     "verdict": "less-specific"
+    },
+    {
+     "callee": "finalize_fixed",
+     "line": "src/noise/handshake.rs:72",
+     "may": [],
+     "must": [
+      "BLAKE2s-128-HMAC"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize_fixed",
+     "line": "src/noise/handshake.rs:80",
+     "may": [],
+     "must": [
+      "BLAKE2s-128-HMAC"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize_fixed",
+     "line": "src/noise/handshake.rs:86",
+     "may": [],
+     "must": [
+      "BLAKE2s-192-HMAC"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 27,
+   "verdicts": {
+    "correct": 21,
+    "function-mismatch": 0,
+    "honest-unknown": 4,
+    "less-specific": 2,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "dufs-0.47.0": {
+  "layer1": {
+   "crypto_found": 23,
+   "crypto_labelled": 23,
+   "crypto_missed": [],
+   "reported": 25,
+   "reported_correct": 23,
+   "reported_not_crypto": [
+    "cmov 0.5.4",
+    "ctutils 0.4.3"
+   ],
+   "support_agree": 7,
+   "support_labelled": 9,
+   "support_listed": 7
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "new_v4",
+     "line": "src/auth.rs:30",
+     "may": [
+      "OS-RNG"
+     ],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "sign",
+     "line": "src/auth.rs:183",
+     "may": [],
+     "must": [
+      "Ed25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "verify",
+     "line": "src/auth.rs:218",
+     "may": [],
+     "must": [
+      "Ed25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "verify_password",
+     "line": "src/auth.rs:494",
+     "may": [],
+     "must": [
+      "SHA-512-crypt"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:523",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:531",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:552",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:565",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:581",
+     "may": [],
+     "must": [
+      "SHA-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:603",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/auth.rs:709",
+     "may": [],
+     "must": [
+      "MD5"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "new_v4",
+     "line": "src/server.rs:1025",
+     "may": [
+      "OS-RNG"
+     ],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "new_v4",
+     "line": "src/server.rs:1318",
+     "may": [
+      "OS-RNG"
+     ],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/server.rs:2066",
+     "may": [],
+     "must": [
+      "SHA-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 14,
+   "verdicts": {
+    "correct": 0,
+    "function-mismatch": 0,
+    "honest-unknown": 11,
+    "less-specific": 0,
+    "miss": 3,
+    "wrong": 0
+   }
+  }
+ },
+ "gcp_auth-0.12.7": {
+  "layer1": {
+   "crypto_found": 8,
+   "crypto_labelled": 8,
+   "crypto_missed": [],
+   "reported": 8,
+   "reported_correct": 8,
+   "reported_not_crypto": [],
+   "support_agree": 2,
+   "support_labelled": 3,
+   "support_listed": 2
+  },
+  "layer2": {
+   "not_correct": [],
+   "sites": 1,
+   "verdicts": {
+    "correct": 1,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "totp-rs-6.0.0": {
+  "layer1": {
+   "crypto_found": 5,
+   "crypto_labelled": 5,
+   "crypto_missed": [],
+   "reported": 7,
+   "reported_correct": 5,
+   "reported_not_crypto": [
+    "cmov 0.5.4",
+    "ctutils 0.4.2"
+   ],
+   "support_agree": 2,
+   "support_labelled": 4,
+   "support_listed": 2
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "finalize",
+     "line": "src/algorithm.rs:107",
+     "may": [],
+     "must": [
+      "HMAC-SHA-1",
+      "HMAC-SHA-256",
+      "HMAC-SHA-512"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 2,
+   "verdicts": {
+    "correct": 1,
+    "function-mismatch": 0,
+    "honest-unknown": 1,
+    "less-specific": 0,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ }
+}

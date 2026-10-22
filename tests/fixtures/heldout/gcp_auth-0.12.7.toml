@@ -1,0 +1,90 @@
+# Ground truth for gcp_auth-0.12.7 (held-out set): Layer 1 crypto packages and Layer 2 operation sites in
+# the package's own source, written from source by two independent labellers (agents, blind to
+# each other and to any tool output), differences adjudicated by the rules (22 October 2026).
+# The labellers agreed on every package and site; the TLS `[[protocol]]` entry (not scored) is at the
+# provider call (`ring::default_provider()`, src/types.rs:121), as realapp's is; the connector is built
+# with it at src/types.rs:42.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source used by ring SystemRandom"
+
+[[package]]
+name = "hyper-rustls"
+version = "0.27.9"
+kind = "protocol"
+why = "hyper HTTPS connector wrapping rustls (ring provider, native roots)"
+
+[[package]]
+name = "openssl-probe"
+version = "0.2.1"
+kind = "support"
+why = "locates system trust-anchor (root CA) bundle paths for rustls-native-certs"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "crypto library: RSA PKCS#1 v1.5 SHA-256 JWT signing and the rustls ring provider"
+
+[[package]]
+name = "rustls"
+version = "0.23.38"
+kind = "protocol"
+why = "TLS 1.3 client implementation (features ring, std; tls12 off)"
+
+[[package]]
+name = "rustls-native-certs"
+version = "0.8.3"
+kind = "pki"
+why = "loads root certificates from the platform trust store"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.14.1"
+kind = "pki"
+why = "shared X.509/PKI types (certificate and private-key DER wrappers, PEM parsing of the service-account key)"
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.13"
+kind = "pki"
+why = "WebPKI X.509 certificate path validation and signature verification (ring backend)"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "tokio-rustls"
+version = "0.26.4"
+kind = "protocol"
+why = "async TLS streams wrapping rustls (used by hyper-rustls)"
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/types.rs"
+line = 265
+callee = "sign"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-256"]
+may = []
+note = "ring RsaKeyPair::sign(&RSA_PKCS1_SHA256, ..) in pub Signer::sign (re-exported at lib.rs:113, reached via CustomServiceAccount::signer and the RS256 JWT in Claims::to_jwt); the SystemRandom is used inside ring (R9.2)"
+
+[[protocol]]
+file = "src/types.rs"
+line = 121
+what = "rustls::crypto::ring::default_provider() handed to hyper-rustls HttpsConnectorBuilder::with_provider_and_native_roots (line 42), which builds a rustls ClientConfig with safe default versions (TLS 1.3 only, tls12 off), native root certificates and no client auth; ring suites TLS13 AES-256-GCM-SHA384, AES-128-GCM-SHA256, CHACHA20-POLY1305-SHA256, kx groups X25519, P-256, P-384"

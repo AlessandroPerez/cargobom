@@ -1,0 +1,385 @@
+# Ground truth for boringtun-0.7.1 (held-out set): Layer 1 crypto packages and Layer 2 operation
+# sites in the package's own source, written from source by two independent labellers (agents,
+# blind to each other and to any tool output), differences adjudicated by the rules (22 October
+# 2026). The labellers agreed on every package and site; they differed only on the keyed BLAKE2s
+# MACs (`Blake2sMac<U16>`, `<U24>`, RFC 7693 keyed mode): the registry's BLAKE2 MAC variant is
+# `BLAKE2s-<size>-HMAC` (HMAC over BLAKE2s is the HMAC family's `HMAC-BLAKE2s-256`), so they are
+# `BLAKE2s-128-HMAC` and `BLAKE2s-192-HMAC`, at sizes the registry does not list (as R10 names
+# bcrypt-pbkdf).
+
+# Labels: boringtun 0.7.1 (/var/tmp/rcbom-validate/heldout/boringtun-0.7.1)
+# Library-only package (crate-type staticlib, cdylib, rlib): analysed as its public API (R14),
+# default features (none), host x86_64-unknown-linux-gnu, release profile.
+# Features device, ffi-bindings, jni-bindings and mock-instant are off: src/device/, src/ffi/ and
+# src/jni.rs are not compiled; their sites are listed with must = [] and may = [] (R1.5).
+# Public entry points: noise::Tunn (new, set_static_private, encapsulate, decapsulate,
+# format_handshake_initiation, update_timers, parse_incoming_packet, ...),
+# noise::handshake::parse_handshake_anon, noise::rate_limiter::RateLimiter (new, reset_count,
+# verify_packet). Every live site below is reached from them.
+# Layer 1 = normal (non-dev, non-build) dependencies from `cargo tree -e normal --target
+# x86_64-unknown-linux-gnu`, excluding packages reachable only through proc-macros.
+# Layer 2 = calls in src/ into crypto libraries. #[cfg(test)] modules and benches/ are out of scope.
+# BLAKE2 names (see boringtun-DECISIONS.md B1): HMAC (RFC 2104) over BLAKE2s-256 is
+# HMAC-BLAKE2s-256; keyed BLAKE2s (RFC 7693 MAC mode) with a 16- or 24-byte digest length is
+# BLAKE2s-128-HMAC / BLAKE2s-192-HMAC.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aead"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto traits for AEAD ciphers (Aead/AeadInPlace) implemented by chacha20poly1305; used directly for XChaCha20-Poly1305 cookie encryption/decryption"
+
+[[package]]
+name = "blake2"
+version = "0.10.6"
+kind = "algorithm"
+why = "BLAKE2s-256 hash (Noise chaining hash) and keyed BLAKE2s MAC (Blake2sMac: WireGuard mac1/mac2/cookie, cookie nonces)"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "chacha20"
+version = "0.9.1"
+kind = "algorithm"
+why = "ChaCha20/XChaCha20 stream cipher implementation used by chacha20poly1305"
+
+[[package]]
+name = "chacha20poly1305"
+version = "0.10.1"
+kind = "algorithm"
+why = "XChaCha20-Poly1305 AEAD for WireGuard cookie replies"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+kind = "algorithm"
+why = "Curve25519 group arithmetic used by x25519-dalek"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs (Digest, FixedOutput, KeyInit, Update)"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source behind rand_core OsRng (rate-limiter secrets, x25519 ephemeral keys) and ring"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC (SimpleHmac) over BLAKE2s-256 for the WireGuard/Noise key-derivation chain"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types used only by cipher modes"
+
+[[package]]
+name = "poly1305"
+version = "0.8.0"
+kind = "algorithm"
+why = "Poly1305 universal hash / one-time MAC"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits (RngCore/CryptoRng) and OsRng via getrandom"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "ChaCha20-Poly1305 AEAD (LessSafeKey) for handshake fields and transport data, constant-time comparison"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "universal-hash"
+version = "0.5.1"
+kind = "trait"
+why = "universal hash function traits (Poly1305)"
+
+[[package]]
+name = "x25519-dalek"
+version = "2.0.1"
+kind = "algorithm"
+why = "X25519 Diffie-Hellman key agreement (features reusable_secrets, static_secrets)"
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/device/mod.rs"
+line = 855
+callee = "next_u32"
+function = "generate"
+must = []
+may = []
+note = "rand_core OsRng.next_u32 in IndexLfsr::random_index; src/device is gated on feature device, off by default (R1.5)"
+
+[[site]]
+file = "src/ffi/mod.rs"
+line = 102
+callee = "random_from_rng"
+function = "keygen"
+must = []
+may = []
+note = "x25519-dalek StaticSecret::random_from_rng(OsRng) in extern \"C\" x25519_secret_key; src/ffi is gated on feature ffi-bindings, off by default (R1.5)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 44
+callee = "finalize"
+function = "digest"
+must = ["BLAKE2s-256"]
+may = []
+note = "Digest::finalize on Blake2s256 in b2s_hash (Noise HASH, mac1/cookie key derivation); reached from Tunn::new, RateLimiter::new and every handshake message"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 54
+callee = "finalize_fixed"
+function = "tag"
+must = ["HMAC-BLAKE2s-256"]
+may = []
+note = "FixedOutput::finalize_fixed on hmac::SimpleHmac<Blake2s256> in b2s_hmac (RFC 2104 HMAC, Noise KDF chain); reached from parse_handshake_anon and all handshake paths"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 65
+callee = "finalize_fixed"
+function = "tag"
+must = ["HMAC-BLAKE2s-256"]
+may = []
+note = "FixedOutput::finalize_fixed on hmac::SimpleHmac<Blake2s256> in b2s_hmac2 (HMAC over two chained inputs, Noise KDF outputs 2/3)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 72
+callee = "finalize_fixed"
+function = "tag"
+must = ["BLAKE2s-128-HMAC"]
+may = []
+note = "FixedOutput::finalize_fixed on Blake2sMac<U16> (keyed BLAKE2s, 16-byte digest length) in b2s_keyed_mac_16: mac1/mac2 of handshake messages and RateLimiter::verify_packet mac1 check"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 80
+callee = "finalize_fixed"
+function = "tag"
+must = ["BLAKE2s-128-HMAC"]
+may = []
+note = "FixedOutput::finalize_fixed on Blake2sMac<U16> in b2s_keyed_mac_16_2: cookie value and mac2 check in RateLimiter::verify_packet under load (reachable, e.g. RateLimiter::new(pk, 0))"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 86
+callee = "finalize_fixed"
+function = "tag"
+must = ["BLAKE2s-192-HMAC"]
+may = []
+note = "FixedOutput::finalize_fixed on Blake2sMac<U24> (keyed BLAKE2s, 24-byte digest length) in b2s_mac_24: derives the cookie-reply XChaCha20 nonce in RateLimiter::nonce"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 111
+callee = "seal_in_place_separate_tag"
+function = "encrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+note = "ring LessSafeKey::seal_in_place_separate_tag (UnboundKey CHACHA20_POLY1305) in aead_chacha20_seal_inner: encrypted_static, encrypted_timestamp, encrypted_nothing of outgoing handshakes"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 150
+callee = "open_in_place"
+function = "decrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+note = "ring LessSafeKey::open_in_place (CHACHA20_POLY1305) in aead_chacha20_open_inner: decrypts handshake fields; reached from parse_handshake_anon and decapsulate"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 348
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "x25519-dalek StaticSecret::diffie_hellman in pub parse_handshake_anon (static_private x peer ephemeral)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 379
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "StaticSecret::diffie_hellman in NoiseParams::new (static-static shared secret); reached from Tunn::new"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 406
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "StaticSecret::diffie_hellman in NoiseParams::set_static_private; reached from pub Tunn::set_static_private"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 507
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "StaticSecret::diffie_hellman in receive_handshake_initialization (responder static x initiator ephemeral); reached from Tunn::decapsulate"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 590
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "ReusableSecret::diffie_hellman in receive_handshake_response (initiator ephemeral x responder ephemeral)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 600
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "StaticSecret::diffie_hellman in receive_handshake_response (initiator static x responder ephemeral)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 671
+callee = "decrypt"
+function = "decrypt"
+must = ["XChaCha20-Poly1305"]
+may = []
+note = "aead Aead::decrypt on XChaCha20Poly1305 in receive_cookie_reply (encrypted cookie, aad = last mac1); reached from Tunn::decapsulate"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 731
+callee = "random_from_rng"
+function = "keygen"
+must = ["x25519"]
+may = []
+note = "x25519-dalek ReusableSecret::random_from_rng(OsRng) in format_handshake_initiation (initiator ephemeral key); the OsRng draw is inside the library (R9.2)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 746
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "ReusableSecret::diffie_hellman in format_handshake_initiation (initiator ephemeral x responder static)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 817
+callee = "random_from_rng"
+function = "keygen"
+must = ["x25519"]
+may = []
+note = "ReusableSecret::random_from_rng(OsRng) in format_handshake_response (responder ephemeral key); reached from Tunn::decapsulate"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 836
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "ReusableSecret::diffie_hellman in format_handshake_response (responder ephemeral x initiator ephemeral)"
+
+[[site]]
+file = "src/noise/handshake.rs"
+line = 844
+callee = "diffie_hellman"
+function = "keyderive"
+must = ["x25519"]
+may = []
+note = "ReusableSecret::diffie_hellman in format_handshake_response (responder ephemeral x initiator static)"
+
+[[site]]
+file = "src/noise/rate_limiter.rs"
+line = 57
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::fill_bytes on OsRng: 16-byte cookie secret in pub RateLimiter::new (also via Tunn::new without a rate limiter)"
+
+[[site]]
+file = "src/noise/rate_limiter.rs"
+line = 73
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "OsRng.fill_bytes: 32-byte nonce key in private RateLimiter::rand_bytes, called from RateLimiter::new"
+
+[[site]]
+file = "src/noise/rate_limiter.rs"
+line = 144
+callee = "encrypt_in_place_detached"
+function = "encrypt"
+must = ["XChaCha20-Poly1305"]
+may = []
+note = "aead AeadInPlace::encrypt_in_place_detached on XChaCha20Poly1305 in format_cookie_reply (cookie, aad = mac1); reached from pub RateLimiter::verify_packet under load"
+
+[[site]]
+file = "src/noise/session.rs"
+line = 217
+callee = "seal_in_place_separate_tag"
+function = "encrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+note = "ring LessSafeKey::seal_in_place_separate_tag in Session::format_packet_data (transport data and keepalives; key built with CHACHA20_POLY1305 in Session::new); reached from Tunn::encapsulate/decapsulate"
+
+[[site]]
+file = "src/noise/session.rs"
+line = 257
+callee = "open_in_place"
+function = "decrypt"
+must = ["ChaCha20-Poly1305"]
+may = []
+note = "ring LessSafeKey::open_in_place in Session::receive_packet_data (transport data); reached from Tunn::decapsulate"

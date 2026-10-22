@@ -1,0 +1,89 @@
+# Ground truth for totp-rs-6.0.0 (held-out set): Layer 1 crypto packages and Layer 2 operation sites in
+# the package's own source, written from source by two independent labellers (agents, blind to
+# each other and to any tool output), differences adjudicated by the rules (22 October 2026).
+# The labellers agreed on every package and site.
+
+# Ground-truth labels: totp-rs 6.0.0 (/var/tmp/rcbom-validate/heldout/totp-rs-6.0.0)
+# Library-only package: analysed as its public API (R14), default features ["std", "migration"]
+# (=> alloc), host x86_64-unknown-linux-gnu, release profile. Features gen_secret (rand), otpauth,
+# qr, serde, steam and zeroize are off: rand, url, qrcodegen-image, serde and zeroize are not built;
+# the cfg(gen_secret) RNG draw in src/secret.rs is listed with must = [] and may = [] (R1.5).
+# Callers choose Algorithm::SHA1 / SHA256 / SHA512 (public enum, Builder::with_algorithm,
+# Algorithm::from_str), so all three HMACs are reachable from Totp::sign / generate / check.
+# #[cfg(test)] modules and examples/ are out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "block-buffer"
+version = "0.12.1"
+kind = "support"
+why = "RustCrypto block buffering for sha1/sha2 0.11 (digest 0.11 line)"
+
+[[package]]
+name = "cmov"
+version = "0.5.4"
+kind = "support"
+why = "constant-time conditional-move intrinsics under ctutils"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.4.2"
+kind = "support"
+why = "constant-time byte comparison of secrets and tokens (Secret and Token PartialEq)"
+
+[[package]]
+name = "crypto-common"
+version = "0.2.2"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, output sizes), 0.2 line"
+
+[[package]]
+name = "ctutils"
+version = "0.4.2"
+kind = "support"
+why = "constant-time utilities; enabled by digest feature mac (constant-time MAC output comparison)"
+
+[[package]]
+name = "digest"
+version = "0.11.3"
+kind = "trait"
+why = "RustCrypto hash and MAC traits (Mac, KeyInit), 0.11 line"
+
+[[package]]
+name = "hmac"
+version = "0.13.0"
+kind = "algorithm"
+why = "HMAC implementation (HMAC-SHA-1/256/512 for HOTP/TOTP codes)"
+
+[[package]]
+name = "sha1"
+version = "0.11.0"
+kind = "algorithm"
+why = "SHA-1 hash, the PRF hash of HMAC-SHA-1 (default TOTP algorithm)"
+
+[[package]]
+name = "sha2"
+version = "0.11.0"
+kind = "algorithm"
+why = "SHA-256 and SHA-512 hashes for HMAC-SHA-256/512"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/algorithm.rs"
+line = 107
+callee = "finalize"
+function = "tag"
+must = ["HMAC-SHA-1", "HMAC-SHA-256", "HMAC-SHA-512"]
+may = []
+note = "RustCrypto Mac::finalize in generic Algorithm::hash<D>, instantiated with Hmac<Sha1>, Hmac<Sha256>, Hmac<Sha512> by Algorithm::sign (lines 112-114); reached from pub Totp::sign/generate/generate_current/check/check_current with any public Algorithm; new_from_slice (104) and update (106) are not sites"
+
+[[site]]
+file = "src/secret.rs"
+line = 730
+callee = "fill"
+function = "generate"
+must = []
+may = []
+note = "rand 0.10 RngExt::fill of the 20-byte secret from rand::rng() (ChaCha12 ThreadRng) in generate_random_bytes; gated on feature gen_secret, off by default (R1.5)"
