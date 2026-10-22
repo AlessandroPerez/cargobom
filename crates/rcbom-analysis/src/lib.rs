@@ -262,6 +262,18 @@ const GENERIC_METHODS: &[&str] = &[
     "new_with_prefix",
 ];
 
+/// Of those, the steps of a computation, no operation even on a modelled crate's type (R8.2:
+/// `Digest::update`, md5's `consume`).
+const STREAMING_STEPS: &[&str] = &[
+    "write",
+    "write_all",
+    "copy",
+    "update",
+    "chain_update",
+    "consume",
+    "new_with_prefix",
+];
+
 /// The name of the asset of operations whose algorithm the analysis does not find; its family
 /// is empty.
 pub const UNKNOWN: &str = "unknown";
