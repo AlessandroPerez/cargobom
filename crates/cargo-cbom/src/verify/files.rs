@@ -40,8 +40,9 @@ impl Files<'_> {
     }
 
     /// The type aliases the Rust files of the package in `dir` define (`pub type Sha256 =
-    /// CoreWrapper<..>;`): name -> the types they stand for, as `norm_path` writes them. Only
-    /// aliases without generic parameters.
+    /// CoreWrapper<..>;`, hmac's `pub type Hmac<D> = CoreWrapper<HmacCore<D>>;`): name -> the
+    /// types they stand for, as `norm_path` writes them, a generic one's parameters as written
+    /// (`expand_aliases` leaves a name given arguments as it is).
     pub(super) fn package_aliases(&mut self, dir: &Path) -> Rc<HashMap<String, Vec<String>>> {
         if let Some(a) = self.pkg_aliases.get(dir) {
             return a.clone();
@@ -51,7 +52,7 @@ impl Files<'_> {
             let Ok(t) = std::fs::read_to_string(&f) else {
                 continue;
             };
-            for m in re!(r"\btype\s+(\w+)\s*=\s*([^;{}]+);").captures_iter(&t) {
+            for m in re!(r"\btype\s+(\w+)\s*(?:<[^=;{}]*>)?\s*=\s*([^;{}]+);").captures_iter(&t) {
                 out.entry(m[1].to_string())
                     .or_default()
                     .push(norm_path(&m[2]));
