@@ -1,0 +1,680 @@
+# Ground truth for ssh-key-0.6.7 (held-out set): Layer 1 crypto packages and Layer 2 operation sites
+# in the package's own source, written from source by two independent labellers (agents, blind to
+# each other and to any tool output), adjudicated by the rules before any tool run (23 October
+# 2026). Build: features crypto,encryption, the Cargo.lock generated on 22 October 2026 (the package
+# ships none). The labellers agreed on 54 of 55 packages and on 31 sites; differences:
+# - ssh-cipher's kind (a: algorithm, b: protocol): protocol, as the corpus labels make age-core,
+#   hpke and digest_auth, crates that select and build algorithms for a protocol (here by SSH
+#   cipher name, with OpenSSH's chacha20-poly1305 built from chacha20 and poly1305).
+# - the DSA sites (b only, feature dsa off): kept as dead sites (R1.5), as the held-out labels of
+#   boringtun and totp-rs list feature-gated code.
+# - src/private/rsa.rs:112 `RsaPrivateKey::new` (a: RSA-PKCS1-1.5-SHA-256 and -SHA-512, b:
+#   RSA-PKCS1-1.5): R2 names the scheme the key is made for; an ssh-rsa key is RSASSA-PKCS1-v1_5 with
+#   the hash chosen per signature, which the registry's `RSA-PKCS1-1.5` names, so that is must and
+#   a's hashed names are may.
+
+# Ground-truth labels (labeller b): ssh-key 0.6.7 (/var/tmp/rcbom-validate/heldout/ssh-key-0.6.7)
+# Written from source only, blind to the other labeller and to any tool output (22 October 2026).
+# Library-only package (R14): the entry points are the public API (pub functions and methods, and the
+# public trait impls on public types such as Signer/Verifier for Ed25519Keypair, EcdsaPrivateKey,
+# RsaKeypair, EcdsaPublicKey, RsaPublicKey). Every value a caller can pass counts: HashAlg, Cipher,
+# EcdsaCurve, Algorithm and Kdf are public enums, key types have public fields, key files are input.
+# Build: the Cargo.lock generated on 22 October 2026, features crypto,encryption on top of the defaults
+# (ecdsa, rand_core, std; crypto = ed25519, p256, p384, p521, rsa; encryption = bcrypt-pbkdf and
+# ssh-cipher aes-cbc, aes-ctr, aes-gcm, chacha20poly1305), host x86_64-unknown-linux-gnu, release profile
+# (debug_assertions off). Features dsa, tdes, getrandom and serde are off: the DSA sites are listed with
+# must = [] and may = [] (R1.5). #[cfg(test)] modules, tests/ and doc examples are out of scope.
+# Calls that dispatch into ssh-key's own Signer/Verifier impls (PrivateKey, KeypairData, KeyData, SshSig,
+# the certificate Builder's generic SigningKey) are not sites; the library calls they reach are.
+# RNG draws on the caller's `rng: &mut impl CryptoRngCore` are named OS-RNG: ssh_key::rand_core::OsRng
+# (rand_core feature getrandom is on through p521) is the only generator the API itself offers; other
+# generators a caller may pass have no name in the rules.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "aead"
+version = "0.5.2"
+kind = "trait"
+why = "RustCrypto AEAD traits (AeadInPlace) used by ssh-cipher with aes-gcm for aes128/aes256-gcm@openssh.com"
+
+[[package]]
+name = "aes"
+version = "0.8.4"
+kind = "algorithm"
+why = "AES block cipher behind ssh-cipher's aes*-cbc, aes*-ctr and aes*-gcm@openssh.com private-key ciphers"
+
+[[package]]
+name = "aes-gcm"
+version = "0.10.3"
+kind = "algorithm"
+why = "AES-128-GCM / AES-256-GCM for aes128-gcm@openssh.com / aes256-gcm@openssh.com private-key encryption"
+
+[[package]]
+name = "base16ct"
+version = "0.2.0"
+kind = "support"
+why = "constant-time (side-channel resistant) hex encoding used by SEC1/elliptic-curve key encoding"
+
+[[package]]
+name = "base64ct"
+version = "1.8.3"
+kind = "support"
+why = "constant-time Base64 used by ssh-encoding and pem-rfc7468 for OpenSSH keys, certificates and signatures"
+
+[[package]]
+name = "bcrypt-pbkdf"
+version = "0.10.0"
+kind = "algorithm"
+why = "bcrypt-pbkdf password-based KDF for passphrase-protected OpenSSH private keys (Kdf::Bcrypt)"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for hash/MAC block processing"
+
+[[package]]
+name = "block-padding"
+version = "0.3.3"
+kind = "support"
+why = "RustCrypto block-cipher padding/unpadding helpers"
+
+[[package]]
+name = "blowfish"
+version = "0.9.1"
+kind = "algorithm"
+why = "Blowfish block cipher (bcrypt variant used by bcrypt-pbkdf)"
+
+[[package]]
+name = "cbc"
+version = "0.1.2"
+kind = "algorithm"
+why = "CBC mode for aes128/192/256-cbc private-key encryption (ssh-cipher feature aes-cbc)"
+
+[[package]]
+name = "chacha20"
+version = "0.9.1"
+kind = "algorithm"
+why = "ChaCha20 stream cipher behind ssh-cipher's chacha20-poly1305@openssh.com"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto block/stream cipher traits"
+
+[[package]]
+name = "const-oid"
+version = "0.9.6"
+kind = "support"
+why = "ASN.1 object identifiers (algorithm OIDs) for DER/PKCS encodings and RSA PKCS#1 v1.5 digest prefixes"
+
+[[package]]
+name = "crypto-bigint"
+version = "0.5.5"
+kind = "support"
+why = "constant-time big-integer arithmetic designed for cryptographic use (elliptic-curve backend)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeyIvInit, output sizes)"
+
+[[package]]
+name = "ctr"
+version = "0.9.2"
+kind = "algorithm"
+why = "CTR mode for aes128/192/256-ctr private-key encryption (also inside AES-GCM)"
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+kind = "algorithm"
+why = "Curve25519/Edwards25519 group arithmetic behind ed25519-dalek"
+
+[[package]]
+name = "der"
+version = "0.7.10"
+kind = "support"
+why = "ASN.1 DER encoder/decoder for PKCS/SEC1/SPKI key formats"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto traits for hash functions and MACs"
+
+[[package]]
+name = "ecdsa"
+version = "0.16.9"
+kind = "algorithm"
+why = "ECDSA signing and verification (RFC 6979 deterministic nonces) behind p256, p384 and p521"
+
+[[package]]
+name = "ed25519"
+version = "2.2.3"
+kind = "trait"
+why = "Ed25519 signature type definitions and signature-trait re-exports used by ed25519-dalek"
+
+[[package]]
+name = "ed25519-dalek"
+version = "2.2.0"
+kind = "algorithm"
+why = "Ed25519 signing and verification for ssh-ed25519 and sk-ssh-ed25519@openssh.com keys (no optional features)"
+
+[[package]]
+name = "elliptic-curve"
+version = "0.13.8"
+kind = "trait"
+why = "RustCrypto elliptic-curve traits and types (SecretKey, SEC1 points, scalars)"
+
+[[package]]
+name = "ff"
+version = "0.13.1"
+kind = "trait"
+why = "finite-field traits underlying elliptic-curve arithmetic"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source behind rand_core OsRng (feature getrandom enabled through p521): p521 signing nonces, ssh_key::rand_core::OsRng"
+
+[[package]]
+name = "ghash"
+version = "0.5.1"
+kind = "algorithm"
+why = "GHASH universal hash used by AES-GCM"
+
+[[package]]
+name = "group"
+version = "0.13.0"
+kind = "trait"
+why = "elliptic-curve group traits"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC used by rfc6979 (HMAC-DRBG deterministic ECDSA nonces)"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "RustCrypto in-place/buffer-to-buffer reference types used only by cipher modes"
+
+[[package]]
+name = "num-bigint-dig"
+version = "0.8.6"
+kind = "support"
+why = "big integers with prime generation (features prime, rand, zeroize) used by the rsa crate and ssh-key's Mpint conversions"
+
+[[package]]
+name = "p256"
+version = "0.13.2"
+kind = "algorithm"
+why = "NIST P-256 ECDSA for ecdsa-sha2-nistp256 and sk-ecdsa-sha2-nistp256@openssh.com keys"
+
+[[package]]
+name = "p384"
+version = "0.13.1"
+kind = "algorithm"
+why = "NIST P-384 ECDSA for ecdsa-sha2-nistp384 keys"
+
+[[package]]
+name = "p521"
+version = "0.13.3"
+kind = "algorithm"
+why = "NIST P-521 ECDSA for ecdsa-sha2-nistp521 keys; signing draws its nonce from OsRng (feature getrandom)"
+
+[[package]]
+name = "pbkdf2"
+version = "0.12.2"
+kind = "algorithm"
+why = "PBKDF2 construction used inside bcrypt-pbkdf (with its Bhash PRF)"
+
+[[package]]
+name = "pem-rfc7468"
+version = "0.7.0"
+kind = "support"
+why = "PEM encoding of OpenSSH private keys and SSH signatures (through ssh-encoding)"
+
+[[package]]
+name = "pkcs1"
+version = "0.7.5"
+kind = "support"
+why = "PKCS#1 RSA key encoding (DER)"
+
+[[package]]
+name = "pkcs8"
+version = "0.10.2"
+kind = "support"
+why = "PKCS#8 private-key encoding (DER)"
+
+[[package]]
+name = "poly1305"
+version = "0.8.0"
+kind = "algorithm"
+why = "Poly1305 one-time MAC of chacha20-poly1305@openssh.com"
+
+[[package]]
+name = "polyval"
+version = "0.6.2"
+kind = "algorithm"
+why = "POLYVAL universal hash (backs GHASH)"
+
+[[package]]
+name = "ppv-lite86"
+version = "0.2.21"
+kind = "support"
+why = "cryptography-oriented SIMD backend used only by rand_chacha's ChaCha core"
+
+[[package]]
+name = "primeorder"
+version = "0.13.6"
+kind = "algorithm"
+why = "complete addition formulas for prime-order curves (P-256/P-384/P-521 arithmetic)"
+
+[[package]]
+name = "rand"
+version = "0.8.8"
+kind = "rng"
+why = "random number generation traits used by num-bigint-dig prime generation for RSA keygen (features rand_chacha, std_rng)"
+
+[[package]]
+name = "rand_chacha"
+version = "0.3.1"
+kind = "rng"
+why = "ChaCha-based CSPRNG behind rand StdRng (feature std_rng)"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits (CryptoRngCore) taken by ssh-key's key generation, key encryption and certificate nonces; OsRng via getrandom; re-exported as ssh_key::rand_core"
+
+[[package]]
+name = "rfc6979"
+version = "0.4.0"
+kind = "algorithm"
+why = "RFC 6979 deterministic ECDSA nonce generation (HMAC-DRBG) used by P-256/P-384 signing"
+
+[[package]]
+name = "rsa"
+version = "0.9.10"
+kind = "algorithm"
+why = "RSA key generation and RSASSA-PKCS1-v1_5 signing/verification (SHA-256, SHA-512) for ssh-rsa keys"
+
+[[package]]
+name = "sec1"
+version = "0.7.3"
+kind = "support"
+why = "SEC1 elliptic-curve point and private-key encodings (ECDSA public keys)"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-256/SHA-512: key fingerprints, SshSig message hashes, sk-* signed data; also inside Ed25519, ECDSA, RSA and bcrypt-pbkdf"
+
+[[package]]
+name = "signature"
+version = "2.2.0"
+kind = "trait"
+why = "RustCrypto digital-signature traits (Signer/Verifier) implemented by ssh-key's key types"
+
+[[package]]
+name = "spki"
+version = "0.7.3"
+kind = "support"
+why = "X.509 SubjectPublicKeyInfo / AlgorithmIdentifier encoding for public keys"
+
+[[package]]
+name = "ssh-cipher"
+version = "0.2.0"
+kind = "protocol"
+why = "OpenSSH private-key ciphers aes128/192/256-cbc, aes128/192/256-ctr, aes128/256-gcm@openssh.com, chacha20-poly1305@openssh.com (features aes-cbc, aes-ctr, aes-gcm, chacha20poly1305)"
+
+[[package]]
+name = "ssh-encoding"
+version = "0.2.0"
+kind = "support"
+why = "SSH wire-format (RFC 4251) encoding of keys, certificates and signatures, with base64, pem and sha2 (digest writer) features"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "universal-hash"
+version = "0.5.1"
+kind = "trait"
+why = "universal hash function traits (Poly1305, GHASH, POLYVAL)"
+
+[[package]]
+name = "zeroize"
+version = "1.9.1"
+kind = "support"
+why = "secure zeroing of secrets in memory (private keys, derived keys, decrypted buffers)"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/algorithm.rs"
+line = 424
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256::digest in the public HashAlg::digest for HashAlg::Sha256; also reached from SshSig::signed_data / SshSig::verify (sshsig.rs:143, :158)"
+
+[[site]]
+file = "src/algorithm.rs"
+line = 425
+callee = "digest"
+function = "digest"
+must = ["SHA-512"]
+may = []
+note = "sha2 Sha512::digest in the public HashAlg::digest for HashAlg::Sha512; also reached from SshSig::signed_data / SshSig::verify"
+
+[[site]]
+file = "src/certificate/builder.rs"
+line = 161
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::fill_bytes of the 16-byte certificate nonce in Builder::new_with_random_nonce; rng is the caller's CryptoRngCore: OS-RNG for ssh_key::rand_core::OsRng, other caller generators unnamed"
+
+[[site]]
+file = "src/fingerprint.rs"
+line = 67
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256 finalize in Fingerprint::new for HashAlg::Sha256 (public key fingerprint); Sha256::new and the ssh-encoding writes into it are streaming steps (R1.2)"
+
+[[site]]
+file = "src/fingerprint.rs"
+line = 72
+callee = "finalize"
+function = "digest"
+must = ["SHA-512"]
+may = []
+note = "sha2 Sha512 finalize in Fingerprint::new for HashAlg::Sha512 (public key fingerprint)"
+
+[[site]]
+file = "src/kdf.rs"
+line = 45
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::fill_bytes of the 16-byte bcrypt salt in the public Kdf::new (also PrivateKey::encrypt / encrypt_with_cipher); rng is the caller's CryptoRngCore: OS-RNG for ssh_key::rand_core::OsRng, other caller generators unnamed"
+
+[[site]]
+file = "src/kdf.rs"
+line = 74
+callee = "bcrypt_pbkdf"
+function = "keyderive"
+must = ["bcrypt-pbkdf"]
+may = []
+note = "bcrypt_pbkdf::bcrypt_pbkdf in the public Kdf::derive (from derive_key_and_iv in PrivateKey::decrypt / encrypt_with); rounds come from the key file, a caller-built Kdf::Bcrypt or DEFAULT_BCRYPT_ROUNDS = 16, output length from the cipher or the caller: no params"
+
+[[site]]
+file = "src/private.rs"
+line = 355
+callee = "decrypt"
+function = "decrypt"
+must = ["AES-128-CBC", "AES-128-CTR", "AES-128-GCM", "AES-192-CBC", "AES-192-CTR", "AES-256-CBC", "AES-256-CTR", "AES-256-GCM", "ChaCha20-Poly1305"]
+may = []
+note = "ssh-cipher Cipher::decrypt in PrivateKey::decrypt; the cipher is the key file's ciphername (parsed input, R15.1): aes*-cbc, aes*-ctr, aes128/256-gcm@openssh.com, chacha20-poly1305@openssh.com (OpenSSH variant, registry ChaCha20-Poly1305); 3des-cbc needs tdes (off), none fails earlier"
+
+[[site]]
+file = "src/private.rs"
+line = 392
+callee = "next_u32"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::next_u32 for the checkint in PrivateKey::encrypt_with_cipher (also encrypt); rng is the caller's CryptoRngCore: OS-RNG for ssh_key::rand_core::OsRng, other caller generators unnamed"
+
+[[site]]
+file = "src/private.rs"
+line = 424
+callee = "encrypt"
+function = "encrypt"
+must = ["AES-128-CBC", "AES-128-CTR", "AES-128-GCM", "AES-192-CBC", "AES-192-CTR", "AES-256-CBC", "AES-256-CTR", "AES-256-GCM", "ChaCha20-Poly1305"]
+may = []
+note = "ssh-cipher Cipher::encrypt in PrivateKey::encrypt_with: Aes256Ctr from encrypt(), or any public Cipher variant passed to encrypt_with_cipher / encrypt_with (R14); TDesCbc returns UnsupportedCipher (tdes off), None fails in derive_key_and_iv before"
+
+[[site]]
+file = "src/private.rs"
+line = 489
+callee = "next_u32"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::next_u32 for the checkint in PrivateKey::random; rng is the caller's CryptoRngCore: OS-RNG for ssh_key::rand_core::OsRng, other caller generators unnamed"
+
+[[site]]
+file = "src/private/dsa.rs"
+line = 145
+callee = "generate"
+function = "keygen"
+must = []
+may = []
+note = "dsa::Components::generate (DSA domain parameters p, q, g, DSA_1024_160) in DsaKeypair::random; gated on feature dsa, off (R1.5)"
+
+[[site]]
+file = "src/private/dsa.rs"
+line = 146
+callee = "generate"
+function = "keygen"
+must = []
+may = []
+note = "dsa::SigningKey::generate in DsaKeypair::random; gated on feature dsa, off (R1.5)"
+
+[[site]]
+file = "src/private/ecdsa.rs"
+line = 193
+callee = "random"
+function = "keygen"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "p256::SecretKey::random in EcdsaKeypair::random for EcdsaCurve::NistP256 (ecdsa-sha2-nistp256 key); the RNG draw is inside the library (R9.2)"
+
+[[site]]
+file = "src/private/ecdsa.rs"
+line = 202
+callee = "random"
+function = "keygen"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "p384::SecretKey::random in EcdsaKeypair::random for EcdsaCurve::NistP384 (ecdsa-sha2-nistp384 key)"
+
+[[site]]
+file = "src/private/ecdsa.rs"
+line = 211
+callee = "random"
+function = "keygen"
+must = ["ECDSA-P-521-SHA-512"]
+may = []
+note = "p521::SecretKey::random in EcdsaKeypair::random for EcdsaCurve::NistP521 (ecdsa-sha2-nistp521 key)"
+
+[[site]]
+file = "src/private/ed25519.rs"
+line = 27
+callee = "fill_bytes"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+note = "rand_core RngCore::fill_bytes of the 32-byte Ed25519 seed in Ed25519PrivateKey::random (also Ed25519Keypair::random, PrivateKey::random); the key is then built by SigningKey::from_bytes, a constructor; rng is the caller's: OS-RNG for ssh_key::rand_core::OsRng"
+
+[[site]]
+file = "src/private/rsa.rs"
+line = 112
+callee = "new"
+function = "keygen"
+must = ["RSA-PKCS1-1.5"]
+may = ["RSA-PKCS1-1.5-SHA-256", "RSA-PKCS1-1.5-SHA-512"]
+note = "rsa::RsaPrivateKey::new in the public RsaKeypair::random (and PrivateKey::random with DEFAULT_RSA_KEY_SIZE 4096); ssh-rsa key for RSASSA-PKCS1-v1_5 with the hash chosen per signature, so the optional hash is left out; bit_size is a caller argument: no key_bits"
+
+[[site]]
+file = "src/signature.rs"
+line = 330
+callee = "try_sign_digest"
+function = "sign"
+must = []
+may = []
+note = "dsa SigningKey::try_sign_digest (DSA with SHA-1) in Signer for DsaKeypair; gated on feature dsa, off (R1.5)"
+
+[[site]]
+file = "src/signature.rs"
+line = 367
+callee = "verify_digest"
+function = "verify"
+must = []
+may = []
+note = "dsa VerifyingKey::verify_digest (DSA with SHA-1) in Verifier for DsaPublicKey; gated on feature dsa, off (R1.5)"
+
+[[site]]
+file = "src/signature.rs"
+line = 401
+callee = "sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "ed25519-dalek Signer::sign in Signer<Signature> for Ed25519Keypair (ssh-ed25519; PrivateKey::sign / SshSig::sign / certificate Builder::sign reach it)"
+
+[[site]]
+file = "src/signature.rs"
+line = 414
+callee = "verify"
+function = "verify"
+must = ["Ed25519"]
+may = []
+note = "ed25519-dalek Verifier::verify in Verifier<Signature> for Ed25519PublicKey (ssh-ed25519 SshSig and certificate signatures)"
+
+[[site]]
+file = "src/signature.rs"
+line = 423
+callee = "verify"
+function = "verify"
+must = ["Ed25519"]
+may = []
+note = "ed25519-dalek Verifier::verify in Verifier<Signature> for public::SkEd25519 (sk-ssh-ed25519@openssh.com) over the U2F signed data built by make_sk_signed_data"
+
+[[site]]
+file = "src/signature.rs"
+line = 435
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "p256 ecdsa VerifyingKey Verifier::verify in Verifier<Signature> for public::SkEcdsaSha2NistP256 (sk-ecdsa-sha2-nistp256@openssh.com) over the U2F signed data"
+
+[[site]]
+file = "src/signature.rs"
+line = 448
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256::digest of the application string in make_sk_signed_data (sk-* signature verification, lines 423/435); a separate hashing call (R2)"
+
+[[site]]
+file = "src/signature.rs"
+line = 450
+callee = "digest"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256::digest of the message in make_sk_signed_data (sk-* signature verification)"
+
+[[site]]
+file = "src/signature.rs"
+line = 520
+callee = "try_sign"
+function = "sign"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "impl_signature_for_curve!(p256, ..): p256 ecdsa SigningKey Signer::try_sign (RFC 6979, SHA-256) in Signer for EcdsaPrivateKey<32>, macro body line 513 (R12.1)"
+
+[[site]]
+file = "src/signature.rs"
+line = 521
+callee = "try_sign"
+function = "sign"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "impl_signature_for_curve!(p384, ..): p384 ecdsa SigningKey Signer::try_sign (RFC 6979, SHA-384) in Signer for EcdsaPrivateKey<48>, macro body line 513 (R12.1)"
+
+[[site]]
+file = "src/signature.rs"
+line = 522
+callee = "try_sign"
+function = "sign"
+must = ["ECDSA-P-521-SHA-512"]
+may = []
+note = "impl_signature_for_curve!(p521, ..): p521 ecdsa SigningKey Signer::try_sign (SHA-512, nonce from OsRng inside p521) in Signer for EcdsaPrivateKey<66>, macro body line 513 (R12.1)"
+
+[[site]]
+file = "src/signature.rs"
+line = 640
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-256-SHA-256"]
+may = []
+note = "p256 ecdsa VerifyingKey Verifier::verify in Verifier<Signature> for EcdsaPublicKey, signature algorithm ecdsa-sha2-nistp256"
+
+[[site]]
+file = "src/signature.rs"
+line = 647
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-384-SHA-384"]
+may = []
+note = "p384 ecdsa VerifyingKey Verifier::verify in Verifier<Signature> for EcdsaPublicKey, signature algorithm ecdsa-sha2-nistp384"
+
+[[site]]
+file = "src/signature.rs"
+line = 654
+callee = "verify"
+function = "verify"
+must = ["ECDSA-P-521-SHA-512"]
+may = []
+note = "p521 ecdsa VerifyingKey Verifier::verify in Verifier<Signature> for EcdsaPublicKey, signature algorithm ecdsa-sha2-nistp521"
+
+[[site]]
+file = "src/signature.rs"
+line = 669
+callee = "try_sign"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-512"]
+may = []
+note = "rsa pkcs1v15::SigningKey<Sha512>::try_sign in Signer for RsaKeypair (rsa-sha2-512); with rsa 0.9.10 the key conversion on line 668 (private/rsa.rs:196-203 passes p twice, from_components validates p*p == n) fails for keys with p != q, so this runs only for an input key with p = q, n = p^2"
+
+[[site]]
+file = "src/signature.rs"
+line = 690
+callee = "verify"
+function = "verify"
+must = ["RSA-PKCS1-1.5-SHA-256"]
+may = []
+note = "rsa pkcs1v15::VerifyingKey<Sha256> Verifier::verify in Verifier<Signature> for RsaPublicKey, signature algorithm rsa-sha2-256 (parsed input)"
+
+[[site]]
+file = "src/signature.rs"
+line = 693
+callee = "verify"
+function = "verify"
+must = ["RSA-PKCS1-1.5-SHA-512"]
+may = []
+note = "rsa pkcs1v15::VerifyingKey<Sha512> Verifier::verify in Verifier<Signature> for RsaPublicKey, signature algorithm rsa-sha2-512 (parsed input)"

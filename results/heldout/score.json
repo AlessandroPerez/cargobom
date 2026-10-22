@@ -102,15 +102,12 @@
    "crypto_found": 23,
    "crypto_labelled": 23,
    "crypto_missed": [],
-   "reported": 25,
+   "reported": 23,
    "reported_correct": 23,
-   "reported_not_crypto": [
-    "cmov 0.5.4",
-    "ctutils 0.4.3"
-   ],
-   "support_agree": 7,
+   "reported_not_crypto": [],
+   "support_agree": 9,
    "support_labelled": 9,
-   "support_listed": 7
+   "support_listed": 9
   },
   "layer2": {
    "not_correct": [
@@ -319,20 +316,440 @@
    }
   }
  },
+ "jwt-0.16.0": {
+  "layer1": {
+   "crypto_found": 4,
+   "crypto_labelled": 4,
+   "crypto_missed": [],
+   "reported": 4,
+   "reported_correct": 4,
+   "reported_not_crypto": [],
+   "support_agree": 2,
+   "support_labelled": 2,
+   "support_listed": 2
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "finalize",
+     "line": "src/algorithm/rust_crypto.rs:57",
+     "may": [],
+     "must": [
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512"
+     ],
+     "reported": [
+      "HMAC"
+     ],
+     "verdict": "less-specific"
+    },
+    {
+     "callee": "verify_slice",
+     "line": "src/algorithm/rust_crypto.rs:81",
+     "may": [],
+     "must": [
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512"
+     ],
+     "reported": [
+      "HMAC"
+     ],
+     "verdict": "less-specific"
+    }
+   ],
+   "sites": 5,
+   "verdicts": {
+    "correct": 3,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 2,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "rustic_core-0.13.0": {
+  "layer1": {
+   "crypto_found": 20,
+   "crypto_labelled": 20,
+   "crypto_missed": [],
+   "reported": 20,
+   "reported_correct": 20,
+   "reported_not_crypto": [],
+   "support_agree": 6,
+   "support_labelled": 8,
+   "support_listed": 6
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "random",
+     "line": "src/chunker/rabin.rs:205",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "shuffle",
+     "line": "src/commands/check.rs:90",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/crypto/aespoly1305.rs:33",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "decrypt",
+     "line": "src/crypto/aespoly1305.rs:98",
+     "may": [],
+     "must": [
+      "AES-256-CTR-Poly1305-AES"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/crypto/aespoly1305.rs:121",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "encrypt_in_place_detached",
+     "line": "src/crypto/aespoly1305.rs:127",
+     "may": [],
+     "must": [
+      "AES-256-CTR-Poly1305-AES"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "digest",
+     "line": "src/crypto/hasher.rs:18",
+     "may": [],
+     "must": [
+      "SHA-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "finalize",
+     "line": "src/crypto/hasher.rs:33",
+     "may": [],
+     "must": [
+      "SHA-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/id.rs:140",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "scrypt",
+     "line": "src/repofile/keyfile.rs:122",
+     "may": [],
+     "must": [
+      "scrypt"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/repofile/keyfile.rs:209",
+     "may": [],
+     "must": [
+      "ChaCha12-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "scrypt",
+     "line": "src/repofile/keyfile.rs:212",
+     "may": [],
+     "must": [
+      "scrypt"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 12,
+   "verdicts": {
+    "correct": 0,
+    "function-mismatch": 0,
+    "honest-unknown": 12,
+    "less-specific": 0,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "ssh-key-0.6.7": {
+  "layer1": {
+   "crypto_found": 37,
+   "crypto_labelled": 37,
+   "crypto_missed": [],
+   "reported": 37,
+   "reported_correct": 37,
+   "reported_not_crypto": [],
+   "support_agree": 16,
+   "support_labelled": 18,
+   "support_listed": 16
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "fill_bytes",
+     "line": "src/certificate/builder.rs:161",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/kdf.rs:45",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "decrypt",
+     "line": "src/private.rs:355",
+     "may": [],
+     "must": [
+      "AES-128-CBC",
+      "AES-128-CTR",
+      "AES-128-GCM",
+      "AES-192-CBC",
+      "AES-192-CTR",
+      "AES-256-CBC",
+      "AES-256-CTR",
+      "AES-256-GCM",
+      "ChaCha20-Poly1305"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "next_u32",
+     "line": "src/private.rs:392",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "encrypt",
+     "line": "src/private.rs:424",
+     "may": [],
+     "must": [
+      "AES-128-CBC",
+      "AES-128-CTR",
+      "AES-128-GCM",
+      "AES-192-CBC",
+      "AES-192-CTR",
+      "AES-256-CBC",
+      "AES-256-CTR",
+      "AES-256-GCM",
+      "ChaCha20-Poly1305"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "next_u32",
+     "line": "src/private.rs:489",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "random",
+     "line": "src/private/ecdsa.rs:193",
+     "may": [],
+     "must": [
+      "ECDSA-P-256-SHA-256"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "random",
+     "line": "src/private/ecdsa.rs:202",
+     "may": [],
+     "must": [
+      "ECDSA-P-384-SHA-384"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "random",
+     "line": "src/private/ecdsa.rs:211",
+     "may": [],
+     "must": [
+      "ECDSA-P-521-SHA-512"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "fill_bytes",
+     "line": "src/private/ed25519.rs:27",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "new",
+     "line": "src/private/rsa.rs:112",
+     "may": [
+      "RSA-PKCS1-1.5-SHA-256",
+      "RSA-PKCS1-1.5-SHA-512"
+     ],
+     "must": [
+      "RSA-PKCS1-1.5"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "try_sign",
+     "line": "src/signature.rs:522",
+     "may": [],
+     "must": [
+      "ECDSA-P-521-SHA-512"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "verify",
+     "line": "src/signature.rs:654",
+     "may": [],
+     "must": [
+      "ECDSA-P-521-SHA-512"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    }
+   ],
+   "sites": 35,
+   "verdicts": {
+    "correct": 22,
+    "function-mismatch": 0,
+    "honest-unknown": 12,
+    "less-specific": 0,
+    "miss": 1,
+    "wrong": 0
+   }
+  }
+ },
  "totp-rs-6.0.0": {
   "layer1": {
    "crypto_found": 5,
    "crypto_labelled": 5,
    "crypto_missed": [],
-   "reported": 7,
+   "reported": 5,
    "reported_correct": 5,
-   "reported_not_crypto": [
-    "cmov 0.5.4",
-    "ctutils 0.4.2"
-   ],
-   "support_agree": 2,
+   "reported_not_crypto": [],
+   "support_agree": 4,
    "support_labelled": 4,
-   "support_listed": 2
+   "support_listed": 4
   },
   "layer2": {
    "not_correct": [

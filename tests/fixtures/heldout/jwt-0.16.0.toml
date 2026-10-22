@@ -1,0 +1,103 @@
+# Ground truth for jwt-0.16.0 (held-out set): Layer 1 crypto packages and Layer 2 operation sites
+# in the package's own source, written from source by two independent labellers (agents, blind to
+# each other and to any tool output), compared before any tool run (22 October 2026). The
+# labellers agreed on every package and site (function, must, may). Amended before any tool run
+# (23 October 2026): the three calls in openssl-gated code, which both labellers' logs list, are
+# dead sites (R1.5), as the held-out labels of boringtun and totp-rs list feature-gated code.
+
+# Ground-truth labels: jwt 0.16.0 (/var/tmp/rcbom-validate/heldout/jwt-0.16.0), labeller a,
+# written from source only, blind to the other labeller and to any tool output (22 October 2026).
+# Library-only package: analysed as its public API (R14), default features (the package declares no
+# `default`; the optional openssl dependency is off, so src/algorithm/openssl.rs and every
+# #[cfg(feature = "openssl")] item is not compiled and has no sites), host x86_64-unknown-linux-gnu,
+# release profile.
+# The only crypto in the build is RustCrypto HMAC: the crate's SigningAlgorithm / VerifyingAlgorithm
+# impls for hmac::Hmac<D> (src/algorithm/rust_crypto.rs), with D bounded by the crate's
+# TypeLevelAlgorithmType, implemented only for sha2::Sha256 / Sha384 / Sha512 (rust_crypto.rs:35-37),
+# so callers can instantiate HS256, HS384 and HS512. #[cfg(test)] modules, doc-tests and examples/
+# are out of scope.
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "block-buffer"
+version = "0.10.0"
+kind = "support"
+why = "RustCrypto block buffering for SHA-2 and HMAC block processing (digest core-api)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.1"
+kind = "trait"
+why = "common RustCrypto traits (KeyInit, KeySizeUser, OutputSizeUser); direct dependency for the InvalidLength key error"
+
+[[package]]
+name = "digest"
+version = "0.10.1"
+kind = "trait"
+why = "RustCrypto hash and MAC traits (Mac, core_api, MacError), features core-api, mac, std"
+
+[[package]]
+name = "hmac"
+version = "0.12.0"
+kind = "algorithm"
+why = "HMAC (Hmac<D>, feature reset) computing and checking the HS256/HS384/HS512 JWT MAC"
+
+[[package]]
+name = "sha2"
+version = "0.10.1"
+kind = "algorithm"
+why = "SHA-256, SHA-384 and SHA-512, the hashes inside HMAC for HS256/HS384/HS512"
+
+[[package]]
+name = "subtle"
+version = "2.4.1"
+kind = "support"
+why = "constant-time comparison used by Mac::verify_slice (digest feature mac)"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/algorithm/rust_crypto.rs"
+line = 57
+callee = "finalize"
+function = "tag"
+must = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
+may = []
+note = "Mac::finalize of the keyed Hmac<D> fed header.claims by get_hmac_with_data (lines 98-102), in pub SigningAlgorithm::sign for Hmac<D>; D is Sha256/Sha384/Sha512, the only TypeLevelAlgorithmType impls (lines 35-37); reached directly and through SignWithKey/SignWithStore (token/signed.rs:97)"
+
+[[site]]
+file = "src/algorithm/rust_crypto.rs"
+line = 81
+callee = "verify_slice"
+function = "verify"
+must = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
+may = []
+note = "Mac::verify_slice recomputes the HMAC over header.claims and compares it in constant time with the decoded signature, in pub VerifyingAlgorithm::verify_bytes for Hmac<D>; D as at line 57; reached directly, through VerifyingAlgorithm::verify (algorithm/mod.rs:65) and VerifyWithKey/VerifyWithStore (token/verified.rs:39)"
+
+[[site]]
+file = "src/algorithm/openssl.rs"
+line = 59
+callee = "sign_to_vec"
+function = "sign"
+must = []
+may = []
+note = "openssl Signer::sign_to_vec in SigningAlgorithm for PKeyWithDigest<Private>; feature openssl off (R1.5)"
+
+[[site]]
+file = "src/algorithm/openssl.rs"
+line = 84
+callee = "verify"
+function = "verify"
+must = []
+may = []
+note = "openssl Verifier::verify (EC keys, after jose_to_der) in VerifyingAlgorithm for PKeyWithDigest<Public>; feature openssl off (R1.5)"
+
+[[site]]
+file = "src/algorithm/openssl.rs"
+line = 86
+callee = "verify"
+function = "verify"
+must = []
+may = []
+note = "openssl Verifier::verify (RSA keys) in VerifyingAlgorithm for PKeyWithDigest<Public>; feature openssl off (R1.5)"
