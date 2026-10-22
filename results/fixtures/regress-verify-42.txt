@@ -1,0 +1,149 @@
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/signature.rs:14:8 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in v42::signature::<impl core::convert::From<&v42::signature::Seed> for ed25519_dalek::signing::SigningKey>::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::from_bytes(&s.0) // Ed25519`; code: `ed25519_dalek::SigningKey::from_bytes`
+  occ HMAC | crypto:algorithm:HMAC | src/macs.rs:28:10 | digest::mac::Mac::update | [reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; line: `h.update(m);`; code: `update`
+  occ HMAC | crypto:algorithm:HMAC | src/macs.rs:29:10 | digest::mac::Mac::finalize | [reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `finalize`
+  occ HMAC | crypto:algorithm:HMAC | src/macs.rs:29:21 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; into_bytes: setup, not a use; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:24:0 | digest::digest::Digest::digest | [reachable] [call] [macro keyed!] in v42::K256::digest; use: digest; expanded from src/lib.rs:19; line: `keyed!(K256, sha2::Sha256); // SHA-256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/signature.rs:6:8 | digest::digest::Digest::digest | [reachable] [call] in v42::signature::<impl v42::Check for v42::public::sk::SkKey>::check; use: digest; line: `sha2::Sha256::digest(m).len() // SHA-256`; code: `sha2::Sha256::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:25:0 | digest::digest::Digest::digest | [reachable] [call] [macro keyed!] in v42::K512::digest; use: digest; expanded from src/lib.rs:19; line: `keyed!(K512, sha2::Sha512); // SHA-512`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:12:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via v42 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:42:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via v42 -> digest -> crypto-common
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | Cargo.lock:52:0 | curve25519-dalek | [manifest] locked curve25519-dalek 4.1.3; reached via v42 -> ed25519-dalek -> curve25519-dalek
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:89:0 | digest | [manifest] locked digest 0.10.7; reached via v42 -> digest
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.toml:9:0 | digest | [manifest] declared by v42 (dependencies)
+  occ ed25519 | pkg:cargo/ed25519@2.2.3 | Cargo.lock:100:0 | ed25519 | [manifest] locked ed25519 2.2.3; reached via v42 -> ed25519-dalek -> ed25519
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:110:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via v42 -> ed25519-dalek
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.toml:10:0 | ed25519-dalek | [manifest] declared by v42 (dependencies)
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:151:0 | hmac | [manifest] locked hmac 0.12.1; reached via v42 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:11:0 | hmac | [manifest] declared by v42 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:247:0 | sha2 | [manifest] locked sha2 0.10.9; reached via v42 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:12:0 | sha2 | [manifest] declared by v42 (dependencies)
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:258:0 | signature | [manifest] locked signature 2.2.0; reached via v42 -> ed25519-dalek -> ed25519 -> signature
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:277:0 | subtle | [manifest] locked subtle 2.6.1; reached via v42 -> digest -> subtle
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:339:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via v42 -> ed25519-dalek -> zeroize
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=knowledge-base
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=1
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop HMAC | crypto:algorithm:HMAC | rcbom:confidence=high
+  prop HMAC | crypto:algorithm:HMAC | rcbom:detection:method=type-resolved
+  prop HMAC | crypto:algorithm:HMAC | rcbom:functions:source=observed
+  prop HMAC | crypto:algorithm:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:algorithm:HMAC | rcbom:occurrences=3
+  prop HMAC | crypto:algorithm:HMAC | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:crypto-role=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:kb-coverage=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:usage=present
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset HMAC | crypto:algorithm:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library curve25519-dalek 4.1.3 | pkg:cargo/curve25519-dalek@4.1.3 | purl pkg:cargo/curve25519-dalek@4.1.3
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library ed25519 2.2.3 | pkg:cargo/ed25519@2.2.3 | purl pkg:cargo/ed25519@2.2.3
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/curve25519-dalek@4.1.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/ed25519@2.2.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/v42@0.1.0 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/v42@0.1.0 -> pkg:cargo/ed25519-dalek@2.2.0
+dep pkg:cargo/v42@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/v42@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:Ed25519
+dependency crypto:algorithm:HMAC
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/curve25519-dalek@4.1.3
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/ed25519@2.2.3
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/v42@0.1.0
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/v42@0.1.0", "name": "v42", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v42@0.1.0", "type": "library", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=lib v42
+run rcbom:run:features=
+run rcbom:run:packages=24
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=15
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
