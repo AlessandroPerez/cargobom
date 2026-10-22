@@ -329,7 +329,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         depth: usize,
         seen: &mut HashSet<Key>,
     ) -> Origin {
-        if path.len() > MAX_PATH {
+        // past the query's budget nothing is followed, places either: reads of places that
+        // reach operands only further down (a value before each write through a raw pointer,
+        // `width(l, r)` in a loop) would recompute the same definitions without bound
+        if path.len() > MAX_PATH || self.nodes.get() > MAX_NODES {
             return Origin::Truncated;
         }
         let key = (local, path.clone(), at);
