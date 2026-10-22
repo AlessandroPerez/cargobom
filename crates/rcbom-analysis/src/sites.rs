@@ -929,17 +929,26 @@ pub(super) fn site_matches(
             };
             // the points-to analysis (`RCBOM_PTA`), where it ran and the call is given a descriptor
             // by reference, only removes doubt: a complete answer within the search's members
-            // drops those it shows cannot reach the call and closes the call's gaps
-            // (`pta_members`); anything else leaves the search's answer as it is
+            // drops those it shows cannot reach the call and closes the call's gaps; one beyond
+            // a search answer that claims completeness gives the unknown (`pta_members`);
+            // anything else leaves the search's answer as it is
             let mut gap_reason = gap_reason;
             let mut unresolved = unresolved;
             if let Some(v) = at.and_then(|at| pta_verdict(ctx, site, at)) {
                 let search_gap =
                     unresolved.is_some() || gap_reason.is_some() || table_gap.is_some();
-                if pta_members(ctx, site, &v, search_gap, &mut out) {
-                    unresolved = None;
-                    gap_reason = None;
-                    table_gap = None;
+                match pta_members(ctx, site, &v, search_gap, &mut out) {
+                    Settled::Closed => {
+                        unresolved = None;
+                        gap_reason = None;
+                        table_gap = None;
+                    }
+                    Settled::Beyond => {
+                        unresolved = unresolved_operation(ctx, site)
+                            .map(|(p, f, _, pr)| (p, f, BEYOND.to_string(), pr));
+                        gap_reason = Some(BEYOND.to_string());
+                    }
+                    Settled::No => {}
                 }
             }
             // a call that is no operation (a key set up with the algorithm) gives no unknown

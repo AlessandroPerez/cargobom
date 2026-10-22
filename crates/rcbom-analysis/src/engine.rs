@@ -26,15 +26,24 @@ pub(super) fn pta_verdict(ctx: &Ctx<'_>, site: &Site, at: &std::path::Path) -> O
                 .as_ref()
                 .is_some_and(|t| ctx.descriptor_types.contains(t))
     };
-    let nargs = calls.iter().map(|c| c.args.len()).max().unwrap_or(0);
-    let k = (0..nargs).find(|&k| {
+    let given = |k: usize| {
         calls.iter().any(|c| {
             c.args
                 .get(k)
                 .and_then(Option::as_ref)
                 .is_some_and(descriptor)
         })
-    })?;
+    };
+    // the argument that carries the algorithm: an operation's, as the knowledge base names it
+    // (`prk.expand(info, &AES_256_GCM)` takes it in its receiver, a key the engine cannot name,
+    // not in the length), else the first given a descriptor by reference
+    let k = match operation_algorithm(ctx, site) {
+        Some(k) => given(k).then_some(k)?,
+        None => {
+            let nargs = calls.iter().map(|c| c.args.len()).max().unwrap_or(0);
+            (0..nargs).find(|&k| given(k))?
+        }
+    };
     let answers: Vec<&rcbom_facts::PtaArg> = calls
         .iter()
         .filter_map(|c| c.args.get(k)?.as_ref())
@@ -57,28 +66,49 @@ pub(super) fn pta_verdict(ctx: &Ctx<'_>, site: &Site, at: &std::path::Path) -> O
             .all(|a| !a.unknown && !a.statics.is_empty() && a.others == 0);
     Some(PtaVerdict { found, complete })
 }
-/// Whether the points-to analysis' verdict (`pta_verdict`) settles a call's members: it only
+/// What the points-to analysis' verdict does to a call's members (`pta_members`).
+#[derive(PartialEq)]
+pub(super) enum Settled {
+    /// Nothing: the search's answer stands.
+    No,
+    /// The members are within the engine's complete answer: the call's gaps close.
+    Closed,
+    /// The engine's complete answer holds a descriptor beyond a search answer that claims
+    /// completeness: one the search may drop, so the call gets the unknown (never the descriptor).
+    Beyond,
+}
+/// The unknown's reason where the engine's complete answer holds a descriptor beyond a search
+/// answer that claims completeness (`Settled::Beyond`).
+pub(super) const BEYOND: &str = "other algorithms than these may reach the call: the points-to \
+                                 analysis finds a value the search does not";
+/// What the points-to analysis' verdict (`pta_verdict`) does to a call's members: it only
 /// removes doubt. A complete answer within the value search's members drops those it shows
 /// cannot reach the call, and the call's gaps close (the caller); the members' sentences count
 /// the new set, and where the search had a gap (`search_gap`) several are each only possibly
 /// reaching the call: the engine is flow-insensitive, and its set holds a value the program
 /// overwrites before the call (`a = &SHA256; *r = &SHA512` through a chain of reborrows). A
 /// descriptor beyond the search's members is such a value, a candidate the engine cannot tell
-/// apart (two pointers swapped before a write through one), or a value the search misses: the
-/// search's answer stands, and the descriptor is reported (`rcbom-pta: beyond the search`) to be
-/// looked at. An incomplete answer settles nothing.
+/// apart (two pointers swapped before a write through one), or a value the search misses: it is
+/// never added; where the search had a gap its unknown covers it, and where the search claimed
+/// completeness the call gets the unknown (`Settled::Beyond`). An incomplete answer settles
+/// nothing.
+///
+/// The engine is also a check on the default run, printed for review (`rcbom-pta: outside the
+/// engine` and `beyond a complete search`, collected and compared between runs by `cargo xtask
+/// pta-candidates`): a member outside a complete answer is a candidate wrong member, a
+/// descriptor beyond a search that claims completeness a candidate drop.
 pub(super) fn pta_members(
     ctx: &Ctx<'_>,
     site: &Site,
     v: &PtaVerdict,
     search_gap: bool,
     out: &mut Vec<SiteMatch>,
-) -> bool {
+) -> Settled {
     let Target::Call { method, .. } = &site.target else {
-        return false;
+        return Settled::No;
     };
     if !v.complete {
-        return false;
+        return Settled::No;
     }
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
     // a member of the call's algorithm set (not one only dead code names)
@@ -103,14 +133,27 @@ pub(super) fn pta_members(
         }
         keys.insert(m.key());
     }
-    if !beyond.is_empty() || keys.is_empty() {
-        for d in beyond {
-            eprintln!(
-                "rcbom-pta: beyond the search: {d} at {}:{}:{}",
-                site.span.file, site.span.line, site.span.col
-            );
+    let at = format!("{}:{}:{}", site.span.file, site.span.line, site.span.col);
+    for o in out
+        .iter()
+        .filter(|o| member(o) && !keys.contains(&o.0.key()))
+    {
+        eprintln!("rcbom-pta: outside the engine: {} at {at}", o.0.name);
+    }
+    if !beyond.is_empty() {
+        // a search that claims a set: the call has members, or is an operation (whose members
+        // all reach it only through dead code); a getter (`alg.output_len()`) or a constructor
+        // whose use is reported where the value is used (`Context::new`) claims nothing
+        if search_gap || (have.is_empty() && unresolved_operation(ctx, site).is_none()) {
+            return Settled::No;
         }
-        return false;
+        for d in beyond {
+            eprintln!("rcbom-pta: beyond a complete search: {d} at {at}");
+        }
+        return Settled::Beyond;
+    }
+    if keys.is_empty() {
+        return Settled::No;
     }
     out.retain(|o| !member(o) || keys.contains(&o.0.key()));
     let n = out.iter().filter(|o| member(o)).count();
@@ -126,7 +169,7 @@ pub(super) fn pta_members(
             }
         }
     }
-    true
+    Settled::Closed
 }
 /// A member's sentence for a set of `n` members: "algorithm from X in the arguments" is one of
 /// `n` when there are several, "one of 2 that may reach the call: X" is "from X" when it is alone.
