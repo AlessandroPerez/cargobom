@@ -56,7 +56,7 @@ const MAX_DEPTH: usize = 10;
 const MAX_WIDTH: usize = 16;
 /// Fields of a struct literal given each its own value (`Origin::Set`); further ones are cut.
 const MAX_FIELDS: usize = 32;
-/// Nodes per origin tree.
+/// Nodes (operands) per origin tree; past them nothing more is read, places either.
 const MAX_NODES: usize = 400;
 /// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
 /// path at each turn, and moves and borrows are free of the other limits.
