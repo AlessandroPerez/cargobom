@@ -84,6 +84,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             origins,
             unconvertible,
             def,
+            lib_generic: false,
         }
     }
 
@@ -159,9 +160,11 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         let did = rustc_internal::internal(tcx, def.def_id());
         let iargs = rustc_internal::internal(tcx, args);
         // not monomorphic (`<A as KeyInit>::new_from_slice`, `Hkdf::<<Kdf as Kdf>::Hash>`):
-        // the walk sees the instances
+        // the walk sees the instances; in a library's generic function its users can call,
+        // which only they instantiate, a call into a KB crate is kept with its types as
+        // parameters (`Sha256::digest::<impl AsRef<[u8]>>`, `v.shuffle::<R>(rng)`)
         if iargs.has_non_region_param() || iargs.has_aliases() {
-            return false;
+            return self.lib_generic && self.cx.kb_crate(did.krate);
         }
         let krate = tcx.crate_name(did.krate).to_string();
         if self.cx.kb_crate(did.krate) {

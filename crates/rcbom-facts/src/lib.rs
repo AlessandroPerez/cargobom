@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 30;
+pub const FACTS_VERSION: u32 = 31;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -70,7 +70,9 @@ pub struct CrateFacts {
     pub krate: CrateInfo,
     /// Places in this crate's own source, scanned per item without following calls.
     /// For fn items without generics, the body is monomorphic; for generic ones, only calls
-    /// whose generic arguments are already concrete are kept.
+    /// whose generic arguments are already concrete are kept, except in a library's generic
+    /// functions its users can call (and their closures), where a call into a KB crate is kept
+    /// with its types as parameters (`TyTree::Param`).
     pub sites: Vec<Site>,
     /// Edges of the data graph that have no source position of their own: statics an
     /// initializer reaches only through evaluation (`static T: Table = make_table();` with

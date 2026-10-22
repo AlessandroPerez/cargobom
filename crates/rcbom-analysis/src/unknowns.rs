@@ -48,9 +48,10 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
     match (op, uncovered_entry) {
         (Some(op), _) if op.self_type => {
             let t = self_ty.as_ref()?;
-            // a trait object (`Box<dyn DynDigest>`): the type is chosen at run time
-            let (reason, provider) = match dyn_trait(t) {
-                Some(d) => (
+            // a trait object (`Box<dyn DynDigest>`): the type is chosen at run time; a type
+            // parameter of a library's generic function (`<A as Aead>::encrypt`): by its callers
+            let (reason, provider) = match (dyn_trait(t), type_param(t)) {
+                (Some(d), _) => (
                     // by the trait's name: one trait reached by two paths
                     // (`digest::DynDigest`, `sha2::digest::DynDigest`) gives one reason
                     format!(
@@ -61,7 +62,16 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                         .into_iter()
                         .collect(),
                 ),
-                None => unmodelled_type(ctx, site, t)?,
+                (None, Some(p)) => (
+                    format!(
+                        "a type parameter (`{p}`) of the library's generic API: its callers \
+                         choose the type"
+                    ),
+                    ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id)
+                        .into_iter()
+                        .collect(),
+                ),
+                (None, None) => unmodelled_type(ctx, site, t)?,
             };
             let function = if op.setup {
                 String::new()
@@ -159,8 +169,12 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             {
                 return None;
             }
-            // what an uncovered crate computes, as its entries say (md5's: a hash), scopes the use
-            let primitives: BTreeSet<&str> = if uncovered {
+            // a type the call is made on or for that is a parameter of a library's generic
+            // function (`v.shuffle::<R>(rng)`): its callers choose it
+            let param = self_ty.iter().chain(args.iter()).find_map(type_param);
+            // what an uncovered crate computes, as its entries say (md5's: a hash), scopes the
+            // use; so it does for a type the callers choose (rand's: a generator)
+            let primitives: BTreeSet<&str> = if uncovered || param.is_some() {
                 let k = callee.krate.name.as_str();
                 ctx.kb
                     .types
@@ -214,20 +228,25 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                 _ => "unknown",
             };
             let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
-            let reason = match &provider {
-                Some((n, v)) if uncovered => format!(
+            let reason = match (&provider, param) {
+                (Some((n, v)), Some(p)) => format!(
+                    "`{}` of {n} {v} on a type parameter (`{p}`) of the library's generic API: \
+                     its callers choose the type",
+                    short(&callee.path)
+                ),
+                (Some((n, v)), None) if uncovered => format!(
                     "`{}` of {n} {v}, a version the knowledge base does not cover",
                     short(&callee.path)
                 ),
-                Some((n, v)) if unnamed_api => format!(
+                (Some((n, v)), None) if unnamed_api => format!(
                     "`{}` of {n} {v}, an API the knowledge base does not name",
                     short(&callee.path)
                 ),
-                Some((n, v)) => format!(
+                (Some((n, v)), None) => format!(
                     "`{}` of {n} {v}, a crypto package the knowledge base does not model",
                     short(&callee.path)
                 ),
-                None => format!("`{}` is not modelled", short(&callee.path)),
+                (None, _) => format!("`{}` is not modelled", short(&callee.path)),
             };
             // the algorithm's packages are those of the types the call is made on or for
             // (`kem::Encapsulate::encapsulate` on an ml-kem key, `diffie_hellman::<NistP256>`),
@@ -266,6 +285,31 @@ pub(super) fn gaps_reason(gaps: &[search::Gap]) -> Option<String> {
             g.reason
         )
     })
+}
+/// The type parameter a call's type is, directly or behind a reference (`&mut R`).
+fn type_param(t: &rcbom_facts::TyTree) -> Option<&str> {
+    match t {
+        rcbom_facts::TyTree::Param(p) => Some(p),
+        rcbom_facts::TyTree::Ref(t) => type_param(t),
+        _ => None,
+    }
+}
+/// Whether a call's types name a type parameter (a site of a library's generic function).
+pub(super) fn names_param(target: &Target) -> bool {
+    fn deep(t: &rcbom_facts::TyTree) -> bool {
+        use rcbom_facts::TyTree;
+        match t {
+            TyTree::Param(_) => true,
+            TyTree::Adt { args, .. } => args.iter().any(deep),
+            TyTree::Ref(t) | TyTree::Slice(t) | TyTree::Array(t, _) => deep(t),
+            TyTree::Tuple(ts) => ts.iter().any(deep),
+            _ => false,
+        }
+    }
+    match target {
+        Target::Call { self_ty, args, .. } => self_ty.iter().chain(args.iter()).any(deep),
+        _ => false,
+    }
 }
 /// Whether a type names a type of a modelled crate that computes no cryptography (rand's
 /// `SmallRng`, at any version).
