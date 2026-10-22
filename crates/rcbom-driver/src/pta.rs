@@ -1824,20 +1824,31 @@ impl<'tcx> Tr<'_, 'tcx> {
                         // function's return, `Box<dyn Tr>` to `Box<dyn Tr>`, or an auto trait
                         // dropped: the vtable is the source's, which the copy below carries)
                         if let Ok(src) = op.ty(self.body.locals())
-                            && let Some((c, d)) = unsize_pair(self.tcx, self.ity(src), dty)
+                            && let Some((c, d, from, to)) =
+                                unsize_pair(self.tcx, self.ity(src), dty)
                             && !same_principal(c, d)
                             && let Some(vt) = self.p.coerced(self.tcx, c, d)
                         {
-                            // the data pointer, then the vtable in the metadata word
-                            if let Some((o, off, _)) = self.operand(op) {
-                                self.write(dst, (o, off), 8);
-                            }
-                            let meta = match dst {
-                                Lv::Direct(d, doff) => Lv::Direct(d, doff + 8),
-                                Lv::Through(p, poff, inner) => Lv::Through(p, poff, inner + 8),
+                            // the data pointer, then the vtable in the metadata word, where the
+                            // pointer sits in the value (`Rc`'s, `Arc`'s field)
+                            let at = |n: u32| match dst {
+                                Lv::Direct(d, doff) => Lv::Direct(d, doff + n),
+                                Lv::Through(p, poff, inner) => Lv::Through(p, poff, inner + n),
                             };
-                            self.write_addr(meta, (vt, 0));
+                            if let Some((o, off, _)) = self.operand(op) {
+                                self.write(at(to), (o, off + from), 8);
+                            }
+                            self.write_addr(at(to + 8), (vt, 0));
                             return;
+                        }
+                        if std::env::var_os("RCBOM_PTA_DEBUG").is_some()
+                            && let Ok(src) = op.ty(self.body.locals())
+                        {
+                            eprintln!(
+                                "rcbom-pta: unsizing cast copied as is: {:?} to {dty:?} ({:?})",
+                                self.ity(src),
+                                unsize_pair(self.tcx, self.ity(src), dty).map(|(c, d, ..)| (c, d))
+                            );
                         }
                     }
                     CastKind::PointerWithExposedProvenance => {
@@ -1866,14 +1877,14 @@ impl<'tcx> Tr<'_, 'tcx> {
                         self.type_obj(t, rustc_middle::ty::Ty::new_mut_ptr(self.tcx, qty));
                         self.t.addr_deref.push((t, 0, o, off, inner));
                         // a reference to an unsized place (`&mut **b` for a `Box<dyn Tr>`, a
-                        // slice) carries the metadata of the pointer it is reached through: the
-                        // vtable a `dyn` call dispatches on
-                        if matches!(
-                            qty.kind(),
-                            rustc_middle::ty::Dynamic(..)
-                                | rustc_middle::ty::Slice(_)
-                                | rustc_middle::ty::Str
-                        ) {
+                        // slice, `&*inner` for an `RcInner<dyn Tr>`) carries the metadata of the
+                        // pointer it is reached through: the vtable a `dyn` call dispatches on
+                        if dyn_tail(self.tcx, qty)
+                            || matches!(
+                                qty.kind(),
+                                rustc_middle::ty::Slice(_) | rustc_middle::ty::Str
+                            )
+                        {
                             self.t.copy.push((t, 8, o, off + 8, 8));
                             self.write(dst, (t, 0), 16);
                         } else {
@@ -2467,13 +2478,15 @@ fn code_words<'tcx>(
                 CODE_PTR
             };
             out.push((base as u32, kind));
-            if matches!(t.kind(), K::Dynamic(..)) {
+            if dyn_tail(tcx, *t) {
                 out.push(((base + 8) as u32, CODE_VT));
             }
             true
         }
         // (elements share the first's words)
         K::Array(e, _) => code_words(tcx, *e, base, out, depth + 1),
+        // (a pattern type, `NonNull`'s `*const T is !null`, holds what its base does)
+        K::Pat(t, _) => code_words(tcx, *t, base, out, depth + 1),
         // (a union's word may hold what any of its fields may: they all sit at offset 0, as the
         // layout below gives them)
         _ => {
@@ -2521,6 +2534,7 @@ fn pointee<'tcx>(tcx: TyCtxt<'tcx>, ty: ITy<'tcx>, off: u64, depth: usize) -> Op
             let el = cx.layout_of(*e).ok()?;
             pointee(tcx, *e, off % el.size.bytes().max(1), depth + 1)
         }
+        rustc_middle::ty::Pat(t, _) => pointee(tcx, *t, off, depth + 1),
         _ => {
             let l = cx.layout_of(ty).ok()?;
             let mut layouts = vec![l];
@@ -2542,14 +2556,57 @@ fn pointee<'tcx>(tcx: TyCtxt<'tcx>, ty: ITy<'tcx>, off: u64, depth: usize) -> Op
 }
 
 /// The concrete and `dyn` types of an unsizing coercion (`&T` to `&dyn Tr`, `Box<T>` to
-/// `Box<dyn Tr>`).
+/// `Box<dyn Tr>`, `Rc<T>` to `Rc<dyn Tr>`), and the offsets of the pointer in the source and in
+/// the destination value.
 fn unsize_pair<'tcx>(
     tcx: TyCtxt<'tcx>,
     src: ITy<'tcx>,
     dst: ITy<'tcx>,
-) -> Option<(ITy<'tcx>, ITy<'tcx>)> {
-    let (s, d) = tail_pair(tcx, src, dst, 0)?;
-    matches!(d.kind(), rustc_middle::ty::Dynamic(..)).then_some((s, d))
+) -> Option<(ITy<'tcx>, ITy<'tcx>, u32, u32)> {
+    let (mut s, mut d, from, to) = tail_pair(tcx, src, dst, 0)?;
+    // a pointee whose last field is the unsized one (`RcInner<dyn Tr>` behind an `Rc`): its tail
+    for _ in 0..8 {
+        if matches!(d.kind(), rustc_middle::ty::Dynamic(..)) {
+            return Some((s, d, from, to));
+        }
+        let (rustc_middle::ty::Adt(sa, sargs), rustc_middle::ty::Adt(da, dargs)) =
+            (s.kind(), d.kind())
+        else {
+            return None;
+        };
+        if sa != da || !sa.is_struct() {
+            return None;
+        }
+        let f = sa.non_enum_variant().tail_opt()?;
+        s = f.ty(tcx, sargs).skip_normalization();
+        d = f.ty(tcx, dargs).skip_normalization();
+    }
+    None
+}
+
+/// Whether `t` is unsized with a `dyn` tail (`dyn Tr`, `RcInner<dyn Tr>` behind an `Rc`): a
+/// pointer to it holds a vtable in its metadata word.
+fn dyn_tail<'tcx>(tcx: TyCtxt<'tcx>, t: ITy<'tcx>) -> bool {
+    let mut t = t;
+    for _ in 0..8 {
+        match t.kind() {
+            rustc_middle::ty::Dynamic(..) => return true,
+            rustc_middle::ty::Adt(a, args) if a.is_struct() => {
+                let Some(f) = a.non_enum_variant().tail_opt() else {
+                    return false;
+                };
+                t = f.ty(tcx, args).skip_normalization();
+            }
+            rustc_middle::ty::Tuple(ts) => {
+                let Some(l) = ts.last() else {
+                    return false;
+                };
+                t = *l;
+            }
+            _ => return false,
+        }
+    }
+    false
 }
 
 /// Whether `c` and `d` are `dyn` types of the same principal trait (their vtables are one).
@@ -2570,25 +2627,32 @@ fn tail_pair<'tcx>(
     src: ITy<'tcx>,
     dst: ITy<'tcx>,
     depth: usize,
-) -> Option<(ITy<'tcx>, ITy<'tcx>)> {
+) -> Option<(ITy<'tcx>, ITy<'tcx>, u32, u32)> {
     if depth > 6 {
         return None;
     }
     if let (Some(s), Some(d)) = (src.builtin_deref(true), dst.builtin_deref(true)) {
-        return Some((s, d));
+        return Some((s, d, 0, 0));
     }
-    // a smart pointer: the field that differs
+    // a pattern type (`NonNull`'s `*const T is !null`): its base
+    if let (rustc_middle::ty::Pat(s, _), rustc_middle::ty::Pat(d, _)) = (src.kind(), dst.kind()) {
+        return tail_pair(tcx, *s, *d, depth + 1);
+    }
+    // a smart pointer: the field that differs, at its offset in each
     if let (rustc_middle::ty::Adt(sa, sargs), rustc_middle::ty::Adt(da, dargs)) =
         (src.kind(), dst.kind())
         && sa == da
     {
-        for f in sa.all_fields() {
+        for (i, f) in sa.all_fields().enumerate() {
             let (sf, df) = (
                 f.ty(tcx, sargs).skip_normalization(),
                 f.ty(tcx, dargs).skip_normalization(),
             );
             if sf != df {
-                return tail_pair(tcx, sf, df, depth + 1);
+                let (s, d, from, to) = tail_pair(tcx, sf, df, depth + 1)?;
+                let from = from + field_offset(tcx, src, None, i)?;
+                let to = to + field_offset(tcx, dst, None, i)?;
+                return Some((s, d, from, to));
             }
         }
     }
