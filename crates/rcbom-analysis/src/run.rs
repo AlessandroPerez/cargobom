@@ -376,8 +376,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 && site.tier == Tier::Present
                 && is_def_hash(&site.owner.id)
                 // (a closure's or `async` body's per-item site: its own arguments, as precise
-                // as an instance's, under the closure's name)
-                && !site.owner.path.contains("{closure")
+                // as an instance's, under the closure's name; not when its types are a library's
+                // generic parameters, which the instance's are as the caller chose them)
+                && (!site.owner.path.contains("{closure") || names_param(&site.target))
                 && walked.contains(&(
                     path.clone(),
                     site.span.line,

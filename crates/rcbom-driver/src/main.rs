@@ -381,6 +381,11 @@ fn analyze(tcx: TyCtxt<'_>) {
             Err(_) => cx.errors += 1,
         }
     }
+    // a library's generic functions its users can call (as `roots` finds them): their bodies,
+    // and their closures', keep the calls whose types are their parameters
+    let lib_reachable = (std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some()
+        && rustc_public::entry_fn().is_none())
+    .then(|| tcx.reachable_set(()));
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn) || !item.has_body() {
             continue;
@@ -396,6 +401,11 @@ fn analyze(tcx: TyCtxt<'_>) {
                     .unwrap_or_else(|| fn_owner_item(&cx, &item))
             };
             let did = rustc_internal::internal(cx.tcx, item.def_id());
+            let root = tcx.typeck_root_def_id(did);
+            let lib_generic = lib_reachable
+                .is_some_and(|r| root.as_local().is_some_and(|l| r.contains(&l)))
+                && rustc_public::CrateItem(rustc_internal::stable(root))
+                    .requires_monomorphization();
             let mut out = Vec::new();
             // the item body, not an instance body: for a monomorphic fn the types are the
             // same, and named consts are not evaluated away (aws-lc-rs algorithms are consts)
@@ -410,6 +420,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                     &mut out,
                     None,
                 );
+                sc.lib_generic = lib_generic;
                 sc.visit_body(&body);
                 sc.promoted_values(did);
                 let mut l = rcbom_facts::Links::default();
@@ -448,9 +459,10 @@ fn analyze(tcx: TyCtxt<'_>) {
     } else {
         roots(&cx)
     };
-    // a library's generic functions its users can call: their per-item sites (those whose
-    // crypto does not depend on the type arguments: `PrivateJar<J>::add` sealing with
-    // AES-256-GCM) are reachable, as when an instance of them is walked
+    // a library's generic functions its users can call: their per-item sites are reachable, as
+    // when an instance of them is walked: those whose crypto does not depend on the type
+    // arguments (`PrivateJar<J>::add` sealing with AES-256-GCM), and those whose types are the
+    // parameters (`v.shuffle::<R>(rng)`), unknown where no instance shows them
     let generic_paths: Vec<String> = generic.iter().map(|d| path_of(cx.tcx, *d)).collect();
     let generic: Vec<String> = generic.iter().map(|d| def_hash(cx.tcx, *d)).collect();
     let reach = (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
@@ -690,6 +702,9 @@ struct Scanner<'a, 'tcx> {
     unconvertible: bool,
     /// The item the body is of.
     def: Option<rustc_span::def_id::DefId>,
+    /// The body is of a library's generic function its users can call, or of a closure in one
+    /// (`lib_generic`): no instance of the library's own may show its calls.
+    lib_generic: bool,
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
