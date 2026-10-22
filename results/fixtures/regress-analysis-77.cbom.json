@@ -178,35 +178,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a77::Over as a77::Local>::alg; line: `impl Local for Over { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a77] in <a77::Over as a77::Local>::alg; line: `impl Local for Over { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 58,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest((h.f)(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest((h.f)(&Over), &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest(v[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a77::Over as a77::Local>::alg`; line: `let _ = digest(v[0], &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a77::Over`, the only type coerced to `dyn a77::Local` at src/main.rs:28); line: `let _ = digest(lo.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a77::Over`, the only type coerced to `dyn a77::Local` at src/main.rs:28); line: `let _ = digest(lo.alg(), &d);`; code: `digest`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in picklib::Pick::alg; line: `pub trait Pick { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: lib picklib] in picklib::Pick::alg; line: `pub trait Pick { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
             "line": 2,
             "location": "picklib/src/lib.rs",
             "offset": 56,
@@ -237,6 +237,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin a77"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib picklib"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "5"
         }
@@ -258,21 +266,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `picklib::W<picklib::L384>` is coerced to `dyn picklib::Gen` at picklib/src/lib.rs:6); line: `let _ = digest(g.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `picklib::W<picklib::L384>` is coerced to `dyn picklib::Gen` at picklib/src/lib.rs:6); line: `let _ = digest(g.alg(), &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `picklib::W<picklib::L384>` is coerced to `dyn picklib::Gen` at picklib/src/lib.rs:6); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `picklib::W<picklib::L384>` is coerced to `dyn picklib::Gen` at picklib/src/lib.rs:6); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <picklib::L384 as picklib::Pick>::alg; line: `impl Pick for L384 { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a77, lib picklib] in <picklib::L384 as picklib::Pick>::alg; line: `impl Pick for L384 { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
             "line": 8,
             "location": "picklib/src/lib.rs",
             "offset": 60,
@@ -303,6 +311,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin a77"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib picklib"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "3"
         }
@@ -324,28 +340,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a77::Fast as picklib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a77] in <a77::Fast as picklib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `picklib::W<a77::Fast>` is coerced to `dyn picklib::Gen` at src/main.rs:18); line: `let _ = digest(g.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `picklib::W<a77::Fast>` is coerced to `dyn picklib::Gen` at src/main.rs:18); line: `let _ = digest(g.alg(), &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `picklib::W<a77::Fast>` is coerced to `dyn picklib::Gen` at src/main.rs:18); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `picklib::W<a77::Fast>` is coerced to `dyn picklib::Gen` at src/main.rs:18); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a77::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a77::Fast as picklib::Pick>::alg`; line: `let _ = digest(f(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a77] in a77::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a77::Fast as picklib::Pick>::alg`; line: `let _ = digest(f(&Fast), &d);`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
@@ -374,6 +390,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin a77"
         },
         {
           "name": "rcbom:occurrences",
@@ -475,7 +495,15 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "142"
+        "value": "143"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a77"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib picklib"
       }
     ],
     "tools": {
@@ -488,7 +516,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:196e18f1-2e20-8bac-864c-4ffe3a97c7e7",
+  "serialNumber": "urn:uuid:4d00f7d9-0964-8d48-91b2-90445e6446e8",
   "specVersion": "1.7",
   "version": 1
 }

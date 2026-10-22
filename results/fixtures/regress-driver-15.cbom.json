@@ -122,77 +122,77 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in dep::N1; dep::N2 -> ring::digest::SHA256; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `N2`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15, lib dep] in dep::N1; dep::N2 -> ring::digest::SHA256; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `N2`",
             "line": 8,
             "location": "dep/src/lib.rs",
             "offset": 36,
             "symbol": "dep::N2"
           },
           {
-            "additionalContext": "[reachable] [static] in dep::N1; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin t15, lib dep] in dep::N1; line: `pub static N1: Node = Node { next: &N2, alg: Some(&SHA256) };`; code: `SHA256`",
             "line": 8,
             "location": "dep/src/lib.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in dep::N2; dep::N1 -> ring::digest::SHA256; line: `pub static N2: Node = Node { next: &N1, alg: None };`; code: `N1`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15, lib dep] in dep::N2; dep::N1 -> ring::digest::SHA256; line: `pub static N2: Node = Node { next: &N1, alg: None };`; code: `N1`",
             "line": 9,
             "location": "dep/src/lib.rs",
             "offset": 36,
             "symbol": "dep::N1"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w1; use: digest; algorithm from ring::digest::SHA256, stored in `static dep::N1`; member: table, stored by `static dep::N1`; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::w1; use: digest; algorithm from ring::digest::SHA256, stored in `static dep::N1`; member: table, stored by `static dep::N1`; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `digest`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w1; dep::N1 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N1`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15] in t15::w1; dep::N1 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N1`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "dep::N1"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w1; use: digest; algorithm from ring::digest::SHA256, stored in `static dep::N1`; member: table, stored by `static dep::N1`; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::w1; use: digest; algorithm from ring::digest::SHA256, stored in `static dep::N1`; member: table, stored by `static dep::N1`; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `digest`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 53,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w1; dep::N2 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N2`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15] in t15::w1; dep::N2 -> ring::digest::SHA256; line: `digest(dep::N1.alg.unwrap(), d).as_ref().len() + digest(dep::N2.next.alg.unwrap(), d).as_ref().len()`; code: `dep::N2`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 60,
             "symbol": "dep::N2"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::w4 at src/main.rs:21:18; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::w4::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::w4 at src/main.rs:21:18; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t15::w4::{closure#0}; instantiated by t15::w4 at src/main.rs:21:18; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin t15] in t15::w4::{closure#0}; instantiated by t15::w4 at src/main.rs:21:18; line: `ds.iter().map(|d| digest(&SHA256, d).as_ref().len()).sum()`; code: `SHA256`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::gen_hash::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2:18; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::gen_hash::{closure#0}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2:18; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::digest`",
             "line": 2,
             "location": "target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t15::gen_hash::{closure#0}; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2:18; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin t15] in t15::gen_hash::{closure#0}; instantiated by t15::gen_hash at target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs:2:18; line: `ds.iter().map(|d| ring::digest::digest(&ring::digest::SHA256, d).as_ref().len()).sum()`; code: `ring::digest::SHA256`",
             "line": 2,
             "location": "target/rcbom/target/release/build/t15/16c22113dbdda655/out/gen.rs",
             "offset": 44,
@@ -223,6 +223,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin t15"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib dep"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "11"
         }
@@ -244,21 +252,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in dep::ALG_C; line: `pub const ALG_C: &Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin t15] in dep::ALG_C; line: `pub const ALG_C: &Algorithm = &ring::digest::SHA384;`; code: `ring::digest::SHA384`",
             "line": 12,
             "location": "dep/src/lib.rs",
             "offset": 31,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w2; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::w2; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w2; dep::ALG_C -> ring::digest::SHA384; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_C`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15] in t15::w2; dep::ALG_C -> ring::digest::SHA384; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_C`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 11,
@@ -289,6 +297,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin t15"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "3"
         }
@@ -310,21 +322,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in dep::ALG_S; line: `pub static ALG_S: &Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: bin t15, lib dep] in dep::ALG_S; line: `pub static ALG_S: &Algorithm = &ring::digest::SHA512;`; code: `ring::digest::SHA512`",
             "line": 13,
             "location": "dep/src/lib.rs",
             "offset": 32,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in t15::w2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin t15] in t15::w2; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t15::w2; dep::ALG_S -> ring::digest::SHA512; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_S`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin t15] in t15::w2; dep::ALG_S -> ring::digest::SHA512; line: `digest(dep::ALG_C, d).as_ref().len() + digest(dep::ALG_S, d).as_ref().len()`; code: `dep::ALG_S`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 50,
@@ -353,6 +365,14 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin t15"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib dep"
         },
         {
           "name": "rcbom:occurrences",
@@ -449,7 +469,15 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "40"
+        "value": "41"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin t15"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib dep"
       }
     ],
     "tools": {
@@ -462,7 +490,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7bf9ff3d-43e7-822f-a574-993ef6ab371a",
+  "serialNumber": "urn:uuid:bc5bb186-547f-8811-a6ed-31c55542782c",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,25 +1,26 @@
-  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:47 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] in <a76::T as picklib::Up>::up; line: `impl Up for T { fn up(&mut self) { self.alg = &SHA1; } }`; code: `SHA1`
-  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: type-join, possible (a value `<a76::T as picklib::Up>::up` stores in the field); line: `let _ = digest(t.alg, &d);`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | picklib/src/lib.rs:2:56 | ring::digest::SHA256 | [reachable] [static] in <a76::Legacy as picklib::Pick>::alg; instantiated by a76::main at src/main.rs:20:26 as `alg`; line: `pub trait Pick { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(Legacy.alg(), &d);`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(pick(&Legacy), &d);`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(W(Legacy).alg(), &d);`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:26 | ring::digest::SHA256 | [reachable] [static] in a76::main; line: `let mut s = S { alg: &SHA256 };`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `a76::main` stores in the field); line: `let _ = digest(s.alg, &d);`; code: `digest`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:26 | ring::digest::SHA256 | [reachable] [static] in a76::main; line: `let mut t = T { alg: &SHA256 };`; code: `SHA256`
-  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a76::main` stores in the field); line: `let _ = digest(t.alg, &d);`; code: `digest`
-  occ SHA-384 | crypto:algorithm:SHA-384 | picklib/src/lib.rs:5:62 | ring::digest::SHA384 | [reachable] [static] in <picklib::Lib384 as picklib::Pick>::alg; line: `impl Pick for Lib384 { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`
-  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<picklib::Lib384 as picklib::Pick>::alg`; line: `let _ = digest(pick(&Lib384), &d);`; code: `digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | picklib/src/lib.rs:9:55 | ring::digest::digest | [reachable] [call] in picklib::digest_with::<a76::Fast>; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; instantiated by a76::main at src/main.rs:26:4 as `picklib::digest_with`; line: `pub fn digest_with<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.alg(), d); }`; code: `digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(Fast.alg(), &d);`; code: `digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(pick(&Fast), &d);`; code: `digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(W(Fast).alg(), &d);`; code: `digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:57 | ring::digest::SHA512 | [reachable] [static] in <a76::Fast as picklib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:15:47 | ring::digest::SHA1_FOR_LEGACY_USE_ONLY | [reachable] [static] [artifacts: bin a76] in <a76::T as picklib::Up>::up; line: `impl Up for T { fn up(&mut self) { self.alg = &SHA1; } }`; code: `SHA1`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: type-join, possible (a value `<a76::T as picklib::Up>::up` stores in the field); line: `let _ = digest(t.alg, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | picklib/src/lib.rs:2:56 | ring::digest::SHA256 | [reachable] [static] [artifacts: bin a76, lib picklib] in <a76::Legacy as picklib::Pick>::alg; instantiated by a76::main at src/main.rs:20:26 as `alg`; line: `pub trait Pick { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(Legacy.alg(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(pick(&Legacy), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a76::Legacy as picklib::Pick>::alg`; line: `let _ = digest(W(Legacy).alg(), &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:27:26 | ring::digest::SHA256 | [reachable] [static] [artifacts: bin a76] in a76::main; line: `let mut s = S { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:29:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `a76::main` stores in the field); line: `let _ = digest(s.alg, &d);`; code: `digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:26 | ring::digest::SHA256 | [reachable] [static] [artifacts: bin a76] in a76::main; line: `let mut t = T { alg: &SHA256 };`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `a76::main` stores in the field); line: `let _ = digest(t.alg, &d);`; code: `digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | picklib/src/lib.rs:5:62 | ring::digest::SHA384 | [reachable] [static] [artifacts: bin a76, lib picklib] in <picklib::Lib384 as picklib::Pick>::alg; line: `impl Pick for Lib384 { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:23:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<picklib::Lib384 as picklib::Pick>::alg`; line: `let _ = digest(pick(&Lib384), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | picklib/src/lib.rs:9:55 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in picklib::digest_with::<a76::Fast>; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; instantiated by a76::main at src/main.rs:26:4 as `picklib::digest_with`; line: `pub fn digest_with<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.alg(), d); }`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:19:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(Fast.alg(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:21:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(pick(&Fast), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:24:12 | ring::digest::digest | [reachable] [call] [artifacts: bin a76] in a76::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a76::Fast as picklib::Pick>::alg`; line: `let _ = digest(W(Fast).alg(), &d);`; code: `digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:9:57 | ring::digest::SHA512 | [reachable] [static] [artifacts: bin a76] in <a76::Fast as picklib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:36:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a76 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:60:0 | ring | [manifest] locked ring 0.17.14; reached via a76 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a76 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | picklib/Cargo.toml:7:0 | ring | [manifest] declared by picklib (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:artifact=bin a76
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
@@ -27,18 +28,23 @@
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=2
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin a76
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=lib picklib
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=8
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=bin a76
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=lib picklib
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:artifact=bin a76
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
@@ -82,10 +88,12 @@ provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/a76@0.1.0", "name": "a76", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a76@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a76
+run rcbom:run:artifact=lib picklib
 run rcbom:run:features=
 run rcbom:run:packages=10
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=78
+run rcbom:run:reachable-instances=79
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

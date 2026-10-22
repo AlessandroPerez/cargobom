@@ -142,14 +142,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a111::Local as tlib::Pick>::alg; line: `impl Pick for Local { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a111] in <a111::Local as tlib::Pick>::alg; line: `impl Pick for Local { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 58,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a111::Local as tlib::Pick>::alg`; line: `let _ = digest(gen_local(&Local), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a111::Local as tlib::Pick>::alg`; line: `let _ = digest(gen_local(&Local), &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
@@ -180,6 +180,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin a111"
+        },
+        {
           "name": "rcbom:param:output_bytes",
           "value": "20"
         },
@@ -205,28 +209,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<ilib::Def as tlib::Pick>::alg`; line: `let _ = digest(Def.via(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<ilib::Def as tlib::Pick>::alg`; line: `let _ = digest(Def.via(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `ilib::Def` is coerced to `dyn tlib::Pick` at tlib/src/lib.rs:17); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `ilib::Def` is coerced to `dyn tlib::Pick` at tlib/src/lib.rs:17); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `ilib::Def` is coerced to `dyn tlib::Pick` at tlib/src/lib.rs:17); line: `let _ = digest(tlib::by_dyn(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `ilib::Def` is coerced to `dyn tlib::Pick` at tlib/src/lib.rs:17); line: `let _ = digest(tlib::by_dyn(&Fast), &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <ilib::Def as tlib::Pick>::alg; instantiated by <ilib::Def as tlib::Pick>::via at tlib/src/lib.rs:4:47 as `alg`; instantiated by a111::main at src/main.rs:18:23 as `via`; line: `fn alg(&self) -> &'static Algorithm { &SHA256 }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a111, lib tlib] in <ilib::Def as tlib::Pick>::alg; instantiated by <ilib::Def as tlib::Pick>::via at tlib/src/lib.rs:4:47 as `alg`; instantiated by a111::main at src/main.rs:18:23 as `via`; line: `fn alg(&self) -> &'static Algorithm { &SHA256 }`; code: `SHA256`",
             "line": 3,
             "location": "tlib/src/lib.rs",
             "offset": 43,
@@ -240,7 +244,7 @@
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in tlib::hash_c::<ilib::CDef>; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by a111::main at src/main.rs:28:4 as `tlib::hash_c::<CDef>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in tlib::hash_c::<ilib::CDef>; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by a111::main at src/main.rs:28:4 as `tlib::hash_c::<CDef>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `digest`",
             "line": 11,
             "location": "tlib/src/lib.rs",
             "offset": 47,
@@ -271,6 +275,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin a111"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib tlib"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "6"
         }
@@ -292,35 +304,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(tlib::pick2(&Mid), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(tlib::pick2(&Mid), &d);`; code: `digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(Holder(Mid).get(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(Holder(Mid).get(), &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(tlib::by_impl(&Mid), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; line: `let _ = digest(tlib::by_impl(&Mid), &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <ilib::Mid as tlib::Pick>::alg; line: `impl Pick for Mid { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a111, lib ilib] in <ilib::Mid as tlib::Pick>::alg; line: `impl Pick for Mid { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
             "line": 6,
             "location": "ilib/src/lib.rs",
             "offset": 59,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in tlib::hash_in::<ilib::Mid>; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; instantiated by a111::main at src/main.rs:26:4 as `tlib::hash_in`; line: `pub fn hash_in<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.alg(), d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in tlib::hash_in::<ilib::Mid>; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<ilib::Mid as tlib::Pick>::alg`; instantiated by a111::main at src/main.rs:26:4 as `tlib::hash_in`; line: `pub fn hash_in<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.alg(), d); }`; code: `digest`",
             "line": 10,
             "location": "tlib/src/lib.rs",
             "offset": 51,
@@ -351,6 +363,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "bin a111"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib ilib"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "5"
         }
@@ -372,77 +392,77 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(tlib::pick(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(tlib::pick(&Fast), &d);`; code: `digest`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(tlib::clos(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(tlib::clos(&Fast), &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(Fast.via(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(Fast.via(), &d);`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(f(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; line: `let _ = digest(f(&Fast), &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `ilib::Fast` is coerced to `dyn tlib::Pick` at src/main.rs:25); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `ilib::Fast` is coerced to `dyn tlib::Pick` at src/main.rs:25); line: `let _ = digest(b.alg(), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `ilib::Fast` is coerced to `dyn tlib::Pick` at src/main.rs:25); line: `let _ = digest(tlib::by_dyn(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in a111::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `ilib::Fast` is coerced to `dyn tlib::Pick` at src/main.rs:25); line: `let _ = digest(tlib::by_dyn(&Fast), &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <ilib::Fast as tlib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Algorithm { &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a111, lib ilib] in <ilib::Fast as tlib::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Algorithm { &SHA512 } }`; code: `SHA512`",
             "line": 4,
             "location": "ilib/src/lib.rs",
             "offset": 60,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in <ilib::CFast as tlib::HasConst>::ALG; line: `impl HasConst for CFast { const ALG: &'static Algorithm = &SHA512; }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: bin a111] in <ilib::CFast as tlib::HasConst>::ALG; line: `impl HasConst for CFast { const ALG: &'static Algorithm = &SHA512; }`; code: `SHA512`",
             "line": 10,
             "location": "ilib/src/lib.rs",
             "offset": 59,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in tlib::hash_c::<ilib::CFast>; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by a111::main at src/main.rs:27:4 as `tlib::hash_c::<CFast>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in tlib::hash_c::<ilib::CFast>; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by a111::main at src/main.rs:27:4 as `tlib::hash_c::<CFast>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `digest`",
             "line": 11,
             "location": "tlib/src/lib.rs",
             "offset": 47,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in tlib::hash_c::<ilib::CFast>; <ilib::CFast as tlib::HasConst>::ALG -> ring::digest::SHA512; instantiated by a111::main at src/main.rs:27:4 as `tlib::hash_c::<CFast>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `T::ALG`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin a111] in tlib::hash_c::<ilib::CFast>; <ilib::CFast as tlib::HasConst>::ALG -> ring::digest::SHA512; instantiated by a111::main at src/main.rs:27:4 as `tlib::hash_c::<CFast>`; line: `pub fn hash_c<T: HasConst>(d: &[u8]) { let _ = digest(T::ALG, d); }`; code: `T::ALG`",
             "line": 11,
             "location": "tlib/src/lib.rs",
             "offset": 54,
             "symbol": "<ilib::CFast as tlib::HasConst>::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in tlib::hash_clos::<ilib::Fast>::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; instantiated by tlib::hash_clos::<ilib::Fast> at tlib/src/lib.rs:12:53; instantiated by a111::main at src/main.rs:29:4 as `tlib::hash_clos`; line: `pub fn hash_clos<T: Pick>(t: &T, d: &[u8]) { let f = |x: &[u8]| { let _ = digest(t.alg(), x); }; f(d) }`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin a111] in tlib::hash_clos::<ilib::Fast>::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<ilib::Fast as tlib::Pick>::alg`; instantiated by tlib::hash_clos::<ilib::Fast> at tlib/src/lib.rs:12:53; instantiated by a111::main at src/main.rs:29:4 as `tlib::hash_clos`; line: `pub fn hash_clos<T: Pick>(t: &T, d: &[u8]) { let f = |x: &[u8]| { let _ = digest(t.alg(), x); }; f(d) }`; code: `digest`",
             "line": 12,
             "location": "tlib/src/lib.rs",
             "offset": 74,
@@ -471,6 +491,14 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin a111"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib ilib"
         },
         {
           "name": "rcbom:occurrences",
@@ -580,7 +608,19 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "103"
+        "value": "104"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a111"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib ilib"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib tlib"
       }
     ],
     "tools": {
@@ -593,7 +633,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e9ef1e02-9c09-88f6-91fd-411d4ccbb7f9",
+  "serialNumber": "urn:uuid:28ef1375-fe3a-8043-9fa0-080971d2def7",
   "specVersion": "1.7",
   "version": 1
 }

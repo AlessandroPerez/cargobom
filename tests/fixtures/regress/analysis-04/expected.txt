@@ -139,10 +139,12 @@ provides pkg:cargo/sha1@0.10.7 -> crypto:candidate:sha1@0.10.7:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:candidate:sha2@0.10.9:SHA-2
 root {"bom-ref": "pkg:cargo/t4@0.1.0", "name": "t4", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t4@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin t4
+run rcbom:run:artifact=lib inner
 run rcbom:run:features=
 run rcbom:run:packages=23
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=7
+run rcbom:run:reachable-instances=8
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
