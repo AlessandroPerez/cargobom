@@ -1374,6 +1374,22 @@ pub(super) fn fn_item_runs(src: &Source, callee: &str, init: &str) -> bool {
                 })
         })
 }
+/// Where ` for ` splits an impl header's text (`Verifier<Signature> for Key`) into its trait and
+/// type: outside the trait's arguments.
+fn top_level_for(t: &str) -> Option<usize> {
+    let mut depth = 0i32;
+    for (i, c) in t.char_indices() {
+        match c {
+            '<' | '(' | '[' => depth += 1,
+            // (not a function type's `->`)
+            '>' if t[..i].ends_with('-') => {}
+            '>' | ')' | ']' => depth -= 1,
+            _ if depth == 0 && t[i..].starts_with(" for ") => return Some(i),
+            _ => {}
+        }
+    }
+    None
+}
 pub(super) fn in_item(item: &str) -> Option<InItem> {
     // the path's segments, generic arguments kept whole
     let chars: Vec<char> = item.chars().collect();
@@ -1424,7 +1440,13 @@ pub(super) fn in_item(item: &str) -> Option<InItem> {
             .collect()
     };
     let (mut mods, mut owner) = (None, None);
-    let plain: Vec<String> = kept.iter().map(|(g, _)| g.clone()).collect();
+    let mut plain: Vec<String> = kept.iter().map(|(g, _)| g.clone()).collect();
+    // an impl in another module than its type (`ssh_key::signature::<impl Verifier<Signature>
+    // for ssh_key::public::sk::SkEcdsaSha2NistP256>::verify`, the type re-exported as
+    // `public::SkEcdsaSha2NistP256`): the modules are the impl's, its block is not one of them
+    if plain.len() > 1 && plain.last().is_some_and(|g| g.starts_with("<impl ")) {
+        plain.pop();
+    }
     if plain.first().is_some_and(|g| !g.starts_with('<')) {
         match plain
             .iter()
@@ -1456,8 +1478,14 @@ pub(super) fn in_item(item: &str) -> Option<InItem> {
     if let Some((g, full)) = kept.last() {
         if let Some(inner) = g.strip_prefix('<').and_then(|g| g.strip_suffix('>')) {
             if let Some(t) = inner.strip_prefix("impl ") {
+                // `impl Trait for Type`, or an inherent impl's `impl Type`
+                let (tr, t) = match top_level_for(t) {
+                    Some(i) => (Some(&t[..i]), &t[i + " for ".len()..]),
+                    None => (None, t),
+                };
                 self_ty = Some(last_of(t));
                 self_full = Some(norm_path(t));
+                trait_name = tr.map(norm_path);
             } else if let Some((t, tr)) = inner.split_once(" as ") {
                 self_ty = Some(last_of(t));
                 self_full = Some(norm_path(t));

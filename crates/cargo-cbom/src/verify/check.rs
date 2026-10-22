@@ -1731,9 +1731,12 @@ impl Files<'_> {
                         Some(vars) => used.iter().any(|u| vars.iter().any(|v| v == u)),
                         None => !used.is_empty(),
                     };
-                    if !word.is_match(text)
-                        && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l)))
-                    {
+                    // (as a use: `fn try_from(..)` defining a function of that name, the line
+                    // before ssh-key's `VerifyingKey::try_from(&key)`, makes no such call)
+                    let named = word
+                        .find_iter(text)
+                        .any(|m| !re!(r"\bfn\s+$").is_match(&text[..m.start()]));
+                    if !named && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l))) {
                         return Err(format!(
                             "`{part}`: line {line} of the macro does not name `{ident}`"
                         ));
