@@ -466,6 +466,17 @@ primitive = "mac"
 functions = ["tag"]
 params = { hash = { arg = 0, asset = true } }
 
+# Poly1305 used on its own by a crate the walk enters (aes256ctr_poly1305aes's Poly1305-AES,
+# `Poly1305::compute_unpadded`); inside chacha20poly1305 it is part of the AEAD, which the walk
+# does not enter
+[[type]]
+crate = "poly1305"
+name = "Poly1305"
+asset = "Poly1305"
+family = "Poly1305"
+primitive = "mac"
+functions = ["tag"]
+
 [[type]]
 crate = "hkdf"
 name = "Hkdf"
@@ -2157,7 +2168,7 @@ methods = ["digest", "update", "update_reader", "chain", "chain_update", "finali
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy"]
+methods = ["update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy", "update_padded", "compute_unpadded"]
 
 [[use]]
 function = "verify"
@@ -2333,6 +2344,22 @@ self_type = true
 [[operation]]
 crate = "digest"
 path = "^mac::Mac::verify(_slice|_truncated_left|_truncated_right|_reset|_slice_reset)?$"
+primitive = "mac"
+use = "verify"
+self_type = true
+
+# A universal hash used on its own (`GHash::update_padded`, `Polyval::finalize`): the Self type
+# names it; GHASH and POLYVAL have no registry name, so they are unknown, never dropped
+[[operation]]
+crate = "universal_hash"
+path = "^UniversalHash::(update|update_padded|finalize|finalize_reset)$"
+primitive = "mac"
+use = "tag"
+self_type = true
+
+[[operation]]
+crate = "universal_hash"
+path = "^UniversalHash::verify$"
 primitive = "mac"
 use = "verify"
 self_type = true
