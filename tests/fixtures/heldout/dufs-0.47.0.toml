@@ -1,0 +1,345 @@
+# Ground truth for dufs-0.47.0 (held-out set): Layer 1 crypto packages and Layer 2 operation sites in
+# the package's own source, written from source by two independent labellers (agents, blind to
+# each other and to any tool output), differences adjudicated by the rules (22 October 2026).
+# The labellers agreed on every site; they differed on the kind of chacha20 0.10.2, built only with
+# its `rng` feature as rand 0.10's generator (uuid's `fast-rng`): `rng`, as the corpus labels rand_chacha.
+
+# Ground-truth labels: dufs 0.47.0 (/var/tmp/rcbom-validate/heldout/dufs-0.47.0)
+# Build analysed: default features ["tls"] (=> tokio-rustls with features ring, tls12, logging;
+# rustls features ring, std, tls12, logging), host x86_64-unknown-linux-gnu, release build of the
+# single binary "dufs" (src/main.rs), so no `artifacts` field (R13 does not apply).
+# Layer 1 = normal dependencies from `cargo tree -e normal --target x86_64-unknown-linux-gnu`,
+# packages reachable only through proc-macros excluded. Layer 2 = calls in src/ into crypto
+# libraries (R1, R7-R9, R12). #[cfg(test)] modules and tests/ are out of scope.
+# Run-time choices: HTTP requests and --auth rules are environment/input, so every handler reached
+# by some request counts (R3). TLS runs only with --tls-cert/--tls-key; certificates and keys are
+# loaded at run time (out of scope) and the TLS setup is one [[protocol]] entry.
+# uuid 1.28.0 is built with v4 + fast-rng: Uuid::new_v4 draws from rand 0.10 ThreadRng
+# (ChaCha12, seeded from getrandom 0.4); its rustdoc names the OS RNG (see DECISIONS).
+
+# ---------------------------------------------------------------- Layer 1
+
+[[package]]
+name = "base64ct"
+version = "1.8.3"
+kind = "support"
+why = "constant-time Base64 used by mcf/sha-crypt for the crypt(3) hash string encoding"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "RustCrypto block buffering for sha1 0.10 (digest 0.10 line)"
+
+[[package]]
+name = "block-buffer"
+version = "0.12.1"
+kind = "support"
+why = "RustCrypto block buffering for sha2 0.11 (digest 0.11 line)"
+
+[[package]]
+name = "chacha20"
+version = "0.10.2"
+kind = "rng"
+why = "built with feature rng only (no cipher): ChaCha12 core of rand 0.10 ThreadRng/StdRng, drawn by uuid new_v4 (fast-rng)"
+
+[[package]]
+name = "cmov"
+version = "0.5.4"
+kind = "support"
+why = "constant-time conditional-move intrinsics under ctutils"
+
+[[package]]
+name = "const-oid"
+version = "0.10.2"
+kind = "support"
+why = "ASN.1 object identifiers; enabled by digest 0.11 feature oid (sha2 oid)"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "common RustCrypto traits (0.1 line) used by digest 0.10 / sha1"
+
+[[package]]
+name = "crypto-common"
+version = "0.2.2"
+kind = "trait"
+why = "common RustCrypto traits (0.2 line) used by digest 0.11 / sha2 0.11"
+
+[[package]]
+name = "ctutils"
+version = "0.4.3"
+kind = "support"
+why = "constant-time selection/equality for cryptographic code; used by sha-crypt to compare hashes"
+
+[[package]]
+name = "curve25519-dalek"
+version = "5.0.0"
+kind = "algorithm"
+why = "Edwards25519 group arithmetic under ed25519-dalek"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto hash traits (0.10 line) for sha1"
+
+[[package]]
+name = "digest"
+version = "0.11.3"
+kind = "trait"
+why = "RustCrypto hash traits (0.11 line) for sha2 0.11, curve25519-dalek 5 and sha-crypt"
+
+[[package]]
+name = "ed25519"
+version = "3.0.0"
+kind = "trait"
+why = "Ed25519 signature type definitions shared by implementations, re-exports the signature traits"
+
+[[package]]
+name = "ed25519-dalek"
+version = "3.0.0"
+kind = "algorithm"
+why = "Ed25519 signing and verification of share tokens"
+
+[[package]]
+name = "getrandom"
+version = "0.2.17"
+kind = "rng"
+why = "OS random number source used by ring SystemRandom (rustls)"
+
+[[package]]
+name = "getrandom"
+version = "0.4.3"
+kind = "rng"
+why = "OS random number source seeding rand 0.10 ThreadRng (sys_rng)"
+
+[[package]]
+name = "mcf"
+version = "0.6.0"
+kind = "support"
+why = "Modular Crypt Format ($id$...) password-hash string parsing for sha-crypt"
+
+[[package]]
+name = "md5"
+version = "0.8.1"
+kind = "algorithm"
+why = "MD5 hash (HTTP Digest authentication responses and nonces)"
+
+[[package]]
+name = "password-hash"
+version = "0.6.1"
+kind = "trait"
+why = "PasswordHasher/PasswordVerifier traits implemented by sha-crypt"
+
+[[package]]
+name = "rand"
+version = "0.10.3"
+kind = "rng"
+why = "random number generation; uuid v4 (fast-rng) draws from rand::random / ThreadRng (ChaCha12)"
+
+[[package]]
+name = "rand_core"
+version = "0.10.1"
+kind = "rng"
+why = "RNG traits for rand 0.10, chacha20 rng and getrandom 0.4 SysRng"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "crypto backend of the rustls ring provider: AEAD, SHA-2, HMAC/HKDF, ECDHE, signatures, SystemRandom"
+
+[[package]]
+name = "rustls"
+version = "0.23.46"
+kind = "protocol"
+why = "TLS 1.2/1.3 server (features ring, std, tls12, logging)"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.15.1"
+kind = "pki"
+why = "certificate and private-key DER wrappers and PEM parsing (load_certs, load_private_key)"
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.15"
+kind = "pki"
+why = "WebPKI X.509 path validation and signature verification (ring backend)"
+
+[[package]]
+name = "sha-crypt"
+version = "0.6.0"
+kind = "algorithm"
+why = "SHA-256/SHA-512-crypt password hashing; verifies $6$ passwords of --auth rules"
+
+[[package]]
+name = "sha1"
+version = "0.10.7"
+kind = "algorithm"
+why = "SHA-1 used by headers 0.4 for Sec-WebSocket-Accept; compiled in, never used by dufs"
+
+[[package]]
+name = "sha2"
+version = "0.11.1"
+kind = "algorithm"
+why = "SHA-2 (SHA-256 file hashes and token key derivation; SHA-512 inside ed25519-dalek and sha-crypt)"
+
+[[package]]
+name = "signature"
+version = "3.0.0"
+kind = "trait"
+why = "Signer/Verifier traits for signature algorithms (ed25519)"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "constant-time comparison/selection primitives"
+
+[[package]]
+name = "tokio-rustls"
+version = "0.26.6"
+kind = "protocol"
+why = "async TLS acceptor wrapping rustls (features ring, tls12, logging)"
+
+[[package]]
+name = "zeroize"
+version = "1.9.1"
+kind = "support"
+why = "secure zeroing of secrets in memory"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/auth.rs"
+line = 30
+callee = "new_v4"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = ["OS-RNG"]
+note = "uuid Uuid::new_v4 (documented 'creates a random UUID') in the lazy_static NONCESTARTHASH initializer, the secret seed of the Digest-auth nonces; fast-rng makes it rand::random (ThreadRng, ChaCha12); its rustdoc names the OS RNG, so OS-RNG is may (R4.10)"
+
+[[site]]
+file = "src/auth.rs"
+line = 183
+callee = "sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+note = "ed25519-dalek Signer::sign on SigningKey in AccessControl::generate_token (?tokengen): signs path:exp with a key derived from SHA-256(user:pass)"
+
+[[site]]
+file = "src/auth.rs"
+line = 218
+callee = "verify"
+function = "verify"
+must = ["Ed25519"]
+may = []
+note = "ed25519-dalek SigningKey::verify (inherent, verifies with its verifying key) in AccessControl::verify_token for a ?token= GET"
+
+[[site]]
+file = "src/auth.rs"
+line = 494
+callee = "verify_password"
+function = "verify"
+must = ["SHA-512-crypt"]
+may = []
+note = "sha-crypt ShaCrypt::SHA512 PasswordVerifier::verify_password (R8) for Basic auth when the configured password starts with $6$, so the hash id is always 6 = SHA-512-crypt; the registry has no SHA-crypt name, so the name is not a registry name (see DECISIONS)"
+
+[[site]]
+file = "src/auth.rs"
+line = 523
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize: HA1 = MD5(user:DUFS:pass) in check_auth for an Authorization: Digest header"
+
+[[site]]
+file = "src/auth.rs"
+line = 531
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize: HA2 = MD5(method:uri) in check_auth (HTTP Digest)"
+
+[[site]]
+file = "src/auth.rs"
+line = 552
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize: response = MD5(HA1:nonce:nc:cnonce:qop:HA2) when the client sends qop=auth or auth-int"
+
+[[site]]
+file = "src/auth.rs"
+line = 565
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize: response = MD5(HA1:nonce:HA2) when no usable qop is sent"
+
+[[site]]
+file = "src/auth.rs"
+line = 581
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256 Digest::finalize of user:pass in derive_secret_key (Ed25519 seed for share tokens); reached from generate_token and verify_token; SigningKey::from_bytes on line 582 is a constructor (R1.1)"
+
+[[site]]
+file = "src/auth.rs"
+line = 603
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize of NONCESTARTHASH.clone() + timestamp in validate_nonce (Digest nonce check)"
+
+[[site]]
+file = "src/auth.rs"
+line = 709
+callee = "finalize"
+function = "digest"
+must = ["MD5"]
+may = []
+note = "md5 Context::finalize of NONCESTARTHASH.clone() + timestamp in create_nonce (WWW-Authenticate Digest challenge, sent when no password is $6$-hashed)"
+
+[[site]]
+file = "src/server.rs"
+line = 1025
+callee = "new_v4"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = ["OS-RNG"]
+note = "uuid Uuid::new_v4 for the multipart/byteranges boundary of a multi-range GET; fast-rng = rand ThreadRng (ChaCha12); rustdoc names the OS RNG (may, R4.10)"
+
+[[site]]
+file = "src/server.rs"
+line = 1318
+callee = "new_v4"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = ["OS-RNG"]
+note = "uuid Uuid::new_v4 for the WebDAV LOCK opaquelocktoken when auth is on; fast-rng = rand ThreadRng (ChaCha12); rustdoc names the OS RNG (may, R4.10)"
+
+[[site]]
+file = "src/server.rs"
+line = 2066
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+note = "sha2 Sha256 Digest::finalize in sha256_file, reached from handle_hash_file for ?hash with --allow-hash (or --allow-all)"
+
+[[protocol]]
+file = "src/main.rs"
+line = 98
+what = "tokio-rustls/rustls ServerConfig::builder_with_provider(Arc::new(ring::default_provider())).with_safe_default_protocol_versions().with_no_client_auth().with_single_cert(certs, key) when --tls-cert and --tls-key are set: rustls 0.23.46 ring provider, TLS 1.3 and 1.2 (tls12), suites TLS13_AES_256_GCM_SHA384, TLS13_AES_128_GCM_SHA256, TLS13_CHACHA20_POLY1305_SHA256, TLS_ECDHE_ECDSA/RSA_WITH_AES_256_GCM_SHA384, _AES_128_GCM_SHA256, _CHACHA20_POLY1305_SHA256; kx X25519, secp256r1, secp384r1; ALPN h2/http1.1; handshakes run in TlsAcceptor::accept (line 113); certificate and key are run-time files"

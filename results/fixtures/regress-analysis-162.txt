@@ -1,0 +1,128 @@
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via a162 -> ed25519-dalek -> curve25519-dalek -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a162 -> ed25519-dalek -> curve25519-dalek -> digest -> crypto-common
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | Cargo.lock:47:0 | curve25519-dalek | [manifest] locked curve25519-dalek 5.0.0; reached via a162 -> ed25519-dalek -> curve25519-dalek
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:74:0 | digest | [manifest] locked digest 0.11.3; reached via a162 -> ed25519-dalek -> curve25519-dalek -> digest
+  occ ed25519 | pkg:cargo/ed25519@3.0.0 | Cargo.lock:84:0 | ed25519 | [manifest] locked ed25519 3.0.0; reached via a162 -> ed25519-dalek -> ed25519
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | Cargo.lock:93:0 | ed25519-dalek | [manifest] locked ed25519-dalek 3.0.0; reached via a162 -> ed25519-dalek
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | Cargo.toml:10:0 | ed25519-dalek | [manifest] declared by a162 (dependencies)
+  occ md5 | pkg:cargo/md5@0.8.1 | Cargo.lock:127:0 | md5 | [manifest] locked md5 0.8.1; reached via a162 -> md5
+  occ md5 | pkg:cargo/md5@0.8.1 | Cargo.toml:9:0 | md5 | [manifest] declared by a162 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.11.1 | Cargo.lock:166:0 | sha2 | [manifest] locked sha2 0.11.1; reached via a162 -> ed25519-dalek -> sha2
+  occ signature | pkg:cargo/signature@3.0.0 | Cargo.lock:177:0 | signature | [manifest] locked signature 3.0.0; reached via a162 -> ed25519-dalek -> ed25519 -> signature
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:183:0 | subtle | [manifest] locked subtle 2.6.1; reached via a162 -> ed25519-dalek -> subtle
+  occ unknown | crypto:algorithm:unknown:hash:md5 | src/main.rs:9:14 | md5::Context::finalize | [reachable] [call] in a162::main; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let _ = c.finalize(); // an unknown hash (MD5)`; code: `finalize`
+  occ unknown | crypto:algorithm:unknown:signature:ed25519-dalek | src/main.rs:11:14 | signature::signer::Signer::sign | [reachable] [call] in a162::main; use: sign; algorithm unresolved: the type `ed25519_dalek::signing::SigningKey` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `let s = k.sign(&d); // an unknown signature (Ed25519)`; code: `sign`
+  occ unknown | crypto:algorithm:unknown:signature:ed25519-dalek | src/main.rs:12:14 | ed25519_dalek::signing::SigningKey::verify | [reachable] [call] in a162::main; use: verify; algorithm unresolved: `ed25519_dalek::signing::SigningKey::verify` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `let _ = k.verify(&d, &s); // an unknown signature (Ed25519)`; code: `verify`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:212:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a162 -> ed25519-dalek -> zeroize
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:kb-coverage=unsupported-version
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@3.0.0 | rcbom:crypto-role=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@3.0.0 | rcbom:kb-coverage=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@3.0.0 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@3.0.0 | rcbom:usage=reachable
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | rcbom:kb-coverage=unsupported-version
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@3.0.0 | rcbom:usage=reachable
+  prop md5 | pkg:cargo/md5@0.8.1 | rcbom:crypto-role=algorithm
+  prop md5 | pkg:cargo/md5@0.8.1 | rcbom:kb-coverage=unsupported-version
+  prop md5 | pkg:cargo/md5@0.8.1 | rcbom:scope=required
+  prop md5 | pkg:cargo/md5@0.8.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:kb-coverage=unsupported-version
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:kb-coverage=unsupported-version
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:md5 | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:signature:ed25519-dalek | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset unknown | crypto:algorithm:unknown:hash:md5 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:signature:ed25519-dalek | {"algorithmProperties": {"cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library curve25519-dalek 5.0.0 | pkg:cargo/curve25519-dalek@5.0.0 | purl pkg:cargo/curve25519-dalek@5.0.0
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library ed25519 3.0.0 | pkg:cargo/ed25519@3.0.0 | purl pkg:cargo/ed25519@3.0.0
+component library ed25519-dalek 3.0.0 | pkg:cargo/ed25519-dalek@3.0.0 | purl pkg:cargo/ed25519-dalek@3.0.0
+component library md5 0.8.1 | pkg:cargo/md5@0.8.1 | purl pkg:cargo/md5@0.8.1
+component library sha2 0.11.1 | pkg:cargo/sha2@0.11.1 | purl pkg:cargo/sha2@0.11.1
+component library signature 3.0.0 | pkg:cargo/signature@3.0.0 | purl pkg:cargo/signature@3.0.0
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/a162@0.1.0 -> pkg:cargo/ed25519-dalek@3.0.0
+dep pkg:cargo/a162@0.1.0 -> pkg:cargo/md5@0.8.1
+dep pkg:cargo/curve25519-dalek@5.0.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/curve25519-dalek@5.0.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@5.0.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/ed25519-dalek@3.0.0 -> pkg:cargo/curve25519-dalek@5.0.0
+dep pkg:cargo/ed25519-dalek@3.0.0 -> pkg:cargo/ed25519@3.0.0
+dep pkg:cargo/ed25519-dalek@3.0.0 -> pkg:cargo/sha2@0.11.1
+dep pkg:cargo/ed25519-dalek@3.0.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@3.0.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/ed25519@3.0.0 -> pkg:cargo/signature@3.0.0
+dep pkg:cargo/sha2@0.11.1 -> pkg:cargo/digest@0.11.3
+dependency crypto:algorithm:unknown:hash:md5
+dependency crypto:algorithm:unknown:signature:ed25519-dalek
+dependency pkg:cargo/a162@0.1.0
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/curve25519-dalek@5.0.0
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/ed25519-dalek@3.0.0
+dependency pkg:cargo/ed25519@3.0.0
+dependency pkg:cargo/md5@0.8.1
+dependency pkg:cargo/sha2@0.11.1
+dependency pkg:cargo/signature@3.0.0
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ed25519-dalek@3.0.0 -> crypto:algorithm:unknown:signature:ed25519-dalek
+provides pkg:cargo/md5@0.8.1 -> crypto:algorithm:unknown:hash:md5
+root {"bom-ref": "pkg:cargo/a162@0.1.0", "name": "a162", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a162@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a162
+run rcbom:run:features=
+run rcbom:run:packages=23
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=58
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
