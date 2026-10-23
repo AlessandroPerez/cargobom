@@ -529,7 +529,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/hmac@0.13.0",
@@ -565,7 +565,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/pbkdf2@0.13.0",
@@ -1399,7 +1399,7 @@
             "symbol": "rand_core::Rng::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
             "line": 209,
             "location": "src/repofile/keyfile.rs",
             "offset": 14,
@@ -1523,14 +1523,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 122,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
             "symbol": "scrypt::scrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 212,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
@@ -1868,7 +1868,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "29317"
+        "value": "37715"
       },
       {
         "name": "rcbom:run:artifact",
@@ -1885,7 +1885,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:adcf6a5a-d690-8550-b504-be7af794c060",
+  "serialNumber": "urn:uuid:9c1c5e8c-566c-8f5d-891f-676bdad91d08",
   "specVersion": "1.7",
   "version": 1
 }

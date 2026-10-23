@@ -54,7 +54,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/aes@0.8.4",
@@ -86,7 +86,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/aes-gcm@0.10.3",
@@ -269,7 +269,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/block-padding@0.3.3",
@@ -305,7 +305,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/blowfish@0.9.1",
@@ -337,7 +337,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/cbc@0.1.2",
@@ -369,7 +369,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/chacha20@0.9.1",
@@ -529,7 +529,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/ctr@0.9.2",
@@ -868,7 +868,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/ghash@0.5.1",
@@ -1093,7 +1093,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/pbkdf2@0.12.2",
@@ -1233,7 +1233,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/poly1305@0.8.0",
@@ -1265,7 +1265,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "present"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/polyval@0.6.2",
@@ -1887,6 +1887,160 @@
       "version": "1.9.1"
     },
     {
+      "bom-ref": "crypto:algorithm:AES-128-CBC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "cbc",
+          "parameterSetIdentifier": "128",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "line": 423,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "line": 427,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "line": 438,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "line": 442,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockDecryptMut::decrypt_padded_mut"
+          }
+        ]
+      },
+      "name": "AES-128-CBC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128-CTR",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "ctr",
+          "parameterSetIdentifier": "128",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "line": 453,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "line": 456,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::stream_core::StreamCipherCore::try_apply_keystream_partial"
+          }
+        ]
+      },
+      "name": "AES-128-CTR",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:AES-128-GCM",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1904,28 +2058,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 266,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 270,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 341,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 344,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -1945,7 +2099,7 @@
         },
         {
           "name": "rcbom:reachability",
-          "value": "present"
+          "value": "reachable"
         },
         {
           "name": "rcbom:functions:source",
@@ -1979,6 +2133,314 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:AES-192-CBC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "cbc",
+          "parameterSetIdentifier": "192",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "line": 423,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "line": 427,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "line": 438,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "line": 442,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockDecryptMut::decrypt_padded_mut"
+          }
+        ]
+      },
+      "name": "AES-192-CBC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-192-CTR",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "ctr",
+          "parameterSetIdentifier": "192",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "line": 453,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "line": 456,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::stream_core::StreamCipherCore::try_apply_keystream_partial"
+          }
+        ]
+      },
+      "name": "AES-192-CTR",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-CBC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "cbc",
+          "parameterSetIdentifier": "256",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "line": 423,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "line": 427,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "line": 438,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "line": 442,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::block::BlockDecryptMut::decrypt_padded_mut"
+          }
+        ]
+      },
+      "name": "AES-256-CBC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-CTR",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt",
+            "decrypt"
+          ],
+          "mode": "ctr",
+          "parameterSetIdentifier": "256",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "line": 453,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "line": 456,
+            "location": "ssh-cipher-0.2.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "cipher::stream_core::StreamCipherCore::try_apply_keystream_partial"
+          }
+        ]
+      },
+      "name": "AES-256-CTR",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:AES-256-GCM",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1996,28 +2458,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 277,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 281,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 351,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 354,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -2037,7 +2499,7 @@
         },
         {
           "name": "rcbom:reachability",
-          "value": "present"
+          "value": "reachable"
         },
         {
           "name": "rcbom:functions:source",
@@ -2086,35 +2548,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (default value) or parameter (argument 1 of the enclosing function); line: `let mut cipher = ChaCha20::new(key, &nonce.into());`; code: `ChaCha20::new`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (default value) or parameter (argument 1 of the enclosing function); line: `let mut cipher = ChaCha20::new(key, &nonce.into());`; code: `ChaCha20::new`",
             "line": 58,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 25,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; use: encrypt or decrypt; line: `cipher.apply_keystream(&mut poly1305_key);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; use: encrypt or decrypt; line: `cipher.apply_keystream(&mut poly1305_key);`; code: `apply_keystream`",
             "line": 60,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 15,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; seek: setup, not a use; line: `cipher.seek(64);`; code: `seek`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; seek: setup, not a use; line: `cipher.seek(64);`; code: `seek`",
             "line": 65,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 15,
             "symbol": "cipher::stream::StreamCipherSeek::seek"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 72,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 20,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 81,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 24,
@@ -2134,7 +2596,7 @@
         },
         {
           "name": "rcbom:reachability",
-          "value": "present"
+          "value": "reachable"
         },
         {
           "name": "rcbom:functions:source",
@@ -2149,7 +2611,7 @@
           "value": "hard-coded,parameter"
         },
         {
-          "name": "rcbom:finding:present",
+          "name": "rcbom:finding",
           "value": "hard-coded-iv"
         },
         {
@@ -2822,21 +3284,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `let mac = Poly1305::new(&poly1305_key);`; code: `Poly1305::new`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `let mac = Poly1305::new(&poly1305_key);`; code: `Poly1305::new`",
             "line": 62,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 18,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: tag; line: `self.mac.compute_unpadded(buffer).into()`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: tag; line: `self.mac.compute_unpadded(buffer).into()`; code: `compute_unpadded`",
             "line": 73,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 17,
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[present] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: tag; line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: tag; line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
             "line": 78,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 36,
@@ -2856,7 +3318,7 @@
         },
         {
           "name": "rcbom:reachability",
-          "value": "present"
+          "value": "reachable"
         },
         {
           "name": "rcbom:functions:source",
@@ -3665,7 +4127,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; line: `let private = p256::SecretKey::random(rng);`; code: `p256::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p256::SecretKey::random(rng);`; code: `p256::SecretKey::random`",
             "line": 193,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -3696,6 +4158,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:rng",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:algorithm",
           "value": "unresolved"
         },
@@ -3720,7 +4186,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; rng: parameter (argument 0 of the enclosing function); line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
             "line": 202,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -3751,6 +4217,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:provenance:rng",
+          "value": "parameter"
+        },
+        {
           "name": "rcbom:algorithm",
           "value": "unresolved"
         },
@@ -3775,7 +4245,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p521::NistP521` of p521 0.13.3, a crypto package the knowledge base does not model; line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p521::NistP521` of p521 0.13.3, a crypto package the knowledge base does not model; rng: parameter (argument 0 of the enclosing function); line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
             "line": 211,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -3804,6 +4274,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "parameter"
         },
         {
           "name": "rcbom:algorithm",
@@ -3949,7 +4423,13 @@
         "pkg:cargo/cipher@0.4.4"
       ],
       "provides": [
+        "crypto:algorithm:AES-128-CBC",
+        "crypto:algorithm:AES-128-CTR",
         "crypto:algorithm:AES-128-GCM",
+        "crypto:algorithm:AES-192-CBC",
+        "crypto:algorithm:AES-192-CTR",
+        "crypto:algorithm:AES-256-CBC",
+        "crypto:algorithm:AES-256-CTR",
         "crypto:algorithm:AES-256-GCM"
       ],
       "ref": "pkg:cargo/aes@0.8.4"
@@ -4010,6 +4490,11 @@
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
       ],
+      "provides": [
+        "crypto:algorithm:AES-128-CBC",
+        "crypto:algorithm:AES-192-CBC",
+        "crypto:algorithm:AES-256-CBC"
+      ],
       "ref": "pkg:cargo/cbc@0.1.2"
     },
     {
@@ -4050,6 +4535,11 @@
     {
       "dependsOn": [
         "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-CTR",
+        "crypto:algorithm:AES-192-CTR",
+        "crypto:algorithm:AES-256-CTR"
       ],
       "ref": "pkg:cargo/ctr@0.9.2"
     },
@@ -4423,7 +4913,31 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CTR"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:AES-128-GCM"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-192-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-192-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CBC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CTR"
     },
     {
       "dependsOn": [],
@@ -4559,7 +5073,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "4582"
+        "value": "4798"
       },
       {
         "name": "rcbom:run:artifact",
@@ -4576,7 +5090,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:688710c6-092c-80ee-b92a-07c3d202daf0",
+  "serialNumber": "urn:uuid:64a960c1-0052-8984-bacd-76cb07894a9a",
   "specVersion": "1.7",
   "version": 1
 }
