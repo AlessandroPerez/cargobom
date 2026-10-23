@@ -1,0 +1,265 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a166 -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a166 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a166 -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-GCM",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "mode": "gcm",
+          "parameterSetIdentifier": "256",
+          "primitive": "ae"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a166::seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (32 bytes, literal at line 13) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "ring::aead::unbound_key::UnboundKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a166::seal; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 46,
+            "symbol": "ring::aead::algorithm::AES_256_GCM"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a166::seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 7); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
+          }
+        ]
+      },
+      "name": "AES-256-GCM",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "environment,hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:provenance:nonce",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a166@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-256-GCM"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-GCM"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a166@0.1.0",
+      "name": "a166",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a166@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "65"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a166"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:87e1fc25-fd25-8e3e-a350-2711d9de61d7",
+  "specVersion": "1.7",
+  "version": 1
+}

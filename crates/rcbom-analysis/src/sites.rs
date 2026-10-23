@@ -607,7 +607,10 @@ pub(super) fn site_matches(
             // ring / aws-lc-rs: keys are untyped, the algorithm is a static passed when the key
             // was built. `k.seal_in_place_append_tag(..)` gets AES-256-GCM from the
             // `UnboundKey::new(&AES_256_GCM, ..)` in the origin of `k`.
-            let has_roles = || !provenance::of_call(kb, &ctx.flow, &site.target, false).is_empty();
+            let has_roles = || {
+                !provenance::of_call(kb, &ctx.flow, &site.owner.path, &site.target, false)
+                    .is_empty()
+            };
             // a call that can give an occurrence: the method is a use, or it has key-material
             // roles (most calls into a protocol crate's own code are neither)
             let can_occur = || {
