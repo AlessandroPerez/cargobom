@@ -138,6 +138,7 @@ Layers 1 and 2 and the verifier are built, and evaluated on:
 - six real projects with labels;
 - seven held-out crates.io crates, labelled blind before any run;
 - the labelled rusi fixtures, against rusi;
-- an external reference case.
+- an external reference case;
+- an independent review of the whole project, which reproduced every number and labelled two more crates blind (the review set).
 
-The numbers are in the README's Results. Layers 3 to 5 are designed, not built.
+The numbers are in the README's Results. Its Limitations lists what the CBOM covers, where it deliberately differs from a label written by the rules, and what it does not do yet. Layers 3 to 5 are designed, not built.

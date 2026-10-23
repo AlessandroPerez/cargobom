@@ -57,10 +57,12 @@ cargo cbom
 - **The knowledge base** (`crates/rcbom-kb/data/seed.toml`) is data: crates and their roles, types, statics and
   functions that are algorithms, operations, uses, argument roles, provenance sources, and
   boundary models.
-- **The verifier** reopens every cited file and checks each position and detail against the
-  code (the token named, the descriptor read by the call, bindings in scope, closures, macro
-  rules, coercions); `--self-test` shifts every position by a line and a column and counts how
-  many shifts it rejects.
+- **The verifier** reopens every cited file and checks each position, and the details it can
+  read in the code (the token named, the item around it, the descriptor read by the call,
+  bindings in scope, closures, macro rules, coercions, witnesses); `--self-test` shifts every
+  position by a line and a column and counts how many shifts it rejects. What comes from the
+  walk or the value search (tiers, provenance classes, set labels) it does not check
+  (Limitations).
 
 ## Build
 
@@ -107,9 +109,11 @@ cargo xtask suite <out> tests/fixtures/suite/*       # the ground-truth suite: 5
 cargo xtask corpus-run <work> <out> tests/fixtures/corpus/*.toml     # the real projects' CBOMs:
                                                      # each package fetched from crates.io as
                                                      # published (`tests/fixtures/projects.toml`),
-                                                     # generated and verified; heldout/ likewise
+                                                     # generated and verified; heldout/, review/
+                                                     # likewise
 cargo xtask corpus-score <out> tests/fixtures/corpus/*.toml          # six real projects
 cargo xtask corpus-score <out> tests/fixtures/heldout/*.toml         # seven held-out crates
+cargo xtask corpus-score <out> tests/fixtures/review/*.toml          # the reviewer's two crates
 cargo xtask score tests/fixtures/rusi/<fixture>/labels.toml <cbom>   # any tool's CBOM
 cargo xtask rusi-to-cbom <rusi report>               # a rusi report as a CBOM, for `score`
 cargo xtask review-sheet <fixture>...                # labels next to their source lines
@@ -121,20 +125,24 @@ Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is ze
 ## Results
 
 Every number comes from the outputs in `results/`, which the commands above regenerate; the
-corpus and held-out projects are crates.io packages as published, pinned by their sha256. Labels
-were written from source by agents that never saw tool output (`docs/suite/RULES.md`): two
-independent labellers per set, compared, and adjudicated by the rules. The held-out crates were chosen after development,
-and their labels were frozen before the first run.
+corpus, held-out and review projects are crates.io packages as published, pinned by their
+sha256. Labels were written from source by agents that never saw tool output
+(`docs/suite/RULES.md`). For the suite, corpus and held-out sets: two independent labellers per
+set, compared, and adjudicated by the rules; the held-out crates were chosen after development
+and their labels frozen before the first run (dufs and rustic_core were then used to fix code,
+jwt and ssh-key the verifier). The review crates were chosen and labelled blind by an
+independent reviewer of the whole project, then used for the fixes its review found.
 
 | set | what | result |
 |---|---|---|
 | ground-truth suite | 53 programs, 107 call sites | 104 correct, 3 less-specific, 0 wrong, 0 miss |
-| corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 38 sites: 28 correct, 4 honest-unknown, 6 miss, 0 wrong |
-| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 sites: 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
+| corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 28 live sites: 18 correct, 4 honest-unknown, 6 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
+| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, 0 wrong; 10 dead sites, nothing reported there |
+| review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 28 correct, 1 less-specific, 1 honest-unknown, 3 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures: 19,153 positions, all verified but 4 the verifier cannot confirm (each checked correct by hand); corpus 1,808 and held-out 1,259, all verified; every one of 89,086 positions shifted by a line or a column rejected |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs |
-| cost | one cold run per project on 6 cores: compilation, analysis, walk check | 5 s (minisign, totp-rs) to 173 s (xh); peak memory of the process tree 0.3 to 3.4 GB; reruns reproduce each CBOM exactly |
+| evidence | every cited position, `verify --self-test` | fixtures: 19,211 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,808, held-out 1,277 and review 781, all verified; every one of 93,192 positions shifted by a line or a column rejected |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
+| cost | one cold run per project on 6 cores: compilation, analysis, walk check | 4 s (totp-rs) to 177 s (xh) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw); reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
 - **Misses.** The corpus misses are calls into crates the knowledge base does not model at their
@@ -142,30 +150,72 @@ Where it is not exact, the CBOM says so instead of guessing:
   inside those crates, not at the program's call. In the held-out set, three are dufs's
   `Uuid::new_v4` (the draw is reported at uuid's own call), and one is ssh-key's RSA key
   generation, which is reported as RSA private-key material, not as the scheme the label names.
+  In the review set, rbw's `Uuid::new_v4` and its two calls of totp-rs's `generate_current`
+  are cited inside uuid and totp-rs.
 - **Honest unknowns.** In the held-out set these are mostly crates at versions the knowledge base
   does not cover: the newer RustCrypto generation (sha2 0.11, hmac 0.13, rand 0.10, scrypt 0.12,
-  md5 0.8, ed25519-dalek 3, blake2 0.11). They are reported as operations of unknown
-  algorithm, with the package and the reason. The others are types a library's callers choose.
+  md5 0.8, ed25519-dalek 3), and blake2, which it does not model (boringtun's BLAKE2s). They are
+  reported as operations of unknown algorithm, with the package and the reason. The others are
+  types a library's callers choose.
 
 ## Limitations
 
-- **The built artifact only:** one target, one feature set, the `release` profile. Tests, build
-  scripts, and code that other features or targets would compile are not covered.
-- **Out of scope by decision:** hand-rolled algorithms, unsafe code, certificates loaded at run
-  time, and security configuration.
-- **Knowledge-base coverage:** the RustCrypto 0.10 generation, ring 0.17, aws-lc-rs 1, rustls
-  0.23, jsonwebtoken 9 and rand 0.8 to 0.9. Other versions and unmodelled crypto packages are
-  reported, with their operations as unknown.
-- **Unmodelled boundaries:** crates the knowledge base does not model at their boundary are
-  walked into, so their calls are cited there.
-- **Values:** values are followed through def-use origins, links across functions and standard
-  library summaries, not through a points-to analysis. Where a value is not followed, the CBOM
-  says unknown; the opt-in points-to engine only removes doubt.
-- **Generic library code:** in a library, a generic function's type parameters belong to its
-  callers, so an operation on one is unknown.
-- **The verifier:** it is text-based. It does not read writes made by code it does not see, and
-  it confirms some identical adjacent candidates only within a range of lines.
-- **Toolchain:** the driver needs its pinned nightly. Layer 2 compiles the project, so the
+What the CBOM covers, what it reports differently from a reading of the labelling rules, and
+what it does not do yet. A reviewer meeting one of these meets a known limit, not a new finding.
+
+**Scope, by decision**
+- The built artifact only: one target, one feature set, the `release` profile. Tests, build
+  scripts, examples, and code that other features or targets would compile are not covered.
+- Hand-rolled algorithms, unsafe code, certificates loaded at run time, and security
+  configuration (which TLS suites a configuration allows) are out of scope.
+- Knowledge-base coverage: the RustCrypto 0.10 generation, ring 0.17, aws-lc-rs 1, rustls 0.23,
+  jsonwebtoken 9, rand 0.8 to 0.9. Other versions and unmodelled crypto packages are reported,
+  with their operations as unknown and the reason.
+- Layers 3 to 5 (purpose, vulnerabilities, policy) are designed, not built: no occurrence says
+  whether it protects anything (`rcbom:usage` is Layer 1's usage tier).
+
+**Conventions: where the CBOM differs from a label written by the rules**
+- Inside a dependency the knowledge base does not model at its boundary, calls are cited there
+  (rage's calls into age are cited in age), not at the program's call into it. Inside algorithm
+  crates nothing is cited: their internals are folded into the call into them.
+- Streaming steps the knowledge base lists (`Digest::update`, `Mac::update`, ring's
+  `Prk::expand`) are reported beside the call that finishes the stream; the rules label only
+  the latter (the scorers count them as unlabelled uses, never as wrong).
+- A call through a function pointer read from a table is cited at the calls the pointed-to
+  functions make into the crypto library, not at the indirect call.
+- RSA key generation (`RsaPrivateKey::new`) is reported as RSA private-key material with its
+  `keygen` use, not as a signature or encryption scheme.
+- A TLS protocol asset lists the versions, suites and groups the build's provider offers, not
+  those a `ClientConfig` restricts it to.
+- A set member that reaches a function several artifacts share from one artifact's code is
+  tagged with every artifact reaching the call: the tags may say too much, never too little.
+
+**Known limits**
+- *Layer 1 from metadata.* An unmodelled package is a crypto package when its `Cargo.toml` says
+  so (category or keyword) or the knowledge base lists it, and `support` when its categories
+  are an encoding's or a parser's. Metadata cannot tell every case (ssh-key, which signs, has
+  der's categories; totp-rs names no crypto), so such packages are listed by name; one not yet
+  listed is reported as `support` or not at all, while its operations are still in Layer 2.
+- *Values.* Values are followed through def-use origins, links across functions and
+  standard-library summaries, not a points-to analysis. Where one is not followed, the CBOM
+  says unknown with the reason (`in-too-deep.md` 6.9); the opt-in points-to engine only removes
+  doubt and was not part of the evaluation.
+- *Generic library code.* In a library, a generic function's type parameters belong to its
+  callers: an operation on one is unknown, or named only as far as the library fixes it
+  (`HMAC` of a caller's hash).
+- *Provenance.* Key material is classified for the arguments the knowledge base gives a role;
+  a generator handed to an API without an `rng` role is not classified, and gets no
+  `predictable-rng` finding.
+- *Parameters.* `rcbom:param:*` properties are not scored against the labels' `params`.
+- *The verifier* is text-based. It checks every position, the token and item there, and the
+  details it can read in the source (the descriptor a call reads, witnesses, bindings,
+  `instantiated by` calls, coercions, macro rules, manifest entries). It does not check the
+  reachability tier, artifact tags, provenance classes, which of an asset's functions a call
+  performs, set labels (member kind, `possible`, `one of N`), the reason of an unknown, or a
+  registry name outside boundary models; and it cannot see an operation the CBOM leaves out
+  (`in-too-deep.md` 8). Four fixture positions it cannot confirm are listed in `verify-known`
+  files, each checked by hand.
+- *Toolchain.* The driver needs its pinned nightly. Layer 2 compiles the project, so the
   project's build scripts and procedural macros run.
 
 ## Layout
@@ -179,7 +229,7 @@ Where it is not exact, the CBOM says so instead of guessing:
 | `crates/rcbom-kb` | knowledge base loader and data (`data/`: the seed, and the Cryptography Registry, Apache-2.0) |
 | `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, CycloneDX assembly |
 | `xtask` | the project's tasks: checks, e2e, scorers, summaries |
-| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run), `projects.toml` (the package behind each corpus and held-out label); each fixture with its golden `expected.txt` |
+| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run), `review/` (an independent reviewer's blind labels for two crates), `projects.toml` (the package behind each corpus, held-out and review label); each fixture with its golden `expected.txt` |
 | `tests/external/` | inputs from an external reference case (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
 | `docs/` | `poc_workflow.md` (the tool, its five layers, related tools), `in-too-deep.md` (how each stage works), `suite/RULES.md` (the labelling rules every label file follows) |
