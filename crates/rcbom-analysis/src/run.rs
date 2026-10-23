@@ -679,7 +679,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let protocol = kb
                 .crate_by_name(&site.owner.krate.name)
                 .is_some_and(|c| c.role == Role::Protocol);
-            let prov = provenance::of_call(kb, &ctx.flow, &site.target, protocol);
+            let prov = provenance::of_call(kb, &ctx.flow, &site.owner.path, &site.target, protocol);
             for (m, kind, function, symbol, detail, unreached) in matches {
                 let tier = if unreached { Tier::Present } else { tier };
                 let artifacts = if unreached {

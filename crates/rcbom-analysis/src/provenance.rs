@@ -62,6 +62,7 @@ pub(crate) fn length_args(kb: &Kb, paths: &[String]) -> HashSet<usize> {
 pub fn of_call(
     kb: &Kb,
     links: &LinkIndex,
+    owner: &str,
     target: &Target,
     protocol: bool,
 ) -> Vec<(String, BTreeSet<Class>)> {
@@ -87,7 +88,7 @@ pub fn of_call(
             }
             if let Some(o) = arg_origins.get(*i) {
                 let mut classes = BTreeSet::new();
-                classify(kb, links, o, 0, &mut classes);
+                classify(kb, links, owner, o, 0, &mut classes);
                 // a constant array or static passed directly, whose length the type gives
                 if let Some(Some(n)) = arg_lens.get(*i)
                     && is_direct_data(o)
@@ -150,7 +151,7 @@ pub fn of_call(
         let mut classes = BTreeSet::new();
         for ty in tys {
             for v in links.impl_returns(&p.method, &ty) {
-                classify(kb, links, &v, 0, &mut classes);
+                classify(kb, links, "", &v, 0, &mut classes);
             }
         }
         if classes.is_empty() {
@@ -203,7 +204,14 @@ fn matches(pattern: &regex::Regex, callee: &str, self_ty: Option<&str>) -> bool 
         || self_ty.is_some_and(|t| pattern.is_match(&format!("{t}::{}", last(&stripped))))
 }
 
-fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTreeSet<Class>) {
+fn classify(
+    kb: &Kb,
+    links: &LinkIndex,
+    owner: &str,
+    o: &Origin,
+    depth: usize,
+    out: &mut BTreeSet<Class>,
+) {
     let class = |kind: &str, detail: String| Class {
         kind: kind.to_string(),
         detail,
@@ -246,8 +254,9 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     format!("run-time contents of static {}", short(&def.path)),
                 ));
             }
+            // (written by other functions: their parameters are not this one's)
             for v in values {
-                classify(kb, links, v, depth + 1, out);
+                classify(kb, links, "", v, depth + 1, out);
             }
         }
         Origin::Data { def, zero, .. } => {
@@ -268,17 +277,28 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         } => match links.field_parts(crate::links::peel(base), adt, *field) {
             Some(parts) => parts
                 .iter()
-                .for_each(|p| classify(kb, links, p, depth + 1, out)),
-            None => classify(kb, links, base, depth + 1, out),
+                .for_each(|p| classify(kb, links, "", p, depth + 1, out)),
+            None => classify(kb, links, owner, base, depth + 1, out),
         },
-        Origin::Param { index, owner } => {
+        Origin::Param { index, owner: of } => {
             out.insert(class(
                 "parameter",
-                match owner {
+                match of {
                     Some(f) => format!("argument {index} of {}", short(f)),
                     None => format!("argument {index} of the enclosing function"),
                 },
             ));
+            // and what the program's callers pass there (`seal(&[1u8; 32], msg)`: hard-coded),
+            // each in its caller; the parameter stays, for callers outside the program or
+            // through pointers
+            let func = of.as_deref().unwrap_or(owner);
+            if !func.is_empty() {
+                for (caller, args) in links.callers_of(func) {
+                    if let Some(a) = args.get(*index) {
+                        classify(kb, links, caller, a, depth + 1, out);
+                    }
+                }
+            }
         }
         // a value of a field-less type: its type may be a source (`OsRng`)
         Origin::Unit { path, .. } => {
@@ -297,7 +317,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
             && callee.ends_with("::unwrap_or_default") =>
         {
             args.iter()
-                .for_each(|a| classify(kb, links, a, depth + 1, out));
+                .for_each(|a| classify(kb, links, owner, a, depth + 1, out));
         }
         Origin::Call {
             callee,
@@ -312,7 +332,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
             // closure returns
             if callee == "<closure>" {
                 for a in args {
-                    classify(kb, links, a, depth + 1, out);
+                    classify(kb, links, owner, a, depth + 1, out);
                 }
                 return;
             }
@@ -345,7 +365,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     && let Some(seed) = args.first().and_then(|r| seeded(kb, r, 0))
                 {
                     let mut inner = BTreeSet::new();
-                    classify(kb, links, seed, depth + 1, &mut inner);
+                    classify(kb, links, owner, seed, depth + 1, &mut inner);
                     for c in inner {
                         out.insert(class(
                             &c.kind,
@@ -377,10 +397,10 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     .filter_map(|i| args.get(*i).cloned())
                     .collect();
                 if data.len() > 1 {
-                    of_inputs(kb, links, &data, depth, out);
+                    of_inputs(kb, links, owner, &data, depth, out);
                 } else {
                     data.iter()
-                        .for_each(|a| classify(kb, links, a, depth + 1, out));
+                        .for_each(|a| classify(kb, links, owner, a, depth + 1, out));
                 }
             } else if path.ends_with("::default::Default::default") && args.is_empty() {
                 // `[u8; 32]::default()`, `GenericArray::default()`, a crypto type's default: a
@@ -424,7 +444,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     // length of its own (`&zeroes[..32]` is not the 64 bytes of `zeroes`); all
                     // of it with `[..]`
                     let mut inner = BTreeSet::new();
-                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    classify(kb, links, owner, &args[0], depth + 1, &mut inner);
                     if whole_range(args.get(1)) {
                         out.extend(inner);
                     } else {
@@ -434,27 +454,27 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                     // copies of the element: `vec![0; n]` (the length is not data, nor is the
                     // element's own)
                     let mut inner = BTreeSet::new();
-                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    classify(kb, links, owner, &args[0], depth + 1, &mut inner);
                     out.extend(inner.into_iter().map(without_length));
                 } else if LOOKUPS.iter().any(|m| path.ends_with(m)) {
                     // a lookup in a container (`map.get(&kid)`, `iter.find(..)`): one of the
                     // values it holds, not the key looked up
-                    classify(kb, links, &args[0], depth + 1, out);
+                    classify(kb, links, owner, &args[0], depth + 1, out);
                 } else if ERROR_ARGS.iter().any(|m| path.ends_with(m)) {
                     // the value is the receiver: `expect(msg)`, `ok_or(err)`, `map_err(f)` (the
                     // other argument is what an error carries)
-                    classify(kb, links, &args[0], depth + 1, out);
+                    classify(kb, links, owner, &args[0], depth + 1, out);
                 } else if FALLBACKS.iter().any(|m| path.ends_with(m)) {
                     // the receiver, or what the fallback supplies instead
                     // (`unwrap_or_else(|_| "literal")`): either one
                     for a in args {
-                        classify(kb, links, a, depth + 1, out);
+                        classify(kb, links, owner, a, depth + 1, out);
                     }
                 } else {
                     // anything else computes its result from all its inputs
                     // (`b"..".iter().chain(secret.iter())`, `1_000u64.wrapping_add(seq)`,
                     // `u64::from_str_radix(s, 16)`): hard-coded only if all of them are
-                    of_inputs(kb, links, args, depth, out);
+                    of_inputs(kb, links, owner, args, depth, out);
                 }
             } else if kb.crate_by_name(krate).is_some() {
                 // a crypto crate's constructor or computation (`Nonce::assume_unique_for_key`,
@@ -463,7 +483,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 // data from the receiver (`&key[..32]`: the range is not key material).
                 if INDEXING.iter().any(|m| path.ends_with(m)) {
                     let mut inner = BTreeSet::new();
-                    classify(kb, links, &args[0], depth + 1, &mut inner);
+                    classify(kb, links, owner, &args[0], depth + 1, &mut inner);
                     if whole_range(args.get(1)) {
                         out.extend(inner);
                     } else {
@@ -472,9 +492,30 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 } else if LOOKUPS.iter().any(|m| path.ends_with(m)) && !args.is_empty() {
                     // a lookup (`jwks.find(&kid)`): what it finds is held by the receiver; the
                     // key it looks up with is not key material
-                    classify(kb, links, &args[0], depth + 1, out);
+                    classify(kb, links, owner, &args[0], depth + 1, out);
                 } else {
-                    of_inputs(kb, links, args, depth, out);
+                    // (a protocol crate's that combines data from two arguments or more,
+                    // rustls's `Nonce::new(&self.iv, seq)` being `iv ^ seq`: computed, from them,
+                    // unless all are constants; an algorithm crate's call is the operation, its
+                    // output a function of its input, `OutputReader::fill(&mut key)` derived)
+                    let protocol = kb
+                        .crate_by_name(krate)
+                        .is_some_and(|c| c.role == rcbom_kb::Role::Protocol);
+                    let carrying = args
+                        .iter()
+                        .filter(|a| {
+                            let mut c = BTreeSet::new();
+                            classify(kb, links, owner, a, depth + 1, &mut c);
+                            !c.is_empty()
+                        })
+                        .count();
+                    let mut inner = BTreeSet::new();
+                    of_inputs(kb, links, owner, args, depth, &mut inner);
+                    if protocol && carrying > 1 && inner.iter().any(|c| c.kind != "hard-coded") {
+                        out.insert(class("computed", short(&path)));
+                    } else {
+                        out.extend(inner);
+                    }
                 }
             } else {
                 // any other function (the program's own `hkdf(key, LABEL, &[])`, a dependency
@@ -487,7 +528,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         Origin::Written { callee, .. } => match links.values(o, "") {
             Some(vs) if !vs.is_empty() => vs
                 .iter()
-                .for_each(|(v, _)| classify(kb, links, v, depth + 1, out)),
+                .for_each(|(v, w)| classify(kb, links, w, v, depth + 1, out)),
             _ => {
                 out.insert(class(
                     "computed",
@@ -512,7 +553,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         Origin::Any(alts) if alts.iter().any(recurs) => {
             let mut inner = BTreeSet::new();
             alts.iter()
-                .for_each(|a| classify(kb, links, a, depth + 1, &mut inner));
+                .for_each(|a| classify(kb, links, owner, a, depth + 1, &mut inner));
             out.extend(inner.into_iter().filter(|c| c.kind != "hard-coded"));
             out.insert(class(
                 "computed",
@@ -521,7 +562,7 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         }
         Origin::Any(alts) => alts
             .iter()
-            .for_each(|a| classify(kb, links, a, depth + 1, out)),
+            .for_each(|a| classify(kb, links, owner, a, depth + 1, out)),
         Origin::Loop => {
             out.insert(class(
                 "computed",
@@ -530,9 +571,9 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
         }
         // built from all of these parts (`[user, b"pepper"].concat()`, `key[31] = 1` after the
         // key was read from the environment): a constant only if every part is
-        Origin::All(parts) => of_inputs(kb, links, parts, depth, out),
+        Origin::All(parts) => of_inputs(kb, links, owner, parts, depth, out),
         // a field written into the value: what was written
-        Origin::Set { value, .. } => classify(kb, links, value, depth, out),
+        Origin::Set { value, .. } => classify(kb, links, owner, value, depth, out),
         Origin::Truncated => {
             out.insert(class("unknown", "origin search bound reached".into()));
         }
@@ -597,14 +638,21 @@ fn recurs(o: &Origin) -> bool {
 /// otherwise whatever its varying inputs are. Inputs that carry no data (an algorithm
 /// descriptor, a value of a field-less type that is no source) are left out; an input whose
 /// origin is unknown keeps the value from being hard-coded.
-fn of_inputs(kb: &Kb, links: &LinkIndex, args: &[Origin], depth: usize, out: &mut BTreeSet<Class>) {
+fn of_inputs(
+    kb: &Kb,
+    links: &LinkIndex,
+    owner: &str,
+    args: &[Origin],
+    depth: usize,
+    out: &mut BTreeSet<Class>,
+) {
     let mut constant = true;
     let mut hard_coded = BTreeSet::new();
     let mut varying = BTreeSet::new();
     let mut any = false;
     for a in args {
         let mut classes = BTreeSet::new();
-        classify(kb, links, a, depth + 1, &mut classes);
+        classify(kb, links, owner, a, depth + 1, &mut classes);
         if classes.is_empty() {
             let no_data = matches!(a, Origin::Unit { .. })
                 || matches!(a, Origin::Data { def, .. } if is_descriptor(kb, def))
@@ -1182,7 +1230,7 @@ mod tests {
             fed: None,
         };
         let mut out = BTreeSet::new();
-        classify(&kb, &LinkIndex::default(), &key, 0, &mut out);
+        classify(&kb, &LinkIndex::default(), "", &key, 0, &mut out);
         let kinds: Vec<_> = out.iter().map(|c| c.kind.as_str()).collect();
         assert_eq!(kinds, ["parameter"]);
         // a static that is not a descriptor is data compiled in
@@ -1190,6 +1238,7 @@ mod tests {
         classify(
             &kb,
             &LinkIndex::default(),
+            "",
             &data("app", "app::MASTER_KEY"),
             0,
             &mut out,
@@ -1243,7 +1292,7 @@ mod tests {
             value: false,
         };
         let salt = |protocol: bool| -> Vec<String> {
-            of_call(&kb, &LinkIndex::default(), &call(1), protocol)
+            of_call(&kb, &LinkIndex::default(), "", &call(1), protocol)
                 .iter()
                 .filter(|(r, _)| r == "salt")
                 .flat_map(|(_, c)| c.iter().map(|c| c.kind.clone()))
@@ -1279,7 +1328,7 @@ mod tests {
 
     fn kinds(kb: &Kb, o: &Origin) -> Vec<String> {
         let mut out = BTreeSet::new();
-        classify(kb, &LinkIndex::default(), o, 0, &mut out);
+        classify(kb, &LinkIndex::default(), "", o, 0, &mut out);
         out.into_iter().map(|c| c.kind).collect()
     }
 
@@ -1299,6 +1348,23 @@ mod tests {
             ],
         );
         assert_eq!(kinds(&kb, &mixed), ["parameter"]);
+        // a protocol crate's combining two values is computed from them (rustls's
+        // `Nonce::new(&self.iv, seq)`, `iv ^ seq`), not the parameters themselves
+        let combined = call(
+            "rustls::crypto::cipher::Nonce::new",
+            "rustls",
+            vec![
+                Origin::Param {
+                    index: 0,
+                    owner: None,
+                },
+                Origin::Param {
+                    index: 2,
+                    owner: None,
+                },
+            ],
+        );
+        assert_eq!(kinds(&kb, &combined), ["computed"]);
         // of constants only, it is a constant
         let constant = call(
             "ring::aead::Nonce::assume_unique_for_key",
