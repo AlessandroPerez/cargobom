@@ -78,6 +78,11 @@ pub(super) fn roots(
                 fns.push(i);
             }
         }
+        for i in generic_callees(cx, &generic) {
+            if !fns.contains(&i) {
+                fns.push(i);
+            }
+        }
     }
     let mut statics = Vec::new();
     for did in tcx.hir_body_owners().map(|d| d.to_def_id()) {
@@ -96,6 +101,88 @@ pub(super) fn roots(
         }
     }
     (fns, statics, generic)
+}
+/// Bodies `generic_callees` reads at most.
+const MAX_GENERIC_BODIES: usize = 50_000;
+
+/// What a library's generic functions run whatever their type arguments: the calls in them
+/// whose callee and arguments are all known (`self.cipher.decrypt(..)`, a function of ssh-cipher,
+/// in ssh-key's `PrivateKey::decrypt(&self, password: impl AsRef<[u8]>)`) and the function items
+/// they pass on, which every instance a user makes calls; `reachable_set` names only the
+/// library's own. A call whose arguments are the caller's types is followed into the callee's
+/// generic body, as are the closures and `async` bodies built, outside the standard library; a
+/// trait method called on a type parameter has no body to follow (its type is the caller's).
+fn generic_callees(cx: &Cx<'_>, generic: &[rustc_span::def_id::DefId]) -> Vec<Instance> {
+    use rustc_middle::mir::visit::Visitor;
+    use rustc_middle::{mir, ty};
+    use rustc_span::def_id::DefId;
+    struct V<'tcx> {
+        calls: Vec<(DefId, ty::GenericArgsRef<'tcx>)>,
+        bodies: Vec<DefId>,
+    }
+    impl<'tcx> Visitor<'tcx> for V<'tcx> {
+        fn visit_const_operand(&mut self, c: &mir::ConstOperand<'tcx>, _: mir::Location) {
+            if let ty::FnDef(def, args) = *c.const_.ty().kind() {
+                self.calls.push((def, args.skip_binder()));
+            }
+        }
+        fn visit_rvalue(&mut self, r: &mir::Rvalue<'tcx>, l: mir::Location) {
+            if let mir::Rvalue::Aggregate(k, _) = r
+                && let mir::AggregateKind::Closure(def, _)
+                | mir::AggregateKind::Coroutine(def, _)
+                | mir::AggregateKind::CoroutineClosure(def, _) = **k
+            {
+                self.bodies.push(def);
+            }
+            self.super_rvalue(r, l);
+        }
+    }
+    let tcx = cx.tcx;
+    let std = |d: DefId| cx.is_std(tcx.crate_name(d.krate).as_str());
+    let env = ty::TypingEnv::fully_monomorphized();
+    let mut seen: HashSet<DefId> = generic.iter().copied().collect();
+    let mut queue: VecDeque<DefId> = generic.iter().copied().collect();
+    let mut out = Vec::new();
+    while let Some(did) = queue.pop_front() {
+        // (a dependency's closure has no MIR of its own to read)
+        if seen.len() > MAX_GENERIC_BODIES
+            || !tcx.is_mir_available(did)
+            || tcx.is_closure_like(did) && !did.is_local()
+        {
+            continue;
+        }
+        let mut v = V {
+            calls: Vec::new(),
+            bodies: Vec::new(),
+        };
+        v.visit_body(tcx.optimized_mir(did));
+        for b in v.bodies {
+            if seen.insert(b) {
+                queue.push_back(b);
+            }
+        }
+        for (def, args) in v.calls {
+            if std(def) {
+                continue;
+            }
+            if args.has_non_region_param() {
+                if seen.insert(def) {
+                    queue.push_back(def);
+                }
+                continue;
+            }
+            let args = tcx.normalize_erasing_regions(env, ty::Unnormalized::new_wip(args));
+            if let Ok(Some(i)) = ty::Instance::try_resolve(tcx, env, def, args)
+                && matches!(i.def, ty::InstanceKind::Item(_))
+                && !std(i.def_id())
+            {
+                out.push(rustc_internal::stable(i));
+            }
+        }
+    }
+    out.sort_by_key(|i| i.mangled_name());
+    out.dedup();
+    out
 }
 /// `<T as std::process::Termination>::report` for the result type `T` of the entry function.
 fn termination_report(tcx: TyCtxt<'_>, main: rustc_span::def_id::DefId) -> Option<Instance> {
