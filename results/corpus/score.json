@@ -12,15 +12,44 @@
    "support_listed": 1
   },
   "layer2": {
-   "not_correct": [],
+   "not_correct": [
+    {
+     "callee": "decode",
+     "line": "src/translators/decode.rs:152",
+     "may": [
+      "HMAC-SHA-256"
+     ],
+     "must": [],
+     "reported": [
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512"
+     ],
+     "verdict": "wrong"
+    },
+    {
+     "callee": "decode",
+     "line": "src/translators/decode.rs:169",
+     "may": [
+      "HMAC-SHA-256"
+     ],
+     "must": [],
+     "reported": [
+      "HMAC-SHA-256",
+      "HMAC-SHA-384",
+      "HMAC-SHA-512"
+     ],
+     "verdict": "wrong"
+    }
+   ],
    "sites": 4,
    "verdicts": {
-    "correct": 4,
+    "correct": 2,
     "function-mismatch": 0,
     "honest-unknown": 0,
     "less-specific": 0,
     "miss": 0,
-    "wrong": 0
+    "wrong": 2
    }
   }
  },
@@ -123,8 +152,10 @@
      "must": [
       "ChaCha20-Poly1305"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     },
     {
      "callee": "decrypt",
@@ -183,9 +214,9 @@
    "verdicts": {
     "correct": 2,
     "function-mismatch": 0,
-    "honest-unknown": 3,
+    "honest-unknown": 4,
     "less-specific": 0,
-    "miss": 5,
+    "miss": 4,
     "wrong": 0
    }
   }
@@ -276,17 +307,19 @@
       "SHA-256",
       "SHA-512/256"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     }
    ],
    "sites": 5,
    "verdicts": {
     "correct": 4,
     "function-mismatch": 0,
-    "honest-unknown": 0,
+    "honest-unknown": 1,
     "less-specific": 0,
-    "miss": 1,
+    "miss": 0,
     "wrong": 0
    }
   }

@@ -1330,6 +1330,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::generate_for; part of Ed25519; line: `let key_pair_doc = Ed25519KeyPair::generate_pkcs8(rng)._err()?;`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "line": 112,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
+          },
+          {
             "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `} else if alg == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
             "line": 259,
             "location": "src/key_pair.rs",
@@ -1342,6 +1349,13 @@
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; part of Ed25519; line: `KeyPairKind::Ed(kp) => kp.sign(msg).as_ref().to_owned(),`; code: `sign`",
+            "line": 460,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
             "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `Self::Sha512 => &digest::SHA512,`; code: `digest::SHA512`",
@@ -1411,7 +1425,83 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "10"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:rustls-pki-types",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `let serialized_der = pkcs8.secret_pkcs8_der().to_vec();`; code: `secret_pkcs8_der`",
+            "line": 237,
+            "location": "src/key_pair.rs",
+            "offset": 29,
+            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivatePkcs8KeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `key.secret_pkcs8_der().try_into()`; code: `secret_pkcs8_der`",
+            "line": 522,
+            "location": "src/key_pair.rs",
+            "offset": 6,
+            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `let pkcs8 = pkcs8.secret_pkcs8_der();`; code: `secret_pkcs8_der`",
+            "line": 536,
+            "location": "src/key_pair.rs",
+            "offset": 21,
+            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivateKeyDer::<'_>::secret_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `serialized_der: key.secret_der().into(),`; code: `secret_der`",
+            "line": 599,
+            "location": "src/key_pair.rs",
+            "offset": 23,
+            "symbol": "rustls_pki_types::PrivateKeyDer::<'_>::secret_der"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -1456,6 +1546,9 @@
       "dependsOn": [
         "pkg:cargo/zeroize@1.8.2"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:rustls-pki-types"
+      ],
       "ref": "pkg:cargo/rustls-pki-types@1.14.1"
     },
     {
@@ -1473,6 +1566,12 @@
         "crypto:algorithm:SHA-384"
       ],
       "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [
@@ -1494,10 +1593,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:material:private-key:RSA"
     },
     {
@@ -1511,6 +1606,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:rustls-pki-types"
     }
   ],
   "metadata": {
@@ -1575,7 +1674,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:46d90efb-5fc6-8ebb-add1-a96900baefa7",
+  "serialNumber": "urn:uuid:3ddf2961-b0d2-82ca-9991-89e97de1835e",
   "specVersion": "1.7",
   "version": 1
 }
