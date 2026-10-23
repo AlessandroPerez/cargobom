@@ -775,13 +775,14 @@ pub fn call_value(
     }
 }
 
-/// The algorithms `outer` computes inside itself (`[[part]]` entries of its family), named by
-/// its parameters: Argon2's BLAKE2b-512, and the BLAKE2b of its tag length. A parameter that
-/// does not resolve leaves the name open, with the entry's reason.
+/// The algorithms `outer` computes inside itself (`[[part]]` entries of its family, or of its
+/// asset), named by its parameters: Argon2's BLAKE2b-512, and the BLAKE2b of its tag length,
+/// Ed25519's SHA-512. A parameter that does not resolve leaves the name open, with the entry's
+/// reason.
 pub fn parts_of(kb: &Kb, outer: &Match) -> Vec<Match> {
     kb.parts
         .iter()
-        .filter(|p| p.of == outer.algo.family)
+        .filter(|p| p.of == outer.algo.family || p.of == outer.name)
         .map(|p| {
             let vals: BTreeMap<String, String> = p
                 .params

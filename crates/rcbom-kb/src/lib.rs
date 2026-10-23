@@ -912,9 +912,22 @@ impl Kb {
                 .map(|a| a.asset.as_str())
                 .collect()
         };
+        // (or of an asset an entry names: Ed25519, whose family EdDSA has Ed448 too)
+        let named = |asset: &str| {
+            self.types
+                .iter()
+                .map(|t| &t.algo)
+                .chain(self.fns.iter().map(|f| &f.algo))
+                .chain(self.statics.iter().map(|s| &s.algo))
+                .any(|a| a.asset == asset)
+        };
         for p in &self.parts {
-            if templates(&p.of).is_empty() {
-                bail!("[[part]] {}: no entry of family {:?}", p.algo.asset, p.of);
+            if templates(&p.of).is_empty() && !named(&p.of) {
+                bail!(
+                    "[[part]] {}: no entry of family or asset {:?}",
+                    p.algo.asset,
+                    p.of
+                );
             }
             if p.params.values().any(|q| q.from.is_none()) {
                 bail!(

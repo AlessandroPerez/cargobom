@@ -1358,21 +1358,61 @@ family = "RSASSA-PKCS1"
 primitive = "signature"
 functions = ["sign"]
 
+# ring's and aws-lc-rs's PSS: the salt is as long as the hash's output, MGF1 with the same hash
+# (ring `rsa::padding::pss`), fixed by the descriptor
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PSS_[0-9]+_[0-9]+_SHA(256|384|512)$"
-asset = "RSA-PSS-SHA-{1}"
+name = "^RSA_PSS_[0-9]+_[0-9]+_SHA256$"
+asset = "RSA-PSS-SHA-256"
 family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["verify"]
+fixed = { salt_bytes = "32", mgf = "MGF1-SHA-256" }
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
-name = "^RSA_PSS_SHA(256|384|512)$"
-asset = "RSA-PSS-SHA-{1}"
+name = "^RSA_PSS_SHA256$"
+asset = "RSA-PSS-SHA-256"
 family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign"]
+fixed = { salt_bytes = "32", mgf = "MGF1-SHA-256" }
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_[0-9]+_[0-9]+_SHA384$"
+asset = "RSA-PSS-SHA-384"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["verify"]
+fixed = { salt_bytes = "48", mgf = "MGF1-SHA-384" }
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_SHA384$"
+asset = "RSA-PSS-SHA-384"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
+fixed = { salt_bytes = "48", mgf = "MGF1-SHA-384" }
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_[0-9]+_[0-9]+_SHA512$"
+asset = "RSA-PSS-SHA-512"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["verify"]
+fixed = { salt_bytes = "64", mgf = "MGF1-SHA-512" }
+
+[[static]]
+crate = ["ring", "aws_lc_rs"]
+name = "^RSA_PSS_SHA512$"
+asset = "RSA-PSS-SHA-512"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
+fixed = { salt_bytes = "64", mgf = "MGF1-SHA-512" }
 
 [[static]]
 crate = "aws_lc_rs"
@@ -1803,6 +1843,17 @@ implemented_by = ["blake2"]
 unresolved = "digest length: not resolved to a registry length (the Argon2 tag's when it is at most 64 bytes)"
 params = { bits = { from = "output_bytes", map = { "20" = "160", "32" = "256", "48" = "384", "64" = "512" } } }
 
+# Ed25519 hashes with SHA-512 (RFC 8032 5.1), as Argon2 with BLAKE2b: a component where it is
+# used; sha2 implements it under ed25519-dalek, ring and aws-lc-rs their own (`of` names the
+# asset here: EdDSA is the family of Ed448 too, which hashes with SHAKE256)
+[[part]]
+of = "Ed25519"
+asset = "SHA-512"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+implemented_by = ["sha2"]
+
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
 crate = "rsa"
@@ -2163,12 +2214,12 @@ methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place",
 [[use]]
 function = "digest"
 primitives = ["hash", "xof"]
-methods = ["digest", "update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "finalize_xof_into", "finalize_xof_reset_into", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy", "read", "read_boxed"]
+methods = ["digest", "update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "finalize_xof_into", "finalize_xof_reset_into", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy", "read", "read_boxed"]
 
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "update_reader", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy", "update_padded", "compute_unpadded"]
+methods = ["update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy", "update_padded", "compute_unpadded"]
 
 [[use]]
 function = "verify"
@@ -2641,6 +2692,7 @@ family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
 key = "Rsa"
+fixed = { salt_bytes = "32", mgf = "MGF1-SHA-256" }
 
 [enum.variants.PS384]
 asset = "RSA-PSS-SHA-384"
@@ -2648,6 +2700,7 @@ family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
 key = "Rsa"
+fixed = { salt_bytes = "48", mgf = "MGF1-SHA-384" }
 
 [enum.variants.PS512]
 asset = "RSA-PSS-SHA-512"
@@ -2655,6 +2708,7 @@ family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
 key = "Rsa"
+fixed = { salt_bytes = "64", mgf = "MGF1-SHA-512" }
 
 [enum.variants.ES256]
 asset = "ECDSA-P-256-SHA-256"
