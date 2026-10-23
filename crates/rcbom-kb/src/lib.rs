@@ -68,6 +68,8 @@ struct BoundaryRaw {
     algorithm: FieldRef,
     #[serde(default)]
     key: Option<FieldRef>,
+    #[serde(default)]
+    off_by: Option<String>,
     #[serde(rename = "enum")]
     enumeration: String,
 }
@@ -245,6 +247,9 @@ pub struct BoundaryEntry {
     pub function: String,
     pub algorithm: FieldRef,
     pub key: Option<FieldRef>,
+    /// A call on the algorithm's argument that may make the call run no cryptography
+    /// (jsonwebtoken's `insecure_disable_signature_validation`): regex over its path.
+    pub off_by: Option<Regex>,
     pub enumeration: String,
 }
 
@@ -790,6 +795,12 @@ impl Kb {
                         function: b.function,
                         algorithm: b.algorithm,
                         key: b.key,
+                        off_by: b
+                            .off_by
+                            .as_deref()
+                            .map(Regex::new)
+                            .transpose()
+                            .with_context(|| format!("[[boundary]] off_by {:?}", b.off_by))?,
                         enumeration: b.enumeration,
                     })
                 })
