@@ -497,7 +497,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v43] in v43::encrypt; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let cipher = cbc::Encryptor::<aes::Aes256>::new(key.into(), iv.into());`; code: `cbc::Encryptor::<aes::Aes256>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v43] in v43::encrypt; new: setup, not a use; key: hard-coded (all zero, 32 bytes, literal at line 65) or parameter (argument 0 of the enclosing function); iv: hard-coded (all zero, 16 bytes, literal at line 65) or parameter (argument 1 of the enclosing function); line: `let cipher = cbc::Encryptor::<aes::Aes256>::new(key.into(), iv.into());`; code: `cbc::Encryptor::<aes::Aes256>::new`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 17,
@@ -540,11 +540,19 @@
         },
         {
           "name": "rcbom:provenance:iv",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-iv"
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:occurrences",
@@ -1453,7 +1461,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:98592f70-d8a8-8d09-aaa4-a53da7b4b6db",
+  "serialNumber": "urn:uuid:9ec3a26f-e078-850c-b318-b9d8bdee9297",
   "specVersion": "1.7",
   "version": 1
 }

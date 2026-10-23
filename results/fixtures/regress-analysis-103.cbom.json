@@ -800,7 +800,7 @@
             "symbol": "jsonwebtoken::encoding::EncodingKey::from_secret"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
+            "additionalContext": "[present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
             "line": 77,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 40,
@@ -1207,6 +1207,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-256"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "32"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -1298,6 +1306,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-384"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "48"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -1387,6 +1403,14 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-512"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "64"
         },
         {
           "name": "rcbom:provenance:public-key",
@@ -1722,11 +1746,25 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::eddsa::sign; part of Ed25519; line: `let out = signing_key.sign(message);`; code: `sign`",
+            "line": 21,
+            "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
+            "offset": 26,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          },
+          {
             "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
             "line": 29,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
             "symbol": "ring::hmac::HMAC_SHA512"
+          },
+          {
+            "additionalContext": "[present] [component] in jsonwebtoken::crypto::verify_ring; part of Ed25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "line": 55,
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "offset": 25,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
             "additionalContext": "[present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
@@ -1786,7 +1824,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -1860,6 +1898,12 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:HMAC-SHA-256"
@@ -1915,10 +1959,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:material:public-key:ECDSA"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [],
@@ -2011,7 +2051,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0258e655-566c-80ef-a0dc-9fb420b0dc55",
+  "serialNumber": "urn:uuid:f19d5ca4-1c43-880a-8057-be95287898bb",
   "specVersion": "1.7",
   "version": 1
 }

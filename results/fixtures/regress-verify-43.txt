@@ -1,4 +1,4 @@
-  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:52:17 | crypto_common::KeyIvInit::new | [reachable] [call] [artifacts: bin v43] in v43::encrypt; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let cipher = cbc::Encryptor::<aes::Aes256>::new(key.into(), iv.into());`; code: `cbc::Encryptor::<aes::Aes256>::new`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:52:17 | crypto_common::KeyIvInit::new | [reachable] [call] [artifacts: bin v43] in v43::encrypt; new: setup, not a use; key: hard-coded (all zero, 32 bytes, literal at line 65) or parameter (argument 0 of the enclosing function); iv: hard-coded (all zero, 16 bytes, literal at line 65) or parameter (argument 1 of the enclosing function); line: `let cipher = cbc::Encryptor::<aes::Aes256>::new(key.into(), iv.into());`; code: `cbc::Encryptor::<aes::Aes256>::new`
   occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:53:11 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] [artifacts: bin v43] in v43::encrypt; use: encrypt; line: `cipher.encrypt_padded_vec_mut::<block_padding::Pkcs7>(m)`; code: `encrypt_padded_vec_mut`
   occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
   occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
@@ -51,11 +51,13 @@
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:artifact=bin v43
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:confidence=high
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:detection:method=type-resolved
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:finding=hard-coded-iv
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:finding=hard-coded-key
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:functions:source=observed
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:kb:version=0.2.0
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:occurrences=2
-  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=parameter
-  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=hard-coded,parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=hard-coded,parameter
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:reachability=reachable
   prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:artifact=bin v43
   prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:confidence=high

@@ -3178,6 +3178,13 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in t19::ed25519ph; part of Ed25519; line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
+            "line": 106,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ed25519_dalek::signing::SigningKey::generate"
+          },
+          {
             "additionalContext": "[reachable] [component] in t19::ed25519ph; part of Ed25519ph; line: `let s1: Signature = sk.sign_prehashed(Sha512::new().chain_update(msg), Some(b\"ctx\")).unwrap();`; code: `sign_prehashed`",
             "line": 108,
             "location": "src/main.rs",
@@ -3260,6 +3267,13 @@
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "digest::digest::Digest::chain_update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t19::ed25519ph; part of Ed25519; line: `let _ = kp.sign(msg);`; code: `sign`",
+            "line": 114,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "signature::signer::Signer::sign"
           }
         ]
       },
@@ -3287,7 +3301,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "12"
+          "value": "14"
         }
       ],
       "type": "cryptographic-asset"
@@ -4048,6 +4062,12 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:PBKDF2-SHA-256-1000-32"
@@ -4097,10 +4117,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha12-RNG"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [],
@@ -4205,7 +4221,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:11592d68-165a-8e13-b7f3-a0fa5310c3f2",
+  "serialNumber": "urn:uuid:850d02e1-0c26-8f3c-a91f-be161a2df7e2",
   "specVersion": "1.7",
   "version": 1
 }

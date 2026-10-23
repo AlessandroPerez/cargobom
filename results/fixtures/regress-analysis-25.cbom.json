@@ -288,7 +288,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at line 9) or parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
@@ -335,7 +335,11 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-ikm"
         },
         {
           "name": "rcbom:occurrences",
@@ -698,7 +702,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5e374489-8520-8d61-879f-2ea7dc4b44a7",
+  "serialNumber": "urn:uuid:f7bcd87b-1556-8d2a-a20d-2a836d1d224d",
   "specVersion": "1.7",
   "version": 1
 }

@@ -212,7 +212,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in t2::ed_sign; from_pkcs8: setup, not a use; key: computed (t2::ed_gen) or parameter (argument 0 of the enclosing function); line: `let kp = signature::Ed25519KeyPair::from_pkcs8(pkcs8).unwrap();`; code: `signature::Ed25519KeyPair::from_pkcs8`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 13,
@@ -258,7 +258,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -296,7 +296,7 @@
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
+            "additionalContext": "[reachable] [call] in t2::hkdf_to_aead; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: hard-coded (3 bytes, literal at line 44) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 58,
@@ -377,7 +377,11 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-ikm"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -493,7 +497,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::ring_pbkdf2; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 21); password: parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in t2::ring_pbkdf2; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 21); password: hard-coded (2 bytes, literal at line 46) or parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(100_000).unwrap(), b\"salt\", pw, &mut out);`; code: `pbkdf2::derive`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 4,
@@ -546,7 +550,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -578,7 +586,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t2::rsa3072; new: setup, not a use; algorithm from ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 in the arguments; public-key: parameter (argument 0 of the enclosing function); line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in t2::rsa3072; new: setup, not a use; algorithm from ring::rsa::verification::RSA_PKCS1_3072_8192_SHA384 in the arguments; public-key: absent (empty) or parameter (argument 0 of the enclosing function); line: `signature::UnparsedPublicKey::new(&signature::RSA_PKCS1_3072_8192_SHA384, pk).verify(msg, sig).is_ok()`; code: `signature::UnparsedPublicKey::new`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 4,
@@ -624,7 +632,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "absent,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -841,6 +849,69 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t2::ed_sign; part of Ed25519; line: `kp.sign(b\"msg\").as_ref().to_vec()`; code: `sign`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t2::ed_gen; part of Ed25519; line: `signature::Ed25519KeyPair::generate_pkcs8(&rng).unwrap().as_ref().to_vec()`; code: `signature::Ed25519KeyPair::generate_pkcs8`",
+            "line": 40,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -870,6 +941,12 @@
         "pkg:cargo/ring@0.17.14"
       ],
       "ref": "pkg:cargo/t2@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [
@@ -903,10 +980,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:SHA-256"
     },
     {
@@ -916,6 +989,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512/256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -980,7 +1057,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1a3d5352-b0a5-8013-a0a2-2c4143b8d012",
+  "serialNumber": "urn:uuid:e95b49c0-3315-8670-9bb0-684a40d4026d",
   "specVersion": "1.7",
   "version": 1
 }

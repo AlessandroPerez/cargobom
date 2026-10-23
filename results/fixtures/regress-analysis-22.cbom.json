@@ -390,6 +390,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-256"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "32"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "environment"
         },
@@ -521,6 +529,62 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in a22::main; part of Ed25519; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "aws_lc_rs::signature::VerificationAlgorithm::verify_sig"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -561,13 +625,15 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:RSA-PSS-SHA-256"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [],
@@ -580,6 +646,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -644,7 +714,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f667f10d-f55a-80c4-aede-2121fce29ca4",
+  "serialNumber": "urn:uuid:66cf61f2-e7e9-86b5-b42f-1a9d3889117d",
   "specVersion": "1.7",
   "version": 1
 }

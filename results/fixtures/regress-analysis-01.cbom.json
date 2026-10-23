@@ -1656,7 +1656,7 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] in t1::argon_two_lines; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (16 bytes, literal at line 52); line: `argon2.hash_password(pw, &salt).unwrap().to_string()`; code: `hash_password`",
+            "additionalContext": "[reachable] [call] in t1::argon_two_lines; use: keyderive; password: hard-coded (2 bytes, literal at line 93) or parameter (argument 0 of the enclosing function); salt: hard-coded (16 bytes, literal at line 52); line: `argon2.hash_password(pw, &salt).unwrap().to_string()`; code: `hash_password`",
             "line": 53,
             "location": "src/main.rs",
             "offset": 11,
@@ -2078,7 +2078,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t1::sha512_trunc; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t1::sha512_trunc; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 91) or parameter (argument 0 of the enclosing function); line: `let m = <Hmac<Sha512_256> as Mac>::new_from_slice(d).unwrap();`; code: `<Hmac<Sha512_256> as Mac>::new_from_slice`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 12,
@@ -2124,7 +2124,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:occurrences",
@@ -2453,6 +2457,76 @@
         {
           "name": "rcbom:occurrences",
           "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t1::ed; part of Ed25519; line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ed25519_dalek::signing::SigningKey::generate"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t1::ed; part of Ed25519; line: `let sig = sk.sign(b\"msg\");`; code: `sign`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t1::ed; part of Ed25519; line: `vk.verify(b\"msg\", &sig).unwrap();`; code: `verify`",
+            "line": 73,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "signature::verifier::Verifier::verify"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -2908,6 +2982,7 @@
       ],
       "provides": [
         "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512",
         "crypto:algorithm:SHA-512/224",
         "crypto:algorithm:SHA-512/256"
       ],
@@ -2966,6 +3041,12 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:SHA-256"
       ],
@@ -3007,10 +3088,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:material:private-key:RSA-2048"
     },
     {
@@ -3024,6 +3101,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512/256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     },
     {
       "dependsOn": [],
@@ -3096,7 +3177,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ef28f45a-cff4-8dd4-bc34-c188457bbc3f",
+  "serialNumber": "urn:uuid:79637de3-40fc-8abd-8657-33d17bd31eac",
   "specVersion": "1.7",
   "version": 1
 }

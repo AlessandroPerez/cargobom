@@ -1,0 +1,515 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via pilot-sig-path -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by pilot-sig-path (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via pilot-sig-path -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_path::main; line: `(&signature::RSA_PKCS1_SHA256, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_path::main; line: `(&signature::RSA_PKCS1_SHA256, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; use: sign; algorithm one of 2 that may reach the call: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 in the arguments; line: `kp.sign(padding, &rng, msg, &mut sig).unwrap();`; code: `sign`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::rsa::keypair::KeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 in the arguments; public-key: hard-coded (1217 bytes, literal at line 14); line: `let pk = UnparsedPublicKey::new(verifier, kp.public_key().as_ref());`; code: `UnparsedPublicKey::new`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; use: verify; algorithm one of 2 that may reach the call: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 in the arguments; line: `println!(\"{}\", pk.verify(msg, &sig).is_ok());`; code: `verify`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PSS-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PSS",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_path::main; line: `(&signature::RSA_PSS_SHA256, &signature::RSA_PSS_2048_8192_SHA256)`; code: `signature::RSA_PSS_SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_path::main; line: `(&signature::RSA_PSS_SHA256, &signature::RSA_PSS_2048_8192_SHA256)`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; use: sign; algorithm one of 2 that may reach the call: ring::rsa::padding::pss::RSA_PSS_SHA256 in the arguments; line: `kp.sign(padding, &rng, msg, &mut sig).unwrap();`; code: `sign`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 7,
+            "symbol": "ring::rsa::keypair::KeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::rsa::verification::RSA_PSS_2048_8192_SHA256 in the arguments; public-key: hard-coded (1217 bytes, literal at line 14); line: `let pk = UnparsedPublicKey::new(verifier, kp.public_key().as_ref());`; code: `UnparsedPublicKey::new`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; use: verify; algorithm one of 2 that may reach the call: ring::rsa::verification::RSA_PSS_2048_8192_SHA256 in the arguments; line: `println!(\"{}\", pk.verify(msg, &sig).is_ok());`; code: `verify`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "RSA-PSS-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-256"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "32"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:material:private-key:RSA",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "relatedCryptoMaterialProperties": {
+          "type": "private-key"
+        }
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_path::main; from_pkcs8: setup, not a use; key: hard-coded (1217 bytes, literal at line 14); line: `let kp = RsaKeyPair::from_pkcs8(include_bytes!(\"rsa.pk8\")).unwrap();`; code: `RsaKeyPair::from_pkcs8`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
+          }
+        ]
+      },
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        },
+        {
+          "name": "rcbom:algorithm-family",
+          "value": "RSA"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_path::main; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `(&signature::RSA_PSS_SHA256, &signature::RSA_PSS_2048_8192_SHA256)`; code: `signature::RSA_PSS_SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_path::main; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `(&signature::RSA_PSS_SHA256, &signature::RSA_PSS_2048_8192_SHA256)`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 38,
+            "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_path::main; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `(&signature::RSA_PKCS1_SHA256, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_path::main; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); line: `(&signature::RSA_PKCS1_SHA256, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/pilot-sig-path@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+        "crypto:algorithm:RSA-PSS-SHA-256",
+        "crypto:algorithm:SHA-256",
+        "crypto:material:private-key:RSA"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PSS-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:material:private-key:RSA"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/pilot-sig-path@0.1.0",
+      "name": "pilot-sig-path",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/pilot-sig-path@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "143"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin pilot-sig-path"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:23fd2511-50a4-82e9-9963-931e388fe199",
+  "specVersion": "1.7",
+  "version": 1
+}
