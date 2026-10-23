@@ -104,6 +104,10 @@ cargo xtask e2e --realapp --regress --suite          # every fixture: whole-CBOM
 cargo xtask suite <out> tests/fixtures/suite/*       # the ground-truth suite: 53 programs, 107
                                                      # call sites labelled from source before
                                                      # any tool run
+cargo xtask corpus-run <work> <out> tests/fixtures/corpus/*.toml     # the real projects' CBOMs:
+                                                     # each package fetched from crates.io as
+                                                     # published (`tests/fixtures/projects.toml`),
+                                                     # generated and verified; heldout/ likewise
 cargo xtask corpus-score <out> tests/fixtures/corpus/*.toml          # six real projects
 cargo xtask corpus-score <out> tests/fixtures/heldout/*.toml         # seven held-out crates
 cargo xtask score tests/fixtures/rusi/<fixture>/labels.toml <cbom>   # any tool's CBOM
@@ -116,7 +120,8 @@ Verdicts: **correct**; **wrong** (an algorithm outside the labels: the bar is ze
 
 ## Results
 
-Every number comes from the outputs in `results/`, which the commands above regenerate. Labels
+Every number comes from the outputs in `results/`, which the commands above regenerate; the
+corpus and held-out projects are crates.io packages as published, pinned by their sha256. Labels
 were written from source by agents that never saw tool output (`docs/suite/RULES.md`): two
 independent labellers per set, compared, and adjudicated by the rules. The held-out crates were chosen after development,
 and their labels were frozen before the first run.
@@ -174,7 +179,7 @@ Where it is not exact, the CBOM says so instead of guessing:
 | `crates/rcbom-kb` | knowledge base loader and data (`data/`: the seed, and the Cryptography Registry, Apache-2.0) |
 | `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, CycloneDX assembly |
 | `xtask` | the project's tasks: checks, e2e, scorers, summaries |
-| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run); each fixture with its golden `expected.txt` |
+| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run), `projects.toml` (the package behind each corpus and held-out label); each fixture with its golden `expected.txt` |
 | `tests/external/` | inputs from an external reference case (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
 | `docs/` | `poc_workflow.md` (the tool, its five layers, related tools), `in-too-deep.md` (how each stage works), `suite/RULES.md` (the labelling rules every label file follows) |

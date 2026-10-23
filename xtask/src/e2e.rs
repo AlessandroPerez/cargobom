@@ -354,7 +354,7 @@ fn meminfo(field: &str) -> Option<u64> {
         .ok()
 }
 
-fn cargo_build(dir: &Path) -> Result<()> {
+pub(crate) fn cargo_build(dir: &Path) -> Result<()> {
     if !crate::cargo()
         .args(["build", "-q", "--profile", "e2e"])
         .current_dir(dir)

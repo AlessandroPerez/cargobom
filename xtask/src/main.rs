@@ -7,7 +7,9 @@
 //! - `summary CBOM.json`: a CBOM as the sorted text lines of the golden files;
 //! - `suite OUT_DIR PROGRAM_DIR... [--json]`: the ground-truth suite's score;
 //! - `score LABELS.toml CBOM.json [--json]`: any tool's CBOM against a rusi fixture's labels;
-//! - `corpus-score CBOM_DIR LABELS.toml... [--json] [--against OLD_CBOM_DIR]`: the six real
+//! - `corpus-run WORK_DIR OUT_DIR LABELS.toml...`: the CBOMs of the real projects behind the
+//!   corpus and held-out labels, fetched as published and verified (`projects.rs`);
+//! - `corpus-score CBOM_DIR LABELS.toml... [--json] [--against OLD_CBOM_DIR]`: the real
 //!   projects' labels;
 //! - `rusi-to-cbom RUSI_REPORT.json`: a rusi report as a CycloneDX document, for `score`;
 //! - `review-sheet FIXTURE_DIR...`: the labels next to their source lines, for review;
@@ -18,6 +20,7 @@ mod candidates;
 mod check;
 mod corpus;
 mod e2e;
+mod projects;
 mod pyjson;
 mod review;
 mod rusi;
@@ -50,7 +53,7 @@ fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let (task, rest) = args
         .split_first()
-        .context("usage: cargo xtask <check|e2e|summary|suite|score|corpus-score|rusi-to-cbom|review-sheet|pta-candidates> ..")?;
+        .context("usage: cargo xtask <check|e2e|summary|suite|score|corpus-run|corpus-score|rusi-to-cbom|review-sheet|pta-candidates> ..")?;
     match task.as_str() {
         "check" => check::run(),
         "e2e" => e2e::run(rest),
@@ -66,6 +69,7 @@ fn main() -> Result<()> {
         }
         "suite" => suite::run(rest),
         "score" => score::run(rest),
+        "corpus-run" => projects::run(rest),
         "corpus-score" => corpus::run(rest),
         "rusi-to-cbom" => rusi::run(rest),
         "review-sheet" => review::run(rest),
