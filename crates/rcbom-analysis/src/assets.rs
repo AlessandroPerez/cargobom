@@ -38,16 +38,16 @@ impl Asset {
             .collect()
     }
 }
-/// The backend package a rustls path names (`crypto::ring::default_provider`,
-/// `crypto::aws_lc_rs::tls13::TLS13_AES_128_GCM_SHA256`).
-pub(super) fn backend_in_path(path: &str) -> Option<&'static str> {
-    if path.contains("::ring::") {
-        Some("ring")
-    } else if path.contains("::aws_lc_rs::") {
-        Some("aws-lc-rs")
-    } else {
-        None
-    }
+/// The backend package a protocol crate's path names, by its `backends` (feature -> package):
+/// rustls's `crypto::ring::default_provider`, `crypto::aws_lc_rs::tls13::TLS13_AES_128_GCM_SHA256`.
+pub(super) fn backend_in_path<'a>(
+    path: &str,
+    backends: &'a BTreeMap<String, String>,
+) -> Option<&'a str> {
+    backends
+        .iter()
+        .find(|(feature, _)| path.contains(&format!("::{feature}::")))
+        .map(|(_, package)| package.as_str())
 }
 /// One use found twice on a line, once with run-time parameters unresolved (`Argon2` from
 /// `hash_password`) and once resolved (`Argon2id-19456-2-1` from `Argon2::default()`): the

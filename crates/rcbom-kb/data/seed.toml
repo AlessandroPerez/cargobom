@@ -2233,6 +2233,18 @@ support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov"
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
 not_crypto = ["SmallRng", "StepRng"]
 
+# --- What some packages' APIs mean ------------------------------------------------------------
+# `draws`: packages whose APIs draw from the generator they are given (rand's
+# `Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`): the call is a draw,
+# where another package's API given a generator draws inside it (a key generation, labelled by
+# what it does). `block_modes`: modes of operation over a block cipher, whose keystream is the
+# block cipher's operation (`ctr::Ctr64BE<Blowfish>`, as AES-CTR is named). `fixed_defaults`:
+# packages whose types' `Default` values are constants (`GenericArray::default()`).
+[semantics]
+draws = ["rand"]
+block_modes = ["ctr", "cfb-mode", "cfb8", "ofb"]
+fixed_defaults = ["generic-array"]
+
 # --- Operations whose algorithm is a run-time value -----------------------------------------
 # A call matched here is always reported: with the algorithms that reach it, or, when none
 # does, with an unknown algorithm and the reason, never dropped. `path` is a regex over the
@@ -2916,16 +2928,16 @@ args = { "0" = "key" }
 path = "^ed25519_dalek::signing::SigningKey::generate$"
 args = { "0" = "rng" }
 
-[[role]]
-path = "^blake3::(keyed_hash|Hasher::new_keyed)$"
-args = { "0" = "key" }
-
 # RustCrypto's generated keys, IVs and nonces, and keys on the elliptic-curve crates' curves:
 # the generator passed (`Aes256Gcm::generate_key(&mut OsRng)`, `generate_nonce(&mut rng)`,
 # `SecretKey::<NistP256>::random(&mut rng)`)
 [[role]]
 path = "(KeyInit::generate_key|KeyIvInit::generate_(key|iv|key_iv)|AeadCore::generate_nonce)$|^elliptic_curve::(secret_key::SecretKey|ecdh::EphemeralSecret)::random$|^ecdsa::signing::SigningKey::random$"
 args = { "0" = "rng" }
+
+[[role]]
+path = "^blake3::(keyed_hash|Hasher::new_keyed)$"
+args = { "0" = "key" }
 
 [[role]]
 path = "^blake3::derive_key$"

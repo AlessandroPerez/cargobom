@@ -83,7 +83,7 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             let primitive = match t {
                 rcbom_facts::TyTree::Adt { krate, .. }
                     if op.primitive == "stream-cipher"
-                        && matches!(krate.name.as_str(), "ctr" | "cfb_mode" | "cfb8" | "ofb") =>
+                        && Kb::lists(&ctx.kb.block_modes, &krate.name) =>
                 {
                     "block-cipher".to_string()
                 }

@@ -53,6 +53,8 @@ struct Raw {
     parts: Vec<PartEntry>,
     #[serde(default)]
     unmodelled: UnmodelledRaw,
+    #[serde(default)]
+    semantics: SemanticsRaw,
 }
 
 #[derive(Debug, Deserialize)]
@@ -77,6 +79,18 @@ struct EnumRaw {
     krate: String,
     name: String,
     variants: BTreeMap<String, Variant>,
+}
+
+/// What some packages' APIs mean, by package (`[semantics]`).
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SemanticsRaw {
+    #[serde(default)]
+    draws: Vec<String>,
+    #[serde(default)]
+    block_modes: Vec<String>,
+    #[serde(default)]
+    fixed_defaults: Vec<String>,
 }
 
 /// Layer 1 for packages without `[[crate]]` entries: which are cryptographic anyway.
@@ -544,6 +558,12 @@ pub struct Kb {
     pub unmodelled_support: Vec<String>,
     /// Types of modelled crates that compute no cryptography (rand's `SmallRng`), by name.
     pub not_crypto: Vec<String>,
+    /// Packages whose APIs draw from the generator they are given (rand's `shuffle`).
+    pub draws: Vec<String>,
+    /// Modes of operation over a block cipher, whose keystream is the block cipher's (ctr).
+    pub block_modes: Vec<String>,
+    /// Packages whose types' `Default` values are constants (generic-array).
+    pub fixed_defaults: Vec<String>,
     /// The crates of the build being analysed, by name: the package each one comes from. Set
     /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
     /// library is named `md5`, like the package md5's).
@@ -773,6 +793,9 @@ impl Kb {
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
             not_crypto: raw.unmodelled.not_crypto,
+            draws: raw.semantics.draws,
+            block_modes: raw.semantics.block_modes,
+            fixed_defaults: raw.semantics.fixed_defaults,
             crate_packages: Default::default(),
         };
         kb.validate()?;
@@ -1014,6 +1037,11 @@ impl Kb {
         } else {
             Unmodelled::Crypto
         })
+    }
+
+    /// Is the crate (by its rustc name) one of the packages listed: `[semantics]`'s lists.
+    pub fn lists(packages: &[String], krate: &str) -> bool {
+        packages.iter().any(|p| p.replace('-', "_") == krate)
     }
 
     /// The boundary model of a call (`[[boundary]]`), by crate name and path inside it.

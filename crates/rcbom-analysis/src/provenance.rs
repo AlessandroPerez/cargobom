@@ -388,7 +388,8 @@ fn classify(kb: &Kb, links: &LinkIndex, o: &Origin, depth: usize, out: &mut BTre
                 // (`Config::default()` reading the environment): an interprocedural question
                 let ty_crate = self_ty.and_then(|t| t.split("::").next());
                 let fixed = ty_crate.is_none_or(|k| {
-                    matches!(k, "core" | "std" | "alloc" | "generic_array")
+                    matches!(k, "core" | "std" | "alloc")
+                        || Kb::lists(&kb.fixed_defaults, k)
                         || kb.crate_by_name(k).is_some()
                 });
                 if fixed {
