@@ -1,0 +1,111 @@
+{
+ "biscuit-auth-6.0.0": {
+  "layer1": {
+   "crypto_found": 21,
+   "crypto_labelled": 21,
+   "crypto_missed": [],
+   "reported": 21,
+   "reported_correct": 21,
+   "reported_not_crypto": [],
+   "support_agree": 18,
+   "support_labelled": 22,
+   "support_listed": 18
+  },
+  "layer2": {
+   "not_correct": [],
+   "sites": 6,
+   "verdicts": {
+    "correct": 6,
+    "function-mismatch": 0,
+    "honest-unknown": 0,
+    "less-specific": 0,
+    "miss": 0,
+    "wrong": 0
+   }
+  }
+ },
+ "rbw-1.15.0": {
+  "layer1": {
+   "crypto_found": 46,
+   "crypto_labelled": 47,
+   "crypto_missed": [
+    "quinn-proto 0.11.13"
+   ],
+   "reported": 46,
+   "reported_correct": 46,
+   "reported_not_crypto": [],
+   "support_agree": 18,
+   "support_labelled": 28,
+   "support_listed": 18
+  },
+  "layer2": {
+   "not_correct": [
+    {
+     "callee": "new_v4",
+     "line": "src/config.rs:232",
+     "may": [],
+     "must": [
+      "OS-RNG"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "try_sign",
+     "line": "src/bin/rbw-agent/ssh_agent.rs:72",
+     "may": [],
+     "must": [
+      "Ed25519"
+     ],
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
+    },
+    {
+     "callee": "try_sign_with_rng",
+     "line": "src/bin/rbw-agent/ssh_agent.rs:110",
+     "may": [],
+     "must": [
+      "RSA-PKCS1-1.5-SHA-1"
+     ],
+     "reported": [
+      "RSA-PKCS1-1.5"
+     ],
+     "verdict": "less-specific"
+    },
+    {
+     "callee": "generate_current",
+     "line": "src/bin/rbw/commands.rs:2798",
+     "may": [],
+     "must": [
+      "HMAC-SHA-1",
+      "HMAC-SHA-256",
+      "HMAC-SHA-512"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    },
+    {
+     "callee": "generate_current",
+     "line": "src/bin/rbw/commands.rs:2800",
+     "may": [],
+     "must": [
+      "HMAC-SHA-1"
+     ],
+     "reported": [],
+     "verdict": "miss"
+    }
+   ],
+   "sites": 27,
+   "verdicts": {
+    "correct": 22,
+    "function-mismatch": 0,
+    "honest-unknown": 1,
+    "less-specific": 1,
+    "miss": 3,
+    "wrong": 0
+   }
+  }
+ }
+}
