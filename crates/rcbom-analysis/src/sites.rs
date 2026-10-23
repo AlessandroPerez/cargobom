@@ -460,11 +460,11 @@ pub(super) fn site_matches(
                 .map(|(m, _)| m.key())
                 .collect();
             for (mut m, outer) in match_types(kb, &trees, &supported) {
-                // ..except by rand's own APIs, which draw from the generator they are given
-                // (`Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`)
-                let drawn_by_rand = callee.krate.name == "rand";
+                // ..except by the APIs drawing from the generator they are given (rand's
+                // `Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`)
+                let draws = Kb::lists(&kb.draws, &callee.krate.name);
                 let handed = m.algo.primitive == "drbg" && !receiver_types.contains(&m.key());
-                if handed && !drawn_by_rand {
+                if handed && !draws {
                     continue;
                 }
                 let outer = outer.map(|p| renamed.get(&p).cloned().unwrap_or(p));

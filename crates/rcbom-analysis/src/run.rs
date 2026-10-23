@@ -481,6 +481,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             {
                 let pkg_of = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
                 let proto_pkg = pkg_of.as_ref().and_then(|(n, v)| man.by_name_version(n, v));
+                let kb_backends = kb
+                    .crate_by_name(&callee.krate.name)
+                    .map(|c| c.backends.clone())
+                    .unwrap_or_default();
                 let entry = protocols.entry(p.name.clone()).or_insert_with(|| Protocol {
                     name: p.name.clone(),
                     kind: p.kind.clone(),
@@ -506,7 +510,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 // a provider named by the program (`crypto::ring::default_provider`) is the
                 // backend, whatever the crate's features enable; rustls naming its own providers,
                 // or dead code, is not the program's choice
-                if let Some(b) = backend_in_path(&callee.path)
+                if let Some(b) = backend_in_path(&callee.path, &kb_backends)
                     && pkg_of.as_ref() != Some(&pkg)
                 {
                     if tier == Tier::Reachable {
@@ -526,7 +530,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                     let n = last(d);
                     if suites.is_match(&n) && !n.ends_with("_INTERNAL") {
-                        if let Some(b) = backend_in_path(&d.path) {
+                        if let Some(b) = backend_in_path(&d.path, &kb_backends) {
                             entry.suite_backends.insert(b.to_string());
                         }
                         // the registry's (IANA's) name: rustls's `TLS13_AES_128_GCM_SHA256` is
