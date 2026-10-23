@@ -2222,10 +2222,12 @@ methods = ["decapsulate"]
 # tls, certificate, x509), as `support` when it is an encoding or parser of crypto data among
 # those (categories encoding, parser-implementations, memory-management). `crypto` lists
 # cryptographic packages whose metadata says nothing (bindings to C crypto libraries, the
-# zkcrypto field and group traits); `support` lists helpers whose metadata
-# says cryptography but which compute none (it never makes a package cryptographic by itself).
+# zkcrypto field and group traits, one-time passwords, QUIC) or reads like an encoding's
+# (OpenSSH keys, which sign, and the agent protocol serving them: the same categories as der's);
+# `support` lists helpers whose metadata says cryptography but which compute none (it never
+# makes a package cryptographic by itself).
 [unmodelled]
-crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group"]
+crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group", "ssh-key", "ssh-agent-lib", "totp-rs", "quinn-proto"]
 support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint"]
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
