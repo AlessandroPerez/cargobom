@@ -2522,7 +2522,7 @@
             "symbol": "elliptic_curve::ecdh::diffie_hellman"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: keygen; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40 as `Kem::encap`; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8 as `setup_sender::<A, Kdf, Kem, R>`; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4 as `hpke::single_shot_seal::<hpke::aead::ChaCha20Poly1305, hpke::kdf::HkdfSha256, Kem, R>`; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24 as `hpke_seal::<Kem, _>`; line: `let sk_e = p256::ecdh::EphemeralSecret::random(csprng);`; code: `p256::ecdh::EphemeralSecret::random`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in <age::native::tagpq::kem::MlKem768P256 as hpke::kem::Kem>::encap::<..>; use: keygen; rng: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:162:40 as `Kem::encap`; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8 as `setup_sender::<A, Kdf, Kem, R>`; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4 as `hpke::single_shot_seal::<hpke::aead::ChaCha20Poly1305, hpke::kdf::HkdfSha256, Kem, R>`; instantiated by <age::native::tagpq::Recipient as age::Recipient>::wrap_file_key at age-0.12.1/src/native/tagpq.rs:95:24 as `hpke_seal::<Kem, _>`; line: `let sk_e = p256::ecdh::EphemeralSecret::random(csprng);`; code: `p256::ecdh::EphemeralSecret::random`",
             "line": 209,
             "location": "age-0.12.1/src/native/tagpq/kem.rs",
             "offset": 19,
@@ -2576,6 +2576,10 @@
         {
           "name": "rcbom:artifact",
           "value": "bin rage"
+        },
+        {
+          "name": "rcbom:provenance:rng",
+          "value": "parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -4941,7 +4945,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cd606343-d884-8d13-b050-ef4db597b158",
+  "serialNumber": "urn:uuid:93520691-840e-8e4e-b577-315d7fb6478f",
   "specVersion": "1.7",
   "version": 1
 }
