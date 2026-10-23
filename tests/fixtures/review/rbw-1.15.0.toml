@@ -1,0 +1,734 @@
+# Blind labels for rbw 1.15.0 (crates.io package, sha256 898e7d86dbccf69ff93dead68d3d20aef9a4b2ac8d0ac12ceba5885c9a92e9b9),
+# written from source by the independent reviewer before any tool run (23 October 2026), by docs/suite/RULES.md.
+# Build: default features (clipboard), host x86_64-unknown-linux-gnu, release; library rbw plus binaries rbw and rbw-agent.
+# Library entry points (R14) and both binaries' mains (R13) reach every site below; tests excluded.
+# Crate versions from the shipped Cargo.lock: aes 0.8.4, cbc 0.1.2, hmac 0.12.1, sha1 0.10.6, sha2 0.10.9, pbkdf2 0.12.2,
+# argon2 0.5.3, hkdf 0.12.4, rsa 0.9.9, rand 0.9.2 (rand::rng() = ThreadRng, ChaCha12) and rand 0.8.5 (as rand_8), uuid 1.19.0
+# (getrandom 0.3), totp-rs 5.7.0 (hmac/sha1/sha2 0.10 inside), ssh-key 0.6.7 (ed25519-dalek 2.2.0 inside).
+
+[[package]]
+name = "aes"
+version = "0.8.4"
+kind = "algorithm"
+why = "AES block cipher under cbc for Bitwarden cipherstrings"
+
+[[package]]
+name = "argon2"
+version = "0.5.3"
+kind = "algorithm"
+why = "Argon2id master-key derivation (KdfType::Argon2id)"
+
+[[package]]
+name = "base16ct"
+version = "0.2.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "base64ct"
+version = "1.8.1"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "blake2"
+version = "0.10.6"
+kind = "algorithm"
+why = "BLAKE2b inside argon2"
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "block-padding"
+version = "0.3.3"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "cbc"
+version = "0.1.2"
+kind = "algorithm"
+why = "AES-256-CBC cipherstring encryption/decryption"
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+kind = "trait"
+why = "RustCrypto cipher traits"
+
+[[package]]
+name = "const-oid"
+version = "0.9.6"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.3.1"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "cpufeatures"
+version = "0.2.17"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "crypto-bigint"
+version = "0.5.5"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "crypto-common"
+version = "0.1.7"
+kind = "trait"
+why = "RustCrypto KeyInit/KeyIvInit traits"
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+kind = "algorithm"
+why = "Curve25519 arithmetic under ed25519-dalek (ssh-key)"
+
+[[package]]
+name = "der"
+version = "0.7.10"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+kind = "trait"
+why = "RustCrypto hash/MAC traits"
+
+[[package]]
+name = "ecdsa"
+version = "0.16.9"
+kind = "algorithm"
+why = "ECDSA under ssh-key p256/p384/p521"
+
+[[package]]
+name = "ed25519"
+version = "2.2.3"
+kind = "trait"
+why = "Ed25519 signature types"
+
+[[package]]
+name = "ed25519-dalek"
+version = "2.2.0"
+kind = "algorithm"
+why = "Ed25519 signing under ssh-key (agent)"
+
+[[package]]
+name = "elliptic-curve"
+version = "0.13.8"
+kind = "trait"
+why = "elliptic-curve traits under p256/p384/p521"
+
+[[package]]
+name = "fastrand"
+version = "2.3.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "ff"
+version = "0.13.1"
+kind = "trait"
+why = "finite-field traits"
+
+[[package]]
+name = "generic-array"
+version = "0.14.7"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "getrandom"
+version = "0.2.16"
+kind = "rng"
+why = "OS randomness (ring, rand_core OsRng, uuid v4)"
+
+[[package]]
+name = "getrandom"
+version = "0.3.4"
+kind = "rng"
+why = "OS randomness (ring, rand_core OsRng, uuid v4)"
+
+[[package]]
+name = "group"
+version = "0.13.0"
+kind = "trait"
+why = "group traits"
+
+[[package]]
+name = "hashbrown"
+version = "0.16.1"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "hkdf"
+version = "0.12.4"
+kind = "algorithm"
+why = "HKDF-SHA-256 expansion of the master key"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+kind = "algorithm"
+why = "HMAC-SHA-256 cipherstring MACs, PBKDF2 PRF, TOTP"
+
+[[package]]
+name = "hyper-rustls"
+version = "0.27.7"
+kind = "protocol"
+why = "TLS for reqwest"
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "num-bigint-dig"
+version = "0.8.6"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "openssl-probe"
+version = "0.1.6"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "p256"
+version = "0.13.2"
+kind = "algorithm"
+why = "NIST P-256 under ssh-key"
+
+[[package]]
+name = "p384"
+version = "0.13.1"
+kind = "algorithm"
+why = "NIST P-384 under ssh-key"
+
+[[package]]
+name = "p521"
+version = "0.13.3"
+kind = "algorithm"
+why = "NIST P-521 under ssh-key"
+
+[[package]]
+name = "password-hash"
+version = "0.5.0"
+kind = "trait"
+why = "password-hash traits under argon2"
+
+[[package]]
+name = "pbkdf2"
+version = "0.12.2"
+kind = "algorithm"
+why = "PBKDF2-HMAC-SHA-256 master key and master password hash"
+
+[[package]]
+name = "pem-rfc7468"
+version = "0.7.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "pkcs1"
+version = "0.7.5"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "pkcs8"
+version = "0.10.2"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "ppv-lite86"
+version = "0.2.21"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "primeorder"
+version = "0.13.6"
+kind = "algorithm"
+why = "prime-order curve arithmetic"
+
+[[package]]
+name = "quinn-proto"
+version = "0.11.13"
+kind = "protocol"
+why = "QUIC transport: TLS 1.3 through rustls and packet protection with its crypto provider (reqwest http3 stack)"
+
+[[package]]
+name = "rand"
+version = "0.8.5"
+kind = "rng"
+why = "random IVs, SSO verifier, password generation (rand 0.9 ThreadRng = ChaCha12); rand 0.8 OsRng for RSA signing"
+
+[[package]]
+name = "rand"
+version = "0.9.2"
+kind = "rng"
+why = "random IVs, SSO verifier, password generation (rand 0.9 ThreadRng = ChaCha12); rand 0.8 OsRng for RSA signing"
+
+[[package]]
+name = "rand_chacha"
+version = "0.3.1"
+kind = "rng"
+why = "ChaCha-based thread RNG"
+
+[[package]]
+name = "rand_chacha"
+version = "0.9.0"
+kind = "rng"
+why = "ChaCha-based thread RNG"
+
+[[package]]
+name = "rand_core"
+version = "0.6.4"
+kind = "rng"
+why = "RNG traits"
+
+[[package]]
+name = "rand_core"
+version = "0.9.3"
+kind = "rng"
+why = "RNG traits"
+
+[[package]]
+name = "rfc6979"
+version = "0.4.0"
+kind = "algorithm"
+why = "deterministic ECDSA nonces"
+
+[[package]]
+name = "ring"
+version = "0.17.14"
+kind = "algorithm"
+why = "rustls crypto provider"
+
+[[package]]
+name = "rsa"
+version = "0.9.9"
+kind = "algorithm"
+why = "RSA-OAEP-SHA-1 decryption of org keys; RSA PKCS#1 v1.5 signing in the ssh agent"
+
+[[package]]
+name = "rustc-hash"
+version = "2.1.1"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "rustls"
+version = "0.23.35"
+kind = "protocol"
+why = "TLS 1.2/1.3 client for the Bitwarden API"
+
+[[package]]
+name = "rustls-native-certs"
+version = "0.8.2"
+kind = "pki"
+why = "system roots for rustls"
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.13.2"
+kind = "pki"
+why = "PKI types"
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.8"
+kind = "pki"
+why = "certificate verification"
+
+[[package]]
+name = "sec1"
+version = "0.7.3"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "secrecy"
+version = "0.8.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "sha1"
+version = "0.10.6"
+kind = "algorithm"
+why = "SHA-1 for RSA-OAEP and ssh-rsa signatures; TOTP SHA1"
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+kind = "algorithm"
+why = "SHA-256 hashing, PRFs, RSA signatures"
+
+[[package]]
+name = "signature"
+version = "2.2.0"
+kind = "trait"
+why = "signature traits"
+
+[[package]]
+name = "spki"
+version = "0.7.3"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "ssh-agent-lib"
+version = "0.5.1"
+kind = "protocol"
+why = "SSH agent protocol (signing requests are served by rbw-agent)"
+
+[[package]]
+name = "ssh-cipher"
+version = "0.2.0"
+kind = "protocol"
+why = "ciphers for encrypted OpenSSH keys (under ssh-key)"
+
+[[package]]
+name = "ssh-encoding"
+version = "0.2.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "ssh-key"
+version = "0.6.7"
+kind = "protocol"
+why = "OpenSSH key formats and Ed25519 signing for the ssh agent"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "tokio-rustls"
+version = "0.26.4"
+kind = "protocol"
+why = "async TLS"
+
+[[package]]
+name = "totp-rs"
+version = "5.7.0"
+kind = "protocol"
+why = "HOTP/TOTP codes over HMAC-SHA-1/256/512"
+
+[[package]]
+name = "typenum"
+version = "1.19.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "untrusted"
+version = "0.9.0"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+kind = "support"
+why = "encoding, constant-time, buffering or type helper; computes no cryptography"
+
+# ---------------------------------------------------------------- Layer 2
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 107
+callee = "encrypt_padded_vec_mut"
+function = "encrypt"
+must = ["AES-256-CBC"]
+may = []
+artifacts = ["rbw-agent"]
+note = "cbc::Encryptor<aes::Aes256> built on line 102 with keys.enc_key() and the random IV; CipherString::encrypt_symmetric, reached from rbw-agent encrypt (agent actions.rs:703) and the public lib API (R8)"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 114
+callee = "finalize"
+function = "tag"
+must = ["HMAC-SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "hmac::Hmac<sha2::Sha256>::finalize over iv and ciphertext in encrypt_symmetric (R8); new_from_slice and update are not sites"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 141
+callee = "decrypt_padded_vec_mut"
+function = "decrypt"
+must = ["AES-256-CBC"]
+may = []
+artifacts = ["rbw-agent"]
+note = "cbc::Decryptor<aes::Aes256> from decrypt_common_symmetric in CipherString::decrypt_symmetric; reached from rbw-agent decrypt (agent actions.rs:667)"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 171
+callee = "decrypt_padded_mut"
+function = "decrypt"
+must = ["AES-256-CBC"]
+may = []
+artifacts = ["rbw-agent"]
+note = "cbc::Decryptor<aes::Aes256> in CipherString::decrypt_locked_symmetric; reached from lib actions::login/unlock (actions.rs:103,116) and agent decrypt_cipher (actions.rs:573)"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 194
+callee = "decrypt"
+function = "decrypt"
+must = ["RSA-OAEP-SHA-1"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rsa RsaPrivateKey::decrypt with Oaep::new::<sha1::Sha1>() in decrypt_locked_asymmetric (org keys); reached from lib actions.rs:126; from_pkcs8_der on line 191 is a constructor (R1.1)"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 228
+callee = "verify"
+function = "verify"
+must = ["HMAC-SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "hmac Mac::verify of the cipherstring MAC in decrypt_common_symmetric, reached from both symmetric decrypt paths (R8)"
+
+[[site]]
+file = "src/cipherstring.rs"
+line = 265
+callee = "fill_bytes"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rand 0.9 rng() (ThreadRng, ChaCha12) fills the 16-byte CBC IV in random_iv, called by encrypt_symmetric (R9.1, R9.3)"
+
+[[site]]
+file = "src/identity.rs"
+line = 32
+callee = "pbkdf2"
+function = "keyderive"
+must = ["PBKDF2-SHA-256"]
+may = []
+params = { length = "32" }
+artifacts = ["rbw-agent"]
+note = "pbkdf2::pbkdf2::<Hmac<Sha256>> derives the 32-byte master key for KdfType::Pbkdf2 in Identity::new (lib actions::login/unlock, reached from rbw-agent); iterations come from the account settings"
+
+[[site]]
+file = "src/identity.rs"
+line = 44
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "sha2 Sha256 finalize of the email as the Argon2 salt (KdfType::Argon2id arm of Identity::new)"
+
+[[site]]
+file = "src/identity.rs"
+line = 57
+callee = "hash_password_into"
+function = "keyderive"
+must = ["Argon2id"]
+may = []
+params = { length = "32" }
+artifacts = ["rbw-agent"]
+note = "argon2::Argon2::hash_password_into with Algorithm::Argon2id, Version::V0x13 and account-supplied memory/iterations/parallelism (no literal costs, R11); 32-byte output"
+
+[[site]]
+file = "src/identity.rs"
+line = 69
+callee = "pbkdf2"
+function = "keyderive"
+must = ["PBKDF2-SHA-256"]
+may = []
+params = { iterations = "1", length = "32" }
+artifacts = ["rbw-agent"]
+note = "pbkdf2::pbkdf2::<Hmac<Sha256>> with one iteration over the master key and password: the 32-byte master password hash"
+
+[[site]]
+file = "src/identity.rs"
+line = 79
+callee = "expand"
+function = "keyderive"
+must = ["HKDF-SHA-256"]
+may = []
+params = { length = "32" }
+artifacts = ["rbw-agent"]
+note = "hkdf Hkdf<Sha256>::expand(b\"enc\") into the 32-byte encryption key; from_prk on line 77 is a constructor (R1.1)"
+
+[[site]]
+file = "src/identity.rs"
+line = 82
+callee = "expand"
+function = "keyderive"
+must = ["HKDF-SHA-256"]
+may = []
+params = { length = "32" }
+artifacts = ["rbw-agent"]
+note = "hkdf Hkdf<Sha256>::expand(b\"mac\") into the 32-byte MAC key"
+
+[[site]]
+file = "src/api.rs"
+line = 1102
+callee = "sample_string"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rand 0.9 Alphanumeric.sample_string(&mut rand::rng(), 64): the SSO state, drawn from ThreadRng (R9.1); obtain_sso_code is reached from Client::login (api.rs:986) for SSO logins"
+
+[[site]]
+file = "src/api.rs"
+line = 1104
+callee = "sample_string"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rand 0.9 Alphanumeric.sample_string(&mut rand::rng(), 64): the PKCE code verifier (R9.1)"
+
+[[site]]
+file = "src/api.rs"
+line = 1109
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "sha2 Sha256 finalize of the PKCE code verifier (the S256 code challenge) in obtain_sso_code"
+
+[[site]]
+file = "src/config.rs"
+line = 232
+callee = "new_v4"
+function = "generate"
+must = ["OS-RNG"]
+may = []
+artifacts = ["rbw-agent"]
+note = "uuid::Uuid::new_v4 (uuid 1.19 with its default rng feature: getrandom 0.3, the OS RNG) for a fresh device id in config::device_id, reached from lib actions (register, login) used by rbw-agent; the draw happens inside uuid"
+
+[[site]]
+file = "src/pwgen.rs"
+line = 52
+callee = "choose"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+artifacts = ["rbw"]
+note = "rand 0.9 IteratorRandom::choose on the alphabet with rng = rand::rng() (ThreadRng, ChaCha12) in pwgen, reached from the rbw generate command (R9.1)"
+
+[[site]]
+file = "src/pwgen.rs"
+line = 64
+callee = "choose"
+function = "generate"
+must = ["ChaCha12-RNG"]
+may = []
+artifacts = ["rbw"]
+note = "IteratorRandom::choose over the EFF word list in diceware with the ThreadRng pwgen passes (R9.1)"
+
+[[site]]
+file = "src/bin/rbw-agent/ssh_agent.rs"
+line = 72
+callee = "try_sign"
+function = "sign"
+must = ["Ed25519"]
+may = []
+artifacts = ["rbw-agent"]
+note = "ssh_key::private::Ed25519Keypair::try_sign (ed25519-dalek inside ssh-key 0.6.7) for an Ed25519 key in the SSH agent sign request; the signature is computed inside ssh-key"
+
+[[site]]
+file = "src/bin/rbw-agent/ssh_agent.rs"
+line = 93
+callee = "try_sign_with_rng"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-512"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rsa pkcs1v15::SigningKey<Sha512>::try_sign_with_rng (rsa-sha2-512) when the request flags ask for SHA2-512; the OsRng passed is drawn inside rsa (R9.2)"
+
+[[site]]
+file = "src/bin/rbw-agent/ssh_agent.rs"
+line = 103
+callee = "try_sign_with_rng"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rsa pkcs1v15::SigningKey<Sha256>::try_sign_with_rng (rsa-sha2-256) when the flags ask for SHA2-256"
+
+[[site]]
+file = "src/bin/rbw-agent/ssh_agent.rs"
+line = 110
+callee = "try_sign_with_rng"
+function = "sign"
+must = ["RSA-PKCS1-1.5-SHA-1"]
+may = []
+artifacts = ["rbw-agent"]
+note = "rsa pkcs1v15::SigningKey<sha1::Sha1>::new_unprefixed then try_sign_with_rng (legacy ssh-rsa) when no SHA-2 flag is set"
+
+[[site]]
+file = "src/bin/rbw-agent/state.rs"
+line = 89
+callee = "finalize_reset"
+function = "digest"
+must = ["SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "sha2 Sha256 finalize_reset inside the insert closure of State::set_master_password_reprompt (called from sync and decrypt_cipher in agent actions.rs:530,561); R12.3 closure run in place"
+
+[[site]]
+file = "src/bin/rbw-agent/actions.rs"
+line = 583
+callee = "finalize"
+function = "digest"
+must = ["SHA-256"]
+may = []
+artifacts = ["rbw-agent"]
+note = "sha2 Sha256 finalize of the cipherstring in decrypt_cipher (master password reprompt check)"
+
+[[site]]
+file = "src/bin/rbw/commands.rs"
+line = 2798
+callee = "generate_current"
+function = "tag"
+must = ["HMAC-SHA-1", "HMAC-SHA-256", "HMAC-SHA-512"]
+may = []
+artifacts = ["rbw"]
+note = "totp_rs::TOTP::generate_current with the algorithm parsed from the otpauth URL (R15.1): SHA1, SHA256 or SHA512 HMAC inside totp-rs 5.7.0 (hmac 0.12, sha1/sha2 0.10)"
+
+[[site]]
+file = "src/bin/rbw/commands.rs"
+line = 2800
+callee = "generate_current"
+function = "tag"
+must = ["HMAC-SHA-1"]
+may = []
+artifacts = ["rbw"]
+note = "totp_rs::TOTP::new_steam(..).generate_current: Steam codes use HMAC-SHA-1 inside totp-rs"
