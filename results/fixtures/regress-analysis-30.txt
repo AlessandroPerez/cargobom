@@ -1,7 +1,7 @@
-  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:32:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe30::main; use: keygen; line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:32:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:33:13 | core::convert::From::from | [reachable] [call] in probe30::main; from: setup, not a use; line: `let pk = p256::PublicKey::from(&e);`; code: `p256::PublicKey::from`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:34:19 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe30::main; use: keyderive; line: `let shared = e.diffie_hellman(&pk);`; code: `diffie_hellman`
-  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:29:13 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe30::main; use: keygen; line: `let sk = p256::ecdsa::SigningKey::random(&mut OsRng);`; code: `p256::ecdsa::SigningKey::random`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:29:13 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = p256::ecdsa::SigningKey::random(&mut OsRng);`; code: `p256::ecdsa::SigningKey::random`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:30:41 | signature::signer::Signer::sign | [reachable] [call] in probe30::main; use: sign; line: `let sig: p256::ecdsa::Signature = sk.sign(b"msg");`; code: `sign`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:14:12 | digest::digest::Digest::digest | [reachable] [call] in probe30::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:13:12; line: `let a = f(b"abc");`; code: `f`
   occ base16ct | pkg:cargo/base16ct@0.2.0 | Cargo.lock:6:0 | base16ct | [manifest] locked base16ct 0.2.0; reached via probe30 -> p256 -> elliptic-curve -> base16ct
@@ -54,12 +54,14 @@
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=3
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:provenance:rng=rng
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:rng=rng
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved

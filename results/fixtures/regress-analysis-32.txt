@@ -3,18 +3,18 @@
   occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:54:7 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `sr.fill_bytes(&mut out);`; code: `fill_bytes`
   occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:56:11 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `seeded.fill_bytes(&mut out);`; code: `fill_bytes`
   occ ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | src/main.rs:60:7 | rand_core::RngCore::fill_bytes | [reachable] [call] in probe32::main; use: generate; line: `cc.fill_bytes(&mut out);`; code: `fill_bytes`
-  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:26:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:26:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:27:19 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe32::main; use: keyderive; line: `let shared = e.diffie_hellman(&sk.public_key());`; code: `diffie_hellman`
-  occ ECDH-P-384 | crypto:algorithm:ECDH-P-384 | src/main.rs:31:15 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let e384 = p384::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p384::ecdh::EphemeralSecret::random`
+  occ ECDH-P-384 | crypto:algorithm:ECDH-P-384 | src/main.rs:31:15 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe32::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let e384 = p384::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p384::ecdh::EphemeralSecret::random`
   occ ECDH-P-384 | crypto:algorithm:ECDH-P-384 | src/main.rs:33:21 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe32::main; use: keyderive; line: `let _s384 = e384.diffie_hellman(&pk384);`; code: `diffie_hellman`
   occ ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | src/main.rs:38:28 | signature::hazmat::PrehashSigner::sign_prehash | [reachable] [call] in probe32::main; use: sign; line: `let sig3: Signature = s.sign_prehash(&[7u8; 32]).unwrap();`; code: `sign_prehash`
-  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:35:12 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let s = SigningKey::random(&mut OsRng);`; code: `SigningKey::random`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:35:12 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let s = SigningKey::random(&mut OsRng);`; code: `SigningKey::random`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:36:28 | signature::signer::Signer::sign | [reachable] [call] in probe32::main; use: sign; line: `let sig1: Signature = s.sign(&d);`; code: `sign`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:39:12 | core::convert::From::from | [reachable] [call] in probe32::main; from: setup, not a use; line: `let v = VerifyingKey::from(&s);`; code: `VerifyingKey::from`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:40:6 | signature::verifier::Verifier::verify | [reachable] [call] in probe32::main; use: verify; line: `v.verify(&d, &sig1).unwrap();`; code: `verify`
   occ ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | src/main.rs:37:28 | signature::signer::DigestSigner::sign_digest | [reachable] [call] in probe32::main; use: sign; line: `let sig2: Signature = s.sign_digest(Sha3_256::new_with_prefix(&d));`; code: `sign_digest`
   occ ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | src/main.rs:41:6 | signature::verifier::DigestVerifier::verify_digest | [reachable] [call] in probe32::main; use: verify; line: `v.verify_digest(Sha3_256::new_with_prefix(&d), &sig2).unwrap();`; code: `verify_digest`
-  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:42:15 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; line: `let s384 = p384::ecdsa::SigningKey::random(&mut OsRng);`; code: `p384::ecdsa::SigningKey::random`
+  occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:42:15 | ecdsa::signing::SigningKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let s384 = p384::ecdsa::SigningKey::random(&mut OsRng);`; code: `p384::ecdsa::SigningKey::random`
   occ ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | src/main.rs:43:44 | signature::signer::Signer::sign | [reachable] [call] in probe32::main; use: sign; line: `let sig4: p384::ecdsa::Signature = s384.sign(&d);`; code: `sign`
   occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:28:20 | elliptic_curve::ecdh::SharedSecret::<C>::extract | [reachable] [call] in probe32::main; use: keyderive; line: `let hk = shared.extract::<sha2::Sha256>(None);`; code: `extract`
   occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:30:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] in probe32::main; use: keyderive; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
@@ -80,8 +80,8 @@
   occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:414:0 | spki | [manifest] locked spki 0.7.3; reached via probe32 -> p256 -> ecdsa -> spki
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:424:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe32 -> p256 -> elliptic-curve -> subtle
   occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe32::main; use: digest; algorithm unresolved: the type `sha3::Keccak256Core` of sha3 0.10.9, which the knowledge base does not name; line: `let k = Keccak256::digest(&d);`; code: `Keccak256::digest`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | src/main.rs:25:13 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; line: `let sk = p256::SecretKey::random(&mut OsRng);`; code: `p256::SecretKey::random`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | src/main.rs:32:16 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`
+  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | src/main.rs:25:13 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: rng (rand_core::os::OsRng); line: `let sk = p256::SecretKey::random(&mut OsRng);`; code: `p256::SecretKey::random`
+  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | src/main.rs:32:16 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; rng: rng (rand_core::os::OsRng); line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:485:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via probe32 -> ml-kem -> kem -> zeroize
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
@@ -102,12 +102,14 @@
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=2
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:provenance:rng=rng
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:confidence=high
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:detection:method=type-resolved
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:functions:source=observed
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:kb:version=0.2.0
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:occurrences=2
+  prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:provenance:rng=rng
   prop ECDH-P-384 | crypto:algorithm:ECDH-P-384 | rcbom:reachability=reachable
   prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:confidence=high
   prop ECDSA-P-256 | crypto:algorithm:ECDSA-P-256 | rcbom:detection:method=type-resolved
@@ -120,6 +122,7 @@
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=4
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:rng=rng
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
   prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:confidence=high
   prop ECDSA-P-256-SHA3-256 | crypto:algorithm:ECDSA-P-256-SHA3-256 | rcbom:detection:method=type-resolved
@@ -132,6 +135,7 @@
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:functions:source=observed
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:kb:version=0.2.0
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:occurrences=2
+  prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:provenance:rng=rng
   prop ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | rcbom:reachability=reachable
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
@@ -307,6 +311,7 @@
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:provenance:rng=rng
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | rcbom:reachability=reachable
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:algorithm=unresolved
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:confidence=high
@@ -314,6 +319,7 @@
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:provenance:rng=rng
   prop unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | rcbom:reachability=reachable
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled

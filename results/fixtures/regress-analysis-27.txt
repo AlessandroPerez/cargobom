@@ -1,5 +1,5 @@
-  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:28:16 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
-  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:29:14 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:28:16 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
+  occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:29:14 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:23 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in unmodelled::main; use: keyderive; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:43 | elliptic_curve::ecdh::EphemeralSecret::<C>::public_key | [reachable] [call] in unmodelled::main; public_key: setup, not a use; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:16:26 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `"md5" => Box::new(Md5::new()),`; code: `Md5::new`
@@ -48,6 +48,7 @@
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=4
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:provenance:rng=rng
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
   prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
   prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved

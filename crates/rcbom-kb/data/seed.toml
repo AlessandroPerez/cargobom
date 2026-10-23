@@ -2920,6 +2920,13 @@ args = { "0" = "rng" }
 path = "^blake3::(keyed_hash|Hasher::new_keyed)$"
 args = { "0" = "key" }
 
+# RustCrypto's generated keys, IVs and nonces, and keys on the elliptic-curve crates' curves:
+# the generator passed (`Aes256Gcm::generate_key(&mut OsRng)`, `generate_nonce(&mut rng)`,
+# `SecretKey::<NistP256>::random(&mut rng)`)
+[[role]]
+path = "(KeyInit::generate_key|KeyIvInit::generate_(key|iv|key_iv)|AeadCore::generate_nonce)$|^elliptic_curve::(secret_key::SecretKey|ecdh::EphemeralSecret)::random$|^ecdsa::signing::SigningKey::random$"
+args = { "0" = "rng" }
+
 [[role]]
 path = "^blake3::derive_key$"
 args = { "1" = "ikm" }

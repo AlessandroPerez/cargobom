@@ -774,7 +774,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
@@ -860,6 +860,10 @@
           "value": "hard-coded-nonce"
         },
         {
+          "name": "rcbom:provenance:rng",
+          "value": "rng"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "7"
         }
@@ -888,7 +892,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
@@ -942,6 +946,10 @@
         },
         {
           "name": "rcbom:provenance:nonce",
+          "value": "rng"
+        },
+        {
+          "name": "rcbom:provenance:rng",
           "value": "rng"
         },
         {
@@ -1573,7 +1581,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3eae6104-6b50-8349-9363-9c07a4ba89b0",
+  "serialNumber": "urn:uuid:135870e4-f31a-8217-821b-285d1670d746",
   "specVersion": "1.7",
   "version": 1
 }
