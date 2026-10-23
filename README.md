@@ -9,7 +9,8 @@ reports:
 - where: every finding is an evidence occurrence at a file, line, column and symbol, with the
   function it is in and why it was reported;
 - how: what each call does (encrypt, sign, digest, keyderive, ...), whether the code is reachable
-  from the program's entry points or only compiled, and where key material comes from
+  from the program's entry points (an upper bound: see Limitations) or only compiled, and where
+  key material comes from
   (hard-coded, environment, RNG, a parameter, derived), with findings such as
   `hard-coded-key`;
 - what it cannot tell: an operation whose algorithm is not determined is reported as `unknown`,
@@ -136,27 +137,33 @@ independent reviewer of the whole project, then used for the fixes its review fo
 | set | what | result |
 |---|---|---|
 | ground-truth suite | 53 programs, 107 call sites | 104 correct, 3 less-specific, 0 wrong, 0 miss |
-| corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 28 live sites: 18 correct, 4 honest-unknown, 6 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
+| corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 28 live sites: 16 correct, 6 honest-unknown, 4 miss, 2 wrong (jwt-cli's insecure decodes, against labels amended after the runs: Limitations); 10 dead sites (features off), nothing reported there |
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, 0 wrong; 10 dead sites, nothing reported there |
-| review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 28 correct, 1 less-specific, 1 honest-unknown, 3 miss, 0 wrong |
+| review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 28 correct, 1 less-specific, 3 honest-unknown, 1 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures: 19,211 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,808, held-out 1,277 and review 781, all verified; every one of 93,192 positions shifted by a line or a column rejected |
+| evidence | every cited position, `verify --self-test` | fixtures (300 outputs, the suite's included): 19,398 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,840, held-out 1,295 and review 799, all verified; every one of 94,350 positions shifted by a line or a column rejected |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 6 cores: compilation, analysis, walk check | 4 s (totp-rs) to 177 s (xh) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw); reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
-- **Misses.** The corpus misses are calls into crates the knowledge base does not model at their
-  boundary: rage's calls into age, xh's into digest_auth. Their algorithms are reported and cited
-  inside those crates, not at the program's call. In the held-out set, three are dufs's
-  `Uuid::new_v4` (the draw is reported at uuid's own call), and one is ssh-key's RSA key
-  generation, which is reported as RSA private-key material, not as the scheme the label names.
-  In the review set, rbw's `Uuid::new_v4` and its two calls of totp-rs's `generate_current`
-  are cited inside uuid and totp-rs.
+- **Misses.** The corpus misses are rage's calls into age that set up its encryptor
+  (`with_user_passphrase`, `with_recipients`) or take no arguments
+  (`read_or_generate_passphrase`); age's own operations, the passphrase's draw among them, are
+  cited inside age. In the held-out set, three are dufs's `Uuid::new_v4` (the draw is reported at
+  uuid's own call), and one is ssh-key's RSA key generation, which is reported as RSA
+  private-key material, not as the scheme the label names. In the review set, it is rbw's
+  `Uuid::new_v4`.
+- **Wrong.** jwt-cli's two `decode` calls with signature validation disabled verify nothing; the
+  CBOM keeps their HMAC candidates with a note that validation is disabled on a way to the call
+  (Limitations), and the labels, amended after the runs to the strict reading of R15.2, allow
+  only HS256 there.
 - **Honest unknowns.** In the held-out set these are mostly crates at versions the knowledge base
   does not cover: the newer RustCrypto generation (sha2 0.11, hmac 0.13, rand 0.10, scrypt 0.12,
   md5 0.8, ed25519-dalek 3), and blake2, which it does not model (boringtun's BLAKE2s). They are
   reported as operations of unknown algorithm, with the package and the reason. The others are
-  types a library's callers choose.
+  types a library's callers choose, and calls into crypto packages the knowledge base does not
+  model (age's `decrypt`, digest_auth's `respond`, totp-rs's `generate_current`, ssh-key's
+  `try_sign`).
 
 ## Limitations
 
@@ -175,9 +182,13 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   whether it protects anything (`rcbom:usage` is Layer 1's usage tier).
 
 **Conventions: where the CBOM differs from a label written by the rules**
-- Inside a dependency the knowledge base does not model at its boundary, calls are cited there
-  (rage's calls into age are cited in age), not at the program's call into it. Inside algorithm
-  crates nothing is cited: their internals are folded into the call into them.
+- A call into a crypto package the knowledge base does not model, made from the program or a
+  dependency that is no crypto package, is an operation of an unknown algorithm, but for what
+  sets something up (a constructor, conversion or accessor; a call taking nothing to operate on)
+  and a step of a stream. Calls between crypto packages are their internals. Where such a
+  package's own code calls modelled crates, those calls are cited inside it too (rage's call
+  into age is an unknown at rage's line, and age's ChaCha20-Poly1305 is cited in age). Inside
+  algorithm crates nothing is cited: their internals are folded into the call into them.
 - Streaming steps the knowledge base lists (`Digest::update`, `Mac::update`, ring's
   `Prk::expand`) are reported beside the call that finishes the stream; the rules label only
   the latter (the scorers count them as unlabelled uses, never as wrong).
@@ -185,12 +196,27 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   functions make into the crypto library, not at the indirect call.
 - RSA key generation (`RsaPrivateKey::new`) is reported as RSA private-key material with its
   `keygen` use, not as a signature or encryption scheme.
-- A TLS protocol asset lists the versions, suites and groups the build's provider offers, not
-  those a `ClientConfig` restricts it to.
+- A key's export to bytes (`SigningKey::to_bytes`) is setup, not a use: none of CycloneDX's
+  crypto functions runs there. The occurrence is cited with the key's algorithm.
+- A TLS protocol asset lists the versions, suites and groups the backend's provider module
+  offers (all nine of rustls's ring suites), not those a provider the program builds or a
+  `ClientConfig` restricts it to; a suite the program names is cited where it names it.
+- jsonwebtoken's `decode` after `insecure_disable_signature_validation()` keeps its candidate
+  algorithms, with a note that validation is disabled on a way to the call and that there it
+  only decodes: whether the call is made on every way is not known, and dropping the claim
+  where it is not would drop an operation.
 - A set member that reaches a function several artifacts share from one artifact's code is
   tagged with every artifact reaching the call: the tags may say too much, never too little.
 
 **Known limits**
+- *Reachability is an upper bound.* `reachable` is what a walk that errs towards reaching
+  finds: a trait-object method is released for every coerced type at any call through the
+  trait or any escape of such an object, and a future's body counts as run where it is built.
+  A vtable method no code calls, an `Arc<dyn Trait>` never called, an `async` body never polled
+  are `reachable`; on realapp, whose `main` only builds rustls's ring provider, 419 of 560
+  occurrences are. `present` means compiled and certainly not reached. A named algorithm in such
+  code is counted as wrong by the scorers where its site is labelled dead; none is in the sets
+  above.
 - *Layer 1 from metadata.* An unmodelled package is a crypto package when its `Cargo.toml` says
   so (category or keyword) or the knowledge base lists it, and `support` when its categories
   are an encoding's or a parser's. Metadata cannot tell every case (ssh-key, which signs, has
@@ -205,7 +231,15 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   (`HMAC` of a caller's hash).
 - *Provenance.* Key material is classified for the arguments the knowledge base gives a role;
   a generator handed to an API without an `rng` role is not classified, and gets no
-  `predictable-rng` finding.
+  `predictable-rng` finding. A parameter's provenance includes what the program's callers pass;
+  callers outside the program or through pointers leave it `parameter`.
+- *Needless unknowns.* A set the code closes but the analysis does not follow is an unknown:
+  a `Box<dyn DynDigest>` built from three constructors just above, a local closure called
+  directly (closures handed to `map`, `and_then` are followed).
+- *Names and parameters.* ring's and aws-lc-rs's PBKDF2 is named without its iteration count and
+  output length; BLAKE3 is `BLAKE3-256` for `hash` and `keyed_hash`, `BLAKE3` for key derivation
+  and XOF output. A library's generic API that sibling binaries instantiate gets no "callers
+  choose" unknown for the library itself.
 - *Parameters.* `rcbom:param:*` properties are not scored against the labels' `params`.
 - *The verifier* is text-based. It checks every position, the token and item there, and the
   details it can read in the source (the descriptor a call reads, witnesses, bindings,
