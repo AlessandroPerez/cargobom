@@ -751,6 +751,12 @@ impl Files<'_> {
             for d in named {
                 let names =
                     rcbom_analysis::static_names(self.kb, d.split("::").next().unwrap_or(""), d);
+                // (a descriptor the knowledge base does not know is none: also where no witness
+                // or argument is checked, a member reaching the call from another function; a
+                // member's label, `passed by `F``, is no path)
+                if names.is_empty() && re!(r"^[A-Za-z_]\w*(::[A-Za-z_]\w*)+$").is_match(d) {
+                    return Err(format!("`{d}` is no knowledge-base descriptor"));
+                }
                 if !names.is_empty()
                     && !names
                         .iter()
@@ -982,6 +988,62 @@ impl Files<'_> {
     /// library, an instantiation's line is in the caller and names what it instantiates (the
     /// occurrence's item, then each caller in turn; a closure is instantiated where it is
     /// written), and a macro's line is in the body of the `macro_rules!` of its tag.
+    /// Whether `line` declares a field of the type the attribute at `attr_line` is on (past the
+    /// attributes and comments between them) whose type names a package providing the asset.
+    fn derived_field(
+        &self,
+        src: &Source,
+        path: &Path,
+        attr_line: usize,
+        line: usize,
+        component_ref: &str,
+    ) -> bool {
+        let Some(item) = src
+            .items
+            .iter()
+            .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > attr_line)
+            .min_by_key(|i| i.start)
+        else {
+            return false;
+        };
+        let attached = (attr_line + 1..item.start.0).all(|l| {
+            let t = src.lines[l - 1].trim_start();
+            t.is_empty() || t.starts_with("#[") || t.starts_with("//")
+        });
+        // (inside its body: the item records its header)
+        let s = &src.code;
+        let a = src.idx(item.start);
+        let Some(open) = (a..s.len()).find(|&k| matches!(s[k], '{' | '(' | ';')) else {
+            return false;
+        };
+        let Some(close) = close_of_at(s, open) else {
+            return false;
+        };
+        if !attached || line <= src.pos(open).0 || line > src.pos(close).0 {
+            return false;
+        }
+        let Some(ty) = re!(r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:r#)?\w+\s*:\s*([^,/]+)")
+            .captures(&src.lines[line - 1])
+            .map(|m| m[1].to_string())
+        else {
+            return false;
+        };
+        let Some(provs) = self.graph.providers.get(component_ref) else {
+            return false;
+        };
+        let owner = self.man.owner_of(path).map(|p| p.id.repr.clone());
+        re!(r"[A-Za-z_]\w*").find_iter(&ty).any(|w| {
+            self.origins(src, owner.as_deref(), w.as_str())
+                .into_iter()
+                .flatten()
+                .filter(|r| !self.neutral(r))
+                .any(|r| {
+                    let cl = self.graph.closure(&r);
+                    provs.iter().any(|p| cl.contains(p))
+                })
+        })
+    }
+
     pub(super) fn check_details(
         &mut self,
         details: &str,
@@ -1194,8 +1256,13 @@ impl Files<'_> {
                     // a closure (or `async` body) the caller itself writes is cited where it
                     // does: `|..|`, `async`, `move`
                     // (an instance written `f::<..>` is `f`)
-                    let bare =
-                        |x: &str| strip_generics(x).trim().trim_end_matches("::").to_string();
+                    let bare = |x: &str| {
+                        strip_generics(x)
+                            .replace("::::", "::")
+                            .trim()
+                            .trim_end_matches("::")
+                            .to_string()
+                    };
                     let own_closure = callee
                         .as_deref()
                         .and_then(closure_parent)
@@ -1421,8 +1488,16 @@ impl Files<'_> {
                                             && (c0 == 0 || !is_ident(chars[c0 - 1]));
                                     // (a coercion's expression may start with `&` or `(`:
                                     // `&Legacy` made a `&dyn Pick`)
+                                    // (a parenthesized expression's `(`, not a call's:
+                                    // `push(Box::new(m))` is coerced at `Box`)
+                                    let call_paren = chars.get(c0) == Some(&'(')
+                                        && before_blank(&chars, c0).is_some_and(|p| {
+                                            is_ident(chars[p])
+                                                || matches!(chars[p], '>' | ')' | ']' | '!')
+                                        });
                                     let coercion = j == c0
                                         && names_owner
+                                        && !call_paren
                                         && chars.get(c0).is_some_and(|ch| matches!(ch, '&' | '('));
                                     // (the coercion's expression from its first token: not a
                                     // token inside `&W(S2)` or `Box::new(X)`)
@@ -1535,7 +1610,7 @@ impl Files<'_> {
                                 (a < ii || (a == ii && !bar))
                                     && ii < b
                                     && !(a + 1..ii).any(|k| {
-                                        closure_at(&src.code, k)
+                                        closure_at_src(&src, k)
                                             && closure_span(&src.code, k)
                                                 .is_some_and(|(x, y)| x < ii && ii < y && y < b)
                                     })
@@ -1702,7 +1777,13 @@ impl Files<'_> {
                     });
                     let Some(t) = bang.filter(|_| rules) else {
                         let first = attribute_start(self, at.0, at.1);
-                        if path != at.0 || first != Some(line) {
+                        // (or a built-in derive's code for one field, `Sha256::default()` of
+                        // `#[derive(Default)]` for `hasher: Sha256`, expanded from that field's
+                        // line, which names a package providing the asset)
+                        let field = path == at.0
+                            && tags.contains("[derive ")
+                            && self.derived_field(&src, &path, at.1, line, component_ref);
+                        if path != at.0 || (first != Some(line) && !field) {
                             return Err(format!(
                                 "`{part}`: not the first line of the attribute or macro call at line {}",
                                 at.1

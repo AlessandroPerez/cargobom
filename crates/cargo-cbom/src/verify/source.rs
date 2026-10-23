@@ -1713,6 +1713,25 @@ pub(super) fn closure_at(s: &[char], k: usize) -> bool {
         },
     }
 }
+/// `closure_at`, with the source's literals, which `code` blanks: a `|` right after a string or
+/// character literal is an or-pattern's (`"socks4" | "socks4a" => ..`), not a closure's.
+pub(super) fn closure_at_src(src: &Source, k: usize) -> bool {
+    if !closure_at(&src.code, k) {
+        return false;
+    }
+    let mut p = k;
+    while p > 0 {
+        p -= 1;
+        let (l, c) = src.pos(p);
+        if src.class.get(l.wrapping_sub(1)).and_then(|r| r.get(c)) == Some(&Class::Literal) {
+            return false;
+        }
+        if !src.code[p].is_whitespace() {
+            return true;
+        }
+    }
+    true
+}
 /// A closure starting at the `|` at `k` (`closure_at`): its parameters' extent (none for `||`)
 /// and its body's.
 #[allow(clippy::type_complexity)]
