@@ -1,0 +1,510 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/aes@0.8.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by ext-cipher-basic (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aes"
+          },
+          {
+            "additionalContext": "[manifest] locked aes 0.8.4; reached via ext-cipher-basic -> aes",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aes"
+          }
+        ]
+      },
+      "name": "aes",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aes@0.8.4",
+      "type": "library",
+      "version": "0.8.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/block-padding@0.3.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-padding 0.3.3; reached via ext-cipher-basic -> aes -> cipher -> inout -> block-padding",
+            "line": 17,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-padding"
+          }
+        ]
+      },
+      "name": "block-padding",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-padding@0.3.3",
+      "type": "library",
+      "version": "0.3.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/cbc@0.1.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by ext-cipher-basic (dependencies); features [\"alloc\"]",
+            "line": 11,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "cbc"
+          },
+          {
+            "additionalContext": "[manifest] locked cbc 0.1.2; reached via ext-cipher-basic -> cbc",
+            "line": 26,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "cbc"
+          }
+        ]
+      },
+      "name": "cbc",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/cbc@0.1.2",
+      "type": "library",
+      "version": "0.1.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/cipher@0.4.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked cipher 0.4.4; reached via ext-cipher-basic -> aes -> cipher",
+            "line": 41,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "cipher"
+          }
+        ]
+      },
+      "name": "cipher",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/cipher@0.4.4",
+      "type": "library",
+      "version": "0.4.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via ext-cipher-basic -> aes -> cipher -> crypto-common",
+            "line": 60,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/ctr@0.9.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by ext-cipher-basic (dependencies)",
+            "line": 12,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ctr"
+          },
+          {
+            "additionalContext": "[manifest] locked ctr 0.9.2; reached via ext-cipher-basic -> ctr",
+            "line": 70,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ctr"
+          }
+        ]
+      },
+      "name": "ctr",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ctr@0.9.2",
+      "type": "library",
+      "version": "0.9.2"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128-CTR",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "ctr",
+          "parameterSetIdentifier": "128",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 15); iv: hard-coded (all zero, 16 bytes, literal at line 15); line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `Ctr::new`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "crypto_common::KeyIvInit::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt or decrypt; line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `apply_keystream`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 54,
+            "symbol": "cipher::stream::StreamCipher::apply_keystream"
+          }
+        ]
+      },
+      "name": "AES-128-CTR",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-iv"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-256-CBC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "decrypt",
+            "encrypt"
+          ],
+          "mode": "cbc",
+          "parameterSetIdentifier": "256",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `CbcEnc::new`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "crypto_common::KeyIvInit::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt; line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `encrypt_padded_vec_mut`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 50,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_vec_mut"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `CbcDec::new`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "crypto_common::KeyIvInit::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: decrypt; line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `decrypt_padded_vec_mut`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 50,
+            "symbol": "cipher::block::BlockDecryptMut::decrypt_padded_vec_mut"
+          }
+        ]
+      },
+      "name": "AES-256-CBC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-iv"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-CTR",
+        "crypto:algorithm:AES-256-CBC"
+      ],
+      "ref": "pkg:cargo/aes@0.8.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-padding@0.3.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-256-CBC"
+      ],
+      "ref": "pkg:cargo/cbc@0.1.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-padding@0.3.3",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/cipher@0.4.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-CTR"
+      ],
+      "ref": "pkg:cargo/ctr@0.9.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/aes@0.8.4",
+        "pkg:cargo/cbc@0.1.2",
+        "pkg:cargo/ctr@0.9.2"
+      ],
+      "ref": "pkg:cargo/ext-cipher-basic@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CTR"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-256-CBC"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/ext-cipher-basic@0.1.0",
+      "name": "ext-cipher-basic",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/ext-cipher-basic@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "13"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "52"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin ext-cipher-basic"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:988f4b91-b444-8458-a0ca-a15460030695",
+  "specVersion": "1.7",
+  "version": 1
+}

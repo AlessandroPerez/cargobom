@@ -1,6 +1,6 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/aliases.rs:11:13 | aead::Aead::encrypt | [reachable] [call] in <aes_gcm::AesGcm<aes::autodetect::Aes256, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>> as v03::aliases::Seal>::seal; use: encrypt; nonce: hard-coded (all zero, 12 bytes, literal at line 11); line: `self.encrypt(Nonce::from_slice(&[0u8; 12]), msg).unwrap_or_default()`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/aliases.rs:30:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in v03::aliases::run; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 30); line: `let c = Aes256Gcm::new_from_slice(&[1u8; 32]).unwrap();`; code: `Aes256Gcm::new_from_slice`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:50:12 | digest::mac::Mac::new_from_slice | [reachable] [call] in v03::multiline; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let m = Hmac::<`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:50:12 | digest::mac::Mac::new_from_slice | [reachable] [call] in v03::multiline; new_from_slice: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `let m = Hmac::<`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:54:16 | digest::mac::Mac::finalize | [reachable] [call] in v03::multiline; use: tag; line: `h.len() + m.finalize().into_bytes().len()`; code: `finalize`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:54:27 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in v03::multiline; into_bytes: setup, not a use; line: `h.len() + m.finalize().into_bytes().len()`; code: `into_bytes`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/aliases.rs:20:8 | digest::digest::Digest::digest | [reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>> as v03::aliases::Fingerprint>::fingerprint; use: digest; line: `Sha256::digest(d).len()`; code: `Sha256::digest`
@@ -73,7 +73,7 @@
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=3
-  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=computed,parameter
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved

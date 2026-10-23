@@ -9,10 +9,10 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t13::o8; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `Aes256Gcm::new_from_slice(&k).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:111:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:111:49 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let b = Argon2::new(VARIANT, Version::V0x13, Params::default());`; code: `Params::default`
-  occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 112); line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: hard-coded (1 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 112); line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t13::n3; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:109:60 | core::default::Default::default | [reachable] [call] in t13::n3; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
-  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t13::n3; use: keyderive; password: hard-coded (1 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); salt: hard-coded (12 bytes, literal at line 110); line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:112:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2d-19456-2-1; line: `b.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:110:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t13::n3; part of Argon2i-19456-2-1; line: `a.hash_password_into(pw, b"saltsaltsalt", &mut out).unwrap();`; code: `hash_password_into`
@@ -20,9 +20,9 @@
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:32:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o3; use: generate; line: `OsRng.fill_bytes(&mut key);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:72:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o7; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:80:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t13::o8; use: generate; line: `OsRng.fill_bytes(r);`; code: `fill_bytes`
-  occ PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | src/main.rs:95:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, 100_000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | src/main.rs:94:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, n, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
-  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:92:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, ITERATIONS, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | src/main.rs:95:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: hard-coded (1 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 118) or parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, 100_000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | src/main.rs:94:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: hard-coded (1 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 118) or parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, n, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:92:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in t13::n1; use: keyderive; password: hard-coded (1 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 118) or parameter (argument 1 of the enclosing function); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, ITERATIONS, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ RSA-3072 | crypto:material:private-key:RSA-3072 | src/main.rs:102:4 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t13::n2; use: keygen; rng: rng (rand_core::os::OsRng); line: `rsa::RsaPrivateKey::new(&mut OsRng, BITS).is_ok()`; code: `rsa::RsaPrivateKey::new`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:92:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t13::n1; part of PBKDF2-SHA-256-600000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, ITERATIONS, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:94:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t13::n1; part of PBKDF2-SHA-256-210000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, salt, n, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
@@ -78,24 +78,26 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:confidence=high
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:finding=hard-coded-password
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:finding=hard-coded-salt
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:functions:source=observed
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:occurrences=3
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:param:output_bytes=32
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:param:version=19
-  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:password=parameter
+  prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:password=hard-coded,parameter
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2d-19456-2-1 | crypto:algorithm:Argon2d-19456-2-1 | rcbom:reachability=reachable
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:confidence=high
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:finding=hard-coded-password
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:finding=hard-coded-salt
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:functions:source=observed
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:occurrences=3
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:output_bytes=32
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:version=19
-  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=parameter
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=hard-coded,parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=hard-coded
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
   prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
@@ -121,27 +123,33 @@
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:finding=hard-coded-password
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:finding=hard-coded-salt
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:password=parameter
-  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:salt=parameter
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:password=hard-coded,parameter
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:salt=hard-coded,parameter
   prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:finding=hard-coded-password
+  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:finding=hard-coded-salt
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:provenance:password=parameter
-  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:provenance:salt=parameter
+  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:provenance:password=hard-coded,parameter
+  prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:provenance:salt=hard-coded,parameter
   prop PBKDF2-SHA-256-210000-32 | crypto:algorithm:PBKDF2-SHA-256-210000-32 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:confidence=high
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:finding=hard-coded-password
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:finding=hard-coded-salt
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=parameter
-  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:salt=parameter
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=hard-coded,parameter
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:salt=hard-coded,parameter
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:reachability=reachable
   prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:algorithm-family=RSA
   prop RSA-3072 | crypto:material:private-key:RSA-3072 | rcbom:confidence=high

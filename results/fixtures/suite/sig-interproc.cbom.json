@@ -1,0 +1,356 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via pilot-sig-interproc -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by pilot-sig-interproc (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via pilot-sig-interproc -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "keygen",
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_interproc::signing_alg; line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "line": 5,
+            "location": "src/main.rs",
+            "offset": 5,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; key: computed (pilot_sig_interproc::signing_alg) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or rng (rand::SystemRandom::new); line: `EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), rng).unwrap()`; code: `EcdsaKeyPair::from_pkcs8`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::issue; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; public-key: computed (pilot_sig_interproc::issue); line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `UnparsedPublicKey::new`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in pilot_sig_interproc::main; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
+          },
+          {
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; use: verify; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `verify`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 78,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "computed,parameter,rng"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "computed"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_interproc::signing_alg; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "line": 5,
+            "location": "src/main.rs",
+            "offset": 5,
+            "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
+          },
+          {
+            "additionalContext": "[reachable] [component] in pilot_sig_interproc::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/pilot-sig-interproc@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/pilot-sig-interproc@0.1.0",
+      "name": "pilot-sig-interproc",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/pilot-sig-interproc@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "85"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin pilot-sig-interproc"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:28bbd32a-ea51-8842-899a-69cc7e13688a",
+  "specVersion": "1.7",
+  "version": 1
+}

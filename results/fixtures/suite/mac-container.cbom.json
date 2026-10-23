@@ -1,0 +1,476 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via ext-mac-container -> ring -> getrandom",
+            "line": 35,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by ext-mac-container (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via ext-mac-container -> ring",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag",
+            "verify"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (18 bytes, literal at line 6); line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::Key::new`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::hmac::Key::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in ext_mac_container::main; line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "ring::hmac::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::hmac::verify"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag",
+            "verify"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA384 in the arguments; key: hard-coded (18 bytes, literal at line 7); line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::Key::new`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "ring::hmac::Key::new"
+          },
+          {
+            "additionalContext": "[reachable] [static] in ext_mac_container::main; line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::hmac::HMAC_SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "ring::hmac::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::hmac::verify"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::hmac::HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 37,
+            "symbol": "ring::hmac::HMAC_SHA384"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/ext-mac-container@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-384",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/ext-mac-container@0.1.0",
+      "name": "ext-mac-container",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/ext-mac-container@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "178"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin ext-mac-container"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:48d391ca-91d7-8d1d-ac24-bd7d4ab41d64",
+  "specVersion": "1.7",
+  "version": 1
+}

@@ -1454,7 +1454,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let ct = cbc::Encryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`",
+            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let ct = cbc::Encryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`",
             "line": 81,
             "location": "src/main.rs",
             "offset": 13,
@@ -1468,7 +1468,7 @@
             "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_b2b_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let pt2 = cbc::Decryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`",
+            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let pt2 = cbc::Decryptor::<aes::Aes128>::new(key.into(), iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 14,
@@ -1507,11 +1507,11 @@
         },
         {
           "name": "rcbom:provenance:iv",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1538,7 +1538,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes128>::new(key.into(), iv.into());`; code: `ctr::Ctr128BE::<aes::Aes128>::new`",
+            "additionalContext": "[reachable] [call] in a15::a7; new: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes128>::new(key.into(), iv.into());`; code: `ctr::Ctr128BE::<aes::Aes128>::new`",
             "line": 89,
             "location": "src/main.rs",
             "offset": 16,
@@ -1577,11 +1577,11 @@
         },
         {
           "name": "rcbom:provenance:iv",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1675,7 +1675,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a15::a15; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (16 bytes, literal at line 191); line: `let ct = cbc::Encryptor::<aes::Aes256>::new(&hashed, &iv.into())`; code: `cbc::Encryptor::<aes::Aes256>::new`",
+            "additionalContext": "[reachable] [call] in a15::a15; new: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: hard-coded (16 bytes, literal at line 191); line: `let ct = cbc::Encryptor::<aes::Aes256>::new(&hashed, &iv.into())`; code: `cbc::Encryptor::<aes::Aes256>::new`",
             "line": 192,
             "location": "src/main.rs",
             "offset": 13,
@@ -1722,7 +1722,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1748,42 +1748,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a15::a4; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a15::a4; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a4; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a4; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a5; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(key.as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a15::a5; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(key.as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 64,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a5; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a5; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a6; new: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new(&key);`; code: `Aes256Gcm::new`",
+            "additionalContext": "[reachable] [call] in a15::a6; new: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new(&key);`; code: `Aes256Gcm::new`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a6; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a6; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b\"m\".as_ref()).unwrap()`; code: `encrypt`",
             "line": 75,
             "location": "src/main.rs",
             "offset": 6,
@@ -1797,7 +1797,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a10; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), msg).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a10; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), msg).unwrap()`; code: `encrypt`",
             "line": 130,
             "location": "src/main.rs",
             "offset": 6,
@@ -1883,7 +1883,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,parameter"
+          "value": "computed,environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1907,7 +1907,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a15::a3; new_with_secret: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Argon2::new_with_secret`",
+            "additionalContext": "[reachable] [call] in a15::a3; new_with_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let h = Argon2::new_with_secret(secret, Algorithm::Argon2i, Version::V0x13, Params::default())`; code: `Argon2::new_with_secret`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 12,
@@ -1921,7 +1921,7 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a3; use: keyderive; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 2 of the enclosing function); line: `h.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`",
+            "additionalContext": "[reachable] [call] in a15::a3; use: keyderive; password: environment (std::env::args) or parameter (argument 1 of the enclosing function); salt: environment (std::env::args) or parameter (argument 2 of the enclosing function); line: `h.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 6,
@@ -1961,15 +1961,15 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -2060,7 +2060,7 @@
             "symbol": "argon2::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`",
+            "additionalContext": "[reachable] [call] in a15::a2; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `.hash_password_customized(pw, None, None, params, &salt)`; code: `hash_password_customized`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 9,
@@ -2092,7 +2092,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -2127,7 +2127,7 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a1; use: verify; verify_password: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); line: `Argon2::default().verify_password(pw, &parsed).is_ok()`; code: `verify_password`",
+            "additionalContext": "[reachable] [call] in a15::a1; use: verify; verify_password: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Argon2::default().verify_password(pw, &parsed).is_ok()`; code: `verify_password`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 22,
@@ -2159,7 +2159,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:registry-name",
@@ -2579,7 +2579,7 @@
             "symbol": "ed25519_dalek::verifying::VerifyingKey::as_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a13; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let esk = ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes(expanded);`; code: `ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in a15::a13; from_bytes: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let esk = ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes(expanded);`; code: `ed25519_dalek::hazmat::ExpandedSecretKey::from_bytes`",
             "line": 166,
             "location": "src/main.rs",
             "offset": 14,
@@ -2600,7 +2600,7 @@
             "symbol": "ed25519_dalek::hazmat::raw_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a14; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let sk = ed25519_dalek::SigningKey::from_bytes(&seed);`; code: `ed25519_dalek::SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in a15::a14; from_bytes: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let sk = ed25519_dalek::SigningKey::from_bytes(&seed);`; code: `ed25519_dalek::SigningKey::from_bytes`",
             "line": 175,
             "location": "src/main.rs",
             "offset": 13,
@@ -2653,7 +2653,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -2709,7 +2709,7 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a15; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(&hashed).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a15::a15; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(&hashed).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 184,
             "location": "src/main.rs",
             "offset": 18,
@@ -2755,7 +2755,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "hard-coded,parameter"
+          "value": "environment,hard-coded,parameter"
         },
         {
           "name": "rcbom:finding",
@@ -3353,11 +3353,32 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in a15::a8; part of Ed25519; line: `let sk = ed25519_dalek::SigningKey::generate(&mut ThreadRng::default());`; code: `ed25519_dalek::SigningKey::generate`",
+            "line": 97,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ed25519_dalek::signing::SigningKey::generate"
+          },
+          {
             "additionalContext": "[reachable] [component] in a15::a13; part of Ed25519; line: `ed25519_dalek::hazmat::raw_sign::<Sha512>(&esk, msg, &vk)`; code: `ed25519_dalek::hazmat::raw_sign::<Sha512>`",
             "line": 168,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ed25519_dalek::hazmat::raw_sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a15::a14; part of Ed25519; line: `let sig = sk.sign(b\"msg\");`; code: `sign`",
+            "line": 176,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in a15::a14; part of Ed25519; line: `sk.verifying_key().verify(b\"msg\", &sig).is_ok()`; code: `verify`",
+            "line": 177,
+            "location": "src/main.rs",
+            "offset": 23,
+            "symbol": "signature::verifier::Verifier::verify"
           },
           {
             "additionalContext": "[reachable] [call] in a15::a15; new: setup, not a use; line: `Sha512::new()`; code: `Sha512::new`",
@@ -3406,7 +3427,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -3935,7 +3956,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f398f805-a977-890e-9221-83db681c4b50",
+  "serialNumber": "urn:uuid:2afe7c40-1dd6-82d3-bfda-93240789841e",
   "specVersion": "1.7",
   "version": 1
 }

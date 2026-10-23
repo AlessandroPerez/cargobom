@@ -444,6 +444,69 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
+          },
+          {
+            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -483,7 +546,9 @@
       "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
     },
     {
-      "dependsOn": [],
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
       "ref": "crypto:algorithm:Ed25519"
     },
     {
@@ -493,6 +558,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -557,7 +626,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c3254de4-436b-8b07-a3f3-80380347d876",
+  "serialNumber": "urn:uuid:17c3e715-0fd6-8632-9376-a1dc340104c5",
   "specVersion": "1.7",
   "version": 1
 }

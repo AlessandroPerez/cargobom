@@ -62,6 +62,7 @@
   occ SHA-1 | crypto:candidate:sha1@0.10.7:SHA-1 | Cargo.toml:15:0 | sha1 | [manifest] declared by t19 (dependencies)
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:101:12 | rsa::pkcs1v15::signing_key::SigningKey::<D>::random | [reachable] [component] in t19::rsa_keys; part of RSA-PKCS1-1.5-SHA-256; line: `let _ = rsa::pkcs1v15::SigningKey::<sha2::Sha256>::random(&mut rng, 2048);`; code: `rsa::pkcs1v15::SigningKey::<sha2::Sha256>::random`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in t19::appended; part of PBKDF2-SHA-256-1000-32; line: `pbkdf2::pbkdf2_hmac::<sha2::Sha256>(b"pw", salt.as_bytes(), 1000, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<sha2::Sha256>`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:106:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [component] in t19::ed25519ph; part of Ed25519; line: `let sk = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:108:27 | ed25519_dalek::signing::SigningKey::sign_prehashed | [reachable] [component] in t19::ed25519ph; part of Ed25519ph; line: `let s1: Signature = sk.sign_prehashed(Sha512::new().chain_update(msg), Some(b"ctx")).unwrap();`; code: `sign_prehashed`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:108:42 | digest::digest::Digest::new | [reachable] [call] in t19::ed25519ph; new: setup, not a use; line: `let s1: Signature = sk.sign_prehashed(Sha512::new().chain_update(msg), Some(b"ctx")).unwrap();`; code: `Sha512::new`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:108:56 | digest::digest::Digest::chain_update | [reachable] [call] in t19::ed25519ph; use: digest; line: `let s1: Signature = sk.sign_prehashed(Sha512::new().chain_update(msg), Some(b"ctx")).unwrap();`; code: `chain_update`
@@ -74,6 +75,7 @@
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:111:15 | signature::verifier::DigestVerifier::verify_digest | [reachable] [component] in t19::ed25519ph; part of Ed25519ph; line: `let _ = vk.verify_digest(Sha512::new().chain_update(msg), &s2);`; code: `verify_digest`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:111:29 | digest::digest::Digest::new | [reachable] [call] in t19::ed25519ph; new: setup, not a use; line: `let _ = vk.verify_digest(Sha512::new().chain_update(msg), &s2);`; code: `Sha512::new`
   occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:111:43 | digest::digest::Digest::chain_update | [reachable] [call] in t19::ed25519ph; use: digest; line: `let _ = vk.verify_digest(Sha512::new().chain_update(msg), &s2);`; code: `chain_update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:114:15 | signature::signer::Signer::sign | [reachable] [component] in t19::ed25519ph; part of Ed25519; line: `let _ = kp.sign(msg);`; code: `sign`
   occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t19 -> aes-gcm -> aead
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t19 -> aes
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:10:0 | aes | [manifest] declared by t19 (dependencies)
@@ -323,7 +325,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=12
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=14
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
@@ -575,6 +577,7 @@ dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-256
 dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:Argon2id-65536-3-4 -> crypto:algorithm:BLAKE2b
 dep crypto:algorithm:Argon2id-65536-3-4 -> crypto:algorithm:BLAKE2b-512
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:Ed25519ph -> crypto:algorithm:SHA-512
 dep crypto:algorithm:PBKDF2-SHA-256-1000-32 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256

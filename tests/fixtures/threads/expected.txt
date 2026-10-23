@@ -1,4 +1,4 @@
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:11:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 21) or parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:12:6 | digest::mac::Mac::update | [reachable] [call] in threads::mac; use: tag; line: `m.update(data);`; code: `update`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:13:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in threads::mac; into_bytes: setup, not a use; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:13:6 | digest::mac::Mac::finalize | [reachable] [call] in threads::mac; use: tag; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
@@ -17,10 +17,11 @@
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:87:0 | subtle | [manifest] locked subtle 2.6.1; reached via threads -> hmac -> digest -> subtle
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:finding=hard-coded-key
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
-  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=hard-coded,parameter
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved

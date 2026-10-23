@@ -1172,7 +1172,7 @@
             "symbol": "ring::aead::BoundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 1 of the enclosing function); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `UnboundKey::new`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 34,
@@ -1218,7 +1218,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -1384,7 +1384,7 @@
             "symbol": "argon2::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k1; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
+            "additionalContext": "[reachable] [call] in a24::k1; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 6,
@@ -1416,7 +1416,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -1904,7 +1904,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; public-key: parameter (argument 2 of the enclosing function); line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; public-key: environment (std::env::args) or parameter (argument 2 of the enclosing function); line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `UnparsedPublicKey::new`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 4,
@@ -1989,7 +1989,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -2117,7 +2117,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::Salt::new`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 14,
@@ -2131,7 +2131,7 @@
             "symbol": "ring::hkdf::HKDF_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `extract`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `extract`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 54,
@@ -2177,11 +2177,11 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -2425,7 +2425,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function) or unknown (too deep); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
             "line": 77,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 40,
@@ -2457,7 +2457,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:note",
@@ -3050,6 +3050,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-256"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "32"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -3150,6 +3158,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-384"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "48"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -3242,6 +3258,14 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-512"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "64"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -3277,7 +3301,7 @@
             "symbol": "rsa::key::RsaPrivateKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k5; from_pkcs8: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let p = RsaKeyPair::from_pkcs8(der).unwrap();`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a24::k5; from_pkcs8: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let p = RsaKeyPair::from_pkcs8(der).unwrap();`; code: `RsaKeyPair::from_pkcs8`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 12,
@@ -3316,7 +3340,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
+          "value": "computed,environment,parameter"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -3726,11 +3750,32 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in a24::k6; part of Ed25519; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `verify`",
+            "line": 86,
+            "location": "src/main.rs",
+            "offset": 41,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::eddsa::sign; part of Ed25519; line: `let out = signing_key.sign(message);`; code: `sign`",
+            "line": 21,
+            "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
+            "offset": 26,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          },
+          {
             "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
             "line": 29,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
             "symbol": "ring::hmac::HMAC_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::verify_ring; part of Ed25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "line": 55,
+            "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
+            "offset": 25,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
             "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
@@ -3790,7 +3835,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "8"
         }
       ],
       "type": "cryptographic-asset"
@@ -3818,7 +3863,7 @@
             "symbol": "aead::stream::Encryptor::<A, S>::from_aead"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 39,
@@ -3839,7 +3884,7 @@
             "symbol": "aead::stream::Decryptor::<A, S>::from_aead"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 39,
@@ -3882,7 +3927,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -4213,6 +4258,12 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:SHA-256"
       ],
@@ -4323,10 +4374,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:material:public-key:Ed25519"
     },
     {
@@ -4424,7 +4471,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1c5620ef-4fec-8f09-93cd-50df0850afb7",
+  "serialNumber": "urn:uuid:80790695-bf3c-89f7-bef2-7f0b43b75eb7",
   "specVersion": "1.7",
   "version": 1
 }

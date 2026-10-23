@@ -356,7 +356,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in t5::aliased; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in t5::aliased; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (1 bytes, literal at line 32) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(ALG, key).unwrap());`; code: `UnboundKey::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 29,
@@ -402,7 +402,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -501,7 +505,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"s\", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b\"s\", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`",
+            "additionalContext": "[reachable] [call] in t5::two_iters; use: keyderive; password: hard-coded (1 bytes, literal at line 35) or parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"s\", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b\"s\", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha256, 32>`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 78,
@@ -533,7 +537,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -565,7 +573,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t5::two_iters; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"s\", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b\"s\", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in t5::two_iters; use: keyderive; password: hard-coded (1 bytes, literal at line 35) or parameter (argument 0 of the enclosing function); salt: hard-coded (1 bytes, literal at line 27); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"s\", 10000, &mut a); let c: [u8; 32] = pbkdf2::pbkdf2_hmac_array::<Sha256, 32>(pw, b\"s\", 1000); b.copy_from_slice(&c);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 4,
@@ -597,7 +605,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -853,7 +865,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7411f635-d2b5-8ba1-ad85-9d4ebc1be65b",
+  "serialNumber": "urn:uuid:805a1514-e8c8-86cc-82d2-7b5fccd6bfc3",
   "specVersion": "1.7",
   "version": 1
 }

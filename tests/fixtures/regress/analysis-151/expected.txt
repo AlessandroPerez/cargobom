@@ -2,15 +2,15 @@
   occ Argon2 | crypto:algorithm:Argon2 | src/main.rs:39:4 | core::default::Default::default | [reachable] [call] in a151::a6; default: setup, not a use; line: `Argon2::default().verify_password(b"password", &parsed).is_ok()`; code: `Argon2::default`
   occ Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | src/main.rs:32:12 | argon2::params::Params::new | [reachable] [call] in a151::a5; new: setup, not a use; line: `let p = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`
   occ Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | src/main.rs:33:12 | argon2::Argon2::<'key>::new | [reachable] [call] in a151::a5; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2d, Version::V0x13, p);`; code: `Argon2::new`
-  occ Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | src/main.rs:34:6 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a5; use: keyderive; password: hard-coded (8 bytes, literal at line 34); salt: parameter (argument 0 of the enclosing function); line: `a.hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
+  occ Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | src/main.rs:34:6 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a5; use: keyderive; password: hard-coded (8 bytes, literal at line 34); salt: hard-coded (16 bytes, literal at line 63) or parameter (argument 0 of the enclosing function); line: `a.hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:27:12 | argon2::Argon2::<'key>::new | [reachable] [call] in a151::a4; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x10, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:27:60 | core::default::Default::default | [reachable] [call] in a151::a4; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x10, Params::default());`; code: `Params::default`
-  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:28:6 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a4; use: keyderive; password: hard-coded (8 bytes, literal at line 28); salt: parameter (argument 0 of the enclosing function); line: `a.hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
+  occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:28:6 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a4; use: keyderive; password: hard-coded (8 bytes, literal at line 28); salt: hard-coded (16 bytes, literal at line 63) or parameter (argument 0 of the enclosing function); line: `a.hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:12:22 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a151::a1; use: keyderive; password: hard-coded (8 bytes, literal at line 12); salt: hard-coded (16 bytes, literal at line 12); line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `hash_password_into`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:12:4 | core::default::Default::default | [reachable] [call] in a151::a1; default: setup, not a use; line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `Argon2::default`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:18:22 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a151::a2; use: keyderive; password: hard-coded (8 bytes, literal at line 18); salt: hard-coded (16 bytes, literal at line 18); line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `hash_password_into`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:18:4 | core::default::Default::default | [reachable] [call] in a151::a2; default: setup, not a use; line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `Argon2::default`
-  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:23:22 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a3; use: keyderive; password: hard-coded (8 bytes, literal at line 23); salt: parameter (argument 0 of the enclosing function); line: `Argon2::default().hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:23:22 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in a151::a3; use: keyderive; password: hard-coded (8 bytes, literal at line 23); salt: hard-coded (16 bytes, literal at line 63) or parameter (argument 0 of the enclosing function); line: `Argon2::default().hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:23:4 | core::default::Default::default | [reachable] [call] in a151::a3; default: setup, not a use; line: `Argon2::default().hash_password(b"password", salt).unwrap().to_string()`; code: `Argon2::default`
   occ BLAKE2b | crypto:algorithm:BLAKE2b | src/main.rs:18:22 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in a151::a2; part of Argon2id-19456-2-1; line: `Argon2::default().hash_password_into(b"password", b"fixed-salt-value", &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b | crypto:algorithm:BLAKE2b | src/main.rs:34:6 | password_hash::traits::PasswordHasher::hash_password | [reachable] [component] in a151::a5; part of Argon2d-65536-3-4; line: `a.hash_password(b"password", salt).unwrap().to_string()`; code: `hash_password`
@@ -56,23 +56,25 @@
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:confidence=high
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:detection:method=type-resolved
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:finding=hard-coded-password
+  prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:finding=hard-coded-salt
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:functions:source=observed
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:kb:version=0.2.0
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:occurrences=3
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:param:version=19
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:provenance:password=hard-coded
-  prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:provenance:salt=parameter
+  prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:provenance:salt=hard-coded,parameter
   prop Argon2d-65536-3-4 | crypto:algorithm:Argon2d-65536-3-4 | rcbom:reachability=reachable
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:confidence=high
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:detection:method=type-resolved
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:finding=hard-coded-password
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:finding=hard-coded-salt
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:functions:source=observed
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:kb:version=0.2.0
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:occurrences=3
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:output_bytes=32
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:param:version=16
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:password=hard-coded
-  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=parameter
+  prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:provenance:salt=hard-coded,parameter
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:reachability=reachable
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved

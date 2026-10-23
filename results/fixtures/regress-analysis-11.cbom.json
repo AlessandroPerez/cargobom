@@ -1322,7 +1322,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 0 of the enclosing function); line: `let enc = cbc::Encryptor::<aes::Aes128>::new_from_slices(&key[..16], &key[..16]).unwrap();`; code: `cbc::Encryptor::<aes::Aes128>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let enc = cbc::Encryptor::<aes::Aes128>::new_from_slices(&key[..16], &key[..16]).unwrap();`; code: `cbc::Encryptor::<aes::Aes128>::new_from_slices`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 14,
@@ -1361,11 +1361,11 @@
         },
         {
           "name": "rcbom:provenance:iv",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1392,7 +1392,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 0 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes256>::new_from_slices(&key[..32], &key[..16]).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes256>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes256>::new_from_slices(&key[..32], &key[..16]).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes256>::new_from_slices`",
             "line": 73,
             "location": "src/main.rs",
             "offset": 16,
@@ -1431,11 +1431,11 @@
         },
         {
           "name": "rcbom:provenance:iv",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1461,14 +1461,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 45,
@@ -1496,7 +1496,7 @@
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: parameter (argument 2 of the enclosing function); line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 117) or parameter (argument 2 of the enclosing function); line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 8,
@@ -1547,7 +1547,11 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,parameter"
+          "value": "computed,hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-nonce"
         },
         {
           "name": "rcbom:occurrences",
@@ -1571,7 +1575,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m2; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `blake3::derive_key`",
+            "additionalContext": "[reachable] [call] in a11::m2; use: keyderive; ikm: hard-coded (3 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `blake3::derive_key`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 14,
@@ -1607,7 +1611,11 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-ikm"
         },
         {
           "name": "rcbom:note",
@@ -1726,7 +1734,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m3; new_keyed: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut h = pick(blake3::Hasher::new_keyed(key));`; code: `blake3::Hasher::new_keyed`",
+            "additionalContext": "[reachable] [call] in a11::m3; new_keyed: setup, not a use; key: hard-coded (32 bytes, literal at line 119) or parameter (argument 0 of the enclosing function); line: `let mut h = pick(blake3::Hasher::new_keyed(key));`; code: `blake3::Hasher::new_keyed`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 21,
@@ -1762,7 +1770,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:note",
@@ -1804,7 +1816,7 @@
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
+            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: hard-coded (3 bytes, literal at line 117) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 58,
@@ -1843,7 +1855,11 @@
         },
         {
           "name": "rcbom:provenance:ikm",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-ikm"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -1931,7 +1947,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m6; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 83); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in a11::m6; use: keyderive; password: hard-coded (2 bytes, literal at line 122) or parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 83); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 4,
@@ -1967,7 +1983,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -2211,7 +2231,7 @@
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m7; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 93); line: `scrypt::scrypt(pw, b\"m7-salt\", &p, &mut out).ok()?;`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a11::m7; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 93); line: `scrypt::scrypt(pw, b\"m7-salt\", &p, &mut out).ok()?;`; code: `scrypt::scrypt`",
             "line": 93,
             "location": "src/main.rs",
             "offset": 4,
@@ -2243,7 +2263,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -2282,7 +2302,7 @@
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m8; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 106); line: `scrypt::scrypt(pw, b\"m8-salt\", &m8_params(log_n), &mut out).unwrap();`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a11::m8; use: keyderive; password: hard-coded (2 bytes, literal at line 124) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 106); line: `scrypt::scrypt(pw, b\"m8-salt\", &m8_params(log_n), &mut out).unwrap();`; code: `scrypt::scrypt`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 4,
@@ -2330,7 +2350,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -2766,7 +2790,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8d2d39bb-1bb5-8b79-95f9-1055b2b2feca",
+  "serialNumber": "urn:uuid:94a4c9d4-b22b-8e47-9e7c-3cdd8b47b7b5",
   "specVersion": "1.7",
   "version": 1
 }

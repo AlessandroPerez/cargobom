@@ -1,4 +1,4 @@
-  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:19:4 | core::convert::TryFrom::try_from | [reachable] [call] in t3::e1; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::try_from(b).is_ok()`; code: `ed25519_dalek::SigningKey::try_from`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:19:4 | core::convert::TryFrom::try_from | [reachable] [call] in t3::e1; try_from: setup, not a use; key: hard-coded (32 bytes, literal at line 29) or parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::try_from(b).is_ok()`; code: `ed25519_dalek::SigningKey::try_from`
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:25:4 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t3::k1; use: keygen; rng: rng (rand_core::os::OsRng); line: `rsa::RsaPrivateKey::new(&mut OsRng, bits).is_ok()`; code: `rsa::RsaPrivateKey::new`
   occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via t3 -> rsa -> pkcs1 -> der -> pem-rfc7468 -> base64ct
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:18:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via t3 -> rsa -> digest -> block-buffer
@@ -36,10 +36,11 @@
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:512:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via t3 -> ed25519-dalek -> zeroize
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:finding=hard-coded-key
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=knowledge-base
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=1
-  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=hard-coded,parameter
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high

@@ -1,12 +1,12 @@
-  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:25:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let enc = cbc::Encryptor::<aes::Aes128Enc>::new_from_slices(&key[..16], iv).unwrap();`; code: `cbc::Encryptor::<aes::Aes128Enc>::new_from_slices`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:25:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let enc = cbc::Encryptor::<aes::Aes128Enc>::new_from_slices(&key[..16], iv).unwrap();`; code: `cbc::Encryptor::<aes::Aes128Enc>::new_from_slices`
   occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:26:17 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] in t9::aes_enc_dec_types; use: encrypt; line: `let ct = enc.encrypt_padded_vec_mut::<Pkcs7>(data);`; code: `encrypt_padded_vec_mut`
-  occ AES-192-CTR | crypto:algorithm:AES-192-CTR | src/main.rs:29:16 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes192Enc>::new_from_slices(&key[..24], iv).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes192Enc>::new_from_slices`
+  occ AES-192-CTR | crypto:algorithm:AES-192-CTR | src/main.rs:29:16 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes192Enc>::new_from_slices(&key[..24], iv).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes192Enc>::new_from_slices`
   occ AES-192-CTR | crypto:algorithm:AES-192-CTR | src/main.rs:30:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in t9::aes_enc_dec_types; use: encrypt or decrypt; line: `c.apply_keystream(data);`; code: `apply_keystream`
-  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:27:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let dec = cbc::Decryptor::<aes::Aes256Dec>::new_from_slices(&key[..32], iv).unwrap();`; code: `cbc::Decryptor::<aes::Aes256Dec>::new_from_slices`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:27:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::aes_enc_dec_types; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let dec = cbc::Decryptor::<aes::Aes256Dec>::new_from_slices(&key[..32], iv).unwrap();`; code: `cbc::Decryptor::<aes::Aes256Dec>::new_from_slices`
   occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:28:16 | cipher::block::BlockDecryptMut::decrypt_padded_vec_mut | [reachable] [call] in t9::aes_enc_dec_types; use: decrypt; line: `let _ = dec.decrypt_padded_vec_mut::<Pkcs7>(&ct);`; code: `decrypt_padded_vec_mut`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:153:12 | argon2::Argon2::<'key>::new_with_secret | [reachable] [call] in t9::argon2_secret; new_with_secret: setup, not a use; key: hard-coded (13 bytes, literal at line 153); line: `let a = Argon2::new_with_secret(b"pepper-pepper", Algorithm::Argon2id, Version::V0x13, Params::default()).unwrap();`; code: `Argon2::new_with_secret`
   occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:153:91 | core::default::Default::default | [reachable] [call] in t9::argon2_secret; default: setup, not a use; line: `let a = Argon2::new_with_secret(b"pepper-pepper", Algorithm::Argon2id, Version::V0x13, Params::default()).unwrap();`; code: `Params::default`
-  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t9::argon2_secret; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: parameter (argument 1 of the enclosing function); line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in t9::argon2_secret; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t9::argon2_secret; part of Argon2id-19456-2-1; line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:155:6 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in t9::argon2_secret; part of Argon2id-19456-2-1; line: `a.hash_password_into(pw, salt, &mut out).unwrap();`; code: `hash_password_into`
   occ BLAKE3 | crypto:algorithm:BLAKE3 | src/main.rs:143:16 | blake3::Hasher::new | [reachable] [call] in t9::verify_and_xof; new: setup, not a use; line: `let mut h = blake3::Hasher::new();`; code: `blake3::Hasher::new`
@@ -32,13 +32,13 @@
   occ Ed25519 | crypto:algorithm:Ed25519 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm ring::ec::curve25519::ed25519::verification::ED25519 only through code or data no entry point reaches; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:132:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [call] in t9::keygens; use: keygen; rng: hard-coded (literal at line 126); line: `let _e = ed25519_dalek::SigningKey::generate(&mut seeded_ed);`; code: `ed25519_dalek::SigningKey::generate`
   occ Ed25519 | crypto:material:public-key:Ed25519 | jsonwebtoken-9.3.1/src/decoding.rs:185:57 | jsonwebtoken::decoding::DecodingKey::from_ed_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`
-  occ HMAC | crypto:material:secret-key:HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
+  occ HMAC | crypto:material:secret-key:HMAC | jsonwebtoken-9.3.1/src/crypto/mod.rs:77:40 | jsonwebtoken::encoding::EncodingKey::from_secret | [present] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`
   occ HMAC | crypto:material:secret-key:HMAC | src/main.rs:161:12 | jsonwebtoken::encoding::EncodingKey::from_base64_secret | [reachable] [call] in t9::jwt_b64; from_base64_secret: setup, not a use; key: hard-coded (20 bytes, literal at line 161); line: `let e = jsonwebtoken::EncodingKey::from_base64_secret("c2VjcmV0LXNlY3JldA==").is_ok();`; code: `jsonwebtoken::EncodingKey::from_base64_secret`
   occ HMAC | crypto:material:secret-key:HMAC | src/main.rs:162:12 | jsonwebtoken::decoding::DecodingKey::from_base64_secret | [reachable] [call] in t9::jwt_b64; from_base64_secret: setup, not a use; key: hard-coded (20 bytes, literal at line 162); line: `let d = jsonwebtoken::DecodingKey::from_base64_secret("c2VjcmV0LXNlY3JldA==").is_ok();`; code: `jsonwebtoken::DecodingKey::from_base64_secret`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:17 | ring::hmac::sign | [present] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm ring::hmac::HMAC_SHA256 only through code or data no entry point reaches; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:17:29 | ring::hmac::Key::new | [present] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm ring::hmac::HMAC_SHA256 only through code or data no entry point reaches; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | jsonwebtoken-9.3.1/src/crypto/mod.rs:27:41 | ring::hmac::HMAC_SHA256 | [present] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:140:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t9::verify_and_xof; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = Hmac::<Sha256>::new_from_slice(key).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:140:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in t9::verify_and_xof; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let mut m = Hmac::<Sha256>::new_from_slice(key).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:141:6 | digest::mac::Mac::update | [reachable] [call] in t9::verify_and_xof; use: tag; line: `m.update(d);`; code: `update`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:142:14 | digest::mac::Mac::verify_truncated_right | [reachable] [call] in t9::verify_and_xof; use: verify; line: `let _ = m.verify_truncated_right(tag);`; code: `verify_truncated_right`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:78:4 | pbkdf2::pbkdf2 | [reachable] [component] in t9::pbkdf2_generic; part of PBKDF2-SHA-256-4096-32; line: `pbkdf2::pbkdf2::<Hmac<Sha256>>(pw, b"fixed-salt", 4096, &mut out).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<Sha256>>`
@@ -52,9 +52,9 @@
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:85:16 | md5::Context::new | [reachable] [call] in t9::md5_ctx; new: setup, not a use; line: `let mut c = md5::Context::new();`; code: `md5::Context::new`
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:86:6 | md5::Context::consume | [reachable] [call] in t9::md5_ctx; use: digest; line: `c.consume(d);`; code: `consume`
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:87:6 | md5::Context::compute | [reachable] [call] in t9::md5_ctx; use: digest; line: `c.compute().0`; code: `compute`
-  occ PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | src/main.rs:79:23 | pbkdf2::pbkdf2_array | [reachable] [call] in t9::pbkdf2_generic; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: derived (pbkdf2::pbkdf2); line: `let _a: [u8; 16] = pbkdf2::pbkdf2_array::<Hmac<Sha256>, 16>(pw, &out, 1000).unwrap();`; code: `pbkdf2::pbkdf2_array::<Hmac<Sha256>, 16>`
-  occ PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | src/main.rs:78:4 | pbkdf2::pbkdf2 | [reachable] [call] in t9::pbkdf2_generic; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (10 bytes, literal at line 78); line: `pbkdf2::pbkdf2::<Hmac<Sha256>>(pw, b"fixed-salt", 4096, &mut out).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<Sha256>>`
-  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:95:27 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t9::password_hash_defaults; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `let b = pbkdf2::Pbkdf2.hash_password(pw, &salt).unwrap().to_string();`; code: `hash_password`
+  occ PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | src/main.rs:79:23 | pbkdf2::pbkdf2_array | [reachable] [call] in t9::pbkdf2_generic; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: derived (pbkdf2::pbkdf2); line: `let _a: [u8; 16] = pbkdf2::pbkdf2_array::<Hmac<Sha256>, 16>(pw, &out, 1000).unwrap();`; code: `pbkdf2::pbkdf2_array::<Hmac<Sha256>, 16>`
+  occ PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | src/main.rs:78:4 | pbkdf2::pbkdf2 | [reachable] [call] in t9::pbkdf2_generic; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (10 bytes, literal at line 78); line: `pbkdf2::pbkdf2::<Hmac<Sha256>>(pw, b"fixed-salt", 4096, &mut out).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<Sha256>>`
+  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:95:27 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t9::password_hash_defaults; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `let b = pbkdf2::Pbkdf2.hash_password(pw, &salt).unwrap().to_string();`; code: `hash_password`
   occ RSA | crypto:material:private-key:RSA | jsonwebtoken-9.3.1/src/crypto/rsa.rs:41:19 | ring::rsa::keypair::KeyPair::from_der | [present] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`
   occ RSA | crypto:material:public-key:RSA | jsonwebtoken-9.3.1/src/decoding.rs:180:16 | jsonwebtoken::decoding::DecodingKey::from_rsa_components | [present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`
   occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:172:13 | rsa::key::RsaPrivateKey::new | [reachable] [call] in t9::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let rk = RsaPrivateKey::new(&mut OsRng, 2048).unwrap();`; code: `RsaPrivateKey::new`
@@ -156,11 +156,14 @@
   occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:14:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:24:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:27:29 | ring::rsa::padding::pss::RSA_PSS_SHA384 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/eddsa.rs:21:26 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [present] [component] in jsonwebtoken::crypto::eddsa::sign; part of Ed25519; line: `let out = signing_key.sign(message);`; code: `sign`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:29:41 | ring::hmac::HMAC_SHA512 | [present] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/mod.rs:55:25 | ring::signature::UnparsedPublicKey::<B>::verify | [present] [component] in jsonwebtoken::crypto::verify_ring; part of Ed25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:12:29 | ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:15:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:25:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`
   occ SHA-512 | crypto:algorithm:SHA-512 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:28:29 | ring::rsa::padding::pss::RSA_PSS_SHA512 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:132:13 | ed25519_dalek::signing::SigningKey::generate | [reachable] [component] in t9::keygens; part of Ed25519; line: `let _e = ed25519_dalek::SigningKey::generate(&mut seeded_ed);`; code: `ed25519_dalek::SigningKey::generate`
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:6:0 | aes | [manifest] locked aes 0.8.4; reached via t9 -> aes
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:9:0 | aes | [manifest] declared by t9 (dependencies)
   occ argon2 | pkg:cargo/argon2@0.5.3 | Cargo.lock:17:0 | argon2 | [manifest] locked argon2 0.5.3; reached via t9 -> argon2
@@ -212,12 +215,12 @@
   occ rsa | pkg:cargo/rsa@0.9.10 | Cargo.toml:21:0 | rsa | [manifest] declared by t9 (dependencies)
   occ salsa20 | pkg:cargo/salsa20@0.10.2 | Cargo.lock:678:0 | salsa20 | [manifest] locked salsa20 0.10.2; reached via t9 -> scrypt -> salsa20
   occ scrypt | crypto:algorithm:scrypt | src/main.rs:105:17 | scrypt::params::Params::new | [reachable] [call] in t9::scrypt_params; new: setup, not a use; line: `let params = scrypt::Params::new(log_n, 8, 1, 32).unwrap();`; code: `scrypt::Params::new`
-  occ scrypt | crypto:algorithm:scrypt | src/main.rs:107:4 | scrypt::scrypt | [reachable] [call] in t9::scrypt_params; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 107); line: `scrypt::scrypt(pw, b"salt", &params, &mut out).unwrap();`; code: `scrypt::scrypt`
+  occ scrypt | crypto:algorithm:scrypt | src/main.rs:107:4 | scrypt::scrypt | [reachable] [call] in t9::scrypt_params; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 107); line: `scrypt::scrypt(pw, b"salt", &params, &mut out).unwrap();`; code: `scrypt::scrypt`
   occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.lock:687:0 | scrypt | [manifest] locked scrypt 0.11.0; reached via t9 -> scrypt
   occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.toml:22:0 | scrypt | [manifest] declared by t9 (dependencies)
   occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:108:16 | scrypt::params::Params::recommended | [reachable] [call] in t9::scrypt_params; recommended: setup, not a use; line: `let fixed = scrypt::Params::recommended();`; code: `scrypt::Params::recommended`
-  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:109:4 | scrypt::scrypt | [reachable] [call] in t9::scrypt_params; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 109); line: `scrypt::scrypt(pw, b"salt", &fixed, &mut out).unwrap();`; code: `scrypt::scrypt`
-  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:94:27 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t9::password_hash_defaults; use: keyderive; password: parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `let a = scrypt::Scrypt.hash_password(pw, &salt).unwrap().to_string();`; code: `hash_password`
+  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:109:4 | scrypt::scrypt | [reachable] [call] in t9::scrypt_params; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 109); line: `scrypt::scrypt(pw, b"salt", &fixed, &mut out).unwrap();`; code: `scrypt::scrypt`
+  occ scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | src/main.rs:94:27 | password_hash::traits::PasswordHasher::hash_password | [reachable] [call] in t9::password_hash_defaults; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `let a = scrypt::Scrypt.hash_password(pw, &salt).unwrap().to_string();`; code: `hash_password`
   occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.lock:748:0 | sha1 | [manifest] locked sha1 0.10.7; reached via t9 -> sha1
   occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.toml:24:0 | sha1 | [manifest] declared by t9 (dependencies)
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:759:0 | sha2 | [manifest] locked sha2 0.10.9; reached via t9 -> sha2
@@ -227,8 +230,8 @@
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:826:0 | subtle | [manifest] locked subtle 2.6.1; reached via t9 -> ed25519-dalek -> subtle
   occ unknown | crypto:algorithm:unknown:block-cipher:blowfish+cbc | src/main.rs:18:8 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] in t9::blowfish_modes; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `enc.encrypt_padded_vec_mut::<Pkcs7>(data)`; code: `encrypt_padded_vec_mut`
   occ unknown | crypto:algorithm:unknown:stream-cipher:blowfish+ctr | src/main.rs:17:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in t9::blowfish_modes; use: encrypt or decrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `c.apply_keystream(data);`; code: `apply_keystream`
-  occ unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | src/main.rs:15:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let enc = cbc::Encryptor::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `cbc::Encryptor::<blowfish::Blowfish>::new_from_slices`
-  occ unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | src/main.rs:16:16 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices`
+  occ unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | src/main.rs:15:14 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let enc = cbc::Encryptor::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `cbc::Encryptor::<blowfish::Blowfish>::new_from_slices`
+  occ unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | src/main.rs:16:16 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in t9::blowfish_modes; new_from_slices: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let mut c = ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices(key, iv).unwrap();`; code: `ctr::Ctr64BE::<blowfish::Blowfish>::new_from_slices`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:115:4 | x25519_dalek::x25519::x25519 | [reachable] [call] in t9::x25519_free; use: keyderive; key: hard-coded (32 bytes, literal at line 115); line: `x25519_dalek::x25519([7u8; 32], peer)`; code: `x25519_dalek::x25519`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:127:12 | x25519_dalek::x25519::EphemeralSecret::random | [reachable] [call] in t9::keygens; use: keygen; line: `let a = x25519_dalek::EphemeralSecret::random();`; code: `x25519_dalek::EphemeralSecret::random`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:128:12 | x25519_dalek::x25519::EphemeralSecret::random_from_rng | [reachable] [call] in t9::keygens; use: keygen; rng: hard-coded (literal at line 125); line: `let b = x25519_dalek::EphemeralSecret::random_from_rng(&mut seeded);`; code: `x25519_dalek::EphemeralSecret::random_from_rng`
@@ -246,24 +249,24 @@
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:functions:source=observed
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:kb:version=0.2.0
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=2
-  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=parameter
-  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=environment,parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=environment,parameter
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:confidence=high
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:detection:method=type-resolved
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:functions:source=observed
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:kb:version=0.2.0
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:occurrences=2
-  prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:provenance:iv=parameter
-  prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:provenance:key=parameter
+  prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:provenance:iv=environment,parameter
+  prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:provenance:key=environment,parameter
   prop AES-192-CTR | crypto:algorithm:AES-192-CTR | rcbom:reachability=reachable
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:confidence=high
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:detection:method=type-resolved
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:functions:source=observed
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:kb:version=0.2.0
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:occurrences=2
-  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=parameter
-  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=environment,parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=environment,parameter
   prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:reachability=reachable
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
@@ -274,8 +277,8 @@
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:output_bytes=32
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:version=19
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:key=hard-coded
-  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=parameter
-  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=parameter
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=environment,parameter
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=environment,parameter
   prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
   prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
   prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:detection:method=type-resolved
@@ -354,7 +357,7 @@
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=8
-  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=environment,parameter
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
   prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
   prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
@@ -382,7 +385,7 @@
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:provenance:password=environment,parameter
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:provenance:salt=derived
   prop PBKDF2-SHA-256-1000-16 | crypto:algorithm:PBKDF2-SHA-256-1000-16 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:confidence=high
@@ -391,7 +394,7 @@
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:provenance:password=environment,parameter
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:provenance:salt=hard-coded
   prop PBKDF2-SHA-256-4096-32 | crypto:algorithm:PBKDF2-SHA-256-4096-32 | rcbom:reachability=reachable
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:confidence=high
@@ -399,7 +402,7 @@
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:functions:source=observed
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:kb:version=0.2.0
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:occurrences=1
-  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=parameter
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=environment,parameter
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:salt=rng
   prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:reachability=reachable
   prop RSA | crypto:material:private-key:RSA | rcbom:algorithm-family=RSA
@@ -472,6 +475,8 @@
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=12
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:mgf=MGF1-SHA-256
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:salt_bytes=32
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:salt_len=20
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:public-key=parameter
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:rng=rng
@@ -481,6 +486,8 @@
   prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:functions:source=observed
   prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:kb:version=0.2.0
   prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:occurrences=6
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:param:mgf=MGF1-SHA-384
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:param:salt_bytes=48
   prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:provenance:public-key=parameter
   prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:reachability=present
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:confidence=high
@@ -488,6 +495,8 @@
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=observed
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:occurrences=6
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:param:mgf=MGF1-SHA-512
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:param:salt_bytes=64
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:provenance:public-key=parameter
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:reachability=present
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
@@ -515,9 +524,9 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=8
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
-  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
   prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
   prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
@@ -649,7 +658,7 @@
   prop scrypt | crypto:algorithm:scrypt | rcbom:param:p=1
   prop scrypt | crypto:algorithm:scrypt | rcbom:param:r=8
   prop scrypt | crypto:algorithm:scrypt | rcbom:param:unresolved=N: not a constant where scrypt::Params is built
-  prop scrypt | crypto:algorithm:scrypt | rcbom:provenance:password=parameter
+  prop scrypt | crypto:algorithm:scrypt | rcbom:provenance:password=environment,parameter
   prop scrypt | crypto:algorithm:scrypt | rcbom:provenance:salt=hard-coded
   prop scrypt | crypto:algorithm:scrypt | rcbom:reachability=reachable
   prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:crypto-role=algorithm
@@ -661,7 +670,7 @@
   prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:functions:source=observed
   prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:kb:version=0.2.0
   prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:occurrences=3
-  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:provenance:password=parameter
+  prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:provenance:password=environment,parameter
   prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:provenance:salt=hard-coded,rng
   prop scrypt-131072-8-1-32 | crypto:algorithm:scrypt-131072-8-1-32 | rcbom:reachability=reachable
   prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:crypto-role=algorithm
@@ -700,8 +709,8 @@
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:functions:source=knowledge-base
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:iv=parameter
-  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:key=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:iv=environment,parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:provenance:key=environment,parameter
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+cbc | rcbom:reachability=reachable
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:algorithm=unresolved
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:confidence=high
@@ -709,8 +718,8 @@
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:functions:source=knowledge-base
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:iv=parameter
-  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:key=parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:iv=environment,parameter
+  prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:provenance:key=environment,parameter
   prop unknown | crypto:algorithm:unknown:unknown:blowfish+ctr | rcbom:reachability=reachable
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
@@ -820,6 +829,7 @@ dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-256
 dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-512
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
 dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
@@ -1071,6 +1081,7 @@ provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt
 provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt-131072-8-1-32
 provides pkg:cargo/sha1@0.10.7 -> crypto:algorithm:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:algorithm:x25519
 root {"bom-ref": "pkg:cargo/t9@0.1.0", "name": "t9", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t9@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0

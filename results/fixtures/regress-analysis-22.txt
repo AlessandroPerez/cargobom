@@ -12,6 +12,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:36 | aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 | [reachable] [component] in a22::main; part of RSA-PSS-SHA-256 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:18:36 | aws_lc_rs::digest::sha::SHA384 | [reachable] [static] in a22::main; line: `let ctx = digest::Context::new(&digest::SHA384);`; code: `digest::SHA384`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:19:16 | aws_lc_rs::digest::Context::finish | [reachable] [call] in a22::main; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `let d = ctx.finish();`; code: `finish`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:10:31 | aws_lc_rs::signature::VerificationAlgorithm::verify_sig | [reachable] [component] in a22::main; part of Ed25519; line: `let _ = signature::ED25519.verify_sig(&a, b"msg", &a);`; code: `verify_sig`
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.lock:13:0 | aws-lc-rs | [manifest] locked aws-lc-rs 1.18.1; reached via a22 -> aws-lc-rs
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | Cargo.toml:9:0 | aws-lc-rs | [manifest] declared by a22 (dependencies); features ["legacy-des", "unstable"]
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
@@ -41,6 +42,8 @@
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=3
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:mgf=MGF1-SHA-256
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:salt_bytes=32
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:public-key=environment
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
@@ -56,6 +59,13 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:crypto-role=algorithm
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:ffi-boundary=true
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:native-links=aws_lc_rs_1_18_1_sys
@@ -77,10 +87,12 @@ asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorit
 asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
 dep pkg:cargo/a22@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
@@ -91,6 +103,7 @@ dependency crypto:algorithm:ML-DSA-44
 dependency crypto:algorithm:RSA-PSS-SHA-256
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
 dependency pkg:cargo/a22@0.1.0
 dependency pkg:cargo/aws-lc-rs@1.18.1
 dependency pkg:cargo/aws-lc-sys@0.45.0

@@ -795,7 +795,7 @@
             "symbol": "micro::seal"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::ring_seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in micro::ring_seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 88) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 29,
@@ -849,7 +849,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -974,7 +978,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 89) or parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 16,
@@ -1027,7 +1031,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
         },
         {
           "name": "rcbom:occurrences",
@@ -1581,7 +1589,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:135870e4-f31a-8217-821b-285d1670d746",
+  "serialNumber": "urn:uuid:db4b1d0e-761c-828e-a1c3-862ad0c01265",
   "specVersion": "1.7",
   "version": 1
 }

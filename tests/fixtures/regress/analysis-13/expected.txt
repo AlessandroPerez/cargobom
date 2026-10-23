@@ -14,6 +14,8 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:32:15 | ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING | [reachable] [component] in t13::sign_ecdsa; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:40:65 | ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 | [reachable] [component] in t13::ACCEPTED; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:45:43 | t13::ACCEPTED | [reachable] [component] in t13::main; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `println!("{} {} {}", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:20:16 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8 | [reachable] [component] in t13::sign_tagged; part of Ed25519; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:23:11 | ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign | [reachable] [component] in t13::sign_tagged; part of Ed25519; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:28:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t13 -> ring -> getrandom
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:45:0 | ring | [manifest] locked ring 0.17.14; reached via t13 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by t13 (dependencies)
@@ -52,6 +54,13 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
@@ -65,10 +74,12 @@ asset ECDSA-P-384-SHA-384 | crypto:algorithm:ECDSA-P-384-SHA-384 | {"algorithmPr
 asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:ECDSA-P-384-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/t13@0.1.0 -> pkg:cargo/ring@0.17.14
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
@@ -76,6 +87,7 @@ dependency crypto:algorithm:ECDSA-P-384-SHA-384
 dependency crypto:algorithm:Ed25519
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ring@0.17.14
 dependency pkg:cargo/t13@0.1.0

@@ -1,6 +1,6 @@
   occ 3DES-112 | crypto:algorithm:3DES-112 | src/main.rs:86:51 | aws_lc_rs::cipher::DES_EDE_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `for alg in [&cipher::DES_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE3_FOR_LEGACY_USE_ONLY] {`; code: `cipher::DES_EDE_FOR_LEGACY_USE_ONLY`
   occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:86:89 | aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `for alg in [&cipher::DES_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE_FOR_LEGACY_USE_ONLY, &cipher::DES_EDE3_FOR_LEGACY_USE_ONLY] {`; code: `cipher::DES_EDE3_FOR_LEGACY_USE_ONLY`
-  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:89:13 | aws_lc_rs::cipher::UnboundCipherKey::new | [reachable] [call] in t10::legacy_and_sha3; new: setup, not a use; algorithm from aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cipher::UnboundCipherKey::new`
+  occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:89:13 | aws_lc_rs::cipher::UnboundCipherKey::new | [reachable] [call] in t10::legacy_and_sha3; new: setup, not a use; algorithm from aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cipher::UnboundCipherKey::new`
   occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:89:44 | aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `let uk = cipher::UnboundCipherKey::new(&cipher::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cipher::DES_EDE3_FOR_LEGACY_USE_ONLY`
   occ 3DES-168 | crypto:algorithm:3DES-168 | src/main.rs:91:15 | aws_lc_rs::cipher::padded::PaddedBlockEncryptingKey::encrypt | [reachable] [call] in t10::legacy_and_sha3; use: encrypt; algorithm from aws_lc_rs::cipher::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = ek.encrypt(&mut buf);`; code: `encrypt`
   occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:19:13 | aws_lc_rs::aead::quic::HeaderProtectionKey::new | [reachable] [call] in t10::literal_keys; new: setup, not a use; algorithm from aws_lc_rs::aead::quic::AES_128 in the arguments; key: hard-coded (16 bytes, literal at line 19); line: `let hp = aead::quic::HeaderProtectionKey::new(&aead::quic::AES_128, &[2u8; 16]).unwrap();`; code: `aead::quic::HeaderProtectionKey::new`
@@ -22,7 +22,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:63:36 | aws_lc_rs::aead::aes_gcm::AES_256_GCM | [reachable] [static] in t10::agreements; line: `let ok = aead::UnboundKey::new(&aead::AES_256_GCM, &shared).is_ok();`; code: `aead::AES_256_GCM`
   occ AES-256-KW | crypto:algorithm:AES-256-KW | src/main.rs:74:16 | aws_lc_rs::key_wrap::KeyWrap::wrap | [reachable] [call] in t10::key_wrapping; use: encrypt; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; line: `let a = kek.wrap(&key[..16], &mut out).map(|o| o.len()).unwrap_or(0);`; code: `wrap`
   occ AES-256-KWP | crypto:algorithm:AES-256-KWP | src/main.rs:76:17 | aws_lc_rs::key_wrap::KeyWrapPadded::wrap_with_padding | [reachable] [call] in t10::key_wrapping; use: encrypt; algorithm from aws_lc_rs::key_wrap::AES_256 in the arguments; line: `let b = kek2.wrap_with_padding(key, &mut out).map(|o| o.len()).unwrap_or(0);`; code: `wrap_with_padding`
-  occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:92:13 | aws_lc_rs::cmac::Key::new | [reachable] [call] in t10::legacy_and_sha3; new: setup, not a use; algorithm from aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: parameter (argument 0 of the enclosing function); line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::Key::new`
+  occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:92:13 | aws_lc_rs::cmac::Key::new | [reachable] [call] in t10::legacy_and_sha3; new: setup, not a use; algorithm from aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::Key::new`
   occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:92:28 | aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY | [reachable] [static] in t10::legacy_and_sha3; line: `let ck = cmac::Key::new(cmac::DES_EDE3_FOR_LEGACY_USE_ONLY, msg).unwrap();`; code: `cmac::DES_EDE3_FOR_LEGACY_USE_ONLY`
   occ CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | src/main.rs:93:12 | aws_lc_rs::cmac::sign | [reachable] [call] in t10::legacy_and_sha3; use: tag; algorithm from aws_lc_rs::cmac::DES_EDE3_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = cmac::sign(&ck, msg);`; code: `cmac::sign`
   occ CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | src/main.rs:24:13 | aws_lc_rs::cmac::Key::new | [reachable] [call] in t10::literal_keys; new: setup, not a use; algorithm from aws_lc_rs::cmac::AES_128 in the arguments; key: hard-coded (16 bytes, literal at line 24); line: `let ck = cmac::Key::new(cmac::AES_128, &[4u8; 16]).unwrap();`; code: `cmac::Key::new`
@@ -92,7 +92,7 @@
   prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:functions:source=observed
   prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:kb:version=0.2.0
   prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:occurrences=4
-  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:provenance:key=parameter
+  prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:provenance:key=environment,parameter
   prop 3DES-168 | crypto:algorithm:3DES-168 | rcbom:reachability=reachable
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
@@ -154,7 +154,7 @@
   prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:functions:source=observed
   prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:kb:version=0.2.0
   prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:occurrences=3
-  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:provenance:key=parameter
+  prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:provenance:key=environment,parameter
   prop CMAC-3DES-168 | crypto:algorithm:CMAC-3DES-168 | rcbom:reachability=reachable
   prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:confidence=high
   prop CMAC-AES-128 | crypto:algorithm:CMAC-AES-128 | rcbom:detection:method=type-resolved
@@ -228,6 +228,8 @@
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:functions:source=knowledge-base
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:kb:version=0.2.0
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:occurrences=1
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:param:mgf=MGF1-SHA-512
+  prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:param:salt_bytes=64
   prop RSA-PSS-SHA-512 | crypto:algorithm:RSA-PSS-SHA-512 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved

@@ -1,4 +1,4 @@
-  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at line 9) or parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
   occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:2:13 | hkdf::Hkdf::<H, I>::new | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | lib1/src/lib.rs:4:7 | hkdf::Hkdf::<H, I>::expand | [reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b"i", &mut out).unwrap();`; code: `expand`
@@ -22,10 +22,11 @@
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:artifact=lib lib1
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:finding=hard-coded-ikm
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=2
-  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=parameter
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=hard-coded,parameter
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:artifact=bin app
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:artifact=lib lib1
