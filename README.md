@@ -174,7 +174,8 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 - The built artifact only: one target, one feature set, the `release` profile. Tests, build
   scripts, examples, and code that other features or targets would compile are not covered.
 - Hand-rolled algorithms, unsafe code, certificates loaded at run time, and security
-  configuration (which TLS suites a configuration allows) are out of scope.
+  configuration (which TLS suites a configuration allows) are out of scope. minisign's own
+  Ed25519, BLAKE2b and SHA-512 are such code: its labels hold only its random draws and scrypt.
 - Knowledge-base coverage: the RustCrypto 0.10 generation, ring 0.17, aws-lc-rs 1, rustls 0.23,
   jsonwebtoken 9, rand 0.8 to 0.9. Other versions and unmodelled crypto packages are reported,
   with their operations as unknown and the reason.
