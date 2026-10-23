@@ -7,7 +7,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:61:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 60); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:69:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o8; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 67) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t2::o9; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 79) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function) or parameter (argument 3 of the enclosing function); line: `Aes256Gcm::new_from_slice(k).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:87:4 | aead::AeadCore::generate_nonce | [reachable] [call] in t2::o10; generate_nonce: setup, not a use; line: `Aes256Gcm::generate_nonce(OsRng).len()`; code: `Aes256Gcm::generate_nonce`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:87:4 | aead::AeadCore::generate_nonce | [reachable] [call] in t2::o10; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); line: `Aes256Gcm::generate_nonce(OsRng).len()`; code: `Aes256Gcm::generate_nonce`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:43:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t2::o5; use: generate; line: `OsRng.fill_bytes(&mut nonce[..]);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:58:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t2::o7; use: generate; line: `OsRng.fill_bytes(&mut key);`; code: `fill_bytes`
   occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t2 -> aes-gcm -> aead
@@ -35,6 +35,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment,hard-coded,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:rng=rng
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
