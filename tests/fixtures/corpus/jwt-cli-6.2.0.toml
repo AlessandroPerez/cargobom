@@ -2,6 +2,10 @@
 # project's own source, written from source by two independent labellers (agents, blind
 # to each other and to any tool output), differences adjudicated by the rules
 # (13 October 2026).
+# Amended after the tool's runs (23 October 2026), against the tool: the two insecure decodes
+# (decode.rs:152, :169) had may = HS256, HS384, HS512, but the validator's algorithm comes from
+# parsing --alg or the token header, which R15.2 keeps out of `may`; only the HS256 fallback
+# written in the code stays. Found by the second independent review; the tool reports the three.
 
 # Ground-truth labels: jwt-cli 6.2.0 (/var/tmp/rcbom-validate/jwt-cli-6.2.0)
 # Build analysed: default features, host x86_64-unknown-linux-gnu, release build of bin "jwt"
@@ -58,8 +62,8 @@ line = 152
 callee = "decode"
 function = "verify"
 must = []
-may = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
-note = "jsonwebtoken::decode with insecure_validator after insecure_disable_signature_validation(): validate_signature is false, so no signature/MAC is checked (decoding.rs:216-232); may = Validation.algorithms because the field-based analysis also sees validate_signature = true"
+may = ["HMAC-SHA-256"]
+note = "jsonwebtoken::decode with insecure_validator after insecure_disable_signature_validation(): validate_signature is false, so no signature/MAC is checked (decoding.rs:216-232); may = the HS256 fallback written in the code (decode.rs:121), the field-based analysis also seeing validate_signature = true; the parsed algorithms are not in may (R15.2), amended 23 October"
 
 [[site]]
 file = "src/translators/decode.rs"
@@ -76,5 +80,5 @@ line = 169
 callee = "decode"
 function = "verify"
 must = []
-may = ["HMAC-SHA-256", "HMAC-SHA-384", "HMAC-SHA-512"]
-note = "jsonwebtoken::decode with insecure_validator (signature validation disabled) when no --secret is given: no verification runs; may as for line 152"
+may = ["HMAC-SHA-256"]
+note = "jsonwebtoken::decode with insecure_validator (signature validation disabled) when no --secret is given: no verification runs; may as for line 152 (amended 23 October)"
