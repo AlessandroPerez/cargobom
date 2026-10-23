@@ -2386,7 +2386,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::stream::Stream::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `aead: ChaCha20Poly1305::new(&key.0),`; code: `ChaCha20Poly1305::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::stream::Stream::new; new: setup, not a use; key: computed (protocol::Encryptor::with_recipients) or computed (protocol::Encryptor::with_user_passphrase) or parameter (argument 0 of the enclosing function); line: `aead: ChaCha20Poly1305::new(&key.0),`; code: `ChaCha20Poly1305::new`",
             "line": 99,
             "location": "age-0.12.1/src/primitives/stream.rs",
             "offset": 18,
@@ -2435,7 +2435,7 @@
             "symbol": "aead::Aead::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in hpke::aead::AeadCtx::<..>::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by hpke::setup::derive_enc_ctx::<..> at hpke-0.12.0/src/setup.rs:131:4 as `AeadCtx::new`; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:164:18 as `derive_enc_ctx::<_, _, Kem, _>`; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8 as `setup_sender::<A, Kdf, Kem, R>`; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4 as `hpke::single_shot_seal::<hpke::aead::ChaCha20Poly1305, hpke::kdf::HkdfSha256, Kem, R>`; line: `encryptor: <A::AeadImpl as aead::KeyInit>::new(&key.0),`; code: `<A::AeadImpl as aead::KeyInit>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in hpke::aead::AeadCtx::<..>::new; new: setup, not a use; key: computed (hpke::aead::AeadKey::default) or computed (kdf::LabeledExpand::labeled_expand) or computed (written through generic_array::GenericArray::as_mut_slice) or parameter (argument 0 of the enclosing function); instantiated by hpke::setup::derive_enc_ctx::<..> at hpke-0.12.0/src/setup.rs:131:4 as `AeadCtx::new`; instantiated by hpke::setup::setup_sender::<..> at hpke-0.12.0/src/setup.rs:164:18 as `derive_enc_ctx::<_, _, Kem, _>`; instantiated by hpke::single_shot::single_shot_seal::<..> at hpke-0.12.0/src/single_shot.rs:77:8 as `setup_sender::<A, Kdf, Kem, R>`; instantiated by age_core::primitives::hpke_seal::<..> at age-core-0.12.0/src/primitives.rs:144:4 as `hpke::single_shot_seal::<hpke::aead::ChaCha20Poly1305, hpke::kdf::HkdfSha256, Kem, R>`; line: `encryptor: <A::AeadImpl as aead::KeyInit>::new(&key.0),`; code: `<A::AeadImpl as aead::KeyInit>::new`",
             "line": 205,
             "location": "hpke-0.12.0/src/aead.rs",
             "offset": 23,
@@ -2482,7 +2482,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
@@ -2745,7 +2745,7 @@
             "symbol": "hkdf::Hkdf::<H, I>::extract"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::HmacWriter::new; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `inner: Hmac::new_from_slice(key.0.expose_secret()).expect(\"key is the correct length\"),`; code: `Hmac::new_from_slice`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::HmacWriter::new; new_from_slice: setup, not a use; key: computed (age::keys::mac_key) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `inner: Hmac::new_from_slice(key.0.expose_secret()).expect(\"key is the correct length\"),`; code: `Hmac::new_from_slice`",
             "line": 33,
             "location": "age-0.12.1/src/primitives.rs",
             "offset": 19,
@@ -2865,7 +2865,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -3872,7 +3872,9 @@
         "algorithmProperties": {
           "cryptoFunctions": [
             "decrypt",
-            "keygen"
+            "digest",
+            "keygen",
+            "unknown"
           ],
           "primitive": "unknown"
         },
@@ -3886,6 +3888,69 @@
             "location": "src/bin/rage-keygen/main.rs",
             "offset": 13,
             "symbol": "age::native::x25519::Identity::generate"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::convert; use: unknown; algorithm unresolved: `age::identity::IdentityFile::<C>::write_recipients_file` of age 0.12.1, a crypto package the knowledge base does not model; line: `file.write_recipients_file(output)`; code: `write_recipients_file`",
+            "line": 82,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 9,
+            "symbol": "age::identity::IdentityFile::<C>::write_recipients_file"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::cli_common::recipients::read_recipients` of age 0.12.1, a crypto package the knowledge base does not model; line: `let recipients = read_recipients(`; code: `read_recipients`",
+            "line": 180,
+            "location": "src/bin/rage/main.rs",
+            "offset": 25,
+            "symbol": "age::cli_common::recipients::read_recipients"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `wrap_output`",
+            "line": 191,
+            "location": "src/bin/rage/main.rs",
+            "offset": 31,
+            "symbol": "age::protocol::Encryptor::wrap_output"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `ArmoredWriter::wrap_output`",
+            "line": 191,
+            "location": "src/bin/rage/main.rs",
+            "offset": 43,
+            "symbol": "age::primitives::armor::ArmoredWriter::<W>::wrap_output"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: digest; algorithm unresolved: `age::primitives::stream::StreamWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model; line: `.finish()`; code: `finish`",
+            "line": 221,
+            "location": "src/bin/rage/main.rs",
+            "offset": 9,
+            "symbol": "age::primitives::stream::StreamWriter::<W>::finish"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt::{closure#3}; use: digest; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model; instantiated by rage::encrypt at src/bin/rage/main.rs:222:18; line: `.and_then(|armor| armor.finish())`; code: `finish`",
+            "line": 222,
+            "location": "src/bin/rage/main.rs",
+            "offset": 32,
+            "symbol": "age::primitives::armor::ArmoredWriter::<W>::finish"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::identities::read_identities` of age 0.12.1, a crypto package the knowledge base does not model; line: `read_identities(opts.identity, opts.max_work_factor, &mut stdin_guard)?`; code: `read_identities`",
+            "line": 271,
+            "location": "src/bin/rage/main.rs",
+            "offset": 8,
+            "symbol": "age::cli_common::identities::read_identities"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::plugin::Identity::default_for_plugin` of age 0.12.1, a crypto package the knowledge base does not model; line: `&[plugin::Identity::default_for_plugin(plugin_name)?],`; code: `plugin::Identity::default_for_plugin`",
+            "line": 276,
+            "location": "src/bin/rage/main.rs",
+            "offset": 14,
+            "symbol": "age::plugin::Identity::default_for_plugin"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::read_secret` of age 0.12.1, a crypto package the knowledge base does not model; line: `match read_secret(&fl!(\"type-passphrase\"), &fl!(\"prompt-passphrase\"), None) {`; code: `read_secret`",
+            "line": 318,
+            "location": "src/bin/rage/main.rs",
+            "offset": 14,
+            "symbol": "age::cli_common::read_secret"
           },
           {
             "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: decrypt; algorithm unresolved: `age::protocol::Decryptor::<R>::decrypt` of age 0.12.1, a crypto package the knowledge base does not model; line: `.decrypt(Some(&identity as _).into_iter())`; code: `decrypt`",
@@ -3939,7 +4004,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -4087,7 +4152,7 @@
             "symbol": "core::convert::Into::into"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::identity::UnencryptedKey::unwrap_stanza; into: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `sk.into()`; code: `into`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::identity::UnencryptedKey::unwrap_stanza; into: setup, not a use; key: computed (ssh::EncryptedKey::decrypt) or parameter (argument 0 of age::Identity::unwrap_stanzas) or parameter (argument 0 of the enclosing function) or unknown (too deep); line: `sk.into()`; code: `into`",
             "line": 114,
             "location": "age-0.12.1/src/ssh/identity.rs",
             "offset": 23,
@@ -4246,7 +4311,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
+          "value": "computed,parameter,unknown"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -4945,7 +5010,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:93520691-840e-8e4e-b577-315d7fb6478f",
+  "serialNumber": "urn:uuid:3acb1356-92da-8948-92e1-ee6da1e9d588",
   "specVersion": "1.7",
   "version": 1
 }

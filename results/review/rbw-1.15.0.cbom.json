@@ -2356,35 +2356,35 @@
             "symbol": "rustls::crypto::ring::tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
             "line": 118,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 16,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 138,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 155,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 177,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 196,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -2433,7 +2433,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_within"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::GcmMessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls12::AES128_GCM` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, &mut payload.as_mut()[GCM_EXPLICIT_NONCE_LEN..])`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::GcmMessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls12::AES128_GCM` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_separate_tag(nonce, aad, &mut payload.as_mut()[GCM_EXPLICIT_NONCE_LEN..])`; code: `seal_in_place_separate_tag`",
             "line": 299,
             "location": "rustls-0.23.35/src/crypto/ring/tls12.rs",
             "offset": 13,
@@ -2475,14 +2475,14 @@
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
             "line": 218,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 250,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
@@ -2576,7 +2576,7 @@
             "symbol": "rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::AES_128; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::AES_128; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_128_GCM_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
             "line": 14,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -2693,7 +2693,7 @@
             "symbol": "cipher::block::BlockDecryptMut::decrypt_padded_mut"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::cipherstring::decrypt_common_symmetric; new_from_slices: setup, not a use; key: computed (locked::Keys::enc_key); iv: parameter (argument 1 of the enclosing function); line: `cbc::Decryptor::<aes::Aes256>::new_from_slices(keys.enc_key(), iv)`; code: `cbc::Decryptor::<aes::Aes256>::new_from_slices`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::cipherstring::decrypt_common_symmetric; new_from_slices: setup, not a use; key: computed (locked::Keys::enc_key); iv: computed (cipherstring::CipherString::new) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `cbc::Decryptor::<aes::Aes256>::new_from_slices(keys.enc_key(), iv)`; code: `cbc::Decryptor::<aes::Aes256>::new_from_slices`",
             "line": 233,
             "location": "src/cipherstring.rs",
             "offset": 4,
@@ -2799,35 +2799,35 @@
             "symbol": "rustls::crypto::ring::tls12::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); key: parameter (argument 0 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
             "line": 118,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 16,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 138,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 155,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 177,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 196,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -2876,7 +2876,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_within"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::GcmMessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls12::AES256_GCM` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, &mut payload.as_mut()[GCM_EXPLICIT_NONCE_LEN..])`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::GcmMessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls12::AES256_GCM` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_separate_tag(nonce, aad, &mut payload.as_mut()[GCM_EXPLICIT_NONCE_LEN..])`; code: `seal_in_place_separate_tag`",
             "line": 299,
             "location": "rustls-0.23.35/src/crypto/ring/tls12.rs",
             "offset": 13,
@@ -2911,14 +2911,14 @@
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
             "line": 218,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 250,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
@@ -3012,7 +3012,7 @@
             "symbol": "rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::AES_256; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); key: parameter (argument 0 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::AES_256; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_AES_256_GCM_SHA384` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
             "line": 14,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -3105,7 +3105,7 @@
             "symbol": "argon2::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::identity::Identity::new; use: keyderive; password: computed (locked::Password::password); salt: parameter (argument 0 of the enclosing function); line: `argon2::Argon2::hash_password_into(`; code: `argon2::Argon2::hash_password_into`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::identity::Identity::new; use: keyderive; password: computed (locked::Password::password); salt: parameter (argument 0 of rbw::actions::login) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of rbw_agent::actions::two_factor) or parameter (argument 10 of rbw_agent::actions::login_success) or unknown (too deep); line: `argon2::Argon2::hash_password_into(`; code: `argon2::Argon2::hash_password_into`",
             "line": 57,
             "location": "src/identity.rs",
             "offset": 16,
@@ -3153,7 +3153,7 @@
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -3444,35 +3444,35 @@
             "symbol": "rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::PacketKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `aead::UnboundKey::new(aead_algorithm, key.as_ref()).unwrap(),`; code: `aead::UnboundKey::new`",
             "line": 118,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 16,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 138,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::encrypt_in_place_for_path; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.seal_in_place_separate_tag(nonce, aad, payload)`; code: `seal_in_place_separate_tag`",
             "line": 155,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 177,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::quic::PacketKey as rustls::quic::PacketKey>::decrypt_in_place_for_path; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::for_path); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 196,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -3507,7 +3507,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::decrypt; use: decrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; nonce: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `.open_in_place(nonce, aead::Aad::from(alleged_key_name), &mut out)`; code: `open_in_place`",
+            "additionalContext": "[present] [call] in <rustls::crypto::ring::ticketer::AeadTicketer as rustls::server::server_conn::ProducesTickets>::decrypt; use: decrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; nonce: computed (rustls::polyfill::try_split_at); line: `.open_in_place(nonce, aead::Aad::from(alleged_key_name), &mut out)`; code: `open_in_place`",
             "line": 174,
             "location": "rustls-0.23.35/src/crypto/ring/ticketer.rs",
             "offset": 13,
@@ -3549,14 +3549,14 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::ChaCha20Poly1305MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `<rustls::crypto::ring::tls12::ChaCha20Poly1305 as rustls::crypto::cipher::Tls12AeadAlgorithm>::decrypter` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::ChaCha20Poly1305MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `<rustls::crypto::ring::tls12::ChaCha20Poly1305 as rustls::crypto::cipher::Tls12AeadAlgorithm>::decrypter` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 352,
             "location": "rustls-0.23.35/src/crypto/ring/tls12.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::ChaCha20Poly1305MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `<rustls::crypto::ring::tls12::ChaCha20Poly1305 as rustls::crypto::cipher::Tls12AeadAlgorithm>::encrypter` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls12::ChaCha20Poly1305MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `<rustls::crypto::ring::tls12::ChaCha20Poly1305 as rustls::crypto::cipher::Tls12AeadAlgorithm>::encrypter` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
             "line": 379,
             "location": "rustls-0.23.35/src/crypto/ring/tls12.rs",
             "offset": 13,
@@ -3598,14 +3598,14 @@
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageEncrypter as rustls::crypto::cipher::MessageEncrypter>::encrypt; use: encrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.seal_in_place_append_tag(nonce, aad, &mut payload)`; code: `seal_in_place_append_tag`",
             "line": 218,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: parameter (argument 0 of the enclosing function) or parameter (argument 2 of the enclosing function); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::tls13::Tls13MessageDecrypter as rustls::crypto::cipher::MessageDecrypter>::decrypt; use: decrypt; algorithm one of 3 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); nonce: computed (cipher::Nonce::new); line: `.open_in_place(nonce, aad, payload)`; code: `open_in_place`",
             "line": 250,
             "location": "rustls-0.23.35/src/crypto/ring/tls13.rs",
             "offset": 13,
@@ -3653,7 +3653,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "parameter,rng"
+          "value": "computed,rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -3698,7 +3698,7 @@
             "symbol": "rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::CHACHA20; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::quic::HeaderProtectionKey::new; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::aead::quic::CHACHA20; member: type-join, possible (a value `static rustls::crypto::ring::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL` stores in the field); key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `Self(aead::quic::HeaderProtectionKey::new(alg, key.as_ref()).unwrap())`; code: `aead::quic::HeaderProtectionKey::new`",
             "line": 14,
             "location": "rustls-0.23.35/src/crypto/ring/quic.rs",
             "offset": 13,
@@ -4023,7 +4023,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::sign::EcdsaSigningKey::convert_sec1_to_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `rustls::crypto::ring::sign::any_ecdsa_type`; key: parameter (argument 2 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(sigalg, &pkcs8, rng).map_err(|_| ())`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::sign::EcdsaSigningKey::convert_sec1_to_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `rustls::crypto::ring::sign::any_ecdsa_type`; key: computed (rustls::x509::wrap_concat_in_sequence); line: `EcdsaKeyPair::from_pkcs8(sigalg, &pkcs8, rng).map_err(|_| ())`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 260,
             "location": "rustls-0.23.35/src/crypto/ring/sign.rs",
             "offset": 8,
@@ -4172,7 +4172,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
+          "value": "computed"
         },
         {
           "name": "rcbom:provenance:public-key",
@@ -4459,7 +4459,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::sign::EcdsaSigningKey::convert_sec1_to_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `rustls::crypto::ring::sign::any_ecdsa_type`; key: parameter (argument 2 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(sigalg, &pkcs8, rng).map_err(|_| ())`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in rustls::crypto::ring::sign::EcdsaSigningKey::convert_sec1_to_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `rustls::crypto::ring::sign::any_ecdsa_type`; key: computed (rustls::x509::wrap_concat_in_sequence); line: `EcdsaKeyPair::from_pkcs8(sigalg, &pkcs8, rng).map_err(|_| ())`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 260,
             "location": "rustls-0.23.35/src/crypto/ring/sign.rs",
             "offset": 8,
@@ -4594,7 +4594,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
+          "value": "computed"
         },
         {
           "name": "rcbom:provenance:public-key",
@@ -6428,7 +6428,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::identity::Identity::new; use: keyderive; password: computed (locked::Password::password); salt: parameter (argument 0 of the enclosing function); line: `pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>(`; code: `pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::identity::Identity::new; use: keyderive; password: computed (locked::Password::password); salt: computed (rbw_agent::actions::config_email) or parameter (argument 0 of rbw::actions::login) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of rbw_agent::actions::two_factor) or parameter (argument 10 of rbw_agent::actions::login_success) or unknown (too deep); line: `pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>(`; code: `pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>`",
             "line": 32,
             "location": "src/identity.rs",
             "offset": 16,
@@ -6472,7 +6472,7 @@
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "value": "computed,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -7272,6 +7272,14 @@
           "value": "lib rbw"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-256"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "32"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -7397,6 +7405,14 @@
           "value": "lib rbw"
         },
         {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-384"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "48"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "parameter"
         },
@@ -7520,6 +7536,14 @@
         {
           "name": "rcbom:artifact",
           "value": "lib rbw"
+        },
+        {
+          "name": "rcbom:param:mgf",
+          "value": "MGF1-SHA-512"
+        },
+        {
+          "name": "rcbom:param:salt_bytes",
+          "value": "64"
         },
         {
           "name": "rcbom:provenance:public-key",
@@ -8952,6 +8976,13 @@
             "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA512"
           },
           {
+            "additionalContext": "[reachable] [component] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <rustls::crypto::ring::sign::Ed25519Signer as rustls::crypto::signer::Signer>::sign; part of Ed25519; line: `Ok(self.key.sign(message).as_ref().into())`; code: `sign`",
+            "line": 414,
+            "location": "rustls-0.23.35/src/crypto/ring/sign.rs",
+            "offset": 20,
+            "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
+          },
+          {
             "additionalContext": "[present] [component] in webpki::ALL_VERIFICATION_ALGS; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `ring::RSA_PKCS1_2048_8192_SHA512,`; code: `ring::RSA_PKCS1_2048_8192_SHA512`",
             "line": 156,
             "location": "rustls-webpki-0.103.8/src/lib.rs",
@@ -8971,6 +9002,13 @@
             "location": "rustls-webpki-0.103.8/src/lib.rs",
             "offset": 4,
             "symbol": "webpki::ring_algs::RSA_PSS_2048_8192_SHA512_LEGACY_KEY"
+          },
+          {
+            "additionalContext": "[reachable] [component] [artifacts: bin rbw, bin rbw-agent, lib rbw] in <webpki::ring_algs::RingAlgorithm as rustls_pki_types::SignatureVerificationAlgorithm>::verify_signature; part of Ed25519; line: `.verify(message, signature)`; code: `verify`",
+            "line": 42,
+            "location": "rustls-webpki-0.103.8/src/ring_algs.rs",
+            "offset": 13,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
             "additionalContext": "[reachable] [component] [artifacts: bin rbw, bin rbw-agent, lib rbw] in webpki::ring_algs::RSA_PKCS1_2048_8192_SHA512; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `verification_alg: &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
@@ -9020,6 +9058,27 @@
             "location": "ssh-key-0.6.7/src/fingerprint.rs",
             "offset": 36,
             "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] [artifacts: bin rbw-agent] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; part of Ed25519; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `sign`",
+            "line": 401,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 67,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[present] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; part of Ed25519; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `verify`",
+            "line": 414,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 53,
+            "symbol": "signature::verifier::Verifier::verify"
+          },
+          {
+            "additionalContext": "[present] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; part of Ed25519; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `verify`",
+            "line": 423,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 66,
+            "symbol": "signature::verifier::Verifier::verify"
           },
           {
             "additionalContext": "[present] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; part of RSA-PKCS1-1.5-SHA-512; line: `let data = rsa::pkcs1v15::SigningKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`",
@@ -9115,7 +9174,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "31"
+          "value": "36"
         }
       ],
       "type": "cryptographic-asset"
@@ -9300,6 +9359,404 @@
         {
           "name": "rcbom:occurrences",
           "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:hyper-rustls+tokio-rustls",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in reqwest::connect::ConnectorService::connect_via_proxy::{closure#0}; use: unknown; algorithm unresolved: `tokio_rustls::client::TlsConnector::connect` of tokio-rustls 0.26.4, a crypto package the knowledge base does not model; instantiated by reqwest::connect::ConnectorService::connect_via_proxy at reqwest-0.12.28/src/connect.rs:783:93; line: `.connect(server_name, TokioIo::new(tunneled))`; code: `connect`",
+            "line": 875,
+            "location": "reqwest-0.12.28/src/connect.rs",
+            "offset": 25,
+            "symbol": "tokio_rustls::client::TlsConnector::connect"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib rbw"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:rustls-pki-types",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in <reqwest::tls::ClientCert as core::clone::Clone>::clone; use: unknown; algorithm unresolved: `rustls_pki_types::PrivateKeyDer::<'_>::clone_key` of rustls-pki-types 1.13.2, a crypto package the knowledge base does not model; line: `key: key.clone_key(),`; code: `clone_key`",
+            "line": 113,
+            "location": "reqwest-0.12.28/src/tls.rs",
+            "offset": 25,
+            "symbol": "rustls_pki_types::PrivateKeyDer::<'_>::clone_key"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw, bin rbw-agent, lib rbw] in reqwest::tls::Certificate::read_pem_certs::<..>; use: unknown; algorithm unresolved: `rustls_pki_types::pem::PemObject::pem_reader_iter` of rustls-pki-types 1.13.2, a crypto package the knowledge base does not model; instantiated by reqwest::tls::Certificate::add_to_rustls at reqwest-0.12.28/src/tls.rs:220:28 as `Self::read_pem_certs`; line: `rustls_pki_types::CertificateDer::pem_reader_iter(reader)`; code: `rustls_pki_types::CertificateDer::pem_reader_iter`",
+            "line": 232,
+            "location": "reqwest-0.12.28/src/tls.rs",
+            "offset": 8,
+            "symbol": "rustls_pki_types::pem::PemObject::pem_reader_iter"
+          },
+          {
+            "additionalContext": "[present] [call] in reqwest::tls::CertificateRevocationList::from_pem_bundle; use: unknown; algorithm unresolved: `rustls_pki_types::pem::PemObject::pem_slice_iter` of rustls-pki-types 1.13.2, a crypto package the knowledge base does not model; line: `rustls_pki_types::CertificateRevocationListDer::pem_slice_iter(pem_bundle)`; code: `rustls_pki_types::CertificateRevocationListDer::pem_slice_iter`",
+            "line": 474,
+            "location": "reqwest-0.12.28/src/tls.rs",
+            "offset": 8,
+            "symbol": "rustls_pki_types::pem::PemObject::pem_slice_iter"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib rbw"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::ssh_agent::SshAgent::run::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::agent::listen` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model; instantiated by rbw_agent::ssh_agent::SshAgent::run at src/bin/rbw-agent/ssh_agent.rs:18:49; line: `ssh_agent_lib::agent::listen(listener, self).await?;`; code: `ssh_agent_lib::agent::listen`",
+            "line": 24,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 8,
+            "symbol": "ssh_agent_lib::agent::listen"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-key",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::{closure#0}::{closure#1}::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::key_data` of ssh-key 0.6.7, a crypto package the knowledge base does not model; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0}::{closure#1} at src/bin/rbw-agent/ssh_agent.rs:44:25; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:42:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..> at src/bin/rbw-agent/ssh_agent.rs:32:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:269:58 as `request_identities`; line: `pubkey: pk.key_data().clone(),`; code: `key_data`",
+            "line": 45,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 35,
+            "symbol": "ssh_key::public::PublicKey::key_data"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::private::PrivateKey::key_data` of ssh-key 0.6.7, a crypto package the knowledge base does not model; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `match private_key.key_data() {`; code: `key_data`",
+            "line": 70,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 26,
+            "symbol": "ssh_key::private::PrivateKey::key_data"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:tokio-rustls",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in tokio_tungstenite::tls::encryption::rustls::wrap_stream::<..>::{closure#0}; use: unknown; algorithm unresolved: `tokio_rustls::client::TlsConnector::connect` of tokio-rustls 0.26.4, a crypto package the knowledge base does not model; instantiated by tokio_tungstenite::tls::client_async_tls_with_config::<..>::{closure#0} at tokio-tungstenite-0.28.0/src/tls.rs:216:88; instantiated by tokio_tungstenite::connect::connect::{closure#0} at tokio-tungstenite-0.28.0/src/connect.rs:97:81; instantiated by tokio_tungstenite::connect::connect_async_with_config::<..>::{closure#0} at tokio-tungstenite-0.28.0/src/connect.rs:52:73; instantiated by tokio_tungstenite::connect::connect_async::<..>::{closure#0} at tokio-tungstenite-0.28.0/src/connect.rs:37:52; line: `let connected = stream.connect(domain, socket).await;`; code: `connect`",
+            "line": 136,
+            "location": "tokio-tungstenite-0.28.0/src/tls.rs",
+            "offset": 43,
+            "symbol": "tokio_rustls::client::TlsConnector::connect"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:totp-rs",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw] in rbw::commands::generate_totp; use: unknown; algorithm unresolved: `totp_rs::TOTP::generate_current` of totp-rs 5.7.0, a crypto package the knowledge base does not model; line: `.generate_current()?),`; code: `generate_current`",
+            "line": 2798,
+            "location": "src/bin/rbw/commands.rs",
+            "offset": 9,
+            "symbol": "totp_rs::TOTP::generate_current"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw] in rbw::commands::generate_totp; use: unknown; algorithm unresolved: `totp_rs::TOTP::generate_current` of totp-rs 5.7.0, a crypto package the knowledge base does not model; line: `.generate_current()?),`; code: `generate_current`",
+            "line": 2800,
+            "location": "src/bin/rbw/commands.rs",
+            "offset": 13,
+            "symbol": "totp_rs::TOTP::generate_current"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -9747,6 +10204,9 @@
         "pkg:cargo/rustls@0.23.35",
         "pkg:cargo/tokio-rustls@0.26.4"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:hyper-rustls+tokio-rustls"
+      ],
       "ref": "pkg:cargo/hyper-rustls@0.27.7"
     },
     {
@@ -10000,6 +10460,9 @@
       "dependsOn": [
         "pkg:cargo/zeroize@1.8.2"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:rustls-pki-types"
+      ],
       "ref": "pkg:cargo/rustls-pki-types@1.13.2"
     },
     {
@@ -10064,6 +10527,9 @@
         "pkg:cargo/ssh-key@0.6.7",
         "pkg:cargo/subtle@2.6.1"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:ssh-agent-lib"
+      ],
       "ref": "pkg:cargo/ssh-agent-lib@0.5.1"
     },
     {
@@ -10099,7 +10565,8 @@
         "pkg:cargo/zeroize@1.8.2"
       ],
       "provides": [
-        "crypto:algorithm:unknown:signature:ssh-key"
+        "crypto:algorithm:unknown:signature:ssh-key",
+        "crypto:algorithm:unknown:unknown:ssh-key"
       ],
       "ref": "pkg:cargo/ssh-key@0.6.7"
     },
@@ -10111,6 +10578,10 @@
       "dependsOn": [
         "pkg:cargo/rustls@0.23.35"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:hyper-rustls+tokio-rustls",
+        "crypto:algorithm:unknown:unknown:tokio-rustls"
+      ],
       "ref": "pkg:cargo/tokio-rustls@0.26.4"
     },
     {
@@ -10119,6 +10590,9 @@
         "pkg:cargo/hmac@0.12.1",
         "pkg:cargo/sha1@0.10.6",
         "pkg:cargo/sha2@0.10.9"
+      ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:totp-rs"
       ],
       "ref": "pkg:cargo/totp-rs@5.7.0"
     },
@@ -10156,6 +10630,12 @@
         "crypto:algorithm:SHA-384"
       ],
       "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [
@@ -10315,10 +10795,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:OS-RNG"
     },
     {
@@ -10352,6 +10828,30 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:ecdsa+p521"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:hyper-rustls+tokio-rustls"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:rustls-pki-types"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:ssh-key"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:tokio-rustls"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:totp-rs"
     },
     {
       "dependsOn": [],
@@ -10440,7 +10940,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4841d6d9-a147-8344-85ae-5613f2933d93",
+  "serialNumber": "urn:uuid:b603d470-102b-8ac8-87e5-300d4b642b62",
   "specVersion": "1.7",
   "version": 1
 }

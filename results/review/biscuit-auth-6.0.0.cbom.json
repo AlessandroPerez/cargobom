@@ -1427,7 +1427,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::p256::KeyPair::new_with_rng::<..>; use: keygen; rng: parameter (argument 0 of the enclosing function); instantiated by biscuit_auth::crypto::p256::KeyPair::new at src/crypto/p256.rs:24:8 as `Self::new_with_rng`; line: `let kp = SigningKey::random(rng);`; code: `SigningKey::random`",
+            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::p256::KeyPair::new_with_rng::<..>; use: keygen; rng: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of the enclosing function) or rng (rand_core::os::OsRng); instantiated by biscuit_auth::crypto::p256::KeyPair::new at src/crypto/p256.rs:24:8 as `Self::new_with_rng`; line: `let kp = SigningKey::random(rng);`; code: `SigningKey::random`",
             "line": 28,
             "location": "src/crypto/p256.rs",
             "offset": 17,
@@ -1462,7 +1462,7 @@
             "symbol": "ecdsa::signing::SigningKey::<C>::to_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::p256::PrivateKey::from_bytes; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `SigningKey::from_bytes(bytes.into())`; code: `SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::p256::PrivateKey::from_bytes; from_bytes: setup, not a use; key: computed (hex::decode) or computed (message::Message::decode) or computed (p256::PrivateKey::to_bytes) or parameter (argument 0 of the enclosing function); line: `SigningKey::from_bytes(bytes.into())`; code: `SigningKey::from_bytes`",
             "line": 142,
             "location": "src/crypto/p256.rs",
             "offset": 8,
@@ -1543,11 +1543,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:provenance:rng",
-          "value": "parameter"
+          "value": "parameter,rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -1574,14 +1574,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::KeyPair::new_with_rng::<..>; use: keygen; rng: parameter (argument 0 of the enclosing function); instantiated by biscuit_auth::crypto::ed25519::KeyPair::new at src/crypto/ed25519.rs:34:8 as `Self::new_with_rng`; line: `let kp = ed25519_dalek::SigningKey::generate(rng);`; code: `ed25519_dalek::SigningKey::generate`",
+            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::KeyPair::new_with_rng::<..>; use: keygen; rng: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of the enclosing function) or rng (rand_core::os::OsRng); instantiated by biscuit_auth::crypto::ed25519::KeyPair::new at src/crypto/ed25519.rs:34:8 as `Self::new_with_rng`; line: `let kp = ed25519_dalek::SigningKey::generate(rng);`; code: `ed25519_dalek::SigningKey::generate`",
             "line": 38,
             "location": "src/crypto/ed25519.rs",
             "offset": 17,
             "symbol": "ed25519_dalek::signing::SigningKey::generate"
           },
           {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::KeyPair::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `kp: ed25519_dalek::SigningKey::from_bytes(&key.0),`; code: `ed25519_dalek::SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::KeyPair::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `kp: ed25519_dalek::SigningKey::from_bytes(&key.0),`; code: `ed25519_dalek::SigningKey::from_bytes`",
             "line": 44,
             "location": "src/crypto/ed25519.rs",
             "offset": 16,
@@ -1644,7 +1644,7 @@
             "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::PrivateKey::public; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `PublicKey(SigningKey::from_bytes(&self.0).verifying_key())`; code: `SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::PrivateKey::public; from_bytes: setup, not a use; key: computed (format::SerializedBiscuit::deserialize) or parameter (argument 0 of the enclosing function); line: `PublicKey(SigningKey::from_bytes(&self.0).verifying_key())`; code: `SigningKey::from_bytes`",
             "line": 189,
             "location": "src/crypto/ed25519.rs",
             "offset": 18,
@@ -1739,15 +1739,85 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:provenance:rng",
-          "value": "parameter"
+          "value": "parameter,rng"
         },
         {
           "name": "rcbom:occurrences",
           "value": "20"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in biscuit_auth::crypto::ed25519::KeyPair::new_with_rng::<..>; part of Ed25519; instantiated by biscuit_auth::crypto::ed25519::KeyPair::new at src/crypto/ed25519.rs:34:8 as `Self::new_with_rng`; line: `let kp = ed25519_dalek::SigningKey::generate(rng);`; code: `ed25519_dalek::SigningKey::generate`",
+            "line": 38,
+            "location": "src/crypto/ed25519.rs",
+            "offset": 17,
+            "symbol": "ed25519_dalek::signing::SigningKey::generate"
+          },
+          {
+            "additionalContext": "[reachable] [component] in biscuit_auth::crypto::ed25519::KeyPair::sign; part of Ed25519; line: `.try_sign(&data)`; code: `try_sign`",
+            "line": 62,
+            "location": "src/crypto/ed25519.rs",
+            "offset": 17,
+            "symbol": "signature::signer::Signer::try_sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in biscuit_auth::crypto::ed25519::PublicKey::verify_signature; part of Ed25519; line: `.verify_strict(&data, &sig)`; code: `verify_strict`",
+            "line": 274,
+            "location": "src/crypto/ed25519.rs",
+            "offset": 13,
+            "symbol": "ed25519_dalek::verifying::VerifyingKey::verify_strict"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -2019,6 +2089,9 @@
       "dependsOn": [
         "pkg:cargo/digest@0.10.7"
       ],
+      "provides": [
+        "crypto:algorithm:SHA-512"
+      ],
       "ref": "pkg:cargo/sha2@0.10.8"
     },
     {
@@ -2049,12 +2122,18 @@
       "ref": "pkg:cargo/zeroize@1.8.1"
     },
     {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
       "dependsOn": [],
       "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:Ed25519"
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -2119,7 +2198,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ed67a849-ce03-80d9-aca6-e558e18172d7",
+  "serialNumber": "urn:uuid:7f8f4c65-40fc-8774-8f52-caf35feb6d30",
   "specVersion": "1.7",
   "version": 1
 }
