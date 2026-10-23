@@ -232,6 +232,9 @@ impl Files<'_> {
             ));
         }
         let mut parsed = None;
+        // a method call (`cipher.encrypt_padded_vec_mut::<Pkcs7>(..)`): its receiver, whose type
+        // the text does not give, may carry the asset, not the method's own type arguments
+        let mut method_call = false;
         let owner = man.owner_of(&path);
         let owner_id = owner.map(|p| p.id.repr.clone());
         // a macro's invocation is in the item the context names, as any position
@@ -425,6 +428,8 @@ impl Files<'_> {
             // generic arguments balanced, so it cannot run on into the next expression
             let (rs, rc) = rest(&src, line, offset);
             parsed = path_and_generics(&rs, &rc);
+            method_call = before_blank(&src.code, src.idx((line, offset)))
+                .is_some_and(|k| src.code[k] == '.');
             let mut ok = parsed.as_ref().is_some_and(|(_, last, _)| {
                 *last == ident
                     || src.binds.iter().any(|b| {
@@ -823,16 +828,21 @@ impl Files<'_> {
                     None => unknown = true,
                 }
             }
+            let provides = |r: &String| {
+                let cl = self.graph.closure(r);
+                provs.iter().any(|p| cl.contains(p))
+            };
+            let mut by_generics = Vec::new();
             for g in generics.iter().filter(|g| !NEUTRAL.contains(&g.as_str())) {
                 match self.origins(&src, owner_id, g) {
-                    Some(r) => roots.extend(r.into_iter().filter(|r| !self.neutral(r))),
+                    Some(r) => by_generics.extend(r.into_iter().filter(|r| !self.neutral(r))),
                     None => unknown = true,
                 }
             }
-            let provided = roots.iter().any(|r| {
-                let cl = self.graph.closure(r);
-                provs.iter().any(|p| cl.contains(p))
-            });
+            if !method_call || by_generics.iter().any(provides) {
+                roots.extend(by_generics);
+            }
+            let provided = roots.iter().any(provides);
             if !unknown && !roots.is_empty() && !provided {
                 roots.sort();
                 roots.dedup();
@@ -1060,6 +1070,41 @@ impl Files<'_> {
                     ));
                 }
             }
+            // an instance its arguments choose, its `<..>` not written (`Algorithm::hash(
+            // HmacSha256::new_from_slice(k).unwrap(), d)`): where they set up assets of this
+            // asset's primitive (constructors, and the components cited with them), this asset
+            // is among them (not the next line's `HmacSha512`)
+            if let (Some(_), Some(c0)) = (&caller, col)
+                && callee
+                    .as_deref()
+                    .is_some_and(|p| p.trim_end().ends_with("::<..>"))
+                && let Some((a, b)) = call_args_span(&src.code, src.idx((line, c0)))
+                && let Some(prim) = self.graph.primitive.get(component_ref)
+            {
+                let (from, to) = (src.pos(a), src.pos(b));
+                let set_up: Vec<&Occ> = self
+                    .occs
+                    .iter()
+                    .filter(|o| {
+                        o.location == file
+                            && (o.line, o.offset) > from
+                            && (o.line, o.offset) < to
+                            && (o.context.contains(": setup, not a use")
+                                || o.context.contains("] [component]"))
+                            && self.graph.primitive.get(&o.component_ref) == Some(prim)
+                    })
+                    .collect();
+                if !set_up.is_empty() && !set_up.iter().any(|o| o.component_ref == component_ref) {
+                    let mut names: Vec<&str> =
+                        set_up.iter().map(|o| o.component.as_str()).collect();
+                    names.sort();
+                    names.dedup();
+                    return Err(format!(
+                        "`{part}`: the call at {file}:{line}:{c0} sets up {}",
+                        names.join(", ")
+                    ));
+                }
+            }
             // in the standard library, the line names the caller: a closure's `call_once` shim
             // is cited at the trait's declaration of it
             if file.starts_with("/rustc/") {
@@ -1148,10 +1193,13 @@ impl Files<'_> {
                     let text = &src.lines[line - 1];
                     // a closure (or `async` body) the caller itself writes is cited where it
                     // does: `|..|`, `async`, `move`
+                    // (an instance written `f::<..>` is `f`)
+                    let bare =
+                        |x: &str| strip_generics(x).trim().trim_end_matches("::").to_string();
                     let own_closure = callee
                         .as_deref()
                         .and_then(closure_parent)
-                        .is_some_and(|p| strip_generics(p) == strip_generics(c));
+                        .is_some_and(|p| bare(p) == bare(c));
                     // a closure's caller that is its parent but for the closures' indexes
                     // (`main::{closure#7}` for `main::{closure#0}::{closure#0}`) names another
                     // closure than the one holding it
@@ -1161,8 +1209,8 @@ impl Files<'_> {
                                 .replace_all(x, "{closure}")
                                 .to_string()
                         };
-                        let (p, c2) = (strip_generics(p), strip_generics(c));
-                        if p.trim() != c2.trim() && idx(&p).trim() == idx(&c2).trim() {
+                        let (p, c2) = (bare(p), bare(c));
+                        if p != c2 && idx(&p) == idx(&c2) {
                             return Err(format!(
                                 "`{part}`: the closure is in `{}`, not in `{}`",
                                 p.trim(),
@@ -1417,6 +1465,19 @@ impl Files<'_> {
                         Some(c0) => named.into_iter().filter(|&j| j == c0).collect(),
                         None => named,
                     };
+                    // an `async fn`'s body is made where the call is awaited: at the `await` of
+                    // `f(..).await`, on the call's line or a later one
+                    let mut awaited = None;
+                    if named.is_empty()
+                        && !own_closure
+                        && let Some(c0) = col
+                        && let Some(n) = callee.as_deref().and_then(in_item)
+                        && let Some(k) = awaited_call(&src.code, src.idx((line, c0)))
+                        && word_of(&src.code, k) == n.name
+                    {
+                        named.push(c0);
+                        awaited = Some(k);
+                    }
                     // a call a macro invoked in the function makes (`calls!(T0 T1)` expanding to
                     // `outer::<T0>()`), or one through a variable bound to the function item
                     // (`let h = Local::alg; h(&d)`)
@@ -1507,7 +1568,8 @@ impl Files<'_> {
                     if let Some(c0) = col
                         && !own_closure
                         && let Some(n) = callee.as_deref().and_then(in_item)
-                        && let Some(t) = receiver_type(&src, src.idx((line, c0)))
+                        && let Some(t) =
+                            receiver_type(&src, awaited.unwrap_or_else(|| src.idx((line, c0))))
                     {
                         if !receiver_fits(&src, &n, &t) {
                             return Err(format!(
@@ -1530,7 +1592,11 @@ impl Files<'_> {
                         && !own_closure
                         && let Some(want_args) = callee.as_deref().and_then(instance_args)
                         && let Some(n) = callee.as_deref().and_then(in_item)
-                        && let Some(found) = call_type_args(&src, src.idx((line, c0)), &n.name)
+                        && let Some(found) = call_type_args(
+                            &src,
+                            awaited.unwrap_or_else(|| src.idx((line, c0))),
+                            &n.name,
+                        )
                     {
                         let man = self.man;
                         let owner = man.owner_of(&path);
@@ -1599,6 +1665,16 @@ impl Files<'_> {
                         }
                     }
                     if !inside && attribute_of(&src, line).is_some_and(|i| i.name == want.name) {
+                        inside = true;
+                    }
+                    // or the impl a `#[derive(..)]` writes (`#[derive(Hash)]` on `PublicKey`
+                    // makes `<PublicKey as Hash>::hash`), cited at the trait's name there
+                    if !inside
+                        && let Some(c0) = col
+                        && let Some((ty, tr)) = derive_at(&src, (line, c0))
+                        && want.self_ty.as_deref().map(type_name) == Some(ty)
+                        && want.trait_name.as_deref().map(type_name) == Some(tr)
+                    {
                         inside = true;
                     }
                     if !inside {
@@ -1773,7 +1849,10 @@ pub(super) fn check_item(
     else {
         return Err("no enclosing item in the context".into());
     };
-    let Some(item) = src.enclosing(at, &[ItemKind::Fn, ItemKind::Static]) else {
+    let Some(item) = src
+        .enclosing(at, &[ItemKind::Fn, ItemKind::Static])
+        .or_else(|| qualified_fn(src, at))
+    else {
         // an item a macro invocation outside any item makes (`hash_fn!(..)` at module level),
         // cited inside the invocation or at its start (hpke's `nistp_dhkex!(..)`)
         if src.enclosing(at, &[ItemKind::MacroCall]).is_some() || macro_call_at(src, at) {

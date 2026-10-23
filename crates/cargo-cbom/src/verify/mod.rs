@@ -114,7 +114,8 @@
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
 //!   `t.map.insert(1, digest)`); a variable computed by code not followed (another crate's
 //!   function, a labelled block) must read a variable bound there;
-//! - a closure's instantiation detail cites the innermost closure, or `async` closure's body,
+//! - a closure's instantiation detail (its caller written `f::<..>` or not) cites the innermost
+//!   closure, or `async` closure's body,
 //!   whose extent strictly holds the next position inward, and a closure caller that is the
 //!   closure's parent but for closure indexes is its parent; an instantiation detail citing an
 //!   `[instantiation]` occurrence's position is of one of that position's assets, and an
@@ -125,11 +126,16 @@
 //!   parentheses and the file's type aliases) is of
 //!   the chain's type, or of one implementing the chain's trait; a generic function's instance
 //!   (`pass::<A>`) is called with those type arguments, written or given by an argument of a
-//!   type of the file (`pass(&B, ..)` is `pass::<B>`); a vtable's detail cites the coercion's
+//!   type of the file (`pass(&B, ..)` is `pass::<B>`); an instance written `f::<..>` whose
+//!   call's arguments set up assets of the asset's primitive (`Algorithm::hash(HmacSha256::
+//!   new_from_slice(k)?, d)`) sets up this asset among them; a vtable's detail cites the coercion's
 //!   expression from its first token (a cast to a pointer, not `as fn(..)`), also a value made
 //!   an object of the method's trait by a function's parameter (`up_dyn(&mut a1)`, a default
 //!   body only for a type whose impl does not write it); an `async fn`'s body (`f::{closure#0}`)
-//!   is cited on a line calling `f`, or where the future is polled (`as `poll``); a call a macro
+//!   is cited on a line calling `f`, at the `await` of a call of `f` (`f(..)` on the line before
+//!   `.await`), at the `async` of `async fn f` (an `#[async_trait]` method's), or where the
+//!   future is polled (`as `poll``); an impl a `#[derive(..)]` writes, at the trait's name in the
+//!   attribute on the type; a call a macro
 //!   invoked in the function
 //!   makes is cited at the invocation, one through a variable bound to a function item running
 //!   the chain's body at the variable's call (not at the `let` binding it);
@@ -154,7 +160,21 @@
 //! same caller on a value whose type the code says is the instance's (`a2.ext()` with `a2: E2`
 //! beside `E2.ext()`): counted apart and printed (`AS TRUE`), not hidden.
 //!
+//! Not checked, by design (the walk, the value search and the knowledge base decide them, which
+//! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
+//! `rcbom:reachability`) and the artifacts an occurrence is tagged with; the provenance class of
+//! key material (`key: rng`) and the findings drawn from it; which of the functions an asset
+//! lists a call performs (a use is checked to be a function, not which one); a set's labels
+//! (the member kind, `possible`, `one of N`, `selector: ..`) beyond the witnesses above; the
+//! reason an unknown gives; an asset's registry name, but for a boundary model's (the
+//! descriptor the call reads is checked, not the name the knowledge base gives it); the crate
+//! segment of the enclosing item's path; a `static` witness of a `type-join` member. Nor does it
+//! see an operation the CBOM leaves out: it checks what is cited.
+//!
 //! Known limits:
+//! - A method call's own type arguments (`cipher.encrypt_padded_vec_mut::<Pkcs7>(..)`) are taken
+//!   as the provider only when they provide the asset: the receiver, whose type the text does not
+//!   give, may.
 //! - A cell handed to a function by a shared borrow (`set(&c)` with `fn set(c: &Cell<A>)`,
 //!   `RefCell`, `Mutex`), or written through a guard kept in a variable, is lent to code whose
 //!   stores are not read: a member from another function read from it is not checked (R4.12),

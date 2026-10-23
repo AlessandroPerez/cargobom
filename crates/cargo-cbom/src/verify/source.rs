@@ -1329,6 +1329,42 @@ pub(super) fn attribute_of(src: &Source, line: usize) -> Option<&Item> {
             })
         })
 }
+/// The function whose qualifier (`async`, `const`, `unsafe`) is at `at`: an `#[async_trait]`
+/// method's body is cited at the `async` of `async fn sign`, before the item's `fn`.
+pub(super) fn qualified_fn(src: &Source, at: (usize, usize)) -> Option<&Item> {
+    let s = &src.code;
+    let mut k = src.idx(at);
+    let mut qualified = false;
+    while ["async", "const", "unsafe"].iter().any(|w| kw(s, k, w)) {
+        k = skip_blank(s, k + word_of(s, k).chars().count());
+        qualified = true;
+    }
+    if !qualified || !kw(s, k, "fn") {
+        return None;
+    }
+    src.items
+        .iter()
+        .find(|i| i.kind == ItemKind::Fn && src.idx(i.start) == k)
+}
+/// The type and trait of the impl a `#[derive(..)]` at `at` writes: the token there names the
+/// trait (`Hash` in `#[derive(Debug, Hash)]`), the type is the item the attribute is on.
+pub(super) fn derive_at(src: &Source, at: (usize, usize)) -> Option<(String, String)> {
+    let chars: Vec<char> = src.lines.get(at.0.wrapping_sub(1))?.chars().collect();
+    let before: String = chars.get(..at.1)?.iter().collect();
+    if !re!(r"#\[\s*derive\s*\([^)]*$").is_match(&before) || !word_start(&chars, at.1) {
+        return None;
+    }
+    let item = src
+        .items
+        .iter()
+        .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > at.0)
+        .min_by_key(|i| i.start)?;
+    let between_ok = (at.0 + 1..item.start.0).all(|l| {
+        let t = src.lines[l - 1].trim_start();
+        t.is_empty() || t.starts_with("#[") || t.starts_with("//")
+    });
+    between_ok.then(|| (item.name.clone(), word_of(&chars, at.1)))
+}
 /// The item a closure or `async` body is written in: `t2::o1` for `t2::o1::{closure#0}`.
 pub(super) fn closure_parent(path: &str) -> Option<&str> {
     let p = path.trim_end();
@@ -1749,6 +1785,21 @@ pub(super) fn closure_span(s: &[char], k: usize) -> Option<(usize, usize)> {
     let mut i = k;
     while ["async", "move", "static"].iter().any(|w| kw(s, i, w)) {
         i = skip_blank(s, i + word_of(s, i).len());
+    }
+    // an `async fn`'s body cited at its `async` (`#[async_trait]` methods): from the `{` after
+    // the signature
+    if kw(s, k, "async") && kw(s, i, "fn") {
+        let mut depth = 0i32;
+        for j in i..s.len() {
+            match s[j] {
+                '(' | '[' => depth += 1,
+                ')' | ']' => depth -= 1,
+                '{' if depth == 0 => return Some((k, close_of_at(s, j)? + 1)),
+                ';' if depth == 0 => return None,
+                _ => {}
+            }
+        }
+        return None;
     }
     match s.get(i)? {
         '|' => {
