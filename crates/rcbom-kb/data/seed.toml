@@ -2617,12 +2617,15 @@ algorithm = { arg = 0, struct = "Header", field = "alg" }
 key = { arg = 2, struct = "EncodingKey", field = "family" }
 enum = "Algorithm"
 
+# (`off_by`: with signature validation disabled on a way to the call, `decode` only decodes
+# there: noted on its members)
 [[boundary]]
 crate = "jsonwebtoken"
 path = "^(decoding::)?decode$"
 use = "verify"
 algorithm = { arg = 2, struct = "Validation", field = "algorithms", list = true }
 key = { arg = 1, struct = "DecodingKey", field = "family" }
+off_by = "::Validation::insecure_disable_signature_validation$"
 enum = "Algorithm"
 
 [[boundary]]

@@ -111,6 +111,17 @@ pub(crate) fn site_matches(
         .retain(|(_, v)| reached(v, reachable, reached_path));
     let what = described(&b.algorithm);
     let mut detail = Vec::new();
+    // a call made on the argument on some way to this one that may make it run no
+    // cryptography (jsonwebtoken's `decode` after `insecure_disable_signature_validation()`
+    // only decodes): noted, the members kept (whether it is made on every way is not known)
+    if let Some(off_by) = &b.off_by
+        && let Some(by) = disabled_by(ctx, &b.krate, &b.algorithm, off_by, arg_origins)
+    {
+        detail.push(format!(
+            "signature validation is disabled on a way to the call (`{by}`): there it only \
+             decodes"
+        ));
+    }
     // the key's family allows some of them
     if let Some(k) = &b.key {
         let families: BTreeSet<&str> = e
@@ -815,6 +826,49 @@ fn members(
         &mut found,
     );
     found
+}
+
+/// The call `off_by` names (`insecure_disable_signature_validation`), when it is made on the
+/// value behind the call's argument on some way to the call: an element of how that value is
+/// built (`All`), on one of its ways (`Any`).
+fn disabled_by(
+    ctx: &Ctx<'_>,
+    krate: &str,
+    f: &FieldRef,
+    off_by: &regex::Regex,
+    arg_origins: &[Origin],
+) -> Option<String> {
+    fn find(o: &Origin, off_by: &regex::Regex, depth: usize) -> Option<String> {
+        match o {
+            Origin::Call { callee, .. } if off_by.is_match(&strip_generics(callee)) => {
+                Some(fn_name(callee))
+            }
+            Origin::All(xs) | Origin::Any(xs) if depth < 8 => {
+                xs.iter().find_map(|x| find(x, off_by, depth + 1))
+            }
+            _ => None,
+        }
+    }
+    let (base, Some(adt), Some(field)) = (arg_origins.get(f.arg)?, &f.adt, &f.field) else {
+        return None;
+    };
+    let prefix = format!("{krate}::");
+    let (adt, field) = ctx.fields.iter().find_map(|(path, names)| {
+        (path.starts_with(&prefix) && path.rsplit("::").next() == Some(adt.as_str()))
+            .then(|| {
+                names
+                    .iter()
+                    .position(|n| n == field)
+                    .map(|i| (path.clone(), i))
+            })
+            .flatten()
+    })?;
+    let mut bases = Vec::new();
+    struct_bases(ctx, base, &adt, field, &mut bases, 0);
+    bases.iter().find_map(|b| match b {
+        Base::Struct(o) => find(o, off_by, 0),
+        Base::Field(..) => None,
+    })
 }
 
 /// A standard-library function on a standard-library type (or none): `Result::unwrap`,
