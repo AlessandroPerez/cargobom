@@ -1116,6 +1116,13 @@ mod tests {
             crypto
         );
         assert_eq!(kb.unmodelled("age-core", &v(&[]), &v(&[])), crypto);
+        // ssh-key signs although its categories are der's; totp-rs's metadata names no crypto
+        let der_like = v(&["cryptography", "encoding", "parser-implementations"]);
+        assert_eq!(kb.unmodelled("ssh-key", &der_like, &v(&["crypto"])), crypto);
+        assert_eq!(
+            kb.unmodelled("totp-rs", &v(&["authentication"]), &v(&["hmac", "otp"])),
+            crypto
+        );
         assert_eq!(
             kb.unmodelled("block-buffer", &v(&["cryptography"]), &v(&[])),
             support
