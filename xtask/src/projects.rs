@@ -7,7 +7,8 @@
 //! the Cargo.lock `lock` names; a package already unpacked in `WORK_DIR` is used as it is. Each is
 //! then generated with the binaries `e2e` builds (`--check-walk`, the features it was labelled
 //! with) into `OUT_DIR/<labels>.cbom.json`, and verified with the self-test
-//! (`OUT_DIR/<labels>.verify`); one at a time, each with every core. A project fails on a
+//! (`OUT_DIR/<labels>.verify`, which `results/` keeps beside each CBOM); one at a time, each with
+//! every core. A project fails on a
 //! generation error, a caught driver panic, a position that does not verify, or a shifted one
 //! that is not rejected.
 
@@ -193,7 +194,12 @@ pub fn run(args: &[String]) -> Result<()> {
             .arg(&cbom_path)
             .arg("--self-test")
             .output()?;
-        let text = String::from_utf8_lossy(&v.stdout).into_owned();
+        // the CBOM named by its file name, as it sits next to the report in the results
+        let prefix = format!("{}/", out.display());
+        let text: String = String::from_utf8_lossy(&v.stdout)
+            .lines()
+            .map(|l| format!("{}\n", l.strip_prefix(&prefix).unwrap_or(l)))
+            .collect();
         std::fs::write(out.join(format!("{name}.verify")), &text)?;
         let (verified, mismatched) = counts
             .captures(&text)
