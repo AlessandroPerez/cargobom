@@ -1,0 +1,270 @@
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:52:17 | crypto_common::KeyIvInit::new | [reachable] [call] [artifacts: bin v43] in v43::encrypt; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `let cipher = cbc::Encryptor::<aes::Aes256>::new(key.into(), iv.into());`; code: `cbc::Encryptor::<aes::Aes256>::new`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/main.rs:53:11 | cipher::block::BlockEncryptMut::encrypt_padded_vec_mut | [reachable] [call] [artifacts: bin v43] in v43::encrypt; use: encrypt; line: `cipher.encrypt_padded_vec_mut::<block_padding::Pkcs7>(m)`; code: `encrypt_padded_vec_mut`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | totp-rs-5.7.0/src/lib.rs:134:47 | digest::mac::Mac::new_from_slice | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA1 => Algorithm::hash(HmacSha1::new_from_slice(key).unwrap(), data),`; code: `HmacSha1::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | totp-rs-5.7.0/src/lib.rs:135:49 | digest::mac::Mac::new_from_slice | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA256 => Algorithm::hash(HmacSha256::new_from_slice(key).unwrap(), data),`; code: `HmacSha256::new_from_slice`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | totp-rs-5.7.0/src/lib.rs:136:49 | digest::mac::Mac::new_from_slice | [reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA512 => Algorithm::hash(HmacSha512::new_from_slice(key).unwrap(), data),`; code: `HmacSha512::new_from_slice`
+  occ SHA-1 | crypto:algorithm:SHA-1 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ SHA-1 | crypto:algorithm:SHA-1 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-1 | crypto:algorithm:SHA-1 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:134:31 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-1 | crypto:algorithm:SHA-1 | totp-rs-5.7.0/src/lib.rs:134:47 | digest::mac::Mac::new_from_slice | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::sign; part of HMAC-SHA-1; line: `Algorithm::SHA1 => Algorithm::hash(HmacSha1::new_from_slice(key).unwrap(), data),`; code: `HmacSha1::new_from_slice`
+  occ SHA-224 | crypto:algorithm:SHA-224 | lib43/src/lib.rs:15:22 | digest::digest::Digest::digest | [reachable] [call] [artifacts: bin v43, lib lib43] in lib43::serialize_with_a_writer_whose_name_is_long_enough::{closure#0}; use: digest; instantiated by lib43::serialize_with_a_writer_whose_name_is_long_enough::<..> at lib43/src/lib.rs:14:16; instantiated by v43::main at src/main.rs:69:12 as `lib43::serialize_with_a_writer_whose_name_is_long_enough`; line: `writer.extend(Sha224::digest(k.as_ref()));`; code: `Sha224::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:8 | digest::digest::Digest::digest | [reachable] [call] [artifacts: bin v43] in <v43::Key as core::hash::Hash>::hash::<..>; use: digest; instantiated by <v43::PublicKey as core::hash::Hash>::hash::<..> at src/main.rs:23:9; instantiated by v43::main at src/main.rs:64:31 as `hash`; line: `Sha256::digest(self.0).hash(state);`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:135:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | totp-rs-5.7.0/src/lib.rs:135:49 | digest::mac::Mac::new_from_slice | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::sign; part of HMAC-SHA-256; line: `Algorithm::SHA256 => Algorithm::hash(HmacSha256::new_from_slice(key).unwrap(), data),`; code: `HmacSha256::new_from_slice`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:47:8 | digest::digest::Digest::digest | [reachable] [call] [artifacts: bin v43] in <v43::S as v43::Signer>::sign::{closure#0}; use: digest; instantiated by <v43::S as v43::Signer>::sign::<'_, '_, '_> at src/main.rs:46:4 as `async`; instantiated by <v43::S as v43::Signer>::sign_twice::<..>::{closure#0} at src/main.rs:37:25 as `sign`; instantiated by <v43::S as v43::Signer>::sign_twice::<'_, '_, '_> at src/main.rs:36:4 as `async`; instantiated by v43::main::{closure#0} at src/main.rs:60:18 as `sign_twice`; line: `Sha384::digest(d).to_vec()`; code: `Sha384::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:29:4 | digest::digest::Digest::digest | [reachable] [call] [artifacts: bin v43] in v43::digest_later::{closure#0}; use: digest; instantiated by v43::main::{closure#0} at src/main.rs:59:13; instantiated by v43::main at src/main.rs:57:44; line: `Sha512::digest(d).to_vec()`; code: `Sha512::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | totp-rs-5.7.0/src/lib.rs:128:15 | digest::mac::Mac::update | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.update(data);`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | totp-rs-5.7.0/src/lib.rs:129:15 | digest::mac::Mac::finalize | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-512 | crypto:algorithm:SHA-512 | totp-rs-5.7.0/src/lib.rs:129:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::Algorithm::sign at totp-rs-5.7.0/src/lib.rs:136:33 as `Algorithm::hash`; line: `digest.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-512 | crypto:algorithm:SHA-512 | totp-rs-5.7.0/src/lib.rs:136:49 | digest::mac::Mac::new_from_slice | [reachable] [component] [artifacts: bin v43] in totp_rs::Algorithm::sign; part of HMAC-SHA-512; line: `Algorithm::SHA512 => Algorithm::hash(HmacSha512::new_from_slice(key).unwrap(), data),`; code: `HmacSha512::new_from_slice`
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:6:0 | aes | [manifest] locked aes 0.8.4; reached via v43 -> aes
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:9:0 | aes | [manifest] declared by v43 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:34:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via v43 -> sha2 -> digest -> block-buffer
+  occ block-padding | pkg:cargo/block-padding@0.3.3 | Cargo.lock:43:0 | block-padding | [manifest] locked block-padding 0.3.3; reached via v43 -> block-padding
+  occ block-padding | pkg:cargo/block-padding@0.3.3 | Cargo.toml:11:0 | block-padding | [manifest] declared by v43 (dependencies)
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.lock:52:0 | cbc | [manifest] locked cbc 0.1.2; reached via v43 -> cbc
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.toml:12:0 | cbc | [manifest] declared by v43 (dependencies); features ["alloc"]
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:67:0 | cipher | [manifest] locked cipher 0.4.4; reached via v43 -> aes -> cipher
+  occ constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | Cargo.lock:77:0 | constant_time_eq | [manifest] locked constant_time_eq 0.3.1; reached via v43 -> totp-rs -> constant_time_eq
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:92:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via v43 -> aes -> cipher -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:102:0 | digest | [manifest] locked digest 0.10.7; reached via v43 -> sha2 -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:158:0 | hmac | [manifest] locked hmac 0.12.1; reached via v43 -> totp-rs -> hmac
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.lock:214:0 | sha1 | [manifest] locked sha1 0.10.7; reached via v43 -> totp-rs -> sha1
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:225:0 | sha2 | [manifest] locked sha2 0.10.9; reached via v43 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by v43 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | lib43/Cargo.toml:7:0 | sha2 | [manifest] declared by lib43 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:242:0 | subtle | [manifest] locked subtle 2.6.1; reached via v43 -> sha2 -> digest -> subtle
+  occ totp-rs | pkg:cargo/totp-rs@5.7.0 | Cargo.lock:259:0 | totp-rs | [manifest] locked totp-rs 5.7.0; reached via v43 -> totp-rs
+  occ totp-rs | pkg:cargo/totp-rs@5.7.0 | Cargo.toml:16:0 | totp-rs | [manifest] declared by v43 (dependencies)
+  occ unknown | crypto:algorithm:unknown:unknown:totp-rs | src/main.rs:67:19 | totp_rs::TOTP::generate | [reachable] [call] [artifacts: bin v43] in v43::main::{closure#1}; use: keygen; algorithm unresolved: `totp_rs::TOTP::generate` of totp-rs 5.7.0, a crypto package the knowledge base does not model; instantiated by v43::main at src/main.rs:67:13; line: `.map(|t| t.generate(59))`; code: `generate`
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:artifact=bin v43
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:confidence=high
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:detection:method=type-resolved
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:functions:source=observed
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:kb:version=0.2.0
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:occurrences=2
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:reachability=reachable
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:artifact=bin v43
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:confidence=high
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:functions:source=observed
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:occurrences=4
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:artifact=bin v43
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:artifact=bin v43
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=observed
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=4
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=parameter
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:artifact=bin v43
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=knowledge-base
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=4
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:only-as-component=true
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:artifact=bin v43
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:artifact=lib lib43
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=1
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin v43
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=bin v43
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:artifact=bin v43
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=5
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:crypto-role=support
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:kb-coverage=unmodelled
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:scope=required
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:usage=reachable
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:crypto-role=algorithm
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:scope=required
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | rcbom:crypto-role=support
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop lib43 | pkg:cargo/lib43@0.1.0 | rcbom:scope=required
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:crypto-role=algorithm
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:scope=required
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop totp-rs | pkg:cargo/totp-rs@5.7.0 | rcbom:crypto-role=unmodelled
+  prop totp-rs | pkg:cargo/totp-rs@5.7.0 | rcbom:kb-coverage=unmodelled
+  prop totp-rs | pkg:cargo/totp-rs@5.7.0 | rcbom:scope=required
+  prop totp-rs | pkg:cargo/totp-rs@5.7.0 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:artifact=bin v43
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:totp-rs | rcbom:reachability=reachable
+asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:totp-rs | {"algorithmProperties": {"cryptoFunctions": ["keygen"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library block-padding 0.3.3 | pkg:cargo/block-padding@0.3.3 | purl pkg:cargo/block-padding@0.3.3
+component library cbc 0.1.2 | pkg:cargo/cbc@0.1.2 | purl pkg:cargo/cbc@0.1.2
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library constant_time_eq 0.3.1 | pkg:cargo/constant_time_eq@0.3.1 | purl pkg:cargo/constant_time_eq@0.3.1
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library lib43 0.1.0 | pkg:cargo/lib43@0.1.0 | purl pkg:cargo/lib43@0.1.0
+component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library totp-rs 5.7.0 | pkg:cargo/totp-rs@5.7.0 | purl pkg:cargo/totp-rs@5.7.0
+dep crypto:algorithm:HMAC-SHA-1 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cbc@0.1.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/block-padding@0.3.3
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/lib43@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/totp-rs@5.7.0 -> pkg:cargo/constant_time_eq@0.3.1
+dep pkg:cargo/totp-rs@5.7.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/totp-rs@5.7.0 -> pkg:cargo/sha1@0.10.7
+dep pkg:cargo/totp-rs@5.7.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/block-padding@0.3.3
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/cbc@0.1.2
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/lib43@0.1.0
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/v43@0.1.0 -> pkg:cargo/totp-rs@5.7.0
+dependency crypto:algorithm:AES-256-CBC
+dependency crypto:algorithm:HMAC-SHA-1
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-224
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:unknown:totp-rs
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/block-padding@0.3.3
+dependency pkg:cargo/cbc@0.1.2
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/constant_time_eq@0.3.1
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/lib43@0.1.0
+dependency pkg:cargo/sha1@0.10.7
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/totp-rs@5.7.0
+dependency pkg:cargo/v43@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-1
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/sha1@0.10.7 -> crypto:algorithm:SHA-1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-224
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+provides pkg:cargo/totp-rs@5.7.0 -> crypto:algorithm:unknown:unknown:totp-rs
+root {"bom-ref": "pkg:cargo/v43@0.1.0", "name": "v43", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v43@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin v43
+run rcbom:run:artifact=lib lib43
+run rcbom:run:features=
+run rcbom:run:packages=33
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=384
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -430,6 +430,64 @@ pub(super) fn skip_blank(s: &[char], mut i: usize) -> usize {
 pub(super) fn before_blank(s: &[char], i: usize) -> Option<usize> {
     (0..i.min(s.len())).rev().find(|&k| !s[k].is_whitespace())
 }
+/// The parentheses of the call whose path starts at `k` (`Algorithm::hash(..)`, `f::<T>(..)`):
+/// the indexes of its `(` and `)`.
+pub(super) fn call_args_span(s: &[char], k: usize) -> Option<(usize, usize)> {
+    let mut i = k;
+    loop {
+        if !word_start(s, i) {
+            return None;
+        }
+        i = skip_blank(s, i + word_of(s, i).chars().count());
+        if !(s.get(i) == Some(&':') && s.get(i + 1) == Some(&':')) {
+            break;
+        }
+        i = skip_blank(s, i + 2);
+        if s.get(i) == Some(&'<') {
+            let cls = vec![Class::Code; s.len() - i];
+            i = skip_blank(s, i + skip_angle(&s[i..], &cls, 0)?);
+            break;
+        }
+    }
+    Some((i, close_of_at(s, i).filter(|_| s.get(i) == Some(&'('))?))
+}
+/// Where the name of the call an `await` at `k` awaits starts: `f` in `f(x).await`, in
+/// `x.f::<T>(y)` with `.await` on the next line.
+pub(super) fn awaited_call(s: &[char], k: usize) -> Option<usize> {
+    if !kw(s, k, "await") {
+        return None;
+    }
+    let mut i = before_blank(s, k).filter(|&i| s[i] == '.')?;
+    i = before_blank(s, i).filter(|&i| s[i] == ')')?;
+    // back over the arguments, then a turbofish's `::<..>`
+    let back = |open: char, close: char, mut i: usize| -> Option<usize> {
+        let mut depth = 0i32;
+        loop {
+            if s[i] == close {
+                depth += 1;
+            } else if s[i] == open {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(i);
+                }
+            }
+            i = i.checked_sub(1)?;
+        }
+    };
+    i = before_blank(s, back('(', ')', i)?)?;
+    if s[i] == '>' {
+        i = before_blank(s, back('<', '>', i)?).filter(|&i| s[i] == ':')?;
+        i = i.checked_sub(1).filter(|&i| s[i] == ':')?;
+        i = before_blank(s, i)?;
+    }
+    if !is_ident(s[i]) {
+        return None;
+    }
+    while i > 0 && is_ident(s[i - 1]) {
+        i -= 1;
+    }
+    word_start(s, i).then_some(i)
+}
 /// The word that ends before `i`, blanks skipped (empty when a symbol does).
 pub(super) fn word_before_at(s: &[char], i: usize) -> String {
     let Some(e) = before_blank(s, i).filter(|&e| is_ident(s[e])) else {
