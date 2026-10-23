@@ -584,10 +584,11 @@ pub(super) fn names_read(
                     Some((o, _, _, _)) => Some((*o, (*o, *o))),
                     None => dom,
                 };
+                // (per name bound: `let (p, q) = pair;` binds two parts of one statement)
                 if !seen.insert((
                     bd.stmt.0,
                     dom.map_or(bd.stmt.1, |d| d.0),
-                    field.clone().unwrap_or_default(),
+                    format!("{}@{}", field.clone().unwrap_or_default(), bd.name),
                 )) {
                     continue;
                 }
