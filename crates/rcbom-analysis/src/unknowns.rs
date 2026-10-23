@@ -89,6 +89,10 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                 }
                 _ => op.primitive.clone(),
             };
+            // (a trait hashes and MACs both implement, on a type it cannot name: either)
+            if op.shared && !op.setup {
+                return Some(("unknown".into(), "digest or tag".into(), reason, provider));
+            }
             Some((primitive, function, reason, provider))
         }
         (Some(op), _) => {
@@ -163,9 +167,32 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             // streaming step of it is still no operation)
             let generic = GENERIC_METHODS.contains(&method.as_str());
             let step = STREAMING_STEPS.contains(&method.as_str());
-            if !(ctx.is_unmodelled(&callee.krate) || unnamed_api || uncovered)
+            // a crypto package without entries: every call into it from another crate is an
+            // operation (openssl's `sha256`, tiny-keccak's `finalize`, curve25519-dalek's
+            // `mul_clamped`), but for a step of a stream and what sets something up (`new`,
+            // `from_der`, `with_key`, or a call taking nothing to operate on: openssl's
+            // `MessageDigest::sha256()`), unless its name is a use
+            // (from outside the crypto layer: another crypto package's calls into it, openssl's
+            // into openssl-sys, are the internals of what the program asked of that one)
+            let crypto_caller = (ctx.is_unmodelled(&site.owner.krate)
+                || ctx.kb_entry(&site.owner.krate).is_some())
+                && ctx
+                    .package_of_crate(&site.owner.krate.name, &site.owner.krate.stable_id)
+                    .is_some_and(|p| !ctx.local.contains(&p));
+            let open =
+                ctx.is_unmodelled(&callee.krate) && !unnamed_api && !uncovered && !crypto_caller;
+            let named_use = ctx
+                .kb
+                .uses
+                .iter()
+                .any(|u| u.methods.iter().any(|m| m == method));
+            if !(open || unnamed_api || uncovered || ctx.is_unmodelled(&callee.krate))
                 || site.owner.krate == callee.krate
-                || (generic && (!uncovered || step))
+                || (open
+                    && (step
+                        || (!named_use
+                            && (ctx.kb.unmodelled_setup(method) || arg_origins.is_empty()))))
+                || (!open && generic && (!uncovered || step))
             {
                 return None;
             }
@@ -211,7 +238,10 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             uses.sort();
             uses.dedup();
             if uses.is_empty() {
-                return None;
+                if !open {
+                    return None;
+                }
+                uses.push("unknown");
             }
             // a draw from a generator that computes no cryptography (`v.shuffle(&mut small_rng)`)
             // is no operation; a key made with one still is

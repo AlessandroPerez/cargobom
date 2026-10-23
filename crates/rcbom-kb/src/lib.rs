@@ -103,6 +103,10 @@ struct UnmodelledRaw {
     support: Vec<String>,
     #[serde(default)]
     not_crypto: Vec<String>,
+    #[serde(default)]
+    setup_methods: Vec<String>,
+    #[serde(default)]
+    setup_prefixes: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -120,6 +124,8 @@ struct OperationRaw {
     self_type: bool,
     #[serde(default)]
     setup: bool,
+    #[serde(default)]
+    shared: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -206,6 +212,9 @@ pub struct OperationEntry {
     /// The call sets the algorithm up (`Digest::new`, `KeyInit::new`) without using it: its
     /// occurrence has no use.
     pub setup: bool,
+    /// A trait hashes and MACs both implement (`FixedOutput::finalize_fixed`): on a type the
+    /// knowledge base does not name, neither is claimed.
+    pub shared: bool,
 }
 
 /// A call's value argument (the receiver is argument 0), or a field of the struct behind it
@@ -558,6 +567,10 @@ pub struct Kb {
     pub unmodelled_support: Vec<String>,
     /// Types of modelled crates that compute no cryptography (rand's `SmallRng`), by name.
     pub not_crypto: Vec<String>,
+    /// Of a crypto package without entries, the methods that set something up (`new`,
+    /// `from_der`, `with_key`): by name, and by prefix.
+    pub unmodelled_setup_methods: Vec<String>,
+    pub unmodelled_setup_prefixes: Vec<String>,
     /// Packages whose APIs draw from the generator they are given (rand's `shuffle`).
     pub draws: Vec<String>,
     /// Modes of operation over a block cipher, whose keystream is the block cipher's (ctr).
@@ -762,6 +775,7 @@ impl Kb {
                         algorithm: o.algorithm,
                         self_type: o.self_type,
                         setup: o.setup,
+                        shared: o.shared,
                     })
                 })
                 .collect::<Result<_>>()?,
@@ -793,6 +807,8 @@ impl Kb {
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
             not_crypto: raw.unmodelled.not_crypto,
+            unmodelled_setup_methods: raw.unmodelled.setup_methods,
+            unmodelled_setup_prefixes: raw.unmodelled.setup_prefixes,
             draws: raw.semantics.draws,
             block_modes: raw.semantics.block_modes,
             fixed_defaults: raw.semantics.fixed_defaults,
@@ -1037,6 +1053,17 @@ impl Kb {
         } else {
             Unmodelled::Crypto
         })
+    }
+
+    /// Is a method of a crypto package without entries one that sets something up (a
+    /// constructor, a conversion, an accessor), not an operation (`[unmodelled]`'s
+    /// `setup_methods`, `setup_prefixes`)?
+    pub fn unmodelled_setup(&self, method: &str) -> bool {
+        self.unmodelled_setup_methods.iter().any(|m| m == method)
+            || self
+                .unmodelled_setup_prefixes
+                .iter()
+                .any(|p| method.starts_with(p.as_str()))
     }
 
     /// Is the crate (by its rustc name) one of the packages listed: `[semantics]`'s lists.

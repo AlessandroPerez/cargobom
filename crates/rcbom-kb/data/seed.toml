@@ -2232,6 +2232,13 @@ support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov"
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
 not_crypto = ["SmallRng", "StepRng"]
+# Of a crypto package without entries, the methods that set something up (a constructor, a
+# conversion, an accessor) rather than operate: every other call into it from another crate is
+# an operation, of the use its name has above (`[[use]]`), else of an unknown one, but for a call
+# taking nothing to operate on (`MessageDigest::sha256()`) and a step of a stream (`write`,
+# `update`), whose operation is the call that ends it (`finish`, `finalize`)
+setup_methods = ["new", "default", "builder", "build", "clone", "len", "is_empty", "size", "bits"]
+setup_prefixes = ["new_", "from_", "try_from", "to_", "as_", "into_", "with_", "set_", "get_", "is_", "has_"]
 
 # --- What some packages' APIs mean ------------------------------------------------------------
 # `draws`: packages whose APIs draw from the generator they are given (rand's
@@ -2343,10 +2350,20 @@ algorithm = 0
 # algorithm naming that type. `path` is inside the trait crate.
 [[operation]]
 crate = "digest"
-path = "^(digest::(Digest::(digest|finalize|finalize_reset|finalize_into|finalize_into_reset|update|chain_update|new_with_prefix)|DynDigest::(update|finalize|finalize_reset|finalize_into|finalize_into_reset))|Update::(update|chain)|FixedOutput(Reset)?::finalize_(fixed|into)(_reset)?|ExtendableOutput(Reset)?::finalize_xof(_reset|_into)?|XofReader::read(_boxed)?)$"
+path = "^(digest::(Digest::(digest|finalize|finalize_reset|finalize_into|finalize_into_reset|update|chain_update|new_with_prefix)|DynDigest::(update|finalize|finalize_reset|finalize_into|finalize_into_reset))|ExtendableOutput(Reset)?::finalize_xof(_reset|_into)?|XofReader::read(_boxed)?)$"
 primitive = "hash"
 use = "digest"
 self_type = true
+
+# the traits MACs implement too (`Blake2sMac::finalize_fixed`, WireGuard's keyed mac1): on a type
+# the knowledge base does not name, a hash or a MAC (`shared`)
+[[operation]]
+crate = "digest"
+path = "^(Update::(update|chain)|FixedOutput(Reset)?::finalize_(fixed|into)(_reset)?)$"
+primitive = "hash"
+use = "digest"
+self_type = true
+shared = true
 
 [[operation]]
 crate = "digest"
