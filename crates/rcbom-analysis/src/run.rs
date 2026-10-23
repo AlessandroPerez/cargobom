@@ -263,6 +263,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 name: r.artifact.clone(),
                 statics: data_reached(&seeds),
                 paths: r.paths.iter().map(String::as_str).collect(),
+                generic: r.generic.iter().map(String::as_str).collect(),
                 fns,
             }
         })
@@ -425,6 +426,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .filter(|w| w.paths.contains(e))
                         .map(|w| w.name.clone())
                         .collect();
+                }
+                // and the libraries whose public generic API holds it (a closure of one, which a
+                // binary's walk instantiates and the library's own does not)
+                if let Some(e) = enclosing_fn(&site.owner.path) {
+                    a.extend(
+                        walks
+                            .iter()
+                            .filter(|w| w.generic.contains(e))
+                            .map(|w| w.name.clone()),
+                    );
                 }
                 // (never untagged: reachable is what some walk reaches)
                 if a.is_empty() {
@@ -844,6 +855,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         && o.symbol == occ.symbol
                 }) {
                     if occ.tier == Tier::Reachable {
+                        // the function named is the one a walk reaches (a module two binaries
+                        // compile: the copy of the binary calling it)
+                        if o.tier != Tier::Reachable {
+                            o.owner = occ.owner.clone();
+                        }
                         o.tier = Tier::Reachable;
                     }
                     o.artifacts.extend(occ.artifacts);
@@ -963,6 +979,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             let same = (&later.location, later.line, later.offset)
                 == (&kept.location, kept.line, kept.offset);
             if same && later.tier == Tier::Reachable {
+                if kept.tier != Tier::Reachable {
+                    kept.owner = later.owner.clone();
+                }
                 kept.tier = Tier::Reachable;
             }
             if same {
@@ -1096,5 +1115,7 @@ struct ArtifactWalk<'f> {
     name: String,
     fns: HashSet<&'f str>,
     paths: HashSet<&'f str>,
+    /// A library's generic functions its users can call, which its walk makes no instance of.
+    generic: HashSet<&'f str>,
     statics: HashSet<String>,
 }
