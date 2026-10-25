@@ -607,13 +607,20 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 return false;
             }
             // a call filling the part (`rng.fill_bytes(&mut cfg.key)`) replaces what an
-            // initialization (`Cfg { key: [0; 32], .. }`) or the entry value had there
-            let fills = || {
-                matches!(e.kind, DefKind::OutParam { .. })
-                    && e.sole
-                    && (d.init
-                        || matches!(d.kind, DefKind::Entry)
-                        || self.part_init(d, &e.path[d.path.len()..]))
+            // initialization (`Cfg { key: [0; 32], .. }`) or the entry value had there; a call
+            // writing all a pointer points to replaces it for reads through that pointer
+            // (`nonce.copy_from_slice(..)`, `nonce` a half of a buffer `split_at_mut` gave)
+            let fills = || match &e.kind {
+                DefKind::OutParam { func, .. } => {
+                    (e.sole
+                        && (d.init
+                            || matches!(d.kind, DefKind::Entry)
+                            || self.part_init(d, &e.path[d.path.len()..])))
+                        || (e.path.len() == d.path.len() + 1
+                            && e.path.last() == Some(&Step::Deref)
+                            && fills_whole(self.body, func))
+                }
+                _ => false,
             };
             (e.strong || fills())
                 && is_prefix(&d.path, &e.path)

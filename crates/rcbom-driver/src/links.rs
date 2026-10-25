@@ -826,16 +826,11 @@ pub(crate) fn body_links(
             });
         }
         if relevant.iter().any(|r| *r) {
+            // (every argument: the others are the key material and data whose provenance is
+            // asked, `stretch(prf, password.as_bytes(), ..)`)
             let args: Vec<Origin> = args
                 .iter()
-                .zip(&relevant)
-                .map(|(a, r)| {
-                    if *r {
-                        origins.operand_at(a, bb, idx)
-                    } else {
-                        Origin::Unknown
-                    }
-                })
+                .map(|a| origins.operand_at(a, bb, idx))
                 .collect();
             // also of the body it runs (an implementation for a known `Self`, an instance of
             // a generic function), whose parameters its summaries name
