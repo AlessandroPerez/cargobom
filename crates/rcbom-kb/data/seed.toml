@@ -2275,11 +2275,12 @@ methods = ["decapsulate"]
 # cryptographic packages whose metadata says nothing (bindings to C crypto libraries, the
 # zkcrypto field and group traits, one-time passwords, QUIC) or reads like an encoding's
 # (OpenSSH keys, which sign, and the agent protocol serving them: the same categories as der's);
-# `support` lists helpers whose metadata says cryptography but which compute none (it never
-# makes a package cryptographic by itself).
+# `support` lists helpers whose metadata or name says cryptography but which compute none
+# (opaque-debug's name is the OPAQUE protocol's); it never makes a package cryptographic by
+# itself.
 [unmodelled]
 crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group", "ssh-key", "ssh-agent-lib", "totp-rs", "quinn-proto"]
-support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint"]
+support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint", "opaque-debug"]
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
 not_crypto = ["SmallRng", "StepRng"]
