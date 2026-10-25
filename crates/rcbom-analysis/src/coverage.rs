@@ -21,6 +21,46 @@ pub struct Coverage {
     pub excused: BTreeMap<String, usize>,
     /// The others: (location, line, 0-based column, callee, calling function).
     pub uncited: Vec<(String, usize, usize, String, String)>,
+    /// Every call and how it is accounted for, by position (`cargo cbom --boundary-list`).
+    pub calls: Vec<Checked>,
+}
+
+/// One call the check accounts for.
+#[derive(Debug)]
+pub struct Checked {
+    pub location: String,
+    pub line: usize,
+    /// 0-based, as an occurrence's offset.
+    pub offset: usize,
+    /// `cited`, the reason it needs no occurrence, or `not cited`.
+    pub verdict: String,
+    pub callee: String,
+    /// The trait the callee is a method of or implements.
+    pub trait_path: Option<String>,
+    pub owner: String,
+    /// Whose code the caller runs for (`Algorithm`, `Package`), when the crypto layer's.
+    pub on_behalf: Option<rcbom_facts::Behalf>,
+}
+
+impl Checked {
+    /// One tab-separated line: position, verdict, callee, trait, caller, on behalf of.
+    pub fn line(&self) -> String {
+        format!(
+            "{}:{}:{}\t{}\t{}\t{}\t{}\t{}",
+            self.location,
+            self.line,
+            self.offset,
+            self.verdict,
+            self.callee,
+            self.trait_path.as_deref().unwrap_or("-"),
+            self.owner,
+            match self.on_behalf {
+                Some(rcbom_facts::Behalf::Algorithm) => "algorithm",
+                Some(rcbom_facts::Behalf::Package) => "package",
+                None => "-",
+            }
+        )
+    }
 }
 
 impl Coverage {
@@ -184,22 +224,38 @@ pub(super) fn check(
                 continue;
             }
             out.edges += 1;
-            if cited.contains(&(location.as_str(), e.span.line, offset)) {
+            let verdict = if cited.contains(&(location.as_str(), e.span.line, offset)) {
                 out.cited += 1;
+                "cited"
             } else if let Some(why) = excuse(ctx, e) {
                 *out.excused.entry(why.to_string()).or_default() += 1;
+                why
             } else {
                 out.uncited.push((
-                    location,
+                    location.clone(),
                     e.span.line,
                     offset,
                     e.callee.path.clone(),
                     e.owner.path.clone(),
                 ));
-            }
+                "not cited"
+            };
+            out.calls.push(Checked {
+                location,
+                line: e.span.line,
+                offset,
+                verdict: verdict.to_string(),
+                callee: e.callee.path.clone(),
+                trait_path: e.trait_path.clone(),
+                owner: e.owner.path.clone(),
+                on_behalf: e.on_behalf,
+            });
         }
     }
     out.uncited.sort();
+    out.calls.sort_by(|a, b| {
+        (&a.location, a.line, a.offset, &a.callee).cmp(&(&b.location, b.line, b.offset, &b.callee))
+    });
     out
 }
 

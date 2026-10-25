@@ -25,7 +25,7 @@ use rcbom_kb::{Algo, Kb, Role};
 use rcbom_manifest::Manifest;
 
 pub use cbom::{RunInfo, to_cyclonedx};
-pub use coverage::Coverage;
+pub use coverage::{Checked, Coverage};
 pub use matcher::static_names;
 use matcher::{
     Match, match_constructor, match_fn, match_fn_with, match_protocol, match_static, match_types,

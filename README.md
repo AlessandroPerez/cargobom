@@ -87,6 +87,9 @@ cd <cargo project>
 <repo>/target/debug/cargo-cbom cbom --manifest-only -o ...  # Layer 1 only, nothing compiled
 <repo>/target/debug/cargo-cbom cbom --features f1,f2 ...    # the artifact other features build
 <repo>/target/debug/cargo-cbom cbom verify cbom.json --self-test
+<repo>/target/debug/cargo-cbom cbom --boundary-list calls.tsv ...  # every call into a crypto
+                                                    # package and how the boundary check
+                                                    # accounts for it
 RCBOM_DEBUG=1 <repo>/target/debug/cargo-cbom cbom -o ...    # also print the driver's caught panics
 ```
 

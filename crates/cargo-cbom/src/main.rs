@@ -69,6 +69,11 @@ struct GenArgs {
     /// its entry points did not reach, by class (`rcbom:run:walk-check`; gaps on stderr).
     #[arg(long)]
     check_walk: bool,
+    /// Write every call the walked code makes into a crypto package to this file, one per line
+    /// with how the boundary check accounts for it: position, `cited` or the reason it needs no
+    /// occurrence (or `not cited`), callee, its trait, the calling function, on whose behalf.
+    #[arg(long)]
+    boundary_list: Option<PathBuf>,
 }
 
 #[derive(Subcommand)]
@@ -166,6 +171,10 @@ fn generate(a: &GenArgs) -> Result<()> {
         for (loc, line, col, callee, owner) in &an.coverage.uncited {
             eprintln!("  not cited: {loc}:{line}:{col} {callee} (in {owner})");
         }
+    }
+    if let Some(p) = &a.boundary_list {
+        let lines: String = an.coverage.calls.iter().map(|c| c.line() + "\n").collect();
+        std::fs::write(p, lines)?;
     }
     Ok(())
 }
