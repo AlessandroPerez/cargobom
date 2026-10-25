@@ -537,6 +537,42 @@
       "version": "0.13.0"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via rustic_core -> aes256ctr_poly1305aes -> poly1305 -> opaque-debug",
+            "line": 2502,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/pbkdf2@0.13.0",
       "evidence": {
         "occurrences": [
@@ -985,7 +1021,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `Aes128::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `Aes128::new`",
             "line": 159,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 8,
@@ -1065,7 +1101,7 @@
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); line: `<Aes256Ctr as KeyIvInit>::new(&self.aes256ctr_key, nonce),`; code: `<Aes256Ctr as KeyIvInit>::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); line: `<Aes256Ctr as KeyIvInit>::new(&self.aes256ctr_key, nonce),`; code: `<Aes256Ctr as KeyIvInit>::new`",
             "line": 164,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 12,
@@ -1194,7 +1230,7 @@
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: computed (written into an element by aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `Poly1305::new(&mac_key),`; code: `Poly1305::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: computed (written into an element by aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce) or parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); line: `Poly1305::new(&mac_key),`; code: `Poly1305::new`",
             "line": 165,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 12,
@@ -1514,7 +1550,8 @@
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
-            "keyderive"
+            "keyderive",
+            "unknown"
           ],
           "primitive": "kdf"
         },
@@ -1523,14 +1560,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: unknown; algorithm unresolved: `scrypt::params::Params::new` of scrypt 0.12.0, a version the knowledge base does not cover: what the call does is not known; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `let params = Params::new(`; code: `Params::new`",
+            "line": 102,
+            "location": "src/repofile/keyfile.rs",
+            "offset": 21,
+            "symbol": "scrypt::params::Params::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of KeyFile::key_from_password::) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of KeyFile::key_from_password::) or parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 122,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
             "symbol": "scrypt::scrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of commands::key::add_key_to_repo); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 212,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
@@ -1574,7 +1618,124 @@
         },
         {
           "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::decrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; line: `Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
+            "line": 97,
+            "location": "src/crypto/aespoly1305.rs",
+            "offset": 8,
+            "symbol": "aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let tag = Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
+            "line": 126,
+            "location": "src/crypto/aespoly1305.rs",
+            "offset": 18,
+            "symbol": "aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
           "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:sha2",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::new; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.0, a version the knowledge base does not cover: what the call does is not known; line: `Self(Sha256::default())`; code: `Sha256::default`",
+            "line": 25,
+            "location": "src/crypto/hasher.rs",
+            "offset": 13,
+            "symbol": "core::default::Default::default"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -1608,7 +1769,8 @@
         "pkg:cargo/zeroize@1.9.0"
       ],
       "provides": [
-        "crypto:algorithm:unknown:ae:aes256ctr_poly1305aes"
+        "crypto:algorithm:unknown:ae:aes256ctr_poly1305aes",
+        "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes"
       ],
       "ref": "pkg:cargo/aes256ctr_poly1305aes@0.2.1"
     },
@@ -1691,6 +1853,10 @@
       "ref": "pkg:cargo/hmac@0.13.0"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/digest@0.11.3",
         "pkg:cargo/hmac@0.13.0"
@@ -1699,6 +1865,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "provides": [
@@ -1763,7 +1930,8 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2"
+        "crypto:algorithm:unknown:hash:sha2",
+        "crypto:algorithm:unknown:unknown:sha2"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -1821,6 +1989,14 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:kdf:scrypt"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:sha2"
     }
   ],
   "metadata": {
@@ -1873,6 +2049,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib rustic_core"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "32 calls into crypto packages: 24 cited, 8 excused (accessor 3, generator setup 5), 0 not cited"
       }
     ],
     "tools": {
@@ -1885,7 +2065,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0a0d31bb-cbad-8788-b232-aa246e21a39a",
+  "serialNumber": "urn:uuid:a1132987-6dd9-8e54-bbe1-037f7919efbc",
   "specVersion": "1.7",
   "version": 1
 }

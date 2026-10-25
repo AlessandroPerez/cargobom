@@ -66,6 +66,7 @@
   occ hkdf | pkg:cargo/hkdf@0.12.4 | Cargo.toml:14:0 | hkdf | [manifest] declared by t1 (dependencies)
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:286:0 | hmac | [manifest] locked hmac 0.12.1; reached via t1 -> hmac
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:13:0 | hmac | [manifest] declared by t1 (dependencies)
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:370:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via t1 -> aes-gcm -> ghash -> opaque-debug
   occ password-hash | pkg:cargo/password-hash@0.5.0 | Cargo.lock:376:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via t1 -> argon2 -> password-hash
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:387:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t1 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:15:0 | pbkdf2 | [manifest] declared by t1 (dependencies); features ["hmac"]; default-features = false
@@ -297,6 +298,10 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:crypto-role=trait
   prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:scope=required
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
@@ -410,6 +415,7 @@ component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
 component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4 | purl pkg:cargo/hkdf@0.12.4
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0 | purl pkg:cargo/password-hash@0.5.0
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
@@ -477,6 +483,7 @@ dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hkdf@0.12.4 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
@@ -491,7 +498,9 @@ dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/pkcs8@0.10.2
 dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/spki@0.7.3
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
@@ -568,6 +577,7 @@ dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hkdf@0.12.4
 dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/password-hash@0.5.0
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/pem-rfc7468@0.7.0
@@ -615,6 +625,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/256
 root {"bom-ref": "pkg:cargo/t1@0.1.0", "name": "t1", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t1@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t1
+run rcbom:run:boundary-check=28 calls into crypto packages: 27 cited, 1 excused (encoding 1), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=69
 run rcbom:run:profile=release

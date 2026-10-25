@@ -69,6 +69,42 @@
       "version": "0.5.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via a164 -> ghash -> opaque-debug",
+            "line": 66,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -561,6 +597,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "provides": [
@@ -570,7 +607,12 @@
       "ref": "pkg:cargo/ghash@0.5.1"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "provides": [
@@ -580,6 +622,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "provides": [
@@ -670,6 +713,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a164"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "11 calls into crypto packages: 11 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -682,7 +729,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6c990921-1fc5-8540-9972-03560208fa2c",
+  "serialNumber": "urn:uuid:93aa6915-8f1d-8d6f-844d-f40351fccc00",
   "specVersion": "1.7",
   "version": 1
 }

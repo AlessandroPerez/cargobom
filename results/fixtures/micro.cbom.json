@@ -427,6 +427,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via micro -> aes-gcm -> ghash -> opaque-debug",
+            "line": 214,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -767,7 +803,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
@@ -889,7 +925,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
@@ -1408,6 +1444,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -1433,13 +1470,19 @@
       "ref": "pkg:cargo/micro@0.1.0"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -1577,6 +1620,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin micro"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "15 calls into crypto packages: 11 cited, 4 excused (setup 3, view 1), 0 not cited"
       }
     ],
     "tools": {
@@ -1589,7 +1636,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:db4b1d0e-761c-828e-a1c3-862ad0c01265",
+  "serialNumber": "urn:uuid:e48d0266-d3c6-82b2-ad6f-f2d92307154a",
   "specVersion": "1.7",
   "version": 1
 }

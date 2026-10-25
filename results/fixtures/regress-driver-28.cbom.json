@@ -360,6 +360,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via d28 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 171,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/polyval@0.6.2",
       "evidence": {
         "occurrences": [
@@ -699,7 +735,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of d28::mac256) or parameter (argument 0 of the enclosing function); instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
             "line": 33,
             "location": "src/lib.rs",
             "offset": 16,
@@ -1159,6 +1195,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -1173,7 +1210,12 @@
       "ref": "pkg:cargo/hmac@0.12.1"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -1311,6 +1353,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib d28"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "5 calls into crypto packages: 5 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -1323,7 +1369,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:45bf3841-e22f-83ce-ac0a-120ec6834833",
+  "serialNumber": "urn:uuid:781ae08f-c21b-84e1-a84c-1c74a14db189",
   "specVersion": "1.7",
   "version": 1
 }

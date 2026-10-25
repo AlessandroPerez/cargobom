@@ -317,6 +317,42 @@
       "version": "0.5.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via t17 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 151,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/polyval@0.6.2",
       "evidence": {
         "occurrences": [
@@ -733,12 +769,18 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -839,6 +881,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib t17"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "3 calls into crypto packages: 3 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -851,7 +897,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:42a5e0d2-92fd-87c4-b5c2-fb087b4d01ef",
+  "serialNumber": "urn:uuid:17072a7e-7cb8-8545-9de1-d0c7e78ab444",
   "specVersion": "1.7",
   "version": 1
 }

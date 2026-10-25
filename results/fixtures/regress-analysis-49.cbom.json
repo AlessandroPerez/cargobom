@@ -104,7 +104,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 29) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 30,
@@ -214,7 +214,7 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 29) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 30,
@@ -643,6 +643,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin m3"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "16 calls into crypto packages: 7 cited, 9 excused (setup 9), 0 not cited"
       }
     ],
     "tools": {
@@ -655,7 +659,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7443e6fa-2fca-8aff-bcfd-aaa43a2d7974",
+  "serialNumber": "urn:uuid:7e012f2e-3234-8b19-af6a-fb9203d83144",
   "specVersion": "1.7",
   "version": 1
 }

@@ -6,6 +6,7 @@
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a164 -> poly1305 -> universal-hash -> crypto-common
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:50:0 | ghash | [manifest] locked ghash 0.5.1; reached via a164 -> ghash
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.toml:10:0 | ghash | [manifest] declared by a164 (dependencies)
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:66:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via a164 -> ghash -> opaque-debug
   occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:72:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via a164 -> poly1305
   occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.toml:9:0 | poly1305 | [manifest] declared by a164 (dependencies)
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:83:0 | polyval | [manifest] locked polyval 0.6.2; reached via a164 -> polyval
@@ -31,6 +32,10 @@
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
@@ -82,6 +87,7 @@ asset unknown | crypto:algorithm:unknown:unknown:ghash | {"algorithmProperties":
 asset unknown | crypto:algorithm:unknown:unknown:polyval | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
 component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
@@ -89,8 +95,11 @@ component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl p
 dep pkg:cargo/a164@0.1.0 -> pkg:cargo/ghash@0.5.1
 dep pkg:cargo/a164@0.1.0 -> pkg:cargo/poly1305@0.8.0
 dep pkg:cargo/a164@0.1.0 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
@@ -102,6 +111,7 @@ dependency crypto:algorithm:unknown:unknown:polyval
 dependency pkg:cargo/a164@0.1.0
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/poly1305@0.8.0
 dependency pkg:cargo/polyval@0.6.2
 dependency pkg:cargo/subtle@2.6.1
@@ -117,6 +127,7 @@ provides pkg:cargo/polyval@0.6.2 -> crypto:algorithm:unknown:unknown:polyval
 root {"bom-ref": "pkg:cargo/a164@0.1.0", "name": "a164", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a164@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a164
+run rcbom:run:boundary-check=11 calls into crypto packages: 11 cited, 0 excused (), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=13
 run rcbom:run:profile=release

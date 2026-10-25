@@ -119,6 +119,68 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:rand",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: unknown; algorithm unresolved: `rand::thread_rng` of rand 0.4.6, a version the knowledge base does not cover: what the call does is not known; line: `let mut r = rand::thread_rng();`; code: `rand::thread_rng`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "rand::thread_rng"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe33::main; use: unknown; algorithm unresolved: `rand::os::OsRng::new` of rand 0.4.6, a version the knowledge base does not cover: what the call does is not known; line: `let mut o = rand::OsRng::new().unwrap();`; code: `rand::OsRng::new`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "rand::os::OsRng::new"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -131,13 +193,18 @@
     {
       "dependsOn": [],
       "provides": [
-        "crypto:algorithm:unknown:drbg:rand"
+        "crypto:algorithm:unknown:drbg:rand",
+        "crypto:algorithm:unknown:unknown:rand"
       ],
       "ref": "pkg:cargo/rand@0.4.6"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:drbg:rand"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:rand"
     }
   ],
   "metadata": {
@@ -190,6 +257,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin probe33"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "6 calls into crypto packages: 6 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -202,7 +273,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b2ea82ad-f15c-85e7-ad09-9c2eb25e9581",
+  "serialNumber": "urn:uuid:68746670-1dd7-81a1-a6a4-e4b7e5b9ec6c",
   "specVersion": "1.7",
   "version": 1
 }

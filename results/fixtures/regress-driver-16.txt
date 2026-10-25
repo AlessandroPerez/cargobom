@@ -36,6 +36,7 @@
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:173:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t16 -> rand -> rand_core -> getrandom
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:184:0 | ghash | [manifest] locked ghash 0.5.1; reached via t16 -> aes-gcm -> ghash
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:194:0 | hmac | [manifest] locked hmac 0.12.1; reached via t16 -> pbkdf2 -> hmac
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:218:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via t16 -> aes-gcm -> ghash -> opaque-debug
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:224:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t16 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:11:0 | pbkdf2 | [manifest] declared by t16 (dependencies); features ["hmac"]; default-features = false
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:234:0 | polyval | [manifest] locked polyval 0.6.2; reached via t16 -> aes-gcm -> ghash -> polyval
@@ -124,6 +125,10 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
@@ -170,6 +175,7 @@ component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/diges
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
 component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
@@ -195,10 +201,12 @@ dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
@@ -231,6 +239,7 @@ dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/polyval@0.6.2
 dependency pkg:cargo/ppv-lite86@0.2.21
@@ -254,6 +263,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t16@0.1.0", "name": "t16", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t16@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t16
+run rcbom:run:boundary-check=22 calls into crypto packages: 20 cited, 2 excused (accessor 1, named 1), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=38
 run rcbom:run:profile=release

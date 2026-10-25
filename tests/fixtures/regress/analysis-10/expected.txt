@@ -76,6 +76,7 @@
   occ aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | aws-lc-rs-1.18.1/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_rs_1_18_1_sys`; code behind the FFI boundary is not analysed
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | Cargo.lock:17:0 | aws-lc-sys | [manifest] locked aws-lc-sys 0.45.0; reached via t10 -> aws-lc-rs -> aws-lc-sys
   occ aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | aws-lc-sys-0.45.0/Cargo.toml:19:0 | links | [manifest] native library `aws_lc_0_45_0`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | src/main.rs:20:19 | aws_lc_rs::aead::quic::HeaderProtectionKey::new_mask | [reachable] [call] in t10::literal_keys; use: encrypt; algorithm unresolved: the result of `aws_lc_rs::aead::quic::HeaderProtectionKey::new`; line: `let _mask = hp.new_mask(&[0u8; 16]);`; code: `new_mask`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:13 | aws_lc_rs::agreement::ephemeral::EphemeralPrivateKey::generate | [reachable] [call] in t10::agreements; use: keygen; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::EphemeralPrivateKey::generate`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:56:55 | aws_lc_rs::agreement::X25519 | [reachable] [static] in t10::agreements; line: `let sk = agreement::EphemeralPrivateKey::generate(&agreement::X25519, &rng).unwrap();`; code: `agreement::X25519`
   occ x25519 | crypto:algorithm:x25519 | src/main.rs:57:27 | aws_lc_rs::agreement::ephemeral::agree_ephemeral | [reachable] [call] in t10::agreements; use: keyderive; algorithm from aws_lc_rs::agreement::X25519 in the arguments; line: `let shared: [u8; 32] = agreement::agree_ephemeral(sk, agreement::UnparsedPublicKey::new(&agreement::X25519, peer), aws_lc_rs::error::Unspecified, |km| {`; code: `agreement::agree_ephemeral`
@@ -293,6 +294,13 @@
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:native-links=aws_lc_0_45_0
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:scope=required
   prop aws-lc-sys | pkg:cargo/aws-lc-sys@0.45.0 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | rcbom:reachability=reachable
   prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
   prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
   prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
@@ -331,6 +339,7 @@ asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithm
 asset SHA3-512 | crypto:algorithm:SHA3-512 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset TLS12-PRF-SHA-256 | crypto:algorithm:TLS12-PRF-SHA-256 | {"algorithmProperties": {"cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset TLS12-PRF-SHA-384 | crypto:algorithm:TLS12-PRF-SHA-384 | {"algorithmProperties": {"cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:aws-lc-rs | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "unknown"}, "assetType": "algorithm"}
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
@@ -373,6 +382,7 @@ dependency crypto:algorithm:SHA3-256
 dependency crypto:algorithm:SHA3-512
 dependency crypto:algorithm:TLS12-PRF-SHA-256
 dependency crypto:algorithm:TLS12-PRF-SHA-384
+dependency crypto:algorithm:unknown:unknown:aws-lc-rs
 dependency crypto:algorithm:x25519
 dependency pkg:cargo/aws-lc-rs@1.18.1
 dependency pkg:cargo/aws-lc-sys@0.45.0
@@ -409,10 +419,12 @@ provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA3-256
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA3-512
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:TLS12-PRF-SHA-256
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:TLS12-PRF-SHA-384
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:unknown:unknown:aws-lc-rs
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:x25519
 root {"bom-ref": "pkg:cargo/t10@0.1.0", "name": "t10", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t10@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t10
+run rcbom:run:boundary-check=56 calls into crypto packages: 37 cited, 19 excused (generator setup 2, public half 2, setup 7, view 8), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=14
 run rcbom:run:profile=release

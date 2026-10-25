@@ -253,6 +253,42 @@
       "version": "0.5.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via t22 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 148,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/polyval@0.6.2",
       "evidence": {
         "occurrences": [
@@ -468,7 +504,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in t22::use_aead; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: caller, passed by `t22::main`; key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(w.0, k).is_ok()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in t22::use_aead; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: caller, passed by `t22::main`; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `UnboundKey::new(w.0, k).is_ok()`; code: `UnboundKey::new`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 4,
@@ -1131,12 +1167,18 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -1254,6 +1296,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin t22"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "33 calls into crypto packages: 17 cited, 16 excused (setup 5, view 11), 0 not cited"
       }
     ],
     "tools": {
@@ -1266,7 +1312,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fccb772f-a8ba-88ea-b3f6-a67aa3328a21",
+  "serialNumber": "urn:uuid:bfbaec91-4d5e-8f24-a680-125c41560c8a",
   "specVersion": "1.7",
   "version": 1
 }

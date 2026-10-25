@@ -1,0 +1,275 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/blake2b_simd@1.0.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a170 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "blake2b_simd"
+          },
+          {
+            "additionalContext": "[manifest] locked blake2b_simd 1.0.3; reached via a170 -> blake2b_simd",
+            "line": 25,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "blake2b_simd"
+          }
+        ]
+      },
+      "name": "blake2b_simd",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/blake2b_simd@1.0.3",
+      "type": "library",
+      "version": "1.0.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/constant_time_eq@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked constant_time_eq 0.3.1; reached via a170 -> blake2b_simd -> constant_time_eq",
+            "line": 36,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "constant_time_eq"
+          }
+        ]
+      },
+      "name": "constant_time_eq",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/constant_time_eq@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:blake2b_simd",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let h = blake2b_simd::blake2b(msg.as_bytes());`; code: `blake2b_simd::blake2b`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "blake2b_simd::blake2b"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::new` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let k = blake2b_simd::Params::new()`; code: `blake2b_simd::Params::new`",
+            "line": 7,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "blake2b_simd::Params::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::hash_length` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.hash_length(32)`; code: `hash_length`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "blake2b_simd::Params::hash_length"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::key` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.key(b\"k\")`; code: `key`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "blake2b_simd::Params::key"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::hash` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.hash(msg.as_bytes());`; code: `hash`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "blake2b_simd::Params::hash"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Hash::to_hex` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `println!(\"{} {}\", h.to_hex(), k.to_hex());`; code: `to_hex`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 24,
+            "symbol": "blake2b_simd::Hash::to_hex"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Hash::to_hex` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `println!(\"{} {}\", h.to_hex(), k.to_hex());`; code: `to_hex`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 36,
+            "symbol": "blake2b_simd::Hash::to_hex"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/blake2b_simd@1.0.3"
+      ],
+      "ref": "pkg:cargo/a170@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/constant_time_eq@0.3.1"
+      ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:blake2b_simd"
+      ],
+      "ref": "pkg:cargo/blake2b_simd@1.0.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/constant_time_eq@0.3.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:blake2b_simd"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a170@0.1.0",
+      "name": "a170",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a170@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "5"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "258"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a170"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "7 calls into crypto packages: 7 cited, 0 excused (), 0 not cited"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:f222cfc4-2d84-8d9c-982e-f1bf6fe0efb6",
+  "specVersion": "1.7",
+  "version": 1
+}

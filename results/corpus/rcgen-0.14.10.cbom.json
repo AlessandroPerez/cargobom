@@ -275,7 +275,7 @@
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 19,
             "location": "src/ring_like.rs",
             "offset": 2,
@@ -335,7 +335,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -403,7 +403,7 @@
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 19,
             "location": "src/ring_like.rs",
             "offset": 2,
@@ -463,7 +463,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1429,82 +1429,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:rustls-pki-types",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `let serialized_der = pkcs8.secret_pkcs8_der().to_vec();`; code: `secret_pkcs8_der`",
-            "line": 237,
-            "location": "src/key_pair.rs",
-            "offset": 29,
-            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivatePkcs8KeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `key.secret_pkcs8_der().try_into()`; code: `secret_pkcs8_der`",
-            "line": 522,
-            "location": "src/key_pair.rs",
-            "offset": 6,
-            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `let pkcs8 = pkcs8.secret_pkcs8_der();`; code: `secret_pkcs8_der`",
-            "line": 536,
-            "location": "src/key_pair.rs",
-            "offset": 21,
-            "symbol": "rustls_pki_types::PrivatePkcs8KeyDer::<'_>::secret_pkcs8_der"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; use: unknown; algorithm unresolved: `rustls_pki_types::PrivateKeyDer::<'_>::secret_der` of rustls-pki-types 1.14.1, a crypto package the knowledge base does not model; line: `serialized_der: key.secret_der().into(),`; code: `secret_der`",
-            "line": 599,
-            "location": "src/key_pair.rs",
-            "offset": 23,
-            "symbol": "rustls_pki_types::PrivateKeyDer::<'_>::secret_der"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "4"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -1545,9 +1469,6 @@
     {
       "dependsOn": [
         "pkg:cargo/zeroize@1.8.2"
-      ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:rustls-pki-types"
       ],
       "ref": "pkg:cargo/rustls-pki-types@1.14.1"
     },
@@ -1606,10 +1527,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:rustls-pki-types"
     }
   ],
   "metadata": {
@@ -1662,6 +1579,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib rcgen"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "54 calls into crypto packages: 16 cited, 38 excused (accessor 1, copy 3, generator setup 5, public half 3, relay 12, view 14), 0 not cited"
       }
     ],
     "tools": {
@@ -1674,7 +1595,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3ddf2961-b0d2-82ca-9991-89e97de1835e",
+  "serialNumber": "urn:uuid:3944cb4d-337e-8d24-9108-d0c3519c1f27",
   "specVersion": "1.7",
   "version": 1
 }

@@ -12,44 +12,15 @@
    "support_listed": 1
   },
   "layer2": {
-   "not_correct": [
-    {
-     "callee": "decode",
-     "line": "src/translators/decode.rs:152",
-     "may": [
-      "HMAC-SHA-256"
-     ],
-     "must": [],
-     "reported": [
-      "HMAC-SHA-256",
-      "HMAC-SHA-384",
-      "HMAC-SHA-512"
-     ],
-     "verdict": "wrong"
-    },
-    {
-     "callee": "decode",
-     "line": "src/translators/decode.rs:169",
-     "may": [
-      "HMAC-SHA-256"
-     ],
-     "must": [],
-     "reported": [
-      "HMAC-SHA-256",
-      "HMAC-SHA-384",
-      "HMAC-SHA-512"
-     ],
-     "verdict": "wrong"
-    }
-   ],
+   "not_correct": [],
    "sites": 4,
    "verdicts": {
-    "correct": 2,
+    "correct": 4,
     "function-mismatch": 0,
     "honest-unknown": 0,
     "less-specific": 0,
     "miss": 0,
-    "wrong": 2
+    "wrong": 0
    }
   }
  },
@@ -88,7 +59,7 @@
    "reported_not_crypto": [],
    "support_agree": 14,
    "support_labelled": 16,
-   "support_listed": 14
+   "support_listed": 15
   },
   "layer2": {
    "not_correct": [
@@ -99,8 +70,10 @@
      "must": [
       "OS-RNG"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     },
     {
      "callee": "with_user_passphrase",
@@ -112,8 +85,10 @@
       "HMAC-SHA-256",
       "scrypt"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     },
     {
      "callee": "with_user_passphrase",
@@ -125,8 +100,10 @@
       "HMAC-SHA-256",
       "scrypt"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     },
     {
      "callee": "with_recipients",
@@ -142,8 +119,10 @@
       "SHA-256",
       "x25519"
      ],
-     "reported": [],
-     "verdict": "miss"
+     "reported": [
+      "unknown"
+     ],
+     "verdict": "honest-unknown"
     },
     {
      "callee": "finish",
@@ -214,9 +193,9 @@
    "verdicts": {
     "correct": 2,
     "function-mismatch": 0,
-    "honest-unknown": 4,
+    "honest-unknown": 8,
     "less-specific": 0,
-    "miss": 4,
+    "miss": 0,
     "wrong": 0
    }
   }
@@ -256,7 +235,7 @@
    "reported_not_crypto": [],
    "support_agree": 8,
    "support_labelled": 10,
-   "support_listed": 8
+   "support_listed": 9
   },
   "layer2": {
    "not_correct": [

@@ -165,7 +165,7 @@
             "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_interproc::stretch; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA512, reaching the call from another function; member: object, from `pilot_kdf_interproc::strong_prf`; salt: hard-coded (9 bytes, literal at line 10); password: parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(prf, rounds, b\"user-salt\", password, out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_interproc::stretch; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA512, reaching the call from another function; member: object, from `pilot_kdf_interproc::strong_prf`; salt: hard-coded (9 bytes, literal at line 10); password: hard-coded (7 bytes, literal at line 20) or parameter (argument 1 of pilot_kdf_interproc::enroll) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(prf, rounds, b\"user-salt\", password, out);`; code: `pbkdf2::derive`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
@@ -197,7 +197,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -361,6 +365,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin pilot-kdf-interproc"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "1 calls into crypto packages: 1 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -373,7 +381,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d8b92239-c37b-8427-8cfe-1dfa4dc16352",
+  "serialNumber": "urn:uuid:70b16848-79a5-84b4-9a71-21878e7d7615",
   "specVersion": "1.7",
   "version": 1
 }

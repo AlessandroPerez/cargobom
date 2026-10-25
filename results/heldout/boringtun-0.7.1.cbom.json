@@ -378,6 +378,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via boringtun -> chacha20poly1305 -> poly1305 -> opaque-debug",
+            "line": 663,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -657,7 +693,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_seal_inner; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: computed (noise::handshake::b2s_hmac2) or parameter (argument 1 of the enclosing function); line: `let key = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_seal_inner; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: computed (noise::handshake::b2s_hmac2) or parameter (argument 1 of noise::handshake::aead_chacha20_seal) or parameter (argument 1 of the enclosing function); line: `let key = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
             "line": 106,
             "location": "src/noise/handshake.rs",
             "offset": 31,
@@ -671,14 +707,14 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_seal_inner; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: computed (written into an element by noise::handshake::aead_chacha20_seal) or hard-coded (all zero, 12 bytes, literal at line 92) or hard-coded (all zero, literal at line 756) or hard-coded (all zero, literal at line 770) or hard-coded (all zero, literal at line 863) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_seal_inner; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: computed (written into an element by noise::handshake::aead_chacha20_seal) or hard-coded (all zero, 12 bytes, literal at line 92) or hard-coded (all zero, literal at line 756) or hard-coded (all zero, literal at line 770) or hard-coded (all zero, literal at line 863) or parameter (argument 2 of noise::handshake::aead_chacha20_seal) or parameter (argument 2 of the enclosing function); line: `.seal_in_place_separate_tag(`; code: `seal_in_place_separate_tag`",
             "line": 111,
             "location": "src/noise/handshake.rs",
             "offset": 9,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_open_inner; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: computed (noise::handshake::b2s_hmac2) or parameter (argument 1 of the enclosing function); line: `let key = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_open_inner; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: computed (noise::handshake::b2s_hmac2) or parameter (argument 1 of noise::handshake::aead_chacha20_open) or parameter (argument 1 of the enclosing function); line: `let key = LessSafeKey::new(UnboundKey::new(&CHACHA20_POLY1305, key).unwrap());`; code: `UnboundKey::new`",
             "line": 146,
             "location": "src/noise/handshake.rs",
             "offset": 31,
@@ -692,7 +728,7 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_open_inner; use: decrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: computed (written into an element by noise::handshake::aead_chacha20_open) or hard-coded (all zero, 12 bytes, literal at line 130) or hard-coded (all zero, literal at line 360) or hard-coded (all zero, literal at line 519) or hard-coded (all zero, literal at line 540) or hard-coded (all zero, literal at line 619) or parameter (argument 2 of the enclosing function); line: `let plaintext = key.open_in_place(`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::aead_chacha20_open_inner; use: decrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: computed (written into an element by noise::handshake::aead_chacha20_open) or hard-coded (all zero, 12 bytes, literal at line 130) or hard-coded (all zero, literal at line 360) or hard-coded (all zero, literal at line 519) or hard-coded (all zero, literal at line 540) or hard-coded (all zero, literal at line 619) or parameter (argument 2 of noise::handshake::aead_chacha20_open) or parameter (argument 2 of the enclosing function); line: `let plaintext = key.open_in_place(`; code: `open_in_place`",
             "line": 150,
             "location": "src/noise/handshake.rs",
             "offset": 24,
@@ -734,7 +770,7 @@
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::receive_packet_data; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (written into an element by session::Session::receive_packet_data) or parameter (argument 1 of the enclosing function); line: `.open_in_place(`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::receive_packet_data; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (rate_limiter::RateLimiter::verify_packet) or computed (written into an element by session::Session::receive_packet_data) or parameter (argument 1 of noise::Tunn::handle_data) or parameter (argument 1 of noise::Tunn::handle_verified_packet) or parameter (argument 1 of the enclosing function); line: `.open_in_place(`; code: `open_in_place`",
             "line": 257,
             "location": "src/noise/session.rs",
             "offset": 17,
@@ -798,7 +834,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hmac; new_from_slice: setup, not a use; key: computed (handshake::Tai64N::parse) or computed (noise::handshake::b2s_hash) or computed (noise::handshake::b2s_hmac) or hard-coded (static noise::handshake::INITIAL_CHAIN_KEY) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `let mut hmac = HmacBlake2s::new_from_slice(key).unwrap();`; code: `HmacBlake2s::new_from_slice`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hmac; new_from_slice: setup, not a use; key: computed (noise::handshake::b2s_hash) or computed (noise::handshake::b2s_hmac) or hard-coded (static noise::handshake::INITIAL_CHAIN_KEY) or parameter (argument 0 of handshake::Handshake::format_handshake_response) or parameter (argument 0 of handshake::Handshake::receive_handshake_response) or parameter (argument 0 of noise::Tunn::decapsulate) or parameter (argument 0 of noise::Tunn::handle_handshake_response) or parameter (argument 0 of noise::Tunn::handle_verified_packet) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of handshake::Handshake::receive_handshake_initialization); line: `let mut hmac = HmacBlake2s::new_from_slice(key).unwrap();`; code: `HmacBlake2s::new_from_slice`",
             "line": 52,
             "location": "src/noise/handshake.rs",
             "offset": 19,
@@ -970,7 +1006,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::Handshake::receive_cookie_reply; use: decrypt; nonce: parameter (argument 1 of the enclosing function); line: `.decrypt(packet.nonce.into(), payload)`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::Handshake::receive_cookie_reply; use: decrypt; nonce: computed (rate_limiter::RateLimiter::verify_packet) or parameter (argument 1 of noise::Tunn::handle_cookie_reply) or parameter (argument 1 of noise::Tunn::handle_verified_packet) or parameter (argument 1 of the enclosing function); line: `.decrypt(packet.nonce.into(), payload)`; code: `decrypt`",
             "line": 671,
             "location": "src/noise/handshake.rs",
             "offset": 13,
@@ -984,7 +1020,7 @@
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::rate_limiter::RateLimiter::format_cookie_reply; use: encrypt; nonce: computed (rate_limiter::RateLimiter::nonce) or hard-coded (all zero, literal at line 287) or parameter (argument 3 of the enclosing function) or parameter (argument 4 of the enclosing function); line: `.encrypt_in_place_detached(iv, mac1, &mut encrypted_cookie[..16])`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::rate_limiter::RateLimiter::format_cookie_reply; use: encrypt; nonce: computed (rate_limiter::RateLimiter::nonce); line: `.encrypt_in_place_detached(iv, mac1, &mut encrypted_cookie[..16])`; code: `encrypt_in_place_detached`",
             "line": 144,
             "location": "src/noise/rate_limiter.rs",
             "offset": 13,
@@ -1024,11 +1060,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-nonce"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1128,7 +1160,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: computed (handshake::Handshake::inc_index) or computed (noise::handshake::b2s_hash) or hard-coded (literal at line 469) or parameter (argument 0 of the enclosing function) or unknown (origin search bound reached); key: computed (handshake::Handshake::inc_index) or computed (noise::handshake::b2s_hash) or hard-coded (literal at line 469) or parameter (argument 0 of the enclosing function) or unknown (origin search bound reached); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: parameter (argument 0 of handshake::Handshake::append_mac1_and_mac2) or parameter (argument 0 of handshake::Handshake::format_handshake_initiation) or parameter (argument 0 of handshake::Handshake::format_handshake_response) or parameter (argument 0 of noise::Tunn::decapsulate) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
             "line": 70,
             "location": "src/noise/handshake.rs",
             "offset": 19,
@@ -1149,7 +1181,7 @@
             "symbol": "digest::FixedOutput::finalize_fixed"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: computed (portable_atomic::AtomicU64::fetch_add) or computed (rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of the enclosing function); key: computed (portable_atomic::AtomicU64::fetch_add) or computed (rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: computed (rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
             "line": 77,
             "location": "src/noise/handshake.rs",
             "offset": 19,
@@ -1177,7 +1209,7 @@
             "symbol": "digest::FixedOutput::finalize_fixed"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: computed (portable_atomic::AtomicU64::fetch_add) or parameter (argument 0 of the enclosing function); key: computed (portable_atomic::AtomicU64::fetch_add) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: parameter (argument 0 of rate_limiter::RateLimiter::format_cookie_reply) or parameter (argument 0 of rate_limiter::RateLimiter::nonce) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
             "line": 84,
             "location": "src/noise/handshake.rs",
             "offset": 19,
@@ -1223,11 +1255,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,hard-coded,parameter,unknown"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-key"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:algorithm",
@@ -1651,7 +1679,12 @@
       "ref": "pkg:cargo/hmac@0.12.1"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
@@ -1779,6 +1812,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib boringtun"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "102 calls into crypto packages: 72 cited, 30 excused (accessor 9, comparison 3, internal 4, setup 12, view 2), 0 not cited"
       }
     ],
     "tools": {
@@ -1791,7 +1828,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f27ffe4b-ff1b-88e6-b241-bf52fa383917",
+  "serialNumber": "urn:uuid:7286e7c3-52b4-82a5-8514-0e0866fc6646",
   "specVersion": "1.7",
   "version": 1
 }

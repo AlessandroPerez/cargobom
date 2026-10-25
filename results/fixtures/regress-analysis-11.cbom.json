@@ -621,6 +621,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via a11 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 344,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/pbkdf2@0.12.2",
       "evidence": {
         "occurrences": [
@@ -1475,7 +1511,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
@@ -1547,7 +1583,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,hard-coded,parameter"
+          "value": "computed,environment,hard-coded,parameter"
         },
         {
           "name": "rcbom:finding",
@@ -2505,6 +2541,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -2514,6 +2551,10 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -2548,6 +2589,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -2778,6 +2820,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a11"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "39 calls into crypto packages: 30 cited, 9 excused (accessor 2, generator setup 3, public half 1, setup 3), 0 not cited"
       }
     ],
     "tools": {
@@ -2790,7 +2836,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:94a4c9d4-b22b-8e47-9e7c-3cdd8b47b7b5",
+  "serialNumber": "urn:uuid:2ff2ccc3-3d55-8488-aeaa-c593e67ad047",
   "specVersion": "1.7",
   "version": 1
 }

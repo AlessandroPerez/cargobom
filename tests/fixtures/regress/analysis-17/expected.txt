@@ -7,13 +7,13 @@
   occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:18:14 | aws_lc_rs::aead::LessSafeKey::open_separate_gather | [reachable] [call] in a17::scatter; use: decrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 18); line: `let r = k.open_separate_gather(Nonce::assume_unique_for_key([2u8; 12]), Aad::empty(), &ct, &tag[..16], &mut pt);`; code: `open_separate_gather`
   occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:19:14 | aws_lc_rs::aead::LessSafeKey::seal_in_place_scatter | [reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 19); line: `let _ = k.seal_in_place_scatter(Nonce::assume_unique_for_key([3u8; 12]), Aad::empty(), data, &[], &mut tag[..16]);`; code: `seal_in_place_scatter`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:65:10 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [static] in a17::P256; line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`
-  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:70:8 | aws_lc_rs::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`
+  occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:70:8 | aws_lc_rs::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:71:13 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); line: `.verify(msg, sig)`; code: `verify`
   occ ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | src/main.rs:85:42 | a17::P256 | [reachable] [via-static] in a17::main; a17::P256 -> aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; line: `println!("{} {}", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:50:13 | aws_lc_rs::ed25519::Ed25519KeyPair::from_seed_unchecked | [reachable] [call] in a17::ed_seed; from_seed_unchecked: setup, not a use; key: hard-coded (32 bytes, literal at line 50); line: `let kp = signature::Ed25519KeyPair::from_seed_unchecked(&[4u8; 32]).unwrap();`; code: `signature::Ed25519KeyPair::from_seed_unchecked`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:51:7 | aws_lc_rs::ed25519::Ed25519KeyPair::sign | [reachable] [call] in a17::ed_seed; use: sign; line: `kp.sign(msg).as_ref().len()`; code: `sign`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:62:10 | aws_lc_rs::signature::ED25519 | [reachable] [static] in a17::ED; line: `alg: &signature::ED25519,`; code: `signature::ED25519`
-  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:70:8 | aws_lc_rs::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`
+  occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:70:8 | aws_lc_rs::signature::UnparsedPublicKey::<B>::new | [reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:71:13 | aws_lc_rs::signature::UnparsedPublicKey::<B>::verify | [reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); line: `.verify(msg, sig)`; code: `verify`
   occ Ed25519 | crypto:algorithm:Ed25519 | src/main.rs:85:22 | a17::ED | [reachable] [via-static] in a17::main; a17::ED -> aws_lc_rs::signature::ED25519; line: `println!("{} {}", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `ED`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:36:19 | aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b"fixed-salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
@@ -63,7 +63,7 @@
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=4
-  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:public-key=parameter
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:public-key=environment,parameter
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
@@ -72,7 +72,7 @@
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=6
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=hard-coded
-  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:public-key=parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:public-key=environment,parameter
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
   prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
@@ -193,6 +193,7 @@ provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-512/256
 root {"bom-ref": "pkg:cargo/a17@0.1.0", "name": "a17", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a17@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a17
+run rcbom:run:boundary-check=30 calls into crypto packages: 17 cited, 13 excused (public half 1, setup 9, view 3), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=14
 run rcbom:run:profile=release

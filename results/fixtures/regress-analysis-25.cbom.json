@@ -288,7 +288,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at line 9) or parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at app/src/main.rs:9) or parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
@@ -690,6 +690,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib lib1"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "4 calls into crypto packages: 4 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -702,7 +706,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f7bcd87b-1556-8d2a-a20d-2a836d1d224d",
+  "serialNumber": "urn:uuid:a9aba68b-38c2-8eb0-8237-cd2b97f80db7",
   "specVersion": "1.7",
   "version": 1
 }

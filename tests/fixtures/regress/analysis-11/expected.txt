@@ -5,7 +5,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:112:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a11::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = Aes256Gcm::new_from_slice(args[0].as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:16:45 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:24:6 | aead::Aead::encrypt | [reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:24:6 | aead::Aead::encrypt | [reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:37:38 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in a11::m1; line: `let okm = prk.expand(&[b"info"], &AES_256_GCM).unwrap();`; code: `AES_256_GCM`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:38:31 | core::convert::From::from | [reachable] [call] in a11::m1; from: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `let key = LessSafeKey::new(UnboundKey::from(okm));`; code: `UnboundKey::from`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:40:8 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 117) or parameter (argument 2 of the enclosing function); line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`
@@ -53,6 +53,7 @@
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:238:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a11 -> ring -> getrandom
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:249:0 | ghash | [manifest] locked ghash 0.5.1; reached via a11 -> aes-gcm -> ghash
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:259:0 | hmac | [manifest] locked hmac 0.12.1; reached via a11 -> pbkdf2 -> hmac
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:344:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via a11 -> aes-gcm -> ghash -> opaque-debug
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:350:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via a11 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:18:0 | pbkdf2 | [manifest] declared by a11 (dependencies); features ["hmac"]; default-features = false
   occ pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | Cargo.lock:360:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 0.7.0; reached via a11 -> rsa -> pkcs1 -> der -> pem-rfc7468
@@ -108,7 +109,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=derived,environment,parameter
-  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,hard-coded,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,environment,hard-coded,parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop BLAKE3 | crypto:algorithm:BLAKE3:hash | rcbom:confidence=high
   prop BLAKE3 | crypto:algorithm:BLAKE3:hash | rcbom:detection:method=type-resolved
@@ -245,6 +246,10 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
@@ -364,6 +369,7 @@ component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/diges
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
 component library pkcs1 0.7.5 | pkg:cargo/pkcs1@0.7.5 | purl pkg:cargo/pkcs1@0.7.5
@@ -420,6 +426,7 @@ dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/const-oid@0.9.6
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
@@ -430,6 +437,7 @@ dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/pkcs8@0.10.2
 dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/spki@0.7.3
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
@@ -490,6 +498,7 @@ dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/pem-rfc7468@0.7.0
 dependency pkg:cargo/pkcs1@0.7.5
@@ -534,6 +543,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/a11@0.1.0", "name": "a11", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a11@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a11
+run rcbom:run:boundary-check=39 calls into crypto packages: 30 cited, 9 excused (accessor 2, generator setup 3, public half 1, setup 3), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=63
 run rcbom:run:profile=release

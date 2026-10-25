@@ -944,6 +944,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via ssh-key -> ssh-cipher -> poly1305 -> opaque-debug",
+            "line": 463,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/p256@0.13.2",
       "evidence": {
         "occurrences": [
@@ -2058,28 +2094,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 266,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 270,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 341,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 344,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -2119,11 +2155,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -2458,28 +2494,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 277,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 281,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 351,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 354,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -2519,11 +2555,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -3515,7 +3551,7 @@
             "symbol": "rsa::key::RsaPrivateKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::key::RsaPrivateKey>::try_from; from_components: setup, not a use; key: parameter (argument 0 of the enclosing function); key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `let ret = rsa::RsaPrivateKey::from_components(`; code: `rsa::RsaPrivateKey::from_components`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::key::RsaPrivateKey>::try_from; from_components: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `let ret = rsa::RsaPrivateKey::from_components(`; code: `rsa::RsaPrivateKey::from_components`",
             "line": 196,
             "location": "src/private/rsa.rs",
             "offset": 18,
@@ -4135,6 +4171,82 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:unknown:unknown:ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `ed25519_dalek::Signature::try_from(&signature)`; code: `ed25519_dalek::Signature::try_from`",
+            "line": 380,
+            "location": "src/signature.rs",
+            "offset": 8,
+            "symbol": "core::convert::TryFrom::try_from"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<&ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `Ok(ed25519_dalek::Signature::try_from(signature.as_bytes())?)`; code: `ed25519_dalek::Signature::try_from`",
+            "line": 391,
+            "location": "src/signature.rs",
+            "offset": 19,
+            "symbol": "core::convert::TryFrom::try_from"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
+            "line": 413,
+            "location": "src/signature.rs",
+            "offset": 24,
+            "symbol": "core::convert::TryFrom::try_from"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
+            "line": 422,
+            "location": "src/signature.rs",
+            "offset": 24,
+            "symbol": "core::convert::TryFrom::try_from"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -4368,6 +4480,89 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:unknown:unknown:p521",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "core::convert::TryFrom::try_from"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; use: unknown; algorithm unresolved: `p521::ecdsa::VerifyingKey::from_encoded_point` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::from_encoded_point"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; use: unknown; algorithm unresolved: `p521::ecdsa::VerifyingKey::to_encoded_point` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::to_encoded_point"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: unknown; algorithm unresolved: `p521::ecdsa::SigningKey::from_slice` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "line": 522,
+            "location": "src/signature.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::SigningKey::from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
+            "line": 652,
+            "location": "src/signature.rs",
+            "offset": 40,
+            "symbol": "core::convert::TryFrom::try_from"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:unknown:unknown:ssh-cipher",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -4383,7 +4578,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive_key_and_iv; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::key_and_iv_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; line: `let (key_size, iv_size) = cipher.key_and_iv_size().ok_or(Error::Decrypted)?;`; code: `key_and_iv_size`",
+            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive_key_and_iv; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::key_and_iv_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `let (key_size, iv_size) = cipher.key_and_iv_size().ok_or(Error::Decrypted)?;`; code: `key_and_iv_size`",
             "line": 89,
             "location": "src/kdf.rs",
             "offset": 41,
@@ -4397,7 +4592,7 @@
             "symbol": "ssh_cipher::Cipher::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; line: `self.cipher.block_size(),`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `self.cipher.block_size(),`; code: `block_size`",
             "line": 360,
             "location": "src/private.rs",
             "offset": 24,
@@ -4411,28 +4606,42 @@
             "symbol": "ssh_cipher::Cipher::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encode_privatekey_comment_pair::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::Encode>::encode::<..> at src/private.rs:784:17 as `encode_privatekey_comment_pair`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::EncodePem>::encode_pem at ssh-encoding-0.2.0/src/encode.rs:68:13 as `encode`; instantiated by ssh_key::private::PrivateKey::encode_openssh at src/private.rs:249:16 as `encode_pem`; line: `let padding_len = cipher.padding_len(unpadded_len);`; code: `padding_len`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encode_privatekey_comment_pair::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::Encode>::encode::<..> at src/private.rs:784:17 as `encode_privatekey_comment_pair`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::EncodePem>::encode_pem at ssh-encoding-0.2.0/src/encode.rs:68:13 as `encode`; instantiated by ssh_key::private::PrivateKey::encode_openssh at src/private.rs:249:16 as `encode_pem`; line: `let padding_len = cipher.padding_len(unpadded_len);`; code: `padding_len`",
             "line": 616,
             "location": "src/private.rs",
             "offset": 33,
             "symbol": "ssh_cipher::Cipher::padding_len"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encoded_privatekey_comment_pair_len; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; line: `[len, cipher.padding_len(len)].checked_sum()`; code: `padding_len`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encoded_privatekey_comment_pair_len; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `[len, cipher.padding_len(len)].checked_sum()`; code: `padding_len`",
             "line": 630,
             "location": "src/private.rs",
             "offset": 21,
             "symbol": "ssh_cipher::Cipher::padding_len"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `if ciphertext.len().checked_rem(cipher.block_size()) != Some(0) {`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::is_some` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `if cipher.is_some() {`; code: `is_some`",
+            "line": 698,
+            "location": "src/private.rs",
+            "offset": 18,
+            "symbol": "ssh_cipher::Cipher::is_some"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `if ciphertext.len().checked_rem(cipher.block_size()) != Some(0) {`; code: `block_size`",
             "line": 702,
             "location": "src/private.rs",
             "offset": 51,
             "symbol": "ssh_cipher::Cipher::block_size"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::{closure#0}; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..> at src/private.rs:735:29; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `Self::decode_privatekey_comment_pair(reader, public_key, cipher.block_size())`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::has_tag` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `let auth_tag = if cipher.has_tag() {`; code: `has_tag`",
+            "line": 706,
+            "location": "src/private.rs",
+            "offset": 37,
+            "symbol": "ssh_cipher::Cipher::has_tag"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::{closure#0}; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..> at src/private.rs:735:29; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `Self::decode_privatekey_comment_pair(reader, public_key, cipher.block_size())`; code: `block_size`",
             "line": 736,
             "location": "src/private.rs",
             "offset": 76,
@@ -4468,7 +4677,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -4652,6 +4861,9 @@
       "dependsOn": [
         "pkg:cargo/signature@2.2.0"
       ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:ed25519"
+      ],
       "ref": "pkg:cargo/ed25519@2.2.3"
     },
     {
@@ -4704,6 +4916,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -4721,6 +4934,10 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -4760,7 +4977,8 @@
         "crypto:algorithm:unknown:signature:p521",
         "crypto:algorithm:unknown:unknown:ecdsa+p521",
         "crypto:algorithm:unknown:unknown:elliptic-curve+p521",
-        "crypto:algorithm:unknown:unknown:ff+p521"
+        "crypto:algorithm:unknown:unknown:ff+p521",
+        "crypto:algorithm:unknown:unknown:p521"
       ],
       "ref": "pkg:cargo/p521@0.13.3"
     },
@@ -4793,6 +5011,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "provides": [
@@ -4802,6 +5021,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -5075,6 +5295,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:ed25519"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p256"
     },
     {
@@ -5088,6 +5312,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:ff+p521"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:p521"
     },
     {
       "dependsOn": [],
@@ -5144,6 +5372,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib ssh-key"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "369 calls into crypto packages: 86 cited, 283 excused (accessor 1, comparison 2, copy 1, encoding 46, error 6, internal 222, public half 1, setup 1, view 3), 0 not cited"
       }
     ],
     "tools": {
@@ -5156,7 +5388,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:300c35da-6487-8aca-9e35-56595440f896",
+  "serialNumber": "urn:uuid:4cba3c03-8cca-8b57-b535-5e17c1ec5813",
   "specVersion": "1.7",
   "version": 1
 }
