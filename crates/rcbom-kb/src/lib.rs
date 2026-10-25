@@ -1043,7 +1043,8 @@ impl Kb {
 
     /// Is a package without a `[[crate]]` entry cryptographic, from its `Cargo.toml` metadata:
     /// a `cryptography` category or a crypto keyword, or the `[unmodelled]` crypto list (for
-    /// packages whose metadata says nothing)? Among those, encodings, parsers, memory wipers
+    /// packages whose metadata says nothing), or a name that names an algorithm of the
+    /// Cryptography Registry (`blake2b_simd`)? Among those, encodings, parsers, memory wipers
     /// and the `[unmodelled]` support list are support crates; the list never makes a package
     /// cryptographic by itself.
     pub fn unmodelled(
@@ -1062,7 +1063,9 @@ impl Kb {
                     "crypto" | "cryptography" | "encryption" | "tls" | "certificate" | "x509"
                 )
             });
-        if !crypto {
+        // (or, when it says nothing, its name names an algorithm of the Cryptography Registry:
+        // `blake2b_simd`, `sha1_smol`)
+        if !crypto && !registry::names_algorithm(package) {
             return None;
         }
         let support = self.unmodelled_support.iter().any(|p| p == package)
@@ -1195,6 +1198,16 @@ mod tests {
             crypto
         );
         assert_eq!(kb.unmodelled("age-core", &v(&[]), &v(&[])), crypto);
+        // a name that names an algorithm, the metadata saying nothing
+        assert_eq!(
+            kb.unmodelled("blake2b_simd", &v(&[]), &v(&["blake2b"])),
+            crypto
+        );
+        assert_eq!(kb.unmodelled("sha1_smol", &v(&[]), &v(&[])), crypto);
+        assert_eq!(
+            kb.unmodelled("serde_json", &v(&["encoding"]), &v(&[])),
+            None
+        );
         // ssh-key signs although its categories are der's; totp-rs's metadata names no crypto
         let der_like = v(&["cryptography", "encoding", "parser-implementations"]);
         assert_eq!(kb.unmodelled("ssh-key", &der_like, &v(&["crypto"])), crypto);

@@ -199,6 +199,50 @@ fn named(name: &str, depth: usize) -> bool {
     })
 }
 
+/// The registry's algorithm names as a package name may write them: each family and the text
+/// each pattern starts with (`BLAKE2b` of `BLAKE2b[-{digestSize}]`), lowercase without `-`
+/// and `/` (`sha1`, `blake2b`, `aes`), of three characters or more.
+static WORDS: LazyLock<std::collections::HashSet<String>> = LazyLock::new(|| {
+    let norm = |t: &str| -> String {
+        t.chars()
+            .filter(|c| c.is_ascii_alphanumeric())
+            .collect::<String>()
+            .to_ascii_lowercase()
+    };
+    // (a pattern is one group of alternatives: each one's leading text)
+    fn leading(toks: &[Tok], out: &mut Vec<String>) {
+        match toks.first() {
+            Some(Tok::Lit(chars)) => out.push(chars.iter().collect()),
+            Some(Tok::Group {
+                alts,
+                optional: false,
+            }) => alts.iter().for_each(|a| leading(a, out)),
+            _ => {}
+        }
+    }
+    let mut out = std::collections::HashSet::new();
+    for (family, toks) in &REGISTRY.patterns {
+        out.insert(norm(family));
+        let mut texts = Vec::new();
+        leading(toks, &mut texts);
+        out.extend(texts.iter().map(|t| norm(t)));
+    }
+    out.retain(|w| w.len() >= 3);
+    out
+});
+
+/// Does a package's name name an algorithm of the registry: its first part (`blake2b` of
+/// `blake2b_simd`, `sha1` of `sha1_smol`) or all of it written without separators (`md-5`)?
+pub fn names_algorithm(package: &str) -> bool {
+    let lower = package.to_ascii_lowercase();
+    let first = lower.split(['-', '_']).next().unwrap_or("");
+    let joined: String = lower
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric())
+        .collect();
+    WORDS.contains(first) || WORDS.contains(&joined)
+}
+
 /// Is this a family of the registry? It lists some that the 1.7 schema's `algorithmFamily`
 /// enum does not (`TLS-PRF`): see [`crate::in_family_enum`].
 pub fn family(family: &str) -> bool {
