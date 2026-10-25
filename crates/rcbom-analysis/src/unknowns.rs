@@ -126,11 +126,14 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
         }
         // the call is the operation the entry says, of an unknown algorithm
         (None, Some(e)) => {
+            // (at a version not covered, a call whose name is no use is cited too: what it
+            // does there is not known)
             let function = e
                 .algo
                 .implied_use
                 .clone()
-                .or_else(|| ctx.kb.use_of(method, &e.algo.primitive))?;
+                .or_else(|| ctx.kb.use_of(method, &e.algo.primitive))
+                .unwrap_or_else(|| "unknown".to_string());
             let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
             let reason = match &provider {
                 Some((n, v)) => format!(
@@ -138,6 +141,11 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                     short(&callee.path)
                 ),
                 None => format!("`{}` is not covered", short(&callee.path)),
+            };
+            let reason = if function == "unknown" {
+                format!("{reason}: what the call does is not known")
+            } else {
+                reason
             };
             Some((
                 e.algo.primitive.clone(),
@@ -147,52 +155,70 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             ))
         }
         (None, None) => {
+            // a method of a standard-library trait run by a type of another crate is a call
+            // into that crate (`<orion::aead::SecretKey as Default>::default()` draws a key)
+            let runs_in = match self_ty {
+                Some(rcbom_facts::TyTree::Adt { krate, .. })
+                    if matches!(callee.krate.name.as_str(), "core" | "std" | "alloc") =>
+                {
+                    krate
+                }
+                _ => &callee.krate,
+            };
             // a crypto package the knowledge base does not model, an API of an algorithm crate
             // it models that it does not name (`p256::SecretKey::random`), or an algorithm or
             // trait crate it models at a version it does not cover (md5 0.8's
             // `Context::finalize`, ed25519-dalek 3's `SigningKey::verify`, password-hash 0.6's
             // `verify_password`), called from another crate
-            let entry = ctx.kb_entry(&callee.krate);
-            let supported = ctx.supported(&callee.krate);
+            // (not what the knowledge base says is no operation, `[[aside]]`: a view, a copy, a
+            // wipe, an accessor; by the trait a method is of, or its path in its crate)
+            let bare = matcher::strip_generics(&callee.path);
+            let trait_path = bare.rsplit_once("::").map(|(t, _)| t);
+            let in_runs = bare
+                .strip_prefix(&format!("{}::", runs_in.name))
+                .unwrap_or("");
+            if ctx.kb.aside(&runs_in.name, in_runs, trait_path).is_some() {
+                return None;
+            }
+            let entry = ctx.kb_entry(runs_in);
+            let supported = ctx.supported(runs_in);
             let unnamed_api = entry.is_some_and(|e| e.role == Role::Algorithm) && supported;
             // (a dependency: the program's own package named like one is no such crate)
             let dependency = ctx
-                .package_of_crate(&callee.krate.name, &callee.krate.stable_id)
+                .package_of_crate(&runs_in.name, &runs_in.stable_id)
                 .is_some_and(|p| !ctx.local.contains(&p));
             let uncovered = entry.is_some_and(|e| matches!(e.role, Role::Algorithm | Role::Trait))
                 && dependency
                 && !supported;
             // (a generic method name says nothing without a modelled type to scope it; a crate
-            // the knowledge base models scopes it, md5's `finalize` being MD5's, though a
-            // streaming step of it is still no operation)
-            let generic = GENERIC_METHODS.contains(&method.as_str());
-            let step = STREAMING_STEPS.contains(&method.as_str());
-            // a crypto package without entries: every call into it from another crate is an
-            // operation (openssl's `sha256`, tiny-keccak's `finalize`, curve25519-dalek's
-            // `mul_clamped`), but for a step of a stream and what sets something up (`new`,
-            // `from_der`, `with_key`, or a call taking nothing to operate on: openssl's
-            // `MessageDigest::sha256()`), unless its name is a use
+            // the knowledge base models scopes it, md5's `finalize` being MD5's, rand's `fill` a
+            // draw, though a streaming step of it is still no operation)
+            let generic = ctx.kb.generic_method(method);
+            let step = ctx.kb.step(method) || ctx.kb.step_trait(trait_path);
+            // a crypto package without entries: every call into it from another crate is
+            // reported (openssl's `sha256`, orion's `SecretKey::default()`, curve25519-dalek's
+            // `mul_clamped`), what it does not known but for a use its name has, other than a
+            // step of a stream, whose operation is the call that ends it, and a call into a
+            // relay (tokio-rustls, rustls-pki-types: `[unmodelled]`)
             // (from outside the crypto layer: another crypto package's calls into it, openssl's
             // into openssl-sys, are the internals of what the program asked of that one)
-            let crypto_caller = (ctx.is_unmodelled(&site.owner.krate)
+            // (or code running on its behalf on every way: a generic function another crate
+            // instantiates with its types, subtle's `CtOption::map` on p384's field elements)
+            let crypto_caller = ((ctx.is_unmodelled(&site.owner.krate)
                 || ctx.kb_entry(&site.owner.krate).is_some())
                 && ctx
                     .package_of_crate(&site.owner.krate.name, &site.owner.krate.stable_id)
-                    .is_some_and(|p| !ctx.local.contains(&p));
-            let open =
-                ctx.is_unmodelled(&callee.krate) && !unnamed_api && !uncovered && !crypto_caller;
-            let named_use = ctx
-                .kb
-                .uses
-                .iter()
-                .any(|u| u.methods.iter().any(|m| m == method));
-            if !(open || unnamed_api || uncovered || ctx.is_unmodelled(&callee.krate))
-                || site.owner.krate == callee.krate
-                || (open
-                    && (step
-                        || (!named_use
-                            && (ctx.kb.unmodelled_setup(method) || arg_origins.is_empty()))))
-                || (!open && generic && (!uncovered || step))
+                    .is_some_and(|p| !ctx.local.contains(&p)))
+                || ctx
+                    .behalf
+                    .get(&(site.span.file.clone(), site.span.line, site.span.col))
+                    == Some(&true);
+            let unmodelled = ctx.is_unmodelled(runs_in) && !ctx.kb.relay(&runs_in.name);
+            let open = unmodelled && !unnamed_api && !uncovered && !crypto_caller;
+            if !(open || unnamed_api || uncovered || unmodelled)
+                || site.owner.krate == *runs_in
+                || step
+                || (!open && !unnamed_api && generic && !uncovered)
             {
                 return None;
             }
@@ -202,7 +228,7 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             // what an uncovered crate computes, as its entries say (md5's: a hash), scopes the
             // use; so it does for a type the callers choose (rand's: a generator)
             let primitives: BTreeSet<&str> = if uncovered || param.is_some() {
-                let k = callee.krate.name.as_str();
+                let k = runs_in.name.as_str();
                 ctx.kb
                     .types
                     .iter()
@@ -225,20 +251,28 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                 .iter()
                 .filter_map(|p| ctx.kb.use_of(method, p))
                 .collect();
-            let mut uses: Vec<&str> = if scoped.is_empty() {
+            // (of a package without entries, a generic name names no use: age's `finish` ends
+            // an encryption)
+            let mut uses: Vec<&str> = if !scoped.is_empty() {
+                scoped.iter().map(String::as_str).collect()
+            } else if open && generic {
+                Vec::new()
+            } else {
                 ctx.kb
                     .uses
                     .iter()
                     .filter(|u| u.methods.iter().any(|m| m == method))
                     .map(|u| u.function.as_str())
                     .collect()
-            } else {
-                scoped.iter().map(String::as_str).collect()
             };
             uses.sort();
             uses.dedup();
             if uses.is_empty() {
-                if !open {
+                // (an API of a modelled crate at a version it covers that it does not name
+                // counts where its name is a use: any other is a gap the boundary check
+                // reports; at a version it does not cover, every call counts, as for a package
+                // without entries)
+                if !open && !uncovered {
                     return None;
                 }
                 uses.push("unknown");
@@ -257,7 +291,7 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                 (false, 1) => primitives.first().copied().unwrap_or("unknown"),
                 _ => "unknown",
             };
-            let provider = ctx.package_of_crate(&callee.krate.name, &callee.krate.stable_id);
+            let provider = ctx.package_of_crate(&runs_in.name, &runs_in.stable_id);
             let reason = match (&provider, param) {
                 (Some((n, v)), Some(p)) => format!(
                     "`{}` of {n} {v} on a type parameter (`{p}`) of the library's generic API: \
@@ -277,6 +311,11 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
                     short(&callee.path)
                 ),
                 (None, _) => format!("`{}` is not modelled", short(&callee.path)),
+            };
+            let reason = if uses == ["unknown"] {
+                format!("{reason}: what the call does is not known")
+            } else {
+                reason
             };
             // the algorithm's packages are those of the types the call is made on or for
             // (`kem::Encapsulate::encapsulate` on an ml-kem key, `diffie_hellman::<NistP256>`),

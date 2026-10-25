@@ -188,6 +188,17 @@ pub fn run(args: &[String]) -> Result<()> {
             failed.push(name);
             continue;
         }
+        if cli_log
+            .lines()
+            .any(|l| l.trim_start().starts_with("not cited: "))
+        {
+            println!(
+                "{name}: calls into crypto packages neither cited nor excused ({})",
+                log.display()
+            );
+            failed.push(name);
+            continue;
+        }
         let v = Command::new(&cbom)
             .current_dir(&dir)
             .args(["cbom", "verify"])

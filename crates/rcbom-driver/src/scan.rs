@@ -85,18 +85,91 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             unconvertible,
             def,
             lib_generic: false,
+            boundary: Vec::new(),
         }
     }
 
-    pub(super) fn push_internal(&mut self, mut internal: rustc_span::Span, target: Target) {
-        // code a derive generates with an input token's span (`quote_spanned!` at a field's
-        // name): the derive's, not the field's
+    /// Where a site at `internal` is: code a derive generates with an input token's span
+    /// (`quote_spanned!` at a field's name) is the derive's, not the field's.
+    fn site_span(&self, internal: rustc_span::Span) -> rustc_span::Span {
         if !internal.from_expansion()
             && let Some(did) = self.def
             && let Some(call) = derive_site(self.cx.tcx, did)
         {
-            internal = call;
+            return call;
         }
+        internal
+    }
+
+    /// A call of a walked body into a crate of the crypto set other than its own, by the
+    /// function it resolves to, at the position a site of it has (`Reach::boundary`).
+    fn boundary_edge(&mut self, func: &Operand, term: &Terminator) {
+        let tcx = self.cx.tcx;
+        let Ok(ty) = func.ty(self.body.locals()) else {
+            return;
+        };
+        let kind = ty.kind();
+        let Some(RigidTy::FnDef(def, args)) = kind.rigid() else {
+            return;
+        };
+        let Ok(inst) = Instance::resolve(*def, args) else {
+            return;
+        };
+        let did = rustc_internal::internal(tcx, inst.def.def_id());
+        if !self.cx.kb_crate(did.krate) || self.def.is_some_and(|d| d.krate == did.krate) {
+            return;
+        }
+        // the callee's name; for a function held in a place, the call's callee expression
+        let span = match func {
+            Operand::Constant(c) => Some(rustc_internal::internal(tcx, c.span)),
+            _ => callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span)).or_else(
+                || {
+                    self.origins
+                        .callee_name_span(func, term)
+                        .map(|s| rustc_internal::internal(tcx, s))
+                },
+            ),
+        };
+        let Some(span) = span else {
+            return;
+        };
+        let (loc, _) = locate(tcx, self.site_span(span));
+        if loc.line == 0 {
+            return;
+        }
+        // (a trait's method, or one an impl of a trait writes)
+        let trait_path = tcx
+            .trait_of_assoc(did)
+            .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
+            .map(|t| path_of(tcx, t));
+        // (the structs and enums its type arguments are, behind references and slices)
+        let mut types = Vec::new();
+        for t in rustc_internal::internal(tcx, inst).args.types() {
+            let mut t = t;
+            while let rustc_middle::ty::Ref(_, i, _) | rustc_middle::ty::Slice(i) = t.kind() {
+                t = *i;
+            }
+            if let rustc_middle::ty::Adt(adt, _) = t.kind() {
+                let p = path_of(tcx, adt.did());
+                if !types.contains(&p) {
+                    types.push(p);
+                }
+            }
+        }
+        self.boundary.push(rcbom_facts::BoundaryEdge {
+            owner: self.owner.clone(),
+            span: loc,
+            callee: def_ref_internal(tcx, did),
+            trait_path,
+            coroutine: tcx.is_coroutine(did),
+            types,
+            through_value: !matches!(func, Operand::Constant(_)),
+            on_behalf: None,
+        });
+    }
+
+    pub(super) fn push_internal(&mut self, internal: rustc_span::Span, target: Target) {
+        let internal = self.site_span(internal);
         let text = span_text(self.cx.tcx, internal);
         let line_text = line_text(self.cx.tcx, internal);
         let (span, expansion) = locate(self.cx.tcx, internal);
@@ -628,6 +701,9 @@ impl Scanner<'_, '_> {
             ..
         } = &term.kind
         {
+            if self.tier == Tier::Reachable {
+                self.boundary_edge(func, term);
+            }
             if let Ok(ty) = func.ty(self.body.locals())
                 && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
                 && self.interesting(def, args)

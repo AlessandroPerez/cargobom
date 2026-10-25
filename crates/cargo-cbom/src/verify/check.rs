@@ -89,7 +89,7 @@ impl Files<'_> {
         // name (`p256::SecretKey::random`, age's `Identity::generate`)
         if o.component_ref.starts_with("crypto:algorithm:unknown:")
             && kind == "call"
-            && !self.is_operation(&o.symbol)
+            && !self.is_operation(&o.symbol, &o.component_ref)
         {
             return Err(format!(
                 "`{}` is no operation the knowledge base lists, nor a crypto package's use",

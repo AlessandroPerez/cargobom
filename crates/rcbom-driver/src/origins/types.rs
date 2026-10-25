@@ -47,16 +47,39 @@ pub(super) fn walk_ty<'tcx>(
     }
     ty
 }
+/// The knowledge base's `[semantics]` for the driver (`RCBOM_SEMANTICS`, one `key=a,b` per
+/// line): `fills`, the random fills that write a whole buffer; `generators`, how random
+/// generators' type names end.
+static SEMANTICS: std::sync::LazyLock<HashMap<String, Vec<String>>> =
+    std::sync::LazyLock::new(|| {
+        std::env::var("RCBOM_SEMANTICS")
+            .unwrap_or_default()
+            .lines()
+            .filter_map(|l| l.split_once('='))
+            .map(|(k, v)| {
+                let vs = v.split(',').filter(|x| !x.is_empty()).map(str::to_string);
+                (k.to_string(), vs.collect())
+            })
+            .collect()
+    });
+fn semantics(key: &str) -> &'static [String] {
+    SEMANTICS.get(key).map_or(&[], Vec::as_slice)
+}
 /// Is the local a random generator (`ThreadRng`, `OsRng`, `StdRng`, `ChaCha20Rng`)?
 pub(super) fn is_rng(body: &Body, local: Local) -> bool {
     match body.locals()[local].ty.kind() {
-        TyKind::RigidTy(RigidTy::Adt(def, _)) => def.name().ends_with("Rng"),
+        TyKind::RigidTy(RigidTy::Adt(def, _)) => {
+            let name = def.name();
+            semantics("generators")
+                .iter()
+                .any(|s| name.ends_with(s.as_str()))
+        }
         _ => false,
     }
 }
 /// Calls that write every byte of the buffers they are given by `&mut`, or fail: random
-/// fills (`RngCore::fill_bytes`, `try_fill_bytes`, `Rng::fill`, ring's `SecureRandom::fill`,
-/// `getrandom`) and `Read::read_exact`.
+/// fills (`fills`: `RngCore::fill_bytes`, `Rng::fill`, `getrandom`), `Read::read_exact` and the
+/// slice's own (`copy_from_slice`, `fill`).
 pub(super) fn fills_whole(body: &Body, func: &Operand) -> bool {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
         func.ty(body.locals()).ok().map(|t| t.kind())
@@ -67,8 +90,8 @@ pub(super) fn fills_whole(body: &Body, func: &Operand) -> bool {
     let last = name.rsplit("::").next().unwrap_or(&name);
     matches!(
         last,
-        "fill_bytes" | "try_fill_bytes" | "fill" | "try_fill" | "getrandom" | "read_exact"
-    )
+        "read_exact" | "copy_from_slice" | "clone_from_slice" | "fill"
+    ) || semantics("fills").iter().any(|f| f == last)
 }
 /// Does a value of the type hold a `&mut` (a field, an element, a type argument)?
 pub(super) fn holds_mut_borrow<'tcx>(
