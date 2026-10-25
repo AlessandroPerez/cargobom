@@ -1,0 +1,122 @@
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:29:4 | getrandom::getrandom | [reachable] [call] in a167::generate; use: generate; line: `getrandom::getrandom(&mut kdf_salt).unwrap();`; code: `getrandom::getrandom`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via a167 -> scrypt -> pbkdf2 -> digest -> block-buffer
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:29:0 | cipher | [manifest] locked cipher 0.4.4; reached via a167 -> scrypt -> salsa20 -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:48:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a167 -> scrypt -> pbkdf2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:58:0 | digest | [manifest] locked digest 0.10.7; reached via a167 -> scrypt -> pbkdf2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:79:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a167 -> getrandom
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.toml:10:0 | getrandom | [manifest] declared by a167 (dependencies)
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:90:0 | hmac | [manifest] locked hmac 0.12.1; reached via a167 -> scrypt -> pbkdf2 -> hmac
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:114:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via a167 -> scrypt -> pbkdf2
+  occ salsa20 | pkg:cargo/salsa20@0.10.2 | Cargo.lock:124:0 | salsa20 | [manifest] locked salsa20 0.10.2; reached via a167 -> scrypt -> salsa20
+  occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.lock:133:0 | scrypt | [manifest] locked scrypt 0.11.0; reached via a167 -> scrypt
+  occ scrypt | pkg:cargo/scrypt@0.11.0 | Cargo.toml:9:0 | scrypt | [manifest] declared by a167 (dependencies); default-features = false
+  occ scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | src/main.rs:19:21 | scrypt::params::Params::new | [reachable] [call] in a167::SecretKey::encrypt; new: setup, not a use; line: `let params = scrypt::Params::new(10, 8, 1, 32).unwrap();`; code: `scrypt::Params::new`
+  occ scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | src/main.rs:21:8 | scrypt::scrypt | [reachable] [call] in a167::SecretKey::encrypt; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of a167::generate) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function) or rng (getrandom::getrandom); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut out).unwrap();`; code: `scrypt::scrypt`
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:144:0 | sha2 | [manifest] locked sha2 0.10.9; reached via a167 -> scrypt -> sha2
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:155:0 | subtle | [manifest] locked subtle 2.6.1; reached via a167 -> scrypt -> pbkdf2 -> digest -> subtle
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=1
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:usage=reachable
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:crypto-role=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:scope=required
+  prop salsa20 | pkg:cargo/salsa20@0.10.2 | rcbom:usage=reachable
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:crypto-role=algorithm
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:scope=required
+  prop scrypt | pkg:cargo/scrypt@0.11.0 | rcbom:usage=reachable
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:confidence=high
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:detection:method=type-resolved
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:functions:source=observed
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:kb:version=0.2.0
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:occurrences=2
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:provenance:password=environment,parameter
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:provenance:salt=parameter,rng
+  prop scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | rcbom:reachability=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset scrypt-1024-8-1-32 | crypto:algorithm:scrypt-1024-8-1-32 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
+component library salsa20 0.10.2 | pkg:cargo/salsa20@0.10.2 | purl pkg:cargo/salsa20@0.10.2
+component library scrypt 0.11.0 | pkg:cargo/scrypt@0.11.0 | purl pkg:cargo/scrypt@0.11.0
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep pkg:cargo/a167@0.1.0 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/a167@0.1.0 -> pkg:cargo/scrypt@0.11.0
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/pbkdf2@0.12.2 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/salsa20@0.10.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/pbkdf2@0.12.2
+dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/salsa20@0.10.2
+dep pkg:cargo/scrypt@0.11.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dependency crypto:algorithm:OS-RNG
+dependency crypto:algorithm:scrypt-1024-8-1-32
+dependency pkg:cargo/a167@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/pbkdf2@0.12.2
+dependency pkg:cargo/salsa20@0.10.2
+dependency pkg:cargo/scrypt@0.11.0
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/getrandom@0.2.17 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt-1024-8-1-32
+root {"bom-ref": "pkg:cargo/a167@0.1.0", "name": "a167", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a167@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a167
+run rcbom:run:boundary-check=3 calls into crypto packages: 3 cited, 0 excused (), 0 not cited
+run rcbom:run:features=
+run rcbom:run:packages=19
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=103
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

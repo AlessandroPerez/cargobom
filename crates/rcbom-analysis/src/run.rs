@@ -705,14 +705,29 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 // the key material of a call belongs to the asset called, not to its parts
                 let prov: &[(String, std::collections::BTreeSet<provenance::Class>)] =
                     if kind == Kind::Component { &[] } else { &prov };
+                // (one clause per role, two arguments of one role merged; a literal in this
+                // file by its line)
+                let mut roles: Vec<(&str, std::collections::BTreeSet<&provenance::Class>)> =
+                    Vec::new();
                 for (role, classes) in prov {
+                    match roles.iter_mut().find(|(r, _)| r == role) {
+                        Some((_, cs)) => cs.extend(classes),
+                        None => roles.push((role, classes.iter().collect())),
+                    }
+                }
+                let here = format!("literal at {}:", site.span.file);
+                for (role, classes) in roles {
                     let text: Vec<String> = classes
                         .iter()
                         .map(|c| {
                             if c.detail.is_empty() {
                                 c.kind.clone()
                             } else {
-                                format!("{} ({})", c.kind, c.detail)
+                                format!(
+                                    "{} ({})",
+                                    c.kind,
+                                    c.detail.replace(&here, "literal at line ")
+                                )
                             }
                         })
                         .collect();
