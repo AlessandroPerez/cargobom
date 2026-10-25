@@ -55,6 +55,17 @@ impl Files<'_> {
         }
 
         if o.context.starts_with("[manifest]") {
+            // the package's component says what its bom-ref does (which the position's lock or
+            // manifest entry is checked against)
+            if let Some([name, version, purl]) = self.graph.libraries.get(&o.component_ref)
+                && (package_of(&o.component_ref) != Some((name.as_str(), version.as_str()))
+                    || *purl != o.component_ref)
+            {
+                return Err(format!(
+                    "the component says {name} {version} ({purl}), its bom-ref {}",
+                    o.component_ref
+                ));
+            }
             let file = o.location.rsplit('/').next().unwrap_or("");
             return match file {
                 "Cargo.lock" => check_lock(
@@ -1109,22 +1120,25 @@ impl Files<'_> {
                 }
             }
             // where the CBOM records what an instantiation chooses there (`[instantiation]`
-            // occurrences: `h::<sha2::Sha384>` is SHA-384's), this asset is among it
+            // occurrences: `h::<sha2::Sha384>` is SHA-384's), this asset is among it, or has it
+            // as a component (`tag::<Sha256>` building an `Hmac<D>`: HMAC-SHA-256's SHA-256)
             if let (Some(_), Some(c0)) = (&caller, col) {
                 let here: Vec<usize> = self
                     .at_pos
                     .get(&(file.clone(), line, c0))
                     .cloned()
                     .unwrap_or_default();
+                let parts = self.graph.depends_on.get(component_ref);
                 let chosen: Vec<&str> = here
                     .iter()
                     .filter(|&&j| self.occs[j].context.contains("] [instantiation]"))
                     .map(|&j| self.occs[j].component.as_str())
                     .collect();
                 if !chosen.is_empty()
-                    && !here
-                        .iter()
-                        .any(|&j| self.occs[j].component_ref == component_ref)
+                    && !here.iter().any(|&j| {
+                        self.occs[j].component_ref == component_ref
+                            || parts.is_some_and(|p| p.contains(&self.occs[j].component_ref))
+                    })
                 {
                     return Err(format!(
                         "`{part}`: the instantiation at {file}:{line}:{c0} chooses {}",
@@ -1246,6 +1260,7 @@ impl Files<'_> {
                 }
                 Some(c) => {
                     let want = in_item(c).ok_or_else(|| format!("`{part}`: no item"))?;
+                    let callee_src = self.source(&inner.0.clone());
                     // where the line names what it instantiates, as a use (not `fn seal(..)`
                     // defining the caller): the item or a caller before it (an occurrence
                     // instantiated along two chains lists both last callers, each naming the
@@ -1311,12 +1326,12 @@ impl Files<'_> {
                             // line calls that function
                             let base = p.trim().strip_suffix("::{closure#0}")?;
                             let name = strip_generics(base).rsplit("::").next()?.to_string();
-                            src.items
-                                .iter()
-                                .any(|it| {
+                            // (written in this file or in the instantiated function's own)
+                            let is_async = |s: &Source| {
+                                s.items.iter().any(|it| {
                                     it.kind == ItemKind::Fn
                                         && it.name == name
-                                        && src.lines.get(it.start.0.wrapping_sub(1)).is_some_and(
+                                        && s.lines.get(it.start.0.wrapping_sub(1)).is_some_and(
                                             |l| {
                                                 Regex::new(&format!(
                                                     r"\basync\s+(?:unsafe\s+)?fn\s+{}\b",
@@ -1326,6 +1341,8 @@ impl Files<'_> {
                                             },
                                         )
                                 })
+                            };
+                            (is_async(&src) || callee_src.as_deref().is_some_and(is_async))
                                 .then_some(name)
                         })
                     {

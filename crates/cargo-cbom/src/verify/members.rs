@@ -511,14 +511,16 @@ impl Files<'_> {
                     .packages
                     .iter()
                     .find(|p| {
-                        p.lib_name.as_deref() == Some(k.as_str()) || p.name.replace('-', "_") == *k
+                        p.lib_name.as_deref() == Some(k.as_str())
+                            || p.name.replace('-', "_") == *k
+                            || (p.local && p.bins.iter().any(|b| b == k))
                     })
-                    .filter(|p| p.local)
                     .map(|p| p.manifest_dir.clone())
             })
             .collect();
+        // (a witness of the program's packages or of a dependency: one of the build's)
         if dirs.is_empty() {
-            return Ok(());
+            return Err(format!("`{w}` names no package of the build"));
         }
         let _ = path;
         let last = d.rsplit("::").next().unwrap_or(d).to_string();
@@ -626,15 +628,20 @@ impl Files<'_> {
                         || r.foreign_items
                             .iter()
                             .any(|k| k.1 != last && !rivals.contains(&k.1)));
-                if r.names.contains(&last) || foreign {
+                // (a model enum's variant is read as a value whatever its case:
+                // `Algorithm::EdDSA` beside `Algorithm::HS256`)
+                let variant = |x: &String| !rivals.is_empty() && (rivals.contains(x) || *x == last);
+                if r.names.contains(&last) || (variant(&last) && r.types.contains(&last)) || foreign
+                {
                     return Ok(());
                 }
-                let others = r.names.iter().any(|x| {
-                    rivals.contains(x)
-                        || self.kb.statics.iter().any(|e| {
-                            e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref()
-                        })
-                });
+                let others = r.types.iter().any(|x| variant(x) && *x != last)
+                    || r.names.iter().any(|x| {
+                        rivals.contains(x)
+                            || self.kb.statics.iter().any(|e| {
+                                e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref()
+                            })
+                    });
                 // a parameter it reads that can hold the algorithm (not an integer, a string,
                 // bytes): a value from its caller it passes on or keeps
                 let sig = fn_sig(&src, f);

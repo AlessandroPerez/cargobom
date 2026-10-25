@@ -85,8 +85,9 @@
 //!   instead (a variable lent as `&mut` into a local binding is lent to code not followed only
 //!   when that binding is a method's receiver or a call's argument: stores through it are
 //!   followed); a witness function (`member: object, from F`, `caller, passed by F`, `impl,
-//!   possible (what F writes)`, `type-join, possible (a value F stores ..)`) of the build's own
-//!   packages, not made by the compiler, exists (`<T as Tr>::m`, `Tr::m for T`: T's impl of Tr,
+//!   possible (what F writes)`, `type-join, possible (a value F stores ..)`) of a package of the
+//!   build (the program's or a dependency's; outside the standard library), not made by the
+//!   compiler, exists (`<T as Tr>::m`, `Tr::m for T`: T's impl of Tr,
 //!   or the trait's default body where T's impl writes no `m`) and can give X: its body names
 //!   X, or reads a parameter that can hold it (not an integer, a string, bytes), or, returning or
 //!   writing the object, has a result or a `&mut` parameter that can (a writer not replacing what
@@ -195,8 +196,9 @@
 //!   A `dyn` member is checked to be at a call on an object of its trait (where the receivers'
 //!   types are known), not on the object the coerced value reaches: moved to a call on another
 //!   object of the same trait, it is accepted.
-//! - Witness functions are checked in the build's own packages only, and by what their bodies
-//!   name and their signatures can carry, not by whether the call's value comes through them.
+//! - Witness functions are checked in the build's packages, not the standard library's, and by
+//!   what their bodies name and their signatures can carry, not by whether the call's value
+//!   comes through them.
 //! - A coercion's detail is checked as a coercion of the type to the trait on that line, not as
 //!   the one whose value reaches the call: of two lines coercing the same type to the same trait
 //!   (two generic functions boxing their `T`), a shift from one to the other is as true.
@@ -312,6 +314,8 @@ type ForeignParam<'a> = dyn FnMut(&[String], &str, usize) -> Option<String> + 'a
 struct Graph {
     /// bom-refs of the packages that are components of the CBOM
     packages: HashSet<String>,
+    /// a library's bom-ref -> its `name`, `version` and `purl`
+    libraries: HashMap<String, [String; 3]>,
     depends_on: HashMap<String, Vec<String>>,
     /// asset bom-ref -> package bom-refs providing it
     providers: HashMap<String, HashSet<String>>,
@@ -388,6 +392,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     };
     let mut graph = Graph {
         packages: HashSet::new(),
+        libraries: HashMap::new(),
         depends_on: HashMap::new(),
         providers: HashMap::new(),
         family: HashMap::new(),
@@ -408,6 +413,12 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         match c["type"].as_str() {
             Some("library" | "application") => {
                 graph.packages.insert(r.to_string());
+                if c["type"] == "library" {
+                    let f = |k: &str| c[k].as_str().unwrap_or("").to_string();
+                    graph
+                        .libraries
+                        .insert(r.to_string(), [f("name"), f("version"), f("purl")]);
+                }
             }
             Some("cryptographic-asset") => {
                 // or the property for a family `algorithmFamily` cannot say (`TLS-PRF`)
