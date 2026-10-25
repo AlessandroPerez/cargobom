@@ -475,6 +475,42 @@
       "version": "9.3.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via a24 -> chacha20poly1305 -> poly1305 -> opaque-debug",
+            "line": 378,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/password-hash@0.5.0",
       "evidence": {
         "occurrences": [
@@ -807,6 +843,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1444,7 +1484,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k2; use: verify; verify_password: its own parameters, not its receiver's; password: parameter (argument 0 of the enclosing function); line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
+            "additionalContext": "[reachable] [call] in a24::k2; use: verify; verify_password: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 44,
@@ -1476,7 +1516,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:registry-name",
@@ -1661,7 +1701,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of the enclosing function); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 35,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 22,
@@ -1675,7 +1715,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -1714,11 +1754,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -1758,7 +1798,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of the enclosing function); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 35,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 22,
@@ -1772,7 +1812,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -1811,11 +1851,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -1946,7 +1986,7 @@
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -1989,7 +2029,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "environment,parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2219,7 +2259,7 @@
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
@@ -2258,7 +2298,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2296,7 +2336,7 @@
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
@@ -2335,7 +2375,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2366,7 +2406,7 @@
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of the enclosing function); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
@@ -2405,7 +2445,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2425,7 +2465,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of the enclosing function) or unknown (too deep); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of the enclosing function) or unknown (too deep); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
             "line": 77,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 40,
@@ -2470,6 +2510,61 @@
         {
           "name": "rcbom:algorithm-family",
           "value": "HMAC"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a24::k1; use: generate; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "password_hash::salt::SaltString::generate"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -2627,7 +2722,7 @@
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -2694,7 +2789,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2719,7 +2814,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -2786,7 +2881,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2811,7 +2906,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -2878,7 +2973,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -2984,7 +3079,7 @@
             "symbol": "rsa::pss::Pss::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -3059,7 +3154,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -3092,7 +3187,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -3167,7 +3262,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -3192,7 +3287,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: parameter (argument 3 of the enclosing function); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
@@ -3267,7 +3362,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter,unknown"
         },
         {
           "name": "rcbom:occurrences",
@@ -3287,7 +3382,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; from_p_q: setup, not a use; key: computed (biguint::BigUint::from_bytes_be); key: computed (biguint::BigUint::from_bytes_be); line: `let key = RsaPrivateKey::from_p_q(BigUint::from_bytes_be(p), BigUint::from_bytes_be(q), BigUint::from(65537u32)).unwrap();`; code: `RsaPrivateKey::from_p_q`",
+            "additionalContext": "[reachable] [call] in a24::k4; from_p_q: setup, not a use; key: computed (biguint::BigUint::from_bytes_be); line: `let key = RsaPrivateKey::from_p_q(BigUint::from_bytes_be(p), BigUint::from_bytes_be(q), BigUint::from(65537u32)).unwrap();`; code: `RsaPrivateKey::from_p_q`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 14,
@@ -3308,7 +3403,7 @@
             "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`",
             "line": 41,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 19,
@@ -3340,7 +3435,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,environment,parameter"
+          "value": "computed,environment,parameter,unknown"
         },
         {
           "name": "rcbom:provenance:rng",
@@ -4055,6 +4150,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -4071,6 +4169,10 @@
         "crypto:material:secret-key:HMAC"
       ],
       "ref": "pkg:cargo/jsonwebtoken@9.3.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -4107,6 +4209,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
@@ -4132,6 +4235,9 @@
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -4382,6 +4488,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:material:private-key:RSA"
     },
     {
@@ -4459,6 +4569,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a24"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "239 calls into crypto packages: 49 cited, 190 excused (accessor 2, comparison 1, copy 1, encoding 4, entered 169, generator setup 5, public half 3, setup 3, view 2), 0 not cited"
       }
     ],
     "tools": {
@@ -4471,7 +4585,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:80790695-bf3c-89f7-bef2-7f0b43b75eb7",
+  "serialNumber": "urn:uuid:35fff9d8-e710-88de-b36b-7a89f4646060",
   "specVersion": "1.7",
   "version": 1
 }

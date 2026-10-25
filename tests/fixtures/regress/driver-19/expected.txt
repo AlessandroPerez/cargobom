@@ -9,7 +9,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:60:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `let _ = Aes256Gcm::new_from_slice(&k1);`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `let _ = Aes256Gcm::new_from_slice(&k2);`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:73:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::load::{closure#0}; new_from_slice: setup, not a use; key: environment (std::env::var); instantiated by t19::load at src/main.rs:68:24; line: `Aes256Gcm::new_from_slice(&key).is_ok() && n == 32`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:83:19 | aead::AeadInPlace::encrypt_in_place_detached | [reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 78) or rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b"", in_out);`; code: `encrypt_in_place_detached`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:83:19 | aead::AeadInPlace::encrypt_in_place_detached | [reachable] [call] in t19::buffers; use: encrypt; nonce: rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b"", in_out);`; code: `encrypt_in_place_detached`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:86:19 | aead::Aead::encrypt | [reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 85); line: `let _ = cipher.encrypt(Nonce::from_slice(&buf[..12]), msg.as_ref());`; code: `encrypt`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:127:12 | argon2::Argon2::<'key>::new | [reachable] [call] in t19::password_hashing; new: setup, not a use; line: `let c = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`
   occ Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | src/main.rs:127:60 | core::default::Default::default | [reachable] [call] in t19::password_hashing; default: setup, not a use; line: `let c = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`
@@ -49,6 +49,7 @@
   occ HKDF | crypto:candidate:hkdf@0.12.4:HKDF | Cargo.toml:17:0 | hkdf | [manifest] declared by t19 (dependencies)
   occ MD5 | crypto:candidate:md5@0.7.0:MD5 | Cargo.lock:402:0 | md5 | [manifest] locked md5 0.7.0; reached via t19 -> md5
   occ MD5 | crypto:candidate:md5@0.7.0:MD5 | Cargo.toml:26:0 | md5 | [manifest] declared by t19 (dependencies)
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:121:15 | password_hash::salt::SaltString::generate | [reachable] [call] in t19::password_hashing; use: generate; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:46:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::fill_out; use: generate; line: `OsRng.fill_bytes(o.buf);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:53:10 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::indirect; use: generate; line: `OsRng.fill_bytes(&mut fresh);`; code: `fill_bytes`
   occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:58:28 | rand_core::RngCore::fill_bytes | [reachable] [call] in t19::indirect::{closure#0}; use: generate; instantiated by t19::indirect at src/main.rs:58:19; line: `let mut fill = || OsRng.fill_bytes(&mut k1);`; code: `fill_bytes`
@@ -115,6 +116,7 @@
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:16:0 | hmac | [manifest] declared by t19 (dependencies)
   occ md5 | pkg:cargo/md5@0.7.0 | Cargo.lock:402:0 | md5 | [manifest] locked md5 0.7.0; reached via t19 -> md5
   occ md5 | pkg:cargo/md5@0.7.0 | Cargo.toml:26:0 | md5 | [manifest] declared by t19 (dependencies)
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:453:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via t19 -> aes-gcm -> ghash -> opaque-debug
   occ password-hash | pkg:cargo/password-hash@0.5.0 | Cargo.lock:459:0 | password-hash | [manifest] locked password-hash 0.5.0; reached via t19 -> argon2 -> password-hash
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.lock:470:0 | pbkdf2 | [manifest] locked pbkdf2 0.12.2; reached via t19 -> pbkdf2
   occ pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | Cargo.toml:18:0 | pbkdf2 | [manifest] declared by t19 (dependencies); features ["simple"]
@@ -268,7 +270,7 @@
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
-  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=3
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=4
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop PBKDF2-SHA-256-1000-32 | crypto:algorithm:PBKDF2-SHA-256-1000-32 | rcbom:confidence=high
@@ -413,6 +415,10 @@
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:crypto-role=algorithm
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:scope=required
   prop md5 | pkg:cargo/md5@0.7.0 | rcbom:usage=declared-not-used
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:crypto-role=trait
   prop password-hash | pkg:cargo/password-hash@0.5.0 | rcbom:scope=required
   prop pbkdf2 | pkg:cargo/pbkdf2@0.12.2 | rcbom:crypto-role=algorithm
@@ -549,6 +555,7 @@ component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5
 component library hkdf 0.12.4 | pkg:cargo/hkdf@0.12.4 | purl pkg:cargo/hkdf@0.12.4
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
 component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library password-hash 0.5.0 | pkg:cargo/password-hash@0.5.0 | purl pkg:cargo/password-hash@0.5.0
 component library pbkdf2 0.12.2 | pkg:cargo/pbkdf2@0.12.2 | purl pkg:cargo/pbkdf2@0.12.2
 component library pem-rfc7468 0.7.0 | pkg:cargo/pem-rfc7468@0.7.0 | purl pkg:cargo/pem-rfc7468@0.7.0
@@ -626,6 +633,7 @@ dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/signature@2.2.0
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
 dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hkdf@0.12.4 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
@@ -642,7 +650,9 @@ dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/pkcs8@0.10.2
 dep pkg:cargo/pkcs1@0.7.5 -> pkg:cargo/spki@0.7.3
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/der@0.7.10
 dep pkg:cargo/pkcs8@0.10.2 -> pkg:cargo/spki@0.7.3
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
@@ -746,6 +756,7 @@ dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hkdf@0.12.4
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/md5@0.7.0
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/password-hash@0.5.0
 dependency pkg:cargo/pbkdf2@0.12.2
 dependency pkg:cargo/pem-rfc7468@0.7.0
@@ -805,6 +816,7 @@ provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:candidate:x25519-dalek@2.0.1:x25
 root {"bom-ref": "pkg:cargo/t19@0.1.0", "name": "t19", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t19@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t19
+run rcbom:run:boundary-check=63 calls into crypto packages: 56 cited, 7 excused (generator setup 3, public half 1, setup 3), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=83
 run rcbom:run:profile=release

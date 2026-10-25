@@ -1101,6 +1101,42 @@
       "version": "0.2.3"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via rage -> age -> aes-gcm -> ghash -> opaque-debug",
+            "line": 1529,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/p256@0.13.2",
       "evidence": {
         "occurrences": [
@@ -2386,7 +2422,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::stream::Stream::new; new: setup, not a use; key: computed (protocol::Encryptor::with_recipients) or computed (protocol::Encryptor::with_user_passphrase) or parameter (argument 0 of the enclosing function); line: `aead: ChaCha20Poly1305::new(&key.0),`; code: `ChaCha20Poly1305::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::stream::Stream::new; new: setup, not a use; key: computed (protocol::Encryptor::with_recipients) or computed (protocol::Encryptor::with_user_passphrase) or parameter (argument 0 of Decryptor::decrypt::{closure#0}) or parameter (argument 0 of Encryptor::wrap_output::) or parameter (argument 0 of Stream::decrypt::) or parameter (argument 0 of Stream::encrypt::) or parameter (argument 0 of stream::Stream::decrypt) or parameter (argument 0 of the enclosing function); line: `aead: ChaCha20Poly1305::new(&key.0),`; code: `ChaCha20Poly1305::new`",
             "line": 99,
             "location": "age-0.12.1/src/primitives/stream.rs",
             "offset": 18,
@@ -2745,7 +2781,7 @@
             "symbol": "hkdf::Hkdf::<H, I>::extract"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::HmacWriter::new; new_from_slice: setup, not a use; key: computed (age::keys::mac_key) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `inner: Hmac::new_from_slice(key.0.expose_secret()).expect(\"key is the correct length\"),`; code: `Hmac::new_from_slice`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::primitives::HmacWriter::new; new_from_slice: setup, not a use; key: computed (age::keys::mac_key) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of format::HeaderV1::new) or parameter (argument 1 of format::HeaderV1::verify_mac); line: `inner: Hmac::new_from_slice(key.0.expose_secret()).expect(\"key is the correct length\"),`; code: `Hmac::new_from_slice`",
             "line": 33,
             "location": "age-0.12.1/src/primitives.rs",
             "offset": 19,
@@ -3163,7 +3199,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::read_ssh::openssh_rsa_privkey::{closure#0}; from_components: setup, not a use; key: parameter (argument 0 of the enclosing function); key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); instantiated by age::ssh::read_ssh::openssh_rsa_privkey at age-0.12.1/src/ssh.rs:354:16; line: `|(n, e, d, _iqmp, p, q)| rsa::RsaPrivateKey::from_components(n, e, d, vec![p, q]),`; code: `rsa::RsaPrivateKey::from_components`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::read_ssh::openssh_rsa_privkey::{closure#0}; from_components: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); instantiated by age::ssh::read_ssh::openssh_rsa_privkey at age-0.12.1/src/ssh.rs:354:16; line: `|(n, e, d, _iqmp, p, q)| rsa::RsaPrivateKey::from_components(n, e, d, vec![p, q]),`; code: `rsa::RsaPrivateKey::from_components`",
             "line": 354,
             "location": "age-0.12.1/src/ssh.rs",
             "offset": 41,
@@ -3872,7 +3908,6 @@
         "algorithmProperties": {
           "cryptoFunctions": [
             "decrypt",
-            "digest",
             "keygen",
             "unknown"
           ],
@@ -3883,6 +3918,20 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::main; use: unknown; algorithm unresolved: `age::i18n::localizer` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `age::localizer().select(&requested_languages).unwrap();`; code: `age::localizer`",
+            "line": 36,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 4,
+            "symbol": "age::i18n::localizer"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::main; use: unknown; algorithm unresolved: `age::cli_common::file_io::OutputWriter::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let output = file_io::OutputWriter::new(`; code: `file_io::OutputWriter::new`",
+            "line": 40,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 17,
+            "symbol": "age::cli_common::file_io::OutputWriter::new"
+          },
+          {
             "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::generate; use: keygen; algorithm unresolved: `age::native::x25519::Identity::generate` of age 0.12.1, a crypto package the knowledge base does not model; line: `let sk = age::x25519::Identity::generate();`; code: `age::x25519::Identity::generate`",
             "line": 57,
             "location": "src/bin/rage-keygen/main.rs",
@@ -3890,67 +3939,207 @@
             "symbol": "age::native::x25519::Identity::generate"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::convert; use: unknown; algorithm unresolved: `age::identity::IdentityFile::<C>::write_recipients_file` of age 0.12.1, a crypto package the knowledge base does not model; line: `file.write_recipients_file(output)`; code: `write_recipients_file`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::generate; use: unknown; algorithm unresolved: `age::native::x25519::Identity::to_public` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let pk = sk.to_public();`; code: `to_public`",
+            "line": 58,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 16,
+            "symbol": "age::native::x25519::Identity::to_public"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::generate; use: unknown; algorithm unresolved: `age::native::x25519::Identity::to_string` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `writeln!(output, \"{}\", sk.to_string().expose_secret())?;`; code: `to_string`",
+            "line": 67,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 30,
+            "symbol": "age::native::x25519::Identity::to_string"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::generate; use: unknown; algorithm unresolved: `age::cli_common::file_io::OutputWriter::is_terminal` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `if !output.is_terminal() {`; code: `is_terminal`",
+            "line": 69,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 15,
+            "symbol": "age::cli_common::file_io::OutputWriter::is_terminal"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::convert; use: unknown; algorithm unresolved: `age::identity::IdentityFile::<..>::from_input_reader` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let file = age::IdentityFile::from_input_reader(`; code: `age::IdentityFile::from_input_reader`",
+            "line": 77,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 15,
+            "symbol": "age::identity::IdentityFile::<age::NoCallbacks>::from_input_reader"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::convert; use: unknown; algorithm unresolved: `age::cli_common::file_io::InputReader::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `file_io::InputReader::new(filename).map_err(error::Error::FailedToOpenInput)?,`; code: `file_io::InputReader::new`",
+            "line": 78,
+            "location": "src/bin/rage-keygen/main.rs",
+            "offset": 8,
+            "symbol": "age::cli_common::file_io::InputReader::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage-keygen] in rage_keygen::convert; use: unknown; algorithm unresolved: `age::identity::IdentityFile::<C>::write_recipients_file` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `file.write_recipients_file(output)`; code: `write_recipients_file`",
             "line": 82,
             "location": "src/bin/rage-keygen/main.rs",
             "offset": 9,
             "symbol": "age::identity::IdentityFile::<C>::write_recipients_file"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::cli_common::recipients::read_recipients` of age 0.12.1, a crypto package the knowledge base does not model; line: `let recipients = read_recipients(`; code: `read_recipients`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::set_up_io; use: unknown; algorithm unresolved: `age::cli_common::file_io::InputReader::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let input = file_io::InputReader::new(input)?;`; code: `file_io::InputReader::new`",
+            "line": 48,
+            "location": "src/bin/rage/main.rs",
+            "offset": 16,
+            "symbol": "age::cli_common::file_io::InputReader::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::set_up_io; use: unknown; algorithm unresolved: `age::cli_common::file_io::OutputWriter::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `file_io::OutputWriter::new(output, true, output_format, 0o666, input.is_terminal())?;`; code: `file_io::OutputWriter::new`",
+            "line": 52,
+            "location": "src/bin/rage/main.rs",
+            "offset": 8,
+            "symbol": "age::cli_common::file_io::OutputWriter::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::set_up_io; use: unknown; algorithm unresolved: `age::cli_common::file_io::InputReader::is_terminal` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `file_io::OutputWriter::new(output, true, output_format, 0o666, input.is_terminal())?;`; code: `is_terminal`",
+            "line": 52,
+            "location": "src/bin/rage/main.rs",
+            "offset": 77,
+            "symbol": "age::cli_common::file_io::InputReader::is_terminal"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::cli_common::StdinGuard::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut stdin_guard = StdinGuard::new(is_stdin);`; code: `StdinGuard::new`",
+            "line": 120,
+            "location": "src/bin/rage/main.rs",
+            "offset": 26,
+            "symbol": "age::cli_common::StdinGuard::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::cli_common::read_or_generate_passphrase` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `match read_or_generate_passphrase() {`; code: `read_or_generate_passphrase`",
+            "line": 147,
+            "location": "src/bin/rage/main.rs",
+            "offset": 14,
+            "symbol": "age::cli_common::read_or_generate_passphrase"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::with_user_passphrase` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `Ok(Passphrase::Typed(passphrase)) => age::Encryptor::with_user_passphrase(passphrase),`; code: `age::Encryptor::with_user_passphrase`",
+            "line": 148,
+            "location": "src/bin/rage/main.rs",
+            "offset": 49,
+            "symbol": "age::protocol::Encryptor::with_user_passphrase"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::with_user_passphrase` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `age::Encryptor::with_user_passphrase(new_passphrase)`; code: `age::Encryptor::with_user_passphrase`",
+            "line": 152,
+            "location": "src/bin/rage/main.rs",
+            "offset": 16,
+            "symbol": "age::protocol::Encryptor::with_user_passphrase"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::cli_common::recipients::read_recipients` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let recipients = read_recipients(`; code: `read_recipients`",
             "line": 180,
             "location": "src/bin/rage/main.rs",
             "offset": 25,
             "symbol": "age::cli_common::recipients::read_recipients"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `wrap_output`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::with_recipients` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `age::Encryptor::with_recipients(recipients.iter().map(|r| r.as_ref() as _))?`; code: `age::Encryptor::with_recipients`",
+            "line": 188,
+            "location": "src/bin/rage/main.rs",
+            "offset": 8,
+            "symbol": "age::protocol::Encryptor::with_recipients"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::protocol::Encryptor::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `wrap_output`",
             "line": 191,
             "location": "src/bin/rage/main.rs",
             "offset": 31,
             "symbol": "age::protocol::Encryptor::wrap_output"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `ArmoredWriter::wrap_output`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::wrap_output` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut output = encryptor.wrap_output(ArmoredWriter::wrap_output(output, format)?)?;`; code: `ArmoredWriter::wrap_output`",
             "line": 191,
             "location": "src/bin/rage/main.rs",
             "offset": 43,
             "symbol": "age::primitives::armor::ArmoredWriter::<W>::wrap_output"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: digest; algorithm unresolved: `age::primitives::stream::StreamWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model; line: `.finish()`; code: `finish`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt; use: unknown; algorithm unresolved: `age::primitives::stream::StreamWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `.finish()`; code: `finish`",
             "line": 221,
             "location": "src/bin/rage/main.rs",
             "offset": 9,
             "symbol": "age::primitives::stream::StreamWriter::<W>::finish"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt::{closure#3}; use: digest; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model; instantiated by rage::encrypt at src/bin/rage/main.rs:222:18; line: `.and_then(|armor| armor.finish())`; code: `finish`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::encrypt::{closure#3}; use: unknown; algorithm unresolved: `age::primitives::armor::ArmoredWriter::<W>::finish` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by rage::encrypt at src/bin/rage/main.rs:222:18; line: `.and_then(|armor| armor.finish())`; code: `finish`",
             "line": 222,
             "location": "src/bin/rage/main.rs",
             "offset": 32,
             "symbol": "age::primitives::armor::ArmoredWriter::<W>::finish"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::identities::read_identities` of age 0.12.1, a crypto package the knowledge base does not model; line: `read_identities(opts.identity, opts.max_work_factor, &mut stdin_guard)?`; code: `read_identities`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::StdinGuard::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut stdin_guard = StdinGuard::new(is_stdin);`; code: `StdinGuard::new`",
+            "line": 265,
+            "location": "src/bin/rage/main.rs",
+            "offset": 26,
+            "symbol": "age::cli_common::StdinGuard::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::identities::read_identities` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `read_identities(opts.identity, opts.max_work_factor, &mut stdin_guard)?`; code: `read_identities`",
             "line": 271,
             "location": "src/bin/rage/main.rs",
             "offset": 8,
             "symbol": "age::cli_common::identities::read_identities"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::plugin::Identity::default_for_plugin` of age 0.12.1, a crypto package the knowledge base does not model; line: `&[plugin::Identity::default_for_plugin(plugin_name)?],`; code: `plugin::Identity::default_for_plugin`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::plugin::IdentityPluginV1::<C>::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `vec![Box::new(plugin::IdentityPluginV1::new(`; code: `plugin::IdentityPluginV1::new`",
+            "line": 274,
+            "location": "src/bin/rage/main.rs",
+            "offset": 22,
+            "symbol": "age::plugin::IdentityPluginV1::<C>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::plugin::Identity::default_for_plugin` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `&[plugin::Identity::default_for_plugin(plugin_name)?],`; code: `plugin::Identity::default_for_plugin`",
             "line": 276,
             "location": "src/bin/rage/main.rs",
             "offset": 14,
             "symbol": "age::plugin::Identity::default_for_plugin"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::read_secret` of age 0.12.1, a crypto package the knowledge base does not model; line: `match read_secret(&fl!(\"type-passphrase\"), &fl!(\"prompt-passphrase\"), None) {`; code: `read_secret`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::protocol::Decryptor::<R>::new_buffered` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let decryptor = age::Decryptor::new_buffered(ArmoredReader::new(input))?;`; code: `age::Decryptor::new_buffered`",
+            "line": 302,
+            "location": "src/bin/rage/main.rs",
+            "offset": 20,
+            "symbol": "age::protocol::Decryptor::<R>::new_buffered"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::primitives::armor::ArmoredReader::<..>::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let decryptor = age::Decryptor::new_buffered(ArmoredReader::new(input))?;`; code: `ArmoredReader::new`",
+            "line": 302,
+            "location": "src/bin/rage/main.rs",
+            "offset": 49,
+            "symbol": "age::primitives::armor::ArmoredReader::<alloc::io::buffered::bufreader::BufReader<R>>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::protocol::Decryptor::<R>::is_scrypt` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `if decryptor.is_scrypt() {`; code: `is_scrypt`",
+            "line": 304,
+            "location": "src/bin/rage/main.rs",
+            "offset": 17,
+            "symbol": "age::protocol::Decryptor::<R>::is_scrypt"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::cli_common::read_secret` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `match read_secret(&fl!(\"type-passphrase\"), &fl!(\"prompt-passphrase\"), None) {`; code: `read_secret`",
             "line": 318,
             "location": "src/bin/rage/main.rs",
             "offset": 14,
             "symbol": "age::cli_common::read_secret"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::native::scrypt::Identity::new` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut identity = scrypt::Identity::new(passphrase);`; code: `scrypt::Identity::new`",
+            "line": 320,
+            "location": "src/bin/rage/main.rs",
+            "offset": 35,
+            "symbol": "age::native::scrypt::Identity::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: unknown; algorithm unresolved: `age::native::scrypt::Identity::set_max_work_factor` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `identity.set_max_work_factor(max_work_factor);`; code: `set_max_work_factor`",
+            "line": 322,
+            "location": "src/bin/rage/main.rs",
+            "offset": 29,
+            "symbol": "age::native::scrypt::Identity::set_max_work_factor"
           },
           {
             "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::decrypt; use: decrypt; algorithm unresolved: `age::protocol::Decryptor::<R>::decrypt` of age 0.12.1, a crypto package the knowledge base does not model; line: `.decrypt(Some(&identity as _).into_iter())`; code: `decrypt`",
@@ -3965,6 +4154,13 @@
             "location": "src/bin/rage/main.rs",
             "offset": 13,
             "symbol": "age::protocol::Decryptor::<R>::decrypt"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in rage::main; use: unknown; algorithm unresolved: `age::i18n::localizer` of age 0.12.1, a crypto package the knowledge base does not model: what the call does is not known; line: `age::localizer().select(&requested_languages).unwrap();`; code: `age::localizer`",
+            "line": 371,
+            "location": "src/bin/rage/main.rs",
+            "offset": 4,
+            "symbol": "age::i18n::localizer"
           }
         ]
       },
@@ -4004,7 +4200,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "12"
+          "value": "35"
         }
       ],
       "type": "cryptographic-asset"
@@ -4152,7 +4348,7 @@
             "symbol": "core::convert::Into::into"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::identity::UnencryptedKey::unwrap_stanza; into: setup, not a use; key: computed (ssh::EncryptedKey::decrypt) or parameter (argument 0 of age::Identity::unwrap_stanzas) or parameter (argument 0 of the enclosing function) or unknown (too deep); line: `sk.into()`; code: `into`",
+            "additionalContext": "[reachable] [call] [artifacts: bin rage] in age::ssh::identity::UnencryptedKey::unwrap_stanza; into: setup, not a use; key: computed (ssh::EncryptedKey::decrypt) or parameter (argument 0 of ::unwrap_stanza) or parameter (argument 0 of ::unwrap_stanzas::{closure#0}) or parameter (argument 0 of Decryptor::obtain_payload_key::{closure#0}) or parameter (argument 0 of age::Identity::unwrap_stanzas) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of Decryptor::decrypt::) or parameter (argument 1 of Decryptor::obtain_payload_key::) or unknown (too deep); line: `sk.into()`; code: `into`",
             "line": 114,
             "location": "age-0.12.1/src/ssh/identity.rs",
             "offset": 23,
@@ -4569,6 +4765,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -4638,6 +4835,10 @@
       "ref": "pkg:cargo/ml-kem@0.2.3"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/elliptic-curve@0.13.8",
         "pkg:cargo/primeorder@0.13.6"
@@ -4671,12 +4872,14 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -4998,6 +5201,10 @@
       {
         "name": "rcbom:run:walk-check",
         "value": "bin rage-keygen: linked 18123, walked 18853; not walked 844: entry 6, std 732, modelled 88, constructor 18, other 0, gap 0"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "322 calls into crypto packages: 132 cited, 190 excused (accessor 9, copy 1, encoding 11, generator setup 7, internal 159, public half 1, setup 1, step 1), 0 not cited"
       }
     ],
     "tools": {
@@ -5010,7 +5217,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3acb1356-92da-8948-92e1-ee6da1e9d588",
+  "serialNumber": "urn:uuid:c18e0a5d-a8f9-8d36-9896-675e5285d1d2",
   "specVersion": "1.7",
   "version": 1
 }

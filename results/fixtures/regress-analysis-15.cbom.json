@@ -853,6 +853,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via a15 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 436,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/password-hash@0.5.0",
       "evidence": {
         "occurrences": [
@@ -1149,6 +1185,10 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.6.4",
@@ -1818,14 +1858,14 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `lazy.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `lazy.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`",
             "line": 146,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: parameter (argument 1 of the enclosing function); line: `+ once.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `+ once.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`",
             "line": 147,
             "location": "src/main.rs",
             "offset": 15,
@@ -2769,6 +2809,61 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a15::a2; use: generate; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`",
+            "line": 31,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "password_hash::salt::SaltString::generate"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:material:private-key:RSA-2048",
       "cryptoProperties": {
         "assetType": "related-crypto-material",
@@ -3431,6 +3526,62 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:blake3",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate",
+            "keyderive"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a15::a4; use: generate or keyderive; algorithm unresolved: `blake3::OutputReader::fill` of blake3 1.8.5, an API the knowledge base does not name; line: `h.finalize_xof().fill(&mut key);`; code: `fill`",
+            "line": 54,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "blake3::OutputReader::fill"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -3519,7 +3670,8 @@
         "pkg:cargo/constant_time_eq@0.4.2"
       ],
       "provides": [
-        "crypto:algorithm:BLAKE3"
+        "crypto:algorithm:BLAKE3",
+        "crypto:algorithm:unknown:unknown:blake3"
       ],
       "ref": "pkg:cargo/blake3@1.8.5"
     },
@@ -3627,10 +3779,14 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -3643,6 +3799,10 @@
         "crypto:algorithm:HMAC-SHA-256"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -3675,6 +3835,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -3700,6 +3861,9 @@
     {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
     },
@@ -3808,6 +3972,18 @@
     },
     {
       "dependsOn": [
+        "crypto:algorithm:OS-RNG"
+      ],
+      "ref": "crypto:material:private-key:RSA-2048"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:OS-RNG"
+      ],
+      "ref": "crypto:material:private-key:RSA-3072"
+    },
+    {
+      "dependsOn": [
         "crypto:algorithm:SHA-1",
         "crypto:algorithm:SHA-256"
       ],
@@ -3871,11 +4047,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:material:private-key:RSA-2048"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:material:private-key:RSA-3072"
+      "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
@@ -3892,6 +4064,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:blake3"
     }
   ],
   "metadata": {
@@ -3944,6 +4120,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a15"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "82 calls into crypto packages: 74 cited, 8 excused (accessor 1, encoding 2, generator setup 3, public half 2), 0 not cited"
       }
     ],
     "tools": {
@@ -3956,7 +4136,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2afe7c40-1dd6-82d3-bfda-93240789841e",
+  "serialNumber": "urn:uuid:1b85f78b-6b0f-8b3c-8dcc-c39f65fb546f",
   "specVersion": "1.7",
   "version": 1
 }

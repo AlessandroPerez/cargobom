@@ -111,14 +111,14 @@
             "symbol": "ring::aead::algorithm::AES_128_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static a14::GCM128` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_128_GCM; member: type-join, possible (a value `static a14::GCM128` stores in the field); key: environment (std::env::args) or parameter (argument 1 of a14::Gcm::key) or parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::make_key; new: setup, not a use; algorithm from ring::aead::algorithm::AES_128_GCM in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::make_key; new: setup, not a use; algorithm from ring::aead::algorithm::AES_128_GCM in the arguments; key: environment (std::env::args) or parameter (argument 0 of a14::seal_with) or parameter (argument 0 of the enclosing function); line: `let unbound = UnboundKey::new(&aead::AES_128_GCM, k).map_err(|_| Error)?;`; code: `UnboundKey::new`",
             "line": 107,
             "location": "src/main.rs",
             "offset": 18,
@@ -212,7 +212,7 @@
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static a14::GCM256` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::Alg::key; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static a14::GCM256` stores in the field); key: environment (std::env::args) or parameter (argument 1 of a14::Gcm::key) or parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 8,
@@ -312,7 +312,7 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in a14::ChaCha::key; new: setup, not a use; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `static a14::CHACHA` stores in the field); key: parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a14::ChaCha::key; new: setup, not a use; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `static a14::CHACHA` stores in the field); key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `UnboundKey::new(self.0.0, k).unwrap()`; code: `UnboundKey::new`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 8,
@@ -351,7 +351,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -376,7 +376,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a14::key_pair; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING in the arguments; key: parameter (argument 0 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a14::key_pair; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING in the arguments; key: environment (std::env::args) or parameter (argument 0 of a14::Signer::new) or parameter (argument 0 of the enclosing function); line: `EcdsaKeyPair::from_pkcs8(&signature::ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8, rng)`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 4,
@@ -422,7 +422,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -743,6 +743,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a14"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "24 calls into crypto packages: 11 cited, 13 excused (generator setup 1, public half 1, setup 6, view 5), 0 not cited"
       }
     ],
     "tools": {
@@ -755,7 +759,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cd7a351c-bc1c-84ff-8d29-ef73aff9fbc0",
+  "serialNumber": "urn:uuid:64c50bf7-8137-8583-a92b-3f5672455882",
   "specVersion": "1.7",
   "version": 1
 }

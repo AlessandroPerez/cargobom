@@ -481,7 +481,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha1::Sha1` of sha1 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 1 of the enclosing function); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha1::Sha1` of sha1 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
             "line": 104,
             "location": "src/algorithm.rs",
             "offset": 25,
@@ -538,7 +538,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 1 of the enclosing function); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
             "line": 104,
             "location": "src/algorithm.rs",
             "offset": 25,
@@ -723,6 +723,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib totp-rs"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "4 calls into crypto packages: 3 cited, 1 excused (accessor 1), 0 not cited"
       }
     ],
     "tools": {
@@ -735,7 +739,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f1962f4f-d581-8da9-b353-f2eb21d72c0a",
+  "serialNumber": "urn:uuid:10616c65-994d-8582-ac24-48fd5e96e209",
   "specVersion": "1.7",
   "version": 1
 }

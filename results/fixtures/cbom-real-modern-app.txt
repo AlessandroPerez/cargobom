@@ -9,6 +9,7 @@
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:94:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via cbom-real-modern-app -> chacha20poly1305 -> aead -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:105:0 | digest | [manifest] locked digest 0.10.7; reached via cbom-real-modern-app -> sha1 -> digest
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:131:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via cbom-real-modern-app -> ring -> getrandom
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:157:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via cbom-real-modern-app -> chacha20poly1305 -> poly1305 -> opaque-debug
   occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:163:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via cbom-real-modern-app -> chacha20poly1305 -> poly1305
   occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:174:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via cbom-real-modern-app -> chacha20poly1305 -> aead -> crypto-common -> rand_core
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:183:0 | ring | [manifest] locked ring 0.17.14; reached via cbom-real-modern-app -> ring
@@ -56,6 +57,10 @@
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=declared-not-used
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=present
@@ -89,6 +94,7 @@ component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
 component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
@@ -111,6 +117,7 @@ dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/zeroize@1.8.2
 dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
@@ -128,6 +135,7 @@ dependency pkg:cargo/cipher@0.4.4
 dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/poly1305@0.8.0
 dependency pkg:cargo/rand_core@0.6.4
 dependency pkg:cargo/ring@0.17.14
@@ -144,6 +152,7 @@ provides pkg:cargo/sha1@0.10.6 -> crypto:algorithm:SHA-1
 root {"bom-ref": "pkg:cargo/cbom-real-modern-app@0.1.0", "name": "cbom-real-modern-app", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/cbom-real-modern-app@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin cbom-real-modern-app
+run rcbom:run:boundary-check=2 calls into crypto packages: 2 cited, 0 excused (), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=28
 run rcbom:run:profile=release

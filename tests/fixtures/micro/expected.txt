@@ -1,11 +1,11 @@
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:13:16 | aead::AeadCore::generate_nonce | [reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:14:11 | aead::Aead::encrypt | [reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `cipher.encrypt(&nonce, msg).expect("encrypt")`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:25:8 | micro::seal | [reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<Aes256Gcm>(&self.0, msg)`; code: `seal::<Aes256Gcm>`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:40:29 | ring::aead::unbound_key::UnboundKey::new | [reachable] [call] in micro::ring_seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 88) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:40:46 | ring::aead::algorithm::AES_256_GCM | [reachable] [static] in micro::ring_seal; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:42:6 | ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag | [reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 41); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`
-  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:12:17 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let cipher = A::new_from_slice(key).expect("key length");`; code: `A::new_from_slice`
   occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:13:16 | aead::AeadCore::generate_nonce | [reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`
   occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:14:11 | aead::Aead::encrypt | [reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `cipher.encrypt(&nonce, msg).expect("encrypt")`; code: `encrypt`
   occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:30:8 | micro::seal | [reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<ChaCha20Poly1305>(&self.0, msg)`; code: `seal::<ChaCha20Poly1305>`
@@ -44,6 +44,7 @@
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:168:0 | ghash | [manifest] locked ghash 0.5.1; reached via micro -> aes-gcm -> ghash
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:178:0 | hmac | [manifest] locked hmac 0.12.1; reached via micro -> hmac
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:12:0 | hmac | [manifest] declared by micro (dependencies)
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:214:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via micro -> aes-gcm -> ghash -> opaque-debug
   occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:220:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via micro -> chacha20poly1305 -> poly1305
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:231:0 | polyval | [manifest] locked polyval 0.6.2; reached via micro -> aes-gcm -> ghash -> polyval
   occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:243:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via micro -> aes-gcm -> aead -> crypto-common -> rand_core
@@ -146,6 +147,10 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
   prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
@@ -195,6 +200,7 @@ component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/diges
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
@@ -226,6 +232,7 @@ dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/micro@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
@@ -234,7 +241,9 @@ dep pkg:cargo/micro@0.1.0 -> pkg:cargo/hmac@0.12.1
 dep pkg:cargo/micro@0.1.0 -> pkg:cargo/ring@0.17.14
 dep pkg:cargo/micro@0.1.0 -> pkg:cargo/sha1@0.10.7
 dep pkg:cargo/micro@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
@@ -263,6 +272,7 @@ dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hmac@0.12.1
 dependency pkg:cargo/micro@0.1.0
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/poly1305@0.8.0
 dependency pkg:cargo/polyval@0.6.2
 dependency pkg:cargo/rand_core@0.6.4
@@ -290,6 +300,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/micro@0.1.0", "name": "micro", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/micro@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin micro
+run rcbom:run:boundary-check=15 calls into crypto packages: 11 cited, 4 excused (setup 3, view 1), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=35
 run rcbom:run:profile=release

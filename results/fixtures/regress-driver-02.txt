@@ -19,6 +19,7 @@
   occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:87:0 | ctr | [manifest] locked ctr 0.9.2; reached via t2 -> aes-gcm -> ctr
   occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:112:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via t2 -> ring -> getrandom
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:123:0 | ghash | [manifest] locked ghash 0.5.1; reached via t2 -> aes-gcm -> ghash
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:148:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via t2 -> aes-gcm -> ghash -> opaque-debug
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:154:0 | polyval | [manifest] locked polyval 0.6.2; reached via t2 -> aes-gcm -> ghash -> polyval
   occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:166:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via t2 -> aes-gcm -> aead -> crypto-common -> rand_core
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:175:0 | ring | [manifest] locked ring 0.17.14; reached via t2 -> ring
@@ -65,6 +66,10 @@
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
   prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
@@ -92,6 +97,7 @@ component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg
 component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
 component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
@@ -108,7 +114,9 @@ dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
 dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
 dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
@@ -126,6 +134,7 @@ dependency pkg:cargo/crypto-common@0.1.7
 dependency pkg:cargo/ctr@0.9.2
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/polyval@0.6.2
 dependency pkg:cargo/rand_core@0.6.4
 dependency pkg:cargo/ring@0.17.14
@@ -142,6 +151,7 @@ provides pkg:cargo/rand_core@0.6.4 -> crypto:algorithm:OS-RNG
 root {"bom-ref": "pkg:cargo/t2@0.1.0", "name": "t2", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t2@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t2
+run rcbom:run:boundary-check=13 calls into crypto packages: 11 cited, 2 excused (setup 1, view 1), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=26
 run rcbom:run:profile=release

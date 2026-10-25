@@ -1,7 +1,7 @@
   occ AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via d28 -> aes-gcm
   occ AES-GCM | crypto:candidate:aes-gcm@0.10.3:AES-GCM | Cargo.toml:9:0 | aes-gcm | [manifest] declared by d28 (dependencies)
   occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/lib.rs:24:6 | rand::seq::SliceRandom::shuffle | [reachable] [call] in d28::t; use: generate; line: `v.shuffle(&mut rand::thread_rng()); // ChaCha12-RNG`; code: `shuffle`
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:33:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:33:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of d28::mac256) or parameter (argument 0 of the enclosing function); instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:34:6 | digest::mac::Mac::update | [reachable] [call] in d28::mac::<..>; use: tag; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.update(d); // HMAC-SHA-256 only: the library's own instance`; code: `update`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:35:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in d28::mac::<..>; into_bytes: setup, not a use; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `into_bytes`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:35:6 | digest::mac::Mac::finalize | [reachable] [call] in d28::mac::<..>; use: tag; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `finalize`
@@ -28,6 +28,7 @@
   occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:137:0 | ghash | [manifest] locked ghash 0.5.1; reached via d28 -> aes-gcm -> ghash
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:147:0 | hmac | [manifest] locked hmac 0.12.1; reached via d28 -> hmac
   occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:10:0 | hmac | [manifest] declared by d28 (dependencies)
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:171:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via d28 -> aes-gcm -> ghash -> opaque-debug
   occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:177:0 | polyval | [manifest] locked polyval 0.6.2; reached via d28 -> aes-gcm -> ghash -> polyval
   occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:189:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via d28 -> rand -> rand_chacha -> ppv-lite86
   occ rand | pkg:cargo/rand@0.8.5 | Cargo.lock:216:0 | rand | [manifest] locked rand 0.8.5; reached via d28 -> rand
@@ -101,6 +102,10 @@
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
   prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
   prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=declared-not-used
@@ -158,6 +163,7 @@ component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/diges
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
 component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
 component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
 component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
 component library rand 0.8.5 | pkg:cargo/rand@0.8.5 | purl pkg:cargo/rand@0.8.5
@@ -185,8 +191,10 @@ dep pkg:cargo/d28@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
 dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
 dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
 dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_chacha@0.3.1
 dep pkg:cargo/rand@0.8.5 -> pkg:cargo/rand_core@0.6.4
@@ -215,6 +223,7 @@ dependency pkg:cargo/digest@0.10.7
 dependency pkg:cargo/getrandom@0.2.17
 dependency pkg:cargo/ghash@0.5.1
 dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/opaque-debug@0.3.1
 dependency pkg:cargo/polyval@0.6.2
 dependency pkg:cargo/ppv-lite86@0.2.21
 dependency pkg:cargo/rand@0.8.5
@@ -237,6 +246,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/d28@0.1.0", "name": "d28", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d28@0.1.0", "type": "library", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=lib d28
+run rcbom:run:boundary-check=5 calls into crypto packages: 5 cited, 0 excused (), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=29
 run rcbom:run:profile=release

@@ -1,0 +1,152 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:16 | digest::digest::Digest::digest | [reachable] [call] in d31::Limiter::nonce; use: digest; line: `let h = Sha256::digest(self.ctr.to_le_bytes());`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:33:24 | digest::digest::Digest::digest | [reachable] [call] in d31::main; use: digest; line: `let key: [u8; 32] = Sha256::digest(std::env::args().collect::<String>()).into();`; code: `Sha256::digest`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:25:21 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in d31::Limiter::seal; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let cipher = XChaCha20Poly1305::new_from_slice(&self.key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:27:25 | aead::AeadInPlace::encrypt_in_place_detached | [reachable] [call] in d31::Limiter::seal; use: encrypt; nonce: computed (d31::Limiter::nonce); line: `let tag = cipher.encrypt_in_place_detached(iv, b"", body).unwrap();`; code: `encrypt_in_place_detached`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via d31 -> chacha20poly1305 -> aead
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:16:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via d31 -> sha2 -> digest -> block-buffer
+  occ chacha20 | pkg:cargo/chacha20@0.9.1 | Cargo.lock:31:0 | chacha20 | [manifest] locked chacha20 0.9.1; reached via d31 -> chacha20poly1305 -> chacha20
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.lock:42:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.10.1; reached via d31 -> chacha20poly1305
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | Cargo.toml:9:0 | chacha20poly1305 | [manifest] declared by d31 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:55:0 | cipher | [manifest] locked cipher 0.4.4; reached via d31 -> chacha20poly1305 -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:75:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via d31 -> chacha20poly1305 -> aead -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:94:0 | digest | [manifest] locked digest 0.10.7; reached via d31 -> sha2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:114:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via d31 -> chacha20poly1305 -> aead -> crypto-common -> rand_core -> getrandom
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:140:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via d31 -> chacha20poly1305 -> poly1305 -> opaque-debug
+  occ poly1305 | pkg:cargo/poly1305@0.8.0 | Cargo.lock:146:0 | poly1305 | [manifest] locked poly1305 0.8.0; reached via d31 -> chacha20poly1305 -> poly1305
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:157:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via d31 -> chacha20poly1305 -> aead -> crypto-common -> rand_core
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:166:0 | sha2 | [manifest] locked sha2 0.10.9; reached via d31 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:10:0 | sha2 | [manifest] declared by d31 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:177:0 | subtle | [manifest] locked subtle 2.6.1; reached via d31 -> chacha20poly1305 -> poly1305 -> universal-hash -> subtle
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:189:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via d31 -> chacha20poly1305 -> poly1305 -> universal-hash
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:211:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via d31 -> chacha20poly1305 -> zeroize
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:confidence=high
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:occurrences=2
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:param:nonce_bytes=24
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:key=environment,parameter
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:nonce=computed
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.9.1 | rcbom:usage=reachable
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:crypto-role=algorithm
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:scope=required
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.10.1 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=declared-not-used
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:crypto-role=algorithm
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:scope=required
+  prop poly1305 | pkg:cargo/poly1305@0.8.0 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library chacha20 0.9.1 | pkg:cargo/chacha20@0.9.1 | purl pkg:cargo/chacha20@0.9.1
+component library chacha20poly1305 0.10.1 | pkg:cargo/chacha20poly1305@0.10.1 | purl pkg:cargo/chacha20poly1305@0.10.1
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
+component library poly1305 0.8.0 | pkg:cargo/poly1305@0.8.0 | purl pkg:cargo/poly1305@0.8.0
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/chacha20@0.9.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/chacha20@0.9.1
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/poly1305@0.8.0
+dep pkg:cargo/chacha20poly1305@0.10.1 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/d31@0.1.0 -> pkg:cargo/chacha20poly1305@0.10.1
+dep pkg:cargo/d31@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/opaque-debug@0.3.1
+dep pkg:cargo/poly1305@0.8.0 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:XChaCha20-Poly1305
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/chacha20@0.9.1
+dependency pkg:cargo/chacha20poly1305@0.10.1
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/d31@0.1.0
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/opaque-debug@0.3.1
+dependency pkg:cargo/poly1305@0.8.0
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/universal-hash@0.5.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/chacha20@0.9.1 -> crypto:algorithm:XChaCha20-Poly1305
+provides pkg:cargo/chacha20poly1305@0.10.1 -> crypto:algorithm:XChaCha20-Poly1305
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/d31@0.1.0", "name": "d31", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d31@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin d31
+run rcbom:run:boundary-check=4 calls into crypto packages: 4 cited, 0 excused (), 0 not cited
+run rcbom:run:features=
+run rcbom:run:packages=23
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=144
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

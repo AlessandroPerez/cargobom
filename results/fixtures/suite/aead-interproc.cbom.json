@@ -189,6 +189,42 @@
       "version": "0.2.17"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via pilot-aead-interproc -> chacha20poly1305 -> poly1305 -> opaque-debug",
+            "line": 113,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/poly1305@0.8.0",
       "evidence": {
         "occurrences": [
@@ -378,7 +414,7 @@
             "symbol": "pilot_aead_interproc::seal"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_interproc::seal::<..>; use: encrypt; nonce: parameter (argument 1 of the enclosing function); instantiated by pilot_aead_interproc::protect::<..> at src/main.rs:10:4 as `seal`; instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect`; line: `cipher.encrypt(nonce, msg).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in pilot_aead_interproc::seal::<..>; use: encrypt; nonce: hard-coded (default value) or parameter (argument 1 of the enclosing function); instantiated by pilot_aead_interproc::protect::<..> at src/main.rs:10:4 as `seal`; instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect`; line: `cipher.encrypt(nonce, msg).unwrap()`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
@@ -504,6 +540,10 @@
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/chacha20poly1305@0.10.1"
       ],
@@ -511,6 +551,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
@@ -591,6 +632,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin pilot-aead-interproc"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "3 calls into crypto packages: 3 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -603,7 +648,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:59afd70e-a331-8eec-abb4-2033bdb52517",
+  "serialNumber": "urn:uuid:ea7c6ae2-9fa2-8e29-a194-6ac7cc98acde",
   "specVersion": "1.7",
   "version": 1
 }

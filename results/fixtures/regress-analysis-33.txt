@@ -4,6 +4,8 @@
   occ unknown | crypto:algorithm:unknown:drbg:rand | src/main.rs:5:17 | rand::random | [reachable] [call] in probe33::main; use: generate; algorithm unresolved: `rand::random` of rand 0.4.6, a version the knowledge base does not cover; line: `let a: u64 = rand::random();`; code: `rand::random`
   occ unknown | crypto:algorithm:unknown:drbg:rand | src/main.rs:7:19 | rand::Rng::gen | [reachable] [call] in probe33::main; use: generate; algorithm unresolved: the type `rand::ThreadRng` of rand 0.4.6, a version the knowledge base does not cover; line: `let b: u32 = r.gen();`; code: `gen`
   occ unknown | crypto:algorithm:unknown:drbg:rand | src/main.rs:9:6 | rand::Rng::fill_bytes | [reachable] [call] in probe33::main; use: generate; algorithm unresolved: the type `rand::ThreadRng` of rand 0.4.6, a version the knowledge base does not cover; line: `r.fill_bytes(&mut buf);`; code: `fill_bytes`
+  occ unknown | crypto:algorithm:unknown:unknown:rand | src/main.rs:10:16 | rand::os::OsRng::new | [reachable] [call] in probe33::main; use: unknown; algorithm unresolved: `rand::os::OsRng::new` of rand 0.4.6, a version the knowledge base does not cover: what the call does is not known; line: `let mut o = rand::OsRng::new().unwrap();`; code: `rand::OsRng::new`
+  occ unknown | crypto:algorithm:unknown:unknown:rand | src/main.rs:6:16 | rand::thread_rng | [reachable] [call] in probe33::main; use: unknown; algorithm unresolved: `rand::thread_rng` of rand 0.4.6, a version the knowledge base does not cover: what the call does is not known; line: `let mut r = rand::thread_rng();`; code: `rand::thread_rng`
   prop rand | pkg:cargo/rand@0.4.6 | rcbom:crypto-role=algorithm
   prop rand | pkg:cargo/rand@0.4.6 | rcbom:kb-coverage=unsupported-version
   prop rand | pkg:cargo/rand@0.4.6 | rcbom:scope=required
@@ -15,19 +17,30 @@
   prop unknown | crypto:algorithm:unknown:drbg:rand | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:drbg:rand | rcbom:occurrences=4
   prop unknown | crypto:algorithm:unknown:drbg:rand | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:unknown:rand | rcbom:reachability=reachable
 asset unknown | crypto:algorithm:unknown:drbg:rand | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:rand | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library rand 0.4.6 | pkg:cargo/rand@0.4.6 | purl pkg:cargo/rand@0.4.6
 dep pkg:cargo/probe33@0.1.0 -> pkg:cargo/rand@0.4.6
 dependency crypto:algorithm:unknown:drbg:rand
+dependency crypto:algorithm:unknown:unknown:rand
 dependency pkg:cargo/probe33@0.1.0
 dependency pkg:cargo/rand@0.4.6
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
 provides pkg:cargo/rand@0.4.6 -> crypto:algorithm:unknown:drbg:rand
+provides pkg:cargo/rand@0.4.6 -> crypto:algorithm:unknown:unknown:rand
 root {"bom-ref": "pkg:cargo/probe33@0.1.0", "name": "probe33", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe33@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin probe33
+run rcbom:run:boundary-check=6 calls into crypto packages: 6 cited, 0 excused (), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=3
 run rcbom:run:profile=release

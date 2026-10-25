@@ -515,7 +515,7 @@
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: computed (minisign::helpers::get_password) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of the enclosing function); salt: computed (minisign::helpers::store_u64_le) or computed (secret_key::SecretKey::from_base64) or computed (secret_key::SecretKey::read_checksum) or hard-coded (static minisign::constants::KDF_ALG) or parameter (argument 0 of the enclosing function) or rng (getrandom::fill); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: computed (minisign::helpers::get_password) or parameter (argument 0 of keypair::KeyPair::generate_encrypted_keypair) or parameter (argument 1 of secret_key::SecretKey::from_box) or parameter (argument 1 of secret_key::SecretKey::from_box_) or parameter (argument 1 of secret_key::SecretKey::from_file) or parameter (argument 1 of secret_key::SecretKeyBox::into_secret_key) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of keypair::KeyPair::generate_and_write_encrypted_keypair); salt: computed (secret_key::SecretKey::from_base64) or parameter (argument 0 of the enclosing function) or rng (getrandom::fill); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
             "line": 138,
             "location": "src/secret_key.rs",
             "offset": 8,
@@ -563,11 +563,7 @@
         },
         {
           "name": "rcbom:provenance:salt",
-          "value": "computed,hard-coded,parameter,rng"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-salt"
+          "value": "computed,parameter,rng"
         },
         {
           "name": "rcbom:occurrences",
@@ -718,6 +714,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib minisign"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "5 calls into crypto packages: 5 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -730,7 +730,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:88ef5a18-69c3-8b1b-b4c4-f65167031838",
+  "serialNumber": "urn:uuid:ffd203cb-e77f-81cf-ad96-75e879a5ed03",
   "specVersion": "1.7",
   "version": 1
 }

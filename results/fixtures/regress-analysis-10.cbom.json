@@ -2069,6 +2069,61 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:unknown:unknown:aws-lc-rs",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in t10::literal_keys; use: encrypt; algorithm unresolved: the result of `aws_lc_rs::aead::quic::HeaderProtectionKey::new`; line: `let _mask = hp.new_mask(&[0u8; 16]);`; code: `new_mask`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "aws_lc_rs::aead::quic::HeaderProtectionKey::new_mask"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:x25519",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -2179,6 +2234,7 @@
         "crypto:algorithm:SHA3-512",
         "crypto:algorithm:TLS12-PRF-SHA-256",
         "crypto:algorithm:TLS12-PRF-SHA-384",
+        "crypto:algorithm:unknown:unknown:aws-lc-rs",
         "crypto:algorithm:x25519"
       ],
       "ref": "pkg:cargo/aws-lc-rs@1.18.1"
@@ -2324,6 +2380,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:aws-lc-rs"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:x25519"
     }
   ],
@@ -2377,6 +2437,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin t10"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "56 calls into crypto packages: 37 cited, 19 excused (generator setup 2, public half 2, setup 7, view 8), 0 not cited"
       }
     ],
     "tools": {
@@ -2389,7 +2453,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c50d4c57-2f4e-8168-a5a5-4323606bf495",
+  "serialNumber": "urn:uuid:a187b880-1046-85b5-9190-c49962cf45ad",
   "specVersion": "1.7",
   "version": 1
 }

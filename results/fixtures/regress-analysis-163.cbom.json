@@ -305,6 +305,10 @@
         {
           "name": "rcbom:kb-coverage",
           "value": "unsupported-version"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.10.1",
@@ -441,6 +445,61 @@
         }
       ],
       "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:rand+rand_core",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a163::new::draws; use: unknown; algorithm unresolved: `rand_core::seedable_rng::SeedableRng::seed_from_u64` of rand_core 0.10.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut s = SmallRng::seed_from_u64(7);`; code: `SmallRng::seed_from_u64`",
+            "line": 25,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "rand_core::seedable_rng::SeedableRng::seed_from_u64"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -488,7 +547,8 @@
         "pkg:cargo/rand_core@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:drbg:rand"
+        "crypto:algorithm:unknown:drbg:rand",
+        "crypto:algorithm:unknown:unknown:rand+rand_core"
       ],
       "ref": "pkg:cargo/rand@0.10.2"
     },
@@ -510,6 +570,9 @@
     },
     {
       "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:rand+rand_core"
+      ],
       "ref": "pkg:cargo/rand_core@0.10.1"
     },
     {
@@ -519,6 +582,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:drbg:rand"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:rand+rand_core"
     }
   ],
   "metadata": {
@@ -571,6 +638,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a163"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "11 calls into crypto packages: 6 cited, 5 excused (generator setup 3, not crypto 2), 0 not cited"
       }
     ],
     "tools": {
@@ -583,7 +654,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:14474de9-90b5-8872-aafe-16bc2795e96b",
+  "serialNumber": "urn:uuid:eff6b6e4-4441-8f5c-916f-2572a1adf859",
   "specVersion": "1.7",
   "version": 1
 }

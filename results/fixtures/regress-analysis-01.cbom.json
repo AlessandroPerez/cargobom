@@ -760,6 +760,42 @@
       "version": "0.12.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via t1 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 370,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/password-hash@0.5.0",
       "evidence": {
         "occurrences": [
@@ -2843,6 +2879,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -2865,6 +2902,10 @@
         "crypto:algorithm:HMAC-SHA-512/256"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -2907,12 +2948,14 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -3165,6 +3208,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin t1"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "28 calls into crypto packages: 27 cited, 1 excused (encoding 1), 0 not cited"
       }
     ],
     "tools": {
@@ -3177,7 +3224,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:79637de3-40fc-8abd-8657-33d17bd31eac",
+  "serialNumber": "urn:uuid:ecbe0b54-ca97-8a47-a549-0288a36dbf6f",
   "specVersion": "1.7",
   "version": 1
 }

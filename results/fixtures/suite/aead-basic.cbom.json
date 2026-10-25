@@ -253,6 +253,42 @@
       "version": "0.5.1"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via pilot-aead-basic -> aes-gcm -> ghash -> opaque-debug",
+            "line": 132,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/polyval@0.6.2",
       "evidence": {
         "occurrences": [
@@ -524,9 +560,14 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -536,6 +577,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -612,6 +654,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin pilot-aead-basic"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "3 calls into crypto packages: 3 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -624,7 +670,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e319c8d0-6ef5-8a8e-adce-aacf1c12f47f",
+  "serialNumber": "urn:uuid:b772ab0a-1389-85b9-ad30-ecf083508fc0",
   "specVersion": "1.7",
   "version": 1
 }

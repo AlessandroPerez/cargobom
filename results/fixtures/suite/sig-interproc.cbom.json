@@ -119,7 +119,7 @@
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; key: computed (pilot_sig_interproc::signing_alg) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or rng (rand::SystemRandom::new); line: `EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), rng).unwrap()`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; key: computed (pilot_sig_interproc::signing_alg) or parameter (argument 0 of pilot_sig_interproc::issue) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or rng (rand::SystemRandom::new); line: `EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), rng).unwrap()`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
@@ -338,6 +338,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin pilot-sig-interproc"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "10 calls into crypto packages: 5 cited, 5 excused (generator setup 1, public half 1, view 3), 0 not cited"
       }
     ],
     "tools": {
@@ -350,7 +354,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:28bbd32a-ea51-8842-899a-69cc7e13688a",
+  "serialNumber": "urn:uuid:4142ef12-daeb-814d-9298-5a8daed5dc3f",
   "specVersion": "1.7",
   "version": 1
 }

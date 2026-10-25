@@ -339,7 +339,7 @@
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 8,
@@ -385,7 +385,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -432,7 +432,7 @@
             "symbol": "aws_lc_rs::signature::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 8,
@@ -486,7 +486,7 @@
         },
         {
           "name": "rcbom:provenance:public-key",
-          "value": "parameter"
+          "value": "environment,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1109,6 +1109,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a17"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "30 calls into crypto packages: 17 cited, 13 excused (public half 1, setup 9, view 3), 0 not cited"
       }
     ],
     "tools": {
@@ -1121,7 +1125,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ba399604-f88c-8cee-9424-5062a7860657",
+  "serialNumber": "urn:uuid:6a11048b-d589-8cff-86e0-1c1a3f57abf6",
   "specVersion": "1.7",
   "version": 1
 }

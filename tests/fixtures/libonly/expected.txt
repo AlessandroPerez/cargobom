@@ -1,4 +1,4 @@
-  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:13:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in libonly::tag::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function); instantiated by libonly::tag_sha256 at src/lib.rs:20:4 as `tag::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:13:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in libonly::tag::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of libonly::tag_sha256) or parameter (argument 0 of the enclosing function); instantiated by libonly::tag_sha256 at src/lib.rs:20:4 as `tag::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(key).unwrap();`; code: `<M as Mac>::new_from_slice`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:14:6 | digest::mac::Mac::update | [reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20:4 as `tag::<Hmac<Sha256>>`; line: `m.update(data);`; code: `update`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:15:17 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in libonly::tag::<..>; into_bytes: setup, not a use; instantiated by libonly::tag_sha256 at src/lib.rs:20:4 as `tag::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`
   occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/lib.rs:15:6 | digest::mac::Mac::finalize | [reachable] [call] in libonly::tag::<..>; use: tag; instantiated by libonly::tag_sha256 at src/lib.rs:20:4 as `tag::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`
@@ -100,6 +100,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/libonly@0.1.0", "name": "libonly", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/libonly@0.1.0", "type": "library", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=lib libonly
+run rcbom:run:boundary-check=5 calls into crypto packages: 5 cited, 0 excused (), 0 not cited
 run rcbom:run:features=
 run rcbom:run:packages=13
 run rcbom:run:profile=release

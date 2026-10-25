@@ -309,7 +309,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a165::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 16); key: hard-coded (32 bytes, literal at line 16); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a165::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 16); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 18,
@@ -386,14 +386,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model; line: `let shared = MontgomeryPoint(out).mul_clamped(secret);`; code: `mul_clamped`",
+            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let shared = MontgomeryPoint(out).mul_clamped(secret);`; code: `mul_clamped`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped"
           },
           {
-            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model; line: `let public = MontgomeryPoint::mul_base_clamped(secret);`; code: `MontgomeryPoint::mul_base_clamped`",
+            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let public = MontgomeryPoint::mul_base_clamped(secret);`; code: `MontgomeryPoint::mul_base_clamped`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 17,
@@ -439,9 +439,7 @@
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
-            "digest",
-            "keyderive",
-            "tag"
+            "unknown"
           ],
           "primitive": "unknown"
         },
@@ -450,7 +448,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a165::main; use: digest or keyderive or tag; algorithm unresolved: `tiny_keccak::Hasher::finalize` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model; line: `h.finalize(&mut out);`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::sha3::Sha3::v256` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut h = Sha3::v256();`; code: `Sha3::v256`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "tiny_keccak::sha3::Sha3::v256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::Hasher::finalize` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `h.finalize(&mut out);`; code: `finalize`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 6,
@@ -486,7 +491,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -614,6 +619,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin a165"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "13 calls into crypto packages: 7 cited, 6 excused (internal 5, step 1), 0 not cited"
       }
     ],
     "tools": {
@@ -626,7 +635,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:530b453f-ae36-8d80-b3b1-db7e055f26be",
+  "serialNumber": "urn:uuid:89843bd4-24d2-8ebc-ad40-a8dc22f8b931",
   "specVersion": "1.7",
   "version": 1
 }

@@ -970,6 +970,42 @@
       "version": "0.7.0"
     },
     {
+      "bom-ref": "pkg:cargo/opaque-debug@0.3.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked opaque-debug 0.3.1; reached via t19 -> aes-gcm -> ghash -> opaque-debug",
+            "line": 453,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "opaque-debug"
+          }
+        ]
+      },
+      "name": "opaque-debug",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/opaque-debug@0.3.1",
+      "type": "library",
+      "version": "0.3.1"
+    },
+    {
       "bom-ref": "pkg:cargo/password-hash@0.5.0",
       "evidence": {
         "occurrences": [
@@ -1880,7 +1916,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: hard-coded (all zero, literal at line 78) or rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b\"\", in_out);`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in t19::buffers; use: encrypt; nonce: rng (rand_core::RngCore::try_fill_bytes); line: `let _ = cipher.encrypt_in_place_detached(&nonce, b\"\", in_out);`; code: `encrypt_in_place_detached`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 19,
@@ -2767,6 +2803,13 @@
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "rand_core::RngCore::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in t19::password_hashing; use: generate; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`",
+            "line": 121,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "password_hash::salt::SaltString::generate"
           }
         ]
       },
@@ -2798,7 +2841,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -3800,6 +3843,7 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/polyval@0.6.2"
       ],
       "ref": "pkg:cargo/ghash@0.5.1"
@@ -3825,6 +3869,10 @@
         "crypto:candidate:md5@0.7.0:MD5"
       ],
       "ref": "pkg:cargo/md5@0.7.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/opaque-debug@0.3.1"
     },
     {
       "dependsOn": [
@@ -3869,12 +3917,14 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/poly1305@0.8.0"
     },
     {
       "dependsOn": [
+        "pkg:cargo/opaque-debug@0.3.1",
         "pkg:cargo/universal-hash@0.5.1"
       ],
       "ref": "pkg:cargo/polyval@0.6.2"
@@ -4209,6 +4259,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin t19"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "63 calls into crypto packages: 56 cited, 7 excused (generator setup 3, public half 1, setup 3), 0 not cited"
       }
     ],
     "tools": {
@@ -4221,7 +4275,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:850d02e1-0c26-8f3c-a91f-be161a2df7e2",
+  "serialNumber": "urn:uuid:30e23488-f087-8b96-bf67-a1b97f66dd13",
   "specVersion": "1.7",
   "version": 1
 }

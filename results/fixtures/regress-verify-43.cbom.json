@@ -597,7 +597,7 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA1 => Algorithm::hash(HmacSha1::new_from_slice(key).unwrap(), data),`; code: `HmacSha1::new_from_slice`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: computed (totp_rs::TOTP::new) or parameter (argument 0 of totp_rs::TOTP::check) or parameter (argument 0 of totp_rs::TOTP::check_current) or parameter (argument 0 of totp_rs::TOTP::generate) or parameter (argument 0 of totp_rs::TOTP::generate_current) or parameter (argument 0 of totp_rs::TOTP::sign) or parameter (argument 0 of v43::main::{closure#1}) or parameter (argument 1 of the enclosing function); line: `Algorithm::SHA1 => Algorithm::hash(HmacSha1::new_from_slice(key).unwrap(), data),`; code: `HmacSha1::new_from_slice`",
             "line": 134,
             "location": "totp-rs-5.7.0/src/lib.rs",
             "offset": 47,
@@ -633,7 +633,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -678,7 +678,7 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA256 => Algorithm::hash(HmacSha256::new_from_slice(key).unwrap(), data),`; code: `HmacSha256::new_from_slice`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: computed (totp_rs::TOTP::new) or parameter (argument 0 of totp_rs::TOTP::check) or parameter (argument 0 of totp_rs::TOTP::check_current) or parameter (argument 0 of totp_rs::TOTP::generate) or parameter (argument 0 of totp_rs::TOTP::generate_current) or parameter (argument 0 of totp_rs::TOTP::sign) or parameter (argument 0 of v43::main::{closure#1}) or parameter (argument 1 of the enclosing function); line: `Algorithm::SHA256 => Algorithm::hash(HmacSha256::new_from_slice(key).unwrap(), data),`; code: `HmacSha256::new_from_slice`",
             "line": 135,
             "location": "totp-rs-5.7.0/src/lib.rs",
             "offset": 49,
@@ -714,7 +714,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -759,7 +759,7 @@
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: parameter (argument 1 of the enclosing function); line: `Algorithm::SHA512 => Algorithm::hash(HmacSha512::new_from_slice(key).unwrap(), data),`; code: `HmacSha512::new_from_slice`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v43] in totp_rs::Algorithm::sign; new_from_slice: setup, not a use; key: computed (totp_rs::TOTP::new) or parameter (argument 0 of totp_rs::TOTP::check) or parameter (argument 0 of totp_rs::TOTP::check_current) or parameter (argument 0 of totp_rs::TOTP::generate) or parameter (argument 0 of totp_rs::TOTP::generate_current) or parameter (argument 0 of totp_rs::TOTP::sign) or parameter (argument 0 of v43::main::{closure#1}) or parameter (argument 1 of the enclosing function); line: `Algorithm::SHA512 => Algorithm::hash(HmacSha512::new_from_slice(key).unwrap(), data),`; code: `HmacSha512::new_from_slice`",
             "line": 136,
             "location": "totp-rs-5.7.0/src/lib.rs",
             "offset": 49,
@@ -795,7 +795,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "value": "computed,parameter"
         },
         {
           "name": "rcbom:occurrences",
@@ -1178,7 +1178,8 @@
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
-            "keygen"
+            "keygen",
+            "unknown"
           ],
           "primitive": "unknown"
         },
@@ -1186,6 +1187,13 @@
       },
       "evidence": {
         "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin v43] in v43::main; use: unknown; algorithm unresolved: `totp_rs::TOTP::new` of totp-rs 5.7.0, a crypto package the knowledge base does not model: what the call does is not known; line: `let otp = totp_rs::TOTP::new(totp_rs::Algorithm::SHA256, 6, 1, 30, vec![7u8; 16])`; code: `totp_rs::TOTP::new`",
+            "line": 66,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "totp_rs::TOTP::new"
+          },
           {
             "additionalContext": "[reachable] [call] [artifacts: bin v43] in v43::main::{closure#1}; use: keygen; algorithm unresolved: `totp_rs::TOTP::generate` of totp-rs 5.7.0, a crypto package the knowledge base does not model; instantiated by v43::main at src/main.rs:67:13; line: `.map(|t| t.generate(59))`; code: `generate`",
             "line": 67,
@@ -1227,7 +1235,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -1449,6 +1457,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "lib lib43"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "14 calls into crypto packages: 14 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -1461,7 +1473,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9ec3a26f-e078-850c-b318-b9d8bdee9297",
+  "serialNumber": "urn:uuid:ef2b8084-4ae0-80c6-83ac-87578103f719",
   "specVersion": "1.7",
   "version": 1
 }

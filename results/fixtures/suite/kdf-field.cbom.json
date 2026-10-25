@@ -165,7 +165,7 @@
             "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_field::hash_password; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA384, reaching the call from another function; member: object, from `pilot_kdf_field::policy`; salt: hard-coded (11 bytes, literal at line 20); password: parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf, p.iterations, b\"tenant-salt\", pw.as_bytes(), &mut out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_field::hash_password; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA384, reaching the call from another function; member: object, from `pilot_kdf_field::policy`; salt: hard-coded (11 bytes, literal at line 20); password: hard-coded (9 bytes, literal at line 26) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf, p.iterations, b\"tenant-salt\", pw.as_bytes(), &mut out);`; code: `pbkdf2::derive`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 4,
@@ -197,7 +197,11 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter"
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
         },
         {
           "name": "rcbom:provenance:salt",
@@ -361,6 +365,10 @@
       {
         "name": "rcbom:run:artifact",
         "value": "bin pilot-kdf-field"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "1 calls into crypto packages: 1 cited, 0 excused (), 0 not cited"
       }
     ],
     "tools": {
@@ -373,7 +381,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2e75a1fc-1b57-8023-81f8-5cfbc4bea2f8",
+  "serialNumber": "urn:uuid:7b36a680-0db5-891d-813c-f0b107a5b2f6",
   "specVersion": "1.7",
   "version": 1
 }
