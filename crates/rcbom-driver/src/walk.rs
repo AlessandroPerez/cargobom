@@ -222,6 +222,8 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             static_refs: Vec::new(),
             static_seen: HashSet::new(),
             sites: Vec::new(),
+            boundary: Vec::new(),
+            callers: HashMap::new(),
             fns: Vec::new(),
             paths: Vec::new(),
             shims: Vec::new(),
@@ -283,6 +285,22 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut shims = std::mem::take(&mut self.shims);
         shims.sort();
         shims.dedup();
+        // whose code each call runs for; one per position, callee and that (a generic
+        // function's instances call alike)
+        let mut memo = HashMap::new();
+        let mut boundary: Vec<rcbom_facts::BoundaryEdge> = std::mem::take(&mut self.boundary)
+            .into_iter()
+            .map(|(inst, mut e)| {
+                e.on_behalf = self.behalf(inst, &mut memo, 0);
+                e
+            })
+            .collect();
+        boundary.sort_by(|a, b| {
+            (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
+        });
+        boundary.dedup_by(|a, b| {
+            a.span == b.span && a.callee.path == b.callee.path && a.on_behalf == b.on_behalf
+        });
         let tcx = self.cx.tcx;
         let crates = self
             .crates
@@ -302,6 +320,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             crates,
             crates_complete: !truncated && usage_complete,
             points_to: None,
+            boundary,
         }
     }
 
@@ -316,12 +335,63 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         ) {
             return;
         }
+        if let Some((from, ..)) = &from {
+            let c = self.callers.entry(inst).or_default();
+            if !c.contains(from) {
+                c.push(*from);
+            }
+        }
         if self.seen.insert(inst) {
             if let Some(f) = from {
                 self.parent.insert(inst, f);
             }
             self.queue.push_back((inst, false));
         }
+    }
+
+    /// Whose code an instance runs for (`BoundaryEdge::on_behalf`): an algorithm's, when it is
+    /// an algorithm crate's or a crate implementing one, or is reached only from such code
+    /// (p384's `Scalar::random`, from elliptic-curve's `SecretKey::random`); a crypto package's,
+    /// when it is one's or is reached only from crypto code (nom's parser run on age's closure).
+    /// Code a root or the program reaches, or a cycle, runs for the program.
+    fn behalf(
+        &self,
+        inst: Instance,
+        memo: &mut HashMap<Instance, Option<rcbom_facts::Behalf>>,
+        depth: usize,
+    ) -> Option<rcbom_facts::Behalf> {
+        use rcbom_facts::Behalf;
+        if let Some(b) = memo.get(&inst) {
+            return *b;
+        }
+        let tcx = self.cx.tcx;
+        let krate = rustc_internal::internal(tcx, inst.def.def_id()).krate;
+        if self.cx.stop_crate(krate) || self.cx.impl_crate(krate) {
+            memo.insert(inst, Some(Behalf::Algorithm));
+            return Some(Behalf::Algorithm);
+        }
+        let own = self.cx.kb_crate(krate).then_some(Behalf::Package);
+        // what reaches it, on every way (a cycle is the program's until shown otherwise)
+        memo.insert(inst, own);
+        let callers = self.callers.get(&inst).cloned().unwrap_or_default();
+        let mut reached = (!callers.is_empty() && depth <= 32).then_some(Behalf::Algorithm);
+        for c in &callers {
+            match (self.behalf(*c, memo, depth + 1), reached) {
+                (None, _) => {
+                    reached = None;
+                    break;
+                }
+                (Some(Behalf::Package), Some(_)) => reached = Some(Behalf::Package),
+                _ => {}
+            }
+        }
+        let b = match (reached, own) {
+            (Some(Behalf::Algorithm), _) => Some(Behalf::Algorithm),
+            (_, Some(b)) => Some(b),
+            (r, None) => r,
+        };
+        memo.insert(inst, b);
+        b
     }
 
     /// Enqueues an instance a stop crate's code calls, walked for usage only: standard-library
@@ -553,6 +623,11 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 lookup,
             );
             sc.visit_body(scanned);
+            self.boundary.extend(
+                std::mem::take(&mut sc.boundary)
+                    .into_iter()
+                    .map(|e| (inst, e)),
+            );
             let mut statics = std::mem::take(&mut sc.statics);
             if item_body.is_some() {
                 let mut v = AllocStatics(Vec::new());

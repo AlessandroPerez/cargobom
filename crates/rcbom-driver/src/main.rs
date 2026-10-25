@@ -18,6 +18,10 @@
 //!   RCBOM_STOP_CRATES  crates whose bodies the reachability walk records no sites in (algorithm
 //!                      implementations: the call into them is the fact, not their internals);
 //!                      their code is followed only to learn which crates run
+//!   RCBOM_SEMANTICS    what the knowledge base's `[semantics]` says the driver needs, one
+//!                      `key=a,b` per line: `fills`, the random fills that write a whole buffer
+//!                      (`fill_bytes`, `getrandom`); `generators`, how random generators' type
+//!                      names end (`Rng`)
 //!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
 //!   RCBOM_SYSROOT      sysroot of the pinned toolchain (else asked from the wrapped rustc)
 //!   RCBOM_DEBUG        if set, print each panic the analysis catches (message and location),
@@ -705,6 +709,8 @@ struct Scanner<'a, 'tcx> {
     /// The body is of a library's generic function its users can call, or of a closure in one
     /// (`lib_generic`): no instance of the library's own may show its calls.
     lib_generic: bool,
+    /// In a walked body, its calls into a crate of the crypto set (`Reach::boundary`).
+    boundary: Vec<rcbom_facts::BoundaryEdge>,
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
@@ -728,6 +734,11 @@ struct Walker<'a, 'tcx> {
     static_refs: Vec<DefRef>,
     static_seen: HashSet<String>,
     sites: Vec<Site>,
+    /// The walked code's calls into a crate of the crypto set (`Reach::boundary`), with the
+    /// instance making each.
+    boundary: Vec<(Instance, rcbom_facts::BoundaryEdge)>,
+    /// Every instance an instance is reached from (`parent` keeps the first).
+    callers: HashMap<Instance, Vec<Instance>>,
     /// Owner ids of the instances whose bodies were walked.
     fns: Vec<String>,
     /// Defining paths of the walked functions.

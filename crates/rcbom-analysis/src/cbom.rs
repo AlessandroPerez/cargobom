@@ -674,6 +674,9 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
     for w in &run.walk_check {
         run_props.push(prop("rcbom:run:walk-check", w));
     }
+    if an.layer2 {
+        run_props.push(prop("rcbom:run:boundary-check", an.coverage.summary()));
+    }
     // the root package is the BOM's subject: `metadata.component`, the same bom-ref the
     // dependency graph starts from, and not also among the components
     let root_component = root.and_then(|r| {

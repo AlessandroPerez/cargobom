@@ -51,6 +51,8 @@ struct Raw {
     enums: Vec<EnumRaw>,
     #[serde(rename = "part", default)]
     parts: Vec<PartEntry>,
+    #[serde(rename = "aside", default)]
+    asides: Vec<AsideRaw>,
     #[serde(default)]
     unmodelled: UnmodelledRaw,
     #[serde(default)]
@@ -93,6 +95,40 @@ struct SemanticsRaw {
     block_modes: Vec<String>,
     #[serde(default)]
     fixed_defaults: Vec<String>,
+    #[serde(default)]
+    algorithm_getters: Vec<String>,
+    #[serde(default)]
+    output_steps: Vec<String>,
+    #[serde(default)]
+    buffer_fills: Vec<String>,
+    #[serde(default)]
+    generator_suffixes: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AsideRaw {
+    name: String,
+    #[serde(default)]
+    traits: Vec<String>,
+    #[serde(rename = "crate", default)]
+    krate: Vec<String>,
+    #[serde(default)]
+    path: Option<String>,
+    why: String,
+}
+
+/// Calls into a crypto package that are no operation and set up no asset: methods of the
+/// `traits` (any type's: a view, a copy, a wipe), or of the crates `krate` whose path inside
+/// the crate `pattern` matches. `name` says which kind, for the boundary check's report.
+#[derive(Debug)]
+pub struct AsideEntry {
+    pub name: String,
+    /// Why such a call needs no occurrence.
+    pub why: String,
+    pub traits: Vec<String>,
+    pub krate: Vec<String>,
+    pub pattern: Option<Regex>,
 }
 
 /// Layer 1 for packages without `[[crate]]` entries: which are cryptographic anyway.
@@ -106,9 +142,13 @@ struct UnmodelledRaw {
     #[serde(default)]
     not_crypto: Vec<String>,
     #[serde(default)]
-    setup_methods: Vec<String>,
+    generic_methods: Vec<String>,
     #[serde(default)]
-    setup_prefixes: Vec<String>,
+    steps: Vec<String>,
+    #[serde(default)]
+    step_traits: Vec<String>,
+    #[serde(default)]
+    relays: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -520,6 +560,8 @@ struct ProtocolRaw {
     versions: BTreeMap<String, String>,
     suites: String,
     groups: String,
+    #[serde(default)]
+    not_suites: Option<String>,
 }
 
 /// A call that configures a protocol stack (`rustls::ClientConfig::builder`).
@@ -535,6 +577,8 @@ pub struct ProtocolEntry {
     /// Names of the protocol crate's statics that are cipher suites, and key-exchange groups.
     pub suites: Regex,
     pub groups: Regex,
+    /// Of the statics `suites` matches, those that are no suite (rustls's `_INTERNAL` halves).
+    pub not_suites: Option<Regex>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -566,22 +610,40 @@ pub struct Kb {
     pub boundaries: Vec<BoundaryEntry>,
     pub enums: Vec<EnumEntry>,
     pub parts: Vec<PartEntry>,
+    /// Calls into a crypto package that are no operation and set up no asset (`[[aside]]`).
+    pub asides: Vec<AsideEntry>,
     /// Packages without `[[crate]]` entries that are cryptographic although their metadata does
     /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
     pub unmodelled_crypto: Vec<String>,
     pub unmodelled_support: Vec<String>,
     /// Types of modelled crates that compute no cryptography (rand's `SmallRng`), by name.
     pub not_crypto: Vec<String>,
-    /// Of a crypto package without entries, the methods that set something up (`new`,
-    /// `from_der`, `with_key`): by name, and by prefix.
-    pub unmodelled_setup_methods: Vec<String>,
-    pub unmodelled_setup_prefixes: Vec<String>,
+    /// Method names that say nothing about cryptography without a modelled type to scope them
+    /// (`write`, `finish`), and of those the steps of a computation (`update`).
+    pub generic_methods: Vec<String>,
+    pub steps: Vec<String>,
+    /// Traits whose methods are steps of a stream (`io::Read`, `io::Write`), by defining path.
+    pub step_traits: Vec<String>,
+    /// Crypto packages without entries whose own calls are no operations: wrappers of a
+    /// modelled protocol crate (tokio-rustls) and types and parsers of PKI data.
+    pub relays: Vec<String>,
     /// Packages whose APIs draw from the generator they are given (rand's `shuffle`).
     pub draws: Vec<String>,
     /// Modes of operation over a block cipher, whose keystream is the block cipher's (ctr).
     pub block_modes: Vec<String>,
     /// Packages whose types' `Default` values are constants (generic-array).
     pub fixed_defaults: Vec<String>,
+    /// Methods of a crypto crate's types that return the descriptor a value was made with
+    /// (ring's `key.algorithm()`).
+    pub algorithm_getters: Vec<String>,
+    /// Methods that output what a key derivation's expansion made (ring's `Okm::fill`), whose
+    /// length descriptor, given at the expansion, names the algorithm.
+    pub output_steps: Vec<String>,
+    /// Methods that write every byte of the buffers they are given by `&mut`, or fail (random
+    /// fills: `fill_bytes`, `getrandom`), and the endings of random generators' type names
+    /// (`Rng`): the driver's (`RCBOM_SEMANTICS`).
+    pub buffer_fills: Vec<String>,
+    pub generator_suffixes: Vec<String>,
     /// The crates of the build being analysed, by name: the package each one comes from. Set
     /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
     /// library is named `md5`, like the package md5's).
@@ -703,6 +765,7 @@ impl Kb {
                         versions: p.versions,
                         suites: pat(&p.suites)?,
                         groups: pat(&p.groups)?,
+                        not_suites: p.not_suites.as_deref().map(pat).transpose()?,
                     })
                 })
                 .collect::<Result<_>>()?,
@@ -815,14 +878,38 @@ impl Kb {
                 })
                 .collect(),
             parts: raw.parts,
+            asides: raw
+                .asides
+                .into_iter()
+                .map(|a| {
+                    Ok(AsideEntry {
+                        name: a.name,
+                        why: a.why,
+                        traits: a.traits,
+                        krate: a.krate,
+                        pattern: a
+                            .path
+                            .as_deref()
+                            .map(Regex::new)
+                            .transpose()
+                            .with_context(|| format!("[[aside]] {:?}", a.path))?,
+                    })
+                })
+                .collect::<Result<_>>()?,
             unmodelled_crypto: raw.unmodelled.crypto,
             unmodelled_support: raw.unmodelled.support,
             not_crypto: raw.unmodelled.not_crypto,
-            unmodelled_setup_methods: raw.unmodelled.setup_methods,
-            unmodelled_setup_prefixes: raw.unmodelled.setup_prefixes,
+            generic_methods: raw.unmodelled.generic_methods,
+            steps: raw.unmodelled.steps,
+            step_traits: raw.unmodelled.step_traits,
+            relays: raw.unmodelled.relays,
             draws: raw.semantics.draws,
             block_modes: raw.semantics.block_modes,
             fixed_defaults: raw.semantics.fixed_defaults,
+            algorithm_getters: raw.semantics.algorithm_getters,
+            output_steps: raw.semantics.output_steps,
+            buffer_fills: raw.semantics.buffer_fills,
+            generator_suffixes: raw.semantics.generator_suffixes,
             crate_packages: Default::default(),
         };
         kb.validate()?;
@@ -1082,15 +1169,48 @@ impl Kb {
         })
     }
 
-    /// Is a method of a crypto package without entries one that sets something up (a
-    /// constructor, a conversion, an accessor), not an operation (`[unmodelled]`'s
-    /// `setup_methods`, `setup_prefixes`)?
-    pub fn unmodelled_setup(&self, method: &str) -> bool {
-        self.unmodelled_setup_methods.iter().any(|m| m == method)
-            || self
-                .unmodelled_setup_prefixes
-                .iter()
-                .any(|p| method.starts_with(p.as_str()))
+    /// Does a method name say nothing about cryptography without a modelled type to scope it
+    /// (`[unmodelled]`'s `generic_methods`: a `write` is a hash update on a `Sha256` but plain
+    /// output on age's `ArmoredWriter`)?
+    pub fn generic_method(&self, method: &str) -> bool {
+        self.generic_methods.iter().any(|m| m == method)
+    }
+
+    /// Is a method name a step of a computation, no operation even on a modelled crate's type
+    /// (`[unmodelled]`'s `steps`; R8.2: `Digest::update`, md5's `consume`)?
+    pub fn step(&self, method: &str) -> bool {
+        self.steps.iter().any(|m| m == method)
+    }
+
+    /// Is a method of this trait (its defining path) a step of a stream (`[unmodelled]`'s
+    /// `step_traits`: reading from or writing into it)?
+    pub fn step_trait(&self, trait_path: Option<&str>) -> bool {
+        trait_path.is_some_and(|t| self.step_traits.iter().any(|x| x == t))
+    }
+
+    /// The `[[aside]]` a call is: of a method of one of its traits, or of its crate at a path it
+    /// names (`path`: inside the crate, generic arguments removed).
+    pub fn aside(&self, krate: &str, path: &str, trait_path: Option<&str>) -> Option<&AsideEntry> {
+        self.asides.iter().find(|a| {
+            trait_path.is_some_and(|t| a.traits.iter().any(|x| x == t))
+                || (a.krate.iter().any(|k| k.replace('-', "_") == krate)
+                    && a.pattern.as_ref().is_some_and(|p| p.is_match(path)))
+        })
+    }
+
+    /// Is the crate (by its rustc name) a crypto package whose own calls are no operations
+    /// (`[unmodelled]`'s `relays`)?
+    pub fn relay(&self, krate: &str) -> bool {
+        Self::lists(&self.relays, krate)
+    }
+
+    /// What the driver takes from `[semantics]` (`RCBOM_SEMANTICS`): one `key=a,b` per line.
+    pub fn driver_semantics(&self) -> String {
+        format!(
+            "fills={}\ngenerators={}\n",
+            self.buffer_fills.join(","),
+            self.generator_suffixes.join(",")
+        )
     }
 
     /// Is the crate (by its rustc name) one of the packages listed: `[semantics]`'s lists.

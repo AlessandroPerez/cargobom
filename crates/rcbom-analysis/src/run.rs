@@ -69,6 +69,20 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 .collect()
         },
         flow,
+        behalf: {
+            let mut m: HashMap<(String, usize, usize), bool> = HashMap::new();
+            for e in facts
+                .iter()
+                .filter_map(|f| f.reach.as_ref())
+                .flat_map(|r| &r.boundary)
+            {
+                let all = m
+                    .entry((e.span.file.clone(), e.span.line, e.span.col))
+                    .or_insert(true);
+                *all &= e.on_behalf.is_some();
+            }
+            m
+        },
         fields: facts
             .iter()
             .flat_map(|f| f.fields.iter().map(|(k, v)| (k.clone(), v.clone())))
@@ -540,7 +554,8 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         continue;
                     }
                     let n = last(d);
-                    if suites.is_match(&n) && !n.ends_with("_INTERNAL") {
+                    if suites.is_match(&n) && !p.not_suites.as_ref().is_some_and(|r| r.is_match(&n))
+                    {
                         if let Some(b) = backend_in_path(&d.path, &kb_backends) {
                             entry.suite_backends.insert(b.to_string());
                         }
@@ -1113,6 +1128,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     if std::env::var_os("RCBOM_DEBUG").is_some() {
         eprintln!("analysis: sites in {:.1?}", main_pass.elapsed());
     }
+    let coverage = coverage::check(&ctx, man, facts, &assets, &protocols);
     Analysis {
         assets,
         protocols,
@@ -1121,6 +1137,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         instances,
         artifacts,
         layer2: true,
+        coverage,
     }
 }
 

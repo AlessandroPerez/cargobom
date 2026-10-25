@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 31;
+pub const FACTS_VERSION: u32 = 32;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -885,6 +885,54 @@ pub struct Reach {
     /// What the points-to analysis (`RCBOM_PTA`) found, when it ran.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub points_to: Option<PointsTo>,
+    /// The calls of the walked code into a crate of the crypto set other than the caller's: the
+    /// edges a CBOM accounts for (`rcbom:run:boundary-check`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub boundary: Vec<BoundaryEdge>,
+}
+
+/// A call of walked code into a crate of the crypto set (`RCBOM_KB_CRATES`: the knowledge
+/// base's crates and the unmodelled crypto packages) other than the caller's, by the function
+/// it resolves to: an implementation for a known type is its crate's (`<orion::aead::SecretKey
+/// as Default>::default` is orion's), whether or not the call is a site.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct BoundaryEdge {
+    /// The calling body, as a site's owner.
+    pub owner: Owner,
+    /// Where a site of the call is: the callee's name, or the macro call it comes from.
+    pub span: Loc,
+    /// The function the call resolves to, by its defining path, with its crate.
+    pub callee: DefRef,
+    /// The trait the callee is a method of, or implements (`core::convert::AsRef`), by its
+    /// defining path.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trait_path: Option<String>,
+    /// The callee is a coroutine's body (an `async fn`'s or block's), polled where it is awaited.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub coroutine: bool,
+    /// The structs and enums among the callee's type arguments, behind references
+    /// (`rand::rngs::small::SmallRng` for `v.shuffle(&mut small_rng)`), by defining path.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub types: Vec<String>,
+    /// The function reaches the call as a value (`hasher.map(|h| h(&d))` with `Some(blake3::
+    /// hash)`): it is cited where it is named.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub through_value: bool,
+    /// The code making the call runs on behalf of the crypto layer, on every way the walk
+    /// reaches it: it is an algorithm crate's or a crate implementing one (`Algorithm`), or a
+    /// crypto package's (`Package`), or a generic instance every chain of instantiations of
+    /// which starts in such code (nom's parser run on age's closure).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub on_behalf: Option<Behalf>,
+}
+
+/// Whose code a call of `BoundaryEdge` runs for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Behalf {
+    /// An algorithm crate's implementation (a stop crate, or a crate implementing one).
+    Algorithm,
+    /// Another crypto package's code (a protocol crate, a package without entries).
+    Package,
 }
 
 /// The points-to analysis' answers at the calls into the knowledge-base crates: what each

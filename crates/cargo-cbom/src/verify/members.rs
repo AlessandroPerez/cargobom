@@ -387,16 +387,31 @@ impl Files<'_> {
     }
 
     /// A call that is an operation, whose algorithm may be unknown: one the knowledge base
-    /// lists (`[[operation]]`, `[[boundary]]`), any call but a setup (`new`, `from_der`: its
-    /// `[unmodelled]` names) into a crypto package it does not model, or a use (a method of
+    /// lists (`[[operation]]`, `[[boundary]]`), any call into a crypto package it does not model
+    /// but a relay (`[unmodelled]`: what the call does may be unknown), or a use (a method of
     /// `[[use]]`) of an algorithm crate's API it does not name, or of an algorithm or trait crate
     /// at a version it does not cover (password-hash 0.6).
-    pub(super) fn is_operation(&self, symbol: &str) -> bool {
+    pub(super) fn is_operation(&self, symbol: &str, component_ref: &str) -> bool {
         let sym = strip_generics(symbol);
         let Some((krate, rest)) = sym.split_once("::") else {
             return false;
         };
         let kb = self.kb;
+        // a standard-library trait's method a type of a crypto package without entries runs
+        // (`<orion::aead::SecretKey as Default>::default()`): the unknown names that package,
+        // and the trait is no view, copy or stream step (`[[aside]]`, `step_traits`)
+        if matches!(krate, "core" | "std" | "alloc") {
+            let trait_path = sym.rsplit_once("::").map(|(t, _)| t);
+            let pkg = component_ref.rsplit(':').next().unwrap_or("");
+            return self.man.packages.iter().any(|p| {
+                p.name == pkg
+                    && !p.local
+                    && ((p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)
+                        && !p.lib_name.as_deref().is_some_and(|l| kb.relay(l)))
+                        || (p.role.is_some() && !p.kb_supported))
+            }) && kb.aside("", "", trait_path).is_none()
+                && !kb.step_trait(trait_path);
+        }
         if kb.operation(krate, rest).is_some()
             || kb
                 .boundaries
@@ -416,16 +431,20 @@ impl Files<'_> {
             .iter()
             .filter(|p| p.lib_name.as_deref() == Some(krate) && !p.local)
             .collect();
+        // (every call into a crypto package without entries is cited, but for a relay's)
         let open = pkgs
             .iter()
-            .any(|p| p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto));
+            .any(|p| p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto))
+            && !kb.relay(krate);
         let modelled = pkgs.iter().any(|p| {
             matches!(
                 p.role,
                 Some(rcbom_kb::Role::Algorithm | rcbom_kb::Role::Trait)
             )
         });
-        (open && (named_use || !kb.unmodelled_setup(method))) || (modelled && named_use)
+        // (of a version the knowledge base does not cover, any call: its uses are not known)
+        let uncovered = pkgs.iter().any(|p| p.role.is_some() && !p.kb_supported);
+        open || uncovered || (modelled && named_use)
     }
 
     pub(super) fn check_witness(

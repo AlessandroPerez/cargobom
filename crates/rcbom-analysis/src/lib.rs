@@ -5,6 +5,7 @@
 mod assets;
 mod boundary;
 mod cbom;
+mod coverage;
 mod engine;
 mod links;
 mod matcher;
@@ -24,6 +25,7 @@ use rcbom_kb::{Algo, Kb, Role};
 use rcbom_manifest::Manifest;
 
 pub use cbom::{RunInfo, to_cyclonedx};
+pub use coverage::Coverage;
 pub use matcher::static_names;
 use matcher::{
     Match, match_constructor, match_fn, match_fn_with, match_protocol, match_static, match_types,
@@ -145,6 +147,9 @@ pub struct Analysis {
     pub artifacts: Vec<String>,
     /// Layer 2 ran: without it (`--manifest-only`) nothing is known about use.
     pub layer2: bool,
+    /// The boundary check: the walked code's calls into crypto packages, and whether each is
+    /// cited (`coverage`).
+    pub coverage: Coverage,
 }
 
 /// The facts files in `dir` of the cargo units `units` (file stems `<crate><unit>`), sorted by
@@ -219,6 +224,10 @@ struct Ctx<'a> {
     /// `unmodelled`): ml-kem, p256, sha3, md-5 (`md5`), by (crate name, stable id): two
     /// packages may name their library alike.
     unmodelled: HashSet<(String, String)>,
+    /// The walked calls into crypto packages (`Reach::boundary`) by position (file as the
+    /// site's, line, column): whether every one there runs on behalf of the crypto layer (subtle's
+    /// `CtOption::map` instantiated by primeorder), as the boundary check takes it.
+    behalf: HashMap<(String, usize, usize), bool>,
 }
 
 type CallKey<'a> = (&'a str, &'a str, usize, usize);
@@ -244,35 +253,6 @@ struct PtaVerdict {
     /// does not name, and every copy has an answer.
     complete: bool,
 }
-
-/// Method names that say nothing about cryptography without a modelled type to scope them: a
-/// `write` is a hash update on a `Sha256` but plain output on age's `ArmoredWriter`.
-const GENERIC_METHODS: &[&str] = &[
-    "write",
-    "write_all",
-    "copy",
-    "update",
-    "chain_update",
-    "finish",
-    "finalize",
-    "hash",
-    "consume",
-    "compute",
-    "fill",
-    "new_with_prefix",
-];
-
-/// Of those, the steps of a computation, no operation even on a modelled crate's type (R8.2:
-/// `Digest::update`, md5's `consume`).
-const STREAMING_STEPS: &[&str] = &[
-    "write",
-    "write_all",
-    "copy",
-    "update",
-    "chain_update",
-    "consume",
-    "new_with_prefix",
-];
 
 /// The name of the asset of operations whose algorithm the analysis does not find; its family
 /// is empty.

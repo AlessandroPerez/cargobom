@@ -113,7 +113,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         Vec::new()
     } else {
         let facts_dir = dir.join("facts");
-        let units = run_driver(a, &man, &dir, &facts_dir)?;
+        let units = run_driver(a, &man, &dir, &facts_dir, &kb.driver_semantics())?;
         load_facts(&facts_dir, &units)?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
@@ -160,6 +160,13 @@ fn generate(a: &GenArgs) -> Result<()> {
     }
     summary(&an);
     walkcheck::print(&walk_check);
+    if an.layer2 {
+        // (a call into a crypto package the CBOM cites nowhere, for no reason it states)
+        eprintln!("cbom: boundary check: {}", an.coverage.summary());
+        for (loc, line, col, callee, owner) in &an.coverage.uncited {
+            eprintln!("  not cited: {loc}:{line}:{col} {callee} (in {owner})");
+        }
+    }
     Ok(())
 }
 
@@ -211,6 +218,7 @@ fn run_driver(
     man: &rcbom_manifest::Manifest,
     dir: &Path,
     facts_dir: &Path,
+    semantics: &str,
 ) -> Result<std::collections::BTreeSet<String>> {
     // the program's own packages: their crates are never knowledge-base or stop crates, even
     // when named like one
@@ -288,7 +296,7 @@ fn run_driver(
     // lists, features, profile, whether the points-to analysis runs) invalidates both.
     let stamp = format!(
         "{}\n{}\n{}\nkb={}\nstop={}\nimpl={}\n{:?}\nprofile={}\nlocal={:?}\nmax-instances={:?}\n\
-         build-std={}\npta={:?}\n",
+         build-std={}\npta={:?}\n{semantics}",
         driver.display(),
         std::fs::metadata(&driver)?
             .modified()
@@ -335,6 +343,7 @@ fn run_driver(
         .env("RCBOM_KB_CRATES", &kb_crates)
         .env("RCBOM_STOP_CRATES", &stop_crates)
         .env("RCBOM_IMPL_CRATES", &impl_crates)
+        .env("RCBOM_SEMANTICS", semantics)
         .env("RCBOM_LOCAL_DIRS", local_dirs.join("\n"))
         .env("RCBOM_SYSROOT", &sysroot)
         .env("LD_LIBRARY_PATH", ld);

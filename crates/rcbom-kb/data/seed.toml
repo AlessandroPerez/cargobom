@@ -2070,10 +2070,10 @@ primitive = "drbg"
 functions = ["generate"]
 use = "generate"
 
-# rand's `random()` draws from the thread generator
+# rand's `random()` draws from the thread generator, and so do rand 0.9's other free functions
 [[fn]]
 crate = "rand"
-path = "^random$"
+path = "^(random|random_iter|random_range|random_bool|random_ratio|fill)$"
 asset = "ChaCha12-RNG"
 family = ""
 primitive = "drbg"
@@ -2191,6 +2191,8 @@ name = "TLS"
 type = "tls"
 versions = { "1.3" = "", "1.2" = "tls12" }
 suites = "^TLS(13)?_[A-Z0-9_]+$"
+# (rustls's `TLS13_AES_128_GCM_SHA256_INTERNAL` is half of a suite, not one)
+not_suites = "_INTERNAL$"
 groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1|SECP384R1|SECP521R1|FFDHE[0-9]+)$"
 
 # --- Uses -------------------------------------------------------------------------------------
@@ -2284,25 +2286,175 @@ support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov"
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
 not_crypto = ["SmallRng", "StepRng"]
-# Of a crypto package without entries, the methods that set something up (a constructor, a
-# conversion, an accessor) rather than operate: every other call into it from another crate is
-# an operation, of the use its name has above (`[[use]]`), else of an unknown one, but for a call
-# taking nothing to operate on (`MessageDigest::sha256()`) and a step of a stream (`write`,
-# `update`), whose operation is the call that ends it (`finish`, `finalize`)
-setup_methods = ["new", "default", "builder", "build", "clone", "len", "is_empty", "size", "bits"]
-setup_prefixes = ["new_", "from_", "try_from", "to_", "as_", "into_", "with_", "set_", "get_", "is_", "has_"]
+# Every call from outside the crypto layer into a crypto package without entries is reported:
+# what it does is not known, but for the use its name has (`[[use]]`, `decrypt`), as a constructor
+# may draw a key (orion's `SecretKey::default()`) and a conversion compute one (`to_public`). Not
+# reported: a step of a computation (`steps`: `write`, `update`), whose operation is the call that
+# ends it, and calls into `relays`, crypto packages whose own calls are no operations: wrappers of
+# rustls (whose operations are cited in rustls) and types, parsers and loaders of PKI data.
+# `generic_methods` say nothing about cryptography without a modelled type to scope them (a
+# `write` is a hash update on a `Sha256` but plain output on age's `ArmoredWriter`): no use there.
+generic_methods = ["write", "write_all", "copy", "update", "chain_update", "finish", "finalize", "hash", "consume", "compute", "fill", "new_with_prefix"]
+steps = ["write", "write_all", "copy", "update", "chain_update", "consume", "new_with_prefix"]
+# (and any method of a trait reading from or writing into a stream: rage reading through age's
+# `InputReader`, `writeln!` into its `ArmoredWriter`)
+step_traits = ["core::io::write::Write", "alloc::io::read::Read", "std::io::Write", "std::io::Read"]
+relays = ["tokio-rustls", "hyper-rustls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs"]
+
+# --- Calls that are no operation ---------------------------------------------------------------
+# The boundary check (`rcbom:run:boundary-check`) lists every call of the walked code into a
+# crypto package, by the function it resolves to: each is cited by an occurrence, or needs none
+# for a reason the run states. These are the calls the knowledge base says are no operation and
+# set up no asset, by kind (`name`): methods of the `traits` (any type's), or of the crates in
+# `crate` at a `path` inside the crate. A call neither cited nor listed fails the check.
+[[aside]]
+name = "view"
+traits = ["core::convert::AsRef", "core::convert::AsMut", "core::borrow::Borrow", "core::borrow::BorrowMut", "core::ops::deref::Deref", "core::ops::deref::DerefMut"]
+why = "a view of a value's bytes or fields: nothing is computed"
+
+[[aside]]
+name = "copy"
+traits = ["core::clone::Clone"]
+why = "a copy of a value: the operations made with either copy are cited where they are made"
+
+[[aside]]
+name = "format"
+traits = ["core::fmt::Debug", "core::fmt::Display"]
+why = "formatting a value for output"
+
+[[aside]]
+name = "wipe"
+traits = ["core::ops::drop::Drop", "zeroize::Zeroize"]
+why = "a destructor or a memory wipe: no cryptographic function"
+
+[[aside]]
+name = "error"
+traits = ["core::error::Error"]
+crate = ["signature", "ssh-key", "ssh-cipher", "rsa", "ecdsa", "ed25519-dalek", "elliptic-curve", "aead", "cipher", "digest", "password-hash"]
+path = "^(.+::)?error::.+$"
+why = "an error value made, compared or described"
+
+[[aside]]
+name = "encoding"
+traits = ["elliptic_curve::sec1::ToEncodedPoint", "elliptic_curve::sec1::FromEncodedPoint", "ff::PrimeField", "rsa::traits::keys::PublicKeyParts", "rsa::traits::keys::PrivateKeyParts", "signature::encoding::SignatureEncoding", "pkcs8::traits::EncodePrivateKey", "pkcs8::traits::DecodePrivateKey", "spki::traits::EncodePublicKey", "spki::traits::DecodePublicKey"]
+why = "a key's or a signature's encoding, decoding or parts (SEC1 points, field representations, an RSA key's numbers, DER and PKCS#8): what is made from them is cited where it is used"
+
+[[aside]]
+name = "encoding"
+crate = ["ecdsa"]
+path = "^(Signature::(to_der|from_der|from_scalars|to_bytes|from_bytes|from_slice|to_vec)|der::Signature::(as_bytes|to_bytes|to_vec))$"
+why = "a signature's encoding or decoding (the signature is cited where it is made or verified)"
+
+[[aside]]
+name = "encoding"
+crate = ["elliptic-curve", "ecdsa"]
+path = "^(field::FieldBytesEncoding::(decode|encode)_field_bytes|scalar::primitive::ScalarPrimitive::(as_uint|to_bytes|from_bytes)|secret_key::SecretKey::(to_bytes|from_bytes|from_slice|to_sec1_der)|hazmat::bits2field)$"
+why = "a key's, a field element's or a scalar's bytes, or a digest as a field element: an encoding (a key's export is setup, README Limitations)"
+
+[[aside]]
+name = "encoding"
+crate = ["rsa"]
+path = "^pkcs1v15::signature::Signature::try_from$"
+why = "a signature decoded from its bytes (cited where it is verified)"
+
+[[aside]]
+name = "encoding"
+crate = ["password-hash"]
+path = "^(PasswordHash::new|salt::SaltString::(encode_b64|from_b64|as_str))$"
+why = "a password hash's or a salt's string form, parsed or written (the hash is cited where it is computed or verified)"
+
+[[aside]]
+name = "public half"
+traits = ["ring::signature::KeyPair", "aws_lc_rs::signature::KeyPair"]
+crate = ["ring", "aws-lc-rs"]
+path = "^(rsa::keypair::KeyPair::public|agreement::(.+::)?EphemeralPrivateKey::compute_public_key|kem::DecapsulationKey::encapsulation_key)$"
+why = "a key's public half, from the private key cited where it is made or read"
+
+[[aside]]
+name = "public half"
+crate = ["rsa"]
+path = "^key::(RsaPrivateKey::to_public_key|RsaPublicKey::from)$"
+why = "a key's public half, from the private key cited where it is made or read"
+
+[[aside]]
+name = "public half"
+crate = ["elliptic-curve"]
+path = "^secret_key::SecretKey::public_key$"
+why = "a key's public half, from the private key cited where it is made or read"
+
+[[aside]]
+name = "setup"
+crate = ["ring", "aws-lc-rs"]
+path = "^(aead::(.+::)?Nonce::(try_)?assume_unique_for_key|aead::Aad::(from|empty)|aead::(.+::)?LessSafeKey::new|digest::Context::new|hmac::Context::with_key|(agreement|signature)::UnparsedPublicKey::new|kem::EncapsulationKey::new|ec::key_pair::EcdsaKeyPair::from_private_key_der|pqdsa::key_pair::PqdsaKeyPair::from_pkcs8|cipher::padded::PaddedBlockEncryptingKey::cbc_pkcs7)$"
+why = "the inputs and keys of an operation made (a nonce, the associated data, a key from its bytes, a context): the operations made with them are cited"
+
+[[aside]]
+name = "setup"
+crate = ["md5", "ed25519-dalek", "rsa", "argon2"]
+path = "^(Context::new|signing::SigningKey::from_bytes|key::RsaPublicKey::(new|new_with_max_size)|Argon2::from|(algorithm::Algorithm|version::Version|block::Block)::default)$"
+why = "a context, a key or a parameter made from its parts: the operations made with it are cited"
+
+[[aside]]
+name = "setup"
+crate = ["ring", "aws-lc-rs"]
+path = "^(aead::Tag::from|cipher::(EncryptingKey|DecryptingKey)::[a-z0-9_]+|iv::FixedLength::from|signature::ParsedPublicKey::new)$"
+why = "a tag, an IV or a key made from its bytes, or a cipher key in its mode: the operations made with them are cited"
+
+[[aside]]
+name = "accessor"
+crate = ["ring", "aws-lc-rs"]
+path = "^((.+::)?(algorithm|tag_len|key_len|nonce_len|output_len|block_len|sample_len|digest_algorithm|modulus_len|public_modulus_len|key_bytes|signature_len|len)|try_fips_mode)$"
+why = "what an algorithm descriptor or a key says about itself (its lengths, its algorithm), or the library's mode"
+
+[[aside]]
+name = "accessor"
+crate = ["x25519-dalek", "elliptic-curve", "blake3", "digest", "scrypt", "rsa", "ring"]
+path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secret_bytes|Hash::as_bytes|mac::CtOutput::into_bytes|params::Params::(log_n|r|p|len)|key::RsaPrivateKey::crt_coefficient|rand::Random::expose)$"
+why = "an operation's output or a key's or parameters' value, read after it is made (cited where it is computed)"
+
+[[aside]]
+name = "generator setup"
+traits = ["rand_core::SeedableRng"]
+crate = ["ring", "aws-lc-rs", "rand"]
+path = "^(rand::SystemRandom::new|rngs::thread::(thread_)?rng|rngs::.+::(default|new)|(distributions|distr)::uniform::.+)$"
+why = "a generator or a distribution made: what draws from it is cited where it draws"
+
+[[aside]]
+name = "comparison"
+crate = ["ring", "aws-lc-rs"]
+path = "^(deprecated_)?constant_time::verify_slices_are_equal$"
+why = "a constant-time comparison of a tag already computed (cited where it is computed)"
+
+[[aside]]
+name = "comparison"
+crate = ["ed25519-dalek", "ecdsa", "ssh-cipher", "blake3"]
+path = "^((signing::SigningKey|verifying::VerifyingKey)::eq|Cipher::eq|Hash::eq)$"
+why = "two keys or cipher names compared: no cryptographic function"
 
 # --- What some packages' APIs mean ------------------------------------------------------------
 # `draws`: packages whose APIs draw from the generator they are given (rand's
-# `Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`): the call is a draw,
+# `Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`, password-hash's
+# `SaltString::generate(&mut OsRng)`): the call is a draw,
 # where another package's API given a generator draws inside it (a key generation, labelled by
 # what it does). `block_modes`: modes of operation over a block cipher, whose keystream is the
 # block cipher's operation (`ctr::Ctr64BE<Blowfish>`, as AES-CTR is named). `fixed_defaults`:
 # packages whose types' `Default` values are constants (`GenericArray::default()`).
 [semantics]
-draws = ["rand"]
+draws = ["rand", "password-hash"]
 block_modes = ["ctr", "cfb-mode", "cfb8", "ofb"]
 fixed_defaults = ["generic-array"]
+# `algorithm_getters`: methods of a crypto crate's types that return the descriptor a value was
+# made with (ring's `ctx.algorithm()`, `key.algorithm()`). `output_steps`: methods that output
+# what a key derivation's expansion made (ring's `Okm::fill`), whose output-length descriptor,
+# given at the expansion (`prk.expand(info, HKDF_SHA256)`), names the algorithm.
+algorithm_getters = ["algorithm"]
+output_steps = ["fill"]
+# For the driver: `buffer_fills`, methods that write every byte of the buffers they are given by
+# `&mut`, or fail (`RngCore::fill_bytes`, `Rng::fill`, ring's `SecureRandom::fill`, getrandom's):
+# what the buffer held before is gone; `generator_suffixes`, how random generators' type names
+# end (`ThreadRng`, `OsRng`, `ChaCha20Rng`): a generator lent to a call is still that generator.
+buffer_fills = ["fill_bytes", "try_fill_bytes", "fill", "try_fill", "getrandom"]
+generator_suffixes = ["Rng"]
 
 # --- Operations whose algorithm is a run-time value -----------------------------------------
 # A call matched here is always reported: with the algorithms that reach it, or, when none
@@ -2394,6 +2546,15 @@ crate = ["ring", "aws_lc_rs"]
 path = "^agreement::(.+::)?agree(_ephemeral)?$"
 primitive = "key-agree"
 use = "keyderive"
+algorithm = 0
+
+# QUIC header protection: the mask is the key's cipher (AES on one block, or ChaCha20) applied to
+# a sample of the packet
+[[operation]]
+crate = ["ring", "aws_lc_rs"]
+path = "^aead::quic::HeaderProtectionKey::new_mask$"
+primitive = "unknown"
+use = "encrypt"
 algorithm = 0
 
 # Operations of the RustCrypto traits: the algorithm is the Self type (`self_type = true`).

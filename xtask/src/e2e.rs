@@ -4,6 +4,8 @@
 //! - a position that does not verify against the source, or a shifted position the self-test
 //!   does not reject (`cargo cbom verify --self-test`);
 //! - a panic the driver caught ("N items could not be analysed"; `RCBOM_DEBUG=1` prints them);
+//! - a call of the walked code into a crypto package the CBOM neither cites nor excuses (the
+//!   boundary check's "not cited" lines);
 //! - a difference from the fixture's golden file (`expected.txt`, the whole CBOM as text:
 //!   `cargo xtask summary`);
 //! - for the labelled rusi fixtures, a score that is not perfect, or that differs in any field
@@ -173,6 +175,17 @@ impl Env {
         if !caught.is_empty() {
             log.push_str(&caught.join("\n"));
             log.push_str("\nthe driver caught panics: each is a bug (RCBOM_DEBUG=1 prints them)\n");
+            return Ok(false);
+        }
+        let uncited: Vec<&str> = cli_log
+            .lines()
+            .filter(|l| l.trim_start().starts_with("not cited: "))
+            .collect();
+        if !uncited.is_empty() {
+            log.push_str(&uncited.join("\n"));
+            log.push_str(
+                "\ncalls into crypto packages the CBOM neither cites nor excuses (boundary check)\n",
+            );
             return Ok(false);
         }
         // the CBOM named by its file name, as it sits next to the report in the results (with

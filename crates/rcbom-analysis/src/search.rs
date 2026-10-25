@@ -1274,7 +1274,7 @@ pub(crate) fn data_in_args(
         }
     }
     let mut chain = Found::default();
-    let hkdf_use = !lengths.is_empty() || method == "fill";
+    let hkdf_use = !lengths.is_empty() || search.kb.output_steps.iter().any(|m| m == method);
     if let Some(r) = arg_origins.first() {
         chain = search.value(r, owner, Mode::Chain { lengths: hkdf_use });
     }

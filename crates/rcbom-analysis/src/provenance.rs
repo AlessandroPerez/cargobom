@@ -1084,7 +1084,11 @@ pub(crate) fn choice_values(callee: &str, args: &[Origin]) -> Vec<Origin> {
 /// A crypto crate's getter for the algorithm a value was made with (`ctx.algorithm()`,
 /// `key.algorithm()`): the descriptor its receiver was built from.
 pub(crate) fn algorithm_getter(kb: &Kb, krate: &str, callee: &str) -> bool {
-    kb.crate_by_name(krate).is_some() && strip_generics(callee).ends_with("::algorithm")
+    kb.crate_by_name(krate).is_some()
+        && kb
+            .algorithm_getters
+            .iter()
+            .any(|g| strip_generics(callee).ends_with(&format!("::{g}")))
 }
 
 /// A standard-library call that stores a value in a container (`Vec::push`, `HashMap::insert`,
