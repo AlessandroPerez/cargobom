@@ -54,6 +54,8 @@ pub struct Pkg {
     pub unmodelled: Option<Unmodelled>,
     /// The crate name of its library target (`md5` for the package md-5), if it has one.
     pub lib_name: Option<String>,
+    /// The crate names of its binary targets (`jwt` for the package jwt-cli).
+    pub bins: Vec<String>,
     /// The knowledge base has entries for this version. A crypto crate in another version is
     /// still a crypto crate, but its APIs are not matched (`unsupported-version`).
     pub kb_supported: bool,
@@ -550,6 +552,12 @@ fn build(
                     })
                 })
                 .map(|t| t.name.replace('-', "_")),
+            bins: p
+                .targets
+                .iter()
+                .filter(|t| t.kind.iter().any(|k| k.to_string() == "bin"))
+                .map(|t| t.name.replace('-', "_"))
+                .collect(),
             kb_supported: exact.is_some(),
             candidates: exact.map(|e| e.candidates.clone()).unwrap_or_default(),
             backends,
