@@ -863,6 +863,11 @@ fn disabled_by(
             })
             .flatten()
     })?;
+    // (the argument's value made by that call on one way, `if c { v.disable() }`, or the values
+    // its field is read from)
+    if let Some(by) = find(base, off_by, 0) {
+        return Some(by);
+    }
     let mut bases = Vec::new();
     struct_bases(ctx, base, &adt, field, &mut bases, 0);
     bases.iter().find_map(|b| match b {
