@@ -204,6 +204,80 @@ fn matches(pattern: &regex::Regex, callee: &str, self_ty: Option<&str>) -> bool 
         || self_ty.is_some_and(|t| pattern.is_match(&format!("{t}::{}", last(&stripped))))
 }
 
+/// A field of a parameter, or a field of a field of one (`self.kdf.salt`): the parameter's
+/// index and owner, and the fields read, outermost first.
+fn param_fields(o: &Origin) -> Option<(usize, Option<&str>, Vec<&Origin>)> {
+    let mut fields = Vec::new();
+    let mut o = o;
+    loop {
+        match crate::links::peel(o) {
+            f @ Origin::Field { base, .. } => {
+                fields.push(f);
+                o = base;
+            }
+            Origin::Param { index, owner } => return Some((*index, owner.as_deref(), fields)),
+            _ => return None,
+        }
+    }
+}
+
+/// A parameter (or `fields` of one): so it says, and what the program's callers pass there
+/// (`seal(&[1u8; 32], msg)`: hard-coded), each in its caller with the same fields read from
+/// it; the parameter stays, for callers outside the program or through pointers.
+#[allow(clippy::too_many_arguments)]
+fn of_param(
+    kb: &Kb,
+    links: &LinkIndex,
+    owner: &str,
+    index: usize,
+    of: Option<&str>,
+    fields: &[&Origin],
+    depth: usize,
+    out: &mut BTreeSet<Class>,
+) {
+    out.insert(Class {
+        kind: "parameter".into(),
+        detail: match of {
+            Some(f) => format!("argument {index} of {}", short(f)),
+            None => format!("argument {index} of the enclosing function"),
+        },
+    });
+    let func = of.unwrap_or(owner);
+    if func.is_empty() {
+        return;
+    }
+    for (caller, args) in links.callers_of(func) {
+        let Some(a) = args.get(index) else {
+            continue;
+        };
+        let mut v = a.clone();
+        for f in fields.iter().rev() {
+            if let Origin::Field {
+                adt, field, args, ..
+            } = f
+            {
+                v = Origin::Field {
+                    adt: adt.clone(),
+                    field: *field,
+                    base: Box::new(v),
+                    args: args.clone(),
+                };
+            }
+        }
+        // (a parameter of the caller is named by it, not as the enclosing function's)
+        let mut inner = BTreeSet::new();
+        classify(kb, links, caller, &v, depth + 1, &mut inner);
+        for mut c in inner {
+            if c.kind == "parameter" && c.detail.ends_with(" of the enclosing function") {
+                c.detail = c
+                    .detail
+                    .replace("the enclosing function", &short(&strip_generics(caller)));
+            }
+            out.insert(c);
+        }
+    }
+}
+
 fn classify(
     kb: &Kb,
     links: &LinkIndex,
@@ -235,10 +309,11 @@ fn classify(
             if let Some(n) = len {
                 d.push(format!("{n} bytes"));
             }
+            // (by its file: the occurrence's names it by its line only)
             if let Some(s) = span
                 && s.line > 0
             {
-                d.push(format!("literal at line {}", s.line));
+                d.push(format!("literal at {}:{}", s.file, s.line));
             }
             out.insert(class("hard-coded", d.join(", ")));
         }
@@ -278,27 +353,17 @@ fn classify(
             Some(parts) => parts
                 .iter()
                 .for_each(|p| classify(kb, links, "", p, depth + 1, out)),
-            None => classify(kb, links, owner, base, depth + 1, out),
+            // (a parameter's field, `&self.kdf_salt`: that field of what the callers pass, not
+            // the fields beside it)
+            None => match param_fields(o) {
+                Some((index, of, fields)) => {
+                    of_param(kb, links, owner, index, of, &fields, depth, out)
+                }
+                None => classify(kb, links, owner, base, depth + 1, out),
+            },
         },
         Origin::Param { index, owner: of } => {
-            out.insert(class(
-                "parameter",
-                match of {
-                    Some(f) => format!("argument {index} of {}", short(f)),
-                    None => format!("argument {index} of the enclosing function"),
-                },
-            ));
-            // and what the program's callers pass there (`seal(&[1u8; 32], msg)`: hard-coded),
-            // each in its caller; the parameter stays, for callers outside the program or
-            // through pointers
-            let func = of.as_deref().unwrap_or(owner);
-            if !func.is_empty() {
-                for (caller, args) in links.callers_of(func) {
-                    if let Some(a) = args.get(*index) {
-                        classify(kb, links, caller, a, depth + 1, out);
-                    }
-                }
-            }
+            of_param(kb, links, owner, *index, of.as_deref(), &[], depth, out)
         }
         // a value of a field-less type: its type may be a source (`OsRng`)
         Origin::Unit { path, .. } => {
