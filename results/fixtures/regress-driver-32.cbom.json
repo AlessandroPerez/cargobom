@@ -1,0 +1,533 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/ct-codecs@1.1.8",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked ct-codecs 1.1.8; reached via d32 -> orion -> ct-codecs",
+            "line": 12,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ct-codecs"
+          }
+        ]
+      },
+      "name": "ct-codecs",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/ct-codecs@1.1.8",
+      "type": "library",
+      "version": "1.1.8"
+    },
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.4.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.4.3; reached via d32 -> orion -> getrandom",
+            "line": 31,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.4.3",
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/orion@0.17.15",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by d32 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "orion"
+          },
+          {
+            "additionalContext": "[manifest] locked orion 0.17.15; reached via d32 -> orion",
+            "line": 48,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "orion"
+          }
+        ]
+      },
+      "name": "orion",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/orion@0.17.15",
+      "type": "library",
+      "version": "0.17.15"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via d32 -> orion -> subtle",
+            "line": 67,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/zeroize@1.9.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked zeroize 1.9.1; reached via d32 -> orion -> zeroize",
+            "line": 73,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "zeroize"
+          }
+        ]
+      },
+      "name": "zeroize",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/zeroize@1.9.1",
+      "type": "library",
+      "version": "1.9.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in orion::hazardous::kem::ml_kem::internal::KeyPairInternal::<..>::from_keys; use: generate; line: `getrandom::fill(&mut m)?;`; code: `getrandom::fill`",
+            "line": 931,
+            "location": "orion-0.17.15/src/hazardous/kem/ml_kem/internal/mod.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in orion::hazardous::kem::ml_kem::mlkem1024::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`",
+            "line": 298,
+            "location": "orion-0.17.15/src/hazardous/kem/ml_kem/mlkem1024.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in orion::hazardous::kem::ml_kem::mlkem512::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`",
+            "line": 297,
+            "location": "orion-0.17.15/src/hazardous/kem/ml_kem/mlkem512.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in orion::hazardous::kem::ml_kem::mlkem768::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`",
+            "line": 298,
+            "location": "orion-0.17.15/src/hazardous/kem/ml_kem/mlkem768.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in orion::hazardous::kem::xwing::XWing::encap; use: generate; line: `getrandom::fill(eseed.as_mut())?;`; code: `getrandom::fill`",
+            "line": 280,
+            "location": "orion-0.17.15/src/hazardous/kem/xwing.rs",
+            "offset": 8,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in orion::util::secure_rand_bytes; use: generate; line: `getrandom::fill(dst).unwrap();`; code: `getrandom::fill`",
+            "line": 81,
+            "location": "orion-0.17.15/src/util/mod.rs",
+            "offset": 4,
+            "symbol": "getrandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:orion",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `core::default::Default::default` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut holder = SecretKey::default();`; code: `SecretKey::default`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `core::default::Default::default` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let v: Vec<SecretKey> = std::iter::repeat_with(SecretKey::default).take(2).collect();`; code: `SecretKey::default`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 51,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::seal` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let c = aead::seal(&k1, b\"m\").unwrap();`; code: `aead::seal`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "orion::high_level::aead::seal"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let n = aead::open(&k2, &c).is_ok() as usize`; code: `aead::open`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&holder, &c).is_ok() as usize`; code: `aead::open`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&ks[0], &c).is_ok() as usize`; code: `aead::open`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&ks[1], &c).is_ok() as usize`; code: `aead::open`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(slot.get_or_insert_default(), &c).is_ok() as usize`; code: `aead::open`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&v[0], &c).is_ok() as usize;`; code: `aead::open`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "orion::high_level::aead::open"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::option::Option::<T>::unwrap_or_default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let k1: SecretKey = none.unwrap_or_default();`; code: `unwrap_or_default`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "core::option::Option::<T>::unwrap_or_default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::mem::take` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let k2 = std::mem::take(&mut holder);`; code: `std::mem::take`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "core::mem::take"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::default::Default::default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let ks: [SecretKey; 2] = Default::default();`; code: `Default::default`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 29,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::option::Option::<T>::get_or_insert_default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `+ aead::open(slot.get_or_insert_default(), &c).is_ok() as usize`; code: `get_or_insert_default`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 26,
+            "symbol": "core::option::Option::<T>::get_or_insert_default"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "13"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/ct-codecs@1.1.8"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/orion@0.17.15"
+      ],
+      "ref": "pkg:cargo/d32@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
+      "ref": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ct-codecs@1.1.8",
+        "pkg:cargo/getrandom@0.4.3",
+        "pkg:cargo/subtle@2.6.1",
+        "pkg:cargo/zeroize@1.9.1"
+      ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:orion"
+      ],
+      "ref": "pkg:cargo/orion@0.17.15"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/zeroize@1.9.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:orion"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/d32@0.1.0",
+      "name": "d32",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/d32@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "410"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin d32"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "19 calls into crypto packages: 9 cited, 4 cited by the check as unknown, 6 excused (format 2, named 1, wipe 3)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:43ac9293-a6e8-8ab5-beac-df618245e0e3",
+  "specVersion": "1.7",
+  "version": 1
+}

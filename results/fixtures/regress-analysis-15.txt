@@ -14,7 +14,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:142:15 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a11; new_from_slice: setup, not a use; key: file (std::fs::read); line: `let once = Aes256Gcm::new_from_slice(ONCE_KEY.get().unwrap()).unwrap();`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:146:9 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `lazy.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:147:15 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `+ once.encrypt(Nonce::from_slice(n), msg).unwrap().len()`; code: `encrypt`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:148:12 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by a15::a11); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:148:12 | aead::Aead::encrypt | [reachable] [call] in a15::a11; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by a15::a11) or partly hard-coded (all zero, literal at line 144); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:235:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = Aes256Gcm::new_from_slice(&k[..32]).unwrap();`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:55:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a15::a4; new_from_slice: setup, not a use; key: derived (blake3::Hasher::new_derive_key) or environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:56:6 | aead::Aead::encrypt | [reachable] [call] in a15::a4; use: encrypt; nonce: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(n), b"m".as_ref()).unwrap()`; code: `encrypt`
@@ -190,7 +190,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,derived,environment,file,parameter
-  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,environment,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,environment,parameter,partly hard-coded
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop Argon2 | crypto:algorithm:Argon2 | rcbom:confidence=high
   prop Argon2 | crypto:algorithm:Argon2 | rcbom:detection:method=type-resolved
@@ -776,7 +776,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
 root {"bom-ref": "pkg:cargo/a15@0.1.0", "name": "a15", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a15@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a15
-run rcbom:run:boundary-check=82 calls into crypto packages: 74 cited, 8 excused (accessor 1, encoding 2, generator setup 3, public half 2), 0 not cited
+run rcbom:run:boundary-check=111 calls into crypto packages: 74 cited, 0 cited by the check as unknown, 37 excused (accessor 1, encoding 2, format 29, generator setup 3, public half 2)
 run rcbom:run:features=
 run rcbom:run:packages=73
 run rcbom:run:profile=release

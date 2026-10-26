@@ -9536,20 +9536,6 @@
             "location": "src/bin/rbw-agent/ssh_agent.rs",
             "offset": 33,
             "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response> as tokio_util::codec::decoder::Decoder>::decode_eof; use: unknown; algorithm unresolved: `core::convert::Into::into` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <tokio_util::codec::framed_impl::FramedImpl<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>, tokio_util::codec::framed_impl::RWFrames> as futures_core::stream::Stream>::poll_next at tokio-util-0.7.17/src/codec/framed_impl.rs:186:45 as `decode_eof`; instantiated by <tokio_util::codec::framed::Framed<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>> as futures_core::stream::Stream>::poll_next at tokio-util-0.7.17/src/codec/framed.rs:310:29 as `poll_next`; instantiated by <tokio_util::codec::framed::Framed<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>> as futures_core::stream::TryStream>::try_poll_next at futures-core-0.3.31/src/stream.rs:206:13 as `poll_next`; instantiated by <tokio_util::codec::framed::Framed<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>> as futures_util::stream::try_stream::TryStreamExt>::try_poll_next_unpin at futures-util-0.3.31/src/stream/try_stream/mod.rs:1131:23 as `try_poll_next`; line: `Err(io::Error::new(io::ErrorKind::Other, \"bytes remaining on stream\").into())`; code: `into`",
-            "line": 151,
-            "location": "tokio-util-0.7.17/src/codec/decoder.rs",
-            "offset": 90,
-            "symbol": "core::convert::Into::into"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <tokio_util::codec::framed_impl::FramedImpl<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>, tokio_util::codec::framed_impl::RWFrames> as futures_sink::Sink<ssh_agent_lib::proto::message::response::Response>>::poll_flush; use: unknown; algorithm unresolved: `core::convert::Into::into` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <tokio_util::codec::framed::Framed<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>> as futures_sink::Sink<ssh_agent_lib::proto::message::response::Response>>::poll_flush at tokio-util-0.7.17/src/codec/framed.rs:332:29 as `poll_flush`; instantiated by <futures_util::sink::send::Send<'_, tokio_util::codec::framed::Framed<tokio::net::unix::stream::UnixStream, ssh_agent_lib::codec::Codec<ssh_agent_lib::proto::message::request::Request, ssh_agent_lib::proto::message::response::Response>>, ssh_agent_lib::proto::message::response::Response> as core::future::future::Future>::poll at futures-util-0.3.31/src/sink/send.rs:37:40 as `poll_flush`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:319:35; instantiated by ssh_agent_lib::agent::listen::<..>::{closure#0}::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:406:73; line: `.into()));`; code: `into`",
-            "line": 294,
-            "location": "tokio-util-0.7.17/src/codec/framed_impl.rs",
-            "offset": 17,
-            "symbol": "core::convert::Into::into"
           }
         ]
       },
@@ -9585,7 +9571,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "7"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -9659,6 +9645,149 @@
         {
           "name": "rcbom:occurrences",
           "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-key",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::actions::find_ssh_private_key::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::to_bytes` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:65:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; line: `let request_bytes = request_public_key.to_bytes();`; code: `to_bytes`",
+            "line": 899,
+            "location": "src/bin/rbw-agent/actions.rs",
+            "offset": 43,
+            "symbol": "ssh_key::public::PublicKey::to_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::actions::find_ssh_private_key::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::from_openssh` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:65:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; line: `ssh_agent_lib::ssh_key::PublicKey::from_openssh(`; code: `ssh_agent_lib::ssh_key::PublicKey::from_openssh`",
+            "line": 922,
+            "location": "src/bin/rbw-agent/actions.rs",
+            "offset": 16,
+            "symbol": "ssh_key::public::PublicKey::from_openssh"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::actions::find_ssh_private_key::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::to_bytes` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:65:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; line: `.to_bytes();`; code: `to_bytes`",
+            "line": 926,
+            "location": "src/bin/rbw-agent/actions.rs",
+            "offset": 17,
+            "symbol": "ssh_key::public::PublicKey::to_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::actions::find_ssh_private_key::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::private::PrivateKey::from_openssh` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:65:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; line: `return ssh_agent_lib::ssh_key::PrivateKey::from_openssh(`; code: `ssh_agent_lib::ssh_key::PrivateKey::from_openssh`",
+            "line": 943,
+            "location": "src/bin/rbw-agent/actions.rs",
+            "offset": 23,
+            "symbol": "ssh_key::private::PrivateKey::from_openssh"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::{closure#0}::{closure#1}::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::key_data` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0}::{closure#1} at src/bin/rbw-agent/ssh_agent.rs:44:25; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:42:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..> at src/bin/rbw-agent/ssh_agent.rs:32:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:269:58 as `request_identities`; line: `pubkey: pk.key_data().clone(),`; code: `key_data`",
+            "line": 45,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 35,
+            "symbol": "ssh_key::public::PublicKey::key_data"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::public::PublicKey::new` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `ssh_agent_lib::ssh_key::PublicKey::new(request.pubkey, \"\");`; code: `ssh_agent_lib::ssh_key::PublicKey::new`",
+            "line": 61,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 12,
+            "symbol": "ssh_key::public::PublicKey::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::private::PrivateKey::key_data` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `match private_key.key_data() {`; code: `key_data`",
+            "line": 70,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 26,
+            "symbol": "ssh_key::private::PrivateKey::key_data"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::mpint::Mpint::as_bytes` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `let p = rsa::BigUint::from_bytes_be(key.private.p.as_bytes());`; code: `as_bytes`",
+            "line": 76,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 66,
+            "symbol": "ssh_key::mpint::Mpint::as_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::mpint::Mpint::as_bytes` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `let q = rsa::BigUint::from_bytes_be(key.private.q.as_bytes());`; code: `as_bytes`",
+            "line": 77,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 66,
+            "symbol": "ssh_key::mpint::Mpint::as_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::mpint::Mpint::as_bytes` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `let e = rsa::BigUint::from_bytes_be(key.public.e.as_bytes());`; code: `as_bytes`",
+            "line": 78,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 65,
+            "symbol": "ssh_key::mpint::Mpint::as_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::signature::Signature::new` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `Ok(ssh_agent_lib::ssh_key::Signature::new(`; code: `ssh_agent_lib::ssh_key::Signature::new`",
+            "line": 116,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 19,
+            "symbol": "ssh_key::signature::Signature::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::algorithm::Algorithm::new` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `ssh_agent_lib::ssh_key::Algorithm::new(algorithm)`; code: `ssh_agent_lib::ssh_key::Algorithm::new`",
+            "line": 117,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 20,
+            "symbol": "ssh_key::algorithm::Algorithm::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0}::{closure#1}; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::str::<impl str>::parse` runs `<ssh_key::public::PublicKey as core::str::traits::FromStr>::from_str` of ssh-key 0.6.7 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `p.parse::<ssh_agent_lib::ssh_key::PublicKey>()`; code: `parse`",
+            "line": 43,
+            "location": "src/bin/rbw-agent/ssh_agent.rs",
+            "offset": 18,
+            "symbol": "core::str::<impl str>::parse"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin rbw-agent"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "13"
         }
       ],
       "type": "cryptographic-asset"
@@ -10546,7 +10675,8 @@
       ],
       "provides": [
         "crypto:algorithm:unknown:signature:ssh-key",
-        "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key"
+        "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key",
+        "crypto:algorithm:unknown:unknown:ssh-key"
       ],
       "ref": "pkg:cargo/ssh-key@0.6.7"
     },
@@ -10823,6 +10953,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:ssh-key"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:totp-rs"
     },
     {
@@ -10903,7 +11037,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "600 calls into crypto packages: 132 cited, 468 excused (accessor 31, awaited 1, comparison 1, copy 24, encoding 4, entered 62, error 2, format 1, generator setup 9, internal 161, public half 4, relay 52, setup 31, view 84, wipe 1), 0 not cited"
+        "value": "728 calls into crypto packages: 144 cited, 1 cited by the check as unknown, 583 excused (accessor 31, awaited 1, comparison 7, copy 36, encoding 5, entered 62, error 7, format 35, generator setup 9, internal 164, named 15, public half 4, relay 59, setup 31, view 87, wipe 30)"
       }
     ],
     "tools": {
@@ -10916,7 +11050,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:38bc81a0-7e1a-8f15-aabb-65f1994a15f3",
+  "serialNumber": "urn:uuid:acfe4a66-a6c6-8f2b-a5a4-64cc51b524f2",
   "specVersion": "1.7",
   "version": 1
 }

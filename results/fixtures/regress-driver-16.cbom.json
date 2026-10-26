@@ -818,7 +818,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t16::d5; new_from_slice: setup, not a use; key: computed (written into an element by t16::d5) or computed (written through core::slice::chunks_mut); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t16::d5; new_from_slice: setup, not a use; key: computed (written into an element by t16::d5) or computed (written through core::slice::chunks_mut) or partly hard-coded (all zero, literal at line 62); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 4,
@@ -914,7 +914,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,environment,file,hard-coded,parameter,rng,unknown"
+          "value": "computed,environment,file,hard-coded,parameter,partly hard-coded,rng,unknown"
         },
         {
           "name": "rcbom:finding",
@@ -1444,7 +1444,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "22 calls into crypto packages: 20 cited, 2 excused (accessor 1, named 1), 0 not cited"
+        "value": "22 calls into crypto packages: 20 cited, 0 cited by the check as unknown, 2 excused (accessor 1, named 1)"
       }
     ],
     "tools": {
@@ -1457,7 +1457,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:63f15820-649b-8214-8d47-4c3ccdad0850",
+  "serialNumber": "urn:uuid:051fa637-837c-8640-84bf-564f015b8fee",
   "specVersion": "1.7",
   "version": 1
 }

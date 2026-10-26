@@ -2,8 +2,6 @@
   occ blake2b_simd | pkg:cargo/blake2b_simd@1.0.3 | Cargo.toml:9:0 | blake2b_simd | [manifest] declared by a170 (dependencies)
   occ constant_time_eq | pkg:cargo/constant_time_eq@0.3.1 | Cargo.lock:36:0 | constant_time_eq | [manifest] locked constant_time_eq 0.3.1; reached via a170 -> blake2b_simd -> constant_time_eq
   occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:10:9 | blake2b_simd::Params::hash | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::hash` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.hash(msg.as_bytes());`; code: `hash`
-  occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:11:24 | blake2b_simd::Hash::to_hex | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Hash::to_hex` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `println!("{} {}", h.to_hex(), k.to_hex());`; code: `to_hex`
-  occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:11:36 | blake2b_simd::Hash::to_hex | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Hash::to_hex` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `println!("{} {}", h.to_hex(), k.to_hex());`; code: `to_hex`
   occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:6:12 | blake2b_simd::blake2b | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let h = blake2b_simd::blake2b(msg.as_bytes());`; code: `blake2b_simd::blake2b`
   occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:7:12 | blake2b_simd::Params::new | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::new` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let k = blake2b_simd::Params::new()`; code: `blake2b_simd::Params::new`
   occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:8:9 | blake2b_simd::Params::hash_length | [reachable] [call] in a170::main; use: unknown; algorithm unresolved: `blake2b_simd::Params::hash_length` of blake2b_simd 1.0.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.hash_length(32)`; code: `hash_length`
@@ -21,7 +19,7 @@
   prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:occurrences=7
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:occurrences=5
   prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:reachability=reachable
 asset unknown | crypto:algorithm:unknown:unknown:blake2b_simd | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library blake2b_simd 1.0.3 | pkg:cargo/blake2b_simd@1.0.3 | purl pkg:cargo/blake2b_simd@1.0.3
@@ -39,7 +37,7 @@ provides pkg:cargo/blake2b_simd@1.0.3 -> crypto:algorithm:unknown:unknown:blake2
 root {"bom-ref": "pkg:cargo/a170@0.1.0", "name": "a170", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a170@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a170
-run rcbom:run:boundary-check=7 calls into crypto packages: 7 cited, 0 excused (), 0 not cited
+run rcbom:run:boundary-check=7 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 2 excused (accessor 2)
 run rcbom:run:features=
 run rcbom:run:packages=5
 run rcbom:run:profile=release

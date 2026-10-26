@@ -19,7 +19,6 @@
   occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:11:17 | orion::high_level::aead::open | [reachable] [call] in a168::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.11, a crypto package the knowledge base does not model: what the call does is not known; line: `let opened = aead::open(&key, &sealed).unwrap();`; code: `aead::open`
   occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:13:20 | orion::hazardous::hash::blake2::blake2b::Blake2b::new | [reachable] [call] in a168::main; use: unknown; algorithm unresolved: `orion::hazardous::hash::blake2::blake2b::Blake2b::new` of orion 0.17.11, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut state = Blake2b::new(32).unwrap();`; code: `Blake2b::new`
   occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:15:23 | orion::hazardous::hash::blake2::blake2b::Blake2b::finalize | [reachable] [call] in a168::main; use: unknown; algorithm unresolved: `orion::hazardous::hash::blake2::blake2b::Blake2b::finalize` of orion 0.17.11, a crypto package the knowledge base does not model: what the call does is not known; line: `let digest = state.finalize().unwrap();`; code: `finalize`
-  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:19:34 | orion::hazardous::hash::blake2::blake2b::Digest::len | [reachable] [call] in a168::main; use: unknown; algorithm unresolved: `orion::hazardous::hash::blake2::blake2b::Digest::len` of orion 0.17.11, a crypto package the knowledge base does not model: what the call does is not known; line: `println!("{} {:02x?}", digest.len(), buf);`; code: `len`
   occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:9:14 | core::default::Default::default | [reachable] [call] in a168::main; use: unknown; algorithm unresolved: `core::default::Default::default` of orion 0.17.11, a crypto package the knowledge base does not model: what the call does is not known; line: `let key = aead::SecretKey::default();`; code: `aead::SecretKey::default`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:183:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a168 -> orion -> zeroize
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
@@ -68,7 +67,7 @@
   prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:detection:method=type-resolved
   prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:functions:source=observed
   prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:occurrences=6
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:occurrences=5
   prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:reachability=reachable
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
@@ -120,7 +119,7 @@ provides pkg:cargo/rand_chacha@0.9.0 -> crypto:algorithm:ChaCha12-RNG
 root {"bom-ref": "pkg:cargo/a168@0.1.0", "name": "a168", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a168@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a168
-run rcbom:run:boundary-check=11 calls into crypto packages: 8 cited, 3 excused (step 1, wipe 2), 0 not cited
+run rcbom:run:boundary-check=17 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 10 excused (accessor 1, format 6, step 1, wipe 2)
 run rcbom:run:features=
 run rcbom:run:packages=14
 run rcbom:run:profile=release

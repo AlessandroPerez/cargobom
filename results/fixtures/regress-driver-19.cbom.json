@@ -1874,14 +1874,14 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop) or computed (written into an element by t19::counters) or partly hard-coded (all zero, literal at line 32); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b\"m\".as_ref());`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by t19::counters) or partly hard-coded (all zero, literal at line 37); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b\"m\".as_ref());`; code: `encrypt`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 14,
@@ -1988,7 +1988,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,hard-coded,rng"
+          "value": "computed,hard-coded,partly hard-coded,rng"
         },
         {
           "name": "rcbom:finding",
@@ -4262,7 +4262,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "63 calls into crypto packages: 56 cited, 7 excused (generator setup 3, public half 1, setup 3), 0 not cited"
+        "value": "70 calls into crypto packages: 56 cited, 0 cited by the check as unknown, 14 excused (copy 1, format 6, generator setup 3, public half 1, setup 3)"
       }
     ],
     "tools": {
@@ -4275,7 +4275,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:30e23488-f087-8b96-bf67-a1b97f66dd13",
+  "serialNumber": "urn:uuid:a569afd8-b9ce-82ee-86a2-c725543371db",
   "specVersion": "1.7",
   "version": 1
 }

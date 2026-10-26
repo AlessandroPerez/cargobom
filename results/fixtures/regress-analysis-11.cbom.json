@@ -1497,7 +1497,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or partly hard-coded (literal at line 14); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 4,
@@ -1511,7 +1511,7 @@
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function) or partly hard-coded (all zero, literal at line 22); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
@@ -1579,11 +1579,11 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "derived,environment,parameter"
+          "value": "derived,environment,parameter,partly hard-coded"
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,environment,hard-coded,parameter"
+          "value": "computed,environment,hard-coded,parameter,partly hard-coded"
         },
         {
           "name": "rcbom:finding",
@@ -2823,7 +2823,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "39 calls into crypto packages: 30 cited, 9 excused (accessor 2, generator setup 3, public half 1, setup 3), 0 not cited"
+        "value": "49 calls into crypto packages: 30 cited, 0 cited by the check as unknown, 19 excused (accessor 2, format 10, generator setup 3, public half 1, setup 3)"
       }
     ],
     "tools": {
@@ -2836,7 +2836,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2ff2ccc3-3d55-8488-aeaa-c593e67ad047",
+  "serialNumber": "urn:uuid:ec856288-b1c4-8085-ae67-4e898a1b192c",
   "specVersion": "1.7",
   "version": 1
 }
