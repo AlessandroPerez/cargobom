@@ -801,6 +801,7 @@ impl<'a> Search<'a> {
                 len: None,
                 span: None,
                 zero: false,
+                range: None,
             };
         }
         let args = &args;
@@ -1542,6 +1543,7 @@ mod tests {
                     len: Some(1),
                     span: None,
                     zero: false,
+                    range: None,
                 },
             ],
         );
@@ -1630,6 +1632,7 @@ mod tests {
                 len: Some(32),
                 span: None,
                 zero: false,
+                range: None,
             }],
         );
         let f = Search::new(&kb, &ix, true, LIVE).value(

@@ -636,7 +636,7 @@ fn classify(
         }
         // built from all of these parts (`[user, b"pepper"].concat()`, `key[31] = 1` after the
         // key was read from the environment): a constant only if every part is
-        Origin::All(parts) => of_inputs(kb, links, owner, parts, depth, out),
+        Origin::All(parts) => of_parts(kb, links, owner, parts, true, depth, out),
         // a field written into the value: what was written
         Origin::Set { value, .. } => classify(kb, links, owner, value, depth, out),
         Origin::Truncated => {
@@ -711,11 +711,35 @@ fn of_inputs(
     depth: usize,
     out: &mut BTreeSet<Class>,
 ) {
+    of_parts(kb, links, owner, args, false, depth, out)
+}
+
+/// `of_inputs`, for a value's parts (`parts`: the elements of a buffer, some written after it
+/// was made) or a computation's inputs: a buffer's literal bytes are bytes of it whatever the
+/// other parts are (`partly hard-coded`), a computation's constant input is not.
+fn of_parts(
+    kb: &Kb,
+    links: &LinkIndex,
+    owner: &str,
+    args: &[Origin],
+    parts: bool,
+    depth: usize,
+    out: &mut BTreeSet<Class>,
+) {
     let mut constant = true;
     let mut hard_coded = BTreeSet::new();
     let mut varying = BTreeSet::new();
+    // literal bytes among the parts (`[0u8; 32]` half of which a call fills, `b"pepper"` beside
+    // the user's input): bytes of the value, whatever the other parts are
+    let mut literal_bytes = BTreeSet::new();
+    let mut literal_len = None;
+    // (and the elements the parts' fills write, through index ranges: `nonce[..4]`)
+    let mut filled: Vec<(u64, Option<u64>)> = Vec::new();
     let mut any = false;
     for a in args {
+        if parts {
+            filled.extend(fill_range(kb, a, 0));
+        }
         let mut classes = BTreeSet::new();
         classify(kb, links, owner, a, depth + 1, &mut classes);
         if classes.is_empty() {
@@ -727,18 +751,100 @@ fn of_inputs(
         }
         any = true;
         constant &= classes.iter().any(|c| c.kind == "hard-coded");
+        let bytes = parts && buffer_literal(a);
+        if bytes && let Origin::Const { len, .. } = a {
+            literal_len = *len;
+        }
         for c in classes {
             if c.kind == "hard-coded" {
+                if bytes {
+                    literal_bytes.insert(c.clone());
+                }
                 hard_coded.insert(c);
             } else {
                 varying.insert(c);
             }
         }
     }
+    // the literal is gone where fills through index ranges write all of it (rustls's
+    // `nonce[..4].copy_from_slice(salt); nonce[4..].copy_from_slice(seq)`)
+    let overwritten = literal_len.is_some_and(|n| covers(&filled, n));
     if any && constant {
-        out.extend(hard_coded);
+        out.extend(
+            hard_coded
+                .into_iter()
+                .filter(|c| !(overwritten && literal_bytes.contains(c))),
+        );
+    } else if !overwritten {
+        // (not a literal value, which would be a finding: a part of it is one)
+        out.extend(literal_bytes.into_iter().map(|c| Class {
+            kind: "partly hard-coded".into(),
+            ..without_length(c)
+        }));
     }
     out.extend(varying);
+}
+
+/// The elements a part of a value writes when it is a whole fill (`copy_from_slice`,
+/// `fill_bytes`: `[semantics] buffer_fills`) of an index range of it (`buf[4..]`).
+fn fill_range(kb: &Kb, o: &Origin, depth: usize) -> Vec<(u64, Option<u64>)> {
+    if depth > 4 {
+        return Vec::new();
+    }
+    match o {
+        Origin::Any(v) => v
+            .iter()
+            .flat_map(|x| fill_range(kb, x, depth + 1))
+            .collect(),
+        Origin::Call { callee, args, .. } => {
+            let last = callee.rsplit("::").next().unwrap_or(callee);
+            let fills = matches!(
+                last,
+                "copy_from_slice" | "clone_from_slice" | "fill" | "read_exact"
+            ) || kb.buffer_fills.iter().any(|f| f == last);
+            if !fills {
+                return Vec::new();
+            }
+            args.iter()
+                .filter_map(|a| match a {
+                    Origin::Call { callee, args, .. }
+                        if callee.ends_with("IndexMut::index_mut") =>
+                    {
+                        match args.get(1) {
+                            Some(Origin::Const { range: Some(r), .. }) => Some(*r),
+                            _ => None,
+                        }
+                    }
+                    _ => None,
+                })
+                .collect()
+        }
+        _ => Vec::new(),
+    }
+}
+
+/// Do the ranges (an end of none: the end) cover all `n` elements?
+fn covers(ranges: &[(u64, Option<u64>)], n: u64) -> bool {
+    let mut rs: Vec<(u64, u64)> = ranges.iter().map(|&(a, b)| (a, b.unwrap_or(n))).collect();
+    rs.sort();
+    let mut reached = 0;
+    for (a, b) in rs {
+        if a > reached {
+            return false;
+        }
+        reached = reached.max(b);
+    }
+    reached >= n
+}
+
+/// Literal data, not a number: bytes of a value made of parts (`[0u8; 32]`, `b"pepper"`, an
+/// element given as one), where an arithmetic operand (`x ^ 0x5c`) is a number.
+fn buffer_literal(o: &Origin) -> bool {
+    match o {
+        Origin::Const { len: Some(n), .. } => *n > 0,
+        Origin::Set { value, .. } => buffer_literal(value),
+        _ => false,
+    }
 }
 
 /// The seed of a generator built from one (`StdRng::seed_from_u64(42)`), looking through the
@@ -1324,6 +1430,7 @@ mod tests {
             len: Some(0),
             span: None,
             zero: false,
+            range: None,
         };
         assert_eq!(kinds(&kb, &empty), ["absent"]);
         let zeros = Origin::Const {
@@ -1331,6 +1438,7 @@ mod tests {
             len: Some(32),
             span: None,
             zero: true,
+            range: None,
         };
         assert_eq!(kinds(&kb, &zeros), ["hard-coded"]);
         // as HKDF's salt or input key: what TLS 1.3 puts where it has none
@@ -1392,6 +1500,7 @@ mod tests {
             len: Some(4),
             span: None,
             zero: false,
+            range: None,
         }
     }
 
@@ -1399,6 +1508,14 @@ mod tests {
         let mut out = BTreeSet::new();
         classify(kb, &LinkIndex::default(), "", o, 0, &mut out);
         out.into_iter().map(|c| c.kind).collect()
+    }
+
+    #[test]
+    fn ranges_cover_a_buffer() {
+        assert!(covers(&[(0, Some(4)), (4, None)], 12));
+        assert!(!covers(&[(4, None)], 12));
+        assert!(!covers(&[(0, Some(4)), (5, None)], 12));
+        assert!(covers(&[(0, None)], 12));
     }
 
     #[test]

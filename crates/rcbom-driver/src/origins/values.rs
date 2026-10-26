@@ -803,6 +803,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 len: bytes_of_ty(t),
                 span: None,
                 zero: false,
+                range: None,
             });
         }
         // the position the scanner gives this call's site
@@ -894,6 +895,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     span: Some(self.loc(span)),
                     zero: crate::const_int(op) == Some(0)
                         && n.eval_target_usize().is_ok_and(|n| n > 0),
+                    range: None,
                 },
                 _ => self.operand(op, at, depth, seen),
             },
@@ -1090,11 +1092,34 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     AggregateKind::Array(t) => byte_len(t, Some(ops.len() as u64)),
                     _ => None,
                 };
+                // (a literal index range, `..4` built from its bounds: the elements it covers)
+                let range = match kind {
+                    AggregateKind::Adt(def, ..) => {
+                        let path =
+                            path_of(self.tcx, rustc_internal::internal(self.tcx, def.def_id()));
+                        let at = |i: usize| {
+                            ops.get(i)
+                                .and_then(crate::const_int)
+                                .and_then(|v| u64::try_from(v).ok())
+                        };
+                        match path.strip_prefix("core::ops::range::") {
+                            Some("RangeFrom") => at(0).map(|a| (a, None)),
+                            Some("RangeTo") => at(0).map(|b| (0, Some(b))),
+                            Some("Range") => at(0).zip(at(1)).map(|(a, b)| (a, Some(b))),
+                            Some("RangeToInclusive") => {
+                                at(0).and_then(|b| b.checked_add(1)).map(|b| (0, Some(b)))
+                            }
+                            _ => None,
+                        }
+                    }
+                    _ => None,
+                };
                 Origin::Const {
                     value: None,
                     len,
                     span: Some(self.loc(span)),
                     zero: ops.iter().all(|o| crate::const_int(o) == Some(0)),
+                    range,
                 }
             }
             _ => {

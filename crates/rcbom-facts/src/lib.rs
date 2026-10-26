@@ -513,6 +513,10 @@ pub enum Origin {
         /// Literal data all of whose bytes are zero (`[0u8; 64]`).
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         zero: bool,
+        /// A literal index range (`..4`, `4..`, `2..6`): where it starts and ends (none: at
+        /// the end), as the elements a write through it covers.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        range: Option<(u64, Option<u64>)>,
     },
     /// A named static or const item (`&ring::aead::AES_256_GCM`). `value` is an integer
     /// const's value (`const ITERATIONS: u32 = 600_000`), when the compiler can evaluate it.
