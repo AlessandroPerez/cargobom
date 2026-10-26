@@ -529,6 +529,13 @@ pub(crate) fn evaluable_const<'tcx>(
 /// a function that is not `const`).
 fn ctfe_body<'tcx>(tcx: TyCtxt<'tcx>, def: DefId) -> Option<Result<&'tcx mir::Body<'tcx>, ()>> {
     match tcx.def_kind(def) {
+        // a trait's constant without a default (`ff::Field::ZERO`): each impl gives its own, the
+        // trait has none to evaluate
+        DefKind::AssocConst
+            if tcx.trait_of_assoc(def).is_some() && !tcx.defaultness(def).has_value() =>
+        {
+            return None;
+        }
         DefKind::Const | DefKind::AssocConst | DefKind::AnonConst => {
             if !def.is_local() && tcx.trivial_const(def).is_some() {
                 return Some(Err(()));
@@ -545,11 +552,18 @@ fn ctfe_body<'tcx>(tcx: TyCtxt<'tcx>, def: DefId) -> Option<Result<&'tcx mir::Bo
     if def.is_local() {
         return Some(Ok(tcx.mir_for_ctfe(def)));
     }
-    // a dependency may not have encoded it (rustc's metadata decoder panics then): not known
-    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tcx.mir_for_ctfe(def)))
-        .ok()
-        .map(Ok)
+    // a dependency may not have encoded it (rustc's metadata decoder panics then): not known,
+    // and counted as an item not analysed
+    let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tcx.mir_for_ctfe(def)));
+    if r.is_err() {
+        CTFE_PANICS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    }
+    r.ok().map(Ok)
 }
+
+/// Panics caught reading a dependency's constant's MIR (`ctfe_body`): items not analysed.
+pub(crate) static CTFE_PANICS: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
 
 /// Whether evaluating `body` may fail: an assertion (overflow, bounds, `assert!`), a call to a
 /// diverging function (`panic!`), to code without MIR, or to a `const fn` or a use of a

@@ -612,6 +612,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         format!("{}{}.json", facts.krate.name, facts.krate.unit)
     });
     std::fs::write(&path, serde_json::to_vec(&facts).unwrap()).unwrap();
+    cx.errors += statics::CTFE_PANICS.swap(0, std::sync::atomic::Ordering::Relaxed);
     if cx.errors > 0 {
         eprintln!(
             "rcbom-driver: {}: {} items could not be analysed",
