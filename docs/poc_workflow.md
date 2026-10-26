@@ -6,7 +6,7 @@
 
 The rules every layer keeps:
 - **The built artifact only.** The CBOM covers one target, one feature set and the `release` profile. Code a feature or `cfg` leaves out is a different artifact.
-- **Never drop an operation.** An operation whose algorithm is not found is reported as `unknown`, with the reason.
+- **Never drop an operation.** An operation whose algorithm is not found is reported as `unknown`, with the reason. The boundary check makes this hold on every run: each call the reachable code makes into a crypto package is cited, excused by a reason the knowledge base states, or cited by the check itself as an unknown operation.
 - **Honest sets.** Each algorithm reaching a call says how it is chosen, with a witness in the code: `fixed`, `table`, `caller`, `object`, `static`, `dyn`, `container` or `type-join`. The last four are marked *possible* where the member only may reach the call (`dyn` when more than one type is coerced to the object).
 - **The knowledge base is data.** `crates/rcbom-kb/data/seed.toml` maps library APIs to Cryptography Registry names. The analysis has no library-specific code.
 
@@ -42,7 +42,7 @@ What cargo-cbom adds is the algorithm *at the call site*, resolved through gener
 
 ## Layer 1: packages (built)
 
-- **What:** the crypto packages that ship in this build. For each: its role in the knowledge base (`algorithm`, `trait` or `protocol`), and the backend its features select (rustls with aws-lc-rs or ring). Also the native libraries the build links, and crypto packages the knowledge base does not model, recognised by their metadata. Each package gets a usage tier: declared but not used, present, or reachable.
+- **What:** the crypto packages that ship in this build. For each: its role in the knowledge base (`algorithm`, `trait` or `protocol`), and the backend its features select (rustls with aws-lc-rs or ring). Also the native libraries the build links, and crypto packages the knowledge base does not model, recognised by their metadata, an explicit list or a name that is a registry algorithm's; a package the knowledge base has at a version it does not cover is marked so. With Layer 2, each package also gets a usage tier: declared but not used, present, or reachable (`--manifest-only` leaves it unknown).
 - **How:** `cargo metadata` gives the resolved graph and features without compiling. The manifests and lockfile are read as text, for the position where each package enters the build. Packages are matched to knowledge-base records by package name and version range. `--manifest-only` stops here and compiles nothing.
 - **Existing tools used:** `cargo metadata` through the `cargo_metadata` crate, and `toml_edit` for positions.
 - **Comparable tools:** lens3329, smp-pqc-inventory and rusi's crate table cover about this layer alone. cargo-auditable's embedded dependency list would extend it to built binaries; it is not used yet.
@@ -53,9 +53,10 @@ What cargo-cbom adds is the algorithm *at the call site*, resolved through gener
 - **What:** each crypto operation the program can reach. For each: the algorithms reaching it, with their label, and its parameters (lengths, iterations, modes). Also the algorithms computed inside it (the hash of an HMAC), the key material handed to it with its provenance (hard-coded, random, derived, parameter), its reachability, and, when the workspace builds several binaries, which of them use it.
 - **How:**
   - A driver on a pinned nightly (`nightly-2026-09-25`) runs as `RUSTC_WRAPPER` under `cargo check`.
-  - It reads monomorphised MIR through `rustc_public` and walks it from each binary's entry points. `--check-walk` checks that walk against the linker: code a binary contains that the walk did not reach, outside the standard library and the modelled crates, is a missing edge.
+  - It reads MIR through `rustc_public`: the monomorphised instances it walks from each binary's entry points, and a library's generic functions, which no instance shows. `--check-walk` checks that walk against the linker: code a binary contains that the walk did not reach, outside the standard library and the modelled crates, is a missing edge.
   - It records sites and value links as facts (JSON).
   - A stable analysis matches the facts against the knowledge base. It follows values backwards across functions, and applies the boundary models (jsonwebtoken, TLS configuration).
+  - The boundary check accounts for every call the walked code makes into a crypto package (also those the standard library makes for it): cited by an occurrence, excused by a reason the knowledge base states (`[[aside]]`: a view, a copy, an accessor), or cited by the check itself as an unknown operation.
   - The analysis assembles the CBOM and validates it against the vendored CycloneDX 1.7 schemas.
   - An opt-in points-to engine only removes doubt: it narrows or closes gaps and never adds algorithms. Where it finds a value a search claiming completeness missed, the call gets the unknown. Its disagreements with the default analysis are printed, which makes it a check on that analysis.
 - **Existing tools used:**
@@ -83,7 +84,7 @@ The rules run on the same backward value search as Layer 2. Layer 2 already prov
   - Three local models vote.
   - The result is recorded as `method=llm`, with the model and the prompt's hash.
 - **Undetermined:** cases that depend on the threat model, such as a checksum on a download, stay `undetermined`, with both readings.
-- **Output:** a purpose property per occurrence (planned as `rcbom:purpose`, with confidence and rationale; `rcbom:usage` already holds Layer 1's usage tier), and the `cryptoFunctions` that policy tools read purpose from.
+- **Output:** a purpose property per occurrence (planned as `rcbom:purpose`, with confidence and rationale; `rcbom:usage` already holds a package's usage tier), and the `cryptoFunctions` that policy tools read purpose from.
 - **Existing tools:** none classifies purpose at the call site.
   - The closest is package-level relevance by Hirsch et al.: a three-model local ensemble, F1 0.82–0.86, matching cloud models.
   - Crypistry's rule repository (Näther and Hirsch, 2026) and CodeQL's `rust/weak-sensitive-data-hashing` cover parts of the sink rules.
@@ -138,7 +139,7 @@ Layers 1 and 2 and the verifier are built, and evaluated on:
 - six real projects with labels;
 - seven held-out crates.io crates, labelled blind before any run;
 - the labelled rusi fixtures, against rusi;
-- an external reference case;
-- an independent review of the whole project, which reproduced every number and labelled two more crates blind (the review set).
+- external reference cases by BOM Fidelity: the rusi fixture `cbom-real-crates-app` with five controlled variants, and jwt-cli 6.1.1 and hkdf 0.12.4 labelled blind; published as a citable reference package;
+- four independent reviews of the whole project, each reproducing every number. The first labelled two more crates blind (the review set); each later one attacked the analysis with new programs and blind crates, and the fourth broke the boundary check in ways since fixed in the check.
 
 The numbers are in the README's Results. Its Limitations lists what the CBOM covers, where it deliberately differs from a label written by the rules, and what it does not do yet. Layers 3 to 5 are designed, not built.

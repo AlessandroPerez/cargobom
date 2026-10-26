@@ -31,11 +31,11 @@ Read it left to right. There is an **asset**, AES-256-GCM. One **occurrence** of
 Every finding is a CycloneDX component of type `cryptographic-asset`. There are three kinds:
 - **Algorithms** (`crypto:algorithm:<name>`), named after the CycloneDX Cryptography Registry: `AES-256-GCM`, `HMAC-SHA-256`, `ECDSA-P-256-SHA-256`, `x25519`. Each has a family, a primitive (AE, hash, MAC, signature…), a mode, a curve or parameter set where it has one, and the functions the program uses it for (`encrypt`, `digest`, `sign`, `keygen`…). An algorithm computed *inside* another one is a **component** of it: the SHA-256 inside `Hmac<Sha256>`, or the BLAKE2b inside Argon2. It gets its own asset and an occurrence at the outer call ("part of PBKDF2-SHA-256-1000-32").
 - **Key material** (`crypto:material:<kind>:<algorithm>`): the keys, nonces, salts and passwords handed to a crypto API, with where each one comes from (its *provenance*, section 6.7).
-- **Unknowns** (`crypto:algorithm:unknown:<primitive>:<package>`): an operation the code performs whose algorithm the tool could not determine, with the reason (section 6.4).
+- **Unknowns** (`crypto:algorithm:unknown:<primitive>:<package>`): an operation the code performs whose algorithm the tool could not determine, with the reason (section 6.4), or a call into a crypto package that the boundary check cites itself because nothing else accounts for it (section 6.10).
 
 Each occurrence is a source position plus an `additionalContext`, the text after the position in the line above, which says what was found there and why. Positions are relative to the workspace. They read `<package>-<version>/<path>` inside a dependency, and `target/<path>` in code a build script generated.
 
-Properties named `rcbom:*` carry what CycloneDX has no field for. These include reachability, the provenance of each key role (`rcbom:provenance:key=hard-coded`), findings (`rcbom:finding=hard-coded-key`), parameters the registry name does not spell out (`rcbom:param:nonce_bytes=12`), and the run's toolchain, target, features and profile.
+Properties named `rcbom:*` carry what CycloneDX has no field for. These include reachability, the provenance of each key role (`rcbom:provenance:key=hard-coded`), findings (`rcbom:finding=hard-coded-key`), parameters the registry name does not spell out (`rcbom:param:nonce_bytes=12`), the run's toolchain, target, features and profile, and the run's checks: the boundary check's counts (`rcbom:run:boundary-check`, section 6.10) and, with `--check-walk`, the walk check's (`rcbom:run:walk-check`, section 5.6).
 
 One package can build several binaries. rage, for instance, builds `rage` and `rage-keygen`. The document lists the artifacts it covers (`rcbom:run:artifact`), and when there are several, every occurrence and asset is tagged with the artifacts that use it (`[artifacts: bin rage-keygen]`, `rcbom:artifact`). That way the reader can see that `rage-keygen` only uses X25519, although the package as a whole uses about twenty algorithms. Section 5.5 explains where the tag comes from.
 
@@ -86,7 +86,7 @@ cargo cbom verify               an independent check of every position the CBOM 
 
 1. Load the knowledge base (`crates/rcbom-kb/data/seed.toml`) and run Layer 1.
 2. Unless `--manifest-only` was given, run `cargo +nightly-2026-09-25 check --workspace --profile release` with `RUSTC_WRAPPER` pointing at the driver. Environment variables tell the driver which crates the knowledge base covers.
-3. Load the facts of every unit Cargo reports (fresh or rebuilt) and run the analysis.
+3. Load the facts of every unit Cargo reports (fresh or rebuilt) and run the analysis. It ends with the boundary check (section 6.10): every call the walks record into a crypto package is cited, excused, or cited by the check itself.
 4. With `--check-walk`, build each binary once more, unoptimised, to check the walk against the linker (section 5.6).
 5. Assemble the CBOM, validate it against the vendored CycloneDX schemas, and write it.
 
@@ -100,7 +100,7 @@ The driver adds three compiler flags. `-Zalways-encode-mir` puts every dependenc
 
 Layer 1 (`crates/rcbom-manifest`) uses `cargo metadata` (the resolved dependency graph and features, nothing compiled) and reads the manifests and the lockfile as text. It finds:
 
-- the crypto packages that ship, each matched against the knowledge base by package name and version range, with its role (`algorithm`, `trait` or `protocol`, chapter 4);
+- the crypto packages that ship, each matched against the knowledge base by package name and version range, with its role (`algorithm`, `trait` or `protocol`, chapter 4); a package the knowledge base has at a version it does not cover is marked so (`rcbom:kb-coverage=unsupported-version`), and its calls are reported as unknowns;
 - crypto packages the knowledge base does not model, recognised from their metadata (a `cryptography` category, or a keyword such as crypto, encryption, tls, in any case, as crates.io's slugs are: rust-crypto's `Crypto`, snowstorm's `Cryptography`), an explicit list, or, when the package declares no category at all, a name that names an algorithm of the Cryptography Registry (its first part or all of it, after an affix that says the crate is Rust's: `blake2b_simd`, `sha1_smol`, `rust-argon2`; procedural macros never count; a web framework named `seed` declares what it is). These are reported as *unmodelled* crypto packages, so a long-tail library is at least named. Among them, encodings and parsers of crypto data (categories encoding, parser-implementations, memory-management: der, pkcs8) are `support`, and so are the helpers on a `support` list whose metadata says cryptography but which compute none (block-buffer, subtle, the constant-time crates cmov and ctutils). Metadata cannot tell every case: ssh-key, which signs, has der's categories, and totp-rs names no crypto at all, so an explicit `crypto` list holds those (with ssh-agent-lib, quinn-proto, age-core, hyper-rustls, and native-tls with its wrappers, which name no crypto either). A package that neither its metadata, the lists nor its name show to be crypto is a known limit (README, Limitations): the driver records calls only into the packages Layer 1 lists, so it is missed by both layers; one filed as support still has its operations in Layer 2, unknown or named, cited inside it;
 - the backend that features select (for example rustls with ring or with aws-lc-rs), and the native libraries the build links;
 - where each package enters the build: the `Cargo.toml` line of a direct dependency, or the `Cargo.lock` entry of a transitive one, with the chain that pulls it in (`reached via t1 -> aes-gcm`).
@@ -129,8 +129,9 @@ The main sections:
 | `[[part]]` | algorithms a family computes inside itself (Argon2's BLAKE2b) |
 | `[[boundary]]`, `[[enum]]` | *boundary models*: an API whose algorithm is a value the program chooses (jsonwebtoken's `Header.alg`) |
 | `[[protocol]]` | protocol configuration (rustls versions, suites, groups) |
-| `[unmodelled]` | Layer 1 for packages without entries: crypto and support lists, and types that compute no cryptography (`SmallRng`) |
-| `[semantics]` | what some packages' APIs mean: those drawing from the generator they are given (rand), modes over a block cipher (ctr), types whose `Default` is a constant (generic-array) |
+| `[unmodelled]` | packages without entries: Layer 1's crypto and support lists, types that compute no cryptography (`SmallRng`), method names that say nothing without a modelled type, stream steps and traits (`update`, `io::Write`), and relays (tokio-rustls) |
+| `[semantics]` | what some packages' APIs mean: those drawing from the generator they are given (rand), modes over a block cipher (ctr), types whose `Default` is a constant (generic-array), algorithm getters, output steps, calls that fill a whole buffer (`fill_bytes`), how generators' type names end |
+| `[[aside]]` | calls that are no operation, by trait or by a crate's path, each with its reason (a view, a copy, a wipe, an accessor, a comparison): what the boundary check excuses (6.10) |
 
 ### 4.1 Roles and stop crates
 
@@ -288,6 +289,8 @@ Compiling a crate makes all of its code *present*. Most of it never runs in a gi
   - the vtables of trait objects (below);
   - the formatting machinery, as a case of the pointers above: `format!` and `{}` build `fmt::Argument`s holding a pointer to the `Display` or `Debug` impl they print, which matters for error types that format themselves.
 - **Stop crates** (section 4.1) are entered only to learn which crates run. The one way code could run without the walk seeing it is a stop crate calling back into a type it does not own through a trait it models (a program's own `Digest` impl handed to `pbkdf2`). That is hand-rolled cryptography, out of scope, and the check against the linker (section 5.6) would show it; none remains in the corpus. bcrypt-pbkdf, which runs Blowfish this way, is itself modelled as the construction it is.
+
+The standard library's instances are walked too, but its MIR carries no source positions: a call it makes into the crypto set (`Option::unwrap_or_default` running orion's `SecretKey::default`) is recorded at the walked code's call into the standard library that leads there (section 6.10).
 
 Sites inside walked instances become `reachable`. The walk also records what it reached (`Reach` in the facts): the reached functions and statics, and which crates' code runs. The analysis uses these to decide whether a value stored somewhere can really reach a call. A member only stored by code no entry point reaches does not count.
 
@@ -616,6 +619,16 @@ Set by you:
 | `RCBOM_PTA=1` | run the points-to engine (chapter 7); `RCBOM_PTA_*` variables tune and trace it |
 | `RCBOM_BUILD_STD=1` | build the standard library from source (for the engine) |
 | `RCBOM_DEBUG`, `RCBOM_DEBUG_WALK` | print caught panics; print the walk's edges out of matching instances |
+| `RCBOM_DEBUG_CELLS`, `RCBOM_DEBUG_LINKS` | print the driver's cell writes; print the analysis's link lookups |
+
+Read by `cargo xtask e2e`:
+
+| variable | meaning |
+|---|---|
+| `RCBOM_RESULTS` | where to write the fixtures' outputs (default: a fresh temporary directory; `results/fixtures` is the committed copy) |
+| `RCBOM_E2E_CACHE` | a directory for the fixtures' build caches, kept between runs |
+| `RCBOM_JOBS` | how many fixtures run in parallel (default: one per core, as far as memory allows) |
+| `RCBOM_BLESS=1` | rewrite the golden files from this run |
 
 ## Appendix C: Implementation Choices at a Glance
 
@@ -632,6 +645,7 @@ Set by you:
 | the engine only removes doubt | flow-insensitive extras would be misclassifications (7.2) |
 | an independent text-based verifier with a self-test | a shared bug cannot confirm itself (8) |
 | check the walk against the linker | every linked-not-walked gap is a missing edge (5.6) |
-| the engine as an oracle on every run | its disagreements with the default run are reviewed, never let through (7.3) |
+| the engine as an oracle in engine runs | its disagreements with the default run are reviewed, never let through (7.3) |
+| account for every call into a crypto package | a call no occurrence cites and no stated reason excuses is cited by the check itself: nothing reached is dropped (6.10) |
 | fix by code point, not by case | the next program needs only a neighbouring case (6.3) |
 
