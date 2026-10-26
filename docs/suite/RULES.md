@@ -296,6 +296,10 @@ Argon2 costs taken from library defaults are not literals in the program and are
   error before any cryptography when the key family does not match the header algorithm.
 - **R15.2 may.** R4.10 is unchanged. Values produced by parsing input are not part of the
   reference analysis, so they never appear in `may`.
+- **R15.4 The program's own mapping.** R15.2 is about values a library produces by parsing
+  (R4.10). A value the program maps to algorithms itself, a `match` over a parsed enum in the
+  program's code (jwt-cli's `translate_algorithm`), is the program's run-time branch: its arms
+  count by R4.8, each arm's algorithm in `may` at the sites its value reaches.
 - **R15.3 Mixed functions.** If a site's `must` mixes MAC algorithms (`tag`) with signature
   algorithms (`sign`), as `jsonwebtoken::encode` does with a run-time algorithm, the site's
   `function` is `sign`.
