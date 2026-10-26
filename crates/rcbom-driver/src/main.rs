@@ -390,6 +390,8 @@ fn analyze(tcx: TyCtxt<'_>) {
     let lib_reachable = (std::env::var_os("CARGO_PRIMARY_PACKAGE").is_some()
         && rustc_public::entry_fn().is_none())
     .then(|| tcx.reachable_set(()));
+    // (and their calls into the crypto set, which no instance shows: the boundary check's)
+    let mut lib_edges: Vec<rcbom_facts::BoundaryEdge> = Vec::new();
     for item in rustc_public::all_local_items() {
         if !matches!(item.kind(), ItemKind::Fn) || !item.has_body() {
             continue;
@@ -426,6 +428,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 );
                 sc.lib_generic = lib_generic;
                 sc.visit_body(&body);
+                lib_edges.extend(std::mem::take(&mut sc.boundary));
                 sc.promoted_values(did);
                 let mut l = rcbom_facts::Links::default();
                 links::body_links(&cx, &body, did, true, None, &mut l);
@@ -475,6 +478,21 @@ fn analyze(tcx: TyCtxt<'_>) {
         }
         let mut w = Walker::new(&mut cx);
         let mut r = w.run(roots, static_roots);
+        // a library's generic functions' calls, where no walked instance makes the same call
+        let walked: HashSet<(Loc, Option<rcbom_facts::CallId>)> = r
+            .boundary
+            .iter()
+            .map(|e| (e.span.clone(), e.call.clone()))
+            .collect();
+        r.boundary.extend(
+            std::mem::take(&mut lib_edges)
+                .into_iter()
+                .filter(|e| !walked.contains(&(e.span.clone(), e.call.clone()))),
+        );
+        r.boundary.sort_by(|a, b| {
+            (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
+        });
+        r.boundary.dedup();
         // which artifact this walk is of: a binary by cargo's name for it (`rage-keygen`), a
         // library by its package's
         r.artifact = match std::env::var("CARGO_BIN_NAME") {
@@ -709,8 +727,11 @@ struct Scanner<'a, 'tcx> {
     /// The body is of a library's generic function its users can call, or of a closure in one
     /// (`lib_generic`): no instance of the library's own may show its calls.
     lib_generic: bool,
-    /// In a walked body, its calls into a crate of the crypto set (`Reach::boundary`).
+    /// In a walked body (or a library's generic function), its calls into a crate of the crypto
+    /// set (`Reach::boundary`).
     boundary: Vec<rcbom_facts::BoundaryEdge>,
+    /// The call whose terminator is being scanned: the sites it gives name it.
+    cur_call: Option<rcbom_facts::CallId>,
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved
@@ -756,6 +777,9 @@ struct Walker<'a, 'tcx> {
     pending: HashMap<String, Vec<(Instance, Instance, Span)>>,
     /// The trait objects each type holds (`Walker::dyn_keys`).
     dyn_cache: HashMap<rustc_middle::ty::Ty<'tcx>, Vec<String>>,
+    /// The calls of walked code (not the standard library's, a stop crate's or a shim) into each
+    /// standard-library instance.
+    std_anchors: HashMap<Instance, Vec<Anchor>>,
     limit: usize,
 }
 
@@ -786,6 +810,24 @@ struct Edges<'a, 'tcx> {
     used: Vec<String>,
     /// The calls (the instance, none through a pointer) and their arguments' types.
     calls: Vec<(Option<Instance>, Vec<rustc_public::ty::Ty>)>,
+    /// The calls into the standard library (or a shim): the instance, the callee's name's span,
+    /// which call (`Walker::std_anchors`).
+    std_calls: Vec<(Instance, Span, Option<rcbom_facts::CallId>)>,
+}
+
+/// A call of walked code into the standard library, whose bodies have no source positions: the
+/// calls they make into the crypto set are the program's at this one (`Walker::std_edges`).
+struct Anchor {
+    caller: Instance,
+    owner: Owner,
+    loc: Loc,
+    expansion: Option<rcbom_facts::Expansion>,
+    text: Option<String>,
+    line_text: Option<String>,
+    call: Option<rcbom_facts::CallId>,
+    /// The functions the walked code hands to it as values (the `FnDef`s among its type
+    /// arguments: `repeat_with(SecretKey::default)`).
+    values: Vec<rustc_span::def_id::DefId>,
 }
 
 /// A type coerced to a trait object: the trait's path, the type's, and for each trait method

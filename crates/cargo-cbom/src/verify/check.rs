@@ -98,9 +98,15 @@ impl Files<'_> {
         // an unknown algorithm is an operation's: the call is one the knowledge base lists (an
         // operation, a boundary model), or a use of a crypto package's API it does not model or
         // name (`p256::SecretKey::random`, age's `Identity::generate`)
+        // (or one the boundary check cites itself: a call into a crypto package the knowledge
+        // base gives no meaning)
         if o.component_ref.starts_with("crypto:algorithm:unknown:")
             && kind == "call"
             && !self.is_operation(&o.symbol, &o.component_ref)
+            && !(ctx
+                .details
+                .contains("algorithm unresolved: the boundary check: ")
+                && self.crypto_package(&o.component_ref))
         {
             return Err(format!(
                 "`{}` is no operation the knowledge base lists, nor a crypto package's use",
@@ -221,6 +227,8 @@ impl Files<'_> {
         let first = o
             .symbol
             .trim_start_matches('<')
+            .trim_start_matches('&')
+            .trim_start_matches("mut ")
             .split("::")
             .next()
             .unwrap_or("");
@@ -312,6 +320,14 @@ impl Files<'_> {
                 .to_string();
             if ident.is_empty() {
                 return Err("no identifier in symbol".into());
+            }
+            // an operator trait's method is called by its operator (`point * scalar`): the
+            // position is the operator
+            let op = operator_of(&o.symbol);
+            if let Some(op) = op
+                && !(at.starts_with(op) && !at[op.len()..].starts_with('='))
+            {
+                return Err(format!("expected the operator `{op}` in {text:?}"));
             }
             // a call through a function pointer (`h(&SHA256, d)`): the position is the call's
             // callee expression, a name, a field or a parenthesised expression followed by its
@@ -503,7 +519,7 @@ impl Files<'_> {
                     }
                 }
             }
-            if pointer.is_none() && !(ok && starts_token) {
+            if pointer.is_none() && op.is_none() && !(ok && starts_token) {
                 return Err(format!("expected `{ident}` in {text:?}"));
             }
         }
@@ -2103,4 +2119,48 @@ pub(super) fn check_item(
         }
     }
     Ok(())
+}
+
+/// The operator a method of an operator trait is written as (`<P as core::ops::arith::Mul<S>>::
+/// mul`: `*`), for a symbol naming one.
+pub(super) fn operator_of(symbol: &str) -> Option<&'static str> {
+    let m = re!(
+        r"core::ops::(?:arith::|bit::)?(Add|Sub|Mul|Div|Rem|BitAnd|BitOr|BitXor|Shl|Shr|Neg|Not)(Assign)?\b"
+    )
+    .captures(symbol)?;
+    let method = symbol.rsplit("::").next().unwrap_or("");
+    let want = format!(
+        "{}{}",
+        m[1].to_ascii_lowercase(),
+        if m.get(2).is_some() { "_assign" } else { "" }
+    );
+    if method != want {
+        return None;
+    }
+    let op = match &m[1] {
+        "Add" => "+",
+        "Sub" | "Neg" => "-",
+        "Mul" => "*",
+        "Div" => "/",
+        "Rem" => "%",
+        "BitAnd" => "&",
+        "BitOr" => "|",
+        "BitXor" => "^",
+        "Shl" => "<<",
+        "Shr" => ">>",
+        _ => "!",
+    };
+    Some(match (op, m.get(2).is_some()) {
+        (o, false) => o,
+        ("+", true) => "+=",
+        ("-", true) => "-=",
+        ("*", true) => "*=",
+        ("/", true) => "/=",
+        ("%", true) => "%=",
+        ("&", true) => "&=",
+        ("|", true) => "|=",
+        ("^", true) => "^=",
+        ("<<", true) => "<<=",
+        (_, true) => ">>=",
+    })
 }

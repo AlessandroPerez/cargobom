@@ -86,6 +86,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             def,
             lib_generic: false,
             boundary: Vec::new(),
+            cur_call: None,
         }
     }
 
@@ -102,7 +103,10 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     }
 
     /// A call of a walked body into a crate of the crypto set other than its own, by the
-    /// function it resolves to, at the position a site of it has (`Reach::boundary`).
+    /// function it resolves to, at the position a site of it has (`Reach::boundary`). In a
+    /// library's generic function (`lib_generic`), which no instance shows, resolved for its own
+    /// type parameters where they fix the function (`scalar * point` on curve25519-dalek's
+    /// types), else the function named (`<D as Digest>::update`: digest's).
     fn boundary_edge(&mut self, func: &Operand, term: &Terminator) {
         let tcx = self.cx.tcx;
         let Ok(ty) = func.ty(self.body.locals()) else {
@@ -112,28 +116,60 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         let Some(RigidTy::FnDef(def, args)) = kind.rigid() else {
             return;
         };
-        let Ok(inst) = Instance::resolve(*def, args) else {
-            return;
+        let named = rustc_internal::internal(tcx, def.def_id());
+        let iargs = rustc_internal::internal(tcx, args);
+        // (arguments with the function's own parameters are resolved in its environment, not
+        // as a monomorphic instance, which rustc_public's resolution assumes)
+        let (did, iargs) = if iargs.has_non_region_param() || iargs.has_aliases() {
+            if !self.lib_generic {
+                return;
+            }
+            let Some(item) = self.def else {
+                return;
+            };
+            let env = rustc_middle::ty::TypingEnv::post_analysis(tcx, item);
+            match rustc_middle::ty::Instance::try_resolve(
+                tcx,
+                env,
+                named,
+                tcx.erase_and_anonymize_regions(iargs),
+            ) {
+                Ok(Some(i)) => (i.def_id(), i.args),
+                _ => (named, iargs),
+            }
+        } else {
+            match Instance::resolve(*def, args) {
+                Ok(inst) => (
+                    rustc_internal::internal(tcx, inst.def.def_id()),
+                    rustc_internal::internal(tcx, inst).args,
+                ),
+                Err(_) => return,
+            }
         };
-        let did = rustc_internal::internal(tcx, inst.def.def_id());
         if !self.cx.kb_crate(did.krate) || self.def.is_some_and(|d| d.krate == did.krate) {
             return;
         }
-        // the callee's name; for a function held in a place, the call's callee expression
+        // the callee's name; for a function held in a place, the call's callee expression; for
+        // an operator (`point * scalar`), the operator
+        let call_span = rustc_internal::internal(tcx, term.source_info.span);
         let span = match func {
+            Operand::Constant(_)
+                if !call_span.from_expansion() && operator(tcx, named).is_some() =>
+            {
+                operator(tcx, named).and_then(|op| operator_span(tcx, call_span, op))
+            }
             Operand::Constant(c) => Some(rustc_internal::internal(tcx, c.span)),
-            _ => callee_span(tcx, rustc_internal::internal(tcx, term.source_info.span)).or_else(
-                || {
-                    self.origins
-                        .callee_name_span(func, term)
-                        .map(|s| rustc_internal::internal(tcx, s))
-                },
-            ),
+            _ => callee_span(tcx, call_span).or_else(|| {
+                self.origins
+                    .callee_name_span(func, term)
+                    .map(|s| rustc_internal::internal(tcx, s))
+            }),
         };
         let Some(span) = span else {
             return;
         };
-        let (loc, _) = locate(tcx, self.site_span(span));
+        let span = self.site_span(span);
+        let (loc, expansion) = locate(tcx, span);
         if loc.line == 0 {
             return;
         }
@@ -142,29 +178,20 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             .trait_of_assoc(did)
             .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
             .map(|t| path_of(tcx, t));
-        // (the structs and enums its type arguments are, behind references and slices)
-        let mut types = Vec::new();
-        for t in rustc_internal::internal(tcx, inst).args.types() {
-            let mut t = t;
-            while let rustc_middle::ty::Ref(_, i, _) | rustc_middle::ty::Slice(i) = t.kind() {
-                t = *i;
-            }
-            if let rustc_middle::ty::Adt(adt, _) = t.kind() {
-                let p = path_of(tcx, adt.did());
-                if !types.contains(&p) {
-                    types.push(p);
-                }
-            }
-        }
         self.boundary.push(rcbom_facts::BoundaryEdge {
             owner: self.owner.clone(),
             span: loc,
             callee: def_ref_internal(tcx, did),
             trait_path,
             coroutine: tcx.is_coroutine(did),
-            types,
+            types: adt_paths(tcx, iargs),
             through_value: !matches!(func, Operand::Constant(_)),
             on_behalf: None,
+            call: self.cur_call.clone(),
+            text: span_text(tcx, span),
+            line_text: line_text(tcx, span),
+            expansion,
+            std_entry: None,
         });
     }
 
@@ -193,6 +220,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             expansion,
             target,
             via: self.via.clone(),
+            call: self.cur_call.clone(),
         });
     }
 
@@ -467,6 +495,150 @@ pub(super) fn args_start(text: &str) -> Option<usize> {
 /// The body without the blocks no execution reaches: those behind a branch on a constant
 /// (`if cfg!(debug_assertions)` is `if false` in a release build, which MIR level 0 keeps).
 /// Their statements are dropped and their terminators made `unreachable`.
+/// Which call a terminator is (`CallId`): its whole expression, where the compiler writes it,
+/// and the function it names.
+pub(super) fn call_id(
+    tcx: TyCtxt<'_>,
+    body: &Body,
+    term: &Terminator,
+) -> Option<rcbom_facts::CallId> {
+    let TerminatorKind::Call { func, .. } = &term.kind else {
+        return None;
+    };
+    let named = match func
+        .ty(body.locals())
+        .ok()
+        .and_then(|t| t.kind().rigid().cloned())
+    {
+        Some(RigidTy::FnDef(def, _)) => path_of(tcx, rustc_internal::internal(tcx, def.def_id())),
+        _ => String::new(),
+    };
+    Some(rcbom_facts::CallId {
+        span: crate::names::raw_loc(tcx, rustc_internal::internal(tcx, term.source_info.span)),
+        named,
+    })
+}
+
+/// The structs and enums among a call's type arguments, behind references and slices, by
+/// defining path.
+pub(super) fn adt_paths<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Vec<String> {
+    let mut types = Vec::new();
+    for t in args.types() {
+        let mut t = t;
+        while let rustc_middle::ty::Ref(_, i, _) | rustc_middle::ty::Slice(i) = t.kind() {
+            t = *i;
+        }
+        if let rustc_middle::ty::Adt(adt, _) = t.kind() {
+            let p = path_of(tcx, adt.did());
+            if !types.contains(&p) {
+                types.push(p);
+            }
+        }
+    }
+    types
+}
+
+/// The operator a method of an operator trait is written as (`Mul::mul`: `*`; `Neg::neg`: a
+/// prefix `-`), and whether it is a prefix one.
+pub(super) fn operator(
+    tcx: TyCtxt<'_>,
+    method: rustc_span::def_id::DefId,
+) -> Option<(&'static str, bool)> {
+    let t = tcx.trait_of_assoc(method)?;
+    let name = tcx
+        .get_diagnostic_name(t)
+        .or_else(|| tcx.lang_items().from_def_id(t).map(|l| l.name()))?;
+    Some(match name.as_str() {
+        "Add" | "add" => ("+", false),
+        "Sub" | "sub" => ("-", false),
+        "Mul" | "mul" => ("*", false),
+        "Div" | "div" => ("/", false),
+        "Rem" | "rem" => ("%", false),
+        "BitAnd" | "bitand" => ("&", false),
+        "BitOr" | "bitor" => ("|", false),
+        "BitXor" | "bitxor" => ("^", false),
+        "Shl" | "shl" => ("<<", false),
+        "Shr" | "shr" => (">>", false),
+        "AddAssign" | "add_assign" => ("+=", false),
+        "SubAssign" | "sub_assign" => ("-=", false),
+        "MulAssign" | "mul_assign" => ("*=", false),
+        "DivAssign" | "div_assign" => ("/=", false),
+        "RemAssign" | "rem_assign" => ("%=", false),
+        "BitAndAssign" | "bitand_assign" => ("&=", false),
+        "BitOrAssign" | "bitor_assign" => ("|=", false),
+        "BitXorAssign" | "bitxor_assign" => ("^=", false),
+        "ShlAssign" | "shl_assign" => ("<<=", false),
+        "ShrAssign" | "shr_assign" => (">>=", false),
+        "Neg" | "neg" => ("-", true),
+        "Not" | "not" => ("!", true),
+        _ => return None,
+    })
+}
+
+/// The span of an operator's token in the expression `call` it applies (`a * b`): a prefix one
+/// starts it; a binary one is the last of its kind outside brackets that follows an operand
+/// (`a * b * c` is `(a * b) * c`; the `*` of `a * *b` before `*b` is the binary one).
+pub(super) fn operator_span(
+    tcx: TyCtxt<'_>,
+    call: rustc_span::Span,
+    (op, prefix): (&str, bool),
+) -> Option<rustc_span::Span> {
+    let text = tcx.sess.source_map().span_to_snippet(call).ok()?;
+    let at = |i: usize| {
+        call.with_lo(call.lo() + rustc_span::BytePos(i as u32))
+            .with_hi(call.lo() + rustc_span::BytePos((i + op.len()) as u32))
+    };
+    if prefix {
+        return text.starts_with(op).then(|| at(0));
+    }
+    let b = text.as_bytes();
+    let (mut depth, mut found, mut i) = (0i32, None, 0usize);
+    let mut last: Option<u8> = None;
+    while i < b.len() {
+        let c = b[i];
+        match c {
+            b'"' => {
+                // a string literal: skipped whole
+                i += 1;
+                while i < b.len() && b[i] != b'"' {
+                    i += if b[i] == b'\\' { 2 } else { 1 };
+                }
+                last = Some(b'"');
+                i += 1;
+                continue;
+            }
+            b'(' | b'[' | b'{' => depth += 1,
+            b')' | b']' | b'}' => depth -= 1,
+            _ => {}
+        }
+        if depth == 0 && text[i..].starts_with(op) {
+            let after = b.get(i + op.len()).copied();
+            // not a longer operator (`*=` for `*`, `<<` for `<`, `&&` for `&`)
+            let longer = after.is_some_and(|a| {
+                a == b'=' && !op.ends_with('=') || (op.len() == 1 && a == op.as_bytes()[0])
+            });
+            let operand_before = last.is_some_and(|l| {
+                l.is_ascii_alphanumeric()
+                    || matches!(l, b'_' | b')' | b']' | b'}' | b'"' | b'?' | b'\'')
+            });
+            if !longer && operand_before {
+                found = Some(i);
+                i += op.len();
+                last = Some(b' ');
+                continue;
+            }
+        }
+        if !c.is_ascii_whitespace() {
+            last = Some(c);
+        }
+        i += 1;
+    }
+    found.map(at)
+}
+
 pub(super) fn live_body(
     tcx: TyCtxt<'_>,
     body: &rustc_public::mir::Body,
@@ -695,13 +867,14 @@ pub(super) fn untuple(body: &Body, tuple: &Operand) -> Option<Vec<Operand>> {
 }
 impl Scanner<'_, '_> {
     pub(super) fn scan_terminator(&mut self, term: &Terminator, loc: Location) {
+        self.cur_call = call_id(self.cx.tcx, self.body, term);
         if let TerminatorKind::Call {
             func,
             args: call_args,
             ..
         } = &term.kind
         {
-            if self.tier == Tier::Reachable {
+            if self.tier == Tier::Reachable || self.lib_generic {
                 self.boundary_edge(func, term);
             }
             if let Ok(ty) = func.ty(self.body.locals())
@@ -793,6 +966,7 @@ impl Scanner<'_, '_> {
             }
         }
         self.super_terminator(term, loc);
+        self.cur_call = None;
     }
 
     /// Functions named as values inside the item's promoted constants (`run(&Holder { f:
