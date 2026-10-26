@@ -219,6 +219,7 @@ fn site(
             Target::Static { def }
         },
         via: via.to_vec(),
+        call: None,
     })
 }
 

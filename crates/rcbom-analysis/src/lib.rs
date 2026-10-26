@@ -87,6 +87,8 @@ pub struct Occurrence {
     /// The artifacts whose walk reaches it (`bin rage-keygen`, `lib rcgen`); none when it is
     /// not reachable.
     pub artifacts: BTreeSet<String>,
+    /// The calls it stands for (`Site::call`): the boundary check's edges it accounts for.
+    pub calls: BTreeSet<rcbom_facts::CallId>,
 }
 
 #[derive(Clone, Debug)]

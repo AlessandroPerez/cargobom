@@ -156,8 +156,13 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
         }
         (None, None) => {
             // a method of a standard-library trait run by a type of another crate is a call
-            // into that crate (`<orion::aead::SecretKey as Default>::default()` draws a key)
-            let runs_in = match self_ty {
+            // into that crate (`<orion::aead::SecretKey as Default>::default()` draws a key), on
+            // a value or a reference to one (`&point * &scalar`)
+            let mut own = self_ty.as_ref();
+            while let Some(rcbom_facts::TyTree::Ref(t)) = own {
+                own = Some(t);
+            }
+            let runs_in = match own {
                 Some(rcbom_facts::TyTree::Adt { krate, .. })
                     if matches!(callee.krate.name.as_str(), "core" | "std" | "alloc") =>
                 {

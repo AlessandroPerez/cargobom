@@ -231,6 +231,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             dyn_used: HashSet::new(),
             pending: HashMap::new(),
             dyn_cache: HashMap::new(),
+            std_anchors: HashMap::new(),
             limit,
         }
     }
@@ -295,11 +296,15 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 e
             })
             .collect();
+        boundary.extend(self.std_edges(&mut memo));
         boundary.sort_by(|a, b| {
             (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
         });
         boundary.dedup_by(|a, b| {
-            a.span == b.span && a.callee.path == b.callee.path && a.on_behalf == b.on_behalf
+            a.span == b.span
+                && a.callee.path == b.callee.path
+                && a.on_behalf == b.on_behalf
+                && a.call == b.call
         });
         let tcx = self.cx.tcx;
         let crates = self
@@ -366,6 +371,12 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
         let tcx = self.cx.tcx;
         let krate = rustc_internal::internal(tcx, inst.def.def_id()).krate;
+        // the program's own code is the program's, whatever calls it (a function handed to
+        // ring's `agree_ephemeral` as its key derivation)
+        if self.cx.local.contains(&krate) {
+            memo.insert(inst, None);
+            return None;
+        }
         if self.cx.stop_crate(krate) || self.cx.impl_crate(krate) {
             memo.insert(inst, Some(Behalf::Algorithm));
             return Some(Behalf::Algorithm);
@@ -392,6 +403,78 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         };
         memo.insert(inst, b);
         b
+    }
+
+    /// The calls the standard library's walked code makes into the crypto set, whose bodies
+    /// have no source positions: each is the walked code's call into the standard library that
+    /// leads there, through standard-library code only (`none.unwrap_or_default()` running
+    /// orion's `SecretKey::default`, cited at `unwrap_or_default`).
+    fn std_edges(
+        &self,
+        memo: &mut HashMap<Instance, Option<rcbom_facts::Behalf>>,
+    ) -> Vec<rcbom_facts::BoundaryEdge> {
+        let tcx = self.cx.tcx;
+        let std_like = |i: &Instance| {
+            matches!(i.kind, InstanceKind::Shim)
+                || self.cx.is_std(
+                    tcx.crate_name(rustc_internal::internal(tcx, i.def.def_id()).krate)
+                        .as_str(),
+                )
+        };
+        let mut out = Vec::new();
+        let mut callees: Vec<&Instance> = self.seen.iter().collect();
+        callees.sort_by_key(|i| i.mangled_name());
+        for c in callees {
+            let did = rustc_internal::internal(tcx, c.def.def_id());
+            if matches!(c.kind, InstanceKind::Shim) || !self.cx.kb_crate(did.krate) {
+                continue;
+            }
+            let mut stack: Vec<Instance> = self
+                .callers
+                .get(c)
+                .into_iter()
+                .flatten()
+                .filter(|i| std_like(i))
+                .copied()
+                .collect();
+            let mut visited = HashSet::new();
+            while let Some(s) = stack.pop() {
+                if !visited.insert(s) {
+                    continue;
+                }
+                for a in self.std_anchors.get(&s).into_iter().flatten() {
+                    let own = rustc_internal::internal(tcx, a.caller.def.def_id()).krate;
+                    if own == did.krate {
+                        continue;
+                    }
+                    let trait_path = tcx
+                        .trait_of_assoc(did)
+                        .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
+                        .map(|t| path_of(tcx, t));
+                    out.push(rcbom_facts::BoundaryEdge {
+                        owner: a.owner.clone(),
+                        span: a.loc.clone(),
+                        callee: def_ref_internal(tcx, did),
+                        trait_path,
+                        coroutine: tcx.is_coroutine(did),
+                        types: adt_paths(tcx, rustc_internal::internal(tcx, c).args),
+                        through_value: a.values.contains(&did),
+                        on_behalf: self.behalf(a.caller, memo, 0),
+                        call: a.call.clone(),
+                        text: a.text.clone(),
+                        line_text: a.line_text.clone(),
+                        expansion: a.expansion.clone(),
+                        std_entry: a.call.as_ref().map(|c| c.named.clone()),
+                    });
+                }
+                for p in self.callers.get(&s).into_iter().flatten() {
+                    if std_like(p) {
+                        stack.push(*p);
+                    }
+                }
+            }
+        }
+        out
     }
 
     /// Enqueues an instance a stop crate's code calls, walked for usage only: standard-library
@@ -535,6 +618,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             deferred: Vec::new(),
             used: Vec::new(),
             calls: Vec::new(),
+            std_calls: Vec::new(),
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
@@ -648,6 +732,58 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             self.sites.extend(sites);
             for s in statics {
                 self.reach_static(rustc_internal::internal(self.cx.tcx, s.def_id()));
+            }
+            // its calls into the standard library, where the calls that code makes into the
+            // crypto set are cited (`std_edges`)
+            let tcx = self.cx.tcx;
+            for (callee, span, call) in std::mem::take(&mut edges.std_calls) {
+                let internal = rustc_internal::internal(tcx, span);
+                let internal = match derive_site(tcx, did) {
+                    Some(d) if !internal.from_expansion() => d,
+                    _ => internal,
+                };
+                let (loc, expansion) = locate(tcx, internal);
+                if loc.line == 0 {
+                    continue;
+                }
+                let mut values = Vec::new();
+                for a in rustc_internal::internal(tcx, callee).args.iter() {
+                    for g in a.walk() {
+                        // (by the function it runs: `SecretKey::default` names `Default::default`)
+                        if let Some(t) = g.as_type()
+                            && let rustc_middle::ty::FnDef(d, args) = *t.kind()
+                        {
+                            let runs = rustc_middle::ty::Instance::try_resolve(
+                                tcx,
+                                rustc_middle::ty::TypingEnv::fully_monomorphized(),
+                                d,
+                                args.skip_binder(),
+                            )
+                            .ok()
+                            .flatten()
+                            .map(|i| i.def_id());
+                            for d in std::iter::once(d).chain(runs) {
+                                if !values.contains(&d) {
+                                    values.push(d);
+                                }
+                            }
+                        }
+                    }
+                }
+                let anchors = self.std_anchors.entry(callee).or_default();
+                if anchors.iter().any(|a| a.call == call && a.loc == loc) {
+                    continue;
+                }
+                anchors.push(Anchor {
+                    caller: inst,
+                    owner: owner.clone(),
+                    loc,
+                    expansion,
+                    text: span_text(tcx, internal),
+                    line_text: line_text(tcx, internal),
+                    call,
+                    values,
+                });
             }
         }
         // the trait objects this body uses: called through one (anywhere walked); handed by the
@@ -947,6 +1083,19 @@ impl Edges<'_, '_> {
                     };
                     self.found.push((i, span));
                     callee = Some(i);
+                    let d = rustc_internal::internal(self.tcx, i.def.def_id());
+                    if matches!(i.kind, InstanceKind::Shim)
+                        || matches!(
+                            self.tcx.crate_name(d.krate).as_str(),
+                            "core" | "std" | "alloc"
+                        )
+                    {
+                        self.std_calls.push((
+                            i,
+                            span,
+                            crate::scan::call_id(self.tcx, self.body, term),
+                        ));
+                    }
                 }
                 self.calls.push((callee, tys));
             }

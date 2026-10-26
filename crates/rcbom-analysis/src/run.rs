@@ -612,6 +612,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     generic_body: false,
                     via: Vec::new(),
                     artifacts: artifacts.clone(),
+                    calls: site.call.iter().cloned().collect(),
                 });
             }
             // a call into a crypto crate uses it, whatever matches (rsa's OAEP through age); so
@@ -837,6 +838,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         })
                         .collect(),
                     artifacts,
+                    calls: site.call.iter().cloned().collect(),
                 };
                 let a = assets.entry(m.key()).or_insert_with(|| Asset {
                     key: m.key(),
@@ -893,6 +895,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         o.tier = Tier::Reachable;
                     }
                     o.artifacts.extend(occ.artifacts);
+                    o.calls.extend(occ.calls);
                     if o.function.is_none() {
                         o.function = occ.function;
                     }
@@ -1128,7 +1131,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     if std::env::var_os("RCBOM_DEBUG").is_some() {
         eprintln!("analysis: sites in {:.1?}", main_pass.elapsed());
     }
-    let coverage = coverage::check(&ctx, man, facts, &assets, &protocols);
+    let coverage = coverage::check(&ctx, man, facts, &mut assets, &protocols, &mut usage);
     Analysis {
         assets,
         protocols,

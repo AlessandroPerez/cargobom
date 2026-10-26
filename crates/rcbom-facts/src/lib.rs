@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 32;
+pub const FACTS_VERSION: u32 = 33;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -812,6 +812,20 @@ pub struct Site {
     /// For sites inside a monomorphized generic instance: the calls that created the
     /// instance, innermost first (`seal::<Aes256Gcm>` called at src/main.rs:23).
     pub via: Vec<ViaStep>,
+    /// For a site that is a call, which call: what its boundary edges name too.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub call: Option<CallId>,
+}
+
+/// One call, as its site and its boundary edges both name it: where the compiler writes its
+/// whole expression (inside a macro's definition, for a macro's code) and the function as named
+/// there, before the call is resolved (`core::ops::arith::Mul::mul`,
+/// `core::option::Option::unwrap_or_default`). An occurrence made from a site accounts for the
+/// edges of its own call, not for every call at its position.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct CallId {
+    pub span: Loc,
+    pub named: String,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -924,6 +938,22 @@ pub struct BoundaryEdge {
     /// which starts in such code (nom's parser run on age's closure).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub on_behalf: Option<Behalf>,
+    /// Which call it is (for a call the standard library makes, the program's call into it).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub call: Option<CallId>,
+    /// The source text at `span` and its line, as a site's (`Site::text`, `Site::line_text`), and
+    /// the macro it comes from: for an occurrence the check cites itself.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line_text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expansion: Option<Expansion>,
+    /// A call the standard library makes on the program's behalf, whose body has no source
+    /// positions: the standard-library function the walked code called there
+    /// (`core::option::Option::unwrap_or_default`, running orion's `SecretKey::default`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub std_entry: Option<String>,
 }
 
 /// Whose code a call of `BoundaryEdge` runs for.
