@@ -2281,7 +2281,7 @@ methods = ["decapsulate"]
 # (opaque-debug's name is the OPAQUE protocol's); it never makes a package cryptographic by
 # itself.
 [unmodelled]
-crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group", "ssh-key", "ssh-agent-lib", "totp-rs", "quinn-proto"]
+crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group", "ssh-key", "ssh-agent-lib", "totp-rs", "quinn-proto", "native-tls", "tokio-native-tls", "hyper-tls", "async-native-tls"]
 support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint", "opaque-debug"]
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
@@ -2319,7 +2319,7 @@ why = "a copy of a value: the operations made with either copy are cited where t
 
 [[aside]]
 name = "format"
-traits = ["core::fmt::Debug", "core::fmt::Display"]
+traits = ["core::fmt::Debug", "core::fmt::Display", "core::fmt::LowerHex", "core::fmt::UpperHex", "core::fmt::Binary", "core::fmt::Octal"]
 why = "formatting a value for output"
 
 [[aside]]
@@ -2342,14 +2342,32 @@ why = "a key's or a signature's encoding, decoding or parts (SEC1 points, field 
 [[aside]]
 name = "encoding"
 crate = ["ecdsa"]
-path = "^(Signature::(to_der|from_der|from_scalars|to_bytes|from_bytes|from_slice|to_vec)|der::Signature::(as_bytes|to_bytes|to_vec))$"
+path = "^(Signature::(to_der|from_der|from_scalars|to_bytes|from_bytes|from_slice|to_vec|split_bytes|split_scalars|r|s)|der::Signature::(as_bytes|to_bytes|to_vec))$"
 why = "a signature's encoding or decoding (the signature is cited where it is made or verified)"
 
 [[aside]]
 name = "encoding"
 crate = ["elliptic-curve", "ecdsa"]
-path = "^(field::FieldBytesEncoding::(decode|encode)_field_bytes|scalar::primitive::ScalarPrimitive::(as_uint|to_bytes|from_bytes)|secret_key::SecretKey::(to_bytes|from_bytes|from_slice|to_sec1_der)|hazmat::bits2field)$"
+path = "^(field::FieldBytesEncoding::(decode|encode)_field_bytes|scalar::primitive::ScalarPrimitive::(as_uint|to_bytes|from_bytes)|secret_key::SecretKey::(to_bytes|from_bytes|from_slice|to_sec1_der|to_nonzero_scalar)|public_key::PublicKey::(from_sec1_bytes|to_sec1_bytes|from_encoded_point|to_encoded_point|from_affine|as_affine|to_projective)|hazmat::bits2field)$"
 why = "a key's, a field element's or a scalar's bytes, or a digest as a field element: an encoding (a key's export is setup, README Limitations)"
+
+[[aside]]
+name = "encoding"
+crate = ["blake3"]
+path = "^Hash::(to_hex|from_hex)$"
+why = "a hash written or read as hex digits"
+
+[[aside]]
+name = "encoding"
+crate = ["ssh-cipher"]
+path = "^Cipher::(from_str|as_str)$"
+why = "a cipher's name parsed or written"
+
+[[aside]]
+name = "step"
+crate = ["rand"]
+path = "^(distributions|distr)::distribution::(DistIter|Iter|DistMap|Map)::(next|size_hint|nth|fold|count)$"
+why = "a draw of the stream `sample_iter` made, or its size: the draws are cited where the stream is made"
 
 [[aside]]
 name = "encoding"
@@ -2367,7 +2385,7 @@ why = "a password hash's or a salt's string form, parsed or written (the hash is
 name = "public half"
 traits = ["ring::signature::KeyPair", "aws_lc_rs::signature::KeyPair"]
 crate = ["ring", "aws-lc-rs"]
-path = "^(rsa::keypair::KeyPair::public|agreement::(.+::)?EphemeralPrivateKey::compute_public_key|kem::DecapsulationKey::encapsulation_key)$"
+path = "^(rsa::keypair::KeyPair::public|agreement::(.+::)?EphemeralPrivateKey::compute_public_key|kem::DecapsulationKey::encapsulation_key|rsa::encryption::PrivateDecryptingKey::public_key)$"
 why = "a key's public half, from the private key cited where it is made or read"
 
 [[aside]]
@@ -2385,7 +2403,7 @@ why = "a key's public half, from the private key cited where it is made or read"
 [[aside]]
 name = "setup"
 crate = ["ring", "aws-lc-rs"]
-path = "^(aead::(.+::)?Nonce::(try_)?assume_unique_for_key|aead::Aad::(from|empty)|aead::(.+::)?LessSafeKey::new|digest::Context::new|hmac::Context::with_key|(agreement|signature)::UnparsedPublicKey::new|kem::EncapsulationKey::new|ec::key_pair::EcdsaKeyPair::from_private_key_der|pqdsa::key_pair::PqdsaKeyPair::from_pkcs8|cipher::padded::PaddedBlockEncryptingKey::cbc_pkcs7)$"
+path = "^(aead::(.+::)?Nonce::(try_)?assume_unique_for_key|aead::Aad::(from|empty)|aead::(.+::)?LessSafeKey::new|digest::Context::new|hmac::Context::with_key|(agreement|signature)::UnparsedPublicKey::new|kem::EncapsulationKey::new|kem::Ciphertext::from|ec::key_pair::EcdsaKeyPair::from_private_key_der|pqdsa::key_pair::PqdsaKeyPair::from_pkcs8|cipher::padded::PaddedBlockEncryptingKey::cbc_pkcs7)$"
 why = "the inputs and keys of an operation made (a nonce, the associated data, a key from its bytes, a context): the operations made with them are cited"
 
 [[aside]]
@@ -2397,8 +2415,14 @@ why = "a context, a key or a parameter made from its parts: the operations made 
 [[aside]]
 name = "setup"
 crate = ["ring", "aws-lc-rs"]
-path = "^(aead::Tag::from|cipher::(EncryptingKey|DecryptingKey)::[a-z0-9_]+|iv::FixedLength::from|signature::ParsedPublicKey::new)$"
-why = "a tag, an IV or a key made from its bytes, or a cipher key in its mode: the operations made with them are cited"
+path = "^(aead::Tag::from|cipher::(EncryptingKey|DecryptingKey)::[a-z0-9_]+|iv::FixedLength::from|signature::ParsedPublicKey::new|cipher::padded::PaddedBlockDecryptingKey::cbc_pkcs7|rsa::encryption::oaep::Oaep(PublicEncrypting|PrivateDecrypting)Key::new|kdf::(sskdf::get_sskdf_(hmac|digest)_algorithm|kbkdf::get_kbkdf_ctr_hmac_algorithm))$"
+why = "a tag, an IV or a key made from its bytes, a cipher key in its mode, a key for OAEP, a KDF's descriptor looked up: the operations made with them are cited"
+
+[[aside]]
+name = "setup"
+crate = ["orion"]
+path = "^(.+::)?(SecretKey|Password|Nonce|Salt|PublicKey|SecretKeyPair)::from_slice$"
+why = "a key, a password, a nonce or a salt made from its bytes: the operations made with them are cited"
 
 [[aside]]
 name = "accessor"
@@ -2413,11 +2437,23 @@ path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secr
 why = "an operation's output or a key's or parameters' value, read after it is made (cited where it is computed)"
 
 [[aside]]
+name = "accessor"
+crate = ["blake2b_simd", "blake2s_simd", "orion", "aws-lc-rs"]
+path = "^(Hash::(as_bytes|as_array|to_hex)|(.+::)?(unprotected_as_bytes|len|is_empty)|cipher::streaming::BufferUpdate::(written|remainder))$"
+why = "an operation's output or a key's value, its length, read after it is made (cited where it is computed)"
+
+[[aside]]
 name = "generator setup"
 traits = ["rand_core::SeedableRng"]
 crate = ["ring", "aws-lc-rs", "rand"]
 path = "^(rand::SystemRandom::new|rngs::thread::(thread_)?rng|rngs::.+::(default|new)|(distributions|distr)::uniform::.+)$"
 why = "a generator or a distribution made: what draws from it is cited where it draws"
+
+[[aside]]
+name = "generator setup"
+crate = ["rand_core"]
+path = "^(os::OsRng::default|TryRngCore::(unwrap_err|unwrap_mut))$"
+why = "the operating system's generator made, or wrapped to panic on errors (`OsRng.unwrap_err()`): what draws from it is cited where it draws"
 
 [[aside]]
 name = "comparison"
@@ -2430,6 +2466,16 @@ name = "comparison"
 crate = ["ed25519-dalek", "ecdsa", "ssh-cipher", "blake3"]
 path = "^((signing::SigningKey|verifying::VerifyingKey)::eq|Cipher::eq|Hash::eq)$"
 why = "two keys or cipher names compared: no cryptographic function"
+
+[[aside]]
+name = "comparison"
+traits = ["core::cmp::PartialEq", "core::cmp::PartialOrd", "core::cmp::Ord", "subtle::ConstantTimeEq", "subtle::ConstantTimeGreater", "subtle::ConstantTimeLess"]
+why = "two values compared (a tag, a key, a point), in constant time or not: what made them is cited where it is made"
+
+[[aside]]
+name = "table key"
+traits = ["core::hash::Hash"]
+why = "a value fed to a hash table's hasher (`Hash`, not a cryptographic hash): no cryptographic function"
 
 # --- What some packages' APIs mean ------------------------------------------------------------
 # `draws`: packages whose APIs draw from the generator they are given (rand's
@@ -2545,6 +2591,15 @@ algorithm = 0
 crate = ["ring", "aws_lc_rs"]
 path = "^agreement::(.+::)?agree(_ephemeral)?$"
 primitive = "key-agree"
+use = "keyderive"
+algorithm = 0
+
+# aws-lc-rs's NIST SP 800-56C (one-step) and SP 800-108 (counter mode) key derivations: the
+# algorithm is the descriptor its getter returns (`get_sskdf_hmac_algorithm(id)`)
+[[operation]]
+crate = ["aws_lc_rs"]
+path = "^kdf::(sskdf::sskdf_(hmac|digest)|kbkdf::kbkdf_ctr_hmac)$"
+primitive = "kdf"
 use = "keyderive"
 algorithm = 0
 
