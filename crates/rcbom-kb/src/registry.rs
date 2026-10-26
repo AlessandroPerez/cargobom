@@ -232,9 +232,20 @@ static WORDS: LazyLock<std::collections::HashSet<String>> = LazyLock::new(|| {
 });
 
 /// Does a package's name name an algorithm of the registry: its first part (`blake2b` of
-/// `blake2b_simd`, `sha1` of `sha1_smol`) or all of it written without separators (`md-5`)?
+/// `blake2b_simd`, `sha1` of `sha1_smol`) or all of it written without separators (`md-5`),
+/// without the affix that says a crate is Rust's (`argon2` of `rust-argon2`, of `argon2-rs`)?
 pub fn names_algorithm(package: &str) -> bool {
     let lower = package.to_ascii_lowercase();
+    let lower = ["rust-", "rust_", "rs-", "rs_"]
+        .iter()
+        .find_map(|p| lower.strip_prefix(p))
+        .or_else(|| {
+            ["-rs", "_rs", "-rust", "_rust"]
+                .iter()
+                .find_map(|s| lower.strip_suffix(s))
+        })
+        .unwrap_or(&lower)
+        .to_string();
     let first = lower.split(['-', '_']).next().unwrap_or("");
     let joined: String = lower
         .chars()

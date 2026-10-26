@@ -1143,22 +1143,26 @@ impl Kb {
         if self.unmodelled_crypto.iter().any(|p| p == package) {
             return Some(Unmodelled::Crypto);
         }
-        let crypto = categories.iter().any(|c| c == "cryptography")
+        // (crates.io's category and keyword slugs are case-insensitive: `Cryptography`, `Crypto`)
+        let crypto = categories
+            .iter()
+            .any(|c| c.eq_ignore_ascii_case("cryptography"))
             || keywords.iter().any(|k| {
                 matches!(
-                    k.as_str(),
+                    k.to_ascii_lowercase().as_str(),
                     "crypto" | "cryptography" | "encryption" | "tls" | "certificate" | "x509"
                 )
             });
-        // (or, when it says nothing, its name names an algorithm of the Cryptography Registry:
-        // `blake2b_simd`, `sha1_smol`)
-        if !crypto && !registry::names_algorithm(package) {
+        // (or, when it says nothing of what it is, no category at all, its name names an
+        // algorithm of the Cryptography Registry: `blake2b_simd`, `sha1_smol`, `rust-argon2`; a
+        // web framework named `seed` says what it is)
+        if !crypto && !(categories.is_empty() && registry::names_algorithm(package)) {
             return None;
         }
         let support = self.unmodelled_support.iter().any(|p| p == package)
             || categories.iter().any(|c| {
                 matches!(
-                    c.as_str(),
+                    c.to_ascii_lowercase().as_str(),
                     "encoding" | "parser-implementations" | "memory-management"
                 )
             });
@@ -1341,6 +1345,25 @@ mod tests {
         );
         assert_eq!(
             kb.unmodelled("serde", &v(&["encoding"]), &v(&["serde"])),
+            None
+        );
+        // crates.io's slugs whatever their case (rust-crypto's `Crypto`, snowstorm's
+        // `Cryptography`); a name after its Rust affix (rust-argon2, no metadata); a name that
+        // is an algorithm's, but the categories say what the package is (seed, a web framework)
+        assert_eq!(
+            kb.unmodelled("rust-crypto", &v(&[]), &v(&["Crypto", "MD5"])),
+            crypto
+        );
+        assert_eq!(
+            kb.unmodelled("snowstorm", &v(&["Cryptography"]), &v(&[])),
+            crypto
+        );
+        assert_eq!(
+            kb.unmodelled("rust-argon2", &v(&[]), &v(&["argon2", "hash"])),
+            crypto
+        );
+        assert_eq!(
+            kb.unmodelled("seed", &v(&["wasm", "web-programming"]), &v(&["frontend"])),
             None
         );
     }
