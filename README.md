@@ -59,11 +59,13 @@ cargo cbom
   functions that are algorithms, operations, uses, argument roles, provenance sources,
   boundary models, and the calls that are no operation (`[[aside]]`).
 - **The boundary check** accounts for every call the walked code makes into a crypto package,
-  by the function it resolves to: each is cited by an occurrence, or needs none for a reason the
-  knowledge base or the contract states (a protocol crate the walk enters, a crypto package's
-  internals, a stream's step, an `[[aside]]` kind: a view, a copy, a wipe, an accessor). A call
-  neither cited nor excused fails the run; the CBOM states the count
-  (`rcbom:run:boundary-check`; `in-too-deep.md` 6.10).
+  by the function it resolves to (and for those the standard library makes on its behalf, and
+  those of a library's generic functions): each is cited by an occurrence of that call, or needs
+  none for a reason the knowledge base or the contract states (a protocol crate the walk
+  enters, a crypto package's internals, a stream's step, an `[[aside]]` kind: a view, a copy, a
+  wipe, an accessor, a comparison). A call neither cited nor excused is cited by the check
+  itself, as an operation of unknown algorithm: nothing the walk reaches is left out. The CBOM
+  states the counts (`rcbom:run:boundary-check`; `in-too-deep.md` 6.10).
 - **The verifier** reopens every cited file and checks each position, and the details it can
   read in the code (the token named, the item around it, the descriptor read by the call,
   bindings in scope, closures, macro rules, coercions, witnesses); `--self-test` shifts every
@@ -140,7 +142,7 @@ sha256. Labels were written from source by agents that never saw tool output
 (`docs/suite/RULES.md`). For the suite, corpus and held-out sets: two independent labellers per
 set, compared, and adjudicated by the rules; the held-out crates were chosen after development
 and their labels frozen before the first run (dufs and rustic_core were then used to fix code,
-jwt and ssh-key the verifier). The review crates were chosen and labelled blind by an
+jwt and ssh-key the verifier, ssh-key and totp-rs the driver). The review crates were chosen and labelled blind by an
 independent reviewer of the whole project, then used for the fixes its review found.
 
 | set | what | result |
@@ -150,8 +152,8 @@ independent reviewer of the whole project, then used for the fixes its review fo
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 28 correct, 1 less-specific, 3 honest-unknown, 1 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (306 outputs, the suite's included): 19,657 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,867, held-out 1,320 and review 808, all verified; every one of 95,759 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package (`rcbom:run:boundary-check`) | none left neither cited nor excused: fixtures 9,895 calls (3,262 cited, 6,633 excused), corpus 1,289 (327, 962), held-out 1,222 (352, 870), review 653 (166, 487) |
+| evidence | every cited position, `verify --self-test` | fixtures (311 outputs, the suite's included): 19,807 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,867, held-out 1,321 and review 819, all verified; every one of 96,479 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 10,831 calls (3,285 cited, 13 cited by the check as unknown, 7,533 excused), corpus 1,558 (334, 0, 1,224), held-out 1,338 (372, 1, 965), review 790 (178, 1, 611) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 6 cores: compilation, analysis, walk check | 4 s (totp-rs) to 177 s (xh) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw); reruns reproduce each CBOM exactly |
 
@@ -171,7 +173,9 @@ Where it is not exact, the CBOM says so instead of guessing:
   types a library's callers choose, and calls into crypto packages the knowledge base does not
   model (age's `decrypt`, digest_auth's `respond`, totp-rs's `generate_current`, ssh-key's
   `try_sign`; in the corpus, rage's calls into age that set up its encryptor or draw its
-  passphrase).
+  passphrase). Two the boundary check cites itself: ssh-key's `Signer::try_sign` on the type
+  parameter of its generic `SshSig::sign`, which no occurrence of the analysis covered (a
+  signature), and rbw's `parse` of an ssh-key public key, which the standard library runs.
 
 ## Limitations
 
@@ -195,7 +199,8 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   dependency that is no crypto package, is cited as an operation of an unknown algorithm: what
   it does is not known, but for the use its name has (`decrypt`). A constructor is cited too
   (orion's `SecretKey::default()` draws a key), and so is a standard-library trait's method its
-  types run. Not cited: a step of a stream (`update`, the methods of `io::Read` and
+  types run, and a call the standard library makes into it for the program, at the program's
+  call (`none.unwrap_or_default()`). Not cited: a step of a stream (`update`, the methods of `io::Read` and
   `io::Write`), what the knowledge base lists as no operation (`[[aside]]`: views, copies,
   wipes, accessors), and calls into relays: tokio-rustls and hyper-rustls wrap rustls, whose
   operations are cited in rustls; rustls-pki-types, rustls-pemfile and rustls-native-certs are
@@ -232,17 +237,21 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   code is counted as wrong by the scorers where its site is labelled dead; none is in the sets
   above.
 - *Layer 1 from metadata.* An unmodelled package is a crypto package when its `Cargo.toml` says
-  so (category or keyword), the knowledge base lists it, or its name names an algorithm of the
-  Cryptography Registry (`blake2b_simd`, `sha1_smol`), and `support` when its categories are an
-  encoding's or a parser's, or the knowledge base lists it as a helper (opaque-debug, whose name
-  is the OPAQUE protocol's). Metadata cannot tell every case (ssh-key, which signs, has der's
-  categories; totp-rs names no crypto), so such packages are listed by name. A crypto package
-  with neither metadata, a listing nor an algorithm name is outside both layers: the driver
-  records calls only into the packages Layer 1 lists, and the boundary check accounts for
-  those only.
-- *What the boundary check rests on.* It shows every call the walk reaches into the crypto set
-  cited or excused, relative to the walk (an upper bound), Layer 1's crypto set, and the
-  knowledge base's word that an excused kind is no operation. A call through a function
+  so (category or keyword, in any case: rust-crypto's `Crypto`), the knowledge base lists it,
+  or it declares no category and its name names an algorithm of the Cryptography Registry
+  (`blake2b_simd`, `sha1_smol`, `rust-argon2` without its Rust affix; the web framework `seed`
+  declares what it is), and `support` when its categories are an encoding's or a parser's, or
+  the knowledge base lists it as a helper (opaque-debug, whose name is the OPAQUE protocol's).
+  Metadata cannot tell every case (ssh-key, which signs, has der's categories; totp-rs and
+  native-tls name no crypto), so such packages are listed by name. A crypto package with
+  neither metadata, a listing nor an algorithm name is outside both layers: the driver records
+  calls only into the packages Layer 1 lists, and the boundary check accounts for those only.
+- *What the boundary check rests on.* Every call the walk reaches into the crypto set, those the
+  standard library makes on the walked code's behalf and those of a library's generic
+  functions are cited, by an occurrence or by the check, or excused, relative to the walk (an
+  upper bound), Layer 1's crypto set, and the knowledge base's word that an excused kind is no
+  operation. A call through a function pointer, a function-typed parameter, a generic field or
+  a returned function is no call of the check: the function is cited where it is named, and a
   pointer the driver does not resolve is cited at the calls the pointed-to functions make.
 - *Values.* Values are followed through def-use origins, links across functions and
   standard-library summaries, not a points-to analysis. Where one is not followed, the CBOM
@@ -258,7 +267,12 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   `parameter`, which also stays beside what the callers pass. Classes are what some way of the
   program may bring there: a library reading one field for every key it is given (jsonwebtoken's
   `EncodingKey`) gets every key the program makes, for each algorithm it may run, and a
-  hard-coded one among them gives each its finding. A value a function of the program
+  hard-coded one among them gives each its finding. A value only some of whose bytes are a
+  literal (a zeroed key half of which a call fills) is `partly hard-coded`, which gives no
+  finding: the value is not a literal. Fills through literal index ranges that cover the whole
+  buffer replace it (rustls's TLS 1.2 nonce, `[..4]` then `[4..]`); a buffer written by a loop
+  (element by element, through `chunks_mut`) keeps its literal as `partly hard-coded`: the
+  analysis does not count a loop's writes. A value a function of the program
   returns is `computed` by it, not followed into its body (a key `load_key()` reads from a file
   is `computed (load_key)`).
 - *Positions.* A call is cited where its path starts (`Sha256::digest` at `S`); a path split
@@ -274,8 +288,9 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 - *The verifier* is text-based. It checks every position, the token and item there, and the
   details it can read in the source (the descriptor a call reads, witnesses in the program and
   its dependencies, bindings, `instantiated by` calls, coercions, macro rules, manifest entries
-  and a library component's name, version and purl). The standard library's witnesses are not
-  read. It does not check the
+  and a library component's name, version and purl; an operator's method at its operator).
+  The standard library's witnesses are not read. It shares the knowledge base with the
+  analysis, and its naming of a descriptor (`static_names`). It does not check the
   reachability tier, artifact tags, provenance classes, which of an asset's functions a call
   performs, set labels (member kind, `possible`, `one of N`), the reason of an unknown, or a
   registry name outside boundary models; and it cannot see an operation the CBOM leaves out
