@@ -763,14 +763,14 @@
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::format_packet_data; use: encrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (portable_atomic::AtomicU64::fetch_add) or computed (written into an element by session::Session::format_packet_data); line: `.seal_in_place_separate_tag(`; code: `seal_in_place_separate_tag`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::format_packet_data; use: encrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (portable_atomic::AtomicU64::fetch_add) or computed (written into an element by session::Session::format_packet_data) or partly hard-coded (all zero, literal at line 213); line: `.seal_in_place_separate_tag(`; code: `seal_in_place_separate_tag`",
             "line": 217,
             "location": "src/noise/session.rs",
             "offset": 17,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_separate_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::receive_packet_data; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (rate_limiter::RateLimiter::verify_packet) or computed (written into an element by session::Session::receive_packet_data) or parameter (argument 1 of noise::Tunn::handle_data) or parameter (argument 1 of noise::Tunn::handle_verified_packet) or parameter (argument 1 of the enclosing function); line: `.open_in_place(`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in boringtun::noise::session::Session::receive_packet_data; use: decrypt; algorithm possibly from ring::aead::algorithm::CHACHA20_POLY1305, the only one found reaching the call from another function; member: type-join, possible (a value `boringtun::noise::session::Session::new` stores in the field); nonce: computed (rate_limiter::RateLimiter::verify_packet) or computed (written into an element by session::Session::receive_packet_data) or parameter (argument 1 of noise::Tunn::handle_data) or parameter (argument 1 of noise::Tunn::handle_verified_packet) or parameter (argument 1 of the enclosing function) or partly hard-coded (all zero, literal at line 253); line: `.open_in_place(`; code: `open_in_place`",
             "line": 257,
             "location": "src/noise/session.rs",
             "offset": 17,
@@ -806,7 +806,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,hard-coded,parameter"
+          "value": "computed,hard-coded,parameter,partly hard-coded"
         },
         {
           "name": "rcbom:finding",
@@ -1815,7 +1815,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "102 calls into crypto packages: 72 cited, 30 excused (accessor 9, comparison 3, internal 4, setup 12, view 2), 0 not cited"
+        "value": "114 calls into crypto packages: 72 cited, 0 cited by the check as unknown, 42 excused (accessor 9, comparison 3, format 12, internal 4, setup 12, view 2)"
       }
     ],
     "tools": {
@@ -1828,7 +1828,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7286e7c3-52b4-82a5-8514-0e0866fc6646",
+  "serialNumber": "urn:uuid:954346d5-682d-8c58-98fa-91563ba58a68",
   "specVersion": "1.7",
   "version": 1
 }

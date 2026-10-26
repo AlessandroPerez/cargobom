@@ -1,0 +1,95 @@
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/hazardous/kem/ml_kem/internal/mod.rs:931:8 | getrandom::fill | [present] [call] in orion::hazardous::kem::ml_kem::internal::KeyPairInternal::<..>::from_keys; use: generate; line: `getrandom::fill(&mut m)?;`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/hazardous/kem/ml_kem/mlkem1024.rs:298:8 | getrandom::fill | [present] [call] in orion::hazardous::kem::ml_kem::mlkem1024::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/hazardous/kem/ml_kem/mlkem512.rs:297:8 | getrandom::fill | [present] [call] in orion::hazardous::kem::ml_kem::mlkem512::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/hazardous/kem/ml_kem/mlkem768.rs:298:8 | getrandom::fill | [present] [call] in orion::hazardous::kem::ml_kem::mlkem768::EncapsulationKey::encap; use: generate; line: `getrandom::fill(m.as_mut())?;`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/hazardous/kem/xwing.rs:280:8 | getrandom::fill | [present] [call] in orion::hazardous::kem::xwing::XWing::encap; use: generate; line: `getrandom::fill(eseed.as_mut())?;`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | orion-0.17.15/src/util/mod.rs:81:4 | getrandom::fill | [reachable] [call] in orion::util::secure_rand_bytes; use: generate; line: `getrandom::fill(dst).unwrap();`; code: `getrandom::fill`
+  occ ct-codecs | pkg:cargo/ct-codecs@1.1.8 | Cargo.lock:12:0 | ct-codecs | [manifest] locked ct-codecs 1.1.8; reached via d32 -> orion -> ct-codecs
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:31:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via d32 -> orion -> getrandom
+  occ orion | pkg:cargo/orion@0.17.15 | Cargo.lock:48:0 | orion | [manifest] locked orion 0.17.15; reached via d32 -> orion
+  occ orion | pkg:cargo/orion@0.17.15 | Cargo.toml:9:0 | orion | [manifest] declared by d32 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:67:0 | subtle | [manifest] locked subtle 2.6.1; reached via d32 -> orion -> subtle
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:10:29 | core::option::Option::<T>::unwrap_or_default | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::option::Option::<T>::unwrap_or_default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let k1: SecretKey = none.unwrap_or_default();`; code: `unwrap_or_default`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:11:21 | core::default::Default::default | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `core::default::Default::default` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut holder = SecretKey::default();`; code: `SecretKey::default`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:12:13 | core::mem::take | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::mem::take` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let k2 = std::mem::take(&mut holder);`; code: `std::mem::take`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:13:29 | core::default::Default::default | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::default::Default::default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let ks: [SecretKey; 2] = Default::default();`; code: `Default::default`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:15:51 | core::default::Default::default | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `core::default::Default::default` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let v: Vec<SecretKey> = std::iter::repeat_with(SecretKey::default).take(2).collect();`; code: `SecretKey::default`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:16:12 | orion::high_level::aead::seal | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::seal` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let c = aead::seal(&k1, b"m").unwrap();`; code: `aead::seal`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:17:12 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `let n = aead::open(&k2, &c).is_ok() as usize`; code: `aead::open`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:18:10 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&holder, &c).is_ok() as usize`; code: `aead::open`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:19:10 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&ks[0], &c).is_ok() as usize`; code: `aead::open`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:20:10 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&ks[1], &c).is_ok() as usize`; code: `aead::open`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:21:10 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(slot.get_or_insert_default(), &c).is_ok() as usize`; code: `aead::open`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:21:26 | core::option::Option::<T>::get_or_insert_default | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::option::Option::<T>::get_or_insert_default` runs `<orion::high_level::hltypes::SecretKey as core::default::Default>::default` of orion 0.17.15 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `+ aead::open(slot.get_or_insert_default(), &c).is_ok() as usize`; code: `get_or_insert_default`
+  occ unknown | crypto:algorithm:unknown:unknown:orion | src/main.rs:22:10 | orion::high_level::aead::open | [reachable] [call] in d32::main; use: unknown; algorithm unresolved: `orion::high_level::aead::open` of orion 0.17.15, a crypto package the knowledge base does not model: what the call does is not known; line: `+ aead::open(&v[0], &c).is_ok() as usize;`; code: `aead::open`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:73:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via d32 -> orion -> zeroize
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=6
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop ct-codecs | pkg:cargo/ct-codecs@1.1.8 | rcbom:crypto-role=support
+  prop ct-codecs | pkg:cargo/ct-codecs@1.1.8 | rcbom:kb-coverage=unmodelled
+  prop ct-codecs | pkg:cargo/ct-codecs@1.1.8 | rcbom:scope=required
+  prop ct-codecs | pkg:cargo/ct-codecs@1.1.8 | rcbom:usage=present
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop orion | pkg:cargo/orion@0.17.15 | rcbom:crypto-role=unmodelled
+  prop orion | pkg:cargo/orion@0.17.15 | rcbom:kb-coverage=unmodelled
+  prop orion | pkg:cargo/orion@0.17.15 | rcbom:scope=required
+  prop orion | pkg:cargo/orion@0.17.15 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:occurrences=13
+  prop unknown | crypto:algorithm:unknown:unknown:orion | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:orion | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library ct-codecs 1.1.8 | pkg:cargo/ct-codecs@1.1.8 | purl pkg:cargo/ct-codecs@1.1.8
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library orion 0.17.15 | pkg:cargo/orion@0.17.15 | purl pkg:cargo/orion@0.17.15
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/d32@0.1.0 -> pkg:cargo/orion@0.17.15
+dep pkg:cargo/orion@0.17.15 -> pkg:cargo/ct-codecs@1.1.8
+dep pkg:cargo/orion@0.17.15 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/orion@0.17.15 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/orion@0.17.15 -> pkg:cargo/zeroize@1.9.1
+dependency crypto:algorithm:OS-RNG
+dependency crypto:algorithm:unknown:unknown:orion
+dependency pkg:cargo/ct-codecs@1.1.8
+dependency pkg:cargo/d32@0.1.0
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/orion@0.17.15
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/getrandom@0.4.3 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/orion@0.17.15 -> crypto:algorithm:unknown:unknown:orion
+root {"bom-ref": "pkg:cargo/d32@0.1.0", "name": "d32", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d32@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin d32
+run rcbom:run:boundary-check=19 calls into crypto packages: 9 cited, 4 cited by the check as unknown, 6 excused (format 2, named 1, wipe 3)
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=410
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

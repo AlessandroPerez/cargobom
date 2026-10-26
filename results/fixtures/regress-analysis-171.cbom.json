@@ -1,0 +1,447 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/blake2b_simd@1.0.5",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a171 (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "blake2b_simd"
+          },
+          {
+            "additionalContext": "[manifest] locked blake2b_simd 1.0.5; reached via a171 -> blake2b_simd",
+            "line": 20,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "blake2b_simd"
+          }
+        ]
+      },
+      "name": "blake2b_simd",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/blake2b_simd@1.0.5",
+      "type": "library",
+      "version": "1.0.5"
+    },
+    {
+      "bom-ref": "pkg:cargo/constant_time_eq@0.4.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked constant_time_eq 0.4.2; reached via a171 -> blake2b_simd -> constant_time_eq",
+            "line": 46,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "constant_time_eq"
+          }
+        ]
+      },
+      "name": "constant_time_eq",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/constant_time_eq@0.4.2",
+      "type": "library",
+      "version": "0.4.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via a171 -> ring -> getrandom",
+            "line": 58,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a171 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via a171 -> ring",
+            "line": 75,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:blake2b_simd",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a171::kdf_named; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; line: `blake2b_simd::blake2b(shared).as_bytes().to_vec()`; code: `blake2b_simd::blake2b`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "blake2b_simd::blake2b"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main::{closure#0}; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; instantiated by a171::main at src/main.rs:15:51; line: `blake2b_simd::blake2b(shared).as_bytes().to_vec()`; code: `blake2b_simd::blake2b`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "blake2b_simd::blake2b"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; line: `let k3 = blake2b_simd::blake2b(&k1).as_bytes().to_vec();`; code: `blake2b_simd::blake2b`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "blake2b_simd::blake2b"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:x25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDH",
+          "cryptoFunctions": [
+            "keyderive",
+            "keygen"
+          ],
+          "ellipticCurve": "other/Curve25519",
+          "primitive": "key-agree"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in a171::main; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 39,
+            "symbol": "ring::ec::curve25519::x25519::X25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::agreement::EphemeralPrivateKey::generate"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a171::main; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 44,
+            "symbol": "ring::ec::curve25519::x25519::X25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let k1 = agreement::agree_ephemeral(my, &peer, |shared| {`; code: `agreement::agree_ephemeral`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::agreement::agree_ephemeral"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let my2 = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "ring::agreement::EphemeralPrivateKey::generate"
+          },
+          {
+            "additionalContext": "[reachable] [static] in a171::main; line: `let my2 = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 45,
+            "symbol": "ring::ec::curve25519::x25519::X25519"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a171::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let k2 = agreement::agree_ephemeral(my2, &peer, kdf_named).unwrap();`; code: `agreement::agree_ephemeral`",
+            "line": 20,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "ring::agreement::agree_ephemeral"
+          }
+        ]
+      },
+      "name": "x25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/blake2b_simd@1.0.5",
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/a171@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/constant_time_eq@0.4.2"
+      ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:blake2b_simd"
+      ],
+      "ref": "pkg:cargo/blake2b_simd@1.0.5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/constant_time_eq@0.4.2"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:x25519"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:blake2b_simd"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:x25519"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a171@0.1.0",
+      "name": "a171",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a171@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "12"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "221"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a171"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "16 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 9 excused (accessor 3, format 4, generator setup 1, setup 1)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:3e553c9c-139a-8254-9b92-20e281ee0ff3",
+  "specVersion": "1.7",
+  "version": 1
+}

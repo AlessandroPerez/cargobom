@@ -1,0 +1,80 @@
+  occ blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | Cargo.lock:20:0 | blake2b_simd | [manifest] locked blake2b_simd 1.0.5; reached via a171 -> blake2b_simd
+  occ blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | Cargo.toml:10:0 | blake2b_simd | [manifest] declared by a171 (dependencies)
+  occ constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | Cargo.lock:46:0 | constant_time_eq | [manifest] locked constant_time_eq 0.4.2; reached via a171 -> blake2b_simd -> constant_time_eq
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:58:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a171 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:75:0 | ring | [manifest] locked ring 0.17.14; reached via a171 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a171 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:16:8 | blake2b_simd::blake2b | [reachable] [call] in a171::main::{closure#0}; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; instantiated by a171::main at src/main.rs:15:51; line: `blake2b_simd::blake2b(shared).as_bytes().to_vec()`; code: `blake2b_simd::blake2b`
+  occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:21:13 | blake2b_simd::blake2b | [reachable] [call] in a171::main; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; line: `let k3 = blake2b_simd::blake2b(&k1).as_bytes().to_vec();`; code: `blake2b_simd::blake2b`
+  occ unknown | crypto:algorithm:unknown:unknown:blake2b_simd | src/main.rs:8:4 | blake2b_simd::blake2b | [reachable] [call] in a171::kdf_named; use: unknown; algorithm unresolved: `blake2b_simd::blake2b` of blake2b_simd 1.0.5, a crypto package the knowledge base does not model: what the call does is not known; line: `blake2b_simd::blake2b(shared).as_bytes().to_vec()`; code: `blake2b_simd::blake2b`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:13:39 | ring::ec::curve25519::x25519::X25519 | [reachable] [static] in a171::main; line: `let peer = UnparsedPublicKey::new(&X25519, [9u8; 32]);`; code: `X25519`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:14:13 | ring::agreement::EphemeralPrivateKey::generate | [reachable] [call] in a171::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:14:44 | ring::ec::curve25519::x25519::X25519 | [reachable] [static] in a171::main; line: `let my = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:15:13 | ring::agreement::agree_ephemeral | [reachable] [call] in a171::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let k1 = agreement::agree_ephemeral(my, &peer, |shared| {`; code: `agreement::agree_ephemeral`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:19:14 | ring::agreement::EphemeralPrivateKey::generate | [reachable] [call] in a171::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let my2 = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:19:45 | ring::ec::curve25519::x25519::X25519 | [reachable] [static] in a171::main; line: `let my2 = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:20:13 | ring::agreement::agree_ephemeral | [reachable] [call] in a171::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let k2 = agreement::agree_ephemeral(my2, &peer, kdf_named).unwrap();`; code: `agreement::agree_ephemeral`
+  prop blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | rcbom:crypto-role=unmodelled
+  prop blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | rcbom:kb-coverage=unmodelled
+  prop blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | rcbom:scope=required
+  prop blake2b_simd | pkg:cargo/blake2b_simd@1.0.5 | rcbom:usage=reachable
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:crypto-role=support
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:kb-coverage=unmodelled
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:scope=required
+  prop constant_time_eq | pkg:cargo/constant_time_eq@0.4.2 | rcbom:usage=present
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:unknown:blake2b_simd | rcbom:reachability=reachable
+  prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
+  prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
+  prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
+  prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
+  prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=7
+  prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
+asset unknown | crypto:algorithm:unknown:unknown:blake2b_simd | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+component library blake2b_simd 1.0.5 | pkg:cargo/blake2b_simd@1.0.5 | purl pkg:cargo/blake2b_simd@1.0.5
+component library constant_time_eq 0.4.2 | pkg:cargo/constant_time_eq@0.4.2 | purl pkg:cargo/constant_time_eq@0.4.2
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep pkg:cargo/a171@0.1.0 -> pkg:cargo/blake2b_simd@1.0.5
+dep pkg:cargo/a171@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/blake2b_simd@1.0.5 -> pkg:cargo/constant_time_eq@0.4.2
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:unknown:unknown:blake2b_simd
+dependency crypto:algorithm:x25519
+dependency pkg:cargo/a171@0.1.0
+dependency pkg:cargo/blake2b_simd@1.0.5
+dependency pkg:cargo/constant_time_eq@0.4.2
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/blake2b_simd@1.0.5 -> crypto:algorithm:unknown:unknown:blake2b_simd
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:x25519
+root {"bom-ref": "pkg:cargo/a171@0.1.0", "name": "a171", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a171@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a171
+run rcbom:run:boundary-check=16 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 9 excused (accessor 3, format 4, generator setup 1, setup 1)
+run rcbom:run:features=
+run rcbom:run:packages=12
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=221
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

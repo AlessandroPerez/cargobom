@@ -6,7 +6,7 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:32:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d2::{closure#0}; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); instantiated by t16::main at src/main.rs:177:33 as `poll`; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:40:8 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d3::{closure#0}; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); instantiated by t16::d3 at src/main.rs:38:19; line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:57:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d4; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `Aes256Gcm::new_from_slice(&cfg.key).is_ok() && cfg.rounds == 1`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:66:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d5; new_from_slice: setup, not a use; key: computed (written into an element by t16::d5) or computed (written through core::slice::chunks_mut); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:66:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d5; new_from_slice: setup, not a use; key: computed (written into an element by t16::d5) or computed (written through core::slice::chunks_mut) or partly hard-coded (all zero, literal at line 62); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:74:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d6; new_from_slice: setup, not a use; key: computed (contents of mutex::Mutex::lock); line: `Aes256Gcm::new_from_slice(&k).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:81:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d7; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 80); line: `Aes256Gcm::new_from_slice(&key).is_ok()`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:87:4 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t16::d8; new_from_slice: setup, not a use; key: computed (t16::env_key); line: `Aes256Gcm::new_from_slice(&live).is_ok()`; code: `Aes256Gcm::new_from_slice`
@@ -57,7 +57,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=13
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
-  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,environment,file,hard-coded,parameter,rng,unknown
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,environment,file,hard-coded,parameter,partly hard-coded,rng,unknown
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:confidence=high
   prop BLAKE3-256 | crypto:algorithm:BLAKE3-256 | rcbom:detection:method=type-resolved
@@ -263,7 +263,7 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/t16@0.1.0", "name": "t16", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t16@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t16
-run rcbom:run:boundary-check=22 calls into crypto packages: 20 cited, 2 excused (accessor 1, named 1), 0 not cited
+run rcbom:run:boundary-check=22 calls into crypto packages: 20 cited, 0 cited by the check as unknown, 2 excused (accessor 1, named 1)
 run rcbom:run:features=
 run rcbom:run:packages=38
 run rcbom:run:profile=release

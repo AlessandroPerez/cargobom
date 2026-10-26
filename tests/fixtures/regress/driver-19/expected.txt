@@ -3,8 +3,8 @@
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:168:17 | crypto_common::KeyInit::new | [reachable] [call] in t19::main; new: setup, not a use; key: rng (crypto_common::KeyInit::generate_key); line: `let cipher = Aes256Gcm::new(&Aes256Gcm::generate_key(OsRng));`; code: `Aes256Gcm::new`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:168:33 | crypto_common::KeyInit::generate_key | [reachable] [call] in t19::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let cipher = Aes256Gcm::new(&Aes256Gcm::generate_key(OsRng));`; code: `Aes256Gcm::generate_key`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:20:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::appended; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _ = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:34:18 | aead::Aead::encrypt | [reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:39:14 | aead::Aead::encrypt | [reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by t19::counters); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b"m".as_ref());`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:34:18 | aead::Aead::encrypt | [reachable] [call] in t19::counters; use: encrypt; nonce: computed (changes with each iteration of a loop) or computed (written into an element by t19::counters) or partly hard-coded (all zero, literal at line 32); line: `let _ = c.encrypt(Nonce::from_slice(&nonce), m.as_ref());`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:39:14 | aead::Aead::encrypt | [reachable] [call] in t19::counters; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by t19::counters) or partly hard-coded (all zero, literal at line 37); line: `let _ = c.encrypt(Nonce::from_slice(&n2), b"m".as_ref());`; code: `encrypt`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:55:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: computed (contents of cell::Cell::get); line: `let _ = Aes256Gcm::new_from_slice(&c.get());`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:60:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `let _ = Aes256Gcm::new_from_slice(&k1);`; code: `Aes256Gcm::new_from_slice`
   occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:64:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t19::indirect; new_from_slice: setup, not a use; key: rng (rand_core::RngCore::fill_bytes); line: `let _ = Aes256Gcm::new_from_slice(&k2);`; code: `Aes256Gcm::new_from_slice`
@@ -169,7 +169,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=computed,environment,rng
-  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,hard-coded,rng
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,hard-coded,partly hard-coded,rng
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:rng=rng
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop Argon2i-19456-2-1 | crypto:algorithm:Argon2i-19456-2-1 | rcbom:confidence=high
@@ -816,7 +816,7 @@ provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:candidate:x25519-dalek@2.0.1:x25
 root {"bom-ref": "pkg:cargo/t19@0.1.0", "name": "t19", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/t19@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin t19
-run rcbom:run:boundary-check=63 calls into crypto packages: 56 cited, 7 excused (generator setup 3, public half 1, setup 3), 0 not cited
+run rcbom:run:boundary-check=70 calls into crypto packages: 56 cited, 0 cited by the check as unknown, 14 excused (copy 1, format 6, generator setup 3, public half 1, setup 3)
 run rcbom:run:features=
 run rcbom:run:packages=83
 run rcbom:run:profile=release

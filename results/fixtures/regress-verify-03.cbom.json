@@ -654,7 +654,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in v03::multiline; new_from_slice: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `let m = Hmac::<`",
+            "additionalContext": "[reachable] [call] in v03::multiline; new_from_slice: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function) or partly hard-coded (literal at line 127); line: `let m = Hmac::<`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 12,
@@ -700,7 +700,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
+          "value": "computed,parameter,partly hard-coded"
         },
         {
           "name": "rcbom:occurrences",
@@ -1286,7 +1286,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "33 calls into crypto packages: 33 cited, 0 excused (), 0 not cited"
+        "value": "35 calls into crypto packages: 33 cited, 0 cited by the check as unknown, 2 excused (format 2)"
       }
     ],
     "tools": {
@@ -1299,7 +1299,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7ee24dbc-5347-8267-a654-0ad1fa28912d",
+  "serialNumber": "urn:uuid:63b618f8-aad2-8797-836a-856338fe7ae7",
   "specVersion": "1.7",
   "version": 1
 }

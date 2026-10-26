@@ -1872,7 +1872,7 @@
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by a15::a11); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a15::a11; use: encrypt; nonce: computed (contents of atomic::Atomic::fetch_add) or computed (written into an element by a15::a11) or partly hard-coded (all zero, literal at line 144); line: `+ c.encrypt(Nonce::from_slice(&nonce), msg).unwrap().len()`; code: `encrypt`",
             "line": 148,
             "location": "src/main.rs",
             "offset": 12,
@@ -1923,7 +1923,7 @@
         },
         {
           "name": "rcbom:provenance:nonce",
-          "value": "computed,environment,parameter"
+          "value": "computed,environment,parameter,partly hard-coded"
         },
         {
           "name": "rcbom:occurrences",
@@ -4123,7 +4123,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "82 calls into crypto packages: 74 cited, 8 excused (accessor 1, encoding 2, generator setup 3, public half 2), 0 not cited"
+        "value": "111 calls into crypto packages: 74 cited, 0 cited by the check as unknown, 37 excused (accessor 1, encoding 2, format 29, generator setup 3, public half 2)"
       }
     ],
     "tools": {
@@ -4136,7 +4136,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1b85f78b-6b0f-8b3c-8dcc-c39f65fb546f",
+  "serialNumber": "urn:uuid:35efdf66-99d7-8e97-8fe7-6754ea5d9c2d",
   "specVersion": "1.7",
   "version": 1
 }
