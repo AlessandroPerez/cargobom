@@ -96,6 +96,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     len,
                     span,
                     zero,
+                    range: index_range(self.tcx, a, &ty),
                 }
             }
             // `&CONST`, `&[42u8; 32]`, `const { &SHA256 }`: what the promoted or inline
@@ -137,6 +138,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                         {
                             return o;
                         }
+                        let range = evaluated.as_ref().and_then(|c| match c.kind() {
+                            ConstantKind::Allocated(a) => index_range(self.tcx, a, &ty),
+                            _ => None,
+                        });
                         let (len, zero) = evaluated
                             .and_then(|c| match c.kind() {
                                 ConstantKind::Allocated(a) => Some(literal_data(a, &ty)),
@@ -148,6 +153,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                             len,
                             span,
                             zero,
+                            range,
                         }
                     })
             }
@@ -156,6 +162,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 len: bytes_of_ty(&ty),
                 span,
                 zero: false,
+                range: None,
             },
         }
     }
@@ -591,6 +598,50 @@ pub(super) fn byte_len(elem: &Ty, n: Option<u64>) -> Option<u64> {
     .then_some(n)
     .flatten()
 }
+/// A literal index range over `usize` (`..4`, `4..`, `2..6`, `..=3`, `..`): where it starts
+/// and where it ends (none: at the end), read from the constant's bytes at its fields' offsets.
+pub(super) fn index_range(
+    tcx: TyCtxt<'_>,
+    a: &rustc_public::ty::Allocation,
+    ty: &Ty,
+) -> Option<(u64, Option<u64>)> {
+    let kind = ty.kind();
+    let Some(RigidTy::Adt(def, args)) = kind.rigid() else {
+        return None;
+    };
+    let path = path_of(tcx, rustc_internal::internal(tcx, def.def_id()));
+    let name = path.strip_prefix("core::ops::range::")?;
+    let over_usize = match args.0.first() {
+        Some(rustc_public::ty::GenericArgKind::Type(t)) => {
+            matches!(t.kind().rigid(), Some(RigidTy::Uint(UintTy::Usize)))
+        }
+        _ => name == "RangeFull",
+    };
+    if !over_usize {
+        return None;
+    }
+    let ity = rustc_internal::internal(tcx, ty);
+    let layout = tcx
+        .layout_of(rustc_middle::ty::TypingEnv::fully_monomorphized().as_query_input(ity))
+        .ok()?;
+    let field = |i: usize| -> Option<u64> {
+        let off = layout.fields.offset(i).bytes_usize();
+        a.bytes
+            .get(off..off + 8)?
+            .iter()
+            .rev()
+            .try_fold(0u64, |acc, b| b.map(|b| (acc << 8) | b as u64))
+    };
+    match name {
+        "RangeFull" => Some((0, None)),
+        "RangeFrom" => Some((field(0)?, None)),
+        "RangeTo" => Some((0, Some(field(0)?))),
+        "Range" => Some((field(0)?, Some(field(1)?))),
+        "RangeToInclusive" => Some((0, Some(field(0)?.checked_add(1)?))),
+        _ => None,
+    }
+}
+
 /// Literal data in an allocated constant: its length in bytes (an array in place, or the
 /// array, slice or `&str` a reference points to: `b"salt"`, `""`) and whether all its bytes are
 /// zero (`&[0u8; 32]`). Not an integer (its value says that).
