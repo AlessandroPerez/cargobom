@@ -192,7 +192,7 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   jsonwebtoken 9, rand 0.8 to 0.9. Other versions and unmodelled crypto packages are reported,
   with their operations as unknown and the reason.
 - Layers 3 to 5 (purpose, vulnerabilities, policy) are designed, not built: no occurrence says
-  whether it protects anything (`rcbom:usage` is Layer 1's usage tier).
+  whether it protects anything (`rcbom:usage` is a package's usage tier, from the walk).
 
 **Conventions: where the CBOM differs from a label written by the rules**
 - A call into a crypto package the knowledge base does not model, made from the program or a
@@ -310,9 +310,9 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 | `crates/rcbom-driver` | the nightly `rustc_public` driver: sites, origins, links, walk |
 | `crates/rcbom-facts` | the facts exchanged between driver and analysis |
 | `crates/rcbom-kb` | knowledge base loader and data (`data/`: the seed, and the Cryptography Registry, Apache-2.0) |
-| `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, CycloneDX assembly |
+| `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, the boundary check, CycloneDX assembly |
 | `xtask` | the project's tasks: checks, e2e, scorers, summaries |
-| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates no development used, frozen before any run), `review/` (an independent reviewer's blind labels for two crates), `projects.toml` (the package behind each corpus, held-out and review label); each fixture with its golden `expected.txt` |
-| `tests/external/` | inputs from an external reference case (BOM Fidelity) |
+| `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates chosen after development, frozen before any run), `review/` (an independent reviewer's blind labels for two crates), `projects.toml` (the package behind each corpus, held-out and review label); each fixture with its golden `expected.txt` |
+| `tests/external/` | the external reference cases' packages and reviews (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
 | `docs/` | `poc_workflow.md` (the tool, its five layers, related tools), `in-too-deep.md` (how each stage works), `suite/RULES.md` (the labelling rules every label file follows) |
