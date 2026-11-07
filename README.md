@@ -313,6 +313,11 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 | `crates/rcbom-analysis` | matching, values across functions, boundary models, provenance, the boundary check, CycloneDX assembly |
 | `xtask` | the project's tasks: checks, e2e, scorers, summaries |
 | `tests/fixtures/` | designed cases (`micro`, `libonly`, `threads`), the `realapp` corpus program, labelled `rusi` fixtures, `suite/` (the ground-truth suite), `regress/` (probes from every audit round), `corpus/` (labels for six real projects), `heldout/` (labels for seven crates.io crates chosen after development, frozen before any run), `review/` (an independent reviewer's blind labels for two crates), `projects.toml` (the package behind each corpus, held-out and review label); each fixture with its golden `expected.txt` |
-| `tests/external/` | the external reference cases' packages and reviews (BOM Fidelity) |
 | `results/` | committed outputs behind the reported numbers |
 | `docs/` | `poc_workflow.md` (the tool, its five layers, related tools), `in-too-deep.md` (how each stage works), `suite/RULES.md` (the labelling rules every label file follows) |
+
+## Licence
+
+Apache License 2.0 (`LICENSE`). The vendored CycloneDX schemas and Cryptography Registry are
+Apache-2.0 too. The external reference cases are BOM Fidelity's, published at
+https://github.com/jaooli-cyber/rust-cbom-reference-cases (release v1.0.0).
