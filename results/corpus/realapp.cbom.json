@@ -5875,6 +5875,13 @@
             "symbol": "ring::digest::Context::finish"
           },
           {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA256` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "ring::digest::Context::update"
+          },
+          {
             "additionalContext": "[reachable] [component] in rustls::crypto::ring::hmac::HMAC_SHA256; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `pub(crate) static HMAC_SHA256: Hmac = Hmac(&ring_like::hmac::HMAC_SHA256);`; code: `ring_like::hmac::HMAC_SHA256`",
             "line": 8,
             "location": "rustls-0.23.45/src/crypto/ring/hmac.rs",
@@ -6236,7 +6243,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "70"
+          "value": "71"
         }
       ],
       "type": "cryptographic-asset"
@@ -6338,6 +6345,13 @@
             "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
             "offset": 23,
             "symbol": "ring::digest::Context::finish"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA384` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "ring::digest::Context::update"
           },
           {
             "additionalContext": "[reachable] [component] in rustls::crypto::ring::hmac::HMAC_SHA384; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `pub(crate) static HMAC_SHA384: Hmac = Hmac(&ring_like::hmac::HMAC_SHA384);`; code: `ring_like::hmac::HMAC_SHA384`",
@@ -6631,7 +6645,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "50"
+          "value": "51"
         }
       ],
       "type": "cryptographic-asset"
@@ -6932,61 +6946,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm unresolved: a field of `rustls::crypto::ring::hash::Context`; line: `self.0.update(data);`; code: `update`",
-            "line": 54,
-            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
-            "offset": 15,
-            "symbol": "ring::digest::Context::update"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -7641,7 +7600,6 @@
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
         "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring",
         "crypto:algorithm:unknown:unknown:ring",
         "crypto:algorithm:x25519",
         "crypto:material:private-key:RSA"
@@ -7917,10 +7875,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:age"
     },
     {
@@ -8006,7 +7960,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1783cd75-a6e9-86cf-b6d0-5bc0305be2ea",
+  "serialNumber": "urn:uuid:18ed9d11-ee08-8665-9f2c-af18f8f7ce0d",
   "specVersion": "1.7",
   "version": 1
 }

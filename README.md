@@ -63,12 +63,15 @@ cargo cbom
   those of a library's generic functions): each is cited by an occurrence of that call, or needs
   none for a reason the knowledge base or the contract states (a protocol crate the walk
   enters, a crypto package's internals, a stream's step, an `[[aside]]` kind: a view, a copy, a
-  wipe, an accessor, a comparison). A call neither cited nor excused is cited by the check
-  itself, as an operation of unknown algorithm: nothing the walk reaches is left out. A call
-  the standard library or a wrapper package makes for the program (`Uuid::new_v4()` drawing
-  from a random generator) is cited at the program's call, by name when the knowledge base
-  names the call made. The CBOM states the counts (`rcbom:run:boundary-check`;
-  `in-too-deep.md` 6.10).
+  wipe, an accessor, a comparison, a function of an error type, which the compiler's impls of
+  `core::error::Error` identify in any package). A call neither cited nor excused is cited by
+  the check itself, as an operation of unknown algorithm: nothing the walk reaches is left
+  out. A call the standard library (every crate of the toolchain's sysroot, `hashbrown` under
+  `HashMap` included) or a wrapper package makes for the program (`Uuid::new_v4()` drawing
+  from a random generator, a `HashMap` hashing its keys with siphasher) is cited at the
+  program's call, by name when the knowledge base names the function called or the type it is
+  a function of. The CBOM states the counts (`rcbom:run:boundary-check`; `in-too-deep.md`
+  6.10).
 - **The verifier** reopens every cited file and checks each position, and the details it can
   read in the code (the token named, the item around it, the descriptor read by the call,
   bindings in scope, closures, macro rules, coercions, witnesses); `--self-test` shifts every
@@ -151,7 +154,9 @@ independent reviewer of the whole project, then used for the fixes its review fo
 RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows below are after
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
-the suite had 3 less-specific sites; no algorithm was reported wrongly then or now.
+the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. The same
+day the tool was run on fifteen crates.io packages it had never been run on (Unseen packages,
+below): what that found is fixed in this build, and changed no labelled site's verdict.
 
 | set | what | result |
 |---|---|---|
@@ -160,8 +165,8 @@ the suite had 3 less-specific sites; no algorithm was reported wrongly then or n
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 69 correct, 2 less-specific, 14 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (322 outputs, the suite's included): 20,255 positions verified, and 4 the verifier cannot confirm (each checked correct by hand); corpus 1,867, held-out 1,366 and review 797, all verified; every one of 98,047 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 10,989 calls (3,443 cited, 3 cited by the check by name, 16 cited by the check as unknown, 7,527 excused), corpus 1,558 (334, 0, 0, 1,224), held-out 1,130 (392, 3, 1, 734), review 793 (174, 1, 1, 617) |
+| evidence | every cited position, `verify --self-test` | fixtures (328 outputs, the suite's included): 20,527 positions verified, 4 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,868, held-out 1,361 and review 797 verified, with 12 and 6 more within a range in the last two; every one of 99,180 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,425 calls (3,522 cited, 13 cited by the check by name, 16 cited by the check as unknown, 7,874 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
@@ -192,6 +197,27 @@ Where it is not exact, the CBOM says so instead of guessing:
   type parameter of its generic `SshSig::sign` (a signature), and rbw's `parse` of an ssh-key
   public key, which the standard library runs; and four by name, the `Uuid::new_v4` draws.
 
+**Unseen packages.** On 10 November the tool was run on fifteen crates.io packages it had never
+been run on, as published: rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
+nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
+branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
+(a sixteenth, jwt-simple, needs cmake to build here). They have no labels: what a run shows is
+whether it completes, whether the verifier confirms every position and rejects every shifted
+one, whether the walk check finds a gap and the boundary check leaves a call out. The first run
+did not pass. The verifier rejected correct positions in four of them (10 in rsign2, 10 in
+miniserve, 12 in jwt-compact, 86 in pgp: a function type's `->` inside generic arguments, a
+type's default arguments, an associated type, a second chain of instantiations); the walk
+check reported 38 gaps on miniserve that were none (the two builds order a trait object's
+bindings differently); calls made inside the standard library's hash table were missing from
+the boundary check; and on pgp the analysis ran out of 15 GB of memory. Each is fixed in this
+build, where all fifteen complete (pgp's 138 crates in 91 s): 2,512 positions verified and 5
+within a range, none mismatched; 21,558 of 21,565 shifted positions rejected, the seven accepted
+all in pgp (Limitations, the verifier); no walk gap; 1,735 calls into crypto packages, 793
+cited, 7 cited by the check by name, 20 as unknown, 915 excused. What stays unknown in them is
+what the knowledge base does not model (minisign under rsign2, bcrypt, the ciphers and modes
+pgp uses beyond AES-GCM) and miniserve's `Box<dyn DynDigest>`. These packages are development
+material from now on (`in-too-deep.md` 8 says what such a run can and cannot show).
+
 ## Limitations
 
 What the CBOM covers, what it reports differently from a reading of the labelling rules, and
@@ -208,10 +234,10 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   0.12, blake2 0.10 to 0.11, hmac 0.13, hkdf 0.13, pbkdf2 0.13, scrypt 0.12, argon2 0.6,
   aead 0.6, aes 0.9, aes-gcm 0.11, chacha20poly1305 0.11, cbc 0.2, ctr 0.10, signature 3,
   ed25519-dalek 3, x25519-dalek 3, ecdsa 0.17 and the curve crates 0.14), each crate of a
-  build matched by its own version; ring 0.17, aws-lc-rs 1, rustls 0.23, jsonwebtoken 9,
-  rand 0.8 to 0.10, md5 0.7 to 0.8. Not covered: rsa 0.10, ml-kem 0.3, jsonwebtoken 10 and
-  later. Other versions and unmodelled crypto packages are reported, with their operations
-  as unknown and the reason.
+  build matched by its own version; rsa 0.9 to 0.10, ml-kem 0.2 to 0.3; ring 0.17,
+  aws-lc-rs 1, rustls 0.23, jsonwebtoken 9 to 11, rand 0.8 to 0.10, md5 0.7 to 0.8,
+  siphasher 0.3 to 1. Other versions and unmodelled crypto packages are reported, with their
+  operations as unknown and the reason.
 - Layers 3 to 5 (purpose, vulnerabilities, policy) are designed, not built: no occurrence says
   whether it protects anything (`rcbom:usage` is a package's usage tier, from the walk).
 
@@ -223,16 +249,16 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   types run, and a call the standard library makes into it for the program, at the program's
   call (`none.unwrap_or_default()`). Not cited: a step of a stream (`update`, the methods of `io::Read` and
   `io::Write`), what the knowledge base lists as no operation (`[[aside]]`: views, copies,
-  wipes, accessors), and calls into relays: tokio-rustls and hyper-rustls wrap rustls, whose
-  operations are cited in rustls; rustls-pki-types, rustls-pemfile and rustls-native-certs are
-  PKI types, parsers and loaders. Calls between crypto packages are their internals. Where such
+  wipes, accessors, an error type's constructors and conversions), and calls into relays:
+  tokio-rustls, hyper-rustls and actix-tls wrap rustls, whose operations are cited in rustls;
+  rustls-pki-types, rustls-pemfile and rustls-native-certs are PKI types, parsers and loaders. Calls between crypto packages are their internals. Where such
   a package's own code calls modelled crates, those calls are cited inside it (rage's call into
   age is an unknown at rage's line, and age's ChaCha20-Poly1305 is cited in age). Inside
   algorithm crates nothing is cited: their internals are folded into the call into them.
 - A call on a type of a crypto package that the knowledge base does not name is an operation
   of unknown algorithm naming that type, also when the type holds one it names: `Cmac<Aes128>`
-  is a MAC it cannot name, not an AES-128 block cipher, and rsa 0.10's `SigningKey<Sha256>` is
-  no SHA-256 hash. Only a trait crate's wrappers (`CoreWrapper<T>`), the standard library's
+  is a MAC it cannot name, not an AES-128 block cipher, and the `SigningKey<Sha256>` of an rsa
+  version it does not cover is no SHA-256 hash. Only a trait crate's wrappers (`CoreWrapper<T>`), the standard library's
   and the program's own types are looked through.
 - A package that is not cryptographic is not cited at the program's calls into it; the calls
   its code makes into crypto packages are cited inside it. A wrapper the knowledge base lists
@@ -330,8 +356,13 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   reachability tier, artifact tags, provenance classes, which of an asset's functions a call
   performs, set labels (member kind, `possible`, `one of N`), the reason of an unknown, or a
   registry name outside boundary models; and it cannot see an operation the CBOM leaves out
-  (`in-too-deep.md` 8). Four fixture positions it cannot confirm are listed in `verify-known`
-  files, each checked by hand.
+  (`in-too-deep.md` 8). An instantiation detail is held to the call's type arguments where the
+  text gives them; of several calls of one generic function by the same text it is verified
+  within that range, a second instance's chain in an occurrence two instances share is not
+  held to the first's arguments, and a method call is not told from another call of that
+  method on the same variable of another crate's type (the seven shifted details it accepts
+  in pgp are of these two kinds). Three fixture positions it cannot confirm are listed in
+  `verify-known` files, each checked by hand.
 - *Toolchain.* The driver needs its pinned nightly. Layer 2 compiles the project, so the
   project's build scripts and procedural macros run. A published package whose `Cargo.lock`
   locks versions the nightly no longer builds (bore-cli 0.6.0's proc-macro2 1.0.56) does not
