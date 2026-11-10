@@ -147,11 +147,14 @@ fn excuse<'k>(ctx: &'k Ctx<'_>, e: &rcbom_facts::BoundaryEdge) -> Option<&'k str
     let in_crate = path
         .strip_prefix(&format!("{}::", callee.name))
         .unwrap_or(&path);
-    // what the knowledge base says is no operation (`[[aside]]`: a view, a wipe, an accessor)
-    if let Some(a) = ctx
-        .kb
-        .aside(&callee.name, in_crate, e.trait_path.as_deref())
-    {
+    // what the knowledge base says is no operation (`[[aside]]`: a view, a wipe, an accessor,
+    // a function of an error type)
+    if let Some(a) = ctx.kb.aside(
+        &callee.name,
+        in_crate,
+        e.trait_path.as_deref(),
+        ctx.implemented(&path),
+    ) {
         return Some(&a.name);
     }
     // a draw from a generator that computes no cryptography (`SmallRng`: `[unmodelled]

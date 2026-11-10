@@ -113,6 +113,8 @@ struct AsideRaw {
     name: String,
     #[serde(default)]
     traits: Vec<String>,
+    #[serde(default)]
+    implements: Vec<String>,
     #[serde(rename = "crate", default)]
     krate: Vec<String>,
     #[serde(default)]
@@ -121,14 +123,18 @@ struct AsideRaw {
 }
 
 /// Calls into a crypto package that are no operation and set up no asset: methods of the
-/// `traits` (any type's: a view, a copy, a wipe), or of the crates `krate` whose path inside
-/// the crate `pattern` matches. `name` says which kind, for the boundary check's report.
+/// `traits` (any type's: a view, a copy, a wipe), functions of a type that implements one of
+/// `implements` (an error type's: the compiler's impls say which types those are), or of the
+/// crates `krate` whose path inside the crate `pattern` matches. `name` says which kind, for
+/// the boundary check's report.
 #[derive(Debug)]
 pub struct AsideEntry {
     pub name: String,
     /// Why such a call needs no occurrence.
     pub why: String,
     pub traits: Vec<String>,
+    /// Traits (by defining path) whose implementors' own functions are such calls.
+    pub implements: Vec<String>,
     pub krate: Vec<String>,
     pub pattern: Option<Regex>,
 }
@@ -928,6 +934,7 @@ impl Kb {
                         name: a.name,
                         why: a.why,
                         traits: a.traits,
+                        implements: a.implements,
                         krate: a.krate,
                         pattern: a
                             .path
@@ -1321,11 +1328,20 @@ impl Kb {
         trait_path.is_some_and(|t| self.step_traits.iter().any(|x| x == t))
     }
 
-    /// The `[[aside]]` a call is: of a method of one of its traits, or of its crate at a path it
-    /// names (`path`: inside the crate, generic arguments removed).
-    pub fn aside(&self, krate: &str, path: &str, trait_path: Option<&str>) -> Option<&AsideEntry> {
+    /// The `[[aside]]` a call is: of a method of one of its traits, of a function of a type
+    /// implementing one of its `implements` (`implemented`: the traits of those the call's own
+    /// type implements), or of its crate at a path it names (`path`: inside the crate, generic
+    /// arguments removed).
+    pub fn aside(
+        &self,
+        krate: &str,
+        path: &str,
+        trait_path: Option<&str>,
+        implemented: &[String],
+    ) -> Option<&AsideEntry> {
         self.asides.iter().find(|a| {
             trait_path.is_some_and(|t| a.traits.iter().any(|x| x == t))
+                || a.implements.iter().any(|x| implemented.contains(x))
                 || (a.krate.iter().any(|k| k.replace('-', "_") == krate)
                     && a.pattern.as_ref().is_some_and(|p| p.is_match(path)))
         })
@@ -1340,11 +1356,20 @@ impl Kb {
     /// What the driver takes from `[semantics]` (`RCBOM_SEMANTICS`): one `key=a,b` per line.
     pub fn driver_semantics(&self) -> String {
         let wrappers: Vec<String> = self.wrappers.iter().map(|w| w.replace('-', "_")).collect();
+        // (the traits whose implementors the asides ask for: the driver reads the impls)
+        let mut implements: Vec<&str> = self
+            .asides
+            .iter()
+            .flat_map(|a| a.implements.iter().map(String::as_str))
+            .collect();
+        implements.sort();
+        implements.dedup();
         format!(
-            "fills={}\ngenerators={}\nwrappers={}\n",
+            "fills={}\ngenerators={}\nwrappers={}\nimplements={}\n",
             self.buffer_fills.join(","),
             self.generator_suffixes.join(","),
-            wrappers.join(",")
+            wrappers.join(","),
+            implements.join(",")
         )
     }
 

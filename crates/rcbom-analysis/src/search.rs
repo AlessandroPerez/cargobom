@@ -1382,6 +1382,7 @@ mod tests {
             links,
             fields: Default::default(),
             variants: Default::default(),
+            implementors: Default::default(),
         }])
     }
 

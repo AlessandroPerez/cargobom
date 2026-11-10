@@ -409,7 +409,7 @@ impl Files<'_> {
                     && ((p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)
                         && !p.lib_name.as_deref().is_some_and(|l| kb.relay(l)))
                         || (p.role.is_some() && !p.kb_supported))
-            }) && kb.aside("", "", trait_path).is_none()
+            }) && kb.aside("", "", trait_path, &[]).is_none()
                 && !kb.step_trait(trait_path);
         }
         if kb.operation(krate, rest).is_some()

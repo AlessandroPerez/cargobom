@@ -28,6 +28,37 @@ pub(crate) fn path_of(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> String
     )));
     local_crate_name(tcx, p)
 }
+/// The crate's own structs, enums and unions that implement one of `traits` (defining paths),
+/// by path, with those traits: read from the crate's impls (`impl Error for PError`).
+pub(crate) fn implementors(
+    tcx: TyCtxt<'_>,
+    traits: &[String],
+) -> std::collections::BTreeMap<String, Vec<String>> {
+    let mut out: std::collections::BTreeMap<String, Vec<String>> = Default::default();
+    if traits.is_empty() {
+        return out;
+    }
+    for (&tr, impls) in tcx.all_local_trait_impls(()) {
+        let name = path_of(tcx, tr);
+        if !traits.contains(&name) {
+            continue;
+        }
+        for &i in impls {
+            if let Some(adt) = tcx.type_of(i).skip_binder().ty_adt_def()
+                && adt.did().is_local()
+            {
+                out.entry(path_of(tcx, adt.did()))
+                    .or_default()
+                    .push(name.clone());
+            }
+        }
+    }
+    for v in out.values_mut() {
+        v.sort();
+        v.dedup();
+    }
+    out
+}
 /// An instance's path with its generic arguments, printed the same way as `path_of`.
 pub(crate) fn instance_name(tcx: TyCtxt<'_>, inst: &Instance) -> String {
     use rustc_middle::ty::print::{

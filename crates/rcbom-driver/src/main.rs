@@ -593,6 +593,13 @@ fn analyze(tcx: TyCtxt<'_>) {
     } else {
         Default::default()
     };
+    // and its types that implement a trait the knowledge base asks about (`[[aside]]
+    // implements`: an error type)
+    let implementors = if cx.kb_crate(rustc_span::def_id::LOCAL_CRATE) {
+        names::implementors(tcx, origins::asked_traits())
+    } else {
+        Default::default()
+    };
     let facts = CrateFacts {
         facts_version: FACTS_VERSION,
         krate,
@@ -602,6 +609,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         links: crate_links,
         fields,
         variants,
+        implementors,
     };
     let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
     std::fs::create_dir_all(&out).unwrap();

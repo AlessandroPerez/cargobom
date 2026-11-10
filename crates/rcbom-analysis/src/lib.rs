@@ -217,6 +217,9 @@ struct Ctx<'a> {
     fields: HashMap<String, Vec<String>>,
     /// The variants of their field-less enums (name, discriminant), by path.
     variants: HashMap<String, Vec<(String, i128)>>,
+    /// The traits the knowledge base asks about (`[[aside]] implements`) that the crypto
+    /// packages' types implement, by the type's path (`CrateFacts::implementors`).
+    implementors: HashMap<String, Vec<String>>,
     /// The points-to analysis' answers (`RCBOM_PTA`), by the position of the call (absolute
     /// file, line, column): one per copy of the calling body it solved.
     pta: HashMap<(PathBuf, usize, usize), Vec<&'a rcbom_facts::PtaCall>>,

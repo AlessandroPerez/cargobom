@@ -185,7 +185,22 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
             let in_runs = bare
                 .strip_prefix(&format!("{}::", runs_in.name))
                 .unwrap_or("");
-            if ctx.kb.aside(&runs_in.name, in_runs, trait_path).is_some() {
+            // (or a function of a type the compiler says implements a trait the knowledge
+            // base names, `[[aside]] implements`: an error type's `new`, its `From::from`)
+            let own_path = match own {
+                Some(rcbom_facts::TyTree::Adt { path, .. }) => format!("{path}::{method}"),
+                _ => bare.clone(),
+            };
+            if ctx
+                .kb
+                .aside(
+                    &runs_in.name,
+                    in_runs,
+                    trait_path,
+                    ctx.implemented(&own_path),
+                )
+                .is_some()
+            {
                 return None;
             }
             let entry = ctx.kb_entry(runs_in);

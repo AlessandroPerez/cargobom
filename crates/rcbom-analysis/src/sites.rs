@@ -20,6 +20,15 @@ impl<'a> Ctx<'a> {
             .push(m.clone());
     }
 
+    /// The traits the knowledge base asks about (`[[aside]] implements`) that the type a
+    /// function is of implements: `f` is the function's path by its type, generic arguments
+    /// removed (`orion::errors::UnknownCryptoError::from`).
+    pub(super) fn implemented(&self, f: &str) -> &[String] {
+        f.rsplit_once("::")
+            .and_then(|(ty, _)| self.implementors.get(ty))
+            .map_or(&[], Vec::as_slice)
+    }
+
     /// A crate of a crypto package the knowledge base does not model.
     pub(super) fn is_unmodelled(&self, k: &rcbom_facts::CrateRef) -> bool {
         self.unmodelled

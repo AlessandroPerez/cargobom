@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 33;
+pub const FACTS_VERSION: u32 = 34;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -99,6 +99,11 @@ pub struct CrateFacts {
     /// (`const ALG: Algorithm = Algorithm::ES384` is `Data { value: 4 }`).
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub variants: std::collections::BTreeMap<String, Vec<(String, i128)>>,
+    /// This crate's structs, enums and unions (by path) that implement a trait the knowledge
+    /// base asks about (`[[aside]] implements`: `core::error::Error`), with those traits, when
+    /// the crate is of the crypto set: read from the crate's own impls.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub implementors: std::collections::BTreeMap<String, Vec<String>>,
 }
 
 /// Value flow across the functions of a crate (see `CrateFacts::links`). Flow-insensitive: a

@@ -101,6 +101,10 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .iter()
             .flat_map(|f| f.variants.iter().map(|(k, v)| (k.clone(), v.clone())))
             .collect(),
+        implementors: facts
+            .iter()
+            .flat_map(|f| f.implementors.iter().map(|(k, v)| (k.clone(), v.clone())))
+            .collect(),
         pta: {
             let mut m: HashMap<_, Vec<&rcbom_facts::PtaCall>> = HashMap::new();
             for f in facts {

@@ -2954,9 +2954,14 @@ name = "wipe"
 traits = ["core::ops::drop::Drop", "zeroize::Zeroize"]
 why = "a destructor or a memory wipe: no cryptographic function"
 
+# (`implements`: a function of a type that implements the trait, as the compiler's impls say:
+# an error type's constructors and conversions, `PError::new`, `<PError as From<io::Error>>::
+# from`, in any crypto package. The crate list covers builds where the impl is behind a feature
+# that is off.)
 [[aside]]
 name = "error"
 traits = ["core::error::Error"]
+implements = ["core::error::Error"]
 crate = ["signature", "ssh-key", "ssh-cipher", "ssh-agent-lib", "rsa", "ecdsa", "ed25519-dalek", "elliptic-curve", "aead", "cipher", "digest", "password-hash"]
 path = "^(.+::)?error::.+$"
 why = "an error value made, compared or described"
