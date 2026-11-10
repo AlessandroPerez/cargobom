@@ -79,7 +79,7 @@ backends = { ring = "ring", aws_lc_rs = "aws-lc-rs" }
 
 [[crate]]
 package = "jsonwebtoken"
-versions = ">=9, <10"
+versions = ">=9, <12"
 role = "protocol"
 candidates = []
 
@@ -115,7 +115,7 @@ candidates = ["Argon2"]
 
 [[crate]]
 package = "rsa"
-versions = ">=0.9, <0.10"
+versions = ">=0.9, <0.11"
 role = "algorithm"
 candidates = []
 
@@ -247,7 +247,7 @@ role = "algorithm"
 
 [[crate]]
 package = "ml-kem"
-versions = ">=0.2, <0.3"
+versions = ">=0.2, <0.4"
 role = "algorithm"
 
 [[crate]]
@@ -941,6 +941,30 @@ asset = "RSA-PSS"
 family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
+versions = "<0.10"
+
+# rsa 0.10: `Pss<D>` and `Oaep<D, MGD = D>` carry their hashes in their types (`Pss::<Sha256>::
+# new()`), and the keys are `PrivateKey` and `PublicKey` (0.9's `RsaPrivateKey`, `RsaPublicKey`)
+[[type]]
+crate = "rsa"
+name = "Pss"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "rsa"
+name = "Oaep"
+asset = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt", "decrypt"]
+versions = ">=0.10"
+defaults = { mgf_hash = "{hash}" }
+params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
 
 [[type]]
 crate = "rsa"
@@ -1001,6 +1025,7 @@ asset = "RSA-OAEP"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+versions = "<0.10"
 
 # SHA-3 (FIPS 202): the fixed-length hashes and the extendable-output functions
 [[type]]
@@ -1257,7 +1282,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["keygen", "encapsulate", "decapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
 
 [[type]]
 crate = "ml_kem"
@@ -1266,7 +1291,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["encapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
 
 [[type]]
 crate = "ml_kem"
@@ -1275,7 +1300,37 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["decapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
+
+# ml-kem 0.3 (over kem 0.3): the parameter set is a struct of its own, on which the keys are
+# made (`MlKem768::generate_keypair_from_rng(&mut rng)`, kem's `Kem` trait); the keys are
+# `EncapsulationKey<MlKem768>`, `DecapsulationKey<MlKem768>` (the entries above)
+[[type]]
+crate = "ml_kem"
+name = "MlKem512"
+asset = "ML-KEM-512"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+versions = ">=0.3"
+
+[[type]]
+crate = "ml_kem"
+name = "MlKem768"
+asset = "ML-KEM-768"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+versions = ">=0.3"
+
+[[type]]
+crate = "ml_kem"
+name = "MlKem1024"
+asset = "ML-KEM-1024"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+versions = ">=0.3"
 
 # Elliptic curves of the RustCrypto elliptic-curve crates: the curve is the type argument
 # (`EphemeralSecret<NistP256>`, `SigningKey<NistP256>`); ECDSA's hash is the curve's
@@ -2312,7 +2367,7 @@ implemented_by = ["sha2"]
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
 crate = "rsa"
-path = "RsaPrivateKey::new$"
+path = "(Rsa)?PrivateKey::new(_unchecked)?$"
 asset = "RSA-{bits}"
 family = "RSA"
 primitive = "pke"
@@ -2327,7 +2382,7 @@ params = { bits = { const_arg = 1 } }
 # `BlindedSigningKey`): an RSA key of `bits`
 [[fn]]
 crate = "rsa"
-path = "RsaPrivateKey::new_with_exp$"
+path = "(Rsa)?PrivateKey::new_with_exp(_unchecked)?$"
 asset = "RSA-{bits}"
 family = "RSA"
 primitive = "pke"
@@ -2367,7 +2422,7 @@ note = "RSASSA-PKCS1-v1_5 of the message's digest without the DigestInfo prefix"
 # `from_p_q(p, q, e)`, `from_primes(primes, e)`, key.rs): key material, its size in `n`
 [[fn]]
 crate = "rsa"
-path = "RsaPrivateKey::(from_components|from_p_q|from_primes)$"
+path = "(Rsa)?PrivateKey::(from_components(_with_large_exponent|_with_wide_primes)?|from_p_q|from_primes)$"
 asset = "RSA"
 family = "RSA"
 primitive = "pke"
@@ -2399,6 +2454,7 @@ asset = "RSA-OAEP-{hash}"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+versions = "<0.10"
 params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 0, asset = true } }
 
 [[fn]]
@@ -2408,6 +2464,7 @@ asset = "RSA-OAEP-{hash}[-MGF1-{mgf_hash}]"
 family = "RSAES-OAEP"
 primitive = "pke"
 functions = ["encrypt", "decrypt"]
+versions = "<0.10"
 defaults = { mgf_hash = "{hash}" }
 params = { hash = { arg = 0, asset = true }, mgf_hash = { arg = 1, asset = true } }
 
@@ -2430,7 +2487,110 @@ asset = "RSA-PSS-{hash}"
 family = "RSASSA-PSS"
 primitive = "signature"
 functions = ["sign", "verify"]
+versions = "<0.10"
 params = { hash = { arg = 0, asset = true }, salt_len = { const_arg = 0 } }
+
+# rsa 0.10: `Pss::<D>::new_with_salt(len)`, `new_blinded_with_salt(len)`: the hash is the
+# type's, the salt length the argument
+[[fn]]
+crate = "rsa"
+self_type = "Pss"
+path = "Pss::new(_with_salt|_blinded|_blinded_with_salt)?$"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign", "verify"]
+versions = ">=0.10"
+params = { hash = { parent_arg = 0, asset = true }, salt_len = { const_arg = 0 } }
+
+# rsa 0.10's methods on the keys themselves, the scheme in the name and the hash a type
+# argument (`key.pss_sign::<Sha256>(msg)`, `public.pkcs1v15_verify::<Sha256>(msg, sig)`,
+# `public.oaep_encrypt::<Sha256>(msg)`, private_key.rs and the scheme modules)
+[[fn]]
+crate = "rsa"
+path = "pss_sign(_prehash)?(_with_rng)?$"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["sign"]
+use = "sign"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "pss_verify(_prehash)?$"
+asset = "RSA-PSS-{hash}"
+family = "RSASSA-PSS"
+primitive = "signature"
+functions = ["verify"]
+use = "verify"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "pkcs1v15_sign(_prehash)?(_with_rng)?$"
+asset = "RSA-PKCS1-1.5-{hash}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["sign"]
+use = "sign"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "pkcs1v15_verify(_prehash)?$"
+asset = "RSA-PKCS1-1.5-{hash}"
+family = "RSASSA-PKCS1"
+primitive = "signature"
+functions = ["verify"]
+use = "verify"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "pkcs1v15_encrypt(_with_rng)?$"
+asset = "RSA-PKCS1-1.5"
+family = "RSAES-PKCS1"
+primitive = "pke"
+functions = ["encrypt"]
+use = "encrypt"
+versions = ">=0.10"
+
+[[fn]]
+crate = "rsa"
+path = "pkcs1v15_decrypt(_with_rng)?$"
+asset = "RSA-PKCS1-1.5"
+family = "RSAES-PKCS1"
+primitive = "pke"
+functions = ["decrypt"]
+use = "decrypt"
+versions = ">=0.10"
+
+[[fn]]
+crate = "rsa"
+path = "oaep_encrypt(_with_rng)?$"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["encrypt"]
+use = "encrypt"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
+
+[[fn]]
+crate = "rsa"
+path = "oaep_decrypt(_with_rng)?$"
+asset = "RSA-OAEP-{hash}"
+family = "RSAES-OAEP"
+primitive = "pke"
+functions = ["decrypt"]
+use = "decrypt"
+versions = ">=0.10"
+params = { hash = { arg = 0, asset = true } }
 
 # A JWT HMAC key: the algorithm (HS256/384/512) is chosen by the header at encode time.
 # `from_base64_secret(text)`: the base64 text is the key.
@@ -2709,7 +2869,7 @@ methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_diges
 
 [[use]]
 function = "keygen"
-methods = ["generate", "try_generate", "generate_from_rng", "try_generate_from_rng", "generate_key", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
+methods = ["generate", "try_generate", "generate_from_rng", "try_generate_from_rng", "generate_key", "generate_keypair", "generate_keypair_from_rng", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
 
 # a draw from a random generator; rand's `seq` traits draw from the one they are given
 # (`v.shuffle(&mut rng)`, `v.choose(&mut rng)`)
@@ -2729,12 +2889,12 @@ methods = ["random"]
 [[use]]
 function = "encapsulate"
 primitives = ["kem"]
-methods = ["encapsulate"]
+methods = ["encapsulate", "encapsulate_with_rng", "encapsulate_deterministic"]
 
 [[use]]
 function = "decapsulate"
 primitives = ["kem"]
-methods = ["decapsulate"]
+methods = ["decapsulate", "decapsulate_slice", "try_decapsulate", "try_decapsulate_slice"]
 
 # --- Layer 1: packages without [[crate]] entries -------------------------------------------
 # A package the knowledge base does not model is still reported as cryptographic when its
@@ -2850,6 +3010,12 @@ why = "a draw of the stream `sample_iter` made, or its size: the draws are cited
 
 [[aside]]
 name = "encoding"
+crate = ["aws-lc-rs"]
+path = "^rsa::key::(PublicKeyComponents::from|PublicKey::from_der)$"
+why = "an RSA public key read from its DER encoding, or its modulus and exponent read from it: what is verified with the key is cited where it is verified"
+
+[[aside]]
+name = "encoding"
 crate = ["rsa"]
 path = "^pkcs1v15::signature::Signature::try_from$"
 why = "a signature decoded from its bytes (cited where it is verified)"
@@ -2870,7 +3036,7 @@ why = "a key's public half, from the private key cited where it is made or read"
 [[aside]]
 name = "public half"
 crate = ["rsa"]
-path = "^key::(RsaPrivateKey::to_public_key|RsaPublicKey::from)$"
+path = "^(key::(RsaPrivateKey::to_public_key|RsaPublicKey::from)|private_key::PrivateKey::(to_public_key|as_public_key)|public_key::PublicKey::from)$"
 why = "a key's public half, from the private key cited where it is made or read"
 
 [[aside]]
@@ -2888,7 +3054,7 @@ why = "the inputs and keys of an operation made (a nonce, the associated data, a
 [[aside]]
 name = "setup"
 crate = ["md5", "ed25519-dalek", "rsa", "argon2"]
-path = "^(Context::new|signing::SigningKey::from_bytes|key::RsaPublicKey::(new|new_with_max_size)|Argon2::from|(algorithm::Algorithm|version::Version|block::Block)::default)$"
+path = "^(Context::new|signing::SigningKey::from_bytes|key::RsaPublicKey::(new|new_with_max_size)|public_key::PublicKey::(new|new_with_max_size|new_with_size_limits|new_unchecked)|Argon2::from|(algorithm::Algorithm|version::Version|block::Block)::default)$"
 why = "a context, a key or a parameter made from its parts: the operations made with it are cited"
 
 [[aside]]
@@ -2912,7 +3078,7 @@ why = "what an algorithm descriptor or a key says about itself (its lengths, its
 [[aside]]
 name = "accessor"
 crate = ["x25519-dalek", "elliptic-curve", "blake3", "digest", "scrypt", "rsa", "ring"]
-path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secret_bytes|Hash::as_bytes|mac::CtOutput::into_bytes|params::Params::(log_n|r|p|len)|key::RsaPrivateKey::crt_coefficient|rand::Random::expose)$"
+path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secret_bytes|Hash::as_bytes|mac::CtOutput::into_bytes|params::Params::(log_n|r|p|len)|(key::RsaPrivateKey|private_key::PrivateKey)::crt_coefficient|rand::Random::expose)$"
 why = "an operation's output or a key's or parameters' value, read after it is made (cited where it is computed)"
 
 [[aside]]
@@ -3575,7 +3741,7 @@ args = { "0" = "key" }
 
 # rsa's private keys decoded from PKCS#8 or PKCS#1 (`DecodePrivateKey`, `DecodeRsaPrivateKey`)
 [[role]]
-path = "RsaPrivateKey::from_(pkcs8|pkcs1)_(pem|der)$"
+path = "(RsaPrivateKey|rsa::private_key::PrivateKey)::from_(pkcs8|pkcs1)_(pem|der)$"
 args = { "0" = "key" }
 
 [[role]]
@@ -3691,7 +3857,7 @@ path = "DecodingKey::from_jwk$"
 args = { "0" = "key" }
 
 [[role]]
-path = "RsaPrivateKey::new(_with_exp)?$"
+path = "(RsaPrivateKey|rsa::private_key::PrivateKey)::new(_with_exp)?(_unchecked)?$"
 args = { "0" = "rng" }
 
 [[role]]
@@ -3700,11 +3866,11 @@ args = { "0" = "rng" }
 
 # the secret parts of an RSA key built from its components: the private exponent and the primes
 [[role]]
-path = "^rsa::key::RsaPrivateKey::from_components$"
+path = "^rsa::(key::RsaPrivateKey|private_key::PrivateKey)::from_components$"
 args = { "2" = "key", "3" = "key" }
 
 [[role]]
-path = "^rsa::key::RsaPrivateKey::(from_p_q|from_primes)$"
+path = "^rsa::(key::RsaPrivateKey|private_key::PrivateKey)::(from_p_q|from_primes)$"
 args = { "0" = "key", "1" = "key" }
 
 # ring / aws-lc-rs `UnparsedPublicKey::new(algorithm, bytes)`: the verification key, set up with
@@ -3716,7 +3882,7 @@ args = { "1" = "public-key" }
 # rsa: `pub_key.encrypt(&mut rng, padding, msg)`, `priv_key.decrypt_blinded(&mut rng, ..)`, and
 # the signature traits' randomized signing (`sign_with_rng(&mut rng, msg)`)
 [[role]]
-path = "^rsa::key::(RsaPublicKey::encrypt|RsaPrivateKey::(decrypt_blinded|sign_with_rng))$|RandomizedSigner::(try_)?sign_with_rng$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$|RandomizedPrehashSigner::sign_prehash_with_rng$|^rsa::traits::encryption::RandomizedEncryptor::encrypt_with_rng$"
+path = "^rsa::(key::(RsaPublicKey::encrypt|RsaPrivateKey::(decrypt_blinded|sign_with_rng))|public_key::PublicKey::encrypt|private_key::PrivateKey::(decrypt_blinded|sign_with_rng))$|(pss_sign|pkcs1v15_sign|pkcs1v15_encrypt|pkcs1v15_decrypt|oaep_encrypt|oaep_decrypt)(_prehash)?_with_rng$|RandomizedSigner::(try_)?sign_with_rng$|RandomizedDigestSigner::(try_)?sign_digest_with_rng$|RandomizedPrehashSigner::sign_prehash_with_rng$|^rsa::traits::encryption::RandomizedEncryptor::encrypt_with_rng$"
 args = { "1" = "rng" }
 
 # ed25519-dalek's hazmat key: `ExpandedSecretKey::from_bytes(&bytes)`
@@ -3749,6 +3915,13 @@ args = { "0" = "rng" }
 path = "(KeyInit::generate_key|KeyIvInit::generate_(key|iv|key_iv)|AeadCore::generate_nonce|Generate::(try_)?generate_from_rng)$|^elliptic_curve::(secret_key::SecretKey|ecdh::EphemeralSecret)::random$|^ecdsa::signing::SigningKey::random$"
 args = { "0" = "rng" }
 
+# kem 0.3: `K::generate_keypair_from_rng(&mut rng)`, `ek.encapsulate_with_rng(&mut rng)`
+[[role]]
+path = "^kem::Kem::generate_keypair_from_rng$"
+args = { "0" = "rng" }
+[[role]]
+path = "^kem::Encapsulate::encapsulate_with_rng$"
+args = { "1" = "rng" }
 [[role]]
 path = "^blake3::(keyed_hash|Hasher::new_keyed)$"
 args = { "0" = "key" }
