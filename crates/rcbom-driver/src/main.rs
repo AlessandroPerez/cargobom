@@ -237,6 +237,9 @@ pub(crate) struct Cx<'tcx> {
         std::cell::RefCell<HashMap<rustc_span::def_id::CrateNum, Option<std::path::PathBuf>>>,
     /// Memo: crates by stable id, for crates the facts name.
     by_stable_id: std::cell::OnceCell<HashMap<String, rustc_span::def_id::CrateNum>>,
+    /// The crates read from the toolchain's sysroot: the standard library and what it is built
+    /// from (`std_crate`).
+    sysroot_crates: std::cell::OnceCell<std::rc::Rc<HashSet<rustc_span::def_id::CrateNum>>>,
     /// The program's own crates (workspace members, path dependencies), by crate number and
     /// stable id: never the crates the knowledge base describes, whatever their names (a member
     /// called `signature`).
@@ -263,6 +266,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         impl_crates: CrateSet::from_env("RCBOM_IMPL_CRATES"),
         crate_roots: Default::default(),
         by_stable_id: Default::default(),
+        sysroot_crates: Default::default(),
         local,
         local_ids,
         interesting_statics: HashMap::new(),
@@ -824,6 +828,8 @@ struct Edges<'a, 'tcx> {
     std_calls: Vec<(Instance, Span, Option<rcbom_facts::CallId>)>,
     /// The crate of the body, by name.
     own: String,
+    /// The crates of the toolchain's sysroot (`Cx::sysroot`): the standard library's.
+    sysroot: std::rc::Rc<HashSet<rustc_span::def_id::CrateNum>>,
 }
 
 /// A call of walked code into the standard library, whose bodies have no source positions: the

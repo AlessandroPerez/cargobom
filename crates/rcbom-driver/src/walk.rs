@@ -138,7 +138,7 @@ fn generic_callees(cx: &Cx<'_>, generic: &[rustc_span::def_id::DefId]) -> Vec<In
         }
     }
     let tcx = cx.tcx;
-    let std = |d: DefId| cx.is_std(tcx.crate_name(d.krate).as_str());
+    let std = |d: DefId| cx.std_crate(d.krate);
     let env = ty::TypingEnv::fully_monomorphized();
     let mut seen: HashSet<DefId> = generic.iter().copied().collect();
     let mut queue: VecDeque<DefId> = generic.iter().copied().collect();
@@ -417,10 +417,10 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // (or a wrapper crate's, `[semantics] wrappers`: its calls into the crypto set are
         // its caller's too, `Uuid::new_v4()` running `rand::random`)
         let std_like = |i: &Instance| {
-            let krate = tcx.crate_name(rustc_internal::internal(tcx, i.def.def_id()).krate);
+            let k = rustc_internal::internal(tcx, i.def.def_id()).krate;
             matches!(i.kind, InstanceKind::Shim)
-                || self.cx.is_std(krate.as_str())
-                || origins::wrapper_crate(krate.as_str())
+                || self.cx.std_crate(k)
+                || origins::wrapper_crate(tcx.crate_name(k).as_str())
         };
         let mut out = Vec::new();
         let mut callees: Vec<&Instance> = self.seen.iter().collect();
@@ -490,8 +490,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
         let tcx = self.cx.tcx;
         let i = rustc_internal::internal(tcx, inst);
-        let std_crate =
-            |did: rustc_span::def_id::DefId| self.cx.is_std(tcx.crate_name(did.krate).as_str());
+        let std_crate = |did: rustc_span::def_id::DefId| self.cx.std_crate(did.krate);
         if std_crate(i.def_id())
             && !i.args.iter().any(|a| {
                 a.walk().any(|g| {
@@ -567,8 +566,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // a stop crate's own dependencies are its implementation (curve25519-dalek under
         // ed25519-dalek), not code it calls back
         let foreign = |did: rustc_span::def_id::DefId| {
-            let k = tcx.crate_name(did.krate).to_string();
-            !self.cx.stop_crate(did.krate) && !self.cx.is_std(&k) && !self.cx.impl_crate(did.krate)
+            !self.cx.stop_crate(did.krate)
+                && !self.cx.std_crate(did.krate)
+                && !self.cx.impl_crate(did.krate)
         };
         let i = rustc_internal::internal(tcx, callee);
         if foreign(i.def_id()) {
@@ -604,7 +604,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let program = !usage
             && !stop
             && !shim
-            && !self.cx.is_std(self.cx.tcx.crate_name(did.krate).as_str())
+            && !self.cx.std_crate(did.krate)
             && !self.cx.impl_crate(did.krate);
         let mut edges = Edges {
             tcx: self.cx.tcx,
@@ -621,6 +621,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             calls: Vec::new(),
             std_calls: Vec::new(),
             own: self.cx.tcx.crate_name(did.krate).to_string(),
+            sysroot: self.cx.sysroot().clone(),
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
@@ -800,7 +801,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 && callee.is_none_or(|c| {
                     let d = rustc_internal::internal(tcx, c.def.def_id());
                     !drops_only(tcx, d)
-                        && (self.cx.is_std(tcx.crate_name(d.krate).as_str())
+                        && (self.cx.std_crate(d.krate)
                             || self.cx.stop_crate(d.krate)
                             || self.cx.impl_crate(d.krate)
                             || tcx.is_foreign_item(d))
@@ -896,7 +897,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                     }
                 }
                 rustc_middle::ty::Adt(adt, args)
-                    if depth < 3 && !self.cx.is_std(tcx.crate_name(adt.did().krate).as_str()) =>
+                    if depth < 3 && !self.cx.std_crate(adt.did().krate) =>
                 {
                     for f in adt.all_fields() {
                         for k in self.dyn_keys(f.ty(tcx, args).skip_norm_wip(), depth + 1) {
@@ -1089,6 +1090,7 @@ impl Edges<'_, '_> {
                     let into = self.tcx.crate_name(d.krate);
                     if matches!(i.kind, InstanceKind::Shim)
                         || matches!(into.as_str(), "core" | "std" | "alloc")
+                        || self.sysroot.contains(&d.krate)
                         || (origins::wrapper_crate(into.as_str()) && into.as_str() != self.own)
                     {
                         self.std_calls.push((

@@ -204,4 +204,33 @@ impl Cx<'_> {
     pub(super) fn is_std(&self, krate: &str) -> bool {
         matches!(krate, "core" | "std" | "alloc")
     }
+
+    /// Is this crate of the standard library as the toolchain ships it: `core`, `alloc`, `std`,
+    /// or a crate of the sysroot `std` is built from (its `hashbrown`, under `HashMap`)? The
+    /// walk takes their code alike: it is not the program's, has no sources of the build's, and
+    /// a call it makes into the crypto set is the walked code's call into it (a `HashMap`
+    /// hashing its keys with a crypto package's hasher). A package of the build named like one
+    /// (`hashbrown` from the registry) is another crate, and not one of them.
+    pub(crate) fn std_crate(&self, c: rustc_span::def_id::CrateNum) -> bool {
+        self.is_std(self.tcx.crate_name(c).as_str()) || self.sysroot().contains(&c)
+    }
+
+    /// The crates read from the toolchain's sysroot.
+    pub(crate) fn sysroot(&self) -> &std::rc::Rc<HashSet<rustc_span::def_id::CrateNum>> {
+        let tcx = self.tcx;
+        self.sysroot_crates.get_or_init(|| {
+            let root = tcx.sess.opts.sysroot.path();
+            std::rc::Rc::new(
+                tcx.crates(())
+                    .iter()
+                    .copied()
+                    .filter(|&k| {
+                        tcx.used_crate_source(k)
+                            .paths()
+                            .any(|p| p.starts_with(root))
+                    })
+                    .collect(),
+            )
+        })
+    }
 }
