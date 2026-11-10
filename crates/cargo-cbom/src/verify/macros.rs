@@ -440,6 +440,52 @@ pub(super) fn rule_for(src: &Source, m: &Item, args: &[Tok]) -> Option<(Rule, Me
     }
     None
 }
+/// The file with its item-level invocations of its own `macro_rules!` that name one of `words`
+/// (the item's type, its function) expanded in place: what the macros write there, among the
+/// file's imports and items. None when no such invocation expands. Positions in it are not the
+/// file's: for reading an item's code, not for placing an occurrence.
+pub(super) fn macro_made(src: &Source, words: &[String]) -> Option<Rc<Source>> {
+    let mut text: String = src.lines.join("\n");
+    let mut any = false;
+    // from the last invocation back, so that the offsets before it hold
+    let mut calls: Vec<&Item> = src
+        .items
+        .iter()
+        .filter(|i| {
+            i.kind == ItemKind::MacroCall && src.enclosing(i.start, &[ItemKind::Fn]).is_none()
+        })
+        .collect();
+    calls.sort_by_key(|i| std::cmp::Reverse(i.start));
+    for c in calls {
+        let Some(start) = invocation_start(src, c.start) else {
+            continue;
+        };
+        let Some((_, call)) = invocation_text(src, start) else {
+            continue;
+        };
+        let names = |w: &String| {
+            Regex::new(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&call))
+        };
+        if !words.iter().any(names) {
+            continue;
+        }
+        let Some(made) = expansion(src, start) else {
+            continue;
+        };
+        // the invocation's place in the text: its line's offset, then its column
+        let line_at: usize = src.lines[..start.0 - 1]
+            .iter()
+            .map(|l| l.chars().count() + 1)
+            .sum();
+        let from = text.char_indices().nth(line_at + start.1).map(|(b, _)| b);
+        let Some(from) = from.filter(|b| text[*b..].starts_with(&call)) else {
+            continue;
+        };
+        text.replace_range(from..from + call.len(), &made);
+        any = true;
+    }
+    any.then(|| Rc::new(Source::new(&text, true, false)))
+}
 /// What the invocation at `at` of the file's `macro_rules!` expands to: the transcriber of the
 /// rule it matches with its metavariables replaced; None when that is not known.
 pub(super) fn expansion(src: &Source, at: (usize, usize)) -> Option<String> {

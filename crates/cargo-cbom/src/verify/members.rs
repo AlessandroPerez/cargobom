@@ -574,16 +574,34 @@ impl Files<'_> {
             type_name(&expand_aliases(&type_name(t), lookup, 3))
         };
         let mut found = false;
-        for f in files {
-            let Some(src) = self.source(&f) else { continue };
-            let is_trait = |t: &str| {
-                src.items
+        // the package's files; then, when none writes the function, what the files' own
+        // `macro_rules!` write at item level (jsonwebtoken 11's `define_ecdsa_signer!(
+        // Es256Signer, ..)` writes `impl Es256Signer { fn new .. }`): each file with the
+        // invocations naming the item expanded in place
+        for round in 0..2 {
+            if round == 1 && found {
+                break;
+            }
+            let sources: Vec<Rc<Source>> = if round == 0 {
+                files.iter().filter_map(|f| self.source(f)).collect()
+            } else {
+                let mut words = vec![n.name.clone()];
+                words.extend(n.self_ty.as_deref().map(type_name));
+                files
                     .iter()
-                    .any(|i| i.kind == ItemKind::Trait && i.name == t)
+                    .filter_map(|f| self.source(f))
+                    .filter_map(|src| macro_made(&src, &words))
+                    .collect()
             };
-            let in_block = |kind: ItemKind, name: &str, tr: Option<&str>, f: &Item| {
-                src.items.iter().any(|b| {
-                    b.kind == kind
+            for src in sources {
+                let is_trait = |t: &str| {
+                    src.items
+                        .iter()
+                        .any(|i| i.kind == ItemKind::Trait && i.name == t)
+                };
+                let in_block = |kind: ItemKind, name: &str, tr: Option<&str>, f: &Item| {
+                    src.items.iter().any(|b| {
+                        b.kind == kind
                         // (the impl's type written in full, with its references and type
                         // arguments, where it says more than its name: `impl Put for &mut A`
                         // is no `<&'static Algorithm as Put>`'s)
@@ -607,102 +625,109 @@ impl Files<'_> {
                                 .as_deref()
                                 .is_some_and(|bt| type_name(bt) == type_name(t))
                         })
-                })
-            };
-            let candidates: Vec<&Item> = src
-                .items
-                .iter()
-                .filter(|f| f.kind == ItemKind::Fn && f.name == n.name)
-                .filter(|f| match (n.self_ty.as_deref(), n.trait_name.as_deref()) {
-                    // `<T as Tr>::m`: T's impl of Tr, else the trait's default body
-                    (Some(t), Some(tr)) => {
-                        in_block(ItemKind::Impl, t, Some(tr), f)
-                            || (!overrides && in_block(ItemKind::Trait, &type_name(tr), None, f))
-                    }
-                    // a trait's method, or an inherent one
-                    (Some(t), None) if is_trait(t) => in_block(ItemKind::Trait, t, None, f),
-                    (Some(t), None) => in_block(ItemKind::Impl, t, None, f),
-                    // a free function
-                    (None, _) => !src.items.iter().any(|o| {
-                        matches!(o.kind, ItemKind::Impl | ItemKind::Trait) && o.contains(f.start)
-                    }),
-                })
-                .collect();
-            for f in candidates {
-                found = true;
-                // (its body: not its own name, read as a call)
-                let (a, b) = src.span(f);
-                let a = scan_to(&src.code, a, b, |k| src.code[k] == '{');
-                let mut r = Reads::default();
-                names_read(&src, self.kb, a, b, 3, &mut HashSet::new(), &mut r, true);
-                // (a model enum's variants are its values, not constants not read)
-                let foreign = r.foreign
-                    && (rivals.is_empty()
-                        || r.foreign_items
-                            .iter()
-                            .any(|k| k.1 != last && !rivals.contains(&k.1)));
-                // (a model enum's variant is read as a value whatever its case:
-                // `Algorithm::EdDSA` beside `Algorithm::HS256`)
-                let variant = |x: &String| !rivals.is_empty() && (rivals.contains(x) || *x == last);
-                if r.names.contains(&last) || (variant(&last) && r.types.contains(&last)) || foreign
-                {
-                    return Ok(());
-                }
-                let others = r.types.iter().any(|x| variant(x) && *x != last)
-                    || r.names.iter().any(|x| {
-                        rivals.contains(x)
-                            || self.kb.statics.iter().any(|e| {
-                                e.pattern.is_match(x) && Some(&e.algo.primitive) == prim.as_ref()
-                            })
-                    });
-                // a parameter it reads that can hold the algorithm (not an integer, a string,
-                // bytes): a value from its caller it passes on or keeps
-                let sig = fn_sig(&src, f);
-                let body = src.text(a, b);
-                let carrying = r.open
-                    && sig.params.iter().any(|(p, ty)| {
-                        !neutral_type(ty)
-                            && Regex::new(&format!(
-                                r"\b{}\b",
-                                regex::escape(p.trim_start_matches("mut ").trim())
-                            ))
-                            .is_ok_and(|x| x.is_match(&body))
-                    });
-                if !others {
-                    // one that returns or writes the object: of a type that can hold it (not a
-                    // `String` made of the arguments)
-                    let gives = sig.ret.as_deref().is_some_and(|t| !neutral_type(t))
-                        || sig.params.iter().any(|(p, ty)| {
-                            (p == "self" || ty.contains("&mut")) && !neutral_type(ty)
-                        });
-                    if carrying
-                        || r.lent
-                        || ((kind == "object, from" || kind.starts_with("impl")) && gives)
+                    })
+                };
+                let candidates: Vec<&Item> = src
+                    .items
+                    .iter()
+                    .filter(|f| f.kind == ItemKind::Fn && f.name == n.name)
+                    .filter(|f| match (n.self_ty.as_deref(), n.trait_name.as_deref()) {
+                        // `<T as Tr>::m`: T's impl of Tr, else the trait's default body
+                        (Some(t), Some(tr)) => {
+                            in_block(ItemKind::Impl, t, Some(tr), f)
+                                || (!overrides
+                                    && in_block(ItemKind::Trait, &type_name(tr), None, f))
+                        }
+                        // a trait's method, or an inherent one
+                        (Some(t), None) if is_trait(t) => in_block(ItemKind::Trait, t, None, f),
+                        (Some(t), None) => in_block(ItemKind::Impl, t, None, f),
+                        // a free function
+                        (None, _) => !src.items.iter().any(|o| {
+                            matches!(o.kind, ItemKind::Impl | ItemKind::Trait)
+                                && o.contains(f.start)
+                        }),
+                    })
+                    .collect();
+                for f in candidates {
+                    found = true;
+                    // (its body: not its own name, read as a call)
+                    let (a, b) = src.span(f);
+                    let a = scan_to(&src.code, a, b, |k| src.code[k] == '{');
+                    let mut r = Reads::default();
+                    names_read(&src, self.kb, a, b, 3, &mut HashSet::new(), &mut r, true);
+                    // (a model enum's variants are its values, not constants not read)
+                    let foreign = r.foreign
+                        && (rivals.is_empty()
+                            || r.foreign_items
+                                .iter()
+                                .any(|k| k.1 != last && !rivals.contains(&k.1)));
+                    // (a model enum's variant is read as a value whatever its case:
+                    // `Algorithm::EdDSA` beside `Algorithm::HS256`)
+                    let variant =
+                        |x: &String| !rivals.is_empty() && (rivals.contains(x) || *x == last);
+                    if r.names.contains(&last)
+                        || (variant(&last) && r.types.contains(&last))
+                        || foreign
                     {
                         return Ok(());
                     }
-                    continue;
-                }
-                // it names other descriptors only: a writer keeping the value before on some way
-                // (or, for a member beside others not followed, one writing the object at all)
-                if kind == "object, from" || kind.starts_with("impl") {
-                    let sc = src.fn_scope(f);
-                    let replaced = sc
-                        .params
-                        .iter()
-                        .any(|p| !body_assigns(&src, f, p, 3).is_empty());
-                    // (or a value of the file's type holding a `&mut`: `fn wset(w: W)` with `W {
-                    // slot: &mut D }`, writing the caller's variable through it)
-                    let holder = |ty: &str| {
-                        struct_fields(&src, &type_name(ty)).is_some_and(|(a, b)| {
-                            re!(r"&\s*(?:'\w+\s+)?mut\b").is_match(&src.text(a, b))
-                        })
-                    };
-                    let writes = sig.params.iter().any(|(p, ty)| {
-                        (p == "self" || ty.contains("&mut") || holder(ty)) && !neutral_type(ty)
-                    });
-                    if (!replaced && carrying) || (beside && writes) {
-                        return Ok(());
+                    let others = r.types.iter().any(|x| variant(x) && *x != last)
+                        || r.names.iter().any(|x| {
+                            rivals.contains(x)
+                                || self.kb.statics.iter().any(|e| {
+                                    e.pattern.is_match(x)
+                                        && Some(&e.algo.primitive) == prim.as_ref()
+                                })
+                        });
+                    // a parameter it reads that can hold the algorithm (not an integer, a string,
+                    // bytes): a value from its caller it passes on or keeps
+                    let sig = fn_sig(&src, f);
+                    let body = src.text(a, b);
+                    let carrying = r.open
+                        && sig.params.iter().any(|(p, ty)| {
+                            !neutral_type(ty)
+                                && Regex::new(&format!(
+                                    r"\b{}\b",
+                                    regex::escape(p.trim_start_matches("mut ").trim())
+                                ))
+                                .is_ok_and(|x| x.is_match(&body))
+                        });
+                    if !others {
+                        // one that returns or writes the object: of a type that can hold it (not a
+                        // `String` made of the arguments)
+                        let gives = sig.ret.as_deref().is_some_and(|t| !neutral_type(t))
+                            || sig.params.iter().any(|(p, ty)| {
+                                (p == "self" || ty.contains("&mut")) && !neutral_type(ty)
+                            });
+                        if carrying
+                            || r.lent
+                            || ((kind == "object, from" || kind.starts_with("impl")) && gives)
+                        {
+                            return Ok(());
+                        }
+                        continue;
+                    }
+                    // it names other descriptors only: a writer keeping the value before on some way
+                    // (or, for a member beside others not followed, one writing the object at all)
+                    if kind == "object, from" || kind.starts_with("impl") {
+                        let sc = src.fn_scope(f);
+                        let replaced = sc
+                            .params
+                            .iter()
+                            .any(|p| !body_assigns(&src, f, p, 3).is_empty());
+                        // (or a value of the file's type holding a `&mut`: `fn wset(w: W)` with `W {
+                        // slot: &mut D }`, writing the caller's variable through it)
+                        let holder = |ty: &str| {
+                            struct_fields(&src, &type_name(ty)).is_some_and(|(a, b)| {
+                                re!(r"&\s*(?:'\w+\s+)?mut\b").is_match(&src.text(a, b))
+                            })
+                        };
+                        let writes = sig.params.iter().any(|(p, ty)| {
+                            (p == "self" || ty.contains("&mut") || holder(ty)) && !neutral_type(ty)
+                        });
+                        if (!replaced && carrying) || (beside && writes) {
+                            return Ok(());
+                        }
                     }
                 }
             }
