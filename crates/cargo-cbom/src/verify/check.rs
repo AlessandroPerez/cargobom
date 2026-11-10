@@ -117,7 +117,7 @@ impl Files<'_> {
         // package (`[semantics] wrappers`) makes for the program, which the knowledge base
         // names as this asset's function (``run for this call by `uuid::..::new_v4`:
         // `rand::random` of rand 0.10.3``); the function called here is the occurrence's symbol
-        if let Some(run) = ctx.details.split("run for this call by ").nth(1) {
+        for run in ctx.details.split("run for this call by ").skip(1) {
             let mut quoted = run.split('`');
             let (entry, callee) = (quoted.nth(1).unwrap_or(""), quoted.nth(1).unwrap_or(""));
             let entry_crate = entry.split("::").next().unwrap_or("");
@@ -140,13 +140,37 @@ impl Files<'_> {
                     o.symbol
                 ));
             }
-            let names =
-                rcbom_analysis::fn_names(self.kb, callee.split("::").next().unwrap_or(""), callee);
+            // (by a `[[fn]]` entry for the function, or by the `[[type]]` entry of the type it
+            // is a function of, whose name may have parameters the type's arguments fill:
+            // `HMAC-{hash}`)
+            let of = run
+                .split("; ")
+                .next()
+                .and_then(|clause| clause.split(", a function of `").nth(1))
+                .and_then(|t| t.split('`').next());
+            let names = rcbom_analysis::floor_names(self.kb, callee, of);
             let asset = o
                 .component_ref
                 .strip_prefix("crypto:algorithm:")
                 .unwrap_or(&o.component_ref);
-            if !names.iter().any(|n| n == asset) {
+            let fits = |template: &str| {
+                let mut re = String::from("^");
+                let mut chars = template.chars();
+                while let Some(ch) = chars.next() {
+                    match ch {
+                        '{' => {
+                            chars.by_ref().take_while(|x| *x != '}').for_each(drop);
+                            re.push_str(".+?");
+                        }
+                        '[' => re.push_str("(?:"),
+                        ']' => re.push_str(")?"),
+                        _ => re.push_str(&regex::escape(&ch.to_string())),
+                    }
+                }
+                re.push('$');
+                Regex::new(&re).is_ok_and(|r| r.is_match(asset))
+            };
+            if !names.iter().any(|n| n == asset || fits(n)) {
                 return Err(format!(
                     "the knowledge base does not name `{callee}` as {asset}"
                 ));

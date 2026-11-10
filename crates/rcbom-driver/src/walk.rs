@@ -466,6 +466,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                         line_text: a.line_text.clone(),
                         expansion: a.expansion.clone(),
                         std_entry: a.call.as_ref().map(|c| c.named.clone()),
+                        self_ty: self_tree(tcx, did, rustc_internal::internal(tcx, c).args),
                     });
                 }
                 for p in self.callers.get(&s).into_iter().flatten() {

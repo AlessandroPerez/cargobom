@@ -370,6 +370,34 @@ pub(super) fn split_self(
     }
     (None, arg_trees(tcx, &args.0, 0))
 }
+/// The struct or enum a resolved function is a function of: the self type of its impl with
+/// the instance's arguments (`SipHasher13` for `<SipHasher13 as Hasher>::write`), `Self` of a
+/// trait's own method.
+pub(crate) fn self_tree<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: rustc_span::def_id::DefId,
+    args: rustc_middle::ty::GenericArgsRef<'tcx>,
+) -> Option<TyTree> {
+    use rustc_middle::ty::TypeVisitableExt;
+    let ty = if tcx.trait_of_assoc(did).is_some() {
+        args.first()?.as_type()?
+    } else {
+        let impl_id = tcx.impl_of_assoc(did)?;
+        let n = tcx.generics_of(impl_id).count().min(args.len());
+        let impl_args = tcx.mk_args(&args[..n]);
+        let ty = tcx.type_of(impl_id).instantiate(tcx, impl_args);
+        if impl_args.has_non_region_param() || impl_args.has_aliases() {
+            ty.skip_norm_wip()
+        } else {
+            tcx.normalize_erasing_regions(rustc_middle::ty::TypingEnv::fully_monomorphized(), ty)
+        }
+    };
+    if !matches!(ty.kind(), rustc_middle::ty::Adt(..)) {
+        return None;
+    }
+    let ty: Ty = rustc_internal::stable(ty);
+    Some(ty_tree(tcx, &ty, 0))
+}
 /// The value of an integer constant argument (`2048`, `1_000`); `None` for anything else.
 pub(crate) fn const_int(op: &Operand) -> Option<i128> {
     let Operand::Constant(c) = op else {

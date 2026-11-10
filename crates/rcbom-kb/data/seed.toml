@@ -245,6 +245,21 @@ package = "md-5"
 versions = ">=0.10, <0.12"
 role = "algorithm"
 
+# (the package sha1 was published as until 0.10.1: the same crate `sha1`, the same entries)
+[[crate]]
+package = "sha-1"
+versions = ">=0.10, <0.11"
+role = "algorithm"
+candidates = ["SHA-1"]
+
+# SipHash, a keyed pseudorandom function: a MAC of short inputs, with a 64- or a 128-bit output
+# (`sip`, `sip128`). The type says the rounds; `SipHasher` is SipHash-2-4.
+[[crate]]
+package = "siphasher"
+versions = ">=0.3, <2"
+role = "algorithm"
+candidates = ["SipHash-1-3", "SipHash-2-4"]
+
 [[crate]]
 package = "ml-kem"
 versions = ">=0.2, <0.4"
@@ -726,6 +741,32 @@ family = "MD5"
 primitive = "hash"
 functions = ["digest"]
 fixed = { output_bytes = "16" }
+
+# siphasher: fed through `core::hash::Hasher` (`write`), read by `finish` or `finish128`;
+# `hash` is the one-shot
+[[type]]
+crate = "siphasher"
+name = "SipHasher13"
+asset = "SipHash-1-3"
+family = "SipHash"
+primitive = "mac"
+functions = ["tag"]
+
+[[type]]
+crate = "siphasher"
+name = "SipHasher24"
+asset = "SipHash-2-4"
+family = "SipHash"
+primitive = "mac"
+functions = ["tag"]
+
+[[type]]
+crate = "siphasher"
+name = "SipHasher"
+asset = "SipHash-2-4"
+family = "SipHash"
+primitive = "mac"
+functions = ["tag"]
 
 # blake3: the constructor of a Hasher says its mode ([[fn]] entries below)
 [[type]]
@@ -2848,7 +2889,7 @@ methods = ["digest", "digest_xof", "update", "update_reader", "update_mmap", "up
 [[use]]
 function = "tag"
 primitives = ["mac"]
-methods = ["update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy", "update_padded", "compute_unpadded"]
+methods = ["update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "sign", "keyed_hash", "write", "write_all", "copy", "update_padded", "compute_unpadded", "finish", "finish128", "hash", "write_u8", "write_u16", "write_u32", "write_u64", "write_u128", "write_usize", "write_i8", "write_i16", "write_i32", "write_i64", "write_i128", "write_isize", "write_str", "write_length_prefix"]
 
 [[use]]
 function = "verify"
@@ -2926,7 +2967,7 @@ steps = ["write", "write_all", "copy", "update", "chain_update", "consume", "new
 # (and any method of a trait reading from or writing into a stream: rage reading through age's
 # `InputReader`, `writeln!` into its `ArmoredWriter`)
 step_traits = ["core::io::write::Write", "alloc::io::read::Read", "std::io::Write", "std::io::Read"]
-relays = ["tokio-rustls", "hyper-rustls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs"]
+relays = ["tokio-rustls", "hyper-rustls", "actix-tls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs"]
 
 # --- Calls that are no operation ---------------------------------------------------------------
 # The boundary check (`rcbom:run:boundary-check`) lists every call of the walked code into a
@@ -3085,6 +3126,12 @@ name = "accessor"
 crate = ["x25519-dalek", "elliptic-curve", "blake3", "digest", "scrypt", "rsa", "ring"]
 path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secret_bytes|Hash::as_bytes|mac::CtOutput::into_bytes|params::Params::(log_n|r|p|len)|(key::RsaPrivateKey|private_key::PrivateKey)::crt_coefficient|rand::Random::expose)$"
 why = "an operation's output or a key's or parameters' value, read after it is made (cited where it is computed)"
+
+[[aside]]
+name = "accessor"
+crate = ["siphasher"]
+path = "^sip(128)?::(SipHasher(13|24)?::(keys|key)|Hash128::(as_bytes|as_u128|as_u64))$"
+why = "a hasher's key or a 128-bit output's bytes, read"
 
 [[aside]]
 name = "accessor"

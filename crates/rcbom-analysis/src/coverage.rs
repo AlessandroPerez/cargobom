@@ -377,26 +377,54 @@ fn floor(
     // knowledge base names as an algorithm's function (`rand::random`, `getrandom::fill` under
     // `Uuid::new_v4()`): that operation, at the program's call, not an unknown one
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
+    let method = bare.rsplit("::").next().unwrap_or_default();
+    // (the type a call named by its type is a function of, as the occurrence says it: the
+    // callee's path may name the impl's parameters, `<CoreWrapper<T> as Default>::default`)
+    let mut by_type = None;
     let named = e
         .std_entry
         .as_ref()
         .and_then(|_| match_fn(ctx.kb, &e.callee, None, &[], &[], &[], &supported))
         .filter(|m| m.algo.material.is_none() && m.algo.open.is_empty())
         .and_then(|m| {
-            let method = bare.rsplit("::").next().unwrap_or_default();
             let f = m
                 .algo
                 .implied_use
                 .clone()
                 .or_else(|| ctx.kb.use_of(method, &m.algo.primitive))?;
+            Some((m, Some(f)))
+        })
+        // or a function of a type the knowledge base names whole (`<SipHasher13 as Hasher>::
+        // write` under `map.insert(k, v)`: SipHash-1-3): the use its name is, or the type's
+        // setup, as a call of it the code writes would be
+        .or_else(|| {
+            e.std_entry.as_ref()?;
+            let t = e.self_ty.as_ref()?;
+            let m = matcher::match_types(ctx.kb, std::slice::from_ref(t), &supported)
+                .into_iter()
+                .find(|(m, outer)| {
+                    outer.is_none() && m.algo.material.is_none() && m.algo.open.is_empty()
+                })?
+                .0;
+            let f = ctx.kb.use_of(method, &m.algo.primitive);
+            by_type = Some(type_text(t));
             Some((m, f))
         });
     let is_named = named.is_some();
     let (mut m, function, detail) = match (named, &e.std_entry) {
         (Some((mut m, f)), Some(entry)) => {
             m.provider_crates.clear();
+            let setup = if f.is_none() {
+                format!("{method}: setup, not a use; ")
+            } else {
+                String::new()
+            };
+            let on = match &by_type {
+                Some(t) => format!(", a function of `{t}`"),
+                None => String::new(),
+            };
             let d = format!(
-                "run for this call by {}`{}`: `{}`{of}",
+                "{setup}run for this call by {}`{}`: `{}`{of}{on}",
                 entry_of(entry),
                 short(entry),
                 short(&e.callee.path)
@@ -418,7 +446,7 @@ fn floor(
                 providers: BTreeSet::new(),
                 provider_crates: Vec::new(),
             },
-            function,
+            Some(function),
             format!("algorithm unresolved: {reason}"),
         ),
     };
@@ -433,7 +461,7 @@ fn floor(
         symbol: without_lifetimes(e.std_entry.as_ref().unwrap_or(&e.callee.path)),
         kind: Kind::Call,
         tier: Tier::Reachable,
-        function: Some(function.clone()),
+        function: function.clone(),
         owner: short(&e.owner.name),
         macro_tag: e
             .expansion
@@ -463,7 +491,9 @@ fn floor(
     });
     a.entry_notes.insert(None);
     a.providers.extend(m.providers.iter().cloned());
-    if !a.algo.functions.contains(&function) {
+    if let Some(function) = function
+        && !a.algo.functions.contains(&function)
+    {
         a.algo.functions.push(function);
         a.algo.functions.sort();
     }
@@ -476,6 +506,10 @@ fn floor(
         Some(o) => {
             o.artifacts.extend(occ.artifacts);
             o.calls.extend(occ.calls);
+            // (a use beside a setup run for the same call: the call is that use)
+            if o.function.is_none() {
+                o.function = occ.function;
+            }
             for d in occ.detail {
                 if !o.detail.contains(&d) {
                     o.detail.push(d);
@@ -485,6 +519,26 @@ fn floor(
         None => a.occurrences.push(occ),
     }
     is_named
+}
+
+/// A type as an occurrence writes it: its path with its arguments
+/// (`digest::core_api::wrapper::CoreWrapper<md5::Md5Core>`).
+fn type_text(t: &rcbom_facts::TyTree) -> String {
+    use rcbom_facts::TyTree;
+    let list = |ts: &[TyTree]| ts.iter().map(type_text).collect::<Vec<_>>().join(", ");
+    match t {
+        TyTree::Adt { path, args, .. } if args.is_empty() => path.clone(),
+        TyTree::Adt { path, args, .. } => format!("{path}<{}>", list(args)),
+        TyTree::Ref(t) => format!("&{}", type_text(t)),
+        TyTree::Slice(t) => format!("[{}]", type_text(t)),
+        TyTree::Array(t, Some(n)) => format!("[{}, {n}]", type_text(t)),
+        TyTree::Array(t, None) => format!("[{}, _]", type_text(t)),
+        TyTree::Tuple(ts) => format!("({})", list(ts)),
+        TyTree::Const(Some(n)) => n.to_string(),
+        TyTree::Const(None) => "_".to_string(),
+        TyTree::Dyn(ts) => format!("dyn {}", ts.join(" + ")),
+        TyTree::Param(p) | TyTree::Other(p) => p.replace(['`', ';'], " "),
+    }
 }
 
 /// A path without its lifetimes (`<&'a EdwardsPoint as Mul<&'b Scalar>>::mul`: `<&EdwardsPoint

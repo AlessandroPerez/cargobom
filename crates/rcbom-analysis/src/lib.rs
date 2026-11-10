@@ -29,7 +29,7 @@ pub use coverage::{Checked, Coverage};
 use matcher::{
     Match, match_constructor, match_fn, match_fn_with, match_protocol, match_static, match_types,
 };
-pub use matcher::{fn_names, static_names};
+pub use matcher::{floor_names, fn_names, static_names};
 pub use run::analyze;
 
 use assets::*;

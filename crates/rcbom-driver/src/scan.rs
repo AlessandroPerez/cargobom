@@ -192,6 +192,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             line_text: line_text(tcx, span),
             expansion,
             std_entry: None,
+            self_ty: self_tree(tcx, did, iargs),
         });
     }
 
@@ -281,7 +282,8 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             // crypto type implements are: `<Argon2 as Default>::default()`,
             // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`;
             // so is data written into it through its `io::Write` impl (`h.write_all(data)`,
-            // `io::copy(&mut file, &mut h)` hashing a file)
+            // `io::copy(&mut file, &mut h)` hashing a file), or through its `Hasher` impl, and
+            // what `finish` reads from it (siphasher's types are fed and read that way)
             let Some(tr) = tcx.trait_of_assoc(did) else {
                 return path_of(tcx, did).ends_with("io::copy::copy")
                     && matches!(trees.get(1), Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate));
@@ -291,6 +293,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                 Some("Default" | "From" | "TryFrom" | "FromStr" | "IoWrite") => trees.first(),
                 // `Into<T>`: `Self` is the source, `T` the crypto type
                 Some("Into" | "TryInto") => trees.get(1),
+                _ if path_of(tcx, tr) == "core::hash::Hasher" => trees.first(),
                 _ => None,
             };
             return matches!(

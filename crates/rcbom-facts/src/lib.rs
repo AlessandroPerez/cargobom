@@ -963,6 +963,11 @@ pub struct BoundaryEdge {
     /// (`core::option::Option::unwrap_or_default`, running orion's `SecretKey::default`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub std_entry: Option<String>,
+    /// The struct or enum the callee is a function of (the self type of its impl, with its
+    /// arguments: `SipHasher13` for `<SipHasher13 as Hasher>::write`): a call the check cites
+    /// itself is named by what the knowledge base says of that type.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub self_ty: Option<TyTree>,
 }
 
 /// Whose code a call of `BoundaryEdge` runs for.

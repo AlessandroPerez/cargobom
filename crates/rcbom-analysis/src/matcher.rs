@@ -272,6 +272,45 @@ pub fn fn_names(kb: &Kb, krate: &str, path: &str) -> Vec<String> {
     out
 }
 
+/// The names a call the boundary check cites by name may have, for `cargo cbom verify`: those
+/// a `[[fn]]` entry gives the function (`fn_names`), and the names, as the entries write them
+/// (`SipHash-1-3`, `HMAC-{hash}`), of the `[[type]]` entries for the types the function's self
+/// type names (`<siphasher::sip::SipHasher13 as core::hash::Hasher>::write`; a wrapper's
+/// argument too: `CoreWrapper<sha2::Sha256VarCore, ..>`), the self type being the one the
+/// occurrence gives where the function's path names an impl's parameters instead (`of`).
+pub fn floor_names(kb: &Kb, callee: &str, of: Option<&str>) -> Vec<String> {
+    let path = callee.trim_start_matches(['<', '&']);
+    let krate = path.split("::").next().unwrap_or_default();
+    let mut out = fn_names(kb, krate, callee);
+    // the self type: the one the occurrence says the function is of (`of`), else a qualified
+    // path's, up to its ` as `, or the path before the function
+    let self_ty = match (of, callee.strip_prefix('<')) {
+        (Some(t), _) => t,
+        (None, Some(q)) => q.split(" as ").next().unwrap_or(q),
+        (None, None) => callee.rsplit_once("::").map_or("", |(t, _)| t),
+    };
+    let mut word = String::new();
+    for c in self_ty.chars().chain(std::iter::once(' ')) {
+        if c.is_alphanumeric() || c == '_' || c == ':' {
+            word.push(c);
+            continue;
+        }
+        let segs: Vec<&str> = word.split("::").filter(|g| !g.is_empty()).collect();
+        if let [k, .., name] = segs[..] {
+            out.extend(
+                kb.types
+                    .iter()
+                    .filter(|t| t.krate == k && t.name == name)
+                    .map(|t| t.algo.asset.clone()),
+            );
+        }
+        word.clear();
+    }
+    out.sort();
+    out.dedup();
+    out
+}
+
 /// A call matched by a `[[fn]]` entry: a free function or method of a KB crate
 /// (`pbkdf2::pbkdf2_hmac::<Sha256>`), or a trait method implemented by a KB type
 /// (`<Argon2 as Default>::default`, entry with `self_type`). Parameters come from the call's
