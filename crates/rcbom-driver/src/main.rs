@@ -811,9 +811,11 @@ struct Edges<'a, 'tcx> {
     used: Vec<String>,
     /// The calls (the instance, none through a pointer) and their arguments' types.
     calls: Vec<(Option<Instance>, Vec<rustc_public::ty::Ty>)>,
-    /// The calls into the standard library (or a shim): the instance, the callee's name's span,
-    /// which call (`Walker::std_anchors`).
+    /// The calls into the standard library (or a shim), and into a wrapper crate from another
+    /// crate: the instance, the callee's name's span, which call (`Walker::std_anchors`).
     std_calls: Vec<(Instance, Span, Option<rcbom_facts::CallId>)>,
+    /// The crate of the body, by name.
+    own: String,
 }
 
 /// A call of walked code into the standard library, whose bodies have no source positions: the

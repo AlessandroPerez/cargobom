@@ -113,6 +113,45 @@ impl Files<'_> {
                 o.symbol
             ));
         }
+        // a call the boundary check cites by name: one the standard library or a wrapper
+        // package (`[semantics] wrappers`) makes for the program, which the knowledge base
+        // names as this asset's function (``run for this call by `uuid::..::new_v4`:
+        // `rand::random` of rand 0.10.3``); the function called here is the occurrence's symbol
+        if let Some(run) = ctx.details.split("run for this call by ").nth(1) {
+            let mut quoted = run.split('`');
+            let (entry, callee) = (quoted.nth(1).unwrap_or(""), quoted.nth(1).unwrap_or(""));
+            let entry_crate = entry.split("::").next().unwrap_or("");
+            let for_caller = matches!(entry_crate, "core" | "std" | "alloc")
+                || self
+                    .kb
+                    .wrappers
+                    .iter()
+                    .any(|w| w.replace('-', "_") == entry_crate);
+            if !for_caller {
+                return Err(format!(
+                    "`{entry}` is neither the standard library's nor a wrapper package's: its \
+                     calls are not the caller's"
+                ));
+            }
+            let last = |p: &str| p.rsplit("::").next().unwrap_or("").to_string();
+            if last(entry) != last(&o.symbol) {
+                return Err(format!(
+                    "the occurrence is at `{}`, not at `{entry}`",
+                    o.symbol
+                ));
+            }
+            let names =
+                rcbom_analysis::fn_names(self.kb, callee.split("::").next().unwrap_or(""), callee);
+            let asset = o
+                .component_ref
+                .strip_prefix("crypto:algorithm:")
+                .unwrap_or(&o.component_ref);
+            if !names.iter().any(|n| n == asset) {
+                return Err(format!(
+                    "the knowledge base does not name `{callee}` as {asset}"
+                ));
+            }
+        }
         let starts_token = token_start(&src, line, offset);
         // the instance of a generic function the occurrence is in (`in tlib::hash_c::<ilib::
         // CFast>`, or a closure in it): its function's type parameters' arguments

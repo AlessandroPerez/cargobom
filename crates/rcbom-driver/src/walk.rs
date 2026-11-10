@@ -414,12 +414,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         memo: &mut HashMap<Instance, Option<rcbom_facts::Behalf>>,
     ) -> Vec<rcbom_facts::BoundaryEdge> {
         let tcx = self.cx.tcx;
+        // (or a wrapper crate's, `[semantics] wrappers`: its calls into the crypto set are
+        // its caller's too, `Uuid::new_v4()` running `rand::random`)
         let std_like = |i: &Instance| {
+            let krate = tcx.crate_name(rustc_internal::internal(tcx, i.def.def_id()).krate);
             matches!(i.kind, InstanceKind::Shim)
-                || self.cx.is_std(
-                    tcx.crate_name(rustc_internal::internal(tcx, i.def.def_id()).krate)
-                        .as_str(),
-                )
+                || self.cx.is_std(krate.as_str())
+                || origins::wrapper_crate(krate.as_str())
         };
         let mut out = Vec::new();
         let mut callees: Vec<&Instance> = self.seen.iter().collect();
@@ -619,6 +620,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             used: Vec::new(),
             calls: Vec::new(),
             std_calls: Vec::new(),
+            own: self.cx.tcx.crate_name(did.krate).to_string(),
         };
         edges.visit_body(&body);
         self.cx.errors += edges.errors;
@@ -1084,11 +1086,10 @@ impl Edges<'_, '_> {
                     self.found.push((i, span));
                     callee = Some(i);
                     let d = rustc_internal::internal(self.tcx, i.def.def_id());
+                    let into = self.tcx.crate_name(d.krate);
                     if matches!(i.kind, InstanceKind::Shim)
-                        || matches!(
-                            self.tcx.crate_name(d.krate).as_str(),
-                            "core" | "std" | "alloc"
-                        )
+                        || matches!(into.as_str(), "core" | "std" | "alloc")
+                        || (origins::wrapper_crate(into.as_str()) && into.as_str() != self.own)
                     {
                         self.std_calls.push((
                             i,

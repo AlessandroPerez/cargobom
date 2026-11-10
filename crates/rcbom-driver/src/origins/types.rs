@@ -49,7 +49,8 @@ pub(super) fn walk_ty<'tcx>(
 }
 /// The knowledge base's `[semantics]` for the driver (`RCBOM_SEMANTICS`, one `key=a,b` per
 /// line): `fills`, the random fills that write a whole buffer; `generators`, how random
-/// generators' type names end.
+/// generators' type names end; `wrappers`, the crates that are not cryptographic whose calls
+/// into the crypto set are their caller's (`wrapper_crate`).
 static SEMANTICS: std::sync::LazyLock<HashMap<String, Vec<String>>> =
     std::sync::LazyLock::new(|| {
         std::env::var("RCBOM_SEMANTICS")
@@ -64,6 +65,13 @@ static SEMANTICS: std::sync::LazyLock<HashMap<String, Vec<String>>> =
     });
 fn semantics(key: &str) -> &'static [String] {
     SEMANTICS.get(key).map_or(&[], Vec::as_slice)
+}
+/// Is the crate (by its name) one the knowledge base lists as a wrapper (`[semantics]
+/// wrappers`: uuid, whose `Uuid::new_v4` draws from a random generator): not cryptographic,
+/// but the calls its code makes into the crypto set are made for its caller, and cited at the
+/// caller's call into it too, as the standard library's are?
+pub(crate) fn wrapper_crate(krate: &str) -> bool {
+    semantics("wrappers").iter().any(|w| w == krate)
 }
 /// Is the local a random generator (`ThreadRng`, `OsRng`, `StdRng`, `ChaCha20Rng`)?
 pub(super) fn is_rng(body: &Body, local: Local) -> bool {

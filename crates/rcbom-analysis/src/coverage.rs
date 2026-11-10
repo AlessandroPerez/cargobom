@@ -14,6 +14,10 @@ pub struct Coverage {
     /// Calls the check cited itself: neither an occurrence's nor excused, an unknown operation
     /// where the call is.
     pub floor: usize,
+    /// Of the calls the check cited itself, those it named: a call the standard library or a
+    /// wrapper package makes for the program that the knowledge base names as an algorithm's
+    /// function (`rand::random` under `Uuid::new_v4()`). Not counted in `floor`.
+    pub named: usize,
     /// Calls that need no occurrence, by why: `entered` (into a protocol crate, whose code the
     /// walk enters: its own calls are checked), `internal` (between crypto packages without
     /// entries: their internals), `relay` (into a crypto package whose own calls are no
@@ -37,7 +41,8 @@ pub struct Checked {
     pub line: usize,
     /// 0-based, as an occurrence's offset.
     pub offset: usize,
-    /// `cited`, `unknown` (cited by the check), or the reason it needs no occurrence.
+    /// `cited`, `unknown` (cited by the check), `named` (cited by the check, by the operation
+    /// the knowledge base names), or the reason it needs no occurrence.
     pub verdict: String,
     pub callee: String,
     /// The trait the callee is a method of or implements.
@@ -70,7 +75,7 @@ impl Checked {
 
 impl Coverage {
     /// `N calls into crypto packages: C cited, F cited by the check as unknown, E excused
-    /// (entered a, internal b, ..)`.
+    /// (entered a, internal b, ..)`; with `M cited by the check by name` when there are some.
     pub fn summary(&self) -> String {
         let excused: usize = self.excused.values().sum();
         let why: Vec<String> = self
@@ -83,8 +88,13 @@ impl Coverage {
         } else {
             format!(", {} not cited", self.uncited.len())
         };
+        let named = if self.named == 0 {
+            String::new()
+        } else {
+            format!(" {} cited by the check by name,", self.named)
+        };
         format!(
-            "{} calls into crypto packages: {} cited, {} cited by the check as unknown, \
+            "{} calls into crypto packages: {} cited,{named} {} cited by the check as unknown, \
              {excused} excused ({}){left}",
             self.edges,
             self.cited,
@@ -271,9 +281,11 @@ pub(super) fn check(
         } else if let Some(why) = excuse(ctx, e) {
             *out.excused.entry(why.to_string()).or_default() += 1;
             why.to_string()
+        } else if floor(ctx, e, &location, artifacts, assets, usage) {
+            out.named += 1;
+            "named".to_string()
         } else {
             out.floor += 1;
-            floor(ctx, e, &location, artifacts, assets, usage);
             "unknown".to_string()
         };
         out.calls.push(Checked {
@@ -295,8 +307,9 @@ pub(super) fn check(
 
 /// A call the check cites itself: an operation of unknown algorithm of the callee's package,
 /// at the call, saying the knowledge base gives the call no meaning. A call the standard
-/// library makes on the program's behalf is cited at the program's call into it, by the
-/// function called there.
+/// library or a wrapper package makes on the program's behalf is cited at the program's call
+/// into it, by the function called there; when the knowledge base names the call made (a
+/// `[[fn]]` entry: `rand::random`), by that operation (and then the result is `true`).
 fn floor(
     ctx: &Ctx<'_>,
     e: &rcbom_facts::BoundaryEdge,
@@ -304,7 +317,7 @@ fn floor(
     artifacts: BTreeSet<String>,
     assets: &mut BTreeMap<String, Asset>,
     usage: &mut HashMap<(String, String), Usage>,
-) {
+) -> bool {
     let provider = ctx.package_of_crate(&e.callee.krate.name, &e.callee.krate.stable_id);
     let package = ctx
         .package_of_crate(&e.owner.krate.name, &e.owner.krate.stable_id)
@@ -333,10 +346,20 @@ fn floor(
     } else {
         String::new()
     };
+    // whose the function called at the position is: the standard library's, or a wrapper
+    // package's (`[semantics] wrappers`: uuid's `Uuid::new_v4`)
+    let entry_of = |f: &str| {
+        if matches!(f.split("::").next(), Some("core" | "std" | "alloc")) {
+            "the standard library's "
+        } else {
+            ""
+        }
+    };
     let reason = match &e.std_entry {
         Some(f) => format!(
-            "the boundary check: the standard library's `{}` runs `{}`{of} here, a call \
-             nothing else in the CBOM accounts for{does}",
+            "the boundary check: {}`{}` runs `{}`{of} here, a call nothing else in the CBOM \
+             accounts for{does}",
+            entry_of(f),
             short(f),
             short(&e.callee.path)
         ),
@@ -345,19 +368,54 @@ fn floor(
             short(&e.callee.path)
         ),
     };
-    let mut m = Match {
-        name: UNKNOWN.to_string(),
-        algo: Algo {
-            asset: UNKNOWN.to_string(),
-            primitive: primitive.clone(),
-            functions: vec![function.clone()],
-            ..Algo::default()
-        },
-        params: BTreeMap::new(),
-        values: BTreeMap::new(),
-        components: BTreeSet::new(),
-        providers: BTreeSet::new(),
-        provider_crates: Vec::new(),
+    // a call made for the program (by the standard library, by a wrapper package) that the
+    // knowledge base names as an algorithm's function (`rand::random`, `getrandom::fill` under
+    // `Uuid::new_v4()`): that operation, at the program's call, not an unknown one
+    let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
+    let named = e
+        .std_entry
+        .as_ref()
+        .and_then(|_| match_fn(ctx.kb, &e.callee, None, &[], &[], &[], &supported))
+        .filter(|m| m.algo.material.is_none() && m.algo.open.is_empty())
+        .and_then(|m| {
+            let method = bare.rsplit("::").next().unwrap_or_default();
+            let f = m
+                .algo
+                .implied_use
+                .clone()
+                .or_else(|| ctx.kb.use_of(method, &m.algo.primitive))?;
+            Some((m, f))
+        });
+    let is_named = named.is_some();
+    let (mut m, function, detail) = match (named, &e.std_entry) {
+        (Some((mut m, f)), Some(entry)) => {
+            m.provider_crates.clear();
+            let d = format!(
+                "run for this call by {}`{}`: `{}`{of}",
+                entry_of(entry),
+                short(entry),
+                short(&e.callee.path)
+            );
+            (m, f, d)
+        }
+        _ => (
+            Match {
+                name: UNKNOWN.to_string(),
+                algo: Algo {
+                    asset: UNKNOWN.to_string(),
+                    primitive: primitive.clone(),
+                    functions: vec![function.clone()],
+                    ..Algo::default()
+                },
+                params: BTreeMap::new(),
+                values: BTreeMap::new(),
+                components: BTreeSet::new(),
+                providers: BTreeSet::new(),
+                provider_crates: Vec::new(),
+            },
+            function,
+            format!("algorithm unresolved: {reason}"),
+        ),
     };
     m.providers.extend(provider.clone());
     if let Some(p) = provider {
@@ -379,7 +437,7 @@ fn floor(
             .map(|x| (x.kind, x.macro_name.clone())),
         line_text: e.line_text.clone(),
         code: e.text.clone(),
-        detail: vec![format!("algorithm unresolved: {reason}")],
+        detail: vec![detail],
         package,
         provenance: Vec::new(),
         note: None,
@@ -421,6 +479,7 @@ fn floor(
         }
         None => a.occurrences.push(occ),
     }
+    is_named
 }
 
 /// A path without its lifetimes (`<&'a EdwardsPoint as Mul<&'b Scalar>>::mul`: `<&EdwardsPoint

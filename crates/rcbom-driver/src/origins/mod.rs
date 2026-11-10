@@ -46,7 +46,7 @@ use types::*;
 // (used elsewhere in the crate, as `crate::origins::..`)
 pub(crate) use instances::{body_name, runs_of, set_summarised, take_instances, write_callee};
 pub(crate) use pointees::returned_pointers;
-pub(crate) use types::{holder_of, holder_steps, holds_cell, self_adt_path};
+pub(crate) use types::{holder_of, holder_steps, holds_cell, self_adt_path, wrapper_crate};
 
 /// Call, aggregate and closure hops followed before the origin is cut (`Truncated`); moves,
 /// borrows and casts are free.

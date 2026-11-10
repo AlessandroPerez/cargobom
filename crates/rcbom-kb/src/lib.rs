@@ -103,6 +103,8 @@ struct SemanticsRaw {
     buffer_fills: Vec<String>,
     #[serde(default)]
     generator_suffixes: Vec<String>,
+    #[serde(default)]
+    wrappers: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -659,6 +661,11 @@ pub struct Kb {
     /// (`Rng`): the driver's (`RCBOM_SEMANTICS`).
     pub buffer_fills: Vec<String>,
     pub generator_suffixes: Vec<String>,
+    /// Packages that are not cryptographic whose APIs run a crypto package's operation for
+    /// their caller (uuid's `Uuid::new_v4` draws from a random generator): the calls their code
+    /// makes into the crypto set are cited at the caller's call into them too, as the standard
+    /// library's are. Layer 1 does not list them; the driver's (`RCBOM_SEMANTICS`).
+    pub wrappers: Vec<String>,
     /// The crates of the build being analysed, by name: the package each one comes from. Set
     /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
     /// library is named `md5`, like the package md5's).
@@ -945,6 +952,7 @@ impl Kb {
             output_steps: raw.semantics.output_steps,
             buffer_fills: raw.semantics.buffer_fills,
             generator_suffixes: raw.semantics.generator_suffixes,
+            wrappers: raw.semantics.wrappers,
             crate_packages: Default::default(),
             crate_versions: Default::default(),
             unmodelled_crates: Default::default(),
@@ -1331,10 +1339,12 @@ impl Kb {
 
     /// What the driver takes from `[semantics]` (`RCBOM_SEMANTICS`): one `key=a,b` per line.
     pub fn driver_semantics(&self) -> String {
+        let wrappers: Vec<String> = self.wrappers.iter().map(|w| w.replace('-', "_")).collect();
         format!(
-            "fills={}\ngenerators={}\n",
+            "fills={}\ngenerators={}\nwrappers={}\n",
             self.buffer_fills.join(","),
-            self.generator_suffixes.join(",")
+            self.generator_suffixes.join(","),
+            wrappers.join(",")
         )
     }
 

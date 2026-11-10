@@ -248,6 +248,30 @@ pub fn static_names(kb: &Kb, krate: &str, path: &str) -> Vec<String> {
     out
 }
 
+/// The names a function of a knowledge-base crate (`path`, inside crate `krate`) is an
+/// algorithm's by a `[[fn]]` entry whose name has no parameters (`rand::random`: ChaCha12-RNG;
+/// `getrandom::fill`: OS-RNG), in any version of the crate. For `cargo cbom verify`, which
+/// checks a call the boundary check cites by name (one the standard library or a wrapper
+/// package makes for the program).
+pub fn fn_names(kb: &Kb, krate: &str, path: &str) -> Vec<String> {
+    let within = path.strip_prefix(&format!("{krate}::")).unwrap_or(path);
+    let bare = strip_generics(within);
+    let mut out: Vec<String> = kb
+        .fns
+        .iter()
+        .filter(|e| {
+            e.self_type.is_none()
+                && e.krates.iter().any(|k| k == krate)
+                && (e.pattern.is_match(within) || e.pattern.is_match(&bare))
+                && !e.algo.asset.contains('{')
+        })
+        .map(|e| e.algo.asset.clone())
+        .collect();
+    out.sort();
+    out.dedup();
+    out
+}
+
 /// A call matched by a `[[fn]]` entry: a free function or method of a KB crate
 /// (`pbkdf2::pbkdf2_hmac::<Sha256>`), or a trait method implemented by a KB type
 /// (`<Argon2 as Default>::default`, entry with `self_type`). Parameters come from the call's

@@ -2980,6 +2980,12 @@ output_steps = ["fill"]
 # end (`ThreadRng`, `OsRng`, `ChaCha20Rng`): a generator lent to a call is still that generator.
 buffer_fills = ["fill_bytes", "try_fill_bytes", "fill", "try_fill", "getrandom"]
 generator_suffixes = ["Rng"]
+# `wrappers`: packages that are not cryptographic (Layer 1 does not list them) whose APIs run a
+# crypto package's operation for their caller: `Uuid::new_v4()` draws from the generator uuid's
+# features select (rand's with `fast-rng`, else the operating system's). The calls their code
+# makes into the crypto set are cited where they are made, in the package, and at the caller's
+# call into it too, as the calls the standard library makes for the program are.
+wrappers = ["uuid"]
 
 # --- Operations whose algorithm is a run-time value -----------------------------------------
 # A call matched here is always reported: with the algorithms that reach it, or, when none
