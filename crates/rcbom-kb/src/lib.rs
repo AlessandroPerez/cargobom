@@ -667,6 +667,10 @@ pub struct Kb {
     /// are two crates named `sha2`): what an entry's `versions` is read against. Set with
     /// `crate_packages`.
     crate_versions: std::sync::RwLock<std::collections::HashMap<(String, String), semver::Version>>,
+    /// The crates of the build that are crypto packages without `[[crate]]` entries, by name and
+    /// `StableCrateId`, and the program's own crates. Set with `crate_packages`.
+    unmodelled_crates: std::sync::RwLock<std::collections::HashSet<(String, String)>>,
+    local_crates: std::sync::RwLock<std::collections::HashSet<(String, String)>>,
 }
 
 /// `cryptoFunctions` values CycloneDX 1.7 accepts.
@@ -943,6 +947,8 @@ impl Kb {
             generator_suffixes: raw.semantics.generator_suffixes,
             crate_packages: Default::default(),
             crate_versions: Default::default(),
+            unmodelled_crates: Default::default(),
+            local_crates: Default::default(),
         };
         kb.validate()?;
         Ok(kb)
@@ -1169,6 +1175,47 @@ impl Kb {
             .crate_versions
             .write()
             .unwrap_or_else(|e| e.into_inner()) = versions;
+    }
+
+    /// Records which crates of the build are crypto packages the knowledge base has no entries
+    /// for, and which are the program's own (each by name and `StableCrateId`).
+    pub fn bind_layers(
+        &self,
+        unmodelled: std::collections::HashSet<(String, String)>,
+        local: std::collections::HashSet<(String, String)>,
+    ) {
+        *self
+            .unmodelled_crates
+            .write()
+            .unwrap_or_else(|e| e.into_inner()) = unmodelled;
+        *self.local_crates.write().unwrap_or_else(|e| e.into_inner()) = local;
+    }
+
+    /// Is a type of this crate, when no `[[type]]` entry names it, an algorithm of its own that
+    /// the knowledge base cannot name, and not a wrapper to look through for the algorithm of
+    /// a call made on it? A crypto package's is: one without entries (`cmac::Cmac<Aes128>` is
+    /// no AES-128 block cipher), or an algorithm or protocol crate's in any version
+    /// (`rsa::pkcs1v15::SigningKey<Sha256>` of a version not covered is no SHA-256 hash). The
+    /// trait crates' wrappers (`digest::core_api::CoreWrapper<T>`, `cipher::
+    /// StreamCipherCoreWrapper<T>`, `digest::CtOutput<T>`), the standard library's and the
+    /// program's own types are looked through.
+    pub fn opaque(&self, name: &str, stable_id: &str) -> bool {
+        let key = (name.to_string(), stable_id.to_string());
+        if self
+            .local_crates
+            .read()
+            .unwrap_or_else(|e| e.into_inner())
+            .contains(&key)
+        {
+            return false;
+        }
+        self.unmodelled_crates
+            .read()
+            .unwrap_or_else(|e| e.into_inner())
+            .contains(&key)
+            || self
+                .crate_by_name(name)
+                .is_some_and(|c| c.role != Role::Trait)
     }
 
     /// Does an entry restricted to `versions` hold for this crate of the build? One without a

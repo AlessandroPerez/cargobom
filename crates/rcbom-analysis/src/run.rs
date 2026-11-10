@@ -131,6 +131,19 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .map(|(_, t)| t.clone())
             .collect(),
     };
+    // ... and whose types are algorithms of their own (the crypto packages without entries),
+    // whose are the program's own
+    kb.bind_layers(
+        ctx.unmodelled.clone(),
+        facts
+            .iter()
+            .filter(|f| {
+                ctx.local
+                    .contains(&(f.krate.package.clone(), f.krate.version.clone()))
+            })
+            .map(|f| (f.krate.name.clone(), f.krate.stable_id.clone()))
+            .collect(),
+    );
     let mut notes = Vec::new();
     let supported = |k: &rcbom_facts::CrateRef| ctx.supported(k);
 

@@ -681,7 +681,11 @@ fn walk(
                 }
                 let inner: Vec<String> = out[before..].iter().map(|(m, _)| m.key()).collect();
                 out[idx].0.components.extend(inner);
-            } else {
+            } else if !kb.opaque(&krate.name, &krate.stable_id) {
+                // a type that is no algorithm of its own (a trait crate's wrapper, the standard
+                // library's `Box`, the program's own struct): what it holds. A crypto
+                // package's type the knowledge base does not name is not looked through:
+                // `Cmac<Aes128>` is a MAC it cannot name, not an AES-128 block cipher
                 for a in args {
                     walk(kb, a, Some(args), outer, supported, out);
                 }
