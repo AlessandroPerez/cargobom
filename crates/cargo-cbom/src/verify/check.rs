@@ -1959,8 +1959,9 @@ impl Files<'_> {
                     // not give (`create_file(pk_path, ..)` above `create_file(sk_path, ..)`, each
                     // a `create_file::<&Path>` as far as the text says): where the caller calls
                     // the function by that text elsewhere too, the position is one of a range of
-                    // candidates the text cannot tell apart. Compared whole, the call is one of
-                    // that instance, on whatever line (the self-test reads it).
+                    // candidates the text cannot tell apart, unless the text says they are one
+                    // instance. Compared whole, the call is one of that instance, on whatever
+                    // line (the self-test reads it).
                     if let Some(c0) = col
                         && !own_closure
                         && !again
@@ -1994,8 +1995,27 @@ impl Files<'_> {
                                     && before_blank(code, i).is_none_or(|p| code[p] != '.')
                                     && word_before_at(code, i) != "fn"
                             };
-                            if calls(here) && (a..b.min(code.len())).any(|i| i != here && calls(i))
-                            {
+                            let others: Vec<usize> = (a..b.min(code.len()))
+                                .filter(|&i| i != here && calls(here) && calls(i))
+                                .collect();
+                            // (the same instance, whichever call: the text writes every type
+                            // argument, `labeled_extract::<Kdf>(..)` twice in one caller, or
+                            // the calls have the same arguments, `gen(rng)` twice)
+                            let written = text.windows(3).any(|w| w == [':', ':', '<'])
+                                && !re!(r"(?:^|[<,\s])_(?:[,>\s]|$)")
+                                    .is_match(&text.iter().collect::<String>());
+                            let args = |i: usize| {
+                                call_args_span(code, i).map(|(x, y)| {
+                                    src.text(x, y).split_whitespace().collect::<String>()
+                                })
+                            };
+                            let same = written
+                                || others
+                                    .iter()
+                                    .all(|&i| args(i).is_some() && args(i) == args(here));
+                            if !others.is_empty() && same {
+                                TYPED.with(|t| t.borrow_mut().push(part.to_string()));
+                            } else if !others.is_empty() {
                                 RANGED.with(|r| r.set(true));
                             }
                         }
