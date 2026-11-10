@@ -108,13 +108,11 @@ fn layer2(labels: &toml::Value, cbom: &Value) -> Val {
     let mut verdicts: BTreeMap<&str, usize> = BTreeMap::new();
     let mut details = Vec::new();
     for s in &sites {
-        let mut occ: Vec<Occ> = at
+        let on_line: Vec<Occ> = at
             .get(&(s.file.clone(), s.line))
             .cloned()
             .unwrap_or_default();
-        if lines[&(s.file.clone(), s.line)] > 1 {
-            occ.retain(|o| o.code.ends_with(&s.callee));
-        }
+        let occ = suite::site_occurrences(s, &on_line, lines[&(s.file.clone(), s.line)]);
         let mut v = suite::verdict(s, &occ);
         if v == "correct" && !suite::function_matches(s, &occ) {
             v = "function-mismatch";

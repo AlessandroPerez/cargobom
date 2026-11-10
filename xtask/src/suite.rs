@@ -6,8 +6,9 @@
 //! site, per what, per how and overall.
 //!
 //! Per labelled site, S is the set of algorithm assets the CBOM cites with a reachable call
-//! occurrence at that file and line (on a line holding two labelled calls, the occurrence whose
-//! code is that callee). A site the CBOM cites only as present (not reachable) is correct when
+//! occurrence at that file and line: the occurrences whose code is the labelled callee when
+//! there are some (or the line holds two labelled calls), else those on the line that are not at
+//! another call it writes (`site_occurrences`). A site the CBOM cites only as present (not reachable) is correct when
 //! the labels make it dead, and a miss when they make it live. Names compare as the registry
 //! writes them: a name with numeric parameter parts (`PBKDF2-SHA-256-600000-32`,
 //! `Argon2id-19456-2-1`) is the labelled name when the parts are the labelled parameters, or
@@ -105,7 +106,20 @@ pub fn sites(labels: &toml::Value) -> Vec<Site> {
                     params: s
                         .get("params")
                         .and_then(toml::Value::as_table)
-                        .map(|t| t.values().map(toml_str).collect())
+                        .map(|t| {
+                            let mut values: BTreeSet<String> = t.values().map(toml_str).collect();
+                            // the registry writes scrypt's work factor as N = 2^log_n
+                            // (`scrypt-16384-8-1-32` for the labelled `log_n = "14"`)
+                            if let Some(k) = t
+                                .get("log_n")
+                                .map(toml_str)
+                                .and_then(|v| v.parse::<u32>().ok())
+                                .filter(|k| *k < 64)
+                            {
+                                values.insert((1u64 << k).to_string());
+                            }
+                            values
+                        })
                         .unwrap_or_default(),
                 })
                 .collect()
@@ -312,6 +326,55 @@ fn exact_among_several(occ: &[Occ]) -> Vec<String> {
     out.into_iter().collect()
 }
 
+/// The occurrences of a labelled site among those cited on its line: those naming the labelled
+/// callee, when any does or when the line holds several labelled calls (another call on the
+/// line, a constructor, an `update`, is not this site). When none names it, those at another
+/// call the line writes are left out too: the line's text has the labelled call, and the
+/// occurrence's code is another's (`h.consume(Uuid::new_v4().as_bytes())`: the MD5 step
+/// `consume` is no report at the draw `new_v4`, which is then a miss). A line that does not
+/// write the callee (a macro's invocation, R12.1) keeps what is cited on it.
+pub fn site_occurrences(site: &Site, on_line: &[Occ], labelled_on_line: usize) -> Vec<Occ> {
+    let named: Vec<Occ> = on_line
+        .iter()
+        .filter(|o| bare(&o.code).ends_with(&site.callee))
+        .cloned()
+        .collect();
+    if !named.is_empty() || labelled_on_line > 1 {
+        return named;
+    }
+    on_line
+        .iter()
+        .filter(|o| !line_calls(&o.ctx, &site.callee))
+        .cloned()
+        .collect()
+}
+
+/// Does the source line an occurrence quotes (`; line: `..``) write a call of `callee`
+/// (`callee(`, `callee::<`)?
+fn line_calls(ctx: &str, callee: &str) -> bool {
+    let Some(line) = ctx
+        .split("; line: `")
+        .nth(1)
+        .and_then(|l| l.split("`; code: `").next())
+    else {
+        return false;
+    };
+    let ident = |c: char| c.is_alphanumeric() || c == '_';
+    let mut rest = line;
+    while let Some(i) = rest.find(callee) {
+        let before = rest[..i].chars().next_back();
+        let after = rest[i + callee.len()..].trim_start();
+        if !callee.is_empty()
+            && !before.is_some_and(ident)
+            && (after.starts_with('(') || after.starts_with("::<"))
+        {
+            return true;
+        }
+        rest = &rest[i + callee.len().max(1)..];
+    }
+    false
+}
+
 /// A call's code without generic arguments (`decode::<C>` is `decode`).
 pub fn bare(code: &str) -> String {
     let (mut out, mut depth) = (String::new(), 0usize);
@@ -402,16 +465,7 @@ pub fn score(out_dir: &Path, programs: &[PathBuf], json: bool) -> Result<String>
                 .get(&(s.file.clone(), s.line))
                 .cloned()
                 .unwrap_or_default();
-            // the occurrences naming the labelled callee, when any does (another call on the
-            // line, a constructor, an `update`, is not this site)
-            let named: Vec<Occ> = occ
-                .iter()
-                .filter(|o| bare(&o.code).ends_with(&s.callee))
-                .cloned()
-                .collect();
-            if !named.is_empty() || labelled_lines[&(s.file.clone(), s.line)] > 1 {
-                occ = named;
-            }
+            occ = site_occurrences(s, &occ, labelled_lines[&(s.file.clone(), s.line)]);
             // several labelled calls of one callee on one line (`digest(a, digest(b, ..))`):
             // the i-th in the labels is the i-th by column (outer first)
             let group = &same_callee[&(s.file.clone(), s.line, s.callee.clone())];
