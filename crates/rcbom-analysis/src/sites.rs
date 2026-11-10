@@ -118,6 +118,7 @@ pub(super) fn argument_constructor<'a>(
     for o in arg_origins.iter().skip(usize::from(skip_receiver)) {
         // the constructor itself, or through plumbing (`Params::new(..).ok()?`, `.unwrap()`)
         let mut o = o;
+        let mut here = false;
         for _ in 0..8 {
             let rcbom_facts::Origin::Call {
                 krate,
@@ -138,11 +139,24 @@ pub(super) fn argument_constructor<'a>(
                 if m.algo.family == family && !found.iter().any(|(f, _)| f.key() == m.key()) {
                     found.push((m, c));
                 }
+                here = true;
                 break;
             }
             match inner.first() {
                 Some(a) if matches!(krate.as_str(), "core" | "std" | "alloc") => o = a,
                 _ => break,
+            }
+        }
+        // a value from elsewhere (a field the constructor's value is stored in, a parameter,
+        // what the program's function returns: `s.scheme.clone()` with `scheme:
+        // Pkcs1v15Sign::new::<Sha384>()` stored by another function): the constructors of the
+        // values that reach it, when every one of them is one; a value not known to be one may
+        // be built another way, and then the call does not say
+        if !here {
+            for (m, c) in constructors_elsewhere(ctx, site, o, &adts, own, overrides) {
+                if m.algo.family == family && !found.iter().any(|(f, _)| f.key() == m.key()) {
+                    found.push((m, c));
+                }
             }
         }
     }
@@ -151,6 +165,130 @@ pub(super) fn argument_constructor<'a>(
         1 => found.pop(),
         _ => None,
     }
+}
+/// The constructor of the receiver that made the hash a verification is given, when that hash
+/// is the result (through standard-library plumbing) of a hashing call of the same type in this
+/// function whose parameters are its receiver's (`argon.verify_password(pw, &hash)` with `hash`
+/// from `argon.hash_password(pw, &salt)`): the stored hash holds those parameters, and the
+/// verification hashes with them, whatever its own receiver is.
+fn stored_hash_constructor(ctx: &Ctx<'_>, site: &Site, m: &Match) -> Option<Match> {
+    let Target::Call {
+        arg_origins,
+        self_ty,
+        ..
+    } = &site.target
+    else {
+        return None;
+    };
+    for o in arg_origins.iter().skip(1) {
+        let mut o = o;
+        for _ in 0..8 {
+            let rcbom_facts::Origin::Call {
+                krate,
+                args: inner,
+                span,
+                ..
+            } = o
+            else {
+                break;
+            };
+            let made = span.as_ref().and_then(|at| {
+                ctx.calls
+                    .get(&(site.owner.id.as_str(), at.file.as_str(), at.line, at.col))
+            });
+            if let Some(&h) = made
+                && let Target::Call {
+                    method: hm,
+                    arg_origins: ha,
+                    self_ty: hs,
+                    ..
+                } = &h.target
+                && hs == self_ty
+                && !m.algo.own_params.iter().any(|x| x == hm)
+                && ctx.kb.use_of(hm, &m.algo.primitive).as_deref() == Some("keyderive")
+            {
+                return ha
+                    .first()
+                    .and_then(|r| match_constructor(ctx.kb, &m.algo.family, r))
+                    .map(|(c, _)| c);
+            }
+            match inner.first() {
+                Some(a) if matches!(krate.as_str(), "core" | "std" | "alloc") => o = a,
+                _ => break,
+            }
+        }
+    }
+    None
+}
+/// The constructor calls the values that reach `o` (read in `site`'s function) from other
+/// functions are, by the links: each with what it matched. Empty unless every such value is a
+/// constructor's call (through standard-library plumbing) that matches in each body it is
+/// written in.
+fn constructors_elsewhere<'a>(
+    ctx: &Ctx<'a>,
+    site: &Site,
+    o: &rcbom_facts::Origin,
+    adts: &[&str],
+    own: Option<&str>,
+    overrides: &BTreeMap<String, String>,
+) -> Vec<(Match, &'a Site)> {
+    let Some(values) = ctx.flow.values(o, &site.owner.path) else {
+        return Vec::new();
+    };
+    let mut out: Vec<(Match, &'a Site)> = Vec::new();
+    for (v, _) in &values {
+        let mut v = v;
+        let mut made = false;
+        for _ in 0..8 {
+            let rcbom_facts::Origin::Call {
+                krate,
+                args: inner,
+                span,
+                ..
+            } = v
+            else {
+                break;
+            };
+            // the call's sites: one in each instance of the function it is written in (a value
+            // a function returns is read in its caller, and written in the function)
+            let sites: Vec<&'a Site> = span
+                .as_ref()
+                .map(|at| {
+                    ctx.calls
+                        .iter()
+                        .filter(|((_, file, line, col), _)| {
+                            *line == at.line && *col == at.col && *file == at.file.as_str()
+                        })
+                        .map(|(_, c)| *c)
+                        .collect()
+                })
+                .unwrap_or_default();
+            let matched: Vec<(Match, &'a Site)> = sites
+                .iter()
+                .filter_map(|c| Some((constructed(ctx, c, adts, own, overrides)?, *c)))
+                .collect();
+            if !sites.is_empty() && matched.len() == sites.len() {
+                out.extend(matched);
+                made = true;
+                break;
+            }
+            match inner.first() {
+                Some(a) if matches!(krate.as_str(), "core" | "std" | "alloc") => v = a,
+                _ => break,
+            }
+        }
+        if !made {
+            return Vec::new();
+        }
+    }
+    out.sort_by(|a, b| {
+        (a.1.span.file.as_str(), a.1.span.line, a.1.span.col).cmp(&(
+            b.1.span.file.as_str(),
+            b.1.span.line,
+            b.1.span.col,
+        ))
+    });
+    out
 }
 /// What the call at `site` matched as a constructor of one of `adts` or of a type of `own`
 /// crate: a [[fn]] entry whose call builds such a value (`Oaep::new_with_label` builds an
@@ -501,6 +639,9 @@ pub(super) fn site_matches(
                     _ => BTreeMap::new(),
                 };
                 let own_crate = providers.first().map(|k| k.name.clone());
+                // named by the constructor of another object (the one that made the stored
+                // hash a verification is given): not what this receiver was set up for
+                let mut by_stored_hash = false;
                 if outer.is_none()
                     && !own_params
                     && let Some(r) = receiver
@@ -550,6 +691,19 @@ pub(super) fn site_matches(
                     m = c;
                     m.components = comps;
                     fix_call_params(&mut m, &fixes, site);
+                } else if outer.is_none()
+                    && own_params
+                    && kb.use_of(method, &m.algo.primitive).as_deref() == Some("verify")
+                    && let Some(c) = stored_hash_constructor(ctx, site, &m)
+                {
+                    // or a verification of a hash made in this function: it hashes with the
+                    // parameters that made the stored hash
+                    by_stored_hash = true;
+                    let comps = std::mem::take(&mut m.components);
+                    renamed.insert(m.name.clone(), c.name.clone());
+                    m = c;
+                    m.components = comps;
+                    fix_call_params(&mut m, &fixes, site);
                 }
                 // the receiver of such a method is set up for what the method computes, unless
                 // the call fixes what the receiver's constructor chose (the variant of
@@ -557,6 +711,7 @@ pub(super) fn site_matches(
                 if outer.is_none()
                     && own_params
                     && overrides.is_empty()
+                    && !by_stored_hash
                     && let Some((_, Some(at))) = receiver.and_then(from_receiver)
                     && let Some(c) =
                         ctx.calls
