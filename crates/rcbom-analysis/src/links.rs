@@ -64,6 +64,8 @@ pub struct LinkIndex {
     active: RefCell<HashSet<Read>>,
     /// Answers already given: the same field is read at many calls.
     memo: RefCell<HashMap<(Origin, String), Option<Found>>>,
+    /// The size of `memo`, in origins (`MEMO_NODES`).
+    memo_nodes: Cell<usize>,
     /// For the current question: the functions each descriptor found was named in (`""`: a
     /// static's initializer, or what a static holds at run time).
     named_in: RefCell<HashMap<String, std::collections::BTreeSet<String>>>,
@@ -254,6 +256,15 @@ struct Stored {
 const MAX_VALUES: usize = 256;
 const MAX_DEPTH: usize = 10;
 const MAX_STEPS: usize = 4096;
+/// The size of a value, in origins. The driver bounds every origin it writes; the search then
+/// puts arguments in place of parameters, function after function, and a value so composed
+/// grows with every hop (a buffer a serializer writes through a trait every type implements:
+/// megabytes for one value, and a set of 256 of them per lookup). One larger than this is cut
+/// (`Truncated`): what lies further is not known, and the set says it is not all.
+const MAX_NODES: usize = 1024;
+/// The answers kept (`memo`), in origins over their keys and values: past this they are
+/// dropped and found again when asked for.
+const MEMO_NODES: usize = 4_000_000;
 
 /// A field read, from the outermost struct in: (struct, field, the struct's type arguments when
 /// known).
@@ -545,6 +556,7 @@ impl LinkIndex {
             }
         }
         self.memo.borrow_mut().clear();
+        self.memo_nodes.set(0);
     }
 
     /// What `func` returns, whole.
@@ -893,11 +905,25 @@ impl LinkIndex {
 
     /// `values`, each with how it reaches the read (`Via`).
     pub fn values_via(&self, o: &Origin, owner: &str) -> Option<Found> {
+        // (a value past the bound is cut at once: nothing to keep)
+        if o.nodes(MAX_NODES) > MAX_NODES {
+            return self.lookup(o, owner);
+        }
         let key = (o.clone(), owner.to_string());
         if let Some(v) = self.memo.borrow().get(&key) {
             return v.clone();
         }
         let v = self.lookup(o, owner);
+        let weight = o.nodes(MAX_NODES)
+            + v.iter()
+                .flatten()
+                .map(|(x, ..)| x.nodes(MAX_NODES))
+                .sum::<usize>();
+        if self.memo_nodes.get() + weight > MEMO_NODES {
+            self.memo.borrow_mut().clear();
+            self.memo_nodes.set(0);
+        }
+        self.memo_nodes.set(self.memo_nodes.get() + weight);
         self.memo.borrow_mut().insert(key, v.clone());
         v
     }
@@ -939,7 +965,7 @@ impl LinkIndex {
         }
         // the bound: what lies further is not known, and the values say so (a set found
         // beside it is not all), never dropped
-        if depth > MAX_DEPTH || self.budget.get() == 0 {
+        if depth > MAX_DEPTH || self.budget.get() == 0 || o.nodes(MAX_NODES) > MAX_NODES {
             push(out, (Origin::Truncated, owner.to_string(), via.clone()));
             return;
         }
@@ -1988,6 +2014,12 @@ fn names_param(o: &Origin) -> bool {
 /// Adds a value once; reached several ways, it keeps the most specific. Past `MAX_VALUES`,
 /// a cut (`Truncated`) stands for the values refused.
 fn push(out: &mut Found, v: (Origin, String, Via)) {
+    // (a value past the bound on its size is cut whole)
+    let v = if v.0.nodes(MAX_NODES) > MAX_NODES {
+        (Origin::Truncated, v.1, v.2)
+    } else {
+        v
+    };
     if let Some(e) = out.iter_mut().find(|e| e.0 == v.0 && e.1 == v.1) {
         if v.2.before(&e.2) {
             e.2 = v.2;

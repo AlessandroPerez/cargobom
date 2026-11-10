@@ -354,9 +354,16 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         if self_ty.is_none() && own.len() == 2 && path_of(tcx, did).ends_with("io::copy::copy") {
             self_ty = Some(own.remove(1));
         }
+        // a call inside an algorithm or trait crate to a function of its own is the
+        // implementation's internals: the analysis makes no occurrence from what such a crate's
+        // code calls, so where the arguments come from is not recorded (in p384's generated
+        // field arithmetic each of two thousand carry-chain calls has arguments that are trees
+        // of hundreds of earlier calls: 190 MB of facts for one crate)
+        let internals =
+            did.krate == rustc_span::def_id::LOCAL_CRATE && self.cx.stop_crate(did.krate);
         let (const_args, arg_origins, arg_lens) = match call {
-            Some((call_args, term)) => self.call_values(call_args, term),
-            None => (Vec::new(), Vec::new(), Vec::new()),
+            Some((call_args, term)) if !internals => self.call_values(call_args, term),
+            _ => (Vec::new(), Vec::new(), Vec::new()),
         };
         self.push_internal(
             span,

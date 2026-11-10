@@ -726,6 +726,33 @@ impl Origin {
         }
     }
 
+    /// How many origins the origin is made of (itself and every one inside it), counted up to
+    /// `limit + 1`: more than `limit` says it is larger, without reading the rest.
+    pub fn nodes(&self, limit: usize) -> usize {
+        fn count(o: &Origin, left: &mut usize) {
+            if *left == 0 {
+                return;
+            }
+            *left -= 1;
+            match o {
+                Origin::Call {
+                    args, pointer, fed, ..
+                } => {
+                    args.iter().for_each(|a| count(a, left));
+                    pointer.iter().chain(fed).for_each(|a| count(a, left));
+                }
+                Origin::Field { base, .. } => count(base, left),
+                Origin::Written { args, .. } => args.iter().for_each(|a| count(a, left)),
+                Origin::Set { value, .. } => count(value, left),
+                Origin::Any(v) | Origin::All(v) => v.iter().for_each(|a| count(a, left)),
+                _ => {}
+            }
+        }
+        let mut left = limit + 1;
+        count(self, &mut left);
+        limit + 1 - left
+    }
+
     /// The origin with what lies more than `depth` origins down cut (`Truncated`): facts are
     /// read back by a parser with a nesting bound (serde_json's 128 levels, up to 3 per
     /// origin), whatever bounds the search that built them.
