@@ -1,0 +1,387 @@
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:36:13 | hkdf::GenericHkdf::<H>::new | [reachable] [call] in a174::main; use: keyderive; salt: hard-coded (4 bytes, literal at line 36); ikm: environment (std::env::args); line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b"salt"), data);`; code: `hkdf::Hkdf::<Sha256>::new`
+  occ HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | src/main.rs:38:7 | hkdf::GenericHkdf::<H>::expand | [reachable] [call] in a174::main; use: keyderive; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:32:16 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 32); line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b"key").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:33:6 | digest::mac::Mac::update | [reachable] [call] in a174::main; use: tag; line: `s.update(data);`; code: `update`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:34:15 | digest::mac::Mac::finalize | [reachable] [call] in a174::main; use: tag; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:34:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:44:4 | pbkdf2::pbkdf2 | [reachable] [component] in a174::main; part of PBKDF2-SHA-1-4096-16; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b"salt", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:23:16 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 23); line: `let mut m = Hmac::<Sha256>::new_from_slice(b"key").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:24:6 | digest::mac::Mac::update | [reachable] [call] in a174::main; use: tag; line: `m.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:25:16 | digest::mac::Mac::finalize | [reachable] [call] in a174::main; use: tag; line: `let tag = m.finalize().into_bytes();`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:25:27 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:36:13 | hkdf::GenericHkdf::<H>::new | [reachable] [component] in a174::main; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b"salt"), data);`; code: `hkdf::Hkdf::<Sha256>::new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:38:7 | hkdf::GenericHkdf::<H>::expand | [reachable] [component] in a174::main; part of HKDF-SHA-256; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:29:16 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 29); line: `let mut r = HmacReset::<Sha384>::new_from_slice(b"key").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:30:6 | digest::mac::Mac::update | [reachable] [call] in a174::main; use: tag; line: `r.update(data);`; code: `update`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:31:15 | digest::mac::Mac::finalize_reset | [reachable] [call] in a174::main; use: tag; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:31:32 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:26:16 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 26); line: `let mut v = Hmac::<Sha512>::new_from_slice(b"key").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:27:6 | digest::mac::Mac::update | [reachable] [call] in a174::main; use: tag; line: `v.update(data);`; code: `update`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:28:15 | digest::mac::Mac::verify_slice | [reachable] [call] in a174::main; use: verify; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:21:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d7 = md5::Md5::digest(data);`; code: `md5::Md5::digest`
+  occ PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | src/main.rs:44:4 | pbkdf2::pbkdf2 | [reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 44); line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b"salt", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`
+  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:41:4 | pbkdf2::pbkdf2_hmac | [reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 41); line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b"salt", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | src/main.rs:42:13 | pbkdf2::pbkdf2_hmac_array | [reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 42); line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b"salt", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:20:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d6 = sha1::Sha1::digest(data);`; code: `sha1::Sha1::digest`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:32:16 | crypto_common::KeyInit::new_from_slice | [reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b"key").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:6 | digest::mac::Mac::update | [reachable] [component] in a174::main; part of HMAC-SHA-1; line: `s.update(data);`; code: `update`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:34:15 | digest::mac::Mac::finalize | [reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:34:26 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:44:4 | pbkdf2::pbkdf2 | [reachable] [component] in a174::main; part of HMAC-SHA-1; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b"salt", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`
+  occ SHA-224 | crypto:algorithm:SHA-224 | src/main.rs:18:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d4 = Sha224::digest(data);`; code: `Sha224::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d1 = Sha256::digest(data);`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:16 | crypto_common::KeyInit::new_from_slice | [reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let mut m = Hmac::<Sha256>::new_from_slice(b"key").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:24:6 | digest::mac::Mac::update | [reachable] [component] in a174::main; part of HMAC-SHA-256; line: `m.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:16 | digest::mac::Mac::finalize | [reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let tag = m.finalize().into_bytes();`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:25:27 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:13 | hkdf::GenericHkdf::<H>::new | [reachable] [component] in a174::main; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b"salt"), data);`; code: `hkdf::Hkdf::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:38:7 | hkdf::GenericHkdf::<H>::expand | [reachable] [component] in a174::main; part of HKDF-SHA-256; line: `hk.expand(b"info", &mut okm).unwrap();`; code: `expand`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:41:4 | pbkdf2::pbkdf2_hmac | [reachable] [component] in a174::main; part of PBKDF2-SHA-256-600000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b"salt", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:17:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d3 = Sha384::digest(data);`; code: `Sha384::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:29:16 | crypto_common::KeyInit::new_from_slice | [reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let mut r = HmacReset::<Sha384>::new_from_slice(b"key").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:30:6 | digest::mac::Mac::update | [reachable] [component] in a174::main; part of HMAC-SHA-384; line: `r.update(data);`; code: `update`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:15 | digest::mac::Mac::finalize_reset | [reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:31:32 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:14:16 | digest::digest::Digest::new | [reachable] [call] in a174::main; new: setup, not a use; line: `let mut h = Sha512::new();`; code: `Sha512::new`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:15:6 | digest::digest::Digest::update | [reachable] [call] in a174::main; use: digest; line: `h.update(data);`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:16:15 | digest::digest::Digest::finalize | [reachable] [call] in a174::main; use: digest; line: `let d2 = h.finalize();`; code: `finalize`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:16 | crypto_common::KeyInit::new_from_slice | [reachable] [component] in a174::main; part of HMAC-SHA-512; line: `let mut v = Hmac::<Sha512>::new_from_slice(b"key").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:27:6 | digest::mac::Mac::update | [reachable] [component] in a174::main; part of HMAC-SHA-512; line: `v.update(data);`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:28:15 | digest::mac::Mac::verify_slice | [reachable] [component] in a174::main; part of HMAC-SHA-512; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:42:13 | pbkdf2::pbkdf2_hmac_array | [reachable] [component] in a174::main; part of PBKDF2-SHA-512-1000-20; line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b"salt", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/main.rs:19:13 | digest::digest::Digest::digest | [reachable] [call] in a174::main; use: digest; line: `let d5 = Sha512_256::digest(data);`; code: `Sha512_256::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:19:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via a174 -> hmac -> digest -> block-buffer
+  occ cipher | pkg:cargo/cipher@0.5.2 | Cargo.lock:34:0 | cipher | [manifest] locked cipher 0.5.2; reached via a174 -> scrypt -> salsa20 -> cipher
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:45:0 | cmov | [manifest] locked cmov 0.5.4; reached via a174 -> hmac -> digest -> ctutils -> cmov
+  occ const-oid | pkg:cargo/const-oid@0.10.2 | Cargo.lock:51:0 | const-oid | [manifest] locked const-oid 0.10.2; reached via a174 -> hmac -> digest -> const-oid
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:66:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a174 -> hmac -> digest -> crypto-common
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:75:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a174 -> hmac -> digest -> ctutils
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:84:0 | digest | [manifest] locked digest 0.11.3; reached via a174 -> hmac -> digest
+  occ hkdf | pkg:cargo/hkdf@0.13.0 | Cargo.lock:96:0 | hkdf | [manifest] locked hkdf 0.13.0; reached via a174 -> hkdf
+  occ hkdf | pkg:cargo/hkdf@0.13.0 | Cargo.toml:13:0 | hkdf | [manifest] declared by a174 (dependencies)
+  occ hmac | pkg:cargo/hmac@0.13.0 | Cargo.lock:105:0 | hmac | [manifest] locked hmac 0.13.0; reached via a174 -> hmac
+  occ hmac | pkg:cargo/hmac@0.13.0 | Cargo.toml:12:0 | hmac | [manifest] declared by a174 (dependencies)
+  occ md-5 | pkg:cargo/md-5@0.11.0 | Cargo.lock:138:0 | md-5 | [manifest] locked md-5 0.11.0; reached via a174 -> md-5
+  occ md-5 | pkg:cargo/md-5@0.11.0 | Cargo.toml:11:0 | md-5 | [manifest] declared by a174 (dependencies)
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | Cargo.lock:148:0 | pbkdf2 | [manifest] locked pbkdf2 0.13.0; reached via a174 -> pbkdf2
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | Cargo.toml:14:0 | pbkdf2 | [manifest] declared by a174 (dependencies)
+  occ salsa20 | pkg:cargo/salsa20@0.11.0 | Cargo.lock:158:0 | salsa20 | [manifest] locked salsa20 0.11.0; reached via a174 -> scrypt -> salsa20
+  occ scrypt | crypto:algorithm:scrypt | src/main.rs:50:4 | scrypt::scrypt | [reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 50); line: `scrypt::scrypt(data, b"salt", &scrypt::Params::RECOMMENDED, &mut k5).unwrap();`; code: `scrypt::scrypt`
+  occ scrypt | pkg:cargo/scrypt@0.12.0 | Cargo.lock:168:0 | scrypt | [manifest] locked scrypt 0.12.0; reached via a174 -> scrypt
+  occ scrypt | pkg:cargo/scrypt@0.12.0 | Cargo.toml:15:0 | scrypt | [manifest] declared by a174 (dependencies)
+  occ scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | src/main.rs:46:17 | scrypt::params::Params::new | [reachable] [call] in a174::main; new: setup, not a use; line: `let params = scrypt::Params::new(15, 8, 1).unwrap();`; code: `scrypt::Params::new`
+  occ scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | src/main.rs:48:4 | scrypt::scrypt | [reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 48); line: `scrypt::scrypt(data, b"salt", &params, &mut k4).unwrap();`; code: `scrypt::scrypt`
+  occ sha1 | pkg:cargo/sha1@0.11.0 | Cargo.lock:180:0 | sha1 | [manifest] locked sha1 0.11.0; reached via a174 -> sha1
+  occ sha1 | pkg:cargo/sha1@0.11.0 | Cargo.toml:10:0 | sha1 | [manifest] declared by a174 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.11.1 | Cargo.lock:191:0 | sha2 | [manifest] locked sha2 0.11.1; reached via a174 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.11.1 | Cargo.toml:9:0 | sha2 | [manifest] declared by a174 (dependencies)
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:finding=hard-coded-salt
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:functions:source=observed
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:kb:version=0.2.0
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:occurrences=2
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:ikm=environment
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:provenance:salt=hard-coded
+  prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:confidence=high
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:functions:source=observed
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:occurrences=5
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=6
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:functions:source=observed
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:occurrences=4
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:reachability=reachable
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=observed
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=3
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=hard-coded
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=1
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:confidence=high
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:occurrences=1
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:provenance:password=environment
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:confidence=high
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=environment
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:confidence=high
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:occurrences=1
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:provenance:password=environment
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=6
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=1
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=8
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=5
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=7
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:confidence=high
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:detection:method=type-resolved
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:kb:version=0.2.0
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:occurrences=1
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop hkdf | pkg:cargo/hkdf@0.13.0 | rcbom:crypto-role=algorithm
+  prop hkdf | pkg:cargo/hkdf@0.13.0 | rcbom:scope=required
+  prop hkdf | pkg:cargo/hkdf@0.13.0 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:usage=reachable
+  prop md-5 | pkg:cargo/md-5@0.11.0 | rcbom:crypto-role=algorithm
+  prop md-5 | pkg:cargo/md-5@0.11.0 | rcbom:scope=required
+  prop md-5 | pkg:cargo/md-5@0.11.0 | rcbom:usage=reachable
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:crypto-role=algorithm
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:usage=reachable
+  prop salsa20 | pkg:cargo/salsa20@0.11.0 | rcbom:crypto-role=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.11.0 | rcbom:kb-coverage=unmodelled
+  prop salsa20 | pkg:cargo/salsa20@0.11.0 | rcbom:scope=required
+  prop salsa20 | pkg:cargo/salsa20@0.11.0 | rcbom:usage=present
+  prop scrypt | crypto:algorithm:scrypt | rcbom:confidence=high
+  prop scrypt | crypto:algorithm:scrypt | rcbom:detection:method=type-resolved
+  prop scrypt | crypto:algorithm:scrypt | rcbom:finding=hard-coded-salt
+  prop scrypt | crypto:algorithm:scrypt | rcbom:functions:source=observed
+  prop scrypt | crypto:algorithm:scrypt | rcbom:kb:version=0.2.0
+  prop scrypt | crypto:algorithm:scrypt | rcbom:occurrences=1
+  prop scrypt | crypto:algorithm:scrypt | rcbom:param:dk_len=32
+  prop scrypt | crypto:algorithm:scrypt | rcbom:provenance:password=environment
+  prop scrypt | crypto:algorithm:scrypt | rcbom:provenance:salt=hard-coded
+  prop scrypt | crypto:algorithm:scrypt | rcbom:reachability=reachable
+  prop scrypt | pkg:cargo/scrypt@0.12.0 | rcbom:crypto-role=algorithm
+  prop scrypt | pkg:cargo/scrypt@0.12.0 | rcbom:scope=required
+  prop scrypt | pkg:cargo/scrypt@0.12.0 | rcbom:usage=reachable
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:confidence=high
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:detection:method=type-resolved
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:finding=hard-coded-salt
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:functions:source=observed
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:kb:version=0.2.0
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:occurrences=2
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:provenance:password=environment
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:provenance:salt=hard-coded
+  prop scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | rcbom:reachability=reachable
+  prop sha1 | pkg:cargo/sha1@0.11.0 | rcbom:crypto-role=algorithm
+  prop sha1 | pkg:cargo/sha1@0.11.0 | rcbom:scope=required
+  prop sha1 | pkg:cargo/sha1@0.11.0 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:usage=reachable
+asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag", "verify"], "primitive": "mac"}, "assetType": "algorithm"}
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-1-4096-16 | crypto:algorithm:PBKDF2-SHA-1-4096-16 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-512-1000-20 | crypto:algorithm:PBKDF2-SHA-512-1000-20 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset scrypt | crypto:algorithm:scrypt | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library cipher 0.5.2 | pkg:cargo/cipher@0.5.2 | purl pkg:cargo/cipher@0.5.2
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library hkdf 0.13.0 | pkg:cargo/hkdf@0.13.0 | purl pkg:cargo/hkdf@0.13.0
+component library hmac 0.13.0 | pkg:cargo/hmac@0.13.0 | purl pkg:cargo/hmac@0.13.0
+component library md-5 0.11.0 | pkg:cargo/md-5@0.11.0 | purl pkg:cargo/md-5@0.11.0
+component library pbkdf2 0.13.0 | pkg:cargo/pbkdf2@0.13.0 | purl pkg:cargo/pbkdf2@0.13.0
+component library salsa20 0.11.0 | pkg:cargo/salsa20@0.11.0 | purl pkg:cargo/salsa20@0.11.0
+component library scrypt 0.12.0 | pkg:cargo/scrypt@0.12.0 | purl pkg:cargo/scrypt@0.12.0
+component library sha1 0.11.0 | pkg:cargo/sha1@0.11.0 | purl pkg:cargo/sha1@0.11.0
+component library sha2 0.11.1 | pkg:cargo/sha2@0.11.1 | purl pkg:cargo/sha2@0.11.1
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:HKDF-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-1 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:PBKDF2-SHA-1-4096-16 -> crypto:algorithm:HMAC-SHA-1
+dep crypto:algorithm:PBKDF2-SHA-1-4096-16 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:PBKDF2-SHA-512-1000-20 -> crypto:algorithm:SHA-512
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/hkdf@0.13.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/hmac@0.13.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/md-5@0.11.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/pbkdf2@0.13.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/scrypt@0.12.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/sha1@0.11.0
+dep pkg:cargo/a174@0.1.0 -> pkg:cargo/sha2@0.11.1
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/hkdf@0.13.0 -> pkg:cargo/hmac@0.13.0
+dep pkg:cargo/hmac@0.13.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/md-5@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/pbkdf2@0.13.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/pbkdf2@0.13.0 -> pkg:cargo/hmac@0.13.0
+dep pkg:cargo/salsa20@0.11.0 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/scrypt@0.12.0 -> pkg:cargo/pbkdf2@0.13.0
+dep pkg:cargo/scrypt@0.12.0 -> pkg:cargo/salsa20@0.11.0
+dep pkg:cargo/scrypt@0.12.0 -> pkg:cargo/sha2@0.11.1
+dep pkg:cargo/sha1@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/sha2@0.11.1 -> pkg:cargo/digest@0.11.3
+dependency crypto:algorithm:HKDF-SHA-256
+dependency crypto:algorithm:HMAC-SHA-1
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-384
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:MD5
+dependency crypto:algorithm:PBKDF2-SHA-1-4096-16
+dependency crypto:algorithm:PBKDF2-SHA-256-600000-32
+dependency crypto:algorithm:PBKDF2-SHA-512-1000-20
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-224
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:SHA-512/256
+dependency crypto:algorithm:scrypt
+dependency crypto:algorithm:scrypt-32768-8-1-64
+dependency pkg:cargo/a174@0.1.0
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/cipher@0.5.2
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/const-oid@0.10.2
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/hkdf@0.13.0
+dependency pkg:cargo/hmac@0.13.0
+dependency pkg:cargo/md-5@0.11.0
+dependency pkg:cargo/pbkdf2@0.13.0
+dependency pkg:cargo/salsa20@0.11.0
+dependency pkg:cargo/scrypt@0.12.0
+dependency pkg:cargo/sha1@0.11.0
+dependency pkg:cargo/sha2@0.11.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/hkdf@0.13.0 -> crypto:algorithm:HKDF-SHA-256
+provides pkg:cargo/hmac@0.13.0 -> crypto:algorithm:HMAC-SHA-1
+provides pkg:cargo/hmac@0.13.0 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/hmac@0.13.0 -> crypto:algorithm:HMAC-SHA-384
+provides pkg:cargo/hmac@0.13.0 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/md-5@0.11.0 -> crypto:algorithm:MD5
+provides pkg:cargo/pbkdf2@0.13.0 -> crypto:algorithm:PBKDF2-SHA-1-4096-16
+provides pkg:cargo/pbkdf2@0.13.0 -> crypto:algorithm:PBKDF2-SHA-256-600000-32
+provides pkg:cargo/pbkdf2@0.13.0 -> crypto:algorithm:PBKDF2-SHA-512-1000-20
+provides pkg:cargo/scrypt@0.12.0 -> crypto:algorithm:scrypt
+provides pkg:cargo/scrypt@0.12.0 -> crypto:algorithm:scrypt-32768-8-1-64
+provides pkg:cargo/sha1@0.11.0 -> crypto:algorithm:SHA-1
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-224
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-512/256
+root {"bom-ref": "pkg:cargo/a174@0.1.0", "name": "a174", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a174@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a174
+run rcbom:run:boundary-check=41 calls into crypto packages: 32 cited, 0 cited by the check as unknown, 9 excused (format 9)
+run rcbom:run:features=
+run rcbom:run:packages=21
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=154
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -682,11 +682,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -2354,7 +2350,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; rng: rng (rand_core::os::OsRng); line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: rng (rand_core::os::OsRng); line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 16,
@@ -2575,6 +2571,8 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
+        "crypto:algorithm:ECDH-P-384",
+        "crypto:algorithm:ECDSA-P-384-SHA-384",
         "crypto:algorithm:unknown:unknown:elliptic-curve+p384"
       ],
       "ref": "pkg:cargo/p384@0.13.1"
@@ -2830,7 +2828,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "555"
+        "value": "235"
       },
       {
         "name": "rcbom:run:artifact",
@@ -2838,7 +2836,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "117 calls into crypto packages: 36 cited, 0 cited by the check as unknown, 81 excused (encoding 2, format 7, generator setup 5, internal 64, not crypto 1, public half 2)"
+        "value": "51 calls into crypto packages: 36 cited, 0 cited by the check as unknown, 15 excused (format 7, generator setup 5, not crypto 1, public half 2)"
       }
     ],
     "tools": {
@@ -2851,7 +2849,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:dbc0440e-7dc1-8a75-a6a3-7e350e816749",
+  "serialNumber": "urn:uuid:d2319764-0ec0-876d-8f97-064cc589b66f",
   "specVersion": "1.7",
   "version": 1
 }

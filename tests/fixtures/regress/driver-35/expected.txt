@@ -1,0 +1,62 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:8:14 | uuid::v4::<impl uuid::Uuid>::new_v4 | [reachable] [call] in d35::main; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `let one = Uuid::new_v4();`; code: `Uuid::new_v4`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:9:41 | uuid::v4::<impl uuid::Uuid>::new_v4 | [reachable] [call] in d35::main::{closure#0}; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `let many: Vec<Uuid> = (0..3).map(|_| Uuid::new_v4()).collect();`; code: `Uuid::new_v4`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | uuid-1.29.2/src/rng.rs:36:12 | rand::random | [reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `rand::random()`; code: `rand::random`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | uuid-1.29.2/src/rng.rs:40:12 | rand::random | [present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `rand::random()`; code: `rand::random`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | uuid-1.29.2/src/rng.rs:44:12 | rand::random | [present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `rand::random()`; code: `rand::random`
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:18:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via d35 -> uuid -> rand -> chacha20
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:69:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via d35 -> uuid -> getrandom
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:128:0 | rand | [manifest] locked rand 0.10.3; reached via d35 -> uuid -> rand
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:139:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via d35 -> uuid -> getrandom -> rand_core
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=5
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/d35@0.1.0 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/d35@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dependency crypto:algorithm:ChaCha12-RNG
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/d35@0.1.0
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand_core@0.10.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/chacha20@0.10.2 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand@0.10.3 -> crypto:algorithm:ChaCha12-RNG
+root {"bom-ref": "pkg:cargo/d35@0.1.0", "name": "d35", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d35@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin d35
+run rcbom:run:boundary-check=3 calls into crypto packages: 1 cited, 2 cited by the check by name, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=114
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

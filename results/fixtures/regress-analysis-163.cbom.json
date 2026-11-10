@@ -25,10 +25,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -207,10 +203,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -301,14 +293,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.10.1",
@@ -348,6 +332,20 @@
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "rand::seq::IteratorRandom::choose"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a163::new::draws; use: generate; line: `v.shuffle(&mut r); // ChaCha12-RNG`; code: `shuffle`",
+            "line": 23,
+            "location": "src/main.rs",
+            "offset": 10,
+            "symbol": "rand::seq::slice::SliceRandom::shuffle"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a163::new::draws; use: generate; line: `let _ = v.choose(&mut r); // ChaCha12-RNG`; code: `choose`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 18,
+            "symbol": "rand::seq::slice::IndexedRandom::choose"
           }
         ]
       },
@@ -379,124 +377,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:drbg:rand",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate"
-          ],
-          "primitive": "drbg"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a163::new::draws; use: generate; algorithm unresolved: `rand::seq::slice::SliceRandom::shuffle` of rand 0.10.2, a version the knowledge base does not cover; line: `v.shuffle(&mut r); // an unknown generator`; code: `shuffle`",
-            "line": 23,
-            "location": "src/main.rs",
-            "offset": 10,
-            "symbol": "rand::seq::slice::SliceRandom::shuffle"
-          },
-          {
-            "additionalContext": "[reachable] [call] in a163::new::draws; use: generate; algorithm unresolved: `rand::seq::slice::IndexedRandom::choose` of rand 0.10.2, a version the knowledge base does not cover; line: `let _ = v.choose(&mut r); // an unknown generator`; code: `choose`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 18,
-            "symbol": "rand::seq::slice::IndexedRandom::choose"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:rand+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in a163::new::draws; use: unknown; algorithm unresolved: `rand_core::seedable_rng::SeedableRng::seed_from_u64` of rand_core 0.10.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut s = SmallRng::seed_from_u64(7);`; code: `SmallRng::seed_from_u64`",
-            "line": 25,
-            "location": "src/main.rs",
-            "offset": 20,
-            "symbol": "rand_core::seedable_rng::SeedableRng::seed_from_u64"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -513,6 +394,9 @@
     {
       "dependsOn": [
         "pkg:cargo/rand_core@0.10.1"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/chacha20@0.10.2"
     },
@@ -547,8 +431,7 @@
         "pkg:cargo/rand_core@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:drbg:rand",
-        "crypto:algorithm:unknown:unknown:rand+rand_core"
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/rand@0.10.2"
     },
@@ -570,22 +453,11 @@
     },
     {
       "dependsOn": [],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:rand+rand_core"
-      ],
       "ref": "pkg:cargo/rand_core@0.10.1"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha12-RNG"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:drbg:rand"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:rand+rand_core"
     }
   ],
   "metadata": {
@@ -641,7 +513,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "11 calls into crypto packages: 6 cited, 0 cited by the check as unknown, 5 excused (generator setup 3, not crypto 2)"
+        "value": "11 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 6 excused (generator setup 4, not crypto 2)"
       }
     ],
     "tools": {
@@ -654,7 +526,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:bcfceb3e-267a-8298-a3da-aa1b78e059e0",
+  "serialNumber": "urn:uuid:45afe257-2341-8889-a101-1b9ed55dc607",
   "specVersion": "1.7",
   "version": 1
 }

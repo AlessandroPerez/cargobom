@@ -358,10 +358,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -454,10 +450,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -1187,10 +1179,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -5831,6 +5819,27 @@
             "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
           },
           {
+            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; new: setup, not a use; line: `let mut hasher = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
+            "line": 148,
+            "location": "rust-embed-utils-8.13.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; use: digest; line: `hasher.update(&data);`; code: `update`",
+            "line": 149,
+            "location": "rust-embed-utils-8.13.0/src/lib.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; use: digest; line: `let hash: [u8; 32] = hasher.finalize().into();`; code: `finalize`",
+            "line": 150,
+            "location": "rust-embed-utils-8.13.0/src/lib.rs",
+            "offset": 30,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
             "additionalContext": "[reachable] [static] in rustls::crypto::ring::hash::SHA256; line: `pub(crate) static SHA256: Hash = Hash(&digest::SHA256, HashAlgorithm::SHA256);`; code: `digest::SHA256`",
             "line": 9,
             "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
@@ -6227,7 +6236,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "67"
+          "value": "70"
         }
       ],
       "type": "cryptographic-asset"
@@ -6983,75 +6992,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; new: setup, not a use; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let mut hasher = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
-            "line": 148,
-            "location": "rust-embed-utils-8.13.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `hasher.update(&data);`; code: `update`",
-            "line": 149,
-            "location": "rust-embed-utils-8.13.0/src/lib.rs",
-            "offset": 9,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[present] [call] in rust_embed_utils::read_file_from_fs; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let hash: [u8; 32] = hasher.finalize().into();`; code: `finalize`",
-            "line": 150,
-            "location": "rust-embed-utils-8.13.0/src/lib.rs",
-            "offset": 30,
-            "symbol": "digest::digest::Digest::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "present"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:unknown:age",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -7771,7 +7711,7 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2"
+        "crypto:algorithm:SHA-256"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -7981,10 +7921,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha2"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:age"
     },
     {
@@ -8066,7 +8002,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:93daa949-5e06-8e66-9069-0acdd0272bb8",
+  "serialNumber": "urn:uuid:78b353c5-ddd8-836d-92c4-47d2588e36fd",
   "specVersion": "1.7",
   "version": 1
 }

@@ -64,11 +64,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -678,6 +674,312 @@
       "version": "1.8.2"
     },
     {
+      "bom-ref": "crypto:algorithm:BLAKE2s-128-HMAC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; new_from_slice: setup, not a use; key: parameter (argument 0 of handshake::Handshake::append_mac1_and_mac2) or parameter (argument 0 of handshake::Handshake::format_handshake_initiation) or parameter (argument 0 of handshake::Handshake::format_handshake_response) or parameter (argument 0 of noise::Tunn::decapsulate) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "line": 70,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; use: tag; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
+            "line": 71,
+            "location": "src/noise/handshake.rs",
+            "offset": 4,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; use: tag; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
+            "line": 72,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; new_from_slice: setup, not a use; key: computed (rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "line": 77,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: tag; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
+            "line": 78,
+            "location": "src/noise/handshake.rs",
+            "offset": 4,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: tag; line: `blake2::digest::Update::update(&mut hmac, data2);`; code: `blake2::digest::Update::update`",
+            "line": 79,
+            "location": "src/noise/handshake.rs",
+            "offset": 4,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: tag; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
+            "line": 80,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          }
+        ]
+      },
+      "name": "BLAKE2s-128-HMAC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "computed,parameter"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "keyed BLAKE2s (RFC 7693), not an HMAC"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2s-192-HMAC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; new_from_slice: setup, not a use; key: parameter (argument 0 of rate_limiter::RateLimiter::format_cookie_reply) or parameter (argument 0 of rate_limiter::RateLimiter::nonce) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
+            "line": 84,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; use: tag; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
+            "line": 85,
+            "location": "src/noise/handshake.rs",
+            "offset": 4,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; use: tag; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
+            "line": 86,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          }
+        ]
+      },
+      "name": "BLAKE2s-192-HMAC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "keyed BLAKE2s (RFC 7693), not an HMAC"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2s-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; new: setup, not a use; line: `let mut hash = Blake2s256::new();`; code: `Blake2s256::new`",
+            "line": 41,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; line: `hash.update(data1);`; code: `update`",
+            "line": 42,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; line: `hash.update(data2);`; code: `update`",
+            "line": 43,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; line: `hash.finalize().into()`; code: `finalize`",
+            "line": 44,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac; part of HMAC-BLAKE2s-256; line: `let mut hmac = HmacBlake2s::new_from_slice(key).unwrap();`; code: `HmacBlake2s::new_from_slice`",
+            "line": 52,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac; part of HMAC-BLAKE2s-256; line: `hmac.update(data1);`; code: `update`",
+            "line": 53,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac; part of HMAC-BLAKE2s-256; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
+            "line": 54,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac2; part of HMAC-BLAKE2s-256; line: `let mut hmac = HmacBlake2s::new_from_slice(key).unwrap();`; code: `HmacBlake2s::new_from_slice`",
+            "line": 62,
+            "location": "src/noise/handshake.rs",
+            "offset": 19,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac2; part of HMAC-BLAKE2s-256; line: `hmac.update(data1);`; code: `update`",
+            "line": 63,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac2; part of HMAC-BLAKE2s-256; line: `hmac.update(data2);`; code: `update`",
+            "line": 64,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in boringtun::noise::handshake::b2s_hmac2; part of HMAC-BLAKE2s-256; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
+            "line": 65,
+            "location": "src/noise/handshake.rs",
+            "offset": 9,
+            "symbol": "digest::FixedOutput::finalize_fixed"
+          }
+        ]
+      },
+      "name": "BLAKE2s-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "11"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:ChaCha20-Poly1305",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -820,7 +1122,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:HMAC",
+      "bom-ref": "crypto:algorithm:HMAC-BLAKE2s-256",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "HMAC",
@@ -884,7 +1186,7 @@
           }
         ]
       },
-      "name": "HMAC",
+      "name": "HMAC-BLAKE2s-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -1065,205 +1367,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "4"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:blake2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; new: setup, not a use; algorithm unresolved: the type `blake2::Blake2sVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let mut hash = Blake2s256::new();`; code: `Blake2s256::new`",
-            "line": 41,
-            "location": "src/noise/handshake.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; algorithm unresolved: the type `blake2::Blake2sVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hash.update(data1);`; code: `update`",
-            "line": 42,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; algorithm unresolved: the type `blake2::Blake2sVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hash.update(data2);`; code: `update`",
-            "line": 43,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_hash; use: digest; algorithm unresolved: the type `blake2::Blake2sVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hash.finalize().into()`; code: `finalize`",
-            "line": 44,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::digest::Digest::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "4"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:blake2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest",
-            "tag"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: parameter (argument 0 of handshake::Handshake::append_mac1_and_mac2) or parameter (argument 0 of handshake::Handshake::format_handshake_initiation) or parameter (argument 0 of handshake::Handshake::format_handshake_response) or parameter (argument 0 of noise::Tunn::decapsulate) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
-            "line": 70,
-            "location": "src/noise/handshake.rs",
-            "offset": 19,
-            "symbol": "crypto_common::KeyInit::new_from_slice"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
-            "line": 71,
-            "location": "src/noise/handshake.rs",
-            "offset": 4,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
-            "line": 72,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::FixedOutput::finalize_fixed"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: computed (rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::current_cookie) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
-            "line": 77,
-            "location": "src/noise/handshake.rs",
-            "offset": 19,
-            "symbol": "crypto_common::KeyInit::new_from_slice"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
-            "line": 78,
-            "location": "src/noise/handshake.rs",
-            "offset": 4,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `blake2::digest::Update::update(&mut hmac, data2);`; code: `blake2::digest::Update::update`",
-            "line": 79,
-            "location": "src/noise/handshake.rs",
-            "offset": 4,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_keyed_mac_16_2; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
-            "line": 80,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::FixedOutput::finalize_fixed"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: parameter (argument 0 of rate_limiter::RateLimiter::format_cookie_reply) or parameter (argument 0 of rate_limiter::RateLimiter::nonce) or parameter (argument 0 of rate_limiter::RateLimiter::verify_packet) or parameter (argument 0 of the enclosing function); line: `let mut hmac = Blake2sMac::new_from_slice(key).unwrap();`; code: `Blake2sMac::new_from_slice`",
-            "line": 84,
-            "location": "src/noise/handshake.rs",
-            "offset": 19,
-            "symbol": "crypto_common::KeyInit::new_from_slice"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `blake2::digest::Update::update(&mut hmac, data1);`; code: `blake2::digest::Update::update`",
-            "line": 85,
-            "location": "src/noise/handshake.rs",
-            "offset": 4,
-            "symbol": "digest::Update::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in boringtun::noise::handshake::b2s_mac_24; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `hmac.finalize_fixed().into()`; code: `finalize_fixed`",
-            "line": 86,
-            "location": "src/noise/handshake.rs",
-            "offset": 9,
-            "symbol": "digest::FixedOutput::finalize_fixed"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:key",
-          "value": "computed,parameter"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -1591,8 +1694,9 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:blake2",
-        "crypto:algorithm:unknown:unknown:blake2"
+        "crypto:algorithm:BLAKE2s-128-HMAC",
+        "crypto:algorithm:BLAKE2s-192-HMAC",
+        "crypto:algorithm:BLAKE2s-256"
       ],
       "ref": "pkg:cargo/blake2@0.10.6"
     },
@@ -1674,7 +1778,7 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:HMAC"
+        "crypto:algorithm:HMAC-BLAKE2s-256"
       ],
       "ref": "pkg:cargo/hmac@0.12.1"
     },
@@ -1734,12 +1838,26 @@
       "ref": "pkg:cargo/zeroize@1.8.2"
     },
     {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:ChaCha20-Poly1305"
+      "dependsOn": [
+        "crypto:algorithm:BLAKE2s-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-BLAKE2s-256"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:HMAC"
+      "ref": "crypto:algorithm:BLAKE2s-128-HMAC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE2s-192-HMAC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE2s-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha20-Poly1305"
     },
     {
       "dependsOn": [],
@@ -1748,14 +1866,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:XChaCha20-Poly1305"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:blake2"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:blake2"
     },
     {
       "dependsOn": [],
@@ -1807,7 +1917,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "1511"
+        "value": "1326"
       },
       {
         "name": "rcbom:run:artifact",
@@ -1815,7 +1925,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "114 calls into crypto packages: 72 cited, 0 cited by the check as unknown, 42 excused (accessor 9, comparison 3, format 12, internal 4, setup 12, view 2)"
+        "value": "110 calls into crypto packages: 72 cited, 0 cited by the check as unknown, 38 excused (accessor 9, comparison 3, format 12, setup 12, view 2)"
       }
     ],
     "tools": {
@@ -1828,7 +1938,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:954346d5-682d-8c58-98fa-91563ba58a68",
+  "serialNumber": "urn:uuid:ce4ab7d0-6693-8f05-a2f8-ee0cb1aeae03",
   "specVersion": "1.7",
   "version": 1
 }

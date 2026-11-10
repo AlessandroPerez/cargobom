@@ -1,0 +1,326 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.4.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.4.3; reached via d34 -> uuid -> getrandom",
+            "line": 49,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.4.3",
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha1_smol@1.0.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked sha1_smol 1.0.1; reached via d34 -> uuid -> sha1_smol",
+            "line": 113,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha1_smol"
+          }
+        ]
+      },
+      "name": "sha1_smol",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha1_smol@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "line": 57,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "line": 68,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "line": 79,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d34::token; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `getrandom::fill` of getrandom 0.4.3; line: `Uuid::new_v4()`; code: `Uuid::new_v4`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:sha1_smol",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "digest",
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut hasher = Sha1::new();`; code: `Sha1::new`",
+            "line": 5,
+            "location": "uuid-1.29.2/src/sha1.rs",
+            "offset": 21,
+            "symbol": "sha1_smol::Sha1::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `digest`",
+            "line": 11,
+            "location": "uuid-1.29.2/src/sha1.rs",
+            "offset": 34,
+            "symbol": "sha1_smol::Sha1::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Digest::bytes` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `bytes`",
+            "line": 11,
+            "location": "uuid-1.29.2/src/sha1.rs",
+            "offset": 43,
+            "symbol": "sha1_smol::Digest::bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d34::main; use: unknown; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Digest::bytes` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::digest` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::new` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let b = Uuid::new_v5(&Uuid::NAMESPACE_DNS, name.as_bytes());`; code: `Uuid::new_v5`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "uuid::v5::<impl uuid::Uuid>::new_v5"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.4.3",
+        "pkg:cargo/sha1_smol@1.0.1"
+      ],
+      "ref": "pkg:cargo/d34@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
+      "ref": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:sha1_smol"
+      ],
+      "ref": "pkg:cargo/sha1_smol@1.0.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:sha1_smol"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/d34@0.1.0",
+      "name": "d34",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/d34@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "6"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "255"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin d34"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "14 calls into crypto packages: 4 cited, 1 cited by the check by name, 3 cited by the check as unknown, 6 excused (format 3, step 3)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:536b0e3a-139f-8d47-8cff-16ea3a537093",
+  "specVersion": "1.7",
+  "version": 1
+}

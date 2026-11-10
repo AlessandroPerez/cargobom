@@ -138,10 +138,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -206,10 +202,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -245,10 +237,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -290,10 +278,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -333,10 +317,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -346,9 +326,10 @@
       "version": "0.11.0"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:mac:hmac+sha1",
+      "bom-ref": "crypto:algorithm:HMAC-SHA-1",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "HMAC",
           "cryptoFunctions": [
             "tag"
           ],
@@ -359,22 +340,43 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; algorithm unresolved: the type `sha1::Sha1` of sha1 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.update(&data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "line": 104,
+            "location": "src/algorithm.rs",
+            "offset": 25,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.update(&data);`; code: `update`",
             "line": 106,
             "location": "src/algorithm.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; algorithm unresolved: the type `sha1::Sha1` of sha1 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
             "line": 107,
             "location": "src/algorithm.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] in totp_rs::algorithm::Algorithm::sign; chosen as generic argument of totp_rs::algorithm::Algorithm::hash; line: `Algorithm::SHA1 => Signature::SHA1(Algorithm::hash::<HmacSha1>(key, counter)),`; code: `Algorithm::hash::<HmacSha1>`",
+            "line": 112,
+            "location": "src/algorithm.rs",
+            "offset": 47,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
           }
         ]
       },
-      "name": "unknown",
+      "name": "HMAC-SHA-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -397,20 +399,21 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:mac:hmac+sha2",
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "HMAC",
           "cryptoFunctions": [
             "tag"
           ],
@@ -421,22 +424,43 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.update(&data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "line": 104,
+            "location": "src/algorithm.rs",
+            "offset": 25,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.update(&data);`; code: `update`",
             "line": 106,
             "location": "src/algorithm.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
             "line": 107,
             "location": "src/algorithm.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] in totp_rs::algorithm::Algorithm::sign; chosen as generic argument of totp_rs::algorithm::Algorithm::hash; line: `Algorithm::SHA256 => Signature::SHA256(Algorithm::hash::<HmacSha256>(key, counter)),`; code: `Algorithm::hash::<HmacSha256>`",
+            "line": 113,
+            "location": "src/algorithm.rs",
+            "offset": 51,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
           }
         ]
       },
-      "name": "unknown",
+      "name": "HMAC-SHA-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -459,37 +483,152 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:unknown:hmac+sha1",
+      "bom-ref": "crypto:algorithm:HMAC-SHA-512",
       "cryptoProperties": {
         "algorithmProperties": {
-          "cryptoFunctions": [],
-          "primitive": "unknown"
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha1::Sha1` of sha1 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
             "line": 104,
             "location": "src/algorithm.rs",
             "offset": 25,
             "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.update(&data);`; code: `update`",
+            "line": 106,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; use: tag; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; into_bytes: setup, not a use; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] in totp_rs::algorithm::Algorithm::sign; chosen as generic argument of totp_rs::algorithm::Algorithm::hash; line: `Algorithm::SHA512 => Signature::SHA512(Algorithm::hash::<HmacSha512>(key, counter)),`; code: `Algorithm::hash::<HmacSha512>`",
+            "line": 114,
+            "location": "src/algorithm.rs",
+            "offset": 51,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
           }
         ]
       },
-      "name": "unknown",
+      "name": "HMAC-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-1",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-1",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "line": 104,
+            "location": "src/algorithm.rs",
+            "offset": 25,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.update(&data);`; code: `update`",
+            "line": 106,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-1; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:112:47 as `Algorithm::hash::<HmacSha1>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::sign; part of HMAC-SHA-1; line: `Algorithm::SHA1 => Signature::SHA1(Algorithm::hash::<HmacSha1>(key, counter)),`; code: `Algorithm::hash::<HmacSha1>`",
+            "line": 112,
+            "location": "src/algorithm.rs",
+            "offset": 47,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
+          }
+        ]
+      },
+      "name": "SHA-1",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -512,41 +651,72 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:provenance:key",
-          "value": "parameter"
+          "name": "rcbom:only-as-component",
+          "value": "true"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:param:output_bytes",
+          "value": "20"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:unknown:hmac+sha2",
+      "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
-          "cryptoFunctions": [],
-          "primitive": "unknown"
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in totp_rs::algorithm::Algorithm::hash::<..>; new_from_slice: setup, not a use; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.0, a version the knowledge base does not cover; key: parameter (argument 0 of the enclosing function) or parameter (argument 0 of totp_rs::Totp::check) or parameter (argument 0 of totp_rs::Totp::check_current) or parameter (argument 0 of totp_rs::Totp::generate) or parameter (argument 0 of totp_rs::Totp::generate_current) or parameter (argument 0 of totp_rs::Totp::sign) or parameter (argument 1 of algorithm::Algorithm::sign); instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
             "line": 104,
             "location": "src/algorithm.rs",
             "offset": 25,
             "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.update(&data);`; code: `update`",
+            "line": 106,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-256; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:113:51 as `Algorithm::hash::<HmacSha256>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::sign; part of HMAC-SHA-256; line: `Algorithm::SHA256 => Signature::SHA256(Algorithm::hash::<HmacSha256>(key, counter)),`; code: `Algorithm::hash::<HmacSha256>`",
+            "line": 113,
+            "location": "src/algorithm.rs",
+            "offset": 51,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
           }
         ]
       },
-      "name": "unknown",
+      "name": "SHA-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -569,16 +739,96 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:provenance:key",
-          "value": "parameter"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:only-as-component",
+          "value": "true"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `let mut digest = D::new_from_slice(key).unwrap();`; code: `D::new_from_slice`",
+            "line": 104,
+            "location": "src/algorithm.rs",
+            "offset": 25,
+            "symbol": "crypto_common::KeyInit::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.update(&data);`; code: `update`",
+            "line": 106,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.finalize().into_bytes()`; code: `finalize`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 15,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::hash::<..>; part of HMAC-SHA-512; instantiated by totp_rs::algorithm::Algorithm::sign at src/algorithm.rs:114:51 as `Algorithm::hash::<HmacSha512>`; line: `digest.finalize().into_bytes()`; code: `into_bytes`",
+            "line": 107,
+            "location": "src/algorithm.rs",
+            "offset": 26,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in totp_rs::algorithm::Algorithm::sign; part of HMAC-SHA-512; line: `Algorithm::SHA512 => Signature::SHA512(Algorithm::hash::<HmacSha512>(key, counter)),`; code: `Algorithm::hash::<HmacSha512>`",
+            "line": 114,
+            "location": "src/algorithm.rs",
+            "offset": 51,
+            "symbol": "totp_rs::algorithm::Algorithm::hash"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -620,10 +870,9 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:mac:hmac+sha1",
-        "crypto:algorithm:unknown:mac:hmac+sha2",
-        "crypto:algorithm:unknown:unknown:hmac+sha1",
-        "crypto:algorithm:unknown:unknown:hmac+sha2"
+        "crypto:algorithm:HMAC-SHA-1",
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-512"
       ],
       "ref": "pkg:cargo/hmac@0.13.0"
     },
@@ -632,8 +881,7 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:mac:hmac+sha1",
-        "crypto:algorithm:unknown:unknown:hmac+sha1"
+        "crypto:algorithm:SHA-1"
       ],
       "ref": "pkg:cargo/sha1@0.11.0"
     },
@@ -642,8 +890,8 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:mac:hmac+sha2",
-        "crypto:algorithm:unknown:unknown:hmac+sha2"
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -657,20 +905,34 @@
       "ref": "pkg:cargo/totp-rs@6.0.0"
     },
     {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:mac:hmac+sha1"
+      "dependsOn": [
+        "crypto:algorithm:SHA-1"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-1"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-512"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:mac:hmac+sha2"
+      "ref": "crypto:algorithm:SHA-1"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:hmac+sha1"
+      "ref": "crypto:algorithm:SHA-256"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:hmac+sha2"
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -726,7 +988,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "5 calls into crypto packages: 3 cited, 0 cited by the check as unknown, 2 excused (accessor 1, format 1)"
+        "value": "5 calls into crypto packages: 4 cited, 0 cited by the check as unknown, 1 excused (format 1)"
       }
     ],
     "tools": {
@@ -739,7 +1001,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e98021bf-55d1-8217-9600-fb495e4d436e",
+  "serialNumber": "urn:uuid:e816588b-8a01-8de5-ac5b-2bc064806001",
   "specVersion": "1.7",
   "version": 1
 }

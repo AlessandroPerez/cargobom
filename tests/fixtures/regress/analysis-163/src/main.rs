@@ -1,6 +1,6 @@
 // rand's `seq` traits draw from the generator they are given: the draw is the call's, never
-// dropped (a ChaCha12 generator of rand 0.8; an unknown one of rand 0.10, a version the knowledge
-// base does not cover); a draw from a generator that computes no cryptography is no operation
+// dropped (a ChaCha12 generator, of rand 0.8 and of rand 0.10 alike); a draw from a generator
+// that computes no cryptography is no operation
 mod old {
     use rand08::rngs::SmallRng;
     use rand08::seq::{IteratorRandom, SliceRandom};
@@ -20,8 +20,8 @@ mod new {
     use rand::SeedableRng;
     pub fn draws(v: &mut [u8]) {
         let mut r = rand::rng();
-        v.shuffle(&mut r); // an unknown generator
-        let _ = v.choose(&mut r); // an unknown generator
+        v.shuffle(&mut r); // ChaCha12-RNG
+        let _ = v.choose(&mut r); // ChaCha12-RNG
         let mut s = SmallRng::seed_from_u64(7);
         v.shuffle(&mut s); // no operation
     }

@@ -12,7 +12,7 @@ fn main() {
     // a modelled hash named as a value, called through the pointer
     let f = <sha2::Sha256 as Digest>::digest;
     let a = f(b"abc");
-    // BLAKE2b (unmodelled): hash and keyed MAC
+    // BLAKE2b: hash and keyed MAC
     let b = blake2::Blake2b512::digest(b"abc");
     let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b"key").unwrap();
     Mac::update(&mut m, b"abc");

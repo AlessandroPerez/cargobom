@@ -164,10 +164,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -226,10 +222,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/cipher@0.5.2",
@@ -358,10 +350,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -458,10 +446,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -522,10 +506,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -594,10 +574,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -671,10 +647,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -705,14 +677,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.10.1",
@@ -818,10 +782,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -859,10 +819,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -1147,6 +1103,89 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::chunker::rabin::random_poly; use: generate; line: `let mut poly: u64 = rng().random();`; code: `random`",
+            "line": 205,
+            "location": "src/chunker/rabin.rs",
+            "offset": 34,
+            "symbol": "rand::rng::RngExt::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::aespoly1305::Key::new; use: generate; line: `rng().fill_bytes(&mut key);`; code: `fill_bytes`",
+            "line": 33,
+            "location": "src/crypto/aespoly1305.rs",
+            "offset": 14,
+            "symbol": "rand_core::Rng::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: generate; line: `rng().fill_bytes(&mut nonce);`; code: `fill_bytes`",
+            "line": 121,
+            "location": "src/crypto/aespoly1305.rs",
+            "offset": 14,
+            "symbol": "rand_core::Rng::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::id::Id::random_from_rng::<..>; use: generate; instantiated by rustic_core::id::Id::random at src/id.rs:147:8 as `Self::random_from_rng`; line: `rng.fill_bytes(&mut id.0);`; code: `fill_bytes`",
+            "line": 140,
+            "location": "src/id.rs",
+            "offset": 12,
+            "symbol": "rand_core::Rng::fill_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: generate; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "line": 209,
+            "location": "src/repofile/keyfile.rs",
+            "offset": 14,
+            "symbol": "rand_core::Rng::fill_bytes"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:OS-RNG",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1272,6 +1311,161 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::hash; use: digest; line: `Id::new(Sha256::digest(data).into())`; code: `Sha256::digest`",
+            "line": 18,
+            "location": "src/crypto/hasher.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::new; default: setup, not a use; line: `Self(Sha256::default())`; code: `Sha256::default`",
+            "line": 25,
+            "location": "src/crypto/hasher.rs",
+            "offset": 13,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::update; use: digest; line: `self.0.update(data);`; code: `update`",
+            "line": 29,
+            "location": "src/crypto/hasher.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::finalize; use: digest; line: `Id::new(self.0.finalize().into())`; code: `finalize`",
+            "line": 33,
+            "location": "src/crypto/hasher.rs",
+            "offset": 23,
+            "symbol": "digest::digest::Digest::finalize"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:scrypt",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "scrypt",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; new: setup, not a use; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `let params = Params::new(`; code: `Params::new`",
+            "line": 102,
+            "location": "src/repofile/keyfile.rs",
+            "offset": 21,
+            "symbol": "scrypt::params::Params::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; password: parameter (argument 1 of KeyFile::key_from_password::) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of KeyFile::key_from_password::) or parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "line": 122,
+            "location": "src/repofile/keyfile.rs",
+            "offset": 8,
+            "symbol": "scrypt::scrypt"
+          },
+          {
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of commands::key::add_key_to_repo); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "line": 212,
+            "location": "src/repofile/keyfile.rs",
+            "offset": 8,
+            "symbol": "scrypt::scrypt"
+          }
+        ]
+      },
+      "name": "scrypt",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:dk_len",
+          "value": "64"
+        },
+        {
+          "name": "rcbom:param:unresolved",
+          "value": "N, r, p: not a constant where scrypt::Params is built"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "parameter"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "parameter,rng"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:unknown:ae:aes256ctr_poly1305aes",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1352,13 +1546,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::chunker::rabin::random_poly; use: generate; algorithm unresolved: `rand::rng::RngExt::random` of rand 0.10.2, a version the knowledge base does not cover; line: `let mut poly: u64 = rng().random();`; code: `random`",
-            "line": 205,
-            "location": "src/chunker/rabin.rs",
-            "offset": 34,
-            "symbol": "rand::rng::RngExt::random"
-          },
-          {
             "additionalContext": "[reachable] [call] in rustic_core::commands::check::ReadSubsetOption::apply_with_rng; use: generate; algorithm unresolved: `rand::seq::slice::SliceRandom::shuffle` of rand 0.10.2 on a type parameter (`impl Rng`) of the library's generic API: its callers choose the type; line: `packs.shuffle(rng);`; code: `shuffle`",
             "line": 90,
             "location": "src/commands/check.rs",
@@ -1395,230 +1582,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:drbg:rand+rand_core",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate"
-          ],
-          "primitive": "drbg"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::aespoly1305::Key::new; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; line: `rng().fill_bytes(&mut key);`; code: `fill_bytes`",
-            "line": 33,
-            "location": "src/crypto/aespoly1305.rs",
-            "offset": 14,
-            "symbol": "rand_core::Rng::fill_bytes"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; line: `rng().fill_bytes(&mut nonce);`; code: `fill_bytes`",
-            "line": 121,
-            "location": "src/crypto/aespoly1305.rs",
-            "offset": 14,
-            "symbol": "rand_core::Rng::fill_bytes"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::id::Id::random_from_rng::<..>; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; instantiated by rustic_core::id::Id::random at src/id.rs:147:8 as `Self::random_from_rng`; line: `rng.fill_bytes(&mut id.0);`; code: `fill_bytes`",
-            "line": 140,
-            "location": "src/id.rs",
-            "offset": 12,
-            "symbol": "rand_core::Rng::fill_bytes"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: generate; algorithm unresolved: `rand_core::Rng::fill_bytes` of rand_core 0.10.1, a version the knowledge base does not cover; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
-            "line": 209,
-            "location": "src/repofile/keyfile.rs",
-            "offset": 14,
-            "symbol": "rand_core::Rng::fill_bytes"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "4"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::hash; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `Id::new(Sha256::digest(data).into())`; code: `Sha256::digest`",
-            "line": 18,
-            "location": "src/crypto/hasher.rs",
-            "offset": 12,
-            "symbol": "digest::digest::Digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::update; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `self.0.update(data);`; code: `update`",
-            "line": 29,
-            "location": "src/crypto/hasher.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::finalize; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `Id::new(self.0.finalize().into())`; code: `finalize`",
-            "line": 33,
-            "location": "src/crypto/hasher.rs",
-            "offset": 23,
-            "symbol": "digest::digest::Digest::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:kdf:scrypt",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "keyderive",
-            "unknown"
-          ],
-          "primitive": "kdf"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: unknown; algorithm unresolved: `scrypt::params::Params::new` of scrypt 0.12.0, a version the knowledge base does not cover: what the call does is not known; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `let params = Params::new(`; code: `Params::new`",
-            "line": 102,
-            "location": "src/repofile/keyfile.rs",
-            "offset": 21,
-            "symbol": "scrypt::params::Params::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of KeyFile::key_from_password::) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of KeyFile::key_from_password::) or parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
-            "line": 122,
-            "location": "src/repofile/keyfile.rs",
-            "offset": 8,
-            "symbol": "scrypt::scrypt"
-          },
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; algorithm unresolved: `scrypt::scrypt` of scrypt 0.12.0, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of commands::key::add_key_to_repo); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
-            "line": 212,
-            "location": "src/repofile/keyfile.rs",
-            "offset": 8,
-            "symbol": "scrypt::scrypt"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:password",
-          "value": "parameter"
-        },
-        {
-          "name": "rcbom:provenance:salt",
-          "value": "parameter,rng"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -1684,61 +1648,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::new; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.0, a version the knowledge base does not cover: what the call does is not known; line: `Self(Sha256::default())`; code: `Sha256::default`",
-            "line": 25,
-            "location": "src/crypto/hasher.rs",
-            "offset": 13,
-            "symbol": "core::default::Default::default"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -1781,6 +1690,9 @@
     {
       "dependsOn": [
         "pkg:cargo/rand_core@0.10.1"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/chacha20@0.10.1"
     },
@@ -1880,16 +1792,13 @@
         "pkg:cargo/rand_core@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:drbg:rand",
-        "crypto:algorithm:unknown:drbg:rand+rand_core"
+        "crypto:algorithm:ChaCha12-RNG",
+        "crypto:algorithm:unknown:drbg:rand"
       ],
       "ref": "pkg:cargo/rand@0.10.2"
     },
     {
       "dependsOn": [],
-      "provides": [
-        "crypto:algorithm:unknown:drbg:rand+rand_core"
-      ],
       "ref": "pkg:cargo/rand_core@0.10.1"
     },
     {
@@ -1921,7 +1830,7 @@
         "pkg:cargo/sha2@0.11.0"
       ],
       "provides": [
-        "crypto:algorithm:unknown:kdf:scrypt"
+        "crypto:algorithm:scrypt"
       ],
       "ref": "pkg:cargo/scrypt@0.12.0"
     },
@@ -1930,8 +1839,7 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2",
-        "crypto:algorithm:unknown:unknown:sha2"
+        "crypto:algorithm:SHA-256"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -1964,11 +1872,23 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:OS-RNG"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:Poly1305"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:scrypt"
     },
     {
       "dependsOn": [],
@@ -1980,23 +1900,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:drbg:rand+rand_core"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha2"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:kdf:scrypt"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:sha2"
     }
   ],
   "metadata": {
@@ -2065,7 +1969,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6ad8f917-04dd-8a7e-a246-f3ade877e695",
+  "serialNumber": "urn:uuid:9cd7d7d5-e4cb-8c02-9d50-dfc4dcbf88a1",
   "specVersion": "1.7",
   "version": 1
 }

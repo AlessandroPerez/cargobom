@@ -1,0 +1,59 @@
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:11:4 | uuid::v4::<impl uuid::Uuid>::new_v4 | [reachable] [call] in d34::token; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `getrandom::fill` of getrandom 0.4.3; line: `Uuid::new_v4()`; code: `Uuid::new_v4`
+  occ OS-RNG | crypto:algorithm:OS-RNG | uuid-1.29.2/src/rng.rs:57:12 | getrandom::fill | [reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | uuid-1.29.2/src/rng.rs:68:12 | getrandom::fill | [present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | uuid-1.29.2/src/rng.rs:79:12 | getrandom::fill | [present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:49:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via d34 -> uuid -> getrandom
+  occ sha1_smol | pkg:cargo/sha1_smol@1.0.1 | Cargo.lock:113:0 | sha1_smol | [manifest] locked sha1_smol 1.0.1; reached via d34 -> uuid -> sha1_smol
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/main.rs:17:12 | uuid::v5::<impl uuid::Uuid>::new_v5 | [reachable] [call] in d34::main; use: unknown; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Digest::bytes` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::digest` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::new` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let b = Uuid::new_v5(&Uuid::NAMESPACE_DNS, name.as_bytes());`; code: `Uuid::new_v5`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | uuid-1.29.2/src/sha1.rs:11:34 | sha1_smol::Sha1::digest | [reachable] [call] in uuid::sha1::hash; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | uuid-1.29.2/src/sha1.rs:11:43 | sha1_smol::Digest::bytes | [reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Digest::bytes` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `bytes`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | uuid-1.29.2/src/sha1.rs:5:21 | sha1_smol::Sha1::new | [reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut hasher = Sha1::new();`; code: `Sha1::new`
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=4
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:crypto-role=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:kb-coverage=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:scope=required
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:occurrences=4
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:reachability=reachable
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:sha1_smol | {"algorithmProperties": {"cryptoFunctions": ["digest", "unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library sha1_smol 1.0.1 | pkg:cargo/sha1_smol@1.0.1 | purl pkg:cargo/sha1_smol@1.0.1
+dep pkg:cargo/d34@0.1.0 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/d34@0.1.0 -> pkg:cargo/sha1_smol@1.0.1
+dependency crypto:algorithm:OS-RNG
+dependency crypto:algorithm:unknown:unknown:sha1_smol
+dependency pkg:cargo/d34@0.1.0
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/sha1_smol@1.0.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/getrandom@0.4.3 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/sha1_smol@1.0.1 -> crypto:algorithm:unknown:unknown:sha1_smol
+root {"bom-ref": "pkg:cargo/d34@0.1.0", "name": "d34", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/d34@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin d34
+run rcbom:run:boundary-check=14 calls into crypto packages: 4 cited, 1 cited by the check by name, 3 cited by the check as unknown, 6 excused (format 3, step 3)
+run rcbom:run:features=
+run rcbom:run:packages=6
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=255
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

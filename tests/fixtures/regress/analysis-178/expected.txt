@@ -1,0 +1,285 @@
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:40:34 | cipher::block::BlockCipherEncrypt::encrypt_block | [reachable] [call] in a178::main; use: encrypt; line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `encrypt_block`
+  occ AES-128 | crypto:algorithm:AES-128 | src/main.rs:40:4 | crypto_common::KeyInit::new | [reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `aes::Aes128::new`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:31:13 | crypto_common::KeyIvInit::new | [reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); line: `let c4 = cbc::Encryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:32:9 | cipher::block::BlockModeEncrypt::encrypt_padded_vec | [reachable] [call] in a178::main; use: encrypt; line: `.encrypt_padded_vec::<Pkcs7>(msg);`; code: `encrypt_padded_vec`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:33:13 | crypto_common::KeyIvInit::new | [reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); line: `let p4 = cbc::Decryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/main.rs:34:9 | cipher::block::BlockModeDecrypt::decrypt_padded_vec | [reachable] [call] in a178::main; use: decrypt; line: `.decrypt_padded_vec::<Pkcs7>(&c4)`; code: `decrypt_padded_vec`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:22:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (literal at line 16); line: `let b = Aes128Gcm::new_from_slice(&key[..16]).unwrap();`; code: `Aes128Gcm::new_from_slice`
+  occ AES-128-GCM | crypto:algorithm:AES-128-GCM | src/main.rs:24:6 | aead::AeadInOut::encrypt_in_place | [reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `b.encrypt_in_place(&n12.into(), b"aad", &mut buf).unwrap();`; code: `encrypt_in_place`
+  occ AES-256-CTR | crypto:algorithm:AES-256-CTR | src/main.rs:36:21 | crypto_common::KeyIvInit::new | [reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 16); iv: hard-coded (16 bytes, literal at line 29); line: `let mut stream = ctr::Ctr128BE::<aes::Aes256>::new(&key.into(), &iv.into());`; code: `ctr::Ctr128BE::<aes::Aes256>::new`
+  occ AES-256-CTR | crypto:algorithm:AES-256-CTR | src/main.rs:38:11 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in a178::main; use: encrypt or decrypt; line: `stream.apply_keystream(&mut s);`; code: `apply_keystream`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:19:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let a = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:20:15 | aead::Aead::encrypt | [reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let c1 = a.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:21:15 | aead::Aead::decrypt | [reachable] [call] in a178::main; use: decrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let p1 = a.decrypt(&n12.into(), c1.as_ref()).unwrap();`; code: `decrypt`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:25:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let c = ChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `ChaCha20Poly1305::new_from_slice`
+  occ ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | src/main.rs:26:15 | aead::Aead::encrypt | [reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let c2 = c.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:27:12 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let x = XChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`
+  occ XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | src/main.rs:28:15 | aead::Aead::encrypt | [reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (24 bytes, literal at line 18); line: `let c3 = x.encrypt(&n24.into(), msg).unwrap();`; code: `encrypt`
+  occ aead | pkg:cargo/aead@0.6.1 | Cargo.lock:17:0 | aead | [manifest] locked aead 0.6.1; reached via a178 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.9.4 | Cargo.lock:27:0 | aes | [manifest] locked aes 0.9.4; reached via a178 -> aes
+  occ aes | pkg:cargo/aes@0.9.4 | Cargo.toml:11:0 | aes | [manifest] declared by a178 (dependencies)
+  occ aes-gcm | pkg:cargo/aes-gcm@0.11.1 | Cargo.lock:38:0 | aes-gcm | [manifest] locked aes-gcm 0.11.1; reached via a178 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.11.1 | Cargo.toml:9:0 | aes-gcm | [manifest] declared by a178 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:52:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via a178 -> aes -> cipher -> block-buffer
+  occ block-padding | pkg:cargo/block-padding@0.4.2 | Cargo.lock:61:0 | block-padding | [manifest] locked block-padding 0.4.2; reached via a178 -> aes -> cipher -> inout -> block-padding
+  occ cbc | pkg:cargo/cbc@0.2.1 | Cargo.lock:70:0 | cbc | [manifest] locked cbc 0.2.1; reached via a178 -> cbc
+  occ cbc | pkg:cargo/cbc@0.2.1 | Cargo.toml:13:0 | cbc | [manifest] declared by a178 (dependencies); features ["alloc"]
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:85:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via a178 -> chacha20poly1305 -> chacha20
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.11.0 | Cargo.lock:96:0 | chacha20poly1305 | [manifest] locked chacha20poly1305 0.11.0; reached via a178 -> chacha20poly1305
+  occ chacha20poly1305 | pkg:cargo/chacha20poly1305@0.11.0 | Cargo.toml:10:0 | chacha20poly1305 | [manifest] declared by a178 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.5.2 | Cargo.lock:108:0 | cipher | [manifest] locked cipher 0.5.2; reached via a178 -> aes -> cipher
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:119:0 | cmov | [manifest] locked cmov 0.5.4; reached via a178 -> aes-gcm -> ctutils -> cmov
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:140:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a178 -> aes -> cipher -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.10.1 | Cargo.lock:151:0 | ctr | [manifest] locked ctr 0.10.1; reached via a178 -> ctr
+  occ ctr | pkg:cargo/ctr@0.10.1 | Cargo.toml:12:0 | ctr | [manifest] declared by a178 (dependencies)
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:160:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a178 -> aes-gcm -> ctutils
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:169:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a178 -> aes -> cipher -> crypto-common -> getrandom
+  occ ghash | pkg:cargo/ghash@0.6.0 | Cargo.lock:181:0 | ghash | [manifest] locked ghash 0.6.0; reached via a178 -> aes-gcm -> ghash
+  occ poly1305 | pkg:cargo/poly1305@0.9.1 | Cargo.lock:215:0 | poly1305 | [manifest] locked poly1305 0.9.1; reached via a178 -> chacha20poly1305 -> poly1305
+  occ polyval | pkg:cargo/polyval@0.7.3 | Cargo.lock:225:0 | polyval | [manifest] locked polyval 0.7.3; reached via a178 -> aes-gcm -> ghash -> polyval
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:242:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a178 -> aes -> cipher -> crypto-common -> rand_core
+  occ universal-hash | pkg:cargo/universal-hash@0.6.1 | Cargo.lock:254:0 | universal-hash | [manifest] locked universal-hash 0.6.1; reached via a178 -> chacha20poly1305 -> poly1305 -> universal-hash
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:finding=hard-coded-key
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:functions:source=observed
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:kb:version=0.2.0
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:occurrences=2
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:provenance:key=hard-coded
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:reachability=reachable
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:confidence=high
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:detection:method=type-resolved
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:finding=hard-coded-iv
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:finding=hard-coded-key
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:functions:source=observed
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:kb:version=0.2.0
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=4
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=hard-coded
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=hard-coded
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:confidence=high
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:detection:method=type-resolved
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:finding=hard-coded-key
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:functions:source=observed
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:kb:version=0.2.0
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:occurrences=2
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:param:nonce_bytes=12
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:param:tag_bytes=16
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:key=hard-coded
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:reachability=reachable
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:confidence=high
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:detection:method=type-resolved
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:finding=hard-coded-iv
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:finding=hard-coded-key
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:functions:source=observed
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:kb:version=0.2.0
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:occurrences=2
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:iv=hard-coded
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:key=hard-coded
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:reachability=reachable
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-nonce
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=observed
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=3
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:finding=hard-coded-key
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:finding=hard-coded-nonce
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:occurrences=2
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:param:nonce_bytes=12
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:provenance:key=hard-coded
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:provenance:nonce=hard-coded
+  prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:confidence=high
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:detection:method=type-resolved
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:finding=hard-coded-key
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:finding=hard-coded-nonce
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:functions:source=observed
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:kb:version=0.2.0
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:occurrences=2
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:param:nonce_bytes=24
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:key=hard-coded
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:provenance:nonce=hard-coded
+  prop XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | rcbom:reachability=reachable
+  prop aead | pkg:cargo/aead@0.6.1 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.6.1 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.9.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.9.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.9.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.11.1 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.11.1 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.11.1 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop block-padding | pkg:cargo/block-padding@0.4.2 | rcbom:crypto-role=support
+  prop block-padding | pkg:cargo/block-padding@0.4.2 | rcbom:kb-coverage=unmodelled
+  prop block-padding | pkg:cargo/block-padding@0.4.2 | rcbom:scope=required
+  prop block-padding | pkg:cargo/block-padding@0.4.2 | rcbom:usage=reachable
+  prop cbc | pkg:cargo/cbc@0.2.1 | rcbom:crypto-role=algorithm
+  prop cbc | pkg:cargo/cbc@0.2.1 | rcbom:scope=required
+  prop cbc | pkg:cargo/cbc@0.2.1 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.11.0 | rcbom:crypto-role=algorithm
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.11.0 | rcbom:scope=required
+  prop chacha20poly1305 | pkg:cargo/chacha20poly1305@0.11.0 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.10.1 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.10.1 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.10.1 | rcbom:usage=reachable
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=declared-not-used
+  prop ghash | pkg:cargo/ghash@0.6.0 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.6.0 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.6.0 | rcbom:usage=reachable
+  prop poly1305 | pkg:cargo/poly1305@0.9.1 | rcbom:crypto-role=algorithm
+  prop poly1305 | pkg:cargo/poly1305@0.9.1 | rcbom:scope=required
+  prop poly1305 | pkg:cargo/poly1305@0.9.1 | rcbom:usage=reachable
+  prop polyval | pkg:cargo/polyval@0.7.3 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.7.3 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.7.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop universal-hash | pkg:cargo/universal-hash@0.6.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.6.1 | rcbom:scope=required
+asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+asset XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
+component library aead 0.6.1 | pkg:cargo/aead@0.6.1 | purl pkg:cargo/aead@0.6.1
+component library aes 0.9.4 | pkg:cargo/aes@0.9.4 | purl pkg:cargo/aes@0.9.4
+component library aes-gcm 0.11.1 | pkg:cargo/aes-gcm@0.11.1 | purl pkg:cargo/aes-gcm@0.11.1
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library block-padding 0.4.2 | pkg:cargo/block-padding@0.4.2 | purl pkg:cargo/block-padding@0.4.2
+component library cbc 0.2.1 | pkg:cargo/cbc@0.2.1 | purl pkg:cargo/cbc@0.2.1
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library chacha20poly1305 0.11.0 | pkg:cargo/chacha20poly1305@0.11.0 | purl pkg:cargo/chacha20poly1305@0.11.0
+component library cipher 0.5.2 | pkg:cargo/cipher@0.5.2 | purl pkg:cargo/cipher@0.5.2
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library ctr 0.10.1 | pkg:cargo/ctr@0.10.1 | purl pkg:cargo/ctr@0.10.1
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library ghash 0.6.0 | pkg:cargo/ghash@0.6.0 | purl pkg:cargo/ghash@0.6.0
+component library poly1305 0.9.1 | pkg:cargo/poly1305@0.9.1 | purl pkg:cargo/poly1305@0.9.1
+component library polyval 0.7.3 | pkg:cargo/polyval@0.7.3 | purl pkg:cargo/polyval@0.7.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library universal-hash 0.6.1 | pkg:cargo/universal-hash@0.6.1 | purl pkg:cargo/universal-hash@0.6.1
+dep pkg:cargo/a178@0.1.0 -> pkg:cargo/aes-gcm@0.11.1
+dep pkg:cargo/a178@0.1.0 -> pkg:cargo/aes@0.9.4
+dep pkg:cargo/a178@0.1.0 -> pkg:cargo/cbc@0.2.1
+dep pkg:cargo/a178@0.1.0 -> pkg:cargo/chacha20poly1305@0.11.0
+dep pkg:cargo/a178@0.1.0 -> pkg:cargo/ctr@0.10.1
+dep pkg:cargo/aead@0.6.1 -> pkg:cargo/block-padding@0.4.2
+dep pkg:cargo/aead@0.6.1 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/aead@0.6.1
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/aes@0.9.4
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/ctr@0.10.1
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/aes-gcm@0.11.1 -> pkg:cargo/ghash@0.6.0
+dep pkg:cargo/aes@0.9.4 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/cbc@0.2.1 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/chacha20poly1305@0.11.0 -> pkg:cargo/aead@0.6.1
+dep pkg:cargo/chacha20poly1305@0.11.0 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/chacha20poly1305@0.11.0 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/chacha20poly1305@0.11.0 -> pkg:cargo/poly1305@0.9.1
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/block-padding@0.4.2
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ctr@0.10.1 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ghash@0.6.0 -> pkg:cargo/polyval@0.7.3
+dep pkg:cargo/poly1305@0.9.1 -> pkg:cargo/universal-hash@0.6.1
+dep pkg:cargo/polyval@0.7.3 -> pkg:cargo/universal-hash@0.6.1
+dep pkg:cargo/universal-hash@0.6.1 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/universal-hash@0.6.1 -> pkg:cargo/ctutils@0.4.8
+dependency crypto:algorithm:AES-128
+dependency crypto:algorithm:AES-128-CBC
+dependency crypto:algorithm:AES-128-GCM
+dependency crypto:algorithm:AES-256-CTR
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ChaCha20-Poly1305
+dependency crypto:algorithm:XChaCha20-Poly1305
+dependency pkg:cargo/a178@0.1.0
+dependency pkg:cargo/aead@0.6.1
+dependency pkg:cargo/aes-gcm@0.11.1
+dependency pkg:cargo/aes@0.9.4
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/block-padding@0.4.2
+dependency pkg:cargo/cbc@0.2.1
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/chacha20poly1305@0.11.0
+dependency pkg:cargo/cipher@0.5.2
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/ctr@0.10.1
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/ghash@0.6.0
+dependency pkg:cargo/poly1305@0.9.1
+dependency pkg:cargo/polyval@0.7.3
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/universal-hash@0.6.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes-gcm@0.11.1 -> crypto:algorithm:AES-128-GCM
+provides pkg:cargo/aes-gcm@0.11.1 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.9.4 -> crypto:algorithm:AES-128
+provides pkg:cargo/aes@0.9.4 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/aes@0.9.4 -> crypto:algorithm:AES-128-GCM
+provides pkg:cargo/aes@0.9.4 -> crypto:algorithm:AES-256-CTR
+provides pkg:cargo/aes@0.9.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/cbc@0.2.1 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/chacha20@0.10.2 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/chacha20@0.10.2 -> crypto:algorithm:XChaCha20-Poly1305
+provides pkg:cargo/chacha20poly1305@0.11.0 -> crypto:algorithm:ChaCha20-Poly1305
+provides pkg:cargo/chacha20poly1305@0.11.0 -> crypto:algorithm:XChaCha20-Poly1305
+provides pkg:cargo/ctr@0.10.1 -> crypto:algorithm:AES-256-CTR
+root {"bom-ref": "pkg:cargo/a178@0.1.0", "name": "a178", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a178@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a178
+run rcbom:run:boundary-check=26 calls into crypto packages: 17 cited, 0 cited by the check as unknown, 9 excused (format 9)
+run rcbom:run:features=
+run rcbom:run:packages=27
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=155
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

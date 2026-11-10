@@ -159,10 +159,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -219,10 +215,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -413,10 +405,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -515,29 +503,29 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe29::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 22); line: `let mut m = hmac::Hmac::<md5rc::Md5>::new_from_slice(b\"key\").unwrap();`; code: `hmac::Hmac::<md5rc::Md5>::new_from_slice`",
-            "line": 22,
+            "additionalContext": "[reachable] [call] in probe29::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 23); line: `let mut m = hmac::Hmac::<md5rc::Md5>::new_from_slice(b\"key\").unwrap();`; code: `hmac::Hmac::<md5rc::Md5>::new_from_slice`",
+            "line": 23,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: tag; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
-            "line": 23,
+            "line": 24,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::mac::Mac::update"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: tag; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
-            "line": 24,
+            "line": 25,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; into_bytes: setup, not a use; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`",
-            "line": 24,
+            "line": 25,
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
@@ -597,42 +585,42 @@
         "occurrences": [
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `let a = md5::compute(b\"abc\");`; code: `md5::compute`",
-            "line": 10,
+            "line": 11,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "md5::compute"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `let b = md5rc::Md5::digest(b\"abc\");`; code: `md5rc::Md5::digest`",
-            "line": 12,
+            "line": 13,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
           },
           {
             "additionalContext": "[reachable] [component] in probe29::main; part of HMAC-MD5; line: `let mut m = hmac::Hmac::<md5rc::Md5>::new_from_slice(b\"key\").unwrap();`; code: `hmac::Hmac::<md5rc::Md5>::new_from_slice`",
-            "line": 22,
+            "line": 23,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
             "additionalContext": "[reachable] [component] in probe29::main; part of HMAC-MD5; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
-            "line": 23,
+            "line": 24,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::mac::Mac::update"
           },
           {
             "additionalContext": "[reachable] [component] in probe29::main; part of HMAC-MD5; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
-            "line": 24,
+            "line": 25,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
             "additionalContext": "[reachable] [component] in probe29::main; part of HMAC-MD5; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`",
-            "line": 24,
+            "line": 25,
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
@@ -673,6 +661,58 @@
       "type": "cryptographic-asset"
     },
     {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `let c = <sha2::Sha256 as sha2::Digest>::digest(b\"abc\");`; code: `<sha2::Sha256 as sha2::Digest>::digest`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:SHA3-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -687,8 +727,8 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe29::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:26:12; line: `let d = f(b\"abc\");`; code: `f`",
-            "line": 27,
+            "additionalContext": "[reachable] [call] in probe29::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:27:12; line: `let d = f(b\"abc\");`; code: `f`",
+            "line": 28,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
@@ -740,28 +780,28 @@
         "occurrences": [
           {
             "additionalContext": "[reachable] [call] in probe29::main; default: setup, not a use; line: `let mut h = sha3::Shake256::default();`; code: `sha3::Shake256::default`",
-            "line": 16,
+            "line": 17,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "core::default::Default::default"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `Update::update(&mut h, b\"abc\");`; code: `Update::update`",
-            "line": 17,
+            "line": 18,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::Update::update"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `let mut r = h.finalize_xof();`; code: `finalize_xof`",
-            "line": 18,
+            "line": 19,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::ExtendableOutput::finalize_xof"
           },
           {
             "additionalContext": "[reachable] [call] in probe29::main; use: digest; line: `r.read(&mut out);`; code: `read`",
-            "line": 20,
+            "line": 21,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::XofReader::read"
@@ -793,61 +833,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "4"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in probe29::main; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let c = <sha2::Sha256 as sha2::Digest>::digest(b\"abc\");`; code: `<sha2::Sha256 as sha2::Digest>::digest`",
-            "line": 14,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "digest::digest::Digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -934,7 +919,7 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2"
+        "crypto:algorithm:SHA-256"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -965,15 +950,15 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:SHA3-256"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHAKE256"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha2"
     }
   ],
   "metadata": {
@@ -1042,7 +1027,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cb8f3a1e-c0ec-812a-afa4-16f9aff5d896",
+  "serialNumber": "urn:uuid:e55b9ae1-44a3-8964-849b-70b2e3a708a8",
   "specVersion": "1.7",
   "version": 1
 }

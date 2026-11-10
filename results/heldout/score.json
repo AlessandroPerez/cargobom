@@ -12,86 +12,13 @@
    "support_listed": 4
   },
   "layer2": {
-   "not_correct": [
-    {
-     "callee": "finalize",
-     "line": "src/noise/handshake.rs:44",
-     "may": [],
-     "must": [
-      "BLAKE2s-256"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize_fixed",
-     "line": "src/noise/handshake.rs:54",
-     "may": [],
-     "must": [
-      "HMAC-BLAKE2s-256"
-     ],
-     "reported": [
-      "HMAC"
-     ],
-     "verdict": "less-specific"
-    },
-    {
-     "callee": "finalize_fixed",
-     "line": "src/noise/handshake.rs:65",
-     "may": [],
-     "must": [
-      "HMAC-BLAKE2s-256"
-     ],
-     "reported": [
-      "HMAC"
-     ],
-     "verdict": "less-specific"
-    },
-    {
-     "callee": "finalize_fixed",
-     "line": "src/noise/handshake.rs:72",
-     "may": [],
-     "must": [
-      "BLAKE2s-128-HMAC"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize_fixed",
-     "line": "src/noise/handshake.rs:80",
-     "may": [],
-     "must": [
-      "BLAKE2s-128-HMAC"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize_fixed",
-     "line": "src/noise/handshake.rs:86",
-     "may": [],
-     "must": [
-      "BLAKE2s-192-HMAC"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    }
-   ],
+   "not_correct": [],
    "sites": 27,
    "verdicts": {
-    "correct": 21,
+    "correct": 27,
     "function-mismatch": 0,
-    "honest-unknown": 4,
-    "less-specific": 2,
+    "honest-unknown": 0,
+    "less-specific": 0,
     "miss": 0,
     "wrong": 0
    }
@@ -112,42 +39,6 @@
   "layer2": {
    "not_correct": [
     {
-     "callee": "new_v4",
-     "line": "src/auth.rs:30",
-     "may": [
-      "OS-RNG"
-     ],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [],
-     "verdict": "miss"
-    },
-    {
-     "callee": "sign",
-     "line": "src/auth.rs:183",
-     "may": [],
-     "must": [
-      "Ed25519"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "verify",
-     "line": "src/auth.rs:218",
-     "may": [],
-     "must": [
-      "Ed25519"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
      "callee": "verify_password",
      "line": "src/auth.rs:494",
      "may": [],
@@ -158,135 +49,15 @@
       "unknown"
      ],
      "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:523",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:531",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:552",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:565",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:581",
-     "may": [],
-     "must": [
-      "SHA-256"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:603",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/auth.rs:709",
-     "may": [],
-     "must": [
-      "MD5"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "new_v4",
-     "line": "src/server.rs:1025",
-     "may": [
-      "OS-RNG"
-     ],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [],
-     "verdict": "miss"
-    },
-    {
-     "callee": "new_v4",
-     "line": "src/server.rs:1318",
-     "may": [
-      "OS-RNG"
-     ],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [],
-     "verdict": "miss"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/server.rs:2066",
-     "may": [],
-     "must": [
-      "SHA-256"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
     }
    ],
    "sites": 14,
    "verdicts": {
-    "correct": 0,
+    "correct": 13,
     "function-mismatch": 0,
-    "honest-unknown": 11,
+    "honest-unknown": 1,
     "less-specific": 0,
-    "miss": 3,
+    "miss": 0,
     "wrong": 0
    }
   }
@@ -385,32 +156,8 @@
   "layer2": {
    "not_correct": [
     {
-     "callee": "random",
-     "line": "src/chunker/rabin.rs:205",
-     "may": [],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
      "callee": "shuffle",
      "line": "src/commands/check.rs:90",
-     "may": [],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "fill_bytes",
-     "line": "src/crypto/aespoly1305.rs:33",
      "may": [],
      "must": [
       "ChaCha12-RNG"
@@ -433,18 +180,6 @@
      "verdict": "honest-unknown"
     },
     {
-     "callee": "fill_bytes",
-     "line": "src/crypto/aespoly1305.rs:121",
-     "may": [],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
      "callee": "encrypt_in_place_detached",
      "line": "src/crypto/aespoly1305.rs:127",
      "may": [],
@@ -455,85 +190,13 @@
       "unknown"
      ],
      "verdict": "honest-unknown"
-    },
-    {
-     "callee": "digest",
-     "line": "src/crypto/hasher.rs:18",
-     "may": [],
-     "must": [
-      "SHA-256"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "finalize",
-     "line": "src/crypto/hasher.rs:33",
-     "may": [],
-     "must": [
-      "SHA-256"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "fill_bytes",
-     "line": "src/id.rs:140",
-     "may": [],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "scrypt",
-     "line": "src/repofile/keyfile.rs:122",
-     "may": [],
-     "must": [
-      "scrypt"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "fill_bytes",
-     "line": "src/repofile/keyfile.rs:209",
-     "may": [],
-     "must": [
-      "ChaCha12-RNG"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "scrypt",
-     "line": "src/repofile/keyfile.rs:212",
-     "may": [],
-     "must": [
-      "scrypt"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
     }
    ],
    "sites": 12,
    "verdicts": {
-    "correct": 0,
+    "correct": 9,
     "function-mismatch": 0,
-    "honest-unknown": 12,
+    "honest-unknown": 3,
     "less-specific": 0,
     "miss": 0,
     "wrong": 0
@@ -702,37 +365,13 @@
      ],
      "reported": [],
      "verdict": "miss"
-    },
-    {
-     "callee": "try_sign",
-     "line": "src/signature.rs:522",
-     "may": [],
-     "must": [
-      "ECDSA-P-521-SHA-512"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    },
-    {
-     "callee": "verify",
-     "line": "src/signature.rs:654",
-     "may": [],
-     "must": [
-      "ECDSA-P-521-SHA-512"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
     }
    ],
    "sites": 35,
    "verdicts": {
-    "correct": 22,
+    "correct": 24,
     "function-mismatch": 0,
-    "honest-unknown": 12,
+    "honest-unknown": 10,
     "less-specific": 0,
     "miss": 1,
     "wrong": 0
@@ -752,27 +391,12 @@
    "support_listed": 4
   },
   "layer2": {
-   "not_correct": [
-    {
-     "callee": "finalize",
-     "line": "src/algorithm.rs:107",
-     "may": [],
-     "must": [
-      "HMAC-SHA-1",
-      "HMAC-SHA-256",
-      "HMAC-SHA-512"
-     ],
-     "reported": [
-      "unknown"
-     ],
-     "verdict": "honest-unknown"
-    }
-   ],
+   "not_correct": [],
    "sites": 2,
    "verdicts": {
-    "correct": 1,
+    "correct": 2,
     "function-mismatch": 0,
-    "honest-unknown": 1,
+    "honest-unknown": 0,
     "less-specific": 0,
     "miss": 0,
     "wrong": 0

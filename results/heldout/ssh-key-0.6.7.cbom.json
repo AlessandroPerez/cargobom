@@ -1046,11 +1046,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1089,11 +1085,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -2871,7 +2863,6 @@
         "algorithmProperties": {
           "algorithmFamily": "ECDSA",
           "cryptoFunctions": [
-            "keygen",
             "sign",
             "verify"
           ],
@@ -2882,148 +2873,57 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::from_bytes; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ecdsa_core::SigningKey::<NistP521>::from_bytes(bytes).map(Into::into)`; code: `ecdsa_core::SigningKey::<NistP521>::from_bytes`",
-            "line": 93,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::signing::SigningKey::<C>::from_bytes"
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; try_from: setup, not a use; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in p521::ecdsa::SigningKey::from_slice; from_slice: setup, not a use; line: `ecdsa_core::SigningKey::<NistP521>::from_slice(bytes).map(Into::into)`; code: `ecdsa_core::SigningKey::<NistP521>::from_slice`",
-            "line": 98,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::signing::SigningKey::<C>::from_slice"
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; from_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::from_encoded_point"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::to_bytes; to_bytes: setup, not a use; line: `self.0.to_bytes()`; code: `to_bytes`",
-            "line": 103,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::signing::SigningKey::<C>::to_bytes"
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; to_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::to_encoded_point"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::as_nonzero_scalar; as_nonzero_scalar: setup, not a use; line: `self.0.as_nonzero_scalar()`; code: `as_nonzero_scalar`",
-            "line": 114,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::signing::SigningKey::<C>::as_nonzero_scalar"
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; from_slice: setup, not a use; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "line": 522,
+            "location": "src/signature.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::SigningKey::from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng::<..>; as_nonzero_scalar: setup, not a use; instantiated by <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng::<..> at p521-0.13.3/src/ecdsa.rs:154:13 as `sign_prehash_with_rng`; instantiated by <p521::ecdsa::SigningKey as signature::signer::Signer<ecdsa::Signature<p521::NistP521>>>::try_sign at p521-0.13.3/src/ecdsa.rs:161:13 as `try_sign_with_rng`; line: `sign_prehashed(self.0.as_nonzero_scalar().as_ref(), k, &z).map(|sig| sig.0)`; code: `as_nonzero_scalar`",
-            "line": 147,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 30,
-            "symbol": "ecdsa::signing::SigningKey::<C>::as_nonzero_scalar"
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; expanded from src/signature.rs:513; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "line": 522,
+            "location": "src/signature.rs",
+            "offset": 0,
+            "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::from_sec1_bytes; from_sec1_bytes: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_sec1_bytes(bytes).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_sec1_bytes`",
-            "line": 174,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_sec1_bytes"
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
+            "line": 652,
+            "location": "src/signature.rs",
+            "offset": 40,
+            "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::from_affine; from_affine: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_affine(affine).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_affine`",
-            "line": 182,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_affine"
-          },
-          {
-            "additionalContext": "[reachable] [call] in p521::ecdsa::VerifyingKey::from_encoded_point; from_encoded_point: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_encoded_point(public_key).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_encoded_point`",
-            "line": 187,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_encoded_point"
-          },
-          {
-            "additionalContext": "[reachable] [call] in p521::ecdsa::VerifyingKey::to_encoded_point; to_encoded_point: setup, not a use; line: `self.0.to_encoded_point(compress)`; code: `to_encoded_point`",
-            "line": 193,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::to_encoded_point"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::as_affine; as_affine: setup, not a use; line: `self.0.as_affine()`; code: `as_affine`",
-            "line": 198,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::as_affine"
-          },
-          {
-            "additionalContext": "[present] [instantiation] in <p521::ecdsa::VerifyingKey as core::convert::From<&p521::ecdsa::SigningKey>>::from; chosen as generic argument of core::convert::From::from; line: `Self::from(*signing_key.0.verifying_key())`; code: `Self::from`",
-            "line": 205,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "core::convert::From::from"
-          },
-          {
-            "additionalContext": "[present] [call] in <p521::ecdsa::VerifyingKey as core::convert::From<&p521::ecdsa::SigningKey>>::from; verifying_key: setup, not a use; line: `Self::from(*signing_key.0.verifying_key())`; code: `verifying_key`",
-            "line": 205,
-            "location": "p521-0.13.3/src/ecdsa.rs",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; line: `verifying_key.verify(message, &signature)`; code: `verify`",
+            "line": 654,
+            "location": "src/signature.rs",
             "offset": 34,
-            "symbol": "ecdsa::signing::SigningKey::<C>::verifying_key"
+            "symbol": "signature::verifier::Verifier::verify"
           }
         ]
       },
       "name": "ECDSA-P-521-SHA-512",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:key",
-          "value": "parameter"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "12"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:ECDSA-P-521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "ECDSA",
-          "cryptoFunctions": [
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::VerifyingKey as signature::hazmat::PrehashVerifier<ecdsa::Signature<p521::NistP521>>>::verify_prehash; use: verify; line: `self.0.verify_prehash(prehash, signature)`; code: `verify_prehash`",
-            "line": 219,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "signature::hazmat::PrehashVerifier::verify_prehash"
-          }
-        ]
-      },
-      "name": "ECDSA-P-521",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -3047,7 +2947,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -3246,61 +3146,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "21"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:OS-RNG",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate"
-          ],
-          "primitive": "drbg"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <p521::arithmetic::scalar::Scalar as ff::Field>::random::<..>; use: generate; instantiated by <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng::<..> at p521-0.13.3/src/ecdsa.rs:146:16 as `Scalar::random`; instantiated by <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng::<..> at p521-0.13.3/src/ecdsa.rs:154:13 as `sign_prehash_with_rng`; instantiated by <p521::ecdsa::SigningKey as signature::signer::Signer<ecdsa::Signature<p521::NistP521>>>::try_sign at p521-0.13.3/src/ecdsa.rs:161:13 as `try_sign_with_rng`; line: `rng.fill_bytes(&mut bytes);`; code: `fill_bytes`",
-            "line": 373,
-            "location": "p521-0.13.3/src/arithmetic/scalar.rs",
-            "offset": 16,
-            "symbol": "rand_core::RngCore::fill_bytes"
-          }
-        ]
-      },
-      "name": "OS-RNG",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:registry-name",
-          "value": "unmatched"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -3723,20 +3568,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng::<..>; use: digest; instantiated by <p521::ecdsa::SigningKey as signature::signer::Signer<ecdsa::Signature<p521::NistP521>>>::try_sign at p521-0.13.3/src/ecdsa.rs:161:13 as `try_sign_with_rng`; line: `self.sign_prehash_with_rng(rng, &Sha512::digest(msg))`; code: `Sha512::digest`",
-            "line": 154,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 41,
-            "symbol": "digest::digest::Digest::digest"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::VerifyingKey as signature::verifier::Verifier<ecdsa::Signature<p521::NistP521>>>::verify; use: digest; line: `self.verify_prehash(&Sha512::digest(msg), signature)`; code: `Sha512::digest`",
-            "line": 226,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 29,
-            "symbol": "digest::digest::Digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>> as ssh_encoding::writer::Writer>::write; use: digest; line: `self.update(bytes);`; code: `update`",
             "line": 55,
             "location": "ssh-encoding-0.2.0/src/writer.rs",
@@ -3853,7 +3684,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
+          "value": "13"
         }
       ],
       "type": "cryptographic-asset"
@@ -3998,69 +3829,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:signature:p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "sign",
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; algorithm unresolved: the type `p521::ecdsa::SigningKey` of p521 0.13.3, a crypto package the knowledge base does not model; expanded from src/signature.rs:513; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
-            "line": 522,
-            "location": "src/signature.rs",
-            "offset": 0,
-            "symbol": "signature::signer::Signer::try_sign"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; algorithm unresolved: the type `p521::ecdsa::VerifyingKey` of p521 0.13.3, a crypto package the knowledge base does not model; line: `verifying_key.verify(message, &signature)`; code: `verify`",
-            "line": 654,
-            "location": "src/signature.rs",
-            "offset": 34,
-            "symbol": "signature::verifier::Verifier::verify"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:signature:signature",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -4118,61 +3886,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ecdsa+p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "sign"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng::<..>; use: sign; algorithm unresolved: `ecdsa::hazmat::sign_prehashed` of ecdsa 0.16.9, an API the knowledge base does not name; instantiated by <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng::<..> at p521-0.13.3/src/ecdsa.rs:154:13 as `sign_prehash_with_rng`; instantiated by <p521::ecdsa::SigningKey as signature::signer::Signer<ecdsa::Signature<p521::NistP521>>>::try_sign at p521-0.13.3/src/ecdsa.rs:161:13 as `try_sign_with_rng`; line: `sign_prehashed(self.0.as_nonzero_scalar().as_ref(), k, &z).map(|sig| sig.0)`; code: `sign_prehashed`",
-            "line": 147,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::hazmat::sign_prehashed"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -4326,7 +4039,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; rng: parameter (argument 0 of the enclosing function); line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
             "line": 202,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -4385,7 +4098,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `p521::NistP521` of p521 0.13.3, a crypto package the knowledge base does not model; rng: parameter (argument 0 of the enclosing function); line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
             "line": 211,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -4426,145 +4139,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ff+p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate",
-            "keygen"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng::<..>; use: generate or keygen; algorithm unresolved: `ff::Field::random` of ff 0.13.1, a crypto package the knowledge base does not model; instantiated by <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng::<..> at p521-0.13.3/src/ecdsa.rs:154:13 as `sign_prehash_with_rng`; instantiated by <p521::ecdsa::SigningKey as signature::signer::Signer<ecdsa::Signature<p521::NistP521>>>::try_sign at p521-0.13.3/src/ecdsa.rs:161:13 as `try_sign_with_rng`; line: `let k = Scalar::random(rng);`; code: `Scalar::random`",
-            "line": 146,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 16,
-            "symbol": "ff::Field::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
-            "line": 202,
-            "location": "src/public/ecdsa.rs",
-            "offset": 0,
-            "symbol": "core::convert::TryFrom::try_from"
-          },
-          {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; use: unknown; algorithm unresolved: `p521::ecdsa::VerifyingKey::from_encoded_point` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
-            "line": 202,
-            "location": "src/public/ecdsa.rs",
-            "offset": 0,
-            "symbol": "p521::ecdsa::VerifyingKey::from_encoded_point"
-          },
-          {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; use: unknown; algorithm unresolved: `p521::ecdsa::VerifyingKey::to_encoded_point` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
-            "line": 202,
-            "location": "src/public/ecdsa.rs",
-            "offset": 0,
-            "symbol": "p521::ecdsa::VerifyingKey::to_encoded_point"
-          },
-          {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: unknown; algorithm unresolved: `p521::ecdsa::SigningKey::from_slice` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
-            "line": 522,
-            "location": "src/signature.rs",
-            "offset": 0,
-            "symbol": "p521::ecdsa::SigningKey::from_slice"
-          },
-          {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of p521 0.13.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
-            "line": 652,
-            "location": "src/signature.rs",
-            "offset": 40,
-            "symbol": "core::convert::TryFrom::try_from"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -4857,10 +4431,7 @@
       ],
       "provides": [
         "crypto:algorithm:ECDSA-P-256-SHA-256",
-        "crypto:algorithm:ECDSA-P-384-SHA-384",
-        "crypto:algorithm:ECDSA-P-521",
-        "crypto:algorithm:ECDSA-P-521-SHA-512",
-        "crypto:algorithm:unknown:unknown:ecdsa+p521"
+        "crypto:algorithm:ECDSA-P-384-SHA-384"
       ],
       "ref": "pkg:cargo/ecdsa@0.16.9"
     },
@@ -4909,16 +4480,10 @@
         "pkg:cargo/rand_core@0.6.4",
         "pkg:cargo/subtle@2.6.1"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:ff+p521"
-      ],
       "ref": "pkg:cargo/ff@0.13.1"
     },
     {
       "dependsOn": [],
-      "provides": [
-        "crypto:algorithm:OS-RNG"
-      ],
       "ref": "pkg:cargo/getrandom@0.2.17"
     },
     {
@@ -4967,6 +4532,7 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
+        "crypto:algorithm:ECDSA-P-384-SHA-384",
         "crypto:algorithm:unknown:unknown:elliptic-curve+p384"
       ],
       "ref": "pkg:cargo/p384@0.13.1"
@@ -4981,11 +4547,8 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
-        "crypto:algorithm:unknown:signature:p521",
-        "crypto:algorithm:unknown:unknown:ecdsa+p521",
-        "crypto:algorithm:unknown:unknown:elliptic-curve+p521",
-        "crypto:algorithm:unknown:unknown:ff+p521",
-        "crypto:algorithm:unknown:unknown:p521"
+        "crypto:algorithm:ECDSA-P-521-SHA-512",
+        "crypto:algorithm:unknown:unknown:elliptic-curve+p521"
       ],
       "ref": "pkg:cargo/p521@0.13.3"
     },
@@ -5062,7 +4625,6 @@
         "pkg:cargo/getrandom@0.2.17"
       ],
       "provides": [
-        "crypto:algorithm:OS-RNG",
         "crypto:algorithm:unknown:drbg:rand_core"
       ],
       "ref": "pkg:cargo/rand_core@0.6.4"
@@ -5258,14 +4820,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:ECDSA-P-521"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:OS-RNG"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:Poly1305"
     },
     {
@@ -5290,15 +4844,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:signature:p521"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:signature:signature"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ecdsa+p521"
     },
     {
       "dependsOn": [],
@@ -5315,14 +4861,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:elliptic-curve+p521"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ff+p521"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:p521"
     },
     {
       "dependsOn": [],
@@ -5374,7 +4912,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "4798"
+        "value": "4143"
       },
       {
         "name": "rcbom:run:artifact",
@@ -5382,7 +4920,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "335 calls into crypto packages: 98 cited, 1 cited by the check as unknown, 236 excused (accessor 1, comparison 4, copy 1, encoding 50, error 6, internal 166, public half 4, setup 1, view 3)"
+        "value": "128 calls into crypto packages: 89 cited, 1 cited by the check as unknown, 38 excused (accessor 1, comparison 2, copy 1, encoding 21, error 6, public half 4, setup 1, view 2)"
       }
     ],
     "tools": {
@@ -5395,7 +4933,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4df71d90-1dac-8d6f-8d66-4907133481ed",
+  "serialNumber": "urn:uuid:cf3198af-1fef-8908-a579-f5c30cdec910",
   "specVersion": "1.7",
   "version": 1
 }

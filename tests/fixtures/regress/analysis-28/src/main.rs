@@ -1,7 +1,7 @@
-// RustCrypto trait operations on types of packages the knowledge base does not model, through
-// the traits below `Digest` (round 6 audit, H4 and H8): SHAKE256 through `Update`,
-// `ExtendableOutput` and `XofReader`; a BLAKE2b MAC set up with `Mac::new_from_slice` (a MAC,
-// not a hash) and used with `update` and `finalize`.
+// RustCrypto trait operations through the traits below `Digest` (round 6 audit, H4 and H8, on
+// types the knowledge base did not model then; analysis-182 keeps that case): SHAKE256
+// through `Update`, `ExtendableOutput` and `XofReader`; a BLAKE2b MAC set up with
+// `Mac::new_from_slice` (a MAC, not a hash) and used with `update` and `finalize`.
 use blake2::digest::{ExtendableOutput, Mac, Update, XofReader};
 use blake2::Blake2bMac512;
 use sha3::Shake256;

@@ -1,0 +1,379 @@
+  occ Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | src/main.rs:24:17 | argon2::params::Params::new | [reachable] [call] in a179::main; new: setup, not a use; line: `let params = argon2::Params::new(8192, 3, 1, None).unwrap();`; code: `argon2::Params::new`
+  occ Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | src/main.rs:25:17 | argon2::Argon2::<'key>::new | [reachable] [call] in a179::main; new: setup, not a use; line: `let custom = argon2::Argon2::new(argon2::Algorithm::Argon2i, argon2::Version::V0x13, params);`; code: `argon2::Argon2::new`
+  occ Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | src/main.rs:27:11 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a179::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (12 bytes, literal at line 27); line: `custom.hash_password_into(data, b"saltsaltsalt", &mut k2).unwrap();`; code: `hash_password_into`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:21:16 | core::default::Default::default | [reachable] [call] in a179::main; default: setup, not a use; line: `let argon = argon2::Argon2::default();`; code: `argon2::Argon2::default`
+  occ Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | src/main.rs:23:10 | argon2::Argon2::<'key>::hash_password_into | [reachable] [call] in a179::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (12 bytes, literal at line 23); line: `argon.hash_password_into(data, b"saltsaltsalt", &mut k1).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b | crypto:algorithm:BLAKE2b | src/main.rs:27:11 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in a179::main; part of Argon2i-8192-3-1; line: `custom.hash_password_into(data, b"saltsaltsalt", &mut k2).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:20:13 | digest::digest::Digest::digest | [reachable] [call] in a179::main; use: digest; line: `let d5 = Blake2b::<U32>::digest(data);`; code: `Blake2b::<U32>::digest`
+  occ BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | src/main.rs:23:10 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in a179::main; part of Argon2id-19456-2-1; line: `argon.hash_password_into(data, b"saltsaltsalt", &mut k1).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:18:13 | digest::digest::Digest::digest | [reachable] [call] in a179::main; use: digest; line: `let d3 = Blake2b512::digest(data);`; code: `Blake2b512::digest`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:23:10 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in a179::main; part of Argon2id-19456-2-1; line: `argon.hash_password_into(data, b"saltsaltsalt", &mut k1).unwrap();`; code: `hash_password_into`
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:27:11 | argon2::Argon2::<'key>::hash_password_into | [reachable] [component] in a179::main; part of Argon2i-8192-3-1; line: `custom.hash_password_into(data, b"saltsaltsalt", &mut k2).unwrap();`; code: `hash_password_into`
+  occ BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | src/main.rs:19:13 | digest::digest::Digest::digest | [reachable] [call] in a179::main; use: digest; line: `let d4 = Blake2s256::digest(data);`; code: `Blake2s256::digest`
+  occ OS-RNG | crypto:algorithm:OS-RNG | phc-0.6.1/src/salt.rs:114:8 | getrandom::fill | [present] [call] in phc::salt::Salt::generate; use: generate; line: `getrandom::fill(&mut bytes).expect("RNG failure");`; code: `getrandom::fill`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:12:13 | digest::digest::Digest::digest | [reachable] [call] in a179::main; use: digest; line: `let d1 = sha3::Sha3_256::digest(data);`; code: `sha3::Sha3_256::digest`
+  occ SHA3-512 | crypto:algorithm:SHA3-512 | src/main.rs:13:13 | digest::digest::Digest::digest | [reachable] [call] in a179::main; use: digest; line: `let d2 = sha3::Sha3_512::digest(data);`; code: `sha3::Sha3_512::digest`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:14:20 | core::default::Default::default | [reachable] [call] in a179::main; default: setup, not a use; line: `let mut shake = sha3::Shake256::default();`; code: `sha3::Shake256::default`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:15:10 | digest::Update::update | [reachable] [call] in a179::main; use: digest; line: `shake.update(data);`; code: `update`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:17:10 | digest::ExtendableOutput::finalize_xof | [reachable] [call] in a179::main; use: digest; line: `shake.finalize_xof().read(&mut out);`; code: `finalize_xof`
+  occ SHAKE256 | crypto:algorithm:SHAKE256 | src/main.rs:17:25 | digest::XofReader::read | [reachable] [call] in a179::main; use: digest; line: `shake.finalize_xof().read(&mut out);`; code: `read`
+  occ argon2 | pkg:cargo/argon2@0.6.0 | Cargo.lock:18:0 | argon2 | [manifest] locked argon2 0.6.0; reached via a179 -> argon2
+  occ argon2 | pkg:cargo/argon2@0.6.0 | Cargo.toml:11:0 | argon2 | [manifest] declared by a179 (dependencies)
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:30:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via a179 -> argon2 -> base64ct
+  occ bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | src/main.rs:29:4 | bcrypt_pbkdf::bcrypt_pbkdf | [reachable] [call] in a179::main; use: keyderive; line: `bcrypt_pbkdf::bcrypt_pbkdf(data, b"salt", 16, &mut k3).unwrap();`; code: `bcrypt_pbkdf::bcrypt_pbkdf`
+  occ bcrypt-pbkdf | pkg:cargo/bcrypt-pbkdf@0.11.0 | Cargo.lock:36:0 | bcrypt-pbkdf | [manifest] locked bcrypt-pbkdf 0.11.0; reached via a179 -> bcrypt-pbkdf
+  occ bcrypt-pbkdf | pkg:cargo/bcrypt-pbkdf@0.11.0 | Cargo.toml:12:0 | bcrypt-pbkdf | [manifest] declared by a179 (dependencies)
+  occ blake2 | pkg:cargo/blake2@0.11.0 | Cargo.lock:47:0 | blake2 | [manifest] locked blake2 0.11.0; reached via a179 -> blake2
+  occ blake2 | pkg:cargo/blake2@0.11.0 | Cargo.toml:10:0 | blake2 | [manifest] declared by a179 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:56:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via a179 -> blake2 -> digest -> block-buffer
+  occ blowfish | pkg:cargo/blowfish@0.10.0 | Cargo.lock:65:0 | blowfish | [manifest] locked blowfish 0.10.0; reached via a179 -> bcrypt-pbkdf -> blowfish
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:87:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via a179 -> rand -> chacha20
+  occ cipher | pkg:cargo/cipher@0.5.2 | Cargo.lock:98:0 | cipher | [manifest] locked cipher 0.5.2; reached via a179 -> bcrypt-pbkdf -> blowfish -> cipher
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:108:0 | cmov | [manifest] locked cmov 0.5.4; reached via a179 -> blake2 -> digest -> ctutils -> cmov
+  occ const-oid | pkg:cargo/const-oid@0.10.2 | Cargo.lock:114:0 | const-oid | [manifest] locked const-oid 0.10.2; reached via a179 -> blake2 -> digest -> const-oid
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:129:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a179 -> blake2 -> digest -> crypto-common
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:138:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a179 -> blake2 -> digest -> ctutils
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | Cargo.lock:147:0 | curve25519-dalek | [manifest] locked curve25519-dalek 5.0.0; reached via a179 -> x25519-dalek -> curve25519-dalek
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:173:0 | digest | [manifest] locked digest 0.11.3; reached via a179 -> blake2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:191:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a179 -> rand -> getrandom
+  occ keccak | pkg:cargo/keccak@0.2.2 | Cargo.lock:221:0 | keccak | [manifest] locked keccak 0.2.2; reached via a179 -> sha3 -> keccak
+  occ password-hash | pkg:cargo/password-hash@0.6.1 | Cargo.lock:237:0 | password-hash | [manifest] locked password-hash 0.6.1; reached via a179 -> argon2 -> password-hash
+  occ pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | Cargo.lock:247:0 | pbkdf2 | [manifest] locked pbkdf2 0.13.0; reached via a179 -> bcrypt-pbkdf -> pbkdf2
+  occ phc | pkg:cargo/phc@0.6.1 | Cargo.lock:256:0 | phc | [manifest] locked phc 0.6.1; reached via a179 -> argon2 -> password-hash -> phc
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:291:0 | rand | [manifest] locked rand 0.10.3; reached via a179 -> rand
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.toml:14:0 | rand | [manifest] declared by a179 (dependencies)
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:302:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a179 -> rand -> rand_core
+  occ sha2 | pkg:cargo/sha2@0.11.1 | Cargo.lock:323:0 | sha2 | [manifest] locked sha2 0.11.1; reached via a179 -> bcrypt-pbkdf -> sha2
+  occ sha3 | pkg:cargo/sha3@0.11.0 | Cargo.lock:334:0 | sha3 | [manifest] locked sha3 0.11.0; reached via a179 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.11.0 | Cargo.toml:9:0 | sha3 | [manifest] declared by a179 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:344:0 | subtle | [manifest] locked subtle 2.6.1; reached via a179 -> x25519-dalek -> curve25519-dalek -> subtle
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:30:15 | x25519_dalek::x25519::EphemeralSecret::random_from_rng | [reachable] [call] in a179::main; use: keygen; rng: rng (rngs::thread::rng); line: `let mine = EphemeralSecret::random_from_rng(&mut rand::rng());`; code: `EphemeralSecret::random_from_rng`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:31:16 | core::convert::From::from | [reachable] [call] in a179::main; from: setup, not a use; key: hard-coded (32 bytes, literal at line 31); line: `let fixed = StaticSecret::from([9u8; 32]);`; code: `StaticSecret::from`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:32:22 | x25519_dalek::x25519::EphemeralSecret::diffie_hellman | [reachable] [call] in a179::main; use: keyderive; line: `let shared = mine.diffie_hellman(&PublicKey::from(&fixed));`; code: `diffie_hellman`
+  occ x25519 | crypto:algorithm:x25519 | src/main.rs:32:38 | core::convert::From::from | [reachable] [call] in a179::main; from: setup, not a use; line: `let shared = mine.diffie_hellman(&PublicKey::from(&fixed));`; code: `PublicKey::from`
+  occ x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | Cargo.lock:373:0 | x25519-dalek | [manifest] locked x25519-dalek 3.0.0; reached via a179 -> x25519-dalek
+  occ x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | Cargo.toml:13:0 | x25519-dalek | [manifest] declared by a179 (dependencies); features ["static_secrets"]
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:384:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a179 -> x25519-dalek -> zeroize
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:confidence=high
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:detection:method=type-resolved
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:finding=hard-coded-salt
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:functions:source=observed
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:kb:version=0.2.0
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:occurrences=3
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:param:output_bytes=24
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:param:version=19
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:provenance:password=environment
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:provenance:salt=hard-coded
+  prop Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | rcbom:reachability=reachable
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:confidence=high
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:detection:method=type-resolved
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:finding=hard-coded-salt
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:functions:source=observed
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:kb:version=0.2.0
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:occurrences=2
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:output_bytes=32
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:param:version=19
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:password=environment
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:provenance:salt=hard-coded
+  prop Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | rcbom:reachability=reachable
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:confidence=high
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:detection:method=type-resolved
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:functions:source=knowledge-base
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:kb:version=0.2.0
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:occurrences=1
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:only-as-component=true
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:param:unresolved=digest length: not resolved to a registry length (the Argon2 tag's when it is at most 64 bytes)
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:reachability=reachable
+  prop BLAKE2b | crypto:algorithm:BLAKE2b | rcbom:registry-name=unmatched
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:confidence=high
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:functions:source=observed
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:occurrences=2
+  prop BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | rcbom:reachability=reachable
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=observed
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=3
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:confidence=high
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:detection:method=type-resolved
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:functions:source=observed
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:kb:version=0.2.0
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:occurrences=1
+  prop BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=1
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:confidence=high
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:detection:method=type-resolved
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:functions:source=observed
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:kb:version=0.2.0
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:occurrences=1
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:reachability=reachable
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:confidence=high
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:detection:method=type-resolved
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:functions:source=observed
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:kb:version=0.2.0
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:occurrences=4
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:reachability=reachable
+  prop argon2 | pkg:cargo/argon2@0.6.0 | rcbom:crypto-role=algorithm
+  prop argon2 | pkg:cargo/argon2@0.6.0 | rcbom:scope=required
+  prop argon2 | pkg:cargo/argon2@0.6.0 | rcbom:usage=reachable
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=reachable
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:confidence=high
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:detection:method=type-resolved
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:functions:source=observed
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:kb:version=0.2.0
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:occurrences=1
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:param:length=48
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:param:rounds=16
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:reachability=reachable
+  prop bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | rcbom:registry-name=unmatched
+  prop bcrypt-pbkdf | pkg:cargo/bcrypt-pbkdf@0.11.0 | rcbom:crypto-role=algorithm
+  prop bcrypt-pbkdf | pkg:cargo/bcrypt-pbkdf@0.11.0 | rcbom:scope=required
+  prop bcrypt-pbkdf | pkg:cargo/bcrypt-pbkdf@0.11.0 | rcbom:usage=reachable
+  prop blake2 | pkg:cargo/blake2@0.11.0 | rcbom:crypto-role=algorithm
+  prop blake2 | pkg:cargo/blake2@0.11.0 | rcbom:scope=required
+  prop blake2 | pkg:cargo/blake2@0.11.0 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop blowfish | pkg:cargo/blowfish@0.10.0 | rcbom:crypto-role=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.10.0 | rcbom:kb-coverage=unmodelled
+  prop blowfish | pkg:cargo/blowfish@0.10.0 | rcbom:scope=required
+  prop blowfish | pkg:cargo/blowfish@0.10.0 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.5.2 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=present
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=present
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@5.0.0 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:usage=reachable
+  prop password-hash | pkg:cargo/password-hash@0.6.1 | rcbom:crypto-role=trait
+  prop password-hash | pkg:cargo/password-hash@0.6.1 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:crypto-role=algorithm
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:scope=required
+  prop pbkdf2 | pkg:cargo/pbkdf2@0.13.0 | rcbom:usage=reachable
+  prop phc | pkg:cargo/phc@0.6.1 | rcbom:crypto-role=support
+  prop phc | pkg:cargo/phc@0.6.1 | rcbom:kb-coverage=unmodelled
+  prop phc | pkg:cargo/phc@0.6.1 | rcbom:scope=required
+  prop phc | pkg:cargo/phc@0.6.1 | rcbom:usage=present
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.11.0 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.11.0 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.11.0 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop x25519 | crypto:algorithm:x25519 | rcbom:confidence=high
+  prop x25519 | crypto:algorithm:x25519 | rcbom:detection:method=type-resolved
+  prop x25519 | crypto:algorithm:x25519 | rcbom:finding=hard-coded-key
+  prop x25519 | crypto:algorithm:x25519 | rcbom:functions:source=observed
+  prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
+  prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=4
+  prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:key=hard-coded
+  prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:rng=rng
+  prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
+  prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:crypto-role=algorithm
+  prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:scope=required
+  prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset Argon2i-8192-3-1 | crypto:algorithm:Argon2i-8192-3-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset Argon2id-19456-2-1 | crypto:algorithm:Argon2id-19456-2-1 | {"algorithmProperties": {"algorithmFamily": "Argon2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset BLAKE2b | crypto:algorithm:BLAKE2b | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-512 | crypto:algorithm:SHA3-512 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "xof"}, "assetType": "algorithm"}
+asset bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | {"algorithmProperties": {"algorithmFamily": "bcrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+component library argon2 0.6.0 | pkg:cargo/argon2@0.6.0 | purl pkg:cargo/argon2@0.6.0
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library bcrypt-pbkdf 0.11.0 | pkg:cargo/bcrypt-pbkdf@0.11.0 | purl pkg:cargo/bcrypt-pbkdf@0.11.0
+component library blake2 0.11.0 | pkg:cargo/blake2@0.11.0 | purl pkg:cargo/blake2@0.11.0
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library blowfish 0.10.0 | pkg:cargo/blowfish@0.10.0 | purl pkg:cargo/blowfish@0.10.0
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library cipher 0.5.2 | pkg:cargo/cipher@0.5.2 | purl pkg:cargo/cipher@0.5.2
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library curve25519-dalek 5.0.0 | pkg:cargo/curve25519-dalek@5.0.0 | purl pkg:cargo/curve25519-dalek@5.0.0
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library keccak 0.2.2 | pkg:cargo/keccak@0.2.2 | purl pkg:cargo/keccak@0.2.2
+component library password-hash 0.6.1 | pkg:cargo/password-hash@0.6.1 | purl pkg:cargo/password-hash@0.6.1
+component library pbkdf2 0.13.0 | pkg:cargo/pbkdf2@0.13.0 | purl pkg:cargo/pbkdf2@0.13.0
+component library phc 0.6.1 | pkg:cargo/phc@0.6.1 | purl pkg:cargo/phc@0.6.1
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library sha2 0.11.1 | pkg:cargo/sha2@0.11.1 | purl pkg:cargo/sha2@0.11.1
+component library sha3 0.11.0 | pkg:cargo/sha3@0.11.0 | purl pkg:cargo/sha3@0.11.0
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library x25519-dalek 3.0.0 | pkg:cargo/x25519-dalek@3.0.0 | purl pkg:cargo/x25519-dalek@3.0.0
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:Argon2i-8192-3-1 -> crypto:algorithm:BLAKE2b
+dep crypto:algorithm:Argon2i-8192-3-1 -> crypto:algorithm:BLAKE2b-512
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-256
+dep crypto:algorithm:Argon2id-19456-2-1 -> crypto:algorithm:BLAKE2b-512
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/argon2@0.6.0
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/bcrypt-pbkdf@0.11.0
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/blake2@0.11.0
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/sha3@0.11.0
+dep pkg:cargo/a179@0.1.0 -> pkg:cargo/x25519-dalek@3.0.0
+dep pkg:cargo/argon2@0.6.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/argon2@0.6.0 -> pkg:cargo/blake2@0.11.0
+dep pkg:cargo/argon2@0.6.0 -> pkg:cargo/password-hash@0.6.1
+dep pkg:cargo/bcrypt-pbkdf@0.11.0 -> pkg:cargo/blowfish@0.10.0
+dep pkg:cargo/bcrypt-pbkdf@0.11.0 -> pkg:cargo/pbkdf2@0.13.0
+dep pkg:cargo/bcrypt-pbkdf@0.11.0 -> pkg:cargo/sha2@0.11.1
+dep pkg:cargo/blake2@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/blowfish@0.10.0 -> pkg:cargo/cipher@0.5.2
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/cipher@0.5.2 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/curve25519-dalek@5.0.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@5.0.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/password-hash@0.6.1 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/password-hash@0.6.1 -> pkg:cargo/phc@0.6.1
+dep pkg:cargo/pbkdf2@0.13.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/phc@0.6.1 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/phc@0.6.1 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/phc@0.6.1 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/sha2@0.11.1 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/sha3@0.11.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/sha3@0.11.0 -> pkg:cargo/keccak@0.2.2
+dep pkg:cargo/x25519-dalek@3.0.0 -> pkg:cargo/curve25519-dalek@5.0.0
+dep pkg:cargo/x25519-dalek@3.0.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/x25519-dalek@3.0.0 -> pkg:cargo/zeroize@1.9.1
+dependency crypto:algorithm:Argon2i-8192-3-1
+dependency crypto:algorithm:Argon2id-19456-2-1
+dependency crypto:algorithm:BLAKE2b
+dependency crypto:algorithm:BLAKE2b-256
+dependency crypto:algorithm:BLAKE2b-512
+dependency crypto:algorithm:BLAKE2s-256
+dependency crypto:algorithm:OS-RNG
+dependency crypto:algorithm:SHA3-256
+dependency crypto:algorithm:SHA3-512
+dependency crypto:algorithm:SHAKE256
+dependency crypto:algorithm:bcrypt-pbkdf
+dependency crypto:algorithm:x25519
+dependency pkg:cargo/a179@0.1.0
+dependency pkg:cargo/argon2@0.6.0
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/bcrypt-pbkdf@0.11.0
+dependency pkg:cargo/blake2@0.11.0
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/blowfish@0.10.0
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/cipher@0.5.2
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/const-oid@0.10.2
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/curve25519-dalek@5.0.0
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/keccak@0.2.2
+dependency pkg:cargo/password-hash@0.6.1
+dependency pkg:cargo/pbkdf2@0.13.0
+dependency pkg:cargo/phc@0.6.1
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/sha2@0.11.1
+dependency pkg:cargo/sha3@0.11.0
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/x25519-dalek@3.0.0
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/argon2@0.6.0 -> crypto:algorithm:Argon2i-8192-3-1
+provides pkg:cargo/argon2@0.6.0 -> crypto:algorithm:Argon2id-19456-2-1
+provides pkg:cargo/bcrypt-pbkdf@0.11.0 -> crypto:algorithm:bcrypt-pbkdf
+provides pkg:cargo/blake2@0.11.0 -> crypto:algorithm:BLAKE2b
+provides pkg:cargo/blake2@0.11.0 -> crypto:algorithm:BLAKE2b-256
+provides pkg:cargo/blake2@0.11.0 -> crypto:algorithm:BLAKE2b-512
+provides pkg:cargo/blake2@0.11.0 -> crypto:algorithm:BLAKE2s-256
+provides pkg:cargo/getrandom@0.4.3 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/sha3@0.11.0 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/sha3@0.11.0 -> crypto:algorithm:SHA3-512
+provides pkg:cargo/sha3@0.11.0 -> crypto:algorithm:SHAKE256
+provides pkg:cargo/x25519-dalek@3.0.0 -> crypto:algorithm:x25519
+root {"bom-ref": "pkg:cargo/a179@0.1.0", "name": "a179", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a179@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a179
+run rcbom:run:boundary-check=25 calls into crypto packages: 19 cited, 0 cited by the check as unknown, 6 excused (accessor 1, format 4, generator setup 1)
+run rcbom:run:features=
+run rcbom:run:packages=41
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=119
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

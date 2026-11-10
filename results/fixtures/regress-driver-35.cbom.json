@@ -1,0 +1,324 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/chacha20@0.10.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked chacha20 0.10.2; reached via d35 -> uuid -> rand -> chacha20",
+            "line": 18,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "chacha20"
+          }
+        ]
+      },
+      "name": "chacha20",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/chacha20@0.10.2",
+      "type": "library",
+      "version": "0.10.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.4.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.4.3; reached via d35 -> uuid -> getrandom",
+            "line": 69,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.4.3",
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand@0.10.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand 0.10.3; reached via d35 -> uuid -> rand",
+            "line": 128,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand"
+          }
+        ]
+      },
+      "name": "rand",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/rand@0.10.3",
+      "type": "library",
+      "version": "0.10.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/rand_core@0.10.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_core 0.10.1; reached via d35 -> uuid -> getrandom -> rand_core",
+            "line": 139,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_core"
+          }
+        ]
+      },
+      "name": "rand_core",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/rand_core@0.10.1",
+      "type": "library",
+      "version": "0.10.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 36,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 40,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 44,
+            "location": "uuid-1.29.2/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d35::main; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `let one = Uuid::new_v4();`; code: `Uuid::new_v4`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          },
+          {
+            "additionalContext": "[reachable] [call] in d35::main::{closure#0}; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `let many: Vec<Uuid> = (0..3).map(|_| Uuid::new_v4()).collect();`; code: `Uuid::new_v4`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 41,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.10.1"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
+      "ref": "pkg:cargo/chacha20@0.10.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.4.3",
+        "pkg:cargo/rand@0.10.3"
+      ],
+      "ref": "pkg:cargo/d35@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.10.1"
+      ],
+      "ref": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/chacha20@0.10.2",
+        "pkg:cargo/getrandom@0.4.3",
+        "pkg:cargo/rand_core@0.10.1"
+      ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
+      "ref": "pkg:cargo/rand@0.10.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/rand_core@0.10.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/d35@0.1.0",
+      "name": "d35",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/d35@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "114"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin d35"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "3 calls into crypto packages: 1 cited, 2 cited by the check by name, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:26248e78-2779-8d37-9baa-228525f67305",
+  "specVersion": "1.7",
+  "version": 1
+}

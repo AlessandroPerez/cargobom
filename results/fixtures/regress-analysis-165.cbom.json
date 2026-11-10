@@ -29,11 +29,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -295,43 +291,43 @@
       "version": "1.9.1"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:unknown:blake2",
+      "bom-ref": "crypto:algorithm:BLAKE2s-256-HMAC",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
           "cryptoFunctions": [
-            "digest",
             "tag"
           ],
-          "primitive": "unknown"
+          "primitive": "mac"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a165::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 16); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`",
-            "line": 19,
+            "additionalContext": "[reachable] [call] in a165::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 17); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`",
+            "line": 20,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a165::main; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Update::update(&mut mac, &data);`; code: `Update::update`",
-            "line": 20,
+            "additionalContext": "[reachable] [call] in a165::main; use: tag; line: `Update::update(&mut mac, &data);`; code: `Update::update`",
+            "line": 21,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::Update::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a165::main; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let tag = mac.finalize_fixed();`; code: `finalize_fixed`",
-            "line": 21,
+            "additionalContext": "[reachable] [call] in a165::main; use: tag; line: `let tag = mac.finalize_fixed();`; code: `finalize_fixed`",
+            "line": 22,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::FixedOutput::finalize_fixed"
           }
         ]
       },
-      "name": "unknown",
+      "name": "BLAKE2s-256-HMAC",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -362,8 +358,8 @@
           "value": "hard-coded-key"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:note",
+          "value": "keyed BLAKE2s (RFC 7693), not an HMAC"
         },
         {
           "name": "rcbom:occurrences",
@@ -387,14 +383,14 @@
         "occurrences": [
           {
             "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let shared = MontgomeryPoint(out).mul_clamped(secret);`; code: `mul_clamped`",
-            "line": 17,
+            "line": 18,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped"
           },
           {
             "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let public = MontgomeryPoint::mul_base_clamped(secret);`; code: `MontgomeryPoint::mul_base_clamped`",
-            "line": 18,
+            "line": 19,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped"
@@ -449,14 +445,14 @@
         "occurrences": [
           {
             "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::sha3::Sha3::v256` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut h = Sha3::v256();`; code: `Sha3::v256`",
-            "line": 12,
+            "line": 13,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "tiny_keccak::sha3::Sha3::v256"
           },
           {
             "additionalContext": "[reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::Hasher::finalize` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `h.finalize(&mut out);`; code: `finalize`",
-            "line": 15,
+            "line": 16,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "tiny_keccak::Hasher::finalize"
@@ -511,7 +507,7 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:blake2"
+        "crypto:algorithm:BLAKE2s-256-HMAC"
       ],
       "ref": "pkg:cargo/blake2@0.10.6"
     },
@@ -558,7 +554,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:blake2"
+      "ref": "crypto:algorithm:BLAKE2s-256-HMAC"
     },
     {
       "dependsOn": [],
@@ -614,7 +610,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "463"
+        "value": "285"
       },
       {
         "name": "rcbom:run:artifact",
@@ -622,7 +618,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "14 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 7 excused (format 1, internal 5, step 1)"
+        "value": "12 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 5 excused (format 1, internal 3, step 1)"
       }
     ],
     "tools": {
@@ -635,7 +631,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ae97ebe0-bc00-8126-b540-ac46843c657a",
+  "serialNumber": "urn:uuid:55cea25f-220a-88db-80b1-b5756d361cb1",
   "specVersion": "1.7",
   "version": 1
 }

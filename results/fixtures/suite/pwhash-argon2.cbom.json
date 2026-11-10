@@ -97,11 +97,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -302,7 +298,8 @@
         "algorithmProperties": {
           "algorithmFamily": "Argon2",
           "cryptoFunctions": [
-            "keyderive"
+            "keyderive",
+            "verify"
           ],
           "primitive": "kdf"
         },
@@ -323,6 +320,13 @@
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "password_hash::traits::PasswordHasher::hash_password"
+          },
+          {
+            "additionalContext": "[reachable] [call] in ext_pwhash_argon2::main; use: verify; verify_password: its own parameters, not its receiver's; password: hard-coded (13 bytes, literal at line 8); line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "password_hash::traits::PasswordVerifier::verify_password"
           }
         ]
       },
@@ -374,71 +378,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:Argon2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "Argon2",
-          "cryptoFunctions": [
-            "verify"
-          ],
-          "primitive": "kdf"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in ext_pwhash_argon2::main; use: verify; verify_password: its own parameters, not its receiver's; password: hard-coded (13 bytes, literal at line 8); line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
-            "line": 8,
-            "location": "src/main.rs",
-            "offset": 19,
-            "symbol": "password_hash::traits::PasswordVerifier::verify_password"
-          }
-        ]
-      },
-      "name": "Argon2",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:password",
-          "value": "hard-coded"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-password"
-        },
-        {
-          "name": "rcbom:registry-name",
-          "value": "unmatched"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -463,6 +403,13 @@
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "password_hash::traits::PasswordHasher::hash_password"
+          },
+          {
+            "additionalContext": "[reachable] [component] in ext_pwhash_argon2::main; part of Argon2id-19456-2-1; line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "password_hash::traits::PasswordVerifier::verify_password"
           }
         ]
       },
@@ -494,7 +441,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -521,7 +468,7 @@
             "symbol": "password_hash::traits::PasswordHasher::hash_password"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_pwhash_argon2::main; part of Argon2; line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
+            "additionalContext": "[reachable] [component] in ext_pwhash_argon2::main; part of Argon2id-19456-2-1; line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 19,
@@ -561,70 +508,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:BLAKE2b",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "BLAKE2",
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [component] in ext_pwhash_argon2::main; part of Argon2; line: `let ok = argon.verify_password(b\"correct horse\", &hash).is_ok();`; code: `verify_password`",
-            "line": 8,
-            "location": "src/main.rs",
-            "offset": 19,
-            "symbol": "password_hash::traits::PasswordVerifier::verify_password"
-          }
-        ]
-      },
-      "name": "BLAKE2b",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:only-as-component",
-          "value": "true"
-        },
-        {
-          "name": "rcbom:param:unresolved",
-          "value": "digest length: not resolved to a registry length (the Argon2 tag's when it is at most 64 bytes)"
-        },
-        {
-          "name": "rcbom:registry-name",
-          "value": "unmatched"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -635,7 +518,6 @@
         "pkg:cargo/password-hash@0.5.0"
       ],
       "provides": [
-        "crypto:algorithm:Argon2",
         "crypto:algorithm:Argon2id-19456-2-1"
       ],
       "ref": "pkg:cargo/argon2@0.5.3"
@@ -649,7 +531,6 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:BLAKE2b",
         "crypto:algorithm:BLAKE2b-256",
         "crypto:algorithm:BLAKE2b-512"
       ],
@@ -701,23 +582,12 @@
       "ref": "crypto:algorithm:Argon2id-19456-2-1"
     },
     {
-      "dependsOn": [
-        "crypto:algorithm:BLAKE2b",
-        "crypto:algorithm:BLAKE2b-512"
-      ],
-      "ref": "crypto:algorithm:Argon2"
-    },
-    {
       "dependsOn": [],
       "ref": "crypto:algorithm:BLAKE2b-256"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:BLAKE2b-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:BLAKE2b"
     }
   ],
   "metadata": {
@@ -786,7 +656,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1e6fd69e-15c4-80a8-8f1c-39e2b9742923",
+  "serialNumber": "urn:uuid:9cf5d1d7-d06a-889a-8543-44feb7699b1c",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,202 @@
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:32:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a175::main; new_from_slice: setup, not a use; key: rng (rand_core::Rng::fill_bytes); line: `let ok = Aes256Gcm::new_from_slice(&k1).is_ok() as u8`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:33:10 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a175::main; new_from_slice: setup, not a use; key: rng (rand_core::TryRng::try_fill_bytes); line: `+ Aes256Gcm::new_from_slice(&k2).is_ok() as u8`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:34:10 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a175::main; new_from_slice: setup, not a use; key: hard-coded (seed of rand_core::Rng::fill_bytes: 32 bytes, literal at line 25); line: `+ Aes256Gcm::new_from_slice(&k3).is_ok() as u8`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:35:10 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a175::main; new_from_slice: setup, not a use; key: rng (getrandom::fill); line: `+ Aes256Gcm::new_from_slice(&k4).is_ok() as u8;`; code: `Aes256Gcm::new_from_slice`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:15:8 | rand_core::Rng::fill_bytes | [reachable] [call] in a175::main; use: generate; line: `rng.fill_bytes(&mut k1);`; code: `fill_bytes`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:16:21 | rand::rng::RngExt::random | [reachable] [call] in a175::main; use: generate; line: `let n: u64 = rng.random();`; code: `random`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:17:16 | rand::rng::RngExt::random_range | [reachable] [call] in a175::main; use: generate; line: `let r = rng.random_range(0..10u32);`; code: `random_range`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:18:17 | rand::random | [reachable] [call] in a175::main; use: generate; line: `let x: u32 = rand::random();`; code: `rand::random`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:20:4 | rand::fill | [reachable] [call] in a175::main; use: generate; line: `rand::fill(&mut b);`; code: `rand::fill`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:24:16 | rand_core::Rng::next_u64 | [reachable] [call] in a175::main; use: generate; line: `let y = std.next_u64();`; code: `next_u64`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/main.rs:29:6 | rand::seq::slice::SliceRandom::shuffle | [reachable] [call] in a175::main; use: generate; line: `v.shuffle(&mut rng);`; code: `shuffle`
+  occ ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | src/main.rs:27:11 | rand_core::Rng::fill_bytes | [reachable] [call] in a175::main; use: generate; line: `seeded.fill_bytes(&mut k3);`; code: `fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:22:11 | rand_core::TryRng::try_fill_bytes | [reachable] [call] in a175::main; use: generate; line: `SysRng.try_fill_bytes(&mut k2).unwrap();`; code: `try_fill_bytes`
+  occ OS-RNG | crypto:algorithm:OS-RNG | src/main.rs:31:4 | getrandom::fill | [reachable] [call] in a175::main; use: generate; line: `getrandom::fill(&mut k4).unwrap();`; code: `getrandom::fill`
+  occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:15:0 | aead | [manifest] locked aead 0.5.2; reached via a175 -> aes-gcm -> aead
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:25:0 | aes | [manifest] locked aes 0.8.4; reached via a175 -> aes-gcm -> aes
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:36:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via a175 -> aes-gcm
+  occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.toml:11:0 | aes-gcm | [manifest] declared by a175 (dependencies)
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:56:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via a175 -> rand -> chacha20
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:67:0 | cipher | [manifest] locked cipher 0.4.4; reached via a175 -> aes-gcm -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:95:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a175 -> aes-gcm -> aead -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:106:0 | ctr | [manifest] locked ctr 0.9.2; reached via a175 -> aes-gcm -> ctr
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:125:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a175 -> aes-gcm -> aead -> crypto-common -> rand_core -> getrandom
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:136:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a175 -> getrandom
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.toml:10:0 | getrandom | [manifest] declared by a175 (dependencies)
+  occ ghash | pkg:cargo/ghash@0.5.1 | Cargo.lock:148:0 | ghash | [manifest] locked ghash 0.5.1; reached via a175 -> aes-gcm -> ghash
+  occ opaque-debug | pkg:cargo/opaque-debug@0.3.1 | Cargo.lock:173:0 | opaque-debug | [manifest] locked opaque-debug 0.3.1; reached via a175 -> aes-gcm -> ghash -> opaque-debug
+  occ polyval | pkg:cargo/polyval@0.6.2 | Cargo.lock:179:0 | polyval | [manifest] locked polyval 0.6.2; reached via a175 -> aes-gcm -> ghash -> polyval
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:197:0 | rand | [manifest] locked rand 0.10.3; reached via a175 -> rand
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.toml:9:0 | rand | [manifest] declared by a175 (dependencies); features ["chacha"]
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:217:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a175 -> getrandom -> rand_core
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:208:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via a175 -> aes-gcm -> aead -> crypto-common -> rand_core
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:223:0 | subtle | [manifest] locked subtle 2.6.1; reached via a175 -> aes-gcm -> subtle
+  occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:235:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via a175 -> aes-gcm -> ghash -> polyval -> universal-hash
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:finding=hard-coded-key
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:functions:source=knowledge-base
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:kb:version=0.2.0
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=4
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:nonce_bytes=12
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=hard-coded,rng
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=7
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:confidence=high
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:functions:source=observed
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:occurrences=1
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:reachability=reachable
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:registry-name=unmatched
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=2
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
+  prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:crypto-role=algorithm
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:scope=required
+  prop aes-gcm | pkg:cargo/aes-gcm@0.10.3 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=present
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=declared-not-used
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:crypto-role=algorithm
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:scope=required
+  prop ghash | pkg:cargo/ghash@0.5.1 | rcbom:usage=reachable
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:crypto-role=support
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:kb-coverage=unmodelled
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:scope=required
+  prop opaque-debug | pkg:cargo/opaque-debug@0.3.1 | rcbom:usage=present
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:crypto-role=algorithm
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:scope=required
+  prop polyval | pkg:cargo/polyval@0.6.2 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
+  prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt", "decrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library ghash 0.5.1 | pkg:cargo/ghash@0.5.1 | purl pkg:cargo/ghash@0.5.1
+component library opaque-debug 0.3.1 | pkg:cargo/opaque-debug@0.3.1 | purl pkg:cargo/opaque-debug@0.3.1
+component library polyval 0.6.2 | pkg:cargo/polyval@0.6.2 | purl pkg:cargo/polyval@0.6.2
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library universal-hash 0.5.1 | pkg:cargo/universal-hash@0.5.1 | purl pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/a175@0.1.0 -> pkg:cargo/aes-gcm@0.10.3
+dep pkg:cargo/a175@0.1.0 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/a175@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/aead@0.5.2 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aead@0.5.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/ghash@0.5.1
+dep pkg:cargo/aes-gcm@0.10.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/crypto-common@0.1.7 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/opaque-debug@0.3.1
+dep pkg:cargo/ghash@0.5.1 -> pkg:cargo/polyval@0.6.2
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/opaque-debug@0.3.1
+dep pkg:cargo/polyval@0.6.2 -> pkg:cargo/universal-hash@0.5.1
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/universal-hash@0.5.1 -> pkg:cargo/subtle@2.6.1
+dependency crypto:algorithm:AES-256-GCM
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:ChaCha20-RNG
+dependency crypto:algorithm:OS-RNG
+dependency pkg:cargo/a175@0.1.0
+dependency pkg:cargo/aead@0.5.2
+dependency pkg:cargo/aes-gcm@0.10.3
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/ghash@0.5.1
+dependency pkg:cargo/opaque-debug@0.3.1
+dependency pkg:cargo/polyval@0.6.2
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/universal-hash@0.5.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes-gcm@0.10.3 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-GCM
+provides pkg:cargo/chacha20@0.10.2 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/chacha20@0.10.2 -> crypto:algorithm:ChaCha20-RNG
+provides pkg:cargo/getrandom@0.4.3 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/rand@0.10.3 -> crypto:algorithm:ChaCha12-RNG
+root {"bom-ref": "pkg:cargo/a175@0.1.0", "name": "a175", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a175@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a175
+run rcbom:run:boundary-check=19 calls into crypto packages: 14 cited, 0 cited by the check as unknown, 5 excused (format 2, generator setup 3)
+run rcbom:run:features=
+run rcbom:run:packages=26
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=77
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

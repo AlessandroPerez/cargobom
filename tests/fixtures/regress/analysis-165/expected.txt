@@ -1,3 +1,6 @@
+  occ BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | src/main.rs:20:18 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a165::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 17); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`
+  occ BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | src/main.rs:21:4 | digest::Update::update | [reachable] [call] in a165::main; use: tag; line: `Update::update(&mut mac, &data);`; code: `Update::update`
+  occ BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | src/main.rs:22:18 | digest::FixedOutput::finalize_fixed | [reachable] [call] in a165::main; use: tag; line: `let tag = mac.finalize_fixed();`; code: `finalize_fixed`
   occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.lock:15:0 | blake2 | [manifest] locked blake2 0.10.6; reached via a165 -> blake2
   occ blake2 | pkg:cargo/blake2@0.10.6 | Cargo.toml:9:0 | blake2 | [manifest] declared by a165 (dependencies)
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:24:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via a165 -> blake2 -> digest -> block-buffer
@@ -8,16 +11,21 @@
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:156:0 | subtle | [manifest] locked subtle 2.6.1; reached via a165 -> curve25519-dalek -> subtle
   occ tiny-keccak | pkg:cargo/tiny-keccak@2.0.2 | Cargo.lock:173:0 | tiny-keccak | [manifest] locked tiny-keccak 2.0.2; reached via a165 -> tiny-keccak
   occ tiny-keccak | pkg:cargo/tiny-keccak@2.0.2 | Cargo.toml:11:0 | tiny-keccak | [manifest] declared by a165 (dependencies); features ["sha3"]
-  occ unknown | crypto:algorithm:unknown:unknown:blake2 | src/main.rs:19:18 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in a165::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 16); line: `let mut mac = blake2::Blake2sMac256::new_from_slice(&secret).unwrap();`; code: `blake2::Blake2sMac256::new_from_slice`
-  occ unknown | crypto:algorithm:unknown:unknown:blake2 | src/main.rs:20:4 | digest::Update::update | [reachable] [call] in a165::main; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Update::update(&mut mac, &data);`; code: `Update::update`
-  occ unknown | crypto:algorithm:unknown:unknown:blake2 | src/main.rs:21:18 | digest::FixedOutput::finalize_fixed | [reachable] [call] in a165::main; use: digest or tag; algorithm unresolved: the type `blake2::Blake2sMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let tag = mac.finalize_fixed();`; code: `finalize_fixed`
-  occ unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | src/main.rs:17:38 | curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let shared = MontgomeryPoint(out).mul_clamped(secret);`; code: `mul_clamped`
-  occ unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | src/main.rs:18:17 | curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let public = MontgomeryPoint::mul_base_clamped(secret);`; code: `MontgomeryPoint::mul_base_clamped`
-  occ unknown | crypto:algorithm:unknown:unknown:tiny-keccak | src/main.rs:12:16 | tiny_keccak::sha3::Sha3::v256 | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::sha3::Sha3::v256` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut h = Sha3::v256();`; code: `Sha3::v256`
-  occ unknown | crypto:algorithm:unknown:unknown:tiny-keccak | src/main.rs:15:6 | tiny_keccak::Hasher::finalize | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::Hasher::finalize` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `h.finalize(&mut out);`; code: `finalize`
+  occ unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | src/main.rs:18:38 | curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let shared = MontgomeryPoint(out).mul_clamped(secret);`; code: `mul_clamped`
+  occ unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | src/main.rs:19:17 | curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped` of curve25519-dalek 4.1.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let public = MontgomeryPoint::mul_base_clamped(secret);`; code: `MontgomeryPoint::mul_base_clamped`
+  occ unknown | crypto:algorithm:unknown:unknown:tiny-keccak | src/main.rs:13:16 | tiny_keccak::sha3::Sha3::v256 | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::sha3::Sha3::v256` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut h = Sha3::v256();`; code: `Sha3::v256`
+  occ unknown | crypto:algorithm:unknown:unknown:tiny-keccak | src/main.rs:16:6 | tiny_keccak::Hasher::finalize | [reachable] [call] in a165::main; use: unknown; algorithm unresolved: `tiny_keccak::Hasher::finalize` of tiny-keccak 2.0.2, a crypto package the knowledge base does not model: what the call does is not known; line: `h.finalize(&mut out);`; code: `finalize`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:200:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a165 -> curve25519-dalek -> zeroize
-  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=unmodelled
-  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:confidence=high
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:detection:method=type-resolved
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:finding=hard-coded-key
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:functions:source=observed
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:kb:version=0.2.0
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:note=keyed BLAKE2s (RFC 7693), not an HMAC
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:occurrences=3
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:provenance:key=hard-coded
+  prop BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | rcbom:reachability=reachable
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=algorithm
   prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:scope=required
   prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:usage=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
@@ -40,15 +48,6 @@
   prop tiny-keccak | pkg:cargo/tiny-keccak@2.0.2 | rcbom:kb-coverage=unmodelled
   prop tiny-keccak | pkg:cargo/tiny-keccak@2.0.2 | rcbom:scope=required
   prop tiny-keccak | pkg:cargo/tiny-keccak@2.0.2 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:finding=hard-coded-key
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:occurrences=3
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:provenance:key=hard-coded
-  prop unknown | crypto:algorithm:unknown:unknown:blake2 | rcbom:reachability=reachable
   prop unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | rcbom:algorithm=unresolved
   prop unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | rcbom:confidence=high
   prop unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | rcbom:detection:method=type-resolved
@@ -67,7 +66,7 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset unknown | crypto:algorithm:unknown:unknown:blake2 | {"algorithmProperties": {"cryptoFunctions": ["digest", "tag"], "primitive": "unknown"}, "assetType": "algorithm"}
+asset BLAKE2s-256-HMAC | crypto:algorithm:BLAKE2s-256-HMAC | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:tiny-keccak | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library blake2 0.10.6 | pkg:cargo/blake2@0.10.6 | purl pkg:cargo/blake2@0.10.6
@@ -87,7 +86,7 @@ dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/zeroize@1.9.1
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
 dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
-dependency crypto:algorithm:unknown:unknown:blake2
+dependency crypto:algorithm:BLAKE2s-256-HMAC
 dependency crypto:algorithm:unknown:unknown:curve25519-dalek
 dependency crypto:algorithm:unknown:unknown:tiny-keccak
 dependency pkg:cargo/a165@0.1.0
@@ -102,17 +101,17 @@ dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
-provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:unknown:blake2
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2s-256-HMAC
 provides pkg:cargo/curve25519-dalek@4.1.3 -> crypto:algorithm:unknown:unknown:curve25519-dalek
 provides pkg:cargo/tiny-keccak@2.0.2 -> crypto:algorithm:unknown:unknown:tiny-keccak
 root {"bom-ref": "pkg:cargo/a165@0.1.0", "name": "a165", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a165@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a165
-run rcbom:run:boundary-check=14 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 7 excused (format 1, internal 5, step 1)
+run rcbom:run:boundary-check=12 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 5 excused (format 1, internal 3, step 1)
 run rcbom:run:features=
 run rcbom:run:packages=22
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=463
+run rcbom:run:reachable-instances=285
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

@@ -101,11 +101,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1092,6 +1088,143 @@
       "version": "1.9.1"
     },
     {
+      "bom-ref": "crypto:algorithm:BLAKE2b-512-HMAC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b\"key\").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "digest::mac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe30::main; use: tag; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
+            "line": 18,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe30::main; use: tag; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in probe30::main; into_bytes: setup, not a use; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          }
+        ]
+      },
+      "name": "BLAKE2b-512-HMAC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:note",
+          "value": "keyed BLAKE2b (RFC 7693), not an HMAC"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:BLAKE2b-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "BLAKE2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in probe30::main; use: digest; line: `let b = blake2::Blake2b512::digest(b\"abc\");`; code: `blake2::Blake2b512::digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "BLAKE2b-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
       "bom-ref": "crypto:algorithm:ECDH-P-256",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1334,138 +1467,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:blake2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in probe30::main; use: digest; algorithm unresolved: the type `blake2::Blake2bVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let b = blake2::Blake2b512::digest(b\"abc\");`; code: `blake2::Blake2b512::digest`",
-            "line": 16,
-            "location": "src/main.rs",
-            "offset": 12,
-            "symbol": "digest::digest::Digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:mac:blake2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "tag"
-          ],
-          "primitive": "mac"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b\"key\").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`",
-            "line": 17,
-            "location": "src/main.rs",
-            "offset": 16,
-            "symbol": "digest::mac::Mac::new_from_slice"
-          },
-          {
-            "additionalContext": "[reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
-            "line": 18,
-            "location": "src/main.rs",
-            "offset": 4,
-            "symbol": "digest::mac::Mac::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
-            "line": 19,
-            "location": "src/main.rs",
-            "offset": 14,
-            "symbol": "digest::mac::Mac::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:key",
-          "value": "hard-coded"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-key"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:stream-cipher:salsa20",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1666,8 +1667,8 @@
         "pkg:cargo/digest@0.10.7"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:blake2",
-        "crypto:algorithm:unknown:mac:blake2"
+        "crypto:algorithm:BLAKE2b-512",
+        "crypto:algorithm:BLAKE2b-512-HMAC"
       ],
       "ref": "pkg:cargo/blake2@0.10.6"
     },
@@ -1902,6 +1903,14 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE2b-512-HMAC"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:BLAKE2b-512"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:ECDH-P-256"
     },
     {
@@ -1915,14 +1924,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:block-cipher:blowfish"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:blake2"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:mac:blake2"
     },
     {
       "dependsOn": [],
@@ -1982,7 +1983,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "463"
+        "value": "326"
       },
       {
         "name": "rcbom:run:artifact",
@@ -1990,7 +1991,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "26 calls into crypto packages: 14 cited, 0 cited by the check as unknown, 12 excused (accessor 2, format 3, internal 7)"
+        "value": "22 calls into crypto packages: 15 cited, 0 cited by the check as unknown, 7 excused (accessor 1, format 3, internal 3)"
       }
     ],
     "tools": {
@@ -2003,7 +2004,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:64115d48-514b-853e-9697-dc94afab60c2",
+  "serialNumber": "urn:uuid:6876ce2f-1a60-8db6-96c5-89dd2870a436",
   "specVersion": "1.7",
   "version": 1
 }

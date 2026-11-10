@@ -403,6 +403,9 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:13:29 | ring::rsa::verification::RSA_PSS_2048_8192_SHA256 | [present] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:23:29 | ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 | [reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | jsonwebtoken-9.3.1/src/crypto/rsa.rs:26:29 | ring::rsa::padding::pss::RSA_PSS_SHA256 | [reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | rust-embed-utils-8.13.0/src/lib.rs:148:19 | digest::digest::Digest::new | [present] [call] in rust_embed_utils::read_file_from_fs; new: setup, not a use; line: `let mut hasher = sha2::Sha256::new();`; code: `sha2::Sha256::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | rust-embed-utils-8.13.0/src/lib.rs:149:9 | digest::digest::Digest::update | [present] [call] in rust_embed_utils::read_file_from_fs; use: digest; line: `hasher.update(&data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | rust-embed-utils-8.13.0/src/lib.rs:150:30 | digest::digest::Digest::finalize | [present] [call] in rust_embed_utils::read_file_from_fs; use: digest; line: `let hash: [u8; 32] = hasher.finalize().into();`; code: `finalize`
   occ SHA-256 | crypto:algorithm:SHA-256 | rustls-0.23.45/src/crypto/ring/hash.rs:21:12 | ring::digest::Context::update | [reachable] [call] in <rustls::crypto::ring::hash::Hash as rustls::crypto::hash::Hash>::hash; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA256` stores in the field); line: `ctx.update(bytes);`; code: `update`
   occ SHA-256 | crypto:algorithm:SHA-256 | rustls-0.23.45/src/crypto/ring/hash.rs:22:20 | ring::digest::Context::finish | [reachable] [call] in <rustls::crypto::ring::hash::Hash as rustls::crypto::hash::Hash>::hash; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA256` stores in the field); line: `convert(ctx.finish())`; code: `finish`
   occ SHA-256 | crypto:algorithm:SHA-256 | rustls-0.23.45/src/crypto/ring/hash.rs:42:31 | ring::digest::Context::finish | [reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::fork_finish; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA256` stores in the field); line: `convert(self.0.clone().finish())`; code: `finish`
@@ -575,9 +578,6 @@
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:1205:0 | subtle | [manifest] locked subtle 2.6.1; reached via realapp -> age -> subtle
   occ universal-hash | pkg:cargo/universal-hash@0.5.1 | Cargo.lock:1369:0 | universal-hash | [manifest] locked universal-hash 0.5.1; reached via realapp -> age -> chacha20poly1305 -> poly1305 -> universal-hash
   occ unknown | crypto:algorithm:unknown:hash:ring | rustls-0.23.45/src/crypto/ring/hash.rs:54:15 | ring::digest::Context::update | [reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm unresolved: a field of `rustls::crypto::ring::hash::Context`; line: `self.0.update(data);`; code: `update`
-  occ unknown | crypto:algorithm:unknown:hash:sha2 | rust-embed-utils-8.13.0/src/lib.rs:148:19 | digest::digest::Digest::new | [present] [call] in rust_embed_utils::read_file_from_fs; new: setup, not a use; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let mut hasher = sha2::Sha256::new();`; code: `sha2::Sha256::new`
-  occ unknown | crypto:algorithm:unknown:hash:sha2 | rust-embed-utils-8.13.0/src/lib.rs:149:9 | digest::digest::Digest::update | [present] [call] in rust_embed_utils::read_file_from_fs; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `hasher.update(&data);`; code: `update`
-  occ unknown | crypto:algorithm:unknown:hash:sha2 | rust-embed-utils-8.13.0/src/lib.rs:150:30 | digest::digest::Digest::finalize | [present] [call] in rust_embed_utils::read_file_from_fs; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `let hash: [u8; 32] = hasher.finalize().into();`; code: `finalize`
   occ unknown | crypto:algorithm:unknown:unknown:age | src/main.rs:3:13 | age::x25519::Identity::generate | [reachable] [call] in realapp::main; use: keygen; algorithm unresolved: `age::x25519::Identity::generate` of age 0.11.5, a crypto package the knowledge base does not model; line: `let id = age::x25519::Identity::generate();`; code: `age::x25519::Identity::generate`
   occ unknown | crypto:algorithm:unknown:unknown:age | src/main.rs:4:22 | age::x25519::Identity::to_public | [reachable] [call] in realapp::main; use: unknown; algorithm unresolved: `age::x25519::Identity::to_public` of age 0.11.5, a crypto package the knowledge base does not model: what the call does is not known; line: `println!("{}", id.to_public());`; code: `to_public`
   occ unknown | crypto:algorithm:unknown:unknown:ring | rustls-0.23.45/src/crypto/ring/quic.rs:29:13 | ring::aead::quic::HeaderProtectionKey::new_mask | [reachable] [call] in rustls::crypto::ring::quic::HeaderProtectionKey::xor_in_place; use: encrypt; algorithm unresolved: a field of `rustls::crypto::ring::quic::HeaderProtectionKey`; line: `.new_mask(sample)`; code: `new_mask`
@@ -858,7 +858,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=67
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=70
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
@@ -912,7 +912,6 @@
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
-  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:kb-coverage=unsupported-version
   prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
   prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:crypto-role=unmodelled
   prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:kb-coverage=unmodelled
@@ -921,7 +920,6 @@
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
-  prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -1006,7 +1004,6 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=present
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
-  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:kb-coverage=unsupported-version
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=present
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
@@ -1022,13 +1019,6 @@
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:occurrences=1
   prop unknown | crypto:algorithm:unknown:hash:ring | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:occurrences=3
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:reachability=present
   prop unknown | crypto:algorithm:unknown:unknown:age | rcbom:algorithm=unresolved
   prop unknown | crypto:algorithm:unknown:unknown:age | rcbom:confidence=high
   prop unknown | crypto:algorithm:unknown:unknown:age | rcbom:detection:method=type-resolved
@@ -1094,7 +1084,6 @@ asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFa
 asset TLS | crypto:protocol:TLS | {"assetType": "protocol", "protocolProperties": {"cipherSuites": [{"name": "TLS_AES_128_GCM_SHA256"}, {"name": "TLS_AES_256_GCM_SHA384"}, {"name": "TLS_CHACHA20_POLY1305_SHA256"}, {"name": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"}, {"name": "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"}, {"name": "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"}, {"name": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"}, {"name": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"}, {"name": "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"}], "type": "tls"}}
 asset scrypt | crypto:algorithm:scrypt | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:hash:ring | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:sha2 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:age | {"algorithmProperties": {"cryptoFunctions": ["keygen", "unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:ring | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "unknown"}, "assetType": "algorithm"}
 asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
@@ -1255,7 +1244,6 @@ dependency crypto:algorithm:SHA-384
 dependency crypto:algorithm:SHA-512
 dependency crypto:algorithm:scrypt
 dependency crypto:algorithm:unknown:hash:ring
-dependency crypto:algorithm:unknown:hash:sha2
 dependency crypto:algorithm:unknown:unknown:age
 dependency crypto:algorithm:unknown:unknown:ring
 dependency crypto:algorithm:x25519
@@ -1357,7 +1345,7 @@ provides pkg:cargo/ring@0.17.14 -> crypto:material:private-key:RSA
 provides pkg:cargo/rustls@0.23.45 -> crypto:protocol:TLS
 provides pkg:cargo/scrypt@0.11.0 -> crypto:algorithm:scrypt
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-provides pkg:cargo/sha2@0.11.0 -> crypto:algorithm:unknown:hash:sha2
+provides pkg:cargo/sha2@0.11.0 -> crypto:algorithm:SHA-256
 provides pkg:cargo/x25519-dalek@2.0.1 -> crypto:algorithm:x25519
 root {"bom-ref": "pkg:cargo/realapp@0.1.0", "name": "realapp", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/realapp@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0

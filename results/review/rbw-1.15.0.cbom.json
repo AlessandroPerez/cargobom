@@ -172,11 +172,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1004,11 +1000,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -1040,11 +1032,7 @@
         },
         {
           "name": "rcbom:crypto-role",
-          "value": "unmodelled"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unmodelled"
+          "value": "algorithm"
         },
         {
           "name": "rcbom:usage",
@@ -4613,7 +4601,6 @@
         "algorithmProperties": {
           "algorithmFamily": "ECDSA",
           "cryptoFunctions": [
-            "keygen",
             "sign",
             "verify"
           ],
@@ -4624,148 +4611,64 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::from_bytes; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ecdsa_core::SigningKey::<NistP521>::from_bytes(bytes).map(Into::into)`; code: `ecdsa_core::SigningKey::<NistP521>::from_bytes`",
-            "line": 93,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::signing::SigningKey::<C>::from_bytes"
+            "additionalContext": "[present] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; try_from: setup, not a use; expanded from ssh-key-0.6.7/src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "ssh-key-0.6.7/src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::from_slice; from_slice: setup, not a use; line: `ecdsa_core::SigningKey::<NistP521>::from_slice(bytes).map(Into::into)`; code: `ecdsa_core::SigningKey::<NistP521>::from_slice`",
-            "line": 98,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::signing::SigningKey::<C>::from_slice"
+            "additionalContext": "[present] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; from_encoded_point: setup, not a use; expanded from ssh-key-0.6.7/src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "ssh-key-0.6.7/src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::from_encoded_point"
           },
           {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::to_bytes; to_bytes: setup, not a use; line: `self.0.to_bytes()`; code: `to_bytes`",
-            "line": 103,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::signing::SigningKey::<C>::to_bytes"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::SigningKey::as_nonzero_scalar; as_nonzero_scalar: setup, not a use; line: `self.0.as_nonzero_scalar()`; code: `as_nonzero_scalar`",
-            "line": 114,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::signing::SigningKey::<C>::as_nonzero_scalar"
-          },
-          {
-            "additionalContext": "[present] [call] in <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng; as_nonzero_scalar: setup, not a use; line: `sign_prehashed(self.0.as_nonzero_scalar().as_ref(), k, &z).map(|sig| sig.0)`; code: `as_nonzero_scalar`",
-            "line": 147,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 30,
-            "symbol": "ecdsa::signing::SigningKey::<C>::as_nonzero_scalar"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::from_sec1_bytes; from_sec1_bytes: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_sec1_bytes(bytes).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_sec1_bytes`",
-            "line": 174,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_sec1_bytes"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::from_affine; from_affine: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_affine(affine).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_affine`",
-            "line": 182,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_affine"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::from_encoded_point; from_encoded_point: setup, not a use; line: `ecdsa_core::VerifyingKey::<NistP521>::from_encoded_point(public_key).map(Into::into)`; code: `ecdsa_core::VerifyingKey::<NistP521>::from_encoded_point`",
-            "line": 187,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_encoded_point"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::to_encoded_point; to_encoded_point: setup, not a use; line: `self.0.to_encoded_point(compress)`; code: `to_encoded_point`",
-            "line": 193,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::to_encoded_point"
-          },
-          {
-            "additionalContext": "[present] [call] in p521::ecdsa::VerifyingKey::as_affine; as_affine: setup, not a use; line: `self.0.as_affine()`; code: `as_affine`",
-            "line": 198,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "ecdsa::verifying::VerifyingKey::<C>::as_affine"
-          },
-          {
-            "additionalContext": "[present] [instantiation] in <p521::ecdsa::VerifyingKey as core::convert::From<&p521::ecdsa::SigningKey>>::from; chosen as generic argument of core::convert::From::from; line: `Self::from(*signing_key.0.verifying_key())`; code: `Self::from`",
-            "line": 205,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
+            "additionalContext": "[present] [instantiation] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<p521::ecdsa::VerifyingKey>>::from; chosen as generic argument of core::convert::From::from; expanded from ssh-key-0.6.7/src/public/ecdsa.rs:187; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "ssh-key-0.6.7/src/public/ecdsa.rs",
+            "offset": 0,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[present] [call] in <p521::ecdsa::VerifyingKey as core::convert::From<&p521::ecdsa::SigningKey>>::from; verifying_key: setup, not a use; line: `Self::from(*signing_key.0.verifying_key())`; code: `verifying_key`",
-            "line": 205,
-            "location": "p521-0.13.3/src/ecdsa.rs",
+            "additionalContext": "[present] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; to_encoded_point: setup, not a use; expanded from ssh-key-0.6.7/src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "line": 202,
+            "location": "ssh-key-0.6.7/src/public/ecdsa.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::VerifyingKey::to_encoded_point"
+          },
+          {
+            "additionalContext": "[present] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; from_slice: setup, not a use; expanded from ssh-key-0.6.7/src/signature.rs:512; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "line": 522,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 0,
+            "symbol": "p521::ecdsa::SigningKey::from_slice"
+          },
+          {
+            "additionalContext": "[present] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; expanded from ssh-key-0.6.7/src/signature.rs:513; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "line": 522,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 0,
+            "symbol": "signature::signer::Signer::try_sign"
+          },
+          {
+            "additionalContext": "[present] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
+            "line": 652,
+            "location": "ssh-key-0.6.7/src/signature.rs",
+            "offset": 40,
+            "symbol": "core::convert::TryFrom::try_from"
+          },
+          {
+            "additionalContext": "[present] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; line: `verifying_key.verify(message, &signature)`; code: `verify`",
+            "line": 654,
+            "location": "ssh-key-0.6.7/src/signature.rs",
             "offset": 34,
-            "symbol": "ecdsa::signing::SigningKey::<C>::verifying_key"
+            "symbol": "signature::verifier::Verifier::verify"
           }
         ]
       },
       "name": "ECDSA-P-521-SHA-512",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "present"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:provenance:key",
-          "value": "parameter"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "12"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:ECDSA-P-521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "ECDSA",
-          "cryptoFunctions": [
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in <p521::ecdsa::VerifyingKey as signature::hazmat::PrehashVerifier<ecdsa::Signature<p521::NistP521>>>::verify_prehash; use: verify; line: `self.0.verify_prehash(prehash, signature)`; code: `verify_prehash`",
-            "line": 219,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 15,
-            "symbol": "signature::hazmat::PrehashVerifier::verify_prehash"
-          }
-        ]
-      },
-      "name": "ECDSA-P-521",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -4789,7 +4692,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "8"
         }
       ],
       "type": "cryptographic-asset"
@@ -6297,6 +6200,13 @@
             "location": "uuid-1.19.0/src/rng.rs",
             "offset": 12,
             "symbol": "getrandom::fill"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent, lib rbw] in rbw::config::device_id::{closure#0}::{closure#1}; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `getrandom::fill` of getrandom 0.3.4; line: `|| uuid::Uuid::new_v4().hyphenated().to_string(),`; code: `uuid::Uuid::new_v4`",
+            "line": 232,
+            "location": "src/config.rs",
+            "offset": 15,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
           }
         ]
       },
@@ -6340,7 +6250,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "8"
+          "value": "9"
         }
       ],
       "type": "cryptographic-asset"
@@ -8885,20 +8795,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in <p521::ecdsa::SigningKey as signature::signer::RandomizedSigner<ecdsa::Signature<p521::NistP521>>>::try_sign_with_rng; use: digest; line: `self.sign_prehash_with_rng(rng, &Sha512::digest(msg))`; code: `Sha512::digest`",
-            "line": 154,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 41,
-            "symbol": "digest::digest::Digest::digest"
-          },
-          {
-            "additionalContext": "[present] [call] in <p521::ecdsa::VerifyingKey as signature::verifier::Verifier<ecdsa::Signature<p521::NistP521>>>::verify; use: digest; line: `self.verify_prehash(&Sha512::digest(msg), signature)`; code: `Sha512::digest`",
-            "line": 226,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 29,
-            "symbol": "digest::digest::Digest::digest"
-          },
-          {
             "additionalContext": "[reachable] [component] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; part of RSA-PKCS1-1.5-SHA-512; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `rsa::pkcs1v15::SigningKey::<sha2::Sha512>::new(`; code: `rsa::pkcs1v15::SigningKey::<sha2::Sha512>::new`",
             "line": 89,
             "location": "src/bin/rbw-agent/ssh_agent.rs",
@@ -9174,70 +9070,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "36"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:signature:p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "sign",
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; algorithm unresolved: the type `p521::ecdsa::SigningKey` of p521 0.13.3, a crypto package the knowledge base does not model; expanded from ssh-key-0.6.7/src/signature.rs:513; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
-            "line": 522,
-            "location": "ssh-key-0.6.7/src/signature.rs",
-            "offset": 0,
-            "symbol": "signature::signer::Signer::try_sign"
-          },
-          {
-            "additionalContext": "[present] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; algorithm unresolved: the type `p521::ecdsa::VerifyingKey` of p521 0.13.3, a crypto package the knowledge base does not model; line: `verifying_key.verify(message, &signature)`; code: `verify`",
-            "line": 654,
-            "location": "ssh-key-0.6.7/src/signature.rs",
-            "offset": 34,
-            "symbol": "signature::verifier::Verifier::verify"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "present"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "34"
         }
       ],
       "type": "cryptographic-asset"
@@ -9304,61 +9137,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ecdsa+p521",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "sign"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[present] [call] in <p521::ecdsa::SigningKey as signature::hazmat::RandomizedPrehashSigner<ecdsa::Signature<p521::NistP521>>>::sign_prehash_with_rng; use: sign; algorithm unresolved: `ecdsa::hazmat::sign_prehashed` of ecdsa 0.16.9, an API the knowledge base does not name; line: `sign_prehashed(self.0.as_nonzero_scalar().as_ref(), k, &z).map(|sig| sig.0)`; code: `sign_prehashed`",
-            "line": 147,
-            "location": "p521-0.13.3/src/ecdsa.rs",
-            "offset": 8,
-            "symbol": "ecdsa::hazmat::sign_prehashed"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "present"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -9431,7 +9209,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:unknown:rsa+ssh-agent-lib",
+      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib",
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
@@ -9444,11 +9222,11 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?;`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 80,
+            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::ssh_agent::SshAgent::run::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::agent::listen` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by rbw_agent::ssh_agent::SshAgent::run at src/bin/rbw-agent/ssh_agent.rs:18:49; line: `ssh_agent_lib::agent::listen(listener, self).await?;`; code: `ssh_agent_lib::agent::listen`",
+            "line": 24,
             "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 29,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
+            "offset": 8,
+            "symbol": "ssh_agent_lib::agent::listen"
           }
         ]
       },
@@ -9485,166 +9263,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in rbw_agent::ssh_agent::SshAgent::run::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::agent::listen` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by rbw_agent::ssh_agent::SshAgent::run at src/bin/rbw-agent/ssh_agent.rs:18:49; line: `ssh_agent_lib::agent::listen(listener, self).await?;`; code: `ssh_agent_lib::agent::listen`",
-            "line": 24,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 8,
-            "symbol": "ssh_agent_lib::agent::listen"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other),`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 73,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 25,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?;`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 94,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 33,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?;`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 104,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 33,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?;`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 111,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 33,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:artifact",
-          "value": "bin rbw-agent"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "5"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::{closure#0}::{closure#1}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0} at src/bin/rbw-agent/ssh_agent.rs:42:17; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..> at src/bin/rbw-agent/ssh_agent.rs:32:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:269:58 as `request_identities`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; line: `.map_err(ssh_agent_lib::error::AgentError::other)`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 48,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 29,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?,`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 118,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 33,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_agent_lib::error::AgentError::other` of ssh-agent-lib 0.5.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `.map_err(ssh_agent_lib::error::AgentError::other)?)`; code: `ssh_agent_lib::error::AgentError::other`",
-            "line": 121,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 25,
-            "symbol": "ssh_agent_lib::error::AgentError::other"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:artifact",
-          "value": "bin rbw-agent"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -9733,20 +9351,6 @@
             "symbol": "ssh_key::mpint::Mpint::as_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::signature::Signature::new` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `Ok(ssh_agent_lib::ssh_key::Signature::new(`; code: `ssh_agent_lib::ssh_key::Signature::new`",
-            "line": 116,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 19,
-            "symbol": "ssh_key::signature::Signature::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::{closure#0}; use: unknown; algorithm unresolved: `ssh_key::algorithm::Algorithm::new` of ssh-key 0.6.7, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::sign::<..> at src/bin/rbw-agent/ssh_agent.rs:53:4 as `async`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:272:54 as `sign`; instantiated by <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::handle::<..> at ssh-agent-lib-0.5.1/src/agent.rs:266:4 as `async`; instantiated by ssh_agent_lib::agent::handle_socket::<..>::{closure#0} at ssh-agent-lib-0.5.1/src/agent.rs:306:41 as `handle`; line: `ssh_agent_lib::ssh_key::Algorithm::new(algorithm)`; code: `ssh_agent_lib::ssh_key::Algorithm::new`",
-            "line": 117,
-            "location": "src/bin/rbw-agent/ssh_agent.rs",
-            "offset": 20,
-            "symbol": "ssh_key::algorithm::Algorithm::new"
-          },
-          {
             "additionalContext": "[reachable] [call] [artifacts: bin rbw-agent] in <rbw_agent::ssh_agent::SshAgent as ssh_agent_lib::agent::Session>::request_identities::<..>::{closure#0}::{closure#1}; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::str::<impl str>::parse` runs `<ssh_key::public::PublicKey as core::str::traits::FromStr>::from_str` of ssh-key 0.6.7 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `p.parse::<ssh_agent_lib::ssh_key::PublicKey>()`; code: `parse`",
             "line": 43,
             "location": "src/bin/rbw-agent/ssh_agent.rs",
@@ -9787,7 +9391,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "13"
+          "value": "11"
         }
       ],
       "type": "cryptographic-asset"
@@ -10223,10 +9827,7 @@
       ],
       "provides": [
         "crypto:algorithm:ECDSA-P-256-SHA-256",
-        "crypto:algorithm:ECDSA-P-384-SHA-384",
-        "crypto:algorithm:ECDSA-P-521",
-        "crypto:algorithm:ECDSA-P-521-SHA-512",
-        "crypto:algorithm:unknown:unknown:ecdsa+p521"
+        "crypto:algorithm:ECDSA-P-384-SHA-384"
       ],
       "ref": "pkg:cargo/ecdsa@0.16.9"
     },
@@ -10336,6 +9937,9 @@
         "pkg:cargo/primeorder@0.13.6",
         "pkg:cargo/sha2@0.10.9"
       ],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-384-SHA-384"
+      ],
       "ref": "pkg:cargo/p384@0.13.1"
     },
     {
@@ -10348,8 +9952,7 @@
         "pkg:cargo/sha2@0.10.9"
       ],
       "provides": [
-        "crypto:algorithm:unknown:signature:p521",
-        "crypto:algorithm:unknown:unknown:ecdsa+p521"
+        "crypto:algorithm:ECDSA-P-521-SHA-512"
       ],
       "ref": "pkg:cargo/p521@0.13.3"
     },
@@ -10542,7 +10145,6 @@
         "crypto:algorithm:RSA-PKCS1-1.5",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-512",
-        "crypto:algorithm:unknown:unknown:rsa+ssh-agent-lib",
         "crypto:material:private-key:RSA"
       ],
       "ref": "pkg:cargo/rsa@0.9.9"
@@ -10635,9 +10237,7 @@
         "pkg:cargo/subtle@2.6.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:rsa+ssh-agent-lib",
-        "crypto:algorithm:unknown:unknown:ssh-agent-lib",
-        "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key"
+        "crypto:algorithm:unknown:unknown:ssh-agent-lib"
       ],
       "ref": "pkg:cargo/ssh-agent-lib@0.5.1"
     },
@@ -10675,7 +10275,6 @@
       ],
       "provides": [
         "crypto:algorithm:unknown:signature:ssh-key",
-        "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key",
         "crypto:algorithm:unknown:unknown:ssh-key"
       ],
       "ref": "pkg:cargo/ssh-key@0.6.7"
@@ -10897,10 +10496,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:ECDSA-P-521"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:OS-RNG"
     },
     {
@@ -10925,15 +10520,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:signature:p521"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:signature:ssh-key"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ecdsa+p521"
     },
     {
       "dependsOn": [],
@@ -10941,15 +10528,7 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:rsa+ssh-agent-lib"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ssh-agent-lib+ssh-key"
     },
     {
       "dependsOn": [],
@@ -11037,7 +10616,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "728 calls into crypto packages: 144 cited, 1 cited by the check as unknown, 583 excused (accessor 31, awaited 1, comparison 7, copy 36, encoding 5, entered 62, error 7, format 35, generator setup 9, internal 164, named 15, public half 4, relay 59, setup 31, view 87, wipe 30)"
+        "value": "731 calls into crypto packages: 142 cited, 1 cited by the check by name, 1 cited by the check as unknown, 587 excused (accessor 31, awaited 1, comparison 7, copy 36, encoding 7, entered 62, error 21, format 37, generator setup 9, internal 158, named 7, public half 4, relay 59, setup 31, view 87, wipe 30)"
       }
     ],
     "tools": {
@@ -11050,7 +10629,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:acfe4a66-a6c6-8f2b-a5a4-64cc51b524f2",
+  "serialNumber": "urn:uuid:38c7b5ce-707a-8221-a912-e477f37c6987",
   "specVersion": "1.7",
   "version": 1
 }

@@ -59,10 +59,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -127,10 +123,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -204,10 +196,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -247,10 +235,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -283,10 +267,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -317,10 +297,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/signature@3.0.0",
@@ -400,9 +376,86 @@
       "version": "1.9.1"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:md5",
+      "bom-ref": "crypto:algorithm:Ed25519",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "sign",
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a162::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 11); line: `let k = SigningKey::from_bytes(&[7u8; 32]);`; code: `SigningKey::from_bytes`",
+            "line": 11,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a162::main; use: sign; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a162::main; use: verify; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 14,
+            "symbol": "ed25519_dalek::signing::SigningKey::verify"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-key"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
           "cryptoFunctions": [
             "digest"
           ],
@@ -413,15 +466,29 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let _ = c.finalize(); // an unknown hash (MD5)`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a162::main; new: setup, not a use; line: `let mut c = md5::Context::new();`; code: `md5::Context::new`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a162::main; use: digest; line: `c.consume(&d);`; code: `consume`",
             "line": 9,
+            "location": "src/main.rs",
+            "offset": 6,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a162::main; use: digest; line: `let _ = c.finalize(); // MD5`; code: `finalize`",
+            "line": 10,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "md5::Context::finalize"
           }
         ]
       },
-      "name": "unknown",
+      "name": "MD5",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -444,47 +511,47 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:signature:ed25519-dalek",
+      "bom-ref": "crypto:algorithm:SHA-512",
       "cryptoProperties": {
         "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
           "cryptoFunctions": [
-            "sign",
-            "verify"
+            "digest"
           ],
-          "primitive": "signature"
+          "primitive": "hash"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: sign; algorithm unresolved: the type `ed25519_dalek::signing::SigningKey` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `let s = k.sign(&d); // an unknown signature (Ed25519)`; code: `sign`",
-            "line": 11,
+            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
+            "line": 12,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: verify; algorithm unresolved: `ed25519_dalek::signing::SigningKey::verify` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `let _ = k.verify(&d, &s); // an unknown signature (Ed25519)`; code: `verify`",
-            "line": 12,
+            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
+            "line": 13,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ed25519_dalek::signing::SigningKey::verify"
           }
         ]
       },
-      "name": "unknown",
+      "name": "SHA-512",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -500,15 +567,15 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
+          "name": "rcbom:only-as-component",
+          "value": "true"
         },
         {
           "name": "rcbom:occurrences",
@@ -564,20 +631,23 @@
         "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:signature:ed25519-dalek"
+        "crypto:algorithm:Ed25519"
       ],
       "ref": "pkg:cargo/ed25519-dalek@3.0.0"
     },
     {
       "dependsOn": [],
       "provides": [
-        "crypto:algorithm:unknown:hash:md5"
+        "crypto:algorithm:MD5"
       ],
       "ref": "pkg:cargo/md5@0.8.1"
     },
     {
       "dependsOn": [
         "pkg:cargo/digest@0.11.3"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/sha2@0.11.1"
     },
@@ -594,12 +664,18 @@
       "ref": "pkg:cargo/zeroize@1.9.1"
     },
     {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:md5"
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:signature:ed25519-dalek"
+      "ref": "crypto:algorithm:MD5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -655,7 +731,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "6 calls into crypto packages: 3 cited, 0 cited by the check as unknown, 3 excused (setup 2, step 1)"
+        "value": "6 calls into crypto packages: 6 cited, 0 cited by the check as unknown, 0 excused ()"
       }
     ],
     "tools": {
@@ -668,7 +744,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:64a27b62-1f1d-8310-bf94-1053d0020875",
+  "serialNumber": "urn:uuid:d4fe423c-0692-8b58-aae1-5ebd81fcdd78",
   "specVersion": "1.7",
   "version": 1
 }

@@ -6,8 +6,8 @@ mod algs;
 use algs::{hash_it, ALG};
 
 // V1: two versions of sha2 (0.10 as `sha2`, 0.11 as `sha2_11`): `Sha256` and `sha2::` name
-// 0.10, which provides SHA-256; 0.11 (a version the knowledge base does not cover) provides
-// nothing.
+// 0.10, `sha2_11::` names 0.11 (first probed as a version the knowledge base did not cover);
+// each provides the SHA-256 of its own calls.
 fn direct(d: &[u8]) -> usize {
     Sha256::digest(d).len()
 }

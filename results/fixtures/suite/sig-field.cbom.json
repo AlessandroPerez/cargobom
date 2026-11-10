@@ -704,53 +704,7 @@
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "rsa::pkcs1v15::Pkcs1v15Sign::new"
-          }
-        ]
-      },
-      "name": "RSA-PKCS1-1.5-SHA-384",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "algorithmFamily": "RSASSA-PKCS1",
-          "cryptoFunctions": [
-            "sign",
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
+          },
           {
             "additionalContext": "[reachable] [call] in pilot_sig_field::sign; use: sign; line: `s.key.sign(s.scheme.clone(), &hashed).unwrap()`; code: `sign`",
             "line": 17,
@@ -767,7 +721,7 @@
           }
         ]
       },
-      "name": "RSA-PKCS1-1.5",
+      "name": "RSA-PKCS1-1.5-SHA-384",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -791,7 +745,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -966,7 +920,6 @@
         "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
-        "crypto:algorithm:RSA-PKCS1-1.5",
         "crypto:algorithm:RSA-PKCS1-1.5-SHA-384"
       ],
       "ref": "pkg:cargo/rsa@0.9.10"
@@ -1006,10 +959,6 @@
         "crypto:algorithm:SHA-384"
       ],
       "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-384"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:RSA-PKCS1-1.5"
     },
     {
       "dependsOn": [],
@@ -1082,7 +1031,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:29fceff1-fc71-85a2-9f13-ee370e5770e1",
+  "serialNumber": "urn:uuid:65979d9b-163c-8299-8347-b2d696cb2802",
   "specVersion": "1.7",
   "version": 1
 }

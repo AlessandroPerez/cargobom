@@ -81,7 +81,7 @@
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:424:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe32 -> p256 -> elliptic-curve -> subtle
   occ unknown | crypto:algorithm:unknown:hash:sha3 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe32::main; use: digest; algorithm unresolved: the type `sha3::Keccak256Core` of sha3 0.10.9, which the knowledge base does not name; line: `let k = Keccak256::digest(&d);`; code: `Keccak256::digest`
   occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p256 | src/main.rs:25:13 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: rng (rand_core::os::OsRng); line: `let sk = p256::SecretKey::random(&mut OsRng);`; code: `p256::SecretKey::random`
-  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | src/main.rs:32:16 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `p384::NistP384` of p384 0.13.1, a crypto package the knowledge base does not model; rng: rng (rand_core::os::OsRng); line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`
+  occ unknown | crypto:algorithm:unknown:unknown:elliptic-curve+p384 | src/main.rs:32:16 | elliptic_curve::secret_key::SecretKey::<C>::random | [reachable] [call] in probe32::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: rng (rand_core::os::OsRng); line: `let pk384 = p384::SecretKey::random(&mut OsRng).public_key();`; code: `p384::SecretKey::random`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:485:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via probe32 -> ml-kem -> kem -> zeroize
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
@@ -245,8 +245,7 @@
   prop p256 | pkg:cargo/p256@0.13.2 | rcbom:crypto-role=algorithm
   prop p256 | pkg:cargo/p256@0.13.2 | rcbom:scope=required
   prop p256 | pkg:cargo/p256@0.13.2 | rcbom:usage=reachable
-  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:crypto-role=unmodelled
-  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:kb-coverage=unmodelled
+  prop p384 | pkg:cargo/p384@0.13.1 | rcbom:crypto-role=algorithm
   prop p384 | pkg:cargo/p384@0.13.1 | rcbom:scope=required
   prop p384 | pkg:cargo/p384@0.13.1 | rcbom:usage=reachable
   prop pem-rfc7468 | pkg:cargo/pem-rfc7468@0.7.0 | rcbom:crypto-role=support
@@ -536,6 +535,8 @@ provides pkg:cargo/ml-kem@0.2.3 -> crypto:algorithm:ML-KEM-768
 provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256
 provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDSA-P-256-SHA-256
 provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:unknown:unknown:elliptic-curve+p256
+provides pkg:cargo/p384@0.13.1 -> crypto:algorithm:ECDH-P-384
+provides pkg:cargo/p384@0.13.1 -> crypto:algorithm:ECDSA-P-384-SHA-384
 provides pkg:cargo/p384@0.13.1 -> crypto:algorithm:unknown:unknown:elliptic-curve+p384
 provides pkg:cargo/rand@0.8.5 -> crypto:algorithm:ChaCha12-RNG
 provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
@@ -548,11 +549,11 @@ provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:unknown:hash:sha3
 root {"bom-ref": "pkg:cargo/probe32@0.1.0", "name": "probe32", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe32@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin probe32
-run rcbom:run:boundary-check=117 calls into crypto packages: 36 cited, 0 cited by the check as unknown, 81 excused (encoding 2, format 7, generator setup 5, internal 64, not crypto 1, public half 2)
+run rcbom:run:boundary-check=51 calls into crypto packages: 36 cited, 0 cited by the check as unknown, 15 excused (format 7, generator setup 5, not crypto 1, public half 2)
 run rcbom:run:features=
 run rcbom:run:packages=44
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=555
+run rcbom:run:reachable-instances=235
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

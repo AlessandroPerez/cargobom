@@ -1857,68 +1857,6 @@
         }
       ],
       "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ed25519",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::KeyPair::sign; use: unknown; algorithm unresolved: `ed25519::Signature::to_bytes` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `.to_bytes()`; code: `to_bytes`",
-            "line": 66,
-            "location": "src/crypto/ed25519.rs",
-            "offset": 17,
-            "symbol": "ed25519::Signature::to_bytes"
-          },
-          {
-            "additionalContext": "[reachable] [call] in biscuit_auth::crypto::ed25519::PublicKey::verify_signature; use: unknown; algorithm unresolved: `ed25519::Signature::from_bytes` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let sig = ed25519_dalek::Signature::from_bytes(&signature_bytes);`; code: `ed25519_dalek::Signature::from_bytes`",
-            "line": 271,
-            "location": "src/crypto/ed25519.rs",
-            "offset": 18,
-            "symbol": "ed25519::Signature::from_bytes"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
     }
   ],
   "dependencies": [
@@ -2031,9 +1969,6 @@
       "dependsOn": [
         "pkg:cargo/pkcs8@0.10.2",
         "pkg:cargo/signature@2.2.0"
-      ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:ed25519"
       ],
       "ref": "pkg:cargo/ed25519@2.2.3"
     },
@@ -2240,10 +2175,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ed25519"
     }
   ],
   "metadata": {
@@ -2299,7 +2230,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "62 calls into crypto packages: 34 cited, 0 cited by the check as unknown, 28 excused (comparison 4, copy 2, encoding 13, format 9)"
+        "value": "62 calls into crypto packages: 32 cited, 0 cited by the check as unknown, 30 excused (comparison 4, copy 2, encoding 15, format 9)"
       }
     ],
     "tools": {
@@ -2312,7 +2243,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fc881792-e97d-8264-ae7f-9872a69f9065",
+  "serialNumber": "urn:uuid:f0194ab8-eac2-8d6b-ac0f-cbcda3137401",
   "specVersion": "1.7",
   "version": 1
 }

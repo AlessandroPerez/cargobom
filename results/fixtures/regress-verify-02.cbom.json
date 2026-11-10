@@ -159,10 +159,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -219,10 +215,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -431,10 +423,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -528,6 +516,13 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
+            "additionalContext": "[reachable] [call] in v02::newer::f; use: digest; line: `sha2_11::Sha256::digest(d).len()`; code: `sha2_11::Sha256::digest`",
+            "line": 22,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [call] in v02::b::f; use: digest; line: `H::digest(d).len()`; code: `H::digest`",
             "line": 39,
             "location": "src/main.rs",
@@ -616,62 +611,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "11"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in v02::newer::f; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `sha2_11::Sha256::digest(d).len()`; code: `sha2_11::Sha256::digest`",
-            "line": 22,
-            "location": "src/main.rs",
-            "offset": 8,
-            "symbol": "digest::digest::Digest::digest"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "12"
         }
       ],
       "type": "cryptographic-asset"
@@ -749,7 +689,7 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2"
+        "crypto:algorithm:SHA-256"
       ],
       "ref": "pkg:cargo/sha2@0.11.0"
     },
@@ -769,10 +709,6 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-256"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha2"
     }
   ],
   "metadata": {
@@ -841,7 +777,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:778f9361-70c8-8ed0-979b-dd9a860134b8",
+  "serialNumber": "urn:uuid:cf8e8166-25e2-8d4e-bd50-b4f79dc79e54",
   "specVersion": "1.7",
   "version": 1
 }

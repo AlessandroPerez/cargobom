@@ -133,10 +133,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -267,10 +263,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/crypto-common@0.2.2",
@@ -399,10 +391,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/digest@0.11.3",
@@ -474,10 +462,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -619,10 +603,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -653,14 +633,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/password-hash@0.6.1",
@@ -689,10 +661,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "algorithm"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         },
         {
           "name": "rcbom:usage",
@@ -725,10 +693,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/rand_core@0.10.1",
@@ -1003,10 +967,6 @@
           "value": "algorithm"
         },
         {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
-        },
-        {
           "name": "rcbom:usage",
           "value": "reachable"
         }
@@ -1037,10 +997,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:kb-coverage",
-          "value": "unsupported-version"
         }
       ],
       "purl": "pkg:cargo/signature@3.0.0",
@@ -1784,6 +1740,96 @@
         {
           "name": "rcbom:occurrences",
           "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ChaCha12-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 36,
+            "location": "uuid-1.28.0/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 40,
+            "location": "uuid-1.28.0/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `rand::random()`; code: `rand::random`",
+            "line": 44,
+            "location": "uuid-1.28.0/src/rng.rs",
+            "offset": 12,
+            "symbol": "rand::random"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <dufs::auth::NONCESTARTHASH as core::ops::deref::Deref>::deref::__static_ref_initialize; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `h.consume(Uuid::new_v4().as_bytes());`; code: `Uuid::new_v4`",
+            "line": 30,
+            "location": "src/auth.rs",
+            "offset": 18,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::server::Server::handle_send_file::{closure#0}; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `let boundary = Uuid::new_v4();`; code: `Uuid::new_v4`",
+            "line": 1025,
+            "location": "src/server.rs",
+            "offset": 35,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::server::Server::handle_lock::{closure#0}; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `rand::random` of rand 0.10.3; line: `format!(\"opaquelocktoken:{}\", Uuid::new_v4())`; code: `Uuid::new_v4`",
+            "line": 1318,
+            "location": "src/server.rs",
+            "offset": 42,
+            "symbol": "uuid::v4::<impl uuid::Uuid>::new_v4"
+          }
+        ]
+      },
+      "name": "ChaCha12-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -2783,6 +2829,27 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::generate_token; use: sign; line: `let sig = signing_key.sign(message.as_bytes()).to_bytes();`; code: `sign`",
+            "line": 183,
+            "location": "src/auth.rs",
+            "offset": 30,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::verify_token; use: verify; line: `derive_secret_key(user, pass).verify(message.as_bytes(), &sig)?;`; code: `verify`",
+            "line": 218,
+            "location": "src/auth.rs",
+            "offset": 38,
+            "symbol": "ed25519_dalek::signing::SigningKey::verify"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of auth::AccessControl::generate_token) or parameter (argument 2 of server::Server::handle_tokengen) or unknown (too deep); line: `SigningKey::from_bytes(&hash.into())`; code: `SigningKey::from_bytes`",
+            "line": 582,
+            "location": "src/auth.rs",
+            "offset": 4,
+            "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
+          },
+          {
             "additionalContext": "[reachable] [via-static] in rustls::crypto::ring::default_provider; rustls::crypto::ring::SUPPORTED_SIG_ALGS -> ring::ec::curve25519::ed25519::verification::ED25519; line: `signature_verification_algorithms: SUPPORTED_SIG_ALGS,`; code: `SUPPORTED_SIG_ALGS`",
             "line": 36,
             "location": "rustls-0.23.46/src/crypto/ring/mod.rs",
@@ -2878,7 +2945,7 @@
         },
         {
           "name": "rcbom:provenance:key",
-          "value": "computed"
+          "value": "computed,parameter,unknown"
         },
         {
           "name": "rcbom:provenance:public-key",
@@ -2886,7 +2953,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "10"
+          "value": "13"
         }
       ],
       "type": "cryptographic-asset"
@@ -3701,6 +3768,300 @@
         {
           "name": "rcbom:occurrences",
           "value": "6"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <dufs::auth::NONCESTARTHASH as core::ops::deref::Deref>::deref::__static_ref_initialize; new: setup, not a use; line: `let mut h = Context::new();`; code: `Context::new`",
+            "line": 29,
+            "location": "src/auth.rs",
+            "offset": 20,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <dufs::auth::NONCESTARTHASH as core::ops::deref::Deref>::deref::__static_ref_initialize; use: digest; line: `h.consume(Uuid::new_v4().as_bytes());`; code: `consume`",
+            "line": 30,
+            "location": "src/auth.rs",
+            "offset": 10,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <dufs::auth::NONCESTARTHASH as core::ops::deref::Deref>::deref::__static_ref_initialize; use: digest; line: `h.consume(std::process::id().to_be_bytes());`; code: `consume`",
+            "line": 31,
+            "location": "src/auth.rs",
+            "offset": 10,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; new: setup, not a use; line: `let mut h = Context::new();`; code: `Context::new`",
+            "line": 521,
+            "location": "src/auth.rs",
+            "offset": 24,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `h.consume(format!(\"{auth_user}:{REALM}:{auth_pass}\").as_bytes());`; code: `consume`",
+            "line": 522,
+            "location": "src/auth.rs",
+            "offset": 14,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `let auth_pass = format!(\"{:x}\", h.finalize());`; code: `finalize`",
+            "line": 523,
+            "location": "src/auth.rs",
+            "offset": 46,
+            "symbol": "md5::Context::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; new: setup, not a use; line: `let mut ha = Context::new();`; code: `Context::new`",
+            "line": 525,
+            "location": "src/auth.rs",
+            "offset": 25,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `ha.consume(method);`; code: `consume`",
+            "line": 526,
+            "location": "src/auth.rs",
+            "offset": 15,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `ha.consume(b\":\");`; code: `consume`",
+            "line": 527,
+            "location": "src/auth.rs",
+            "offset": 15,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `ha.consume(uri);`; code: `consume`",
+            "line": 529,
+            "location": "src/auth.rs",
+            "offset": 19,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `let ha = format!(\"{:x}\", ha.finalize());`; code: `finalize`",
+            "line": 531,
+            "location": "src/auth.rs",
+            "offset": 40,
+            "symbol": "md5::Context::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; new: setup, not a use; line: `let mut c = Context::new();`; code: `Context::new`",
+            "line": 536,
+            "location": "src/auth.rs",
+            "offset": 36,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(&auth_pass);`; code: `consume`",
+            "line": 537,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 538,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(nonce);`; code: `consume`",
+            "line": 539,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 540,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(nc);`; code: `consume`",
+            "line": 542,
+            "location": "src/auth.rs",
+            "offset": 30,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 544,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(cnonce);`; code: `consume`",
+            "line": 546,
+            "location": "src/auth.rs",
+            "offset": 30,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 548,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(qop);`; code: `consume`",
+            "line": 549,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 550,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(&*ha);`; code: `consume`",
+            "line": 551,
+            "location": "src/auth.rs",
+            "offset": 26,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `format!(\"{:x}\", c.finalize())`; code: `finalize`",
+            "line": 552,
+            "location": "src/auth.rs",
+            "offset": 42,
+            "symbol": "md5::Context::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; new: setup, not a use; line: `let mut c = Context::new();`; code: `Context::new`",
+            "line": 559,
+            "location": "src/auth.rs",
+            "offset": 32,
+            "symbol": "md5::Context::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(&auth_pass);`; code: `consume`",
+            "line": 560,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 561,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(nonce);`; code: `consume`",
+            "line": 562,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(b\":\");`; code: `consume`",
+            "line": 563,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `c.consume(&*ha);`; code: `consume`",
+            "line": 564,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; line: `format!(\"{:x}\", c.finalize())`; code: `finalize`",
+            "line": 565,
+            "location": "src/auth.rs",
+            "offset": 38,
+            "symbol": "md5::Context::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::validate_nonce; use: digest; line: `h.consume(secs_nonce.to_be_bytes());`; code: `consume`",
+            "line": 602,
+            "location": "src/auth.rs",
+            "offset": 14,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::validate_nonce; use: digest; line: `let h = format!(\"{:x}\", h.finalize());`; code: `finalize`",
+            "line": 603,
+            "location": "src/auth.rs",
+            "offset": 38,
+            "symbol": "md5::Context::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::create_nonce; use: digest; line: `h.consume(secs.to_be_bytes());`; code: `consume`",
+            "line": 707,
+            "location": "src/auth.rs",
+            "offset": 6,
+            "symbol": "md5::Context::consume"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::create_nonce; use: digest; line: `let n = format!(\"{:08x}{:032x}\", secs, h.finalize());`; code: `finalize`",
+            "line": 709,
+            "location": "src/auth.rs",
+            "offset": 45,
+            "symbol": "md5::Context::finalize"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "35"
         }
       ],
       "type": "cryptographic-asset"
@@ -4715,6 +5076,48 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; new: setup, not a use; line: `let mut hasher = Sha256::new();`; code: `Sha256::new`",
+            "line": 579,
+            "location": "src/auth.rs",
+            "offset": 21,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; use: digest; line: `hasher.update(format!(\"{user}:{pass}\").as_bytes());`; code: `update`",
+            "line": 580,
+            "location": "src/auth.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; use: digest; line: `let hash = hasher.finalize();`; code: `finalize`",
+            "line": 581,
+            "location": "src/auth.rs",
+            "offset": 22,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; new: setup, not a use; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `let mut hasher = Sha256::new();`; code: `Sha256::new`",
+            "line": 2055,
+            "location": "src/server.rs",
+            "offset": 21,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; use: digest; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `hasher.update(&buffer[..bytes_read]);`; code: `update`",
+            "line": 2063,
+            "location": "src/server.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; use: digest; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `let result = hasher.finalize();`; code: `finalize`",
+            "line": 2066,
+            "location": "src/server.rs",
+            "offset": 24,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
             "additionalContext": "[reachable] [static] in rustls::crypto::ring::hash::SHA256; line: `pub(crate) static SHA256: Hash = Hash(&digest::SHA256, HashAlgorithm::SHA256);`; code: `digest::SHA256`",
             "line": 9,
             "location": "rustls-0.23.46/src/crypto/ring/hash.rs",
@@ -5084,6 +5487,181 @@
             "location": "rustls-webpki-0.103.15/src/ring_algs.rs",
             "offset": 27,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; default: setup, not a use; line: `let mut hasher_alt = Sha256::default();`; code: `Sha256::default`",
+            "line": 86,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 90,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `let dp = hasher_alt.finalize();`; code: `finalize`",
+            "line": 94,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 24,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; default: setup, not a use; line: `hasher_alt = Sha256::default();`; code: `Sha256::default`",
+            "line": 101,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `hasher_alt.update(salt);`; code: `update`",
+            "line": 106,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `let ds = hasher_alt.finalize();`; code: `finalize`",
+            "line": 111,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 24,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; default: setup, not a use; line: `let mut hasher = Sha256::default();`; code: `Sha256::default`",
+            "line": 122,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `hasher.update(digest_c);`; code: `update`",
+            "line": 128,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `hasher.update(digest_c);`; code: `update`",
+            "line": 143,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; line: `digest_c.clone_from_slice(&hasher.finalize());`; code: `finalize`",
+            "line": 148,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 42,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; default: setup, not a use; line: `let mut hasher = Sha256::default();`; code: `Sha256::default`",
+            "line": 247,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 21,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(password);`; code: `update`",
+            "line": 248,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(salt);`; code: `update`",
+            "line": 249,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; default: setup, not a use; line: `let mut hasher_alt = Sha256::default();`; code: `Sha256::default`",
+            "line": 252,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 254,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher_alt.update(salt);`; code: `update`",
+            "line": 256,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 258,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `let digest_b = hasher_alt.finalize();`; code: `finalize`",
+            "line": 260,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 30,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(digest_b);`; code: `update`",
+            "line": 264,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(&digest_b[..(pw_len % BLOCK_SIZE_SHA256)]);`; code: `update`",
+            "line": 267,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(digest_b);`; code: `update`",
+            "line": 276,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.update(password);`; code: `update`",
+            "line": 278,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; line: `hasher.finalize().into()`; code: `finalize`",
+            "line": 284,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha256>; use: digest; instantiated by sha_crypt::sha256_crypt at sha-crypt-0.6.0/src/lib.rs:126:12 as `hash_byte_seq`; line: `digest.update(fill_from);`; code: `update`",
+            "line": 333,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha256>; use: digest; instantiated by sha_crypt::sha256_crypt at sha-crypt-0.6.0/src/lib.rs:126:12 as `hash_byte_seq`; line: `digest.update(&fill_from[..(len % bs)]);`; code: `update`",
+            "line": 335,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
           }
         ]
       },
@@ -5111,7 +5689,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "53"
+          "value": "84"
         }
       ],
       "type": "cryptographic-asset"
@@ -5477,6 +6055,20 @@
       "evidence": {
         "occurrences": [
           {
+            "additionalContext": "[reachable] [component] in dufs::auth::AccessControl::generate_token; part of Ed25519; line: `let sig = signing_key.sign(message.as_bytes()).to_bytes();`; code: `sign`",
+            "line": 183,
+            "location": "src/auth.rs",
+            "offset": 30,
+            "symbol": "signature::signer::Signer::sign"
+          },
+          {
+            "additionalContext": "[reachable] [component] in dufs::auth::AccessControl::verify_token; part of Ed25519; line: `derive_secret_key(user, pass).verify(message.as_bytes(), &sig)?;`; code: `verify`",
+            "line": 218,
+            "location": "src/auth.rs",
+            "offset": 38,
+            "symbol": "ed25519_dalek::signing::SigningKey::verify"
+          },
+          {
             "additionalContext": "[present] [component] in rustls::crypto::ring::hmac::HMAC_SHA512; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `pub(crate) static HMAC_SHA512: Hmac = Hmac(&ring_like::hmac::HMAC_SHA512);`; code: `ring_like::hmac::HMAC_SHA512`",
             "line": 11,
             "location": "rustls-0.23.46/src/crypto/ring/hmac.rs",
@@ -5594,6 +6186,181 @@
             "location": "rustls-webpki-0.103.15/src/ring_algs.rs",
             "offset": 27,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; default: setup, not a use; line: `let mut hasher_alt = Sha512::default();`; code: `Sha512::default`",
+            "line": 176,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 180,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `let dp = hasher_alt.finalize();`; code: `finalize`",
+            "line": 184,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 24,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; default: setup, not a use; line: `hasher_alt = Sha512::default();`; code: `Sha512::default`",
+            "line": 191,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 17,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `hasher_alt.update(salt);`; code: `update`",
+            "line": 196,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `let ds = hasher_alt.finalize();`; code: `finalize`",
+            "line": 201,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 24,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; default: setup, not a use; line: `let mut hasher = Sha512::default();`; code: `Sha512::default`",
+            "line": 212,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `hasher.update(digest_c);`; code: `update`",
+            "line": 218,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `hasher.update(digest_c);`; code: `update`",
+            "line": 233,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; line: `digest_c.clone_from_slice(&hasher.finalize());`; code: `finalize`",
+            "line": 238,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 42,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; default: setup, not a use; line: `let mut hasher = Sha512::default();`; code: `Sha512::default`",
+            "line": 290,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 21,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(password);`; code: `update`",
+            "line": 291,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(salt);`; code: `update`",
+            "line": 292,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; default: setup, not a use; line: `let mut hasher_alt = Sha512::default();`; code: `Sha512::default`",
+            "line": 295,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 297,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher_alt.update(salt);`; code: `update`",
+            "line": 299,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher_alt.update(password);`; code: `update`",
+            "line": 301,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `let digest_b = hasher_alt.finalize();`; code: `finalize`",
+            "line": 303,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 30,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(digest_b);`; code: `update`",
+            "line": 307,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(&digest_b[..(pw_len % BLOCK_SIZE_SHA512)]);`; code: `update`",
+            "line": 310,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(digest_b);`; code: `update`",
+            "line": 319,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.update(password);`; code: `update`",
+            "line": 321,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 19,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; line: `hasher.finalize().into()`; code: `finalize`",
+            "line": 327,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha512>; use: digest; instantiated by sha_crypt::sha512_crypt at sha-crypt-0.6.0/src/lib.rs:216:12 as `hash_byte_seq`; line: `digest.update(fill_from);`; code: `update`",
+            "line": 333,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha512>; use: digest; instantiated by sha_crypt::sha512_crypt at sha-crypt-0.6.0/src/lib.rs:216:12 as `hash_byte_seq`; line: `digest.update(&fill_from[..(len % bs)]);`; code: `update`",
+            "line": 335,
+            "location": "sha-crypt-0.6.0/src/lib.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::update"
           }
         ]
       },
@@ -5613,75 +6380,6 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:only-as-component",
-          "value": "true"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "17"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:drbg:rand",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate"
-          ],
-          "primitive": "drbg"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; algorithm unresolved: `rand::random` of rand 0.10.3, a version the knowledge base does not cover; line: `rand::random()`; code: `rand::random`",
-            "line": 36,
-            "location": "uuid-1.28.0/src/rng.rs",
-            "offset": 12,
-            "symbol": "rand::random"
-          },
-          {
-            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; algorithm unresolved: `rand::random` of rand 0.10.3, a version the knowledge base does not cover; line: `rand::random()`; code: `rand::random`",
-            "line": 40,
-            "location": "uuid-1.28.0/src/rng.rs",
-            "offset": 12,
-            "symbol": "rand::random"
-          },
-          {
-            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; algorithm unresolved: `rand::random` of rand 0.10.3, a version the knowledge base does not cover; line: `rand::random()`; code: `rand::random`",
-            "line": 44,
-            "location": "uuid-1.28.0/src/rng.rs",
-            "offset": 12,
-            "symbol": "rand::random"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
           "value": "observed"
         },
         {
@@ -5689,102 +6387,8 @@
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "3"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:md5",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let auth_pass = format!(\"{:x}\", h.finalize());`; code: `finalize`",
-            "line": 523,
-            "location": "src/auth.rs",
-            "offset": 46,
-            "symbol": "md5::Context::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let ha = format!(\"{:x}\", ha.finalize());`; code: `finalize`",
-            "line": 531,
-            "location": "src/auth.rs",
-            "offset": 40,
-            "symbol": "md5::Context::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `format!(\"{:x}\", c.finalize())`; code: `finalize`",
-            "line": 552,
-            "location": "src/auth.rs",
-            "offset": 42,
-            "symbol": "md5::Context::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `format!(\"{:x}\", c.finalize())`; code: `finalize`",
-            "line": 565,
-            "location": "src/auth.rs",
-            "offset": 38,
-            "symbol": "md5::Context::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::validate_nonce; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let h = format!(\"{:x}\", h.finalize());`; code: `finalize`",
-            "line": 603,
-            "location": "src/auth.rs",
-            "offset": 38,
-            "symbol": "md5::Context::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::create_nonce; use: digest; algorithm unresolved: `md5::Context::finalize` of md5 0.8.1, a version the knowledge base does not cover; line: `let n = format!(\"{:08x}{:032x}\", secs, h.finalize());`; code: `finalize`",
-            "line": 709,
-            "location": "src/auth.rs",
-            "offset": 45,
-            "symbol": "md5::Context::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "44"
         }
       ],
       "type": "cryptographic-asset"
@@ -5845,525 +6449,23 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; new: setup, not a use; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `let mut hasher = Sha256::new();`; code: `Sha256::new`",
-            "line": 579,
-            "location": "src/auth.rs",
-            "offset": 21,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(format!(\"{user}:{pass}\").as_bytes());`; code: `update`",
-            "line": 580,
-            "location": "src/auth.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::derive_secret_key; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `let hash = hasher.finalize();`; code: `finalize`",
-            "line": 581,
-            "location": "src/auth.rs",
-            "offset": 22,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; new: setup, not a use; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `let mut hasher = Sha256::new();`; code: `Sha256::new`",
-            "line": 2055,
-            "location": "src/server.rs",
-            "offset": 21,
-            "symbol": "digest::digest::Digest::new"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `hasher.update(&buffer[..bytes_read]);`; code: `update`",
-            "line": 2063,
-            "location": "src/server.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::server::sha256_file::{closure#0}; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by dufs::server::Server::handle_hash_file::{closure#0} at src/server.rs:1156:39; instantiated by dufs::server::Server::handle::{closure#0} at src/server.rs:379:77; instantiated by dufs::server::Server::call::{closure#0} at src/server.rs:119:53; instantiated by dufs::server::Server::call at src/server.rs:110:40; line: `let result = hasher.finalize();`; code: `finalize`",
-            "line": 2066,
-            "location": "src/server.rs",
-            "offset": 24,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 90,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `let dp = hasher_alt.finalize();`; code: `finalize`",
-            "line": 94,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 24,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(salt);`; code: `update`",
-            "line": 106,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `let ds = hasher_alt.finalize();`; code: `finalize`",
-            "line": 111,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 24,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_c);`; code: `update`",
-            "line": 128,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_c);`; code: `update`",
-            "line": 143,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `digest_c.clone_from_slice(&hasher.finalize());`; code: `finalize`",
-            "line": 148,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 42,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 180,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `let dp = hasher_alt.finalize();`; code: `finalize`",
-            "line": 184,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 24,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(salt);`; code: `update`",
-            "line": 196,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `let ds = hasher_alt.finalize();`; code: `finalize`",
-            "line": 201,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 24,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_c);`; code: `update`",
-            "line": 218,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_c);`; code: `update`",
-            "line": 233,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `digest_c.clone_from_slice(&hasher.finalize());`; code: `finalize`",
-            "line": 238,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 42,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(password);`; code: `update`",
-            "line": 248,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(salt);`; code: `update`",
-            "line": 249,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 254,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(salt);`; code: `update`",
-            "line": 256,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 258,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `let digest_b = hasher_alt.finalize();`; code: `finalize`",
-            "line": 260,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 30,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_b);`; code: `update`",
-            "line": 264,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(&digest_b[..(pw_len % BLOCK_SIZE_SHA256)]);`; code: `update`",
-            "line": 267,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_b);`; code: `update`",
-            "line": 276,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(password);`; code: `update`",
-            "line": 278,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.finalize().into()`; code: `finalize`",
-            "line": 284,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(password);`; code: `update`",
-            "line": 291,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(salt);`; code: `update`",
-            "line": 292,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 297,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(salt);`; code: `update`",
-            "line": 299,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher_alt.update(password);`; code: `update`",
-            "line": 301,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `let digest_b = hasher_alt.finalize();`; code: `finalize`",
-            "line": 303,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 30,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_b);`; code: `update`",
-            "line": 307,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(&digest_b[..(pw_len % BLOCK_SIZE_SHA512)]);`; code: `update`",
-            "line": 310,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(digest_b);`; code: `update`",
-            "line": 319,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.update(password);`; code: `update`",
-            "line": 321,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 19,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; line: `hasher.finalize().into()`; code: `finalize`",
-            "line": 327,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::finalize"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha512>; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by sha_crypt::sha512_crypt at sha-crypt-0.6.0/src/lib.rs:216:12 as `hash_byte_seq`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by sha_crypt::sha256_crypt at sha-crypt-0.6.0/src/lib.rs:126:12 as `hash_byte_seq`; line: `digest.update(fill_from);`; code: `update`",
-            "line": 333,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 15,
-            "symbol": "digest::digest::Digest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::hash_byte_seq::<sha2::Sha512>; use: digest; algorithm unresolved: the type `sha2::Sha512` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by sha_crypt::sha512_crypt at sha-crypt-0.6.0/src/lib.rs:216:12 as `hash_byte_seq`; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.1, a version the knowledge base does not cover; instantiated by sha_crypt::sha256_crypt at sha-crypt-0.6.0/src/lib.rs:126:12 as `hash_byte_seq`; line: `digest.update(&fill_from[..(len % bs)]);`; code: `update`",
-            "line": 335,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 11,
-            "symbol": "digest::digest::Digest::update"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "44"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:signature:ed25519-dalek",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "sign",
-            "verify"
-          ],
-          "primitive": "signature"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::generate_token; use: sign; algorithm unresolved: the type `ed25519_dalek::signing::SigningKey` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `let sig = signing_key.sign(message.as_bytes()).to_bytes();`; code: `sign`",
-            "line": 183,
-            "location": "src/auth.rs",
-            "offset": 30,
-            "symbol": "signature::signer::Signer::sign"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::verify_token; use: verify; algorithm unresolved: `ed25519_dalek::signing::SigningKey::verify` of ed25519-dalek 3.0.0, a version the knowledge base does not cover; line: `derive_secret_key(user, pass).verify(message.as_bytes(), &sig)?;`; code: `verify`",
-            "line": 218,
-            "location": "src/auth.rs",
-            "offset": 38,
-            "symbol": "ed25519_dalek::signing::SigningKey::verify"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:ed25519",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::generate_token; use: unknown; algorithm unresolved: `ed25519::Signature::to_bytes` of ed25519 3.0.0, a crypto package the knowledge base does not model: what the call does is not known; line: `let sig = signing_key.sign(message.as_bytes()).to_bytes();`; code: `to_bytes`",
-            "line": 183,
-            "location": "src/auth.rs",
-            "offset": 55,
-            "symbol": "ed25519::Signature::to_bytes"
-          },
-          {
-            "additionalContext": "[reachable] [call] in dufs::auth::AccessControl::verify_token; use: unknown; algorithm unresolved: `ed25519::Signature::from_bytes` of ed25519 3.0.0, a crypto package the knowledge base does not model: what the call does is not known; line: `let sig = Signature::from_bytes(&<[u8; 64]>::try_from(sig_bytes)?);`; code: `Signature::from_bytes`",
-            "line": 215,
-            "location": "src/auth.rs",
-            "offset": 18,
-            "symbol": "ed25519::Signature::from_bytes"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:password-hash+sha-crypt",
+      "bom-ref": "crypto:algorithm:unknown:kdf:sha-crypt",
       "cryptoProperties": {
         "algorithmProperties": {
           "cryptoFunctions": [
             "verify"
           ],
-          "primitive": "unknown"
+          "primitive": "kdf"
         },
         "assetType": "algorithm"
       },
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: verify; algorithm unresolved: `password_hash::PasswordVerifier::verify_password` of password-hash 0.6.1, a version the knowledge base does not cover; password: unknown (origin search bound reached); line: `.verify_password(pass.as_bytes(), auth_pass)`; code: `verify_password`",
+            "additionalContext": "[reachable] [call] in dufs::auth::check_auth; use: verify; algorithm unresolved: the type `sha_crypt::mcf::ShaCrypt` of sha-crypt 0.6.0, a crypto package the knowledge base does not model; password: unknown (origin search bound reached); line: `.verify_password(pass.as_bytes(), auth_pass)`; code: `verify_password`",
             "line": 494,
             "location": "src/auth.rs",
             "offset": 17,
-            "symbol": "password_hash::PasswordVerifier::verify_password"
-          },
-          {
-            "additionalContext": "[present] [call] in <sha_crypt::mcf::ShaCrypt as password_hash::PasswordHasher<mcf::allocating::PasswordHash>>::hash_password_with_salt; use: keyderive; algorithm unresolved: `password_hash::CustomizedPasswordHasher::hash_password_customized` of password-hash 0.6.1, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function); line: `self.hash_password_customized(password, salt, None, None, self.params)`; code: `hash_password_customized`",
-            "line": 94,
-            "location": "sha-crypt-0.6.0/src/mcf.rs",
-            "offset": 13,
-            "symbol": "password_hash::CustomizedPasswordHasher::hash_password_customized"
-          },
-          {
-            "additionalContext": "[present] [call] in <sha_crypt::mcf::ShaCrypt as password_hash::PasswordVerifier<mcf::allocating::PasswordHash>>::verify_password; use: verify; algorithm unresolved: `password_hash::PasswordVerifier::verify_password` of password-hash 0.6.1, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); line: `self.verify_password(password, hash.as_password_hash_ref())`; code: `verify_password`",
-            "line": 101,
-            "location": "sha-crypt-0.6.0/src/mcf.rs",
-            "offset": 13,
-            "symbol": "password_hash::PasswordVerifier::verify_password"
-          },
-          {
-            "additionalContext": "[reachable] [call] in <sha_crypt::mcf::ShaCrypt as password_hash::PasswordVerifier<str>>::verify_password; use: verify; algorithm unresolved: `password_hash::PasswordVerifier::verify_password` of password-hash 0.6.1, a version the knowledge base does not cover; password: parameter (argument 1 of the enclosing function); line: `self.verify_password(password, hash)`; code: `verify_password`",
-            "line": 156,
-            "location": "sha-crypt-0.6.0/src/mcf.rs",
-            "offset": 13,
             "symbol": "password_hash::PasswordVerifier::verify_password"
           }
         ]
@@ -6392,11 +6494,7 @@
         },
         {
           "name": "rcbom:provenance:password",
-          "value": "parameter,unknown"
-        },
-        {
-          "name": "rcbom:provenance:salt",
-          "value": "parameter"
+          "value": "unknown"
         },
         {
           "name": "rcbom:algorithm",
@@ -6404,7 +6502,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -6460,124 +6558,6 @@
         {
           "name": "rcbom:occurrences",
           "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:unknown:sha2",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "unknown"
-          ],
-          "primitive": "unknown"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher_alt = Sha256::default();`; code: `Sha256::default`",
-            "line": 86,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `hasher_alt = Sha256::default();`; code: `Sha256::default`",
-            "line": 101,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 17,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher = Sha256::default();`; code: `Sha256::default`",
-            "line": 122,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher_alt = Sha512::default();`; code: `Sha512::default`",
-            "line": 176,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `hasher_alt = Sha512::default();`; code: `Sha512::default`",
-            "line": 191,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 17,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher = Sha512::default();`; code: `Sha512::default`",
-            "line": 212,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher = Sha256::default();`; code: `Sha256::default`",
-            "line": 247,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 21,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha256_crypt_intermediate; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher_alt = Sha256::default();`; code: `Sha256::default`",
-            "line": 252,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher = Sha512::default();`; code: `Sha512::default`",
-            "line": 290,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 21,
-            "symbol": "core::default::Default::default"
-          },
-          {
-            "additionalContext": "[reachable] [call] in sha_crypt::sha512_crypt_intermediate; use: unknown; algorithm unresolved: `core::default::Default::default` of sha2 0.11.1, a version the knowledge base does not cover: what the call does is not known; line: `let mut hasher_alt = Sha512::default();`; code: `Sha512::default`",
-            "line": 295,
-            "location": "sha-crypt-0.6.0/src/lib.rs",
-            "offset": 25,
-            "symbol": "core::default::Default::default"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -6773,6 +6753,9 @@
       "dependsOn": [
         "pkg:cargo/rand_core@0.10.1"
       ],
+      "provides": [
+        "crypto:algorithm:ChaCha12-RNG"
+      ],
       "ref": "pkg:cargo/chacha20@0.10.2"
     },
     {
@@ -6838,9 +6821,6 @@
       "dependsOn": [
         "pkg:cargo/signature@3.0.0"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:ed25519"
-      ],
       "ref": "pkg:cargo/ed25519@3.0.0"
     },
     {
@@ -6852,7 +6832,7 @@
         "pkg:cargo/zeroize@1.9.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:signature:ed25519-dalek"
+        "crypto:algorithm:Ed25519"
       ],
       "ref": "pkg:cargo/ed25519-dalek@3.0.0"
     },
@@ -6875,15 +6855,12 @@
     {
       "dependsOn": [],
       "provides": [
-        "crypto:algorithm:unknown:hash:md5"
+        "crypto:algorithm:MD5"
       ],
       "ref": "pkg:cargo/md5@0.8.1"
     },
     {
       "dependsOn": [],
-      "provides": [
-        "crypto:algorithm:unknown:unknown:password-hash+sha-crypt"
-      ],
       "ref": "pkg:cargo/password-hash@0.6.1"
     },
     {
@@ -6893,7 +6870,7 @@
         "pkg:cargo/rand_core@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:drbg:rand"
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/rand@0.10.3"
     },
@@ -6976,7 +6953,7 @@
         "pkg:cargo/sha2@0.11.1"
       ],
       "provides": [
-        "crypto:algorithm:unknown:unknown:password-hash+sha-crypt"
+        "crypto:algorithm:unknown:kdf:sha-crypt"
       ],
       "ref": "pkg:cargo/sha-crypt@0.6.0"
     },
@@ -6994,8 +6971,8 @@
         "pkg:cargo/digest@0.11.3"
       ],
       "provides": [
-        "crypto:algorithm:unknown:hash:sha2",
-        "crypto:algorithm:unknown:unknown:sha2"
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/sha2@0.11.1"
     },
@@ -7133,6 +7110,10 @@
     },
     {
       "dependsOn": [],
+      "ref": "crypto:algorithm:ChaCha12-RNG"
+    },
+    {
+      "dependsOn": [],
       "ref": "crypto:algorithm:ChaCha20-Poly1305"
     },
     {
@@ -7146,6 +7127,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:ECDH-P-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
     },
     {
       "dependsOn": [],
@@ -7173,39 +7158,15 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:drbg:rand"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:md5"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:hash:ring"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:sha2"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:signature:ed25519-dalek"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:ed25519"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:password-hash+sha-crypt"
+      "ref": "crypto:algorithm:unknown:kdf:sha-crypt"
     },
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:ring"
-    },
-    {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:unknown:sha2"
     },
     {
       "dependsOn": [],
@@ -7273,7 +7234,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "439 calls into crypto packages: 122 cited, 0 cited by the check as unknown, 317 excused (accessor 31, comparison 3, copy 24, entered 28, format 21, generator setup 5, internal 55, public half 4, relay 12, setup 37, step 24, view 49, wipe 24)"
+        "value": "442 calls into crypto packages: 150 cited, 3 cited by the check by name, 0 cited by the check as unknown, 289 excused (accessor 31, comparison 3, copy 24, encoding 2, entered 28, format 21, generator setup 5, internal 55, public half 4, relay 12, setup 31, view 49, wipe 24)"
       }
     ],
     "tools": {
@@ -7286,7 +7247,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:181e890b-ec0b-8f5a-a66c-9e232547f2df",
+  "serialNumber": "urn:uuid:e2d50824-9d79-8586-943f-b0742ad81850",
   "specVersion": "1.7",
   "version": 1
 }

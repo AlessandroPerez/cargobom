@@ -1,3 +1,8 @@
+  occ BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe30::main; use: digest; line: `let b = blake2::Blake2b512::digest(b"abc");`; code: `blake2::Blake2b512::digest`
+  occ BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | src/main.rs:17:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in probe30::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b"key").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`
+  occ BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | src/main.rs:18:4 | digest::mac::Mac::update | [reachable] [call] in probe30::main; use: tag; line: `Mac::update(&mut m, b"abc");`; code: `Mac::update`
+  occ BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | src/main.rs:19:14 | digest::mac::Mac::finalize | [reachable] [call] in probe30::main; use: tag; line: `let t = m.finalize().into_bytes();`; code: `finalize`
+  occ BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | src/main.rs:19:25 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in probe30::main; into_bytes: setup, not a use; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:32:12 | elliptic_curve::ecdh::EphemeralSecret::<C>::random | [reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:33:13 | core::convert::From::from | [reachable] [call] in probe30::main; from: setup, not a use; line: `let pk = p256::PublicKey::from(&e);`; code: `p256::PublicKey::from`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:34:19 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in probe30::main; use: keyderive; line: `let shared = e.diffie_hellman(&pk);`; code: `diffie_hellman`
@@ -41,14 +46,25 @@
   occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:355:0 | spki | [manifest] locked spki 0.7.3; reached via probe30 -> p256 -> ecdsa -> spki
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:365:0 | subtle | [manifest] locked subtle 2.6.1; reached via probe30 -> blake2 -> digest -> subtle
   occ unknown | crypto:algorithm:unknown:block-cipher:blowfish | src/main.rs:23:7 | cipher::block::BlockEncrypt::encrypt_block | [reachable] [call] in probe30::main; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `bf.encrypt_block(&mut blk);`; code: `encrypt_block`
-  occ unknown | crypto:algorithm:unknown:hash:blake2 | src/main.rs:16:12 | digest::digest::Digest::digest | [reachable] [call] in probe30::main; use: digest; algorithm unresolved: the type `blake2::Blake2bVarCore` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let b = blake2::Blake2b512::digest(b"abc");`; code: `blake2::Blake2b512::digest`
-  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:17:16 | digest::mac::Mac::new_from_slice | [reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b"key").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`
-  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:18:4 | digest::mac::Mac::update | [reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `Mac::update(&mut m, b"abc");`; code: `Mac::update`
-  occ unknown | crypto:algorithm:unknown:mac:blake2 | src/main.rs:19:14 | digest::mac::Mac::finalize | [reachable] [call] in probe30::main; use: tag; algorithm unresolved: the type `blake2::Blake2bMac` of blake2 0.10.6, a crypto package the knowledge base does not model; line: `let t = m.finalize().into_bytes();`; code: `finalize`
   occ unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | src/main.rs:27:6 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in probe30::main; use: encrypt or decrypt; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; line: `s.apply_keystream(&mut buf);`; code: `apply_keystream`
   occ unknown | crypto:algorithm:unknown:unknown:blowfish | src/main.rs:21:13 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 21); line: `let bf = blowfish::Blowfish::<byteorder::BE>::new_from_slice(b"0123456789abcdef").unwrap();`; code: `blowfish::Blowfish::<byteorder::BE>::new_from_slice`
   occ unknown | crypto:algorithm:unknown:unknown:salsa20 | src/main.rs:25:16 | crypto_common::KeyIvInit::new | [reachable] [call] in probe30::main; new: setup, not a use; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 25); iv: hard-coded (8 bytes, literal at line 25); line: `let mut s = salsa20::Salsa20::new(&[1u8; 32].into(), &[2u8; 8].into());`; code: `salsa20::Salsa20::new`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:389:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via probe30 -> p256 -> elliptic-curve -> zeroize
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:confidence=high
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:functions:source=observed
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:occurrences=1
+  prop BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | rcbom:reachability=reachable
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:confidence=high
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:detection:method=type-resolved
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:finding=hard-coded-key
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:functions:source=observed
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:kb:version=0.2.0
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:note=keyed BLAKE2b (RFC 7693), not an HMAC
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:occurrences=4
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:provenance:key=hard-coded
+  prop BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | rcbom:reachability=reachable
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:functions:source=observed
@@ -77,8 +93,7 @@
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=present
-  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=unmodelled
-  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:kb-coverage=unmodelled
+  prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:crypto-role=algorithm
   prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:scope=required
   prop blake2 | pkg:cargo/blake2@0.10.6 | rcbom:usage=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
@@ -179,22 +194,6 @@
   prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:occurrences=1
   prop unknown | crypto:algorithm:unknown:block-cipher:blowfish | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:hash:blake2 | rcbom:reachability=reachable
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:finding=hard-coded-key
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:occurrences=3
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:provenance:key=hard-coded
-  prop unknown | crypto:algorithm:unknown:mac:blake2 | rcbom:reachability=reachable
   prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:algorithm=unresolved
   prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:confidence=high
   prop unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | rcbom:detection:method=type-resolved
@@ -226,12 +225,12 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
 asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "primitive": "signature"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:block-cipher:blowfish | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:blake2 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:mac:blake2 | {"algorithmProperties": {"cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | {"algorithmProperties": {"cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:blowfish | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:salsa20 | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}
@@ -334,12 +333,12 @@ dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/digest@0.10.7
 dep pkg:cargo/signature@2.2.0 -> pkg:cargo/rand_core@0.6.4
 dep pkg:cargo/spki@0.7.3 -> pkg:cargo/der@0.7.10
+dependency crypto:algorithm:BLAKE2b-512
+dependency crypto:algorithm:BLAKE2b-512-HMAC
 dependency crypto:algorithm:ECDH-P-256
 dependency crypto:algorithm:ECDSA-P-256-SHA-256
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:unknown:block-cipher:blowfish
-dependency crypto:algorithm:unknown:hash:blake2
-dependency crypto:algorithm:unknown:mac:blake2
 dependency crypto:algorithm:unknown:stream-cipher:salsa20
 dependency crypto:algorithm:unknown:unknown:blowfish
 dependency crypto:algorithm:unknown:unknown:salsa20
@@ -378,8 +377,8 @@ dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
-provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:hash:blake2
-provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:unknown:mac:blake2
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512
+provides pkg:cargo/blake2@0.10.6 -> crypto:algorithm:BLAKE2b-512-HMAC
 provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:block-cipher:blowfish
 provides pkg:cargo/blowfish@0.9.1 -> crypto:algorithm:unknown:unknown:blowfish
 provides pkg:cargo/ecdsa@0.16.9 -> crypto:algorithm:ECDSA-P-256-SHA-256
@@ -392,11 +391,11 @@ provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/probe30@0.1.0", "name": "probe30", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/probe30@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin probe30
-run rcbom:run:boundary-check=26 calls into crypto packages: 14 cited, 0 cited by the check as unknown, 12 excused (accessor 2, format 3, internal 7)
+run rcbom:run:boundary-check=22 calls into crypto packages: 15 cited, 0 cited by the check as unknown, 7 excused (accessor 1, format 3, internal 3)
 run rcbom:run:features=
 run rcbom:run:packages=40
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=463
+run rcbom:run:reachable-instances=326
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

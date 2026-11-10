@@ -1,6 +1,7 @@
   occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:31:8 | digest::digest::Digest::digest | [reachable] [call] in v02::a::f; use: digest; line: `H::digest(d).len()`; code: `H::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:4 | digest::digest::Digest::digest | [reachable] [call] in v02::direct; use: digest; line: `Sha256::digest(d).len()`; code: `Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:4 | digest::digest::Digest::digest | [reachable] [call] in v02::qualified; use: digest; line: `sha2::Sha256::digest(d).len()`; code: `sha2::Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:8 | digest::digest::Digest::digest | [reachable] [call] in v02::newer::f; use: digest; line: `sha2_11::Sha256::digest(d).len()`; code: `sha2_11::Sha256::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:8 | digest::digest::Digest::digest | [reachable] [call] in v02::b::f; use: digest; line: `H::digest(d).len()`; code: `H::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:49:4 | digest::digest::Digest::digest | [reachable] [call] in v02::chosen; use: digest; line: `Hasher::digest(d).len()`; code: `Hasher::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:54:13 | ring::digest::SHA256 | [reachable] [static] in v02::aliased; line: `hash_it(&ALG, d).as_ref().len()`; code: `ALG`
@@ -28,7 +29,6 @@
   occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by v02 (dependencies)
   occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.lock:182:0 | sha2 | [manifest] locked sha2 0.11.0; reached via v02 -> sha2
   occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.toml:19:0 | sha2_11 | [manifest] declared by v02 (dependencies)
-  occ unknown | crypto:algorithm:unknown:hash:sha2 | src/main.rs:22:8 | digest::digest::Digest::digest | [reachable] [call] in v02::newer::f; use: digest; algorithm unresolved: the type `sha2::Sha256` of sha2 0.11.0, a version the knowledge base does not cover; line: `sha2_11::Sha256::digest(d).len()`; code: `sha2_11::Sha256::digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
@@ -40,7 +40,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=11
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=12
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
@@ -57,12 +57,10 @@
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
   prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
   prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
-  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:kb-coverage=unsupported-version
   prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
-  prop digest | pkg:cargo/digest@0.11.3 | rcbom:kb-coverage=unsupported-version
   prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -79,19 +77,10 @@
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
-  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:kb-coverage=unsupported-version
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
   prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:occurrences=1
-  prop unknown | crypto:algorithm:unknown:hash:sha2 | rcbom:reachability=reachable
 asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:sha2 | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
 component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
@@ -119,7 +108,6 @@ dep pkg:cargo/v02@0.1.0 -> pkg:cargo/sha2@0.10.9
 dep pkg:cargo/v02@0.1.0 -> pkg:cargo/sha2@0.11.0
 dependency crypto:algorithm:SHA-1
 dependency crypto:algorithm:SHA-256
-dependency crypto:algorithm:unknown:hash:sha2
 dependency pkg:cargo/block-buffer@0.10.4
 dependency pkg:cargo/block-buffer@0.12.1
 dependency pkg:cargo/const-oid@0.10.2
@@ -139,7 +127,7 @@ doc version=1
 provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
 provides pkg:cargo/sha1@0.10.7 -> crypto:algorithm:SHA-1
 provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
-provides pkg:cargo/sha2@0.11.0 -> crypto:algorithm:unknown:hash:sha2
+provides pkg:cargo/sha2@0.11.0 -> crypto:algorithm:SHA-256
 root {"bom-ref": "pkg:cargo/v02@0.1.0", "name": "v02", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/v02@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin v02
