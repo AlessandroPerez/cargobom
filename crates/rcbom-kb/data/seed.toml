@@ -17,37 +17,37 @@ version = "0.2.0"
 
 [[crate]]
 package = "aes-gcm"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 candidates = ["AES-GCM"]
 
 [[crate]]
 package = "chacha20poly1305"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 candidates = ["ChaCha20-Poly1305"]
 
 [[crate]]
 package = "hmac"
-versions = ">=0.12, <0.13"
+versions = ">=0.12, <0.14"
 role = "algorithm"
 candidates = ["HMAC"]
 
 [[crate]]
 package = "hkdf"
-versions = ">=0.12, <0.13"
+versions = ">=0.12, <0.14"
 role = "algorithm"
 candidates = ["HKDF"]
 
 [[crate]]
 package = "sha2"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 candidates = ["SHA-2"]
 
 [[crate]]
 package = "sha1"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 candidates = ["SHA-1"]
 
@@ -59,13 +59,13 @@ candidates = []
 
 [[crate]]
 package = "x25519-dalek"
-versions = ">=2, <3"
+versions = ">=2, <4"
 role = "algorithm"
 candidates = ["x25519"]
 
 [[crate]]
 package = "scrypt"
-versions = ">=0.11, <0.12"
+versions = ">=0.11, <0.13"
 role = "algorithm"
 candidates = ["scrypt"]
 
@@ -91,7 +91,7 @@ candidates = []
 
 [[crate]]
 package = "md5"
-versions = ">=0.7, <0.8"
+versions = ">=0.7, <0.9"
 role = "algorithm"
 candidates = ["MD5"]
 
@@ -103,13 +103,13 @@ candidates = ["BLAKE3"]
 
 [[crate]]
 package = "pbkdf2"
-versions = ">=0.12, <0.13"
+versions = ">=0.12, <0.14"
 role = "algorithm"
 candidates = ["PBKDF2"]
 
 [[crate]]
 package = "argon2"
-versions = ">=0.5, <0.6"
+versions = ">=0.5, <0.7"
 role = "algorithm"
 candidates = ["Argon2"]
 
@@ -121,98 +121,108 @@ candidates = []
 
 [[crate]]
 package = "ed25519-dalek"
-versions = ">=2, <3"
+versions = ">=2, <4"
 role = "algorithm"
 candidates = ["Ed25519"]
 
 [[crate]]
 package = "password-hash"
-versions = ">=0.5, <0.6"
+versions = ">=0.5, <0.7"
 role = "trait"
 
-# Trait and building-block crates of the RustCrypto 0.10 generation: calls go through them,
-# their bodies are not walked.
+# Trait and building-block crates of RustCrypto: calls go through them, their bodies are not
+# walked. Two generations: the one of digest 0.10 (crypto-common 0.1, generic-array), and the
+# one after it (digest 0.11, crypto-common 0.2, hybrid-array), whose hashes are structs of
+# their own and whose `Hmac<D>` is a struct over the hash. An entry below that holds for one
+# generation only says so (`versions`).
 [[crate]]
 package = "aead"
-versions = ">=0.5, <0.6"
+versions = ">=0.5, <0.7"
 role = "trait"
 
 [[crate]]
 package = "crypto-common"
-versions = ">=0.1, <0.2"
+versions = ">=0.1, <0.3"
 role = "trait"
 
 [[crate]]
 package = "digest"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
+role = "trait"
+
+# the `Kdf` trait of the generation after 0.10 (`Scrypt.derive_key(password, salt, &mut out)`)
+[[crate]]
+package = "kdf"
+versions = ">=0.1, <0.2"
 role = "trait"
 
 [[crate]]
 package = "cipher"
-versions = ">=0.4, <0.5"
+versions = ">=0.4, <0.6"
 role = "trait"
 
 [[crate]]
 package = "universal-hash"
-versions = ">=0.5, <0.6"
+versions = ">=0.5, <0.7"
 role = "trait"
 
 # `Signer::sign`, `Verifier::verify` of ed25519-dalek and rsa go through this trait crate.
 [[crate]]
 package = "signature"
-versions = ">=2, <3"
+versions = ">=2, <4"
 role = "trait"
 
 [[crate]]
 package = "aes"
-versions = ">=0.8, <0.9"
-role = "algorithm"
-
-[[crate]]
-package = "chacha20"
-versions = ">=0.9, <0.10"
-role = "algorithm"
-
-[[crate]]
-package = "poly1305"
-versions = ">=0.8, <0.9"
-role = "algorithm"
-
-[[crate]]
-package = "ghash"
-versions = ">=0.5, <0.6"
-role = "algorithm"
-
-[[crate]]
-package = "polyval"
-versions = ">=0.6, <0.7"
-role = "algorithm"
-
-[[crate]]
-package = "ctr"
-versions = ">=0.9, <0.10"
-role = "algorithm"
-
-[[crate]]
-package = "cbc"
-versions = ">=0.1, <0.2"
-role = "algorithm"
-
-# Random number generation: the CSPRNG (rand's ThreadRng, ChaCha12 over rand_chacha), its
-# traits, and the OS source. Their outputs are provenance sources (see [[source]] below).
-[[crate]]
-package = "rand"
 versions = ">=0.8, <0.10"
 role = "algorithm"
 
 [[crate]]
+package = "chacha20"
+versions = ">=0.9, <0.11"
+role = "algorithm"
+
+[[crate]]
+package = "poly1305"
+versions = ">=0.8, <0.10"
+role = "algorithm"
+
+[[crate]]
+package = "ghash"
+versions = ">=0.5, <0.7"
+role = "algorithm"
+
+[[crate]]
+package = "polyval"
+versions = ">=0.6, <0.8"
+role = "algorithm"
+
+[[crate]]
+package = "ctr"
+versions = ">=0.9, <0.11"
+role = "algorithm"
+
+[[crate]]
+package = "cbc"
+versions = ">=0.1, <0.3"
+role = "algorithm"
+
+# Random number generation: the CSPRNG (rand's ThreadRng, ChaCha12 over rand_chacha, and over
+# chacha20's `rng` feature from rand 0.10), its traits, and the OS source. Their outputs are
+# provenance sources (see [[source]] below).
+[[crate]]
+package = "rand"
+versions = ">=0.8, <0.11"
+role = "algorithm"
+
+[[crate]]
 package = "rand_chacha"
-versions = ">=0.3, <0.10"
+versions = ">=0.3, <0.11"
 role = "algorithm"
 
 [[crate]]
 package = "rand_core"
-versions = ">=0.6, <0.10"
+versions = ">=0.6, <0.11"
 # the RngCore traits, which rand and others implement, and OsRng, a thin type over getrandom
 # (its [[type]] entry below)
 role = "trait"
@@ -227,12 +237,12 @@ role = "algorithm"
 # (OpenSSH's key derivation)
 [[crate]]
 package = "sha3"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.13"
 role = "algorithm"
 
 [[crate]]
 package = "md-5"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 
 [[crate]]
@@ -247,22 +257,45 @@ role = "trait"
 
 [[crate]]
 package = "p256"
-versions = ">=0.13, <0.14"
+versions = ">=0.13, <0.15"
+role = "algorithm"
+
+# the other curves of the elliptic-curve crates: their types are `ecdsa`'s and
+# `elliptic_curve`'s over the curve (`NistP384`, `Secp256k1`), but for p521's own ECDSA keys
+[[crate]]
+package = "p384"
+versions = ">=0.13, <0.15"
+role = "algorithm"
+
+[[crate]]
+package = "p521"
+versions = ">=0.13, <0.15"
+role = "algorithm"
+
+[[crate]]
+package = "k256"
+versions = ">=0.13, <0.15"
 role = "algorithm"
 
 [[crate]]
 package = "elliptic-curve"
-versions = ">=0.13, <0.14"
+versions = ">=0.13, <0.15"
 role = "algorithm"
 
 [[crate]]
 package = "ecdsa"
-versions = ">=0.16, <0.17"
+versions = ">=0.16, <0.18"
 role = "algorithm"
 
 [[crate]]
 package = "bcrypt-pbkdf"
-versions = ">=0.10, <0.11"
+versions = ">=0.10, <0.12"
+role = "algorithm"
+
+# BLAKE2 (RFC 7693): the hashes and their keyed mode
+[[crate]]
+package = "blake2"
+versions = ">=0.10, <0.12"
 role = "algorithm"
 
 # --- Layer 2: types (RustCrypto) -----------------------------------------------------------
@@ -304,7 +337,20 @@ asset = "{core}{rounds}-Poly1305"
 family = "ChaCha20"
 primitive = "ae"
 functions = ["encrypt", "decrypt"]
+versions = "<0.11"
 params = { core = { arg = 0, path = [0], map = { ChaChaCore = "ChaCha", XChaChaCore = "XChaCha" } }, rounds = { arg = 0, path = [0, 0], typenum = true, scale = 2 }, nonce_bytes = { arg = 1, typenum = true } }
+
+# chacha20poly1305 0.11 over chacha20 0.10, whose cores name their rounds by a marker type
+# (`ChaChaCore<R20, Ietf>`, `XChaChaCore<R20>`)
+[[type]]
+crate = "chacha20poly1305"
+name = "ChaChaPoly1305"
+asset = "{core}{rounds}-Poly1305"
+family = "ChaCha20"
+primitive = "ae"
+functions = ["encrypt", "decrypt"]
+versions = ">=0.11"
+params = { core = { arg = 0, path = [0], map = { ChaChaCore = "ChaCha", XChaChaCore = "XChaCha" } }, rounds = { arg = 0, path = [0, 0], map = { R8 = "8", R12 = "12", R20 = "20" } }, nonce_bytes = { arg = 1, typenum = true } }
 
 # aes 0.8's block ciphers used directly (`Aes128::new(key).encrypt_block(&mut block)`): one block
 # at a time, no mode (registry AES[-(128|192|256)][-{mode}]..). Inside a mode or an AEAD they are
@@ -400,6 +446,7 @@ asset = "ChaCha{rounds}"
 family = "ChaCha20"
 primitive = "stream-cipher"
 functions = ["encrypt", "decrypt"]
+versions = "<0.10"
 params = { rounds = { arg = 0, typenum = true, scale = 2 } }
 
 [[type]]
@@ -409,7 +456,31 @@ asset = "XChaCha{rounds}"
 family = "ChaCha20"
 primitive = "stream-cipher"
 functions = ["encrypt", "decrypt"]
+versions = "<0.10"
 params = { rounds = { arg = 0, typenum = true, scale = 2 } }
+
+# chacha20 0.10: ChaCha20 = StreamCipherCoreWrapper<ChaChaCore<R20, Ietf>>, XChaCha20 =
+# ..<XChaChaCore<R20>>; the rounds are a marker type (`R8`, `R12`, `R20`), the second argument
+# the nonce layout (`Ietf`, or `Legacy` with its 64-bit nonce: the same cipher)
+[[type]]
+crate = "chacha20"
+name = "ChaChaCore"
+asset = "ChaCha{rounds}"
+family = "ChaCha20"
+primitive = "stream-cipher"
+functions = ["encrypt", "decrypt"]
+versions = ">=0.10"
+params = { rounds = { arg = 0, map = { R8 = "8", R12 = "12", R20 = "20" } } }
+
+[[type]]
+crate = "chacha20"
+name = "XChaChaCore"
+asset = "XChaCha{rounds}"
+family = "ChaCha20"
+primitive = "stream-cipher"
+functions = ["encrypt", "decrypt"]
+versions = ">=0.10"
+params = { rounds = { arg = 0, map = { R8 = "8", R12 = "12", R20 = "20" } } }
 
 # A block cipher in a mode: the cipher is a parameter of the mode, and these entries hold for
 # AES ciphers only (`required`): `cbc::Encryptor<blowfish::Blowfish>` and
@@ -466,6 +537,44 @@ primitive = "mac"
 functions = ["tag"]
 params = { hash = { arg = 0, asset = true } }
 
+# hmac 0.13: `Hmac<D>` and `HmacReset<D>` are structs over the hash (`Hmac<Sha256>`), around the
+# cores of `hmac::block_api`
+[[type]]
+crate = "hmac"
+name = "Hmac"
+asset = "HMAC-{hash}"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "hmac"
+name = "HmacReset"
+asset = "HMAC-{hash}"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "hmac"
+name = "HmacResetCore"
+asset = "HMAC-{hash}"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag"]
+params = { hash = { arg = 0, asset = true } }
+
+[[type]]
+crate = "hmac"
+name = "SimpleHmacReset"
+asset = "HMAC-{hash}"
+family = "HMAC"
+primitive = "mac"
+functions = ["tag"]
+params = { hash = { arg = 0, asset = true } }
+
 # Poly1305 used on its own by a crate the walk enters (aes256ctr_poly1305aes's Poly1305-AES,
 # `Poly1305::compute_unpadded`); inside chacha20poly1305 it is part of the AEAD, which the walk
 # does not enter
@@ -496,6 +605,26 @@ primitive = "kdf"
 functions = ["keyderive"]
 params = { hash = { arg = 0, asset = true } }
 
+# hkdf 0.13: `Hkdf<H> = GenericHkdf<Hmac<H>>` (`SimpleHkdf<H>` over `SimpleHmac<H>`): the hash
+# is the HMAC's argument, the HMAC a component
+[[type]]
+crate = "hkdf"
+name = "GenericHkdf"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, path = [0], asset = true } }
+
+[[type]]
+crate = "hkdf"
+name = "GenericHkdfExtract"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+params = { hash = { arg = 0, path = [0], asset = true } }
+
 # sha2 0.10: Sha256 = CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, U32, OidSha256>>; the
 # output size (SHA-224 vs SHA-256) is an argument of the wrapper around the core.
 [[type]]
@@ -518,9 +647,69 @@ primitive = "hash"
 functions = ["digest"]
 params = { bits = { parent_arg = 1, typenum = true, scale = 8, map = { "224" = "512/224", "256" = "512/256", "384" = "384", "512" = "512" } } }
 
+# sha2 0.11: each hash is a struct of its own (`digest::buffer_fixed!` around
+# `CtOutWrapper<Sha256VarCore, U32>`), the truncated SHA-512s included (lib.rs)
+[[type]]
+crate = "sha2"
+name = "Sha224"
+asset = "SHA-224"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha2"
+name = "Sha256"
+asset = "SHA-256"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha2"
+name = "Sha384"
+asset = "SHA-384"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha2"
+name = "Sha512"
+asset = "SHA-512"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha2"
+name = "Sha512_224"
+asset = "SHA-512/224"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha2"
+name = "Sha512_256"
+asset = "SHA-512/256"
+family = "SHA-2"
+primitive = "hash"
+functions = ["digest"]
+
 [[type]]
 crate = "sha1"
 name = "Sha1Core"
+asset = "SHA-1"
+family = "SHA-1"
+primitive = "hash"
+functions = ["digest"]
+fixed = { output_bytes = "20" }
+
+# sha1 0.11: `Sha1` is a struct around the core
+[[type]]
+crate = "sha1"
+name = "Sha1"
 asset = "SHA-1"
 family = "SHA-1"
 primitive = "hash"
@@ -577,6 +766,19 @@ family = "scrypt"
 primitive = "kdf"
 functions = ["keyderive"]
 own_params = ["hash_password_customized"]
+versions = "<0.12"
+
+# scrypt 0.12, pbkdf2 0.13: the hasher is a value holding its parameters (`Scrypt::new()`,
+# `Scrypt::from(params)`; `Pbkdf2::from(Algorithm::Pbkdf2Sha512)`), not a unit struct with the
+# crate's defaults: the type alone is the family name
+[[type]]
+crate = "scrypt"
+name = "Scrypt"
+asset = "scrypt"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+versions = ">=0.12"
 
 [[type]]
 crate = "pbkdf2"
@@ -585,6 +787,16 @@ asset = "PBKDF2"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
+versions = ">=0.13"
+
+[[type]]
+crate = "pbkdf2"
+name = "Pbkdf2"
+asset = "PBKDF2"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+versions = "<0.13"
 
 [[type]]
 crate = "ed25519_dalek"
@@ -855,6 +1067,72 @@ family = "SHA-3"
 primitive = "xof"
 functions = ["digest"]
 
+# sha3 0.11 and 0.12: each function is a struct of its own (0.12 has the fixed-length hashes
+# only; its Keccak variants have no registry name, as before)
+[[type]]
+crate = "sha3"
+name = "Sha3_224"
+asset = "SHA3-224"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_256"
+asset = "SHA3-256"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_384"
+asset = "SHA3-384"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Sha3_512"
+asset = "SHA3-512"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake128"
+asset = "SHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake128Reader"
+asset = "SHAKE128"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake256"
+asset = "SHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
+[[type]]
+crate = "sha3"
+name = "Shake256Reader"
+asset = "SHAKE256"
+family = "SHA-3"
+primitive = "xof"
+functions = ["digest"]
+
 # cSHAKE (SP 800-185), customised SHAKE; sha3's Keccak (pre-standard padding) and TurboSHAKE
 # have no registry name: their calls are unknown, naming the type
 [[type]]
@@ -898,6 +1176,78 @@ family = "MD5"
 primitive = "hash"
 functions = ["digest"]
 fixed = { output_bytes = "16" }
+
+# md-5 0.11: `Md5` is a struct around the core
+[[type]]
+crate = "md5"
+name = "Md5"
+asset = "MD5"
+family = "MD5"
+primitive = "hash"
+functions = ["digest"]
+fixed = { output_bytes = "16" }
+
+# blake2 0.10: Blake2b512 = CoreWrapper<CtVariableCoreWrapper<Blake2bVarCore, U64>>, the output
+# size an argument of the wrapper around the core, as sha2 0.10's (a `Blake2bVar`, whose size
+# is chosen at run time, is the family name). `Blake2bMac<OutSize>` is BLAKE2's keyed mode
+# (RFC 7693 2.5), which the registry names `-HMAC` though it is no HMAC: an HMAC over BLAKE2
+# (`SimpleHmac<Blake2s256>`, WireGuard's) is `HMAC-BLAKE2s-256`.
+[[type]]
+crate = "blake2"
+name = "Blake2bVarCore"
+asset = "BLAKE2b-{bits}"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+params = { bits = { parent_arg = 1, typenum = true, scale = 8 } }
+
+[[type]]
+crate = "blake2"
+name = "Blake2sVarCore"
+asset = "BLAKE2s-{bits}"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+params = { bits = { parent_arg = 1, typenum = true, scale = 8 } }
+
+# blake2 0.11: `Blake2b<OutSize>` and `Blake2s<OutSize>` are structs over the output size
+[[type]]
+crate = "blake2"
+name = "Blake2b"
+asset = "BLAKE2b-{bits}"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+params = { bits = { arg = 0, typenum = true, scale = 8 } }
+
+[[type]]
+crate = "blake2"
+name = "Blake2s"
+asset = "BLAKE2s-{bits}"
+family = "BLAKE2"
+primitive = "hash"
+functions = ["digest"]
+params = { bits = { arg = 0, typenum = true, scale = 8 } }
+
+[[type]]
+crate = "blake2"
+name = "Blake2bMac"
+asset = "BLAKE2b-{bits}-HMAC"
+family = "BLAKE2"
+primitive = "mac"
+functions = ["tag"]
+note = "keyed BLAKE2b (RFC 7693), not an HMAC"
+params = { bits = { arg = 0, typenum = true, scale = 8 } }
+
+[[type]]
+crate = "blake2"
+name = "Blake2sMac"
+asset = "BLAKE2s-{bits}-HMAC"
+family = "BLAKE2"
+primitive = "mac"
+functions = ["tag"]
+note = "keyed BLAKE2s (RFC 7693), not an HMAC"
+params = { bits = { arg = 0, typenum = true, scale = 8 } }
 
 # ML-KEM: the parameter set is the type argument (`Kem<MlKem768Params>`, `EncapsulationKey<..>`)
 [[type]]
@@ -957,6 +1307,26 @@ primitive = "signature"
 functions = ["verify"]
 params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" }, required = true } }
 
+# p521 0.13.3's ECDSA keys are structs of its own around `ecdsa::SigningKey<NistP521>` (p256's
+# and p384's are aliases of it): ECDSA with the curve's hash, SHA-512
+[[type]]
+crate = "p521"
+name = "SigningKey"
+module = "^ecdsa::"
+asset = "ECDSA-P-521-SHA-512"
+family = "ECDSA"
+primitive = "signature"
+functions = ["keygen", "sign"]
+
+[[type]]
+crate = "p521"
+name = "VerifyingKey"
+module = "^ecdsa::"
+asset = "ECDSA-P-521-SHA-512"
+family = "ECDSA"
+primitive = "signature"
+functions = ["verify"]
+
 # Random generators: a draw (`fill_bytes`, `fill`, `gen`) is a `generate` use. The registry names
 # only DRBG families, so the OS generator and rand's ChaCha12 generator carry no
 # algorithmFamily (`family = ""`).
@@ -976,7 +1346,7 @@ asset = "ChaCha12-RNG"
 family = ""
 primitive = "drbg"
 functions = ["generate"]
-implemented_by = ["rand_chacha"]
+implemented_by = ["rand_chacha", "chacha20"]
 
 [[type]]
 crate = "rand"
@@ -985,7 +1355,17 @@ asset = "ChaCha12-RNG"
 family = ""
 primitive = "drbg"
 functions = ["generate"]
-implemented_by = ["rand_chacha"]
+implemented_by = ["rand_chacha", "chacha20"]
+
+# getrandom 0.4's `SysRng` (rand 0.10's `rngs::SysRng`): the operating system's generator as a
+# value, as rand_core's `OsRng` was
+[[type]]
+crate = "getrandom"
+name = "SysRng"
+asset = "OS-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
 
 [[type]]
 crate = "ring"
@@ -1014,6 +1394,31 @@ functions = ["generate"]
 
 [[type]]
 crate = "rand_chacha"
+name = "ChaCha8Rng"
+asset = "ChaCha8-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+# chacha20 0.10's generators (feature `rng`; rand 0.10 re-exports them as `rngs::ChaCha20Rng`)
+[[type]]
+crate = "chacha20"
+name = "ChaCha20Rng"
+asset = "ChaCha20-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+[[type]]
+crate = "chacha20"
+name = "ChaCha12Rng"
+asset = "ChaCha12-RNG"
+family = ""
+primitive = "drbg"
+functions = ["generate"]
+
+[[type]]
+crate = "chacha20"
 name = "ChaCha8Rng"
 asset = "ChaCha8-RNG"
 family = ""
@@ -1567,6 +1972,19 @@ asset = "scrypt-131072-8-1-32"
 family = "scrypt"
 primitive = "kdf"
 functions = ["keyderive"]
+versions = "<0.12"
+
+# scrypt 0.12 `Params::new_with_output_len(log_n, r, p, len)`: as `Params::new`, the length
+# being the password-hash API's only
+[[fn]]
+crate = "scrypt"
+path = "Params::new_with_output_len$"
+asset = "scrypt-{N}-{r}-{p}-{dk_len}"
+family = "scrypt"
+primitive = "kdf"
+functions = ["keyderive"]
+unresolved = "{missing}: not a constant where scrypt::Params is built"
+params = { dk_len = {}, N = { const_arg = 0, map = { "1" = "2", "2" = "4", "3" = "8", "4" = "16", "5" = "32", "6" = "64", "7" = "128", "8" = "256", "9" = "512", "10" = "1024", "11" = "2048", "12" = "4096", "13" = "8192", "14" = "16384", "15" = "32768", "16" = "65536", "17" = "131072", "18" = "262144", "19" = "524288", "20" = "1048576", "21" = "2097152", "22" = "4194304", "23" = "8388608", "24" = "16777216", "25" = "33554432", "26" = "67108864", "27" = "134217728", "28" = "268435456", "29" = "536870912", "30" = "1073741824", "31" = "2147483648" } }, r = { const_arg = 1 }, p = { const_arg = 2 } }
 
 # ed25519-dalek 2's `hazmat` API: `raw_sign::<Sha512>(&esk, msg, &vk)` signs (SHA-512 is part of
 # Ed25519), `raw_verify::<Sha512>(..)` verifies; `ExpandedSecretKey::from_bytes(&[u8; 64])` (or
@@ -1724,6 +2142,7 @@ asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
+versions = "<0.13"
 params = { hash = { arg = 0, path = [0, 0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg_len = 3 } }
 
 [[fn]]
@@ -1733,7 +2152,42 @@ asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
+versions = "<0.13"
 params = { hash = { arg = 0, path = [0, 0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg = 1, typenum = true } }
+
+# pbkdf2 0.13: the PRF is `Hmac<D>`, a struct over the hash (`pbkdf2::<Hmac<Sha256>>(..)`):
+# the hash is its argument
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2$"
+asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+versions = ">=0.13"
+params = { hash = { arg = 0, path = [0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg_len = 3 } }
+
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2_array$"
+asset = "PBKDF2-{hash}-{iterations}-{dk_len}"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+versions = ">=0.13"
+params = { hash = { arg = 0, path = [0], asset = true }, iterations = { const_arg = 2 }, dk_len = { arg = 1, typenum = true } }
+
+# pbkdf2 0.13 `pbkdf2_hmac_with_params(password, salt, algorithm, params, out)`: the hash
+# (`Algorithm::Pbkdf2Sha256`, `Pbkdf2Sha512`) and the rounds are run-time values
+[[fn]]
+crate = "pbkdf2"
+path = "^pbkdf2_hmac_with_params$"
+asset = "PBKDF2"
+family = "PBKDF2"
+primitive = "kdf"
+functions = ["keyderive"]
+use = "keyderive"
+unresolved = "the hash and the rounds: values of `pbkdf2::Algorithm` and `pbkdf2::Params`"
 
 # `Pbkdf2.hash_password(..)` (password-hash API): pbkdf2 0.12 `Algorithm::default()` is
 # PBKDF2-SHA256, `Params::default()` 600000 rounds and 32 bytes (simple.rs)
@@ -1745,6 +2199,7 @@ asset = "PBKDF2-SHA-256-600000-32"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
+versions = "<0.13"
 
 # A std trait implemented by the crypto type: `self_type` names it, `path` matches the callee.
 # argon2 0.5: Algorithm::default() = Argon2id, Params::default() = m 19 MiB, t 2, p 1, no output
@@ -2079,7 +2534,7 @@ family = ""
 primitive = "drbg"
 functions = ["generate"]
 use = "generate"
-implemented_by = ["rand_chacha"]
+implemented_by = ["rand_chacha", "chacha20"]
 
 # ECDH as a function over a curve type argument (`diffie_hellman::<NistP256>(..)`)
 [[fn]]
@@ -2103,6 +2558,18 @@ primitive = "kdf"
 functions = ["keyderive"]
 use = "keyderive"
 params = { hash = { arg = 0, asset = true } }
+
+# hkdf 0.13: the same on `GenericHkdf<Hmac<H>>` (`Hkdf::<Sha256>::new(salt, ikm)`); the hash
+# is the HMAC's argument
+[[fn]]
+crate = "hkdf"
+path = "^GenericHkdf::new$"
+asset = "HKDF-{hash}"
+family = "HKDF"
+primitive = "kdf"
+functions = ["keyderive"]
+use = "keyderive"
+params = { hash = { arg = 0, path = [0], asset = true } }
 
 # HKDF-Extract over an ECDH shared secret (`shared.extract::<Sha256>(salt)`): an `Hkdf` whose
 # `expand` derives the keys
@@ -2206,17 +2673,17 @@ groups = "^(X25519MLKEM768|SECP256R1MLKEM768|MLKEM768|MLKEM1024|X25519|SECP256R1
 [[use]]
 function = "encrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "seal_in_place", "seal_in_place_append_tag", "seal_in_place_separate_tag", "seal_in_place_scatter", "seal_out_of_place_scatter", "less_safe_encrypt", "encrypt_padded", "encrypt_padded_mut", "encrypt_padded_vec", "encrypt_padded_vec_mut", "encrypt_padded_b2b", "encrypt_padded_b2b_mut", "encrypt_padded_inout", "encrypt_padded_inout_mut", "encrypt_block", "encrypt_block_mut", "encrypt_block_b2b", "encrypt_block_b2b_mut", "encrypt_block_inout", "encrypt_block_inout_mut", "encrypt_blocks", "encrypt_blocks_mut", "encrypt_blocks_b2b", "encrypt_blocks_b2b_mut", "encrypt_blocks_inout", "encrypt_blocks_inout_mut", "encrypt_b2b", "encrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "wrap", "wrap_with_padding", "encrypt_next", "encrypt_last", "encrypt_next_in_place", "encrypt_last_in_place"]
+methods = ["encrypt", "encrypt_with_rng", "encrypt_in_place", "encrypt_in_place_detached", "encrypt_inout_detached", "seal_in_place", "seal_in_place_append_tag", "seal_in_place_separate_tag", "seal_in_place_scatter", "seal_out_of_place_scatter", "less_safe_encrypt", "encrypt_padded", "encrypt_padded_mut", "encrypt_padded_vec", "encrypt_padded_vec_mut", "encrypt_padded_b2b", "encrypt_padded_b2b_mut", "encrypt_padded_inout", "encrypt_padded_inout_mut", "encrypt_block", "encrypt_block_mut", "encrypt_block_b2b", "encrypt_block_b2b_mut", "encrypt_block_inout", "encrypt_block_inout_mut", "encrypt_blocks", "encrypt_blocks_mut", "encrypt_blocks_b2b", "encrypt_blocks_b2b_mut", "encrypt_blocks_inout", "encrypt_blocks_inout_mut", "encrypt_b2b", "encrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "wrap", "wrap_with_padding", "encrypt_next", "encrypt_last", "encrypt_next_in_place", "encrypt_last_in_place"]
 
 [[use]]
 function = "decrypt"
 primitives = ["ae", "block-cipher", "stream-cipher", "pke", "key-wrap"]
-methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "open_in_place", "open_in_place_separate_tag", "open_separate_gather", "open_within", "decrypt_padded", "decrypt_padded_mut", "decrypt_padded_vec", "decrypt_padded_vec_mut", "decrypt_padded_b2b", "decrypt_padded_b2b_mut", "decrypt_padded_inout", "decrypt_padded_inout_mut", "decrypt_block", "decrypt_block_mut", "decrypt_block_b2b", "decrypt_block_b2b_mut", "decrypt_block_inout", "decrypt_block_inout_mut", "decrypt_blocks", "decrypt_blocks_mut", "decrypt_blocks_b2b", "decrypt_blocks_b2b_mut", "decrypt_blocks_inout", "decrypt_blocks_inout_mut", "decrypt_b2b", "decrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "unwrap", "unwrap_with_padding", "decrypt_next", "decrypt_last", "decrypt_next_in_place", "decrypt_last_in_place"]
+methods = ["decrypt", "decrypt_blinded", "decrypt_with_rng", "decrypt_in_place", "decrypt_in_place_detached", "decrypt_inout_detached", "open_in_place", "open_in_place_separate_tag", "open_separate_gather", "open_within", "decrypt_padded", "decrypt_padded_mut", "decrypt_padded_vec", "decrypt_padded_vec_mut", "decrypt_padded_b2b", "decrypt_padded_b2b_mut", "decrypt_padded_inout", "decrypt_padded_inout_mut", "decrypt_block", "decrypt_block_mut", "decrypt_block_b2b", "decrypt_block_b2b_mut", "decrypt_block_inout", "decrypt_block_inout_mut", "decrypt_blocks", "decrypt_blocks_mut", "decrypt_blocks_b2b", "decrypt_blocks_b2b_mut", "decrypt_blocks_inout", "decrypt_blocks_inout_mut", "decrypt_b2b", "decrypt_inout", "apply_keystream", "apply_keystream_b2b", "apply_keystream_inout", "try_apply_keystream", "try_apply_keystream_b2b", "try_apply_keystream_inout", "unwrap", "unwrap_with_padding", "decrypt_next", "decrypt_last", "decrypt_next_in_place", "decrypt_last_in_place"]
 
 [[use]]
 function = "digest"
 primitives = ["hash", "xof"]
-methods = ["digest", "update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "finalize_xof_into", "finalize_xof_reset_into", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy", "read", "read_boxed"]
+methods = ["digest", "digest_xof", "update", "update_reader", "update_mmap", "update_mmap_rayon", "update_rayon", "chain", "chain_update", "finalize", "finalize_reset", "finalize_into", "finalize_into_reset", "finalize_fixed", "finalize_fixed_reset", "finalize_xof", "finalize_xof_reset", "finalize_xof_into", "finalize_xof_reset_into", "finalize_boxed", "finalize_boxed_reset", "new_with_prefix", "compute", "consume", "hash", "finish", "write", "write_all", "copy", "read", "read_boxed"]
 
 [[use]]
 function = "tag"
@@ -2226,30 +2693,30 @@ methods = ["update", "update_reader", "update_mmap", "update_mmap_rayon", "updat
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_reset", "verify_slice_reset", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed"]
+methods = ["verify", "verify_slice", "verify_reset", "verify_slice_reset", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed", "multipart_verify"]
 
 [[use]]
 function = "keyderive"
 primitives = ["kdf", "key-agree"]
-methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_into", "hash_password_into_with_memory", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
+methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_with_salt", "hash_password_with_rng", "hash_password_with_params", "hash_password_into", "hash_password_into_with_memory", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "pbkdf2_hmac_with_params", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
 
 # the `signature` crate's traits: Signer, RandomizedSigner, DigestSigner,
 # RandomizedDigestSigner, hazmat::PrehashSigner, RandomizedPrehashSigner
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "sign_prehashed", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate"]
+methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "sign_prehashed", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate", "multipart_sign", "try_multipart_sign", "multipart_sign_with_rng", "try_multipart_sign_with_rng"]
 
 [[use]]
 function = "keygen"
-methods = ["generate", "generate_key", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
+methods = ["generate", "try_generate", "generate_from_rng", "try_generate_from_rng", "generate_key", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
 
 # a draw from a random generator; rand's `seq` traits draw from the one they are given
 # (`v.shuffle(&mut rng)`, `v.choose(&mut rng)`)
 [[use]]
 function = "generate"
 primitives = ["drbg"]
-methods = ["fill_bytes", "try_fill_bytes", "next_u32", "next_u64", "fill", "try_fill", "gen", "gen_range", "gen_bool", "gen_ratio", "random", "random_range", "random_bool", "random_ratio", "random_iter", "sample", "sample_iter", "sample_string", "shuffle", "partial_shuffle", "choose", "choose_mut", "choose_iter", "choose_stable", "choose_multiple", "choose_multiple_array", "choose_multiple_fill", "choose_multiple_weighted", "choose_weighted", "choose_weighted_mut", "choose_weighted_iter", "sample_array", "sample_fill", "sample_weighted"]
+methods = ["fill_bytes", "try_fill_bytes", "next_u32", "next_u64", "try_next_u32", "try_next_u64", "fill", "try_fill", "gen", "gen_range", "gen_bool", "gen_ratio", "random", "random_range", "random_bool", "random_ratio", "random_iter", "sample", "sample_iter", "sample_string", "shuffle", "partial_shuffle", "choose", "choose_mut", "choose_iter", "choose_stable", "choose_multiple", "choose_multiple_array", "choose_multiple_fill", "choose_multiple_weighted", "choose_weighted", "choose_weighted_mut", "choose_weighted_iter", "sample_array", "sample_fill", "sample_weighted"]
 
 # x25519-dalek 2's `EphemeralSecret::random()`, `StaticSecret::random()` (feature getrandom);
 # rsa's `pkcs1v15::SigningKey::random(rng, bits)`
@@ -2330,7 +2797,7 @@ why = "a destructor or a memory wipe: no cryptographic function"
 [[aside]]
 name = "error"
 traits = ["core::error::Error"]
-crate = ["signature", "ssh-key", "ssh-cipher", "rsa", "ecdsa", "ed25519-dalek", "elliptic-curve", "aead", "cipher", "digest", "password-hash"]
+crate = ["signature", "ssh-key", "ssh-cipher", "ssh-agent-lib", "rsa", "ecdsa", "ed25519-dalek", "elliptic-curve", "aead", "cipher", "digest", "password-hash"]
 path = "^(.+::)?error::.+$"
 why = "an error value made, compared or described"
 
@@ -2359,9 +2826,21 @@ why = "a hash written or read as hex digits"
 
 [[aside]]
 name = "encoding"
+crate = ["ed25519"]
+path = "^Signature::(to_bytes|from_bytes|from_slice|from_components|to_vec|r_bytes|s_bytes)$"
+why = "an Ed25519 signature's bytes written or read (the signature is cited where it is made or verified)"
+
+[[aside]]
+name = "encoding"
 crate = ["ssh-cipher"]
 path = "^Cipher::(from_str|as_str)$"
 why = "a cipher's name parsed or written"
+
+[[aside]]
+name = "encoding"
+crate = ["ssh-key"]
+path = "^(signature::Signature::new|algorithm::Algorithm::new)$"
+why = "an OpenSSH signature value made from its algorithm's name and its bytes, or an algorithm's name parsed: the signature is cited where it is computed"
 
 [[aside]]
 name = "step"
@@ -2444,9 +2923,9 @@ why = "an operation's output or a key's value, its length, read after it is made
 
 [[aside]]
 name = "generator setup"
-traits = ["rand_core::SeedableRng"]
+traits = ["rand_core::SeedableRng", "rand_core::seedable_rng::SeedableRng"]
 crate = ["ring", "aws-lc-rs", "rand"]
-path = "^(rand::SystemRandom::new|rngs::thread::(thread_)?rng|rngs::.+::(default|new)|(distributions|distr)::uniform::.+)$"
+path = "^(rand::SystemRandom::new|rngs::thread::(thread_)?rng|make_rng|rngs::.+::(default|new)|(distributions|distr)::uniform::.+)$"
 why = "a generator or a distribution made: what draws from it is cited where it draws"
 
 [[aside]]
@@ -2618,7 +3097,7 @@ algorithm = 0
 # algorithm naming that type. `path` is inside the trait crate.
 [[operation]]
 crate = "digest"
-path = "^(digest::(Digest::(digest|finalize|finalize_reset|finalize_into|finalize_into_reset|update|chain_update|new_with_prefix)|DynDigest::(update|finalize|finalize_reset|finalize_into|finalize_into_reset))|ExtendableOutput(Reset)?::finalize_xof(_reset|_into)?|XofReader::read(_boxed)?)$"
+path = "^(digest::(Digest::(digest|finalize|finalize_reset|finalize_into|finalize_into_reset|update|chain_update|new_with_prefix)|DynDigest::(update|finalize|finalize_reset|finalize_into|finalize_into_reset))|ExtendableOutput(Reset)?::(finalize_xof(_reset)?(_into)?|digest_xof|finalize_boxed(_reset)?)|XofReader::read(_boxed)?)$"
 primitive = "hash"
 use = "digest"
 self_type = true
@@ -2665,14 +3144,14 @@ self_type = true
 
 [[operation]]
 crate = "aead"
-path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace)::encrypt(_in_place|_in_place_detached)?$|^stream::Encryptor::encrypt_(next|last)(_in_place)?$"
+path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace|AeadInOut)::encrypt(_in_place|_in_place_detached|_inout_detached)?$|^stream::Encryptor::encrypt_(next|last)(_in_place)?$"
 primitive = "ae"
 use = "encrypt"
 self_type = true
 
 [[operation]]
 crate = "aead"
-path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace)::decrypt(_in_place|_in_place_detached)?$|^stream::Decryptor::decrypt_(next|last)(_in_place)?$"
+path = "^(Aead|AeadInPlace|AeadMut|AeadMutInPlace|AeadInOut)::decrypt(_in_place|_in_place_detached|_inout_detached)?$|^stream::Decryptor::decrypt_(next|last)(_in_place)?$"
 primitive = "ae"
 use = "decrypt"
 self_type = true
@@ -2698,6 +3177,15 @@ primitive = "unknown"
 use = "keygen"
 self_type = true
 
+# crypto-common 0.2's `Generate` (`SigningKey::generate()`, `generate_from_rng(&mut rng)`): a
+# key of the Self type, from the operating system's generator or the one given
+[[operation]]
+crate = "crypto_common"
+path = "^generate::Generate::(try_)?generate(_from_rng)?$"
+primitive = "unknown"
+use = "keygen"
+self_type = true
+
 [[operation]]
 crate = "cipher"
 path = "^stream::StreamCipher::(try_)?apply_keystream(_b2b|_inout)?$"
@@ -2707,58 +3195,69 @@ self_type = true
 
 [[operation]]
 crate = "cipher"
-path = "^block::Block(Encrypt|EncryptMut)::encrypt_"
+path = "^block::Block(Encrypt|EncryptMut|CipherEncrypt|ModeEncrypt)::encrypt_"
 primitive = "block-cipher"
 use = "encrypt"
 self_type = true
 
 [[operation]]
 crate = "cipher"
-path = "^block::Block(Decrypt|DecryptMut)::decrypt_"
+path = "^block::Block(Decrypt|DecryptMut|CipherDecrypt|ModeDecrypt)::decrypt_"
 primitive = "block-cipher"
 use = "decrypt"
 self_type = true
 
 [[operation]]
 crate = "signature"
-path = "^(signer|hazmat)::\\w*Signer::(try_)?sign\\w*$"
+path = "^(signer|hazmat)::\\w*Signer(Mut)?::(try_)?(multipart_)?sign\\w*$"
 primitive = "signature"
 use = "sign"
 self_type = true
 
 [[operation]]
 crate = "signature"
-path = "^(verifier|hazmat)::\\w*Verifier::verify\\w*$"
+path = "^(verifier|hazmat)::\\w*Verifier::(multipart_)?verify\\w*$"
 primitive = "signature"
 use = "verify"
 self_type = true
 
+# (password-hash 0.5's traits are in `traits`; 0.6's at the root, with `hash_password_with_salt`,
+# `hash_password_with_rng` and the `CustomizedPasswordHasher` trait)
 [[operation]]
 crate = "password_hash"
-path = "^traits::PasswordHasher::hash_password(_customized)?$"
+path = "^(traits::)?(PasswordHasher::hash_password(_customized|_with_salt|_with_rng)?|CustomizedPasswordHasher::hash_password_(customized|with_params))$"
 primitive = "kdf"
 use = "keyderive"
 self_type = true
 
 [[operation]]
 crate = "password_hash"
-path = "^traits::PasswordVerifier::verify_password$"
+path = "^(traits::)?PasswordVerifier::verify_password$"
 primitive = "kdf"
 use = "verify"
+self_type = true
+
+# `Kdf::derive_key(&self, password, salt, out)` of the generation after 0.10, on the hasher
+# value (`Scrypt`, `Pbkdf2`, `Argon2`)
+[[operation]]
+crate = "kdf"
+path = "^Kdf::derive_key$"
+primitive = "kdf"
+use = "keyderive"
 self_type = true
 
 # Draws through rand's traits on a generator the knowledge base does not name (a version it
 # does not cover: rand 0.4's `OsRng`): unknown, naming the type
 [[operation]]
 crate = "rand_core"
-path = "^RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$"
+path = "^(RngCore|TryRngCore|Rng|TryRng)::(fill_bytes|try_fill_bytes|next_u32|next_u64|try_next_u32|try_next_u64)$"
 primitive = "drbg"
 use = "generate"
 self_type = true
 
 [[operation]]
 crate = "rand"
-path = "^(rng::)?Rng::(gen|gen_range|gen_bool|gen_ratio|gen_iter|fill|try_fill|fill_bytes|try_fill_bytes|next_u32|next_u64|sample|sample_iter|random|random_range|random_bool|random_ratio|random_iter)$"
+path = "^(rng::)?(Rng|RngExt)::(gen|gen_range|gen_bool|gen_ratio|gen_iter|fill|try_fill|fill_bytes|try_fill_bytes|next_u32|next_u64|sample|sample_iter|random|random_range|random_bool|random_ratio|random_iter)$"
 primitive = "drbg"
 use = "generate"
 self_type = true
@@ -2975,7 +3474,7 @@ path = "Mac::new(_from_slice)?$"
 args = { "0" = "key" }
 
 [[role]]
-path = "(Aead|AeadInPlace|AeadMut|AeadInOut)::(encrypt|decrypt)(_in_place)?(_detached)?$"
+path = "(Aead|AeadInPlace|AeadMut|AeadInOut)::(encrypt|decrypt)(_in_place|_inout)?(_detached)?$"
 args = { "1" = "nonce" }
 
 [[role]]
@@ -3108,10 +3607,20 @@ args = { "1" = "password", "2" = "salt" }
 path = "Argon2::hash_password_into(_with_memory)?$"
 args = { "1" = "password", "2" = "salt" }
 
-# `hash_password_customized(&self, password, algorithm, version, params, salt)`
+# `hash_password_customized(&self, password, algorithm, version, params, salt)` (password-hash
+# 0.5, in `traits`); 0.6's takes the salt second (`CustomizedPasswordHasher::
+# hash_password_customized(&self, password, salt, algorithm, version, params)`), as its
+# `hash_password_with_salt(&self, password, salt)` and `hash_password_with_params` do, and
+# `hash_password_with_rng(&self, rng, password)` draws it
 [[role]]
-path = "PasswordHasher::hash_password_customized$"
+path = "traits::PasswordHasher::hash_password_customized$"
 args = { "1" = "password", "5" = "salt" }
+[[role]]
+path = "^password_hash::(CustomizedPasswordHasher::hash_password_(customized|with_params)|PasswordHasher::hash_password_with_salt)$"
+args = { "1" = "password", "2" = "salt" }
+[[role]]
+path = "^password_hash::PasswordHasher::hash_password_with_rng$"
+args = { "1" = "rng", "2" = "password" }
 
 # the secret (pepper) of `Argon2::new_with_secret(secret, algorithm, version, params)`
 [[role]]
@@ -3120,6 +3629,14 @@ args = { "0" = "key" }
 
 [[role]]
 path = "^scrypt::scrypt$"
+args = { "0" = "password", "1" = "salt" }
+# `Kdf::derive_key(&self, password, salt, out)`; pbkdf2 0.13's
+# `pbkdf2_hmac_with_params(password, salt, algorithm, params, out)`
+[[role]]
+path = "^kdf::Kdf::derive_key$"
+args = { "1" = "password", "2" = "salt" }
+[[role]]
+path = "^pbkdf2::pbkdf2_hmac_with_params$"
 args = { "0" = "password", "1" = "salt" }
 
 [[role]]
@@ -3223,7 +3740,7 @@ args = { "0" = "rng" }
 # the generator passed (`Aes256Gcm::generate_key(&mut OsRng)`, `generate_nonce(&mut rng)`,
 # `SecretKey::<NistP256>::random(&mut rng)`)
 [[role]]
-path = "(KeyInit::generate_key|KeyIvInit::generate_(key|iv|key_iv)|AeadCore::generate_nonce)$|^elliptic_curve::(secret_key::SecretKey|ecdh::EphemeralSecret)::random$|^ecdsa::signing::SigningKey::random$"
+path = "(KeyInit::generate_key|KeyIvInit::generate_(key|iv|key_iv)|AeadCore::generate_nonce|Generate::(try_)?generate_from_rng)$|^elliptic_curve::(secret_key::SecretKey|ecdh::EphemeralSecret)::random$|^ecdsa::signing::SigningKey::random$"
 args = { "0" = "rng" }
 
 [[role]]
@@ -3249,12 +3766,12 @@ path = "^std::fs::(read|read_to_string)$|^(std|alloc)::io::(read::)?Read::read|^
 
 [[source]]
 kind = "rng"
-path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|RngCore::(fill_bytes|try_fill_bytes|next_u32|next_u64)$|Rng::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random|new)$|OsRng|ThreadRng::default$)"
+path = "(^rand::(rngs::thread::)?(thread_rng|rng)$|^rand::random$|(RngCore|TryRngCore|Rng|TryRng)::(fill_bytes|try_fill_bytes|next_u32|next_u64|try_next_u32|try_next_u64)$|(Rng|RngExt)::(gen|random|fill)|^getrandom::|AeadCore::generate_(nonce|key)$|KeyInit::generate_key$|SaltString::generate$|^(ring|aws_lc_rs)::rand::|SecureRandom::fill$|::random_from_rng$|^x25519_dalek::x25519::(StaticSecret|EphemeralSecret|ReusableSecret)::(random|new)$|OsRng|SysRng|ThreadRng::default$)"
 
 # the output of a key derivation (the PRK, the OKM, a shared secret) is derived, whatever went in
 [[source]]
 kind = "derived"
-path = "(^hkdf::Hkdf::(expand|expand_multi_info|extract)$|^hkdf::HkdfExtract::finalize$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password(_customized)?$|::hash_password_into(_with_memory)?$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$|^blake3::Hasher::new_derive_key$)"
+path = "(^hkdf::(Generic)?Hkdf::(expand|expand_multi_info|extract)$|^hkdf::(Generic)?HkdfExtract::finalize$|^kdf::Kdf::derive_key$|^pbkdf2::pbkdf2_hmac_with_params$|^(ring|aws_lc_rs)::hkdf::(Prk::expand|Okm::fill|Salt::extract)$|^(ring|aws_lc_rs)::pbkdf2::derive$|PasswordHasher::hash_password(_customized|_with_salt|_with_rng|_with_params)?$|::hash_password_into(_with_memory)?$|::diffie_hellman$|^(ring|aws_lc_rs)::agreement::(ephemeral::)?agree_ephemeral$|^aws_lc_rs::agreement::agree$|^x25519_dalek::x25519::x25519$|^scrypt::scrypt$|^pbkdf2::pbkdf2(_hmac)?(_array)?$|^blake3::derive_key$|^blake3::Hasher::new_derive_key$)"
 
 # Calls whose result carries only some arguments' data (receiver = argument 0).
 [[passthrough]]
