@@ -316,8 +316,9 @@ fn floor(
     // what the knowledge base says the call does, when it names it as an operation
     // (`Signer::try_sign`: a signature) the analysis gave no occurrence
     let bare = by_type(&e.callee.path);
-    let op = ctx.kb.operation(
+    let op = ctx.kb.operation_of(
         &e.callee.krate.name,
+        &e.callee.krate.stable_id,
         bare.strip_prefix(&format!("{}::", e.callee.krate.name))
             .unwrap_or(&bare),
     );

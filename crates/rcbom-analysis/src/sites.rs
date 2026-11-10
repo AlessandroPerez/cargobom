@@ -1051,7 +1051,11 @@ pub(super) fn operation_algorithm(ctx: &Ctx<'_>, site: &Site) -> Option<usize> {
         .strip_prefix(&format!("{}::", callee.krate.name))
         .unwrap_or(&callee.path);
     ctx.kb
-        .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
+        .operation_of(
+            &callee.krate.name,
+            &callee.krate.stable_id,
+            &matcher::strip_generics(in_crate),
+        )
         .filter(|op| !op.self_type)
         .map(|op| op.algorithm)
 }

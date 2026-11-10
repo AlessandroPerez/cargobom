@@ -193,7 +193,9 @@ pub fn match_static_called(
         .strip_prefix(&format!("{}::", def.krate.name))
         .unwrap_or(&def.path);
     for e in kb.statics.iter().filter(|e| {
-        e.krates.contains(&def.krate.name) && e.module.as_ref().is_none_or(|m| m.is_match(within))
+        e.krates.contains(&def.krate.name)
+            && e.module.as_ref().is_none_or(|m| m.is_match(within))
+            && kb.applies(e.versions.as_ref(), &def.krate.name, &def.krate.stable_id)
     }) {
         if let Some(c) = e.pattern.captures(name) {
             let vals: BTreeMap<String, String> = (1..c.len())
@@ -294,7 +296,11 @@ pub fn match_fn_with(
                 krate,
                 path: tp,
                 args: targs,
-            }) if e.krates.contains(&krate.name) && last(tp) == st && supported(krate) => {
+            }) if e.krates.contains(&krate.name)
+                && last(tp) == st
+                && supported(krate)
+                && kb.applies(e.versions.as_ref(), &krate.name, &krate.stable_id) =>
+            {
                 let ok = e.pattern.is_match(&callee.path) || e.pattern.is_match(&full_bare);
                 if ok {
                     provider = Some(krate.clone());
@@ -307,6 +313,11 @@ pub fn match_fn_with(
         None => {
             let ok = e.krates.contains(&callee.krate.name)
                 && supported(&callee.krate)
+                && kb.applies(
+                    e.versions.as_ref(),
+                    &callee.krate.name,
+                    &callee.krate.stable_id,
+                )
                 && (e.pattern.is_match(path) || e.pattern.is_match(&bare));
             if ok {
                 provider = Some(callee.krate.clone());
@@ -463,6 +474,7 @@ fn argument_entry<'k, 'o>(
                 e.algo.family == family
                     && e.self_type.is_none()
                     && e.krates.contains(krate)
+                    && kb.applies(e.versions.as_ref(), krate, "")
                     && e.pattern.is_match(within)
             })
         {
@@ -473,7 +485,9 @@ fn argument_entry<'k, 'o>(
             && let Some(e) = kb.fns.iter().find(|e| {
                 e.algo.family == family
                     && e.self_type.as_deref() == Some(last(t))
-                    && e.krates.iter().any(|k| t.starts_with(&format!("{k}::")))
+                    && e.krates.iter().any(|k| {
+                        t.starts_with(&format!("{k}::")) && kb.applies(e.versions.as_ref(), k, "")
+                    })
                     && e.pattern.is_match(&path)
             })
         {
@@ -515,11 +529,15 @@ pub fn match_constructor<'o>(
                 && match &e.self_type {
                     Some(st) => self_ty.as_deref().is_some_and(|t| {
                         last(t) == st
-                            && e.krates.iter().any(|k| t.starts_with(&format!("{k}::")))
+                            && e.krates.iter().any(|k| {
+                                t.starts_with(&format!("{k}::"))
+                                    && kb.applies(e.versions.as_ref(), k, "")
+                            })
                             && e.pattern.is_match(&path)
                     }),
                     None => {
                         e.krates.contains(krate)
+                            && kb.applies(e.versions.as_ref(), krate, "")
                             && e.pattern
                                 .is_match(path.strip_prefix(&format!("{krate}::")).unwrap_or(&path))
                     }
@@ -611,6 +629,7 @@ fn walk(
                             .as_deref()
                             .is_none_or(|m| regex::Regex::new(m).is_ok_and(|r| r.is_match(within)))
                         && supported(krate)
+                        && kb.applies(e.versions.as_ref(), &krate.name, &krate.stable_id)
                 })
                 .find_map(|e| Some((e, type_match(kb, e, args, parent, supported)?)));
             if let Some((e, mut m)) = entry {

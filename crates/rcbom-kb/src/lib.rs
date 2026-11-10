@@ -168,6 +168,8 @@ struct OperationRaw {
     setup: bool,
     #[serde(default)]
     shared: bool,
+    #[serde(default, deserialize_with = "de_opt_req")]
+    versions: Option<semver::VersionReq>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -257,6 +259,8 @@ pub struct OperationEntry {
     /// A trait hashes and MACs both implement (`FixedOutput::finalize_fixed`): on a type the
     /// knowledge base does not name, neither is claimed.
     pub shared: bool,
+    /// The versions of the crate the entry holds for (all it covers, if none).
+    pub versions: Option<semver::VersionReq>,
 }
 
 /// A call's value argument (the receiver is argument 0), or a field of the struct behind it
@@ -438,6 +442,11 @@ pub struct TypeEntry {
     /// `pkcs1v15::SigningKey` and `pss::SigningKey`).
     #[serde(default)]
     pub module: Option<String>,
+    /// The versions of the crate the entry holds for (all the crate's entry covers, if none):
+    /// a name that means another thing in another generation (`pbkdf2::Pbkdf2`, a unit struct
+    /// in 0.12 and a value with its algorithm and costs in 0.13).
+    #[serde(default, deserialize_with = "de_opt_req")]
+    pub versions: Option<semver::VersionReq>,
     #[serde(flatten)]
     pub algo: Algo,
     #[serde(default)]
@@ -516,6 +525,8 @@ struct StaticRaw {
     /// `key_wrap::AES_256` is AES-256-KW for `wrap`, AES-256-KWP for `wrap_with_padding`.
     #[serde(default)]
     asset_by_method: BTreeMap<String, String>,
+    #[serde(default, deserialize_with = "de_opt_req")]
+    versions: Option<semver::VersionReq>,
     #[serde(flatten)]
     algo: Algo,
 }
@@ -529,6 +540,8 @@ struct FnRaw {
     self_type: Option<String>,
     #[serde(default)]
     params: BTreeMap<String, Param>,
+    #[serde(default, deserialize_with = "de_opt_req")]
+    versions: Option<semver::VersionReq>,
     #[serde(flatten)]
     algo: Algo,
 }
@@ -545,6 +558,8 @@ pub struct PatternEntry {
     pub params: BTreeMap<String, Param>,
     /// For statics: method -> asset name template (`asset_by_method`).
     pub asset_by_method: BTreeMap<String, String>,
+    /// The versions of the crate the entry holds for (all the crate's entry covers, if none).
+    pub versions: Option<semver::VersionReq>,
     pub algo: Algo,
 }
 
@@ -648,6 +663,10 @@ pub struct Kb {
     /// once per run (`bind_crates`); crate names alone are ambiguous (the package md-5's
     /// library is named `md5`, like the package md5's).
     crate_packages: std::sync::RwLock<std::collections::HashMap<String, String>>,
+    /// The version of each crate of the build, by name and `StableCrateId` (two versions of sha2
+    /// are two crates named `sha2`): what an entry's `versions` is read against. Set with
+    /// `crate_packages`.
+    crate_versions: std::sync::RwLock<std::collections::HashMap<(String, String), semver::Version>>,
 }
 
 /// `cryptoFunctions` values CycloneDX 1.7 accepts.
@@ -710,6 +729,15 @@ fn de_req<'de, D: serde::Deserializer<'de>>(d: D) -> Result<semver::VersionReq, 
     semver::VersionReq::parse(&s).map_err(serde::de::Error::custom)
 }
 
+fn de_opt_req<'de, D: serde::Deserializer<'de>>(
+    d: D,
+) -> Result<Option<semver::VersionReq>, D::Error> {
+    let s = String::deserialize(d)?;
+    semver::VersionReq::parse(&s)
+        .map(Some)
+        .map_err(serde::de::Error::custom)
+}
+
 impl Kb {
     pub fn seed() -> Result<Kb> {
         Kb::parse(SEED).context("parsing the built-in knowledge base")
@@ -733,6 +761,7 @@ impl Kb {
                         self_type: None,
                         params: BTreeMap::new(),
                         asset_by_method: s.asset_by_method,
+                        versions: s.versions,
                         algo: s.algo,
                     })
                 })
@@ -748,6 +777,7 @@ impl Kb {
                         self_type: s.self_type,
                         params: s.params,
                         asset_by_method: BTreeMap::new(),
+                        versions: s.versions,
                         algo: s.algo,
                     })
                 })
@@ -844,6 +874,7 @@ impl Kb {
                         self_type: o.self_type,
                         setup: o.setup,
                         shared: o.shared,
+                        versions: o.versions,
                     })
                 })
                 .collect::<Result<_>>()?,
@@ -911,6 +942,7 @@ impl Kb {
             buffer_fills: raw.semantics.buffer_fills,
             generator_suffixes: raw.semantics.generator_suffixes,
             crate_packages: Default::default(),
+            crate_versions: Default::default(),
         };
         kb.validate()?;
         Ok(kb)
@@ -1128,6 +1160,48 @@ impl Kb {
             .unwrap_or_else(|e| e.into_inner()) = crates;
     }
 
+    /// Records the version of each crate of the build (name and `StableCrateId` -> version).
+    pub fn bind_versions(
+        &self,
+        versions: std::collections::HashMap<(String, String), semver::Version>,
+    ) {
+        *self
+            .crate_versions
+            .write()
+            .unwrap_or_else(|e| e.into_inner()) = versions;
+    }
+
+    /// Does an entry restricted to `versions` hold for this crate of the build? One without a
+    /// restriction holds for every version its `[[crate]]` entry covers. A crate known by its
+    /// name only (`stable_id` empty: a call in an origin tree) is every crate of the build so
+    /// named: the entry holds when it does for each of them, so that two generations of one
+    /// crate in a build never lend each other's entries. Before a build is bound (the verifier,
+    /// which reads names in source text), every entry holds.
+    pub fn applies(
+        &self,
+        versions: Option<&semver::VersionReq>,
+        name: &str,
+        stable_id: &str,
+    ) -> bool {
+        let Some(req) = versions else {
+            return true;
+        };
+        let bound = self
+            .crate_versions
+            .read()
+            .unwrap_or_else(|e| e.into_inner());
+        if bound.is_empty() {
+            return true;
+        }
+        if !stable_id.is_empty() {
+            return bound
+                .get(&(name.to_string(), stable_id.to_string()))
+                .is_some_and(|v| req.matches(v));
+        }
+        let mut named = bound.iter().filter(|((n, _), _)| n == name).peekable();
+        named.peek().is_some() && named.all(|(_, v)| req.matches(v))
+    }
+
     /// Is a package without a `[[crate]]` entry cryptographic, from its `Cargo.toml` metadata:
     /// a `cryptography` category or a crypto keyword, or the `[unmodelled]` crypto list (for
     /// packages whose metadata says nothing), or a name that names an algorithm of the
@@ -1232,9 +1306,22 @@ impl Kb {
     /// The `[[operation]]` entry of a callee: its crate name and its path inside the crate,
     /// generic arguments removed (`digest::Context::update`).
     pub fn operation(&self, krate: &str, path: &str) -> Option<&OperationEntry> {
-        self.operations
-            .iter()
-            .find(|o| o.krates.iter().any(|k| k == krate) && o.pattern.is_match(path))
+        self.operation_of(krate, "", path)
+    }
+
+    /// [`Kb::operation`] for exactly one crate of the build (its name and `StableCrateId`):
+    /// an entry restricted to some versions is read against that crate's.
+    pub fn operation_of(
+        &self,
+        krate: &str,
+        stable_id: &str,
+        path: &str,
+    ) -> Option<&OperationEntry> {
+        self.operations.iter().find(|o| {
+            o.krates.iter().any(|k| k == krate)
+                && o.pattern.is_match(path)
+                && self.applies(o.versions.as_ref(), krate, stable_id)
+        })
     }
 
     /// The use a call to `method` makes of an asset with `primitive`, if it is one. A method

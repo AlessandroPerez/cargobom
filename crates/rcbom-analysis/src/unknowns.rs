@@ -29,8 +29,11 @@ pub(super) fn unresolved_operation(ctx: &Ctx<'_>, site: &Site) -> Option<Unresol
     // any version of the crate: a trait crate of an unsupported version (digest 0.11 under sha2
     // 0.11) still names the operation
     let op = ctx.kb.crate_by_name(&callee.krate.name).and_then(|_| {
-        ctx.kb
-            .operation(&callee.krate.name, &matcher::strip_generics(in_crate))
+        ctx.kb.operation_of(
+            &callee.krate.name,
+            &callee.krate.stable_id,
+            &matcher::strip_generics(in_crate),
+        )
     });
     // an API the knowledge base names, of a version it does not cover (`getrandom::fill` of
     // getrandom 0.5)

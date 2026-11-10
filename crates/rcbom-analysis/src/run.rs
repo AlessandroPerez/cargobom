@@ -11,6 +11,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .map(|f| (f.krate.name.clone(), f.krate.package.clone()))
             .collect(),
     );
+    // ... and an entry restricted to some versions is read against each crate's own
+    kb.bind_versions(
+        facts
+            .iter()
+            .filter_map(|f| {
+                let v = semver::Version::parse(&f.krate.version).ok()?;
+                Some(((f.krate.name.clone(), f.krate.stable_id.clone()), v))
+            })
+            .collect(),
+    );
     let mut flow = {
         let t = std::time::Instant::now();
         let ix = links::LinkIndex::new(facts);
