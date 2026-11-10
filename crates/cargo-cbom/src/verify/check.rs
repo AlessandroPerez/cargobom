@@ -271,6 +271,8 @@ impl Files<'_> {
             .split("::")
             .next()
             .unwrap_or("");
+        // (of a type parameter's, `<D as digest::digest::Digest>::update`, its trait's)
+        let first = first.split(" as ").last().unwrap_or(first);
         let known = matches!(first, "core" | "std" | "alloc")
             || self.libs.as_ref().is_some_and(|l| l.contains_key(first))
             || self
@@ -563,10 +565,16 @@ impl Files<'_> {
             }
         }
         // an instantiation's position that details cite (`instantiated by X at F:L:C`) is cited
-        // by one of this asset's
+        // by one of this asset's, where an asset of its kind cites it at all: the function
+        // instantiated may use, beside the algorithm its type argument chooses, one of its own
+        // (pgp's `StreamDecryptor::<Aes128>::new`: the cipher chosen, and the SHA-1 of its
+        // integrity check, whose occurrences cite the instantiation)
         if kind == "instantiation"
             && let Some(by) = self.cited.get(&(o.location.clone(), line, offset))
             && !by.contains(&o.component_ref)
+            && by
+                .iter()
+                .any(|b| self.graph.primitive.get(b) == self.graph.primitive.get(&o.component_ref))
         {
             return Err(format!(
                 "the instantiation here is cited by {} occurrences of other assets only",
@@ -1134,8 +1142,21 @@ impl Files<'_> {
             .collect();
         // the position the next detail's code holds: the occurrence's, then each cited
         // caller's (line, and column where the detail gives one)
-        let mut inner: (PathBuf, usize, Option<usize>) = (at.0.to_path_buf(), at.1, Some(at.2));
+        /// A position a detail's code holds: file, line, and the column where one is given.
+        type Held = (PathBuf, usize, Option<usize>);
+        let mut inner: Held = (at.0.to_path_buf(), at.1, Some(at.2));
+        // the chain so far: each item instantiated, with the position its code holds. An
+        // occurrence instantiated along two chains that part at a closure (a generic function's
+        // closure, made once per instance of the function) lists the second chain from that
+        // closure on: a detail naming the closure's parent continues from the closure.
+        let mut chain: Vec<(String, Held)> =
+            callee.iter().map(|c| (c.clone(), inner.clone())).collect();
         for part in parts(details) {
+            if let Some(c) = &callee
+                && chain.last().is_none_or(|(k, _)| k != c)
+            {
+                chain.push((c.clone(), inner.clone()));
+            }
             let Some(m) =
                 re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?(?: as `([^`]*)`)?$")
                     .captures(part)
@@ -1176,17 +1197,35 @@ impl Files<'_> {
             }
             // where the CBOM records what an instantiation chooses there (`[instantiation]`
             // occurrences: `h::<sha2::Sha384>` is SHA-384's), this asset is among it, or has it
-            // as a component (`tag::<Sha256>` building an `Hmac<D>`: HMAC-SHA-256's SHA-256)
-            if let (Some(_), Some(c0)) = (&caller, col) {
+            // as a component (`tag::<Sha256>` building an `Hmac<D>`: HMAC-SHA-256's SHA-256).
+            // What is chosen there of another kind than this asset and its components says
+            // nothing of it: the function instantiated may use an algorithm of its own beside
+            // the one its type argument chooses (the SHA-1 of pgp's integrity check, in a
+            // decryptor instantiated with its cipher); nor of an operation of unknown algorithm
+            // (cfb-mode's, run over the cipher chosen there)
+            if let (Some(_), Some(c0)) = (&caller, col)
+                && !component_ref.starts_with("crypto:algorithm:unknown")
+            {
                 let here: Vec<usize> = self
                     .at_pos
                     .get(&(file.clone(), line, c0))
                     .cloned()
                     .unwrap_or_default();
                 let parts = self.graph.depends_on.get(component_ref);
+                let kinds: Vec<&String> = std::iter::once(component_ref)
+                    .chain(parts.into_iter().flatten().map(String::as_str))
+                    .filter_map(|r| self.graph.primitive.get(r))
+                    .collect();
                 let chosen: Vec<&str> = here
                     .iter()
-                    .filter(|&&j| self.occs[j].context.contains("] [instantiation]"))
+                    .filter(|&&j| {
+                        self.occs[j].context.contains("] [instantiation]")
+                            && self
+                                .graph
+                                .primitive
+                                .get(&self.occs[j].component_ref)
+                                .is_some_and(|p| kinds.contains(&p))
+                    })
                     .map(|&j| self.occs[j].component.as_str())
                     .collect();
                 if !chosen.is_empty()
@@ -1205,6 +1244,8 @@ impl Files<'_> {
             // HmacSha256::new_from_slice(k).unwrap(), d)`): where they set up assets of this
             // asset's primitive (constructors, and the components cited with them), this asset
             // is among them (not the next line's `HmacSha512`)
+            // (whether the call's arguments told the instance: the assets they set up)
+            let mut by_arguments = false;
             if let (Some(_), Some(c0)) = (&caller, col)
                 && callee
                     .as_deref()
@@ -1225,6 +1266,7 @@ impl Files<'_> {
                             && self.graph.primitive.get(&o.component_ref) == Some(prim)
                     })
                     .collect();
+                by_arguments = !set_up.is_empty();
                 if !set_up.is_empty() && !set_up.iter().any(|o| o.component_ref == component_ref) {
                     let mut names: Vec<&str> =
                         set_up.iter().map(|o| o.component.as_str()).collect();
@@ -1333,10 +1375,58 @@ impl Files<'_> {
                             .trim_end_matches("::")
                             .to_string()
                     };
-                    let own_closure = callee
-                        .as_deref()
-                        .and_then(closure_parent)
-                        .is_some_and(|p| bare(p) == bare(c));
+                    let closure_of =
+                        |k: &str| closure_parent(k).is_some_and(|p| bare(p) == bare(c));
+                    // (the second chain of a closure instantiated with two instances of its
+                    // parent: a detail without a call's text that names the parent of a closure
+                    // earlier in the chain, not of the item before it, starts again there)
+                    // (a chain begun again is another instance's as far as the text says: an
+                    // occurrence several instances of a generic item reach is written in one of
+                    // them, `in generic::<Fast>`, with every instance's chain, so its calls are
+                    // not held to that instance's type arguments)
+                    let mut again = false;
+                    if !callee.as_deref().is_some_and(closure_of)
+                        && !part.contains(" as `")
+                        && let Some((k, at)) = chain.iter().rev().find(|(k, _)| closure_of(k))
+                    {
+                        callee = Some(k.clone());
+                        inner = at.clone();
+                        again = true;
+                    }
+                    // (and of a function two callers instantiate: a detail whose call's text
+                    // names an item earlier in the chain, not the one before it, continues from
+                    // that item: `.. as `fill_inner`` after another chain's last caller)
+                    // (of several so named, the one the receiver's type is of, where the code
+                    // says it: `i.read(buf)` on a `StreamDecryptorInner` after a chain through
+                    // another type's `read`)
+                    if let Some(t) = &call_text
+                        && let Some(last) = strip_generics(t).rsplit("::").next()
+                    {
+                        let named = |k: &str| in_item(k).filter(|n| n.name == last);
+                        let on = col.and_then(|c0| receiver_type(&src, src.idx((line, c0))));
+                        let fits = |k: &str| {
+                            named(k).is_some_and(|n| {
+                                on.as_deref().is_none_or(|t| receiver_fits(&src, &n, t))
+                            })
+                        };
+                        if !callee.as_deref().is_some_and(fits)
+                            && let Some((k, at)) =
+                                chain.iter().rev().find(|(k, _)| fits(k)).or_else(|| {
+                                    callee
+                                        .as_deref()
+                                        .is_none_or(|k| named(k).is_none())
+                                        .then(|| {
+                                            chain.iter().rev().find(|(k, _)| named(k).is_some())
+                                        })
+                                        .flatten()
+                                })
+                        {
+                            callee = Some(k.clone());
+                            inner = at.clone();
+                            again = true;
+                        }
+                    }
+                    let own_closure = callee.as_deref().is_some_and(closure_of);
                     // a closure's caller that is its parent but for the closures' indexes
                     // (`main::{closure#7}` for `main::{closure#0}::{closure#0}`) names another
                     // closure than the one holding it
@@ -1355,8 +1445,19 @@ impl Files<'_> {
                             ));
                         }
                     }
+                    // (or a standard-library trait's method that the line runs by calling
+                    // another function of the standard library: `key.into()` runs `From::from`,
+                    // `x.to_string()` runs `Display::fmt`; the call's text is at its column)
                     let unnamed = callee.as_deref().is_none_or(|p| {
-                        p.trim_end().ends_with('}') || in_item(p).is_some_and(|n| by_syntax(&n))
+                        p.trim_end().ends_with('}')
+                            || in_item(p).is_some_and(|n| {
+                                by_syntax(&n)
+                                    || (std_impl(p)
+                                        && call_text.as_ref().is_some_and(|t| {
+                                            strip_generics(t).rsplit("::").next()
+                                                != Some(n.name.as_str())
+                                        }))
+                            })
                     });
                     let chars: Vec<char> = text.chars().collect();
                     // an `async` closure's body is made where it starts (`async move |d| expr`:
@@ -1725,18 +1826,61 @@ impl Files<'_> {
                                 n.path
                             ));
                         }
+                        // its type arguments too, where the code gives them and the instance's
+                        // type is that type: the payload of the enum variant an arm matched
+                        // (`Self::Aes192(i) => i.fill_buf()` is no call on an `Inner<Aes128, R>`).
+                        // An argument the code writes as a parameter of the item around the
+                        // call, or as an alias, says nothing.
+                        let ci = awaited.unwrap_or_else(|| src.idx((line, c0)));
+                        if !again
+                            && n.self_ty.as_deref() == Some(t.as_str())
+                            && let Some(full) = n.self_full.as_deref()
+                            && let Some(w) = receiver_written(&src, ci)
+                        {
+                            let (want, have) = (type_args(full), type_args(&deref_type(&w)));
+                            let mut params: Vec<String> = src
+                                .enclosing((line, c0), &[ItemKind::Fn])
+                                .map(|f| fn_sig(&src, f).generics)
+                                .unwrap_or_default();
+                            if let Some(b) = src.enclosing((line, c0), &[ItemKind::Impl])
+                                && let Some((_, own)) = impl_self(&src, b)
+                            {
+                                params.extend(own);
+                            }
+                            let man = self.man;
+                            let owner = man.owner_of(&path);
+                            for (a, b) in want.iter().zip(&have) {
+                                let written = b.chars().all(is_ident)
+                                    && b.starts_with(char::is_uppercase)
+                                    && !params.contains(b)
+                                    && want.len() == have.len();
+                                if written
+                                    && type_name(a) != type_name(&imported_as(&src, b))
+                                    && self.alias_targets(&src, owner, b).is_empty()
+                                {
+                                    return Err(format!(
+                                        "`{part}`: the method at {line}:{c0} is called on a \
+                                         `{}`, not on a `{full}`",
+                                        norm_path(&deref_type(&w))
+                                    ));
+                                }
+                            }
+                        }
                         // (the instance's own type, not one implementing its trait: a call of
                         // that instance this caller makes, on whatever line; the self-test reads
                         // it)
-                        if n.self_ty.as_deref() == Some(t.as_str()) {
+                        if !again && n.self_ty.as_deref() == Some(t.as_str()) {
                             TYPED.with(|t| t.borrow_mut().push(part.to_string()));
                         }
                     }
                     // a generic function's instance (`pass::<A>`): the call's type arguments,
                     // written (`pass::<Last>(..)`) or given by its arguments (`pass(&B, ..)` for
                     // `fn pass<T: Pick>(t: &T, ..)`), are the instance's
+                    // (whether every type argument of the instance was compared with the call's)
+                    let mut compared = false;
                     if let Some(c0) = col
                         && !own_closure
+                        && !again
                         && let Some(want_args) = callee.as_deref().and_then(instance_args)
                         && let Some(n) = callee.as_deref().and_then(in_item)
                         && let Some(found) = call_type_args(
@@ -1747,6 +1891,9 @@ impl Files<'_> {
                     {
                         let man = self.man;
                         let owner = man.owner_of(&path);
+                        compared = !want_args.is_empty()
+                            && (0..want_args.len())
+                                .all(|k| found.get(k).is_some_and(Option::is_some));
                         for (k, t) in found.iter().enumerate() {
                             // (through the file's type aliases: `apply(&mut a)` with `a: A`,
                             // `type A = &'static Algorithm`; the one in scope at the call, else
@@ -1781,6 +1928,51 @@ impl Files<'_> {
                                     norm_path(t),
                                     norm_path(w)
                                 ));
+                            }
+                        }
+                    }
+                    // a generic function's instance whose type arguments the call's text does
+                    // not give (`create_file(pk_path, ..)` above `create_file(sk_path, ..)`, each
+                    // a `create_file::<&Path>` as far as the text says): where the caller calls
+                    // the function by that text elsewhere too, the position is one of a range of
+                    // candidates the text cannot tell apart. Compared whole, the call is one of
+                    // that instance, on whatever line (the self-test reads it).
+                    if let Some(c0) = col
+                        && !own_closure
+                        && !again
+                        && !by_arguments
+                        && let Some(k) = callee.as_deref()
+                        && k.trim_end().ends_with('>')
+                        && let Some(n) = in_item(k)
+                        && !by_syntax(&n)
+                    {
+                        if compared {
+                            TYPED.with(|t| t.borrow_mut().push(part.to_string()));
+                        } else if let Some(f) = src.enclosing((line, c0), &[ItemKind::Fn]) {
+                            let (a, b) = src.span(f);
+                            let code = &src.code;
+                            let here = src.idx((line, c0));
+                            let text: Vec<char> = call_text
+                                .clone()
+                                .unwrap_or_else(|| n.name.clone())
+                                .chars()
+                                .collect();
+                            let calls = |i: usize| {
+                                code.get(i..i + text.len()) == Some(&text[..])
+                                    && word_start(code, i)
+                                    && !code.get(i + text.len()).is_some_and(|c| is_ident(*c))
+                                    && {
+                                        let j = skip_blank(code, i + text.len());
+                                        code.get(j) == Some(&'(')
+                                            || (code.get(j) == Some(&':')
+                                                && code.get(j + 1) == Some(&':'))
+                                    }
+                                    && before_blank(code, i).is_none_or(|p| code[p] != '.')
+                                    && word_before_at(code, i) != "fn"
+                            };
+                            if calls(here) && (a..b.min(code.len())).any(|i| i != here && calls(i))
+                            {
+                                RANGED.with(|r| r.set(true));
                             }
                         }
                     }
@@ -2090,10 +2282,19 @@ pub(super) fn check_item(
                 ));
             }
         } else if let Some((ty, mods)) = &want.owner {
+            // (an impl's or a trait's associated type of that name is no definition of the type:
+            // `type VerifyingKey = T::VerifyingKey;` beside `impl X for p256::ecdsa::VerifyingKey`)
             let defs: Vec<&Item> = src
                 .items
                 .iter()
                 .filter(|i| matches!(i.kind, ItemKind::TypeDef | ItemKind::Trait) && i.name == *ty)
+                .filter(|i| {
+                    !src.items.iter().any(|o| {
+                        matches!(o.kind, ItemKind::Impl | ItemKind::Trait)
+                            && o.start < i.start
+                            && o.contains(i.start)
+                    })
+                })
                 .collect();
             if !defs.is_empty() && !defs.iter().any(|d| in_chain(&around(d.start), mods)) {
                 return Err(format!(
@@ -2161,8 +2362,15 @@ pub(super) fn check_item(
 }
 
 /// The operator a method of an operator trait is written as (`<P as core::ops::arith::Mul<S>>::
-/// mul`: `*`), for a symbol naming one.
+/// mul`: `*`; `core::ops::try_trait::FromResidual::from_residual`: `?`), for a symbol naming one.
 pub(super) fn operator_of(symbol: &str) -> Option<&'static str> {
+    // (`?` branches on its operand and converts the error it returns: `Try::branch`,
+    // `FromResidual::from_residual`)
+    if re!(r"core::ops::try_trait::(?:Try\b.*::branch|FromResidual\b.*::from_residual)$")
+        .is_match(symbol)
+    {
+        return Some("?");
+    }
     let m = re!(
         r"core::ops::(?:arith::|bit::)?(Add|Sub|Mul|Div|Rem|BitAnd|BitOr|BitXor|Shl|Shr|Neg|Not)(Assign)?\b"
     )

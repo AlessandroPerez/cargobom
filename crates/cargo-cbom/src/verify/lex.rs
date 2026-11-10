@@ -2,16 +2,30 @@
 
 use super::*;
 
+/// A path or type without its generic arguments: every `<..>` whose brackets match is removed
+/// (an unmatched `<` or `>` stays, as a comparison's). The `>` of a function type's `->` closes
+/// nothing (`MapErr<S, fn(E) -> F {into_service_error}, F>` is `MapErr`).
 pub(super) fn strip_generics(s: &str) -> String {
-    let re = re!(r"<[^<>]*>");
-    let mut s = s.to_string();
-    loop {
-        let n = re.replace_all(&s, "").to_string();
-        if n == s {
-            return s;
+    let chars: Vec<char> = s.chars().collect();
+    let mut keep = vec![true; chars.len()];
+    let mut open = Vec::new();
+    for (i, &c) in chars.iter().enumerate() {
+        match c {
+            '<' => open.push(i),
+            '>' if i > 0 && chars[i - 1] == '-' => {}
+            '>' => {
+                if let Some(a) = open.pop() {
+                    keep[a..=i].iter_mut().for_each(|k| *k = false);
+                }
+            }
+            _ => {}
         }
-        s = n;
     }
+    chars
+        .iter()
+        .zip(keep)
+        .filter_map(|(c, k)| k.then_some(*c))
+        .collect()
 }
 pub(super) fn is_ident(c: char) -> bool {
     c.is_alphanumeric() || c == '_'

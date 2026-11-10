@@ -203,8 +203,19 @@
 //!   the one whose value reaches the call: of two lines coercing the same type to the same trait
 //!   (two generic functions boxing their `T`), a shift from one to the other is as true.
 //! - A generic call's type arguments are compared only where written, or given by an argument
-//!   whose type is one of the file's; an elided `<..>` is not compared. A closure's index is not
-//!   counted against the closures of its parent's body.
+//!   whose type is one of the file's; an elided `<..>` is not compared. Where they are not and
+//!   the caller calls the function by the same text elsewhere, the position is verified within
+//!   that range. A closure's index is not counted against the closures of its parent's body.
+//! - An occurrence in a generic item that several instances reach is written in one of them
+//!   (`in generic::<Fast>`) with every instance's chain: a second chain's calls are not held to
+//!   that instance's type arguments, and a detail of it moved to a neighbouring call of the
+//!   item is accepted.
+//! - A method's receiver is typed where the code says its type: a value of one of the file's
+//!   types, with its type arguments where an enum's variant declares them (`Self::Aes128(i) =>
+//!   i.read(..)`). On a variable of another crate's type it is not, and an instantiation detail
+//!   moved to another call of that method on the same variable (`mac.update(..)` three lines
+//!   running) is accepted: the same instance when the method has no type arguments of its own,
+//!   which the text does not say.
 //! - A standard-library macro's line is checked against the symbol or a metavariable, not
 //!   against the rule the invocation matches (the standard library's `macro` items are not read).
 //! - That a claim without an unknown lists every value that may reach the call is not checked,
@@ -1658,5 +1669,75 @@ ring = "0.17"
         let (a, b) = async_body_at(&s, body).unwrap();
         assert_eq!(&text[a..b], "c(z)");
         assert!(async_body_at(&s, text.find("a(x)").unwrap()).is_none());
+    }
+
+    #[test]
+    fn generic_arguments_are_stripped_past_a_function_types_arrow() {
+        assert_eq!(
+            strip_generics("m::MapErr<S, fn(E<A, !>) -> E<A, B> {E::<..>::into::<..>}, E<A, B>>"),
+            "m::MapErr"
+        );
+        assert_eq!(
+            type_name("m::MapErr<S, fn(E<A, !>) -> E<A, B> {E::<..>::into::<..>}, E<A, B>>"),
+            "MapErr"
+        );
+        // (an unmatched bracket stays, as before)
+        assert_eq!(strip_generics("a < b"), "a < b");
+        assert_eq!(strip_generics("Vec<u8> > x"), "Vec > x");
+        let n = in_item(
+            "<m::MapErr<S, fn(E<A, !>) -> E<A, B> {E::<..>::into::<..>}, E<A, B>> as \
+             s::Service<T>>::poll_ready",
+        )
+        .unwrap();
+        assert_eq!(
+            (
+                n.name.as_str(),
+                n.self_ty.as_deref(),
+                n.trait_name.as_deref()
+            ),
+            ("poll_ready", Some("MapErr"), Some("Service<T>"))
+        );
+    }
+
+    #[test]
+    fn calls_written_as_syntax_are_at_their_token() {
+        assert_eq!(
+            check::operator_of("core::ops::try_trait::FromResidual::from_residual"),
+            Some("?")
+        );
+        assert_eq!(
+            check::operator_of(
+                "<core::result::Result<T, F> as core::ops::try_trait::FromResidual<R>>::from_residual"
+            ),
+            Some("?")
+        );
+        assert_eq!(
+            check::operator_of("core::ops::try_trait::Try::branch"),
+            Some("?")
+        );
+        assert_eq!(
+            check::operator_of("<P as core::ops::arith::Mul<S>>::mul"),
+            Some("*")
+        );
+        assert_eq!(check::operator_of("m::from_residual"), None);
+    }
+
+    #[test]
+    fn a_types_defaults_are_read_from_its_definition() {
+        let src = Source::new(
+            "pub struct Named<F = File> { f: F }\nstruct Plain;\nenum E<'a, T: Iterator<Item = u8> = Bytes, const N: usize = 4> { A(&'a T) }\n",
+            true,
+            false,
+        );
+        assert_eq!(
+            type_defaults(&src, "Named"),
+            Some(vec![Some("File".to_string())])
+        );
+        assert_eq!(type_defaults(&src, "Plain"), Some(vec![]));
+        assert_eq!(
+            type_defaults(&src, "E"),
+            Some(vec![Some("Bytes".to_string()), Some("4".to_string())])
+        );
+        assert_eq!(type_defaults(&src, "Missing"), None);
     }
 }

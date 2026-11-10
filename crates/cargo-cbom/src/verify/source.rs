@@ -1310,6 +1310,30 @@ pub(super) fn by_syntax(item: &InItem) -> bool {
             .as_deref()
             .is_some_and(|t| TRAITS.contains(&t.split('<').next().unwrap_or(t)))
 }
+/// Is the path a method of an impl of a standard-library trait (`<Key as core::convert::From<
+/// [u8; 32]>>::from`)?
+pub(super) fn std_impl(path: &str) -> bool {
+    let Some(q) = path.trim_start().strip_prefix('<') else {
+        return false;
+    };
+    let mut depth = 0i32;
+    for (i, c) in q.char_indices() {
+        match c {
+            '<' | '(' | '[' => depth += 1,
+            '>' if q[..i].ends_with('-') => {}
+            '>' if depth == 0 => return false,
+            '>' | ')' | ']' => depth -= 1,
+            ' ' if depth == 0 && q[i..].starts_with(" as ") => {
+                let tr = &q[i + 4..];
+                return ["core::", "std::", "alloc::"]
+                    .iter()
+                    .any(|k| tr.starts_with(k));
+            }
+            _ => {}
+        }
+    }
+    false
+}
 /// The function an attribute on a line belongs to (`#[tokio::main]` above `async fn main`): the
 /// line holds an attribute, and the next item after it and any further attributes is that
 /// function.

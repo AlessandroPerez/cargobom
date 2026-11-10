@@ -198,12 +198,9 @@ pub(super) fn receiver_at(s: &[char], dot: usize) -> Option<(usize, String, usiz
     let r = root?;
     Some((r, word_of(s, r), dot))
 }
-/// The type of the value a method called at `i` (`E1.ext()`, `W(S1).alg()`, `g.alg()` with `let
-/// g = &W(S2);`, `p.b.ext()` with `p` a `Pair` whose `b` is an `E2`, `mk1().ext()`, `e.ext()` with
-/// `let e = E1.upgrade();`) is called on, when the code says which type of the file it is: `None`
-/// when it does not (a parameter of a type parameter, a trait object, a value of another crate's
-/// type).
-pub(super) fn receiver_type(src: &Source, i: usize) -> Option<String> {
+/// The type the code says the receiver of the method call at `i` has, as it writes it
+/// (`StreamDecryptorInner<Aes128, R>`, with its arguments).
+pub(super) fn receiver_written(src: &Source, i: usize) -> Option<String> {
     let s = &src.code;
     let dot = before_blank(s, i).filter(|&d| s[d] == '.')?;
     // (a parenthesized receiver, `(&e1).ext()`: what is inside)
@@ -232,15 +229,41 @@ pub(super) fn receiver_type(src: &Source, i: usize) -> Option<String> {
         }
         None => receiver_at(s, dot)?.0,
     };
-    let mut ty = type_name(&deref_type(&expr_type(src, r, dot, 5)?));
-    // (a type alias of the file: `type A2 = E2;`)
+    expr_type(src, r, dot, 5)
+}
+/// The type of the value a method called at `i` (`E1.ext()`, `W(S1).alg()`, `g.alg()` with `let
+/// g = &W(S2);`, `p.b.ext()` with `p` a `Pair` whose `b` is an `E2`, `mk1().ext()`, `e.ext()` with
+/// `let e = E1.upgrade();`) is called on, when the code says which type of the file it is: `None`
+/// when it does not (a parameter of a type parameter, a trait object, a value of another crate's
+/// type).
+pub(super) fn receiver_type(src: &Source, i: usize) -> Option<String> {
+    let mut ty = type_name(&deref_type(&receiver_written(src, i)?));
+    // (a type alias of the file: `type A2 = E2;`; an associated type is the one of the impl
+    // around the call, `Self::SigningKey` in `impl Algorithm for Hs384` being that impl's
+    // `type SigningKey = Hs384Key;`, not another impl's of the same name)
+    let around = src.enclosing(src.pos(i), &[ItemKind::Impl]);
+    let code: String = src.code.iter().collect();
     for _ in 0..4 {
         let Ok(re) = Regex::new(&format!(r"\btype\s+{}\s*=\s*([^;<]+)", regex::escape(&ty))) else {
             break;
         };
-        let code: String = src.code.iter().collect();
-        match re.captures(&code) {
-            Some(m) => ty = type_name(m[1].trim()),
+        let defs: Vec<((usize, usize), String)> = re
+            .captures_iter(&code)
+            .map(|m| {
+                let at = code[..m.get(0).map_or(0, |g| g.start())].chars().count();
+                (src.pos(at), type_name(m[1].trim()))
+            })
+            .collect();
+        let in_block = |p: (usize, usize)| {
+            src.items
+                .iter()
+                .any(|o| matches!(o.kind, ItemKind::Impl | ItemKind::Trait) && o.contains(p))
+        };
+        let own = defs
+            .iter()
+            .find(|(p, _)| around.is_some_and(|b| b.contains(*p)));
+        match own.or_else(|| defs.iter().find(|(p, _)| !in_block(*p))) {
+            Some((_, t)) => ty = t.clone(),
             None => break,
         }
     }
@@ -795,6 +818,26 @@ pub(super) fn expr_type(src: &Source, a: usize, b: usize, depth: usize) -> Optio
                         _ => (pat.trim().to_string(), None),
                     };
                     let p = p.trim_start_matches("mut ").trim();
+                    // the payload of an enum's variant a `match` arm or an `if let` binds
+                    // (`Self::Aes128(i) => i.fill_buf()`): the type the enum declares for it
+                    if matches!(bd.kind, BindKind::Arm | BindKind::Cond)
+                        && let Some(m) =
+                            re!(r"^&?\s*((?:\w+\s*::\s*)+)(\w+)\s*\(([^()]*)\)$").captures(p)
+                        && let Some(k) = split_top(&m[3]).iter().position(|x| {
+                            let x = x.trim();
+                            let x = x.strip_prefix("ref ").unwrap_or(x).trim();
+                            x.strip_prefix("mut ").unwrap_or(x).trim() == last
+                        })
+                    {
+                        let owner = m[1].trim().trim_end_matches(':').trim();
+                        let owner = owner.rsplit("::").next().unwrap_or(owner).trim();
+                        let owner = if owner == "Self" {
+                            around(start)?
+                        } else {
+                            owner.to_string()
+                        };
+                        return variant_field(src, &owner, &m[2], k);
+                    }
                     if p != last || !matches!(bd.kind, BindKind::Let) {
                         return None;
                     }
@@ -959,6 +1002,31 @@ pub(super) fn trait_alias(src: &Source, t: &str) -> String {
         .find(|b| b.name == t && b.path.len() > 1)
         .and_then(|b| b.path.last().cloned())
         .unwrap_or_else(|| t.to_string())
+}
+/// The type the file's enum `owner` declares for field `idx` of its tuple variant `variant`
+/// (`enum D<R> { Aes128(Inner<Aes128, R>), .. }`: `Inner<Aes128, R>`).
+pub(super) fn variant_field(
+    src: &Source,
+    owner: &str,
+    variant: &str,
+    idx: usize,
+) -> Option<String> {
+    let it = src.items.iter().find(|it| {
+        it.kind == ItemKind::TypeDef && it.name == owner && kw(&src.code, src.idx(it.start), "enum")
+    })?;
+    let a = src.idx(it.start);
+    let open = scan_to(&src.code, a, src.code.len(), |k| {
+        matches!(src.code[k], '{' | ';')
+    });
+    let close = close_of_at(&src.code, open)?;
+    let text = src.text(open, close);
+    let var = Regex::new(&format!(r"[{{,]\s*{}\s*\(", regex::escape(variant))).ok()?;
+    let m = var.find(&text)?;
+    let paren = open + text[..m.end()].chars().count() - 1;
+    let end = close_of_at(&src.code, paren)?;
+    split_top(&src.text(paren + 1, end))
+        .get(idx)
+        .map(|f| f.trim().trim_start_matches("pub").trim().to_string())
 }
 /// The type of field `idx` of the tuple struct or enum variant a constructor `w` makes (`W2(..)`,
 /// `E3::A(..)`), as the file declares it.
@@ -1459,7 +1527,75 @@ pub(super) fn written_self(
     }
     // (then the package's, by name)
     let expanded = expand_aliases(&resolved, aliases, 3);
-    Some(fold_typenum(&norm_path(&expanded)) == fold_typenum(&norm_path(full)))
+    let (written, named) = (
+        fold_typenum(&norm_path(&expanded)),
+        fold_typenum(&norm_path(full)),
+    );
+    // a context that gives the type no arguments where the header writes some: arguments equal
+    // to the type's defaults are not printed (`NamedTempFile::new_in` is a method of `impl
+    // NamedTempFile<File>`, with `struct NamedTempFile<F = File>`). Where the file defines the
+    // type, the written arguments are its defaults; elsewhere the context says no more than the
+    // type's name.
+    if !named.contains('<')
+        && written
+            .strip_prefix(named.as_str())
+            .is_some_and(|r| r.starts_with('<'))
+    {
+        let defaults = type_defaults(src, &type_name(ty))?;
+        let args = type_args(&expanded);
+        return Some(
+            args.len() == defaults.len()
+                && args.iter().zip(&defaults).all(|(a, d)| {
+                    d.as_deref()
+                        .is_some_and(|d| fold_typenum(&norm_path(d)) == fold_typenum(&norm_path(a)))
+                }),
+        );
+    }
+    Some(written == named)
+}
+
+/// The defaults of the type and const parameters of the file's struct, enum or union `ty`, in
+/// order (`struct NamedTempFile<F = File>`: `[Some("File")]`), lifetimes left out.
+pub(super) fn type_defaults(src: &Source, ty: &str) -> Option<Vec<Option<String>>> {
+    let s = &src.code;
+    let def = src.items.iter().find(|it| {
+        it.kind == ItemKind::TypeDef
+            && it.name == ty
+            && ["struct", "enum", "union"]
+                .iter()
+                .any(|w| kw(s, src.idx(it.start), w))
+    })?;
+    let at = src.idx(def.start);
+    let mut i = skip_blank(s, at + word_of(s, at).chars().count());
+    i = skip_blank(s, i + word_of(s, i).chars().count());
+    if s.get(i) != Some(&'<') {
+        return Some(Vec::new());
+    }
+    let cls = vec![Class::Code; s.len() - i];
+    let e = i + skip_angle(&s[i..], &cls, 0)?;
+    let inner: String = s[i + 1..e - 1].iter().collect();
+    Some(
+        split_top(&inner)
+            .into_iter()
+            .map(|p| p.trim().to_string())
+            .filter(|p| !p.is_empty() && !p.starts_with('\''))
+            .map(|p| {
+                // the `=` outside the bounds' brackets (`T: Iterator<Item = u8> = Bytes`)
+                let mut depth = 0i32;
+                p.char_indices()
+                    .find(|&(k, c)| {
+                        match c {
+                            '<' | '(' | '[' => depth += 1,
+                            '>' if p[..k].ends_with('-') => {}
+                            '>' | ')' | ']' => depth -= 1,
+                            _ => {}
+                        }
+                        c == '=' && depth == 0
+                    })
+                    .map(|(k, _)| p[k + 1..].trim().to_string())
+            })
+            .collect(),
+    )
 }
 
 /// An impl block's self type as written (`m::K`, `&mut A`, the `where` clause left out), and
