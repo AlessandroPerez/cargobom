@@ -92,6 +92,8 @@ fn instance_base(name: &str) -> String {
         for (j, ch) in rest[i + 2..].char_indices() {
             match ch {
                 '<' => depth += 1,
+                // (the `>` of a function type's `->` closes nothing)
+                '>' if rest[i + 2..i + 2 + j].ends_with('-') => {}
                 '>' => {
                     depth -= 1;
                     if depth == 0 {
@@ -1884,6 +1886,7 @@ fn implemented_method(f: &str) -> Option<String> {
     for (i, c) in rest.char_indices() {
         match c {
             '<' => depth += 1,
+            '>' if rest[..i].ends_with('-') => {}
             '>' => {
                 depth -= 1;
                 if depth == 0 {

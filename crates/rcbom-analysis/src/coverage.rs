@@ -113,6 +113,8 @@ fn by_type(path: &str) -> String {
         for (i, c) in rest.char_indices() {
             match c {
                 '<' => depth += 1,
+                // (the `>` of a function type's `->` closes nothing)
+                '>' if rest[..i].ends_with('-') => {}
                 '>' if depth == 0 => {
                     close = Some(i);
                     break;

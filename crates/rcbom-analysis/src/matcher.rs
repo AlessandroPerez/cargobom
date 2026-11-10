@@ -594,13 +594,21 @@ pub fn match_constructor<'o>(
 pub(crate) fn strip_generics(path: &str) -> String {
     let mut out = String::new();
     let mut depth = 0usize;
+    let mut prev = ' ';
     for ch in path.chars() {
         match ch {
             '<' => depth += 1,
+            // (the `>` of a function type's `->` closes nothing: `Map<I, fn(A) -> B>`)
+            '>' if prev == '-' => {
+                if depth == 0 {
+                    out.push(ch);
+                }
+            }
             '>' => depth = depth.saturating_sub(1),
             _ if depth == 0 => out.push(ch),
             _ => {}
         }
+        prev = ch;
     }
     out.replace("::::", "::")
 }

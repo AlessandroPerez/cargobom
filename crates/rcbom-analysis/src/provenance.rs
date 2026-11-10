@@ -1286,16 +1286,24 @@ fn strip_generics(path: &str) -> String {
         let mut out = String::new();
         let mut depth = 0;
         let mut changed = false;
+        let mut prev = ' ';
         for ch in s.chars() {
             match ch {
                 '<' => {
                     depth += 1;
                     changed = true;
                 }
+                // (the `>` of a function type's `->` closes nothing)
+                '>' if prev == '-' => {
+                    if depth == 0 {
+                        out.push(ch);
+                    }
+                }
                 '>' if depth > 0 => depth -= 1,
                 _ if depth == 0 => out.push(ch),
                 _ => {}
             }
+            prev = ch;
         }
         if !changed {
             return out.replace("::::", "::");
@@ -1318,6 +1326,7 @@ fn fn_display(path: &str) -> String {
         for (i, c) in inner.char_indices() {
             match c {
                 '<' => depth += 1,
+                '>' if inner[..i].ends_with('-') => {}
                 '>' => {
                     depth -= 1;
                     if depth == 0 {

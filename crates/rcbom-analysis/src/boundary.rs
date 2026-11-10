@@ -713,6 +713,7 @@ fn fn_name(f: &str) -> String {
         for (i, c) in f.char_indices() {
             match c {
                 '<' => depth += 1,
+                '>' if f[..i].ends_with('-') => {}
                 '>' => {
                     depth -= 1;
                     if depth == 0 {
