@@ -74,8 +74,7 @@ pub(crate) fn runs_of<'tcx>(
     did: DefId,
     args: rustc_middle::ty::GenericArgsRef<'tcx>,
 ) -> Option<String> {
-    use rustc_middle::ty::TypeVisitableExt;
-    if args.has_non_region_param() || dyn_self(tcx, did, args).is_some() {
+    if open_args(args) || dyn_self(tcx, did, args).is_some() {
         return None;
     }
     if tcx.trait_of_assoc(did).is_none() && !tcx.generics_of(did).requires_monomorphization(tcx) {
@@ -94,6 +93,9 @@ pub(super) fn item_runs<'tcx>(
     args: rustc_middle::ty::GenericArgsRef<'tcx>,
 ) -> Option<String> {
     runs_of(tcx, did, args).or_else(|| {
+        if open_args(args) {
+            return None;
+        }
         let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
         rustc_middle::ty::Instance::try_resolve(tcx, env, did, args)
             .ok()
@@ -101,6 +103,17 @@ pub(super) fn item_runs<'tcx>(
             .and_then(|i| body_name(tcx, i))
             .filter(|n| *n != path_of(tcx, did))
     })
+}
+/// Are these arguments not those of one instance: a parameter of the enclosing item, or a
+/// type or constant bound by a binder around them (a placeholder, `for<const N: usize>`)?
+/// Resolving an instance for them in the monomorphic environment is rustc's panic (der 0.8:
+/// "cannot find `!BoundConst` in param-env"), so no body is named for them.
+fn open_args(args: rustc_middle::ty::GenericArgsRef<'_>) -> bool {
+    use rustc_middle::ty::TypeVisitableExt;
+    args.has_non_region_param()
+        || args.has_non_region_placeholders()
+        || args.has_escaping_bound_vars()
+        || args.has_non_region_infer()
 }
 /// The function a call of `did` with `args` writes through, as `Links::writes` names it: a
 /// trait method's call with a known `Self` type is its implementation's (`<Ctx as Up>::up`, or
@@ -117,7 +130,7 @@ pub(crate) fn write_callee<'tcx>(
     use rustc_middle::ty::TypeVisitableExt;
     let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
     let resolved = |args: rustc_middle::ty::GenericArgsRef<'tcx>| {
-        if args.has_non_region_param() {
+        if open_args(args) {
             return None;
         }
         let i = rustc_middle::ty::Instance::try_resolve(tcx, env, did, args).ok()??;
