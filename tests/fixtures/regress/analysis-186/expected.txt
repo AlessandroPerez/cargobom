@@ -1,0 +1,91 @@
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:30:17 | digest::digest::Digest::digest | [reachable] [call] in a186::main; use: digest; line: `let digest = Sha1::digest(b"message");`; code: `Sha1::digest`
+  occ SipHash-1-3 | crypto:algorithm:SipHash-1-3 | src/main.rs:14:21 | siphasher::sip128::SipHasher13::new_with_keys | [reachable] [call] in a186::table_hash; new_with_keys: setup, not a use; line: `let mut hasher = SipHasher13::new_with_keys(0, key);`; code: `SipHasher13::new_with_keys`
+  occ SipHash-1-3 | crypto:algorithm:SipHash-1-3 | src/main.rs:15:6 | core::hash::Hash::hash | [reachable] [call] in a186::table_hash; use: tag; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; line: `x.hash(&mut hasher);`; code: `hash`
+  occ SipHash-1-3 | crypto:algorithm:SipHash-1-3 | src/main.rs:16:19 | siphasher::sip128::Hasher128::finish128 | [reachable] [call] in a186::table_hash; use: tag; line: `let h = hasher.finish128();`; code: `finish128`
+  occ SipHash-1-3 | crypto:algorithm:SipHash-1-3 | src/main.rs:28:8 | std::collections::hash::map::HashMap::<K, V, S, A>::insert | [reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `map.insert("a", 1);`; code: `insert`
+  occ SipHash-1-3 | crypto:algorithm:SipHash-1-3 | src/main.rs:29:20 | std::collections::hash::map::HashMap::<K, V, S, A>::get | [reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `let found = map.get("a").copied();`; code: `get`
+  occ SipHash-2-4 | crypto:algorithm:SipHash-2-4 | src/main.rs:22:19 | siphasher::sip::SipHasher24::new_with_key | [reachable] [call] in a186::main; new_with_key: setup, not a use; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b"message");`; code: `SipHasher24::new_with_key`
+  occ SipHash-2-4 | crypto:algorithm:SipHash-2-4 | src/main.rs:22:57 | siphasher::sip::SipHasher24::hash | [reachable] [call] in a186::main; use: tag; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b"message");`; code: `hash`
+  occ SipHash-2-4 | crypto:algorithm:SipHash-2-4 | src/main.rs:23:20 | siphasher::sip::SipHasher::new | [reachable] [call] in a186::main; new: setup, not a use; line: `let mut plain = SipHasher::new();`; code: `SipHasher::new`
+  occ SipHash-2-4 | crypto:algorithm:SipHash-2-4 | src/main.rs:24:10 | core::hash::Hasher::write | [reachable] [call] in a186::main; use: tag; line: `plain.write(b"message");`; code: `write`
+  occ SipHash-2-4 | crypto:algorithm:SipHash-2-4 | src/main.rs:25:31 | core::hash::Hasher::finish | [reachable] [call] in a186::main; use: tag; line: `let default_rounds = plain.finish();`; code: `finish`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via a186 -> sha-1 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a186 -> sha-1 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:48:0 | digest | [manifest] locked digest 0.10.7; reached via a186 -> sha-1 -> digest
+  occ sha-1 | pkg:cargo/sha-1@0.10.1 | Cargo.lock:74:0 | sha-1 | [manifest] locked sha-1 0.10.1; reached via a186 -> sha-1
+  occ sha-1 | pkg:cargo/sha-1@0.10.1 | Cargo.toml:10:0 | sha-1 | [manifest] declared by a186 (dependencies)
+  occ siphasher | pkg:cargo/siphasher@1.0.4 | Cargo.lock:85:0 | siphasher | [manifest] locked siphasher 1.0.4; reached via a186 -> siphasher
+  occ siphasher | pkg:cargo/siphasher@1.0.4 | Cargo.toml:9:0 | siphasher | [manifest] declared by a186 (dependencies)
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=1
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:confidence=high
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:detection:method=type-resolved
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:functions:source=observed
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:kb:version=0.2.0
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:occurrences=5
+  prop SipHash-1-3 | crypto:algorithm:SipHash-1-3 | rcbom:reachability=reachable
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:confidence=high
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:detection:method=type-resolved
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:functions:source=observed
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:kb:version=0.2.0
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:occurrences=5
+  prop SipHash-2-4 | crypto:algorithm:SipHash-2-4 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop sha-1 | pkg:cargo/sha-1@0.10.1 | rcbom:crypto-role=algorithm
+  prop sha-1 | pkg:cargo/sha-1@0.10.1 | rcbom:scope=required
+  prop sha-1 | pkg:cargo/sha-1@0.10.1 | rcbom:usage=reachable
+  prop siphasher | pkg:cargo/siphasher@1.0.4 | rcbom:crypto-role=algorithm
+  prop siphasher | pkg:cargo/siphasher@1.0.4 | rcbom:scope=required
+  prop siphasher | pkg:cargo/siphasher@1.0.4 | rcbom:usage=reachable
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SipHash-1-3 | crypto:algorithm:SipHash-1-3 | {"algorithmProperties": {"algorithmFamily": "SipHash", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SipHash-2-4 | crypto:algorithm:SipHash-2-4 | {"algorithmProperties": {"algorithmFamily": "SipHash", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library sha-1 0.10.1 | pkg:cargo/sha-1@0.10.1 | purl pkg:cargo/sha-1@0.10.1
+component library siphasher 1.0.4 | pkg:cargo/siphasher@1.0.4 | purl pkg:cargo/siphasher@1.0.4
+dep pkg:cargo/a186@0.1.0 -> pkg:cargo/sha-1@0.10.1
+dep pkg:cargo/a186@0.1.0 -> pkg:cargo/siphasher@1.0.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/sha-1@0.10.1 -> pkg:cargo/digest@0.10.7
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SipHash-1-3
+dependency crypto:algorithm:SipHash-2-4
+dependency pkg:cargo/a186@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/sha-1@0.10.1
+dependency pkg:cargo/siphasher@1.0.4
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/sha-1@0.10.1 -> crypto:algorithm:SHA-1
+provides pkg:cargo/siphasher@1.0.4 -> crypto:algorithm:SipHash-1-3
+provides pkg:cargo/siphasher@1.0.4 -> crypto:algorithm:SipHash-2-4
+root {"bom-ref": "pkg:cargo/a186@0.1.0", "name": "a186", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a186@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a186
+run rcbom:run:boundary-check=18 calls into crypto packages: 8 cited, 10 cited by the check by name, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=11
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=147
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

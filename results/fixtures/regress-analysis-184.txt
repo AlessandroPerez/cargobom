@@ -1,0 +1,162 @@
+  occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:13:21 | kem::Kem::generate_keypair_from_rng | [reachable] [call] in a184::main; use: keygen; rng: rng (rngs::thread::rng); line: `let (dk2, ek2) = MlKem1024::generate_keypair_from_rng(&mut rng);`; code: `MlKem1024::generate_keypair_from_rng`
+  occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:14:23 | kem::Encapsulate::encapsulate_with_rng | [reachable] [call] in a184::main; use: encapsulate; rng: rng (rngs::thread::rng); line: `let (ct2, _) = ek2.encapsulate_with_rng(&mut rng);`; code: `encapsulate_with_rng`
+  occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:15:17 | kem::Decapsulate::decapsulate | [reachable] [call] in a184::main; use: decapsulate; line: `let k3 = dk2.decapsulate(&ct2);`; code: `decapsulate`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:10:19 | kem::Kem::generate_keypair_from_rng | [reachable] [call] in a184::main; use: keygen; rng: rng (rngs::thread::rng); line: `let (dk, ek) = MlKem768::generate_keypair_from_rng(&mut rng);`; code: `MlKem768::generate_keypair_from_rng`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:11:22 | kem::Encapsulate::encapsulate_with_rng | [reachable] [call] in a184::main; use: encapsulate; rng: rng (rngs::thread::rng); line: `let (ct, k1) = ek.encapsulate_with_rng(&mut rng);`; code: `encapsulate_with_rng`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:12:16 | kem::Decapsulate::decapsulate | [reachable] [call] in a184::main; use: decapsulate; line: `let k2 = dk.decapsulate(&ct);`; code: `decapsulate`
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:32:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via a184 -> rand -> chacha20
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:43:0 | cmov | [manifest] locked cmov 0.5.4; reached via a184 -> ml-kem -> hybrid-array -> ctutils -> cmov
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:64:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a184 -> ml-kem -> kem -> crypto-common
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:74:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a184 -> ml-kem -> hybrid-array -> ctutils
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:93:0 | digest | [manifest] locked digest 0.11.3; reached via a184 -> ml-kem -> sha3 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:102:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a184 -> rand -> getrandom
+  occ keccak | pkg:cargo/keccak@0.2.2 | Cargo.lock:124:0 | keccak | [manifest] locked keccak 0.2.2; reached via a184 -> ml-kem -> sha3 -> keccak
+  occ kem | pkg:cargo/kem@0.3.0 | Cargo.lock:134:0 | kem | [manifest] locked kem 0.3.0; reached via a184 -> ml-kem -> kem
+  occ ml-kem | pkg:cargo/ml-kem@0.3.4 | Cargo.lock:150:0 | ml-kem | [manifest] locked ml-kem 0.3.4; reached via a184 -> ml-kem
+  occ ml-kem | pkg:cargo/ml-kem@0.3.4 | Cargo.toml:9:0 | ml-kem | [manifest] declared by a184 (dependencies)
+  occ module-lattice | pkg:cargo/module-lattice@0.2.4 | Cargo.lock:165:0 | module-lattice | [manifest] locked module-lattice 0.2.4; reached via a184 -> ml-kem -> module-lattice
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:201:0 | rand | [manifest] locked rand 0.10.3; reached via a184 -> rand
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.toml:10:0 | rand | [manifest] declared by a184 (dependencies)
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:212:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a184 -> ml-kem -> rand_core
+  occ sha3 | pkg:cargo/sha3@0.12.0 | Cargo.lock:218:0 | sha3 | [manifest] locked sha3 0.12.0; reached via a184 -> ml-kem -> sha3
+  occ shake | pkg:cargo/shake@0.1.0 | Cargo.lock:229:0 | shake | [manifest] locked shake 0.1.0; reached via a184 -> ml-kem -> shake
+  occ sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | Cargo.lock:250:0 | sponge-cursor | [manifest] locked sponge-cursor 0.1.0; reached via a184 -> ml-kem -> sha3 -> sponge-cursor
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:confidence=high
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:detection:method=type-resolved
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:functions:source=observed
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:kb:version=0.2.0
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:occurrences=3
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:provenance:rng=rng
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:reachability=reachable
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:confidence=high
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:detection:method=type-resolved
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:functions:source=observed
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=3
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:provenance:rng=rng
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:usage=reachable
+  prop kem | pkg:cargo/kem@0.3.0 | rcbom:crypto-role=trait
+  prop kem | pkg:cargo/kem@0.3.0 | rcbom:scope=required
+  prop ml-kem | pkg:cargo/ml-kem@0.3.4 | rcbom:crypto-role=algorithm
+  prop ml-kem | pkg:cargo/ml-kem@0.3.4 | rcbom:scope=required
+  prop ml-kem | pkg:cargo/ml-kem@0.3.4 | rcbom:usage=reachable
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:crypto-role=unmodelled
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:kb-coverage=unmodelled
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:scope=required
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.12.0 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.12.0 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.12.0 | rcbom:usage=reachable
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:crypto-role=unmodelled
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:scope=required
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:usage=reachable
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:crypto-role=unmodelled
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:scope=required
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:usage=reachable
+asset ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
+asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library keccak 0.2.2 | pkg:cargo/keccak@0.2.2 | purl pkg:cargo/keccak@0.2.2
+component library kem 0.3.0 | pkg:cargo/kem@0.3.0 | purl pkg:cargo/kem@0.3.0
+component library ml-kem 0.3.4 | pkg:cargo/ml-kem@0.3.4 | purl pkg:cargo/ml-kem@0.3.4
+component library module-lattice 0.2.4 | pkg:cargo/module-lattice@0.2.4 | purl pkg:cargo/module-lattice@0.2.4
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library sha3 0.12.0 | pkg:cargo/sha3@0.12.0 | purl pkg:cargo/sha3@0.12.0
+component library shake 0.1.0 | pkg:cargo/shake@0.1.0 | purl pkg:cargo/shake@0.1.0
+component library sponge-cursor 0.1.0 | pkg:cargo/sponge-cursor@0.1.0 | purl pkg:cargo/sponge-cursor@0.1.0
+dep pkg:cargo/a184@0.1.0 -> pkg:cargo/ml-kem@0.3.4
+dep pkg:cargo/a184@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/kem@0.3.0 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/kem@0.3.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/kem@0.3.0
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/module-lattice@0.2.4
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/sha3@0.12.0
+dep pkg:cargo/ml-kem@0.3.4 -> pkg:cargo/shake@0.1.0
+dep pkg:cargo/module-lattice@0.2.4 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/sha3@0.12.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/sha3@0.12.0 -> pkg:cargo/keccak@0.2.2
+dep pkg:cargo/sha3@0.12.0 -> pkg:cargo/sponge-cursor@0.1.0
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/keccak@0.2.2
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/sponge-cursor@0.1.0
+dependency crypto:algorithm:ML-KEM-1024
+dependency crypto:algorithm:ML-KEM-768
+dependency pkg:cargo/a184@0.1.0
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/keccak@0.2.2
+dependency pkg:cargo/kem@0.3.0
+dependency pkg:cargo/ml-kem@0.3.4
+dependency pkg:cargo/module-lattice@0.2.4
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/sha3@0.12.0
+dependency pkg:cargo/shake@0.1.0
+dependency pkg:cargo/sponge-cursor@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ml-kem@0.3.4 -> crypto:algorithm:ML-KEM-1024
+provides pkg:cargo/ml-kem@0.3.4 -> crypto:algorithm:ML-KEM-768
+root {"bom-ref": "pkg:cargo/a184@0.1.0", "name": "a184", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a184@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a184
+run rcbom:run:boundary-check=7 calls into crypto packages: 6 cited, 0 cited by the check as unknown, 1 excused (generator setup 1)
+run rcbom:run:features=
+run rcbom:run:packages=23
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=56
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

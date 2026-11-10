@@ -7711,6 +7711,13 @@
             "symbol": "aws_lc_rs::digest::Context::finish"
           },
           {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::digest::sha::SHA256; member: type-join, possible (a value `static rustls::crypto::aws_lc_rs::hash::SHA256` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.40/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "aws_lc_rs::digest::Context::update"
+          },
+          {
             "additionalContext": "[present] [component] in rustls::crypto::aws_lc_rs::hmac::HMAC_SHA256; part of HMAC-SHA-256 (aws_lc_rs::hmac::HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `pub(crate) static HMAC_SHA256: Hmac = Hmac(&ring_like::hmac::HMAC_SHA256);`; code: `ring_like::hmac::HMAC_SHA256`",
             "line": 8,
             "location": "rustls-0.23.40/src/crypto/ring/hmac.rs",
@@ -7827,7 +7834,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "90"
+          "value": "91"
         }
       ],
       "type": "cryptographic-asset"
@@ -8197,6 +8204,13 @@
             "symbol": "aws_lc_rs::digest::Context::finish"
           },
           {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::digest::sha::SHA384; member: type-join, possible (a value `static rustls::crypto::aws_lc_rs::hash::SHA384` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.40/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "aws_lc_rs::digest::Context::update"
+          },
+          {
             "additionalContext": "[present] [component] in rustls::crypto::aws_lc_rs::hmac::HMAC_SHA384; part of HMAC-SHA-384 (aws_lc_rs::hmac::HMAC_SHA384 -> aws_lc_rs::digest::sha::SHA384); line: `pub(crate) static HMAC_SHA384: Hmac = Hmac(&ring_like::hmac::HMAC_SHA384);`; code: `ring_like::hmac::HMAC_SHA384`",
             "line": 9,
             "location": "rustls-0.23.40/src/crypto/ring/hmac.rs",
@@ -8327,7 +8341,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "65"
+          "value": "66"
         }
       ],
       "type": "cryptographic-asset"
@@ -8998,61 +9012,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:aws-lc-rs",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::aws_lc_rs::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm unresolved: a field of `rustls::crypto::aws_lc_rs::hash::Context`; line: `self.0.update(data);`; code: `update`",
-            "line": 54,
-            "location": "rustls-0.23.40/src/crypto/ring/hash.rs",
-            "offset": 15,
-            "symbol": "aws_lc_rs::digest::Context::update"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:signature:aws-lc-rs",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -9534,7 +9493,6 @@
         "crypto:algorithm:SHA-512",
         "crypto:algorithm:TLS12-PRF-SHA-256",
         "crypto:algorithm:TLS12-PRF-SHA-384",
-        "crypto:algorithm:unknown:hash:aws-lc-rs",
         "crypto:algorithm:unknown:signature:aws-lc-rs",
         "crypto:algorithm:unknown:unknown:aws-lc-rs",
         "crypto:algorithm:x25519",
@@ -10013,10 +9971,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:aws-lc-rs"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:signature:aws-lc-rs"
     },
     {
@@ -10098,7 +10052,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:a8718769-c977-87d6-88ad-6a0eb81a10ea",
+  "serialNumber": "urn:uuid:a89b1b73-cce7-858f-ad9c-85b380633612",
   "specVersion": "1.7",
   "version": 1
 }

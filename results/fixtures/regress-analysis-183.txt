@@ -1,0 +1,318 @@
+  occ RSA-2048 | crypto:material:private-key:RSA-2048 | src/main.rs:14:14 | rsa::private_key::PrivateKey::new | [reachable] [call] in a183::main; use: keygen; rng: rng (rngs::thread::rng); line: `let key = PrivateKey::new(&mut rng, 2048).unwrap();`; code: `PrivateKey::new`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:22:20 | rsa::public_key::PublicKey::encrypt | [reachable] [call] in a183::main; use: encrypt; rng: rng (rngs::thread::rng); line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:22:38 | rsa::oaep::Oaep::<D>::new | [reachable] [call] in a183::main; new: setup, not a use; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:23:17 | rsa::private_key::PrivateKey::decrypt | [reachable] [call] in a183::main; use: decrypt; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`
+  occ RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | src/main.rs:23:25 | rsa::oaep::Oaep::<D>::new | [reachable] [call] in a183::main; new: setup, not a use; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:16:17 | rsa::pkcs1v15::signing_key::SigningKey::<D>::new | [reachable] [call] in a183::main; new: setup, not a use; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:17:21 | signature::signer::RandomizedSigner::sign_with_rng | [reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:18:14 | rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new | [reachable] [call] in a183::main; new: setup, not a use; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`
+  occ RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | src/main.rs:18:58 | signature::verifier::Verifier::verify | [reachable] [call] in a183::main; use: verify; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:20:17 | rsa::private_key::PrivateKey::sign_with_rng | [reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:20:41 | rsa::pss::Pss::<D>::new_with_salt | [reachable] [call] in a183::main; new_with_salt: setup, not a use; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:21:21 | rsa::public_key::PublicKey::verify | [reachable] [call] in a183::main; use: verify; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`
+  occ RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | src/main.rs:21:28 | rsa::pss::Pss::<D>::new | [reachable] [call] in a183::main; new: setup, not a use; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | src/main.rs:24:17 | rsa::pss::<impl rsa::private_key::PrivateKey>::pss_sign_with_rng | [reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`
+  occ RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | src/main.rs:25:21 | rsa::pss::<impl rsa::public_key::PublicKey>::pss_verify | [reachable] [call] in a183::main; use: verify; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:16:17 | rsa::pkcs1v15::signing_key::SigningKey::<D>::new | [reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:21 | signature::signer::RandomizedSigner::sign_with_rng | [reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:18:14 | rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new | [reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:18:58 | signature::verifier::Verifier::verify | [reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:17 | digest::digest::Digest::digest | [reachable] [call] in a183::main; use: digest; line: `let digest = Sha256::digest(msg);`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:17 | rsa::private_key::PrivateKey::sign_with_rng | [reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:41 | rsa::pss::Pss::<D>::new_with_salt | [reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:21 | rsa::public_key::PublicKey::verify | [reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:21:28 | rsa::pss::Pss::<D>::new | [reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:20 | rsa::public_key::PublicKey::encrypt | [reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:22:38 | rsa::oaep::Oaep::<D>::new | [reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:17 | rsa::private_key::PrivateKey::decrypt | [reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:23:25 | rsa::oaep::Oaep::<D>::new | [reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:24:17 | rsa::pss::<impl rsa::private_key::PrivateKey>::pss_sign_with_rng | [reachable] [component] in a183::main; part of RSA-PSS-SHA-384; line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:21 | rsa::pss::<impl rsa::public_key::PublicKey>::pss_verify | [reachable] [component] in a183::main; part of RSA-PSS-SHA-384; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`
+  occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:26:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via a183 -> rsa -> pkcs1 -> der -> pem-rfc7468 -> base64ct
+  occ block-buffer | pkg:cargo/block-buffer@0.12.1 | Cargo.lock:32:0 | block-buffer | [manifest] locked block-buffer 0.12.1; reached via a183 -> rsa -> digest -> block-buffer
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:48:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via a183 -> rand -> chacha20
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:59:0 | cmov | [manifest] locked cmov 0.5.4; reached via a183 -> rsa -> crypto-bigint -> ctutils -> cmov
+  occ const-oid | pkg:cargo/const-oid@0.10.2 | Cargo.lock:65:0 | const-oid | [manifest] locked const-oid 0.10.2; reached via a183 -> rsa -> const-oid
+  occ crypto-bigint | pkg:cargo/crypto-bigint@0.7.11 | Cargo.lock:86:0 | crypto-bigint | [manifest] locked crypto-bigint 0.7.11; reached via a183 -> rsa -> crypto-bigint
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:101:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a183 -> rsa -> crypto-common
+  occ crypto-primes | pkg:cargo/crypto-primes@0.7.2 | Cargo.lock:112:0 | crypto-primes | [manifest] locked crypto-primes 0.7.2; reached via a183 -> rsa -> crypto-primes
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:122:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a183 -> rsa -> crypto-bigint -> ctutils
+  occ der | pkg:cargo/der@0.8.3 | Cargo.lock:131:0 | der | [manifest] locked der 0.8.3; reached via a183 -> rsa -> pkcs1 -> der
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:142:0 | digest | [manifest] locked digest 0.11.3; reached via a183 -> rsa -> digest
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:155:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a183 -> rand -> getrandom
+  occ hmac | pkg:cargo/hmac@0.13.0 | Cargo.lock:167:0 | hmac | [manifest] locked hmac 0.13.0; reached via a183 -> rsa -> hmac
+  occ pem-rfc7468 | pkg:cargo/pem-rfc7468@1.0.0 | Cargo.lock:200:0 | pem-rfc7468 | [manifest] locked pem-rfc7468 1.0.0; reached via a183 -> rsa -> pkcs1 -> der -> pem-rfc7468
+  occ pkcs1 | pkg:cargo/pkcs1@0.8.0 | Cargo.lock:209:0 | pkcs1 | [manifest] locked pkcs1 0.8.0; reached via a183 -> rsa -> pkcs1
+  occ pkcs8 | pkg:cargo/pkcs8@0.11.0 | Cargo.lock:219:0 | pkcs8 | [manifest] locked pkcs8 0.11.0; reached via a183 -> rsa -> pkcs8
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:253:0 | rand | [manifest] locked rand 0.10.3; reached via a183 -> rand
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.toml:10:0 | rand | [manifest] declared by a183 (dependencies)
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:264:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a183 -> rand -> rand_core
+  occ rsa | pkg:cargo/rsa@0.10.0 | Cargo.lock:270:0 | rsa | [manifest] locked rsa 0.10.0; reached via a183 -> rsa
+  occ rsa | pkg:cargo/rsa@0.10.0 | Cargo.toml:9:0 | rsa | [manifest] declared by a183 (dependencies); features ["pkcs1v15"]
+  occ sha2 | pkg:cargo/sha2@0.11.1 | Cargo.lock:330:0 | sha2 | [manifest] locked sha2 0.11.1; reached via a183 -> rsa -> sha2
+  occ signature | pkg:cargo/signature@3.0.0 | Cargo.lock:341:0 | signature | [manifest] locked signature 3.0.0; reached via a183 -> rsa -> signature
+  occ spki | pkg:cargo/spki@0.8.1 | Cargo.lock:351:0 | spki | [manifest] locked spki 0.8.1; reached via a183 -> rsa -> spki
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:384:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via a183 -> rsa -> zeroize
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:detection:method=type-resolved
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:functions:source=observed
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=1
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:confidence=high
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:functions:source=observed
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:occurrences=4
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:provenance:rng=rng
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:reachability=reachable
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:confidence=high
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:occurrences=4
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:provenance:rng=rng
+  prop RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | rcbom:reachability=reachable
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:confidence=high
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:occurrences=4
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:salt_len=20
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:rng=rng
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=reachable
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:confidence=high
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:detection:method=type-resolved
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:functions:source=observed
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:kb:version=0.2.0
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:occurrences=2
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:provenance:rng=rng
+  prop RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=13
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:scope=required
+  prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:usage=reachable
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.7.11 | rcbom:crypto-role=support
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.7.11 | rcbom:kb-coverage=unmodelled
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.7.11 | rcbom:scope=required
+  prop crypto-bigint | pkg:cargo/crypto-bigint@0.7.11 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop crypto-primes | pkg:cargo/crypto-primes@0.7.2 | rcbom:crypto-role=unmodelled
+  prop crypto-primes | pkg:cargo/crypto-primes@0.7.2 | rcbom:kb-coverage=unmodelled
+  prop crypto-primes | pkg:cargo/crypto-primes@0.7.2 | rcbom:scope=required
+  prop crypto-primes | pkg:cargo/crypto-primes@0.7.2 | rcbom:usage=reachable
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=reachable
+  prop der | pkg:cargo/der@0.8.3 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.8.3 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.8.3 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.8.3 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.13.0 | rcbom:usage=present
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@1.0.0 | rcbom:crypto-role=support
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@1.0.0 | rcbom:kb-coverage=unmodelled
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@1.0.0 | rcbom:scope=required
+  prop pem-rfc7468 | pkg:cargo/pem-rfc7468@1.0.0 | rcbom:usage=reachable
+  prop pkcs1 | pkg:cargo/pkcs1@0.8.0 | rcbom:crypto-role=support
+  prop pkcs1 | pkg:cargo/pkcs1@0.8.0 | rcbom:kb-coverage=unmodelled
+  prop pkcs1 | pkg:cargo/pkcs1@0.8.0 | rcbom:scope=required
+  prop pkcs1 | pkg:cargo/pkcs1@0.8.0 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop rsa | pkg:cargo/rsa@0.10.0 | rcbom:crypto-role=algorithm
+  prop rsa | pkg:cargo/rsa@0.10.0 | rcbom:scope=required
+  prop rsa | pkg:cargo/rsa@0.10.0 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.1 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
+asset RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSAES-OAEP", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "pke"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-256 | crypto:algorithm:RSA-PKCS1-1.5-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-384 | crypto:algorithm:RSA-PSS-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
+component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
+component library crypto-bigint 0.7.11 | pkg:cargo/crypto-bigint@0.7.11 | purl pkg:cargo/crypto-bigint@0.7.11
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library crypto-primes 0.7.2 | pkg:cargo/crypto-primes@0.7.2 | purl pkg:cargo/crypto-primes@0.7.2
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library der 0.8.3 | pkg:cargo/der@0.8.3 | purl pkg:cargo/der@0.8.3
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library hmac 0.13.0 | pkg:cargo/hmac@0.13.0 | purl pkg:cargo/hmac@0.13.0
+component library pem-rfc7468 1.0.0 | pkg:cargo/pem-rfc7468@1.0.0 | purl pkg:cargo/pem-rfc7468@1.0.0
+component library pkcs1 0.8.0 | pkg:cargo/pkcs1@0.8.0 | purl pkg:cargo/pkcs1@0.8.0
+component library pkcs8 0.11.0 | pkg:cargo/pkcs8@0.11.0 | purl pkg:cargo/pkcs8@0.11.0
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library rsa 0.10.0 | pkg:cargo/rsa@0.10.0 | purl pkg:cargo/rsa@0.10.0
+component library sha2 0.11.1 | pkg:cargo/sha2@0.11.1 | purl pkg:cargo/sha2@0.11.1
+component library signature 3.0.0 | pkg:cargo/signature@3.0.0 | purl pkg:cargo/signature@3.0.0
+component library spki 0.8.1 | pkg:cargo/spki@0.8.1 | purl pkg:cargo/spki@0.8.1
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep crypto:algorithm:RSA-OAEP-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PKCS1-1.5-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PSS-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:RSA-PSS-SHA-384 -> crypto:algorithm:SHA-384
+dep pkg:cargo/a183@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/a183@0.1.0 -> pkg:cargo/rsa@0.10.0
+dep pkg:cargo/block-buffer@0.12.1 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/crypto-bigint@0.7.11 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/crypto-bigint@0.7.11 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/crypto-bigint@0.7.11 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/crypto-bigint@0.7.11 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/crypto-primes@0.7.2 -> pkg:cargo/crypto-bigint@0.7.11
+dep pkg:cargo/crypto-primes@0.7.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/der@0.8.3 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/der@0.8.3 -> pkg:cargo/pem-rfc7468@1.0.0
+dep pkg:cargo/der@0.8.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/block-buffer@0.12.1
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/hmac@0.13.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/pem-rfc7468@1.0.0 -> pkg:cargo/base64ct@1.8.3
+dep pkg:cargo/pkcs1@0.8.0 -> pkg:cargo/der@0.8.3
+dep pkg:cargo/pkcs1@0.8.0 -> pkg:cargo/spki@0.8.1
+dep pkg:cargo/pkcs8@0.11.0 -> pkg:cargo/der@0.8.3
+dep pkg:cargo/pkcs8@0.11.0 -> pkg:cargo/spki@0.8.1
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/crypto-bigint@0.7.11
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/crypto-primes@0.7.2
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/hmac@0.13.0
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/pkcs1@0.8.0
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/pkcs8@0.11.0
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/sha2@0.11.1
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/signature@3.0.0
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/spki@0.8.1
+dep pkg:cargo/rsa@0.10.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/sha2@0.11.1 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/signature@3.0.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/signature@3.0.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/spki@0.8.1 -> pkg:cargo/der@0.8.3
+dependency crypto:algorithm:RSA-OAEP-SHA-256
+dependency crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+dependency crypto:algorithm:RSA-PSS-SHA-256
+dependency crypto:algorithm:RSA-PSS-SHA-384
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:material:private-key:RSA-2048
+dependency pkg:cargo/a183@0.1.0
+dependency pkg:cargo/base64ct@1.8.3
+dependency pkg:cargo/block-buffer@0.12.1
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/const-oid@0.10.2
+dependency pkg:cargo/crypto-bigint@0.7.11
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/crypto-primes@0.7.2
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/der@0.8.3
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/hmac@0.13.0
+dependency pkg:cargo/pem-rfc7468@1.0.0
+dependency pkg:cargo/pkcs1@0.8.0
+dependency pkg:cargo/pkcs8@0.11.0
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/rsa@0.10.0
+dependency pkg:cargo/sha2@0.11.1
+dependency pkg:cargo/signature@3.0.0
+dependency pkg:cargo/spki@0.8.1
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/rsa@0.10.0 -> crypto:algorithm:RSA-OAEP-SHA-256
+provides pkg:cargo/rsa@0.10.0 -> crypto:algorithm:RSA-PKCS1-1.5-SHA-256
+provides pkg:cargo/rsa@0.10.0 -> crypto:algorithm:RSA-PSS-SHA-256
+provides pkg:cargo/rsa@0.10.0 -> crypto:algorithm:RSA-PSS-SHA-384
+provides pkg:cargo/rsa@0.10.0 -> crypto:material:private-key:RSA-2048
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.11.1 -> crypto:algorithm:SHA-384
+root {"bom-ref": "pkg:cargo/a183@0.1.0", "name": "a183", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a183@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a183
+run rcbom:run:boundary-check=26 calls into crypto packages: 16 cited, 0 cited by the check as unknown, 10 excused (copy 2, encoding 1, format 5, generator setup 1, public half 1)
+run rcbom:run:features=
+run rcbom:run:packages=32
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=163
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

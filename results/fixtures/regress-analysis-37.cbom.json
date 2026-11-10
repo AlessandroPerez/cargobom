@@ -8230,6 +8230,13 @@
             "symbol": "aws_lc_rs::digest::Context::finish"
           },
           {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA256` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "ring::digest::Context::update"
+          },
+          {
             "additionalContext": "[present] [call] in <rustls::crypto::aws_lc_rs::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm aws_lc_rs::digest::sha::SHA256 only through code or data no entry point reaches (stored by static `rustls::crypto::aws_lc_rs::hash::SHA256`); line: `self.0.update(data);`; code: `update`",
             "line": 54,
             "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
@@ -8689,7 +8696,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "134"
+          "value": "135"
         }
       ],
       "type": "cryptographic-asset"
@@ -9043,6 +9050,13 @@
             "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
             "offset": 23,
             "symbol": "aws_lc_rs::digest::Context::finish"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `static rustls::crypto::ring::hash::SHA384` stores in the field); line: `self.0.update(data);`; code: `update`",
+            "line": 54,
+            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
+            "offset": 15,
+            "symbol": "ring::digest::Context::update"
           },
           {
             "additionalContext": "[present] [call] in <rustls::crypto::aws_lc_rs::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm aws_lc_rs::digest::sha::SHA384 only through code or data no entry point reaches (stored by static `rustls::crypto::aws_lc_rs::hash::SHA384`); line: `self.0.update(data);`; code: `update`",
@@ -9448,7 +9462,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "102"
+          "value": "103"
         }
       ],
       "type": "cryptographic-asset"
@@ -10189,61 +10203,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:hash:ring",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in <rustls::crypto::ring::hash::Context as rustls::crypto::hash::Context>::update; use: digest; algorithm unresolved: a field of `rustls::crypto::ring::hash::Context`; line: `self.0.update(data);`; code: `update`",
-            "line": 54,
-            "location": "rustls-0.23.45/src/crypto/ring/hash.rs",
-            "offset": 15,
-            "symbol": "ring::digest::Context::update"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:unknown:aws-lc-rs",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -10790,7 +10749,6 @@
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-384",
         "crypto:algorithm:SHA-512",
-        "crypto:algorithm:unknown:hash:ring",
         "crypto:algorithm:unknown:unknown:ring",
         "crypto:algorithm:x25519",
         "crypto:material:private-key:RSA"
@@ -11047,10 +11005,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:ring"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:aws-lc-rs"
     },
     {
@@ -11119,7 +11073,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "315 calls into crypto packages: 56 cited, 0 cited by the check as unknown, 259 excused (accessor 31, comparison 4, copy 32, entered 9, format 19, generator setup 5, internal 83, named 4, public half 4, relay 1, setup 31, view 34, wipe 2)"
+        "value": "323 calls into crypto packages: 56 cited, 0 cited by the check as unknown, 267 excused (accessor 31, comparison 8, copy 32, entered 9, format 19, generator setup 5, internal 83, named 4, public half 4, relay 1, setup 31, table key 4, view 34, wipe 2)"
       }
     ],
     "tools": {
@@ -11132,7 +11086,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0eb997b8-981c-8159-ac2b-7ff766497d61",
+  "serialNumber": "urn:uuid:48809258-7076-85a9-9a87-99dbf66c5735",
   "specVersion": "1.7",
   "version": 1
 }
