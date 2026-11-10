@@ -196,9 +196,92 @@ fn linked_symbols(data: &[u8]) -> Result<Vec<(String, String)>> {
     Ok(out)
 }
 
-/// A symbol demangled without crate hashes (`{:#}`).
+/// A symbol demangled without crate hashes (`{:#}`), its trait objects' bindings in one order.
 fn demangle(sym: &str) -> String {
-    format!("{:#}", rustc_demangle::demangle(sym))
+    let d: Vec<char> = format!("{:#}", rustc_demangle::demangle(sym))
+        .chars()
+        .collect();
+    canonical(&d)
+}
+
+/// A demangled name with the associated-type bindings of each argument list (`dyn Service<Req,
+/// Response = R, Error = E, Future = F>`) in the order of their names: the compiler orders a
+/// trait object's bindings by a hash of their definitions, which the two builds compute
+/// differently (the same instance is `Future = .., Error = .., Response = ..` in one and
+/// `Response = .., Error = .., Future = ..` in the other).
+fn canonical(s: &[char]) -> String {
+    let mut out = String::new();
+    let mut i = 0;
+    while i < s.len() {
+        if s[i] == '<'
+            && let Some(e) = close_of(s, i)
+        {
+            let mut args: Vec<String> = split_args(&s[i + 1..e])
+                .into_iter()
+                .map(canonical)
+                .collect();
+            let binding = |a: &String| {
+                a.split_once(" = ").is_some_and(|(n, _)| {
+                    !n.is_empty() && n.chars().all(|c| c.is_alphanumeric() || c == '_')
+                })
+            };
+            let first = args.iter().position(binding).unwrap_or(args.len());
+            if args[first..].iter().all(binding) {
+                args[first..].sort();
+            }
+            out.push('<');
+            out.push_str(&args.join(", "));
+            out.push('>');
+            i = e + 1;
+            continue;
+        }
+        out.push(s[i]);
+        i += 1;
+    }
+    out
+}
+
+/// The `>` closing the `<` at `open` (not the arrow of a function type, `fn() -> T`).
+fn close_of(s: &[char], open: usize) -> Option<usize> {
+    let mut depth = 0usize;
+    for k in open..s.len() {
+        match s[k] {
+            '<' => depth += 1,
+            '>' if k > 0 && s[k - 1] == '-' => {}
+            '>' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(k);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// An argument list's arguments: split at its commas outside every bracket.
+fn split_args(s: &[char]) -> Vec<&[char]> {
+    let (mut out, mut depth, mut from) = (Vec::new(), 0i32, 0);
+    for (k, &c) in s.iter().enumerate() {
+        match c {
+            '<' | '(' | '[' | '{' => depth += 1,
+            '>' if k > 0 && s[k - 1] == '-' => {}
+            '>' | ')' | ']' | '}' => depth -= 1,
+            ',' if depth == 0 => {
+                out.push(&s[from..k]);
+                from = k + 1;
+            }
+            _ => {}
+        }
+    }
+    out.push(&s[from..]);
+    out.into_iter()
+        .map(|a| {
+            let lead = a.iter().take_while(|c| c.is_whitespace()).count();
+            &a[lead..]
+        })
+        .collect()
 }
 
 /// The crates of the build by what the check makes of their code.
@@ -429,5 +512,21 @@ mod tests {
             "<age::error::Error as core::fmt::Display>::fmt"
         ));
         assert!(!is_constructor("age::decrypt"));
+    }
+
+    #[test]
+    fn a_trait_objects_bindings_are_compared_in_one_order() {
+        let c = |s: &str| canonical(&s.chars().collect::<Vec<_>>());
+        let a = "<r::Router<Box<dyn s::Service<Req, Future = Pin<Box<dyn Future<Output = \
+                 Result<Res, E>>>>, Error = E, Response = Res>>, Vec<G>>>::recognize_fn::<Req, \
+                 fn(&Req) -> bool>";
+        let b = "<r::Router<Box<dyn s::Service<Req, Response = Res, Error = E, Future = \
+                 Pin<Box<dyn Future<Output = Result<Res, E>>>>>>, Vec<G>>>::recognize_fn::<Req, \
+                 fn(&Req) -> bool>";
+        assert_eq!(c(a), c(b));
+        // (nothing else moves: positional arguments, a qualified path, a function type)
+        let plain = "<(u8, u8) as core::ops::function::FnOnce<(A, B)>>::call_once::<fn() -> T>";
+        assert_eq!(c(plain), plain);
+        assert_ne!(c("f::<A, B>"), c("f::<B, A>"));
     }
 }
