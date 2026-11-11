@@ -1936,10 +1936,14 @@ impl Files<'_> {
                     // the caller is a method of, whose derive names the caller's trait)
                     // (the field's type may name the callee's: a token of the type's body
                     // either way)
+                    // (a procedural derive: one of the language cites its calls at the trait's
+                    // name in the attribute, `derive_at`)
                     if !own_closure
                         && let Some(c0) = col
+                        && cols.contains(&c0)
                         && let Some(n) = in_item(c)
                         && let Some(tr) = n.trait_name.as_deref()
+                        && !language_derive(&src, &type_name(tr))
                         && let Some((ty, derives)) = derived_type_at(&src, (line, c0))
                         && n.self_ty.as_deref() == Some(ty.as_str())
                         && derives.contains(&type_name(tr))
@@ -2560,7 +2564,16 @@ impl Files<'_> {
                             Vec::new()
                         };
                         let field = fields.contains(&line);
-                        if path != at.0 || !(field || (fields.is_empty() && first == Some(line))) {
+                        // (a derive of the language spans its code at the fields; a procedural
+                        // one, named by a path or imported by the file, where it chooses: at
+                        // the attribute too, `derive_more::Debug` formatting a field of a
+                        // crypto package's type)
+                        let builtin = re!(r"\[derive ([\w:]+)\]")
+                            .captures(tags)
+                            .is_some_and(|m| language_derive(&src, &m[1]));
+                        if path != at.0
+                            || !(field || ((fields.is_empty() || !builtin) && first == Some(line)))
+                        {
                             return Err(format!(
                                 "`{part}`: not the first line of the attribute or macro call at line {}",
                                 at.1
@@ -2693,6 +2706,24 @@ impl Files<'_> {
         }
         Ok(())
     }
+}
+/// Whether a derive named `name` on a type of `src` is the language's own, not a procedural
+/// macro's: one of its built-in derives, under a name the file does not import (`use
+/// derive_more::Debug;`). The language spans a derived method's calls at the trait's name in
+/// the attribute; a procedural macro where it chooses.
+fn language_derive(src: &Source, name: &str) -> bool {
+    const OF_THE_LANGUAGE: &[&str] = &[
+        "Clone",
+        "Copy",
+        "Debug",
+        "Default",
+        "Eq",
+        "Hash",
+        "Ord",
+        "PartialEq",
+        "PartialOrd",
+    ];
+    OF_THE_LANGUAGE.contains(&name) && !src.binds.iter().any(|b| b.name == name)
 }
 /// Whether two instance names are of one item of the source: one path once their generic
 /// arguments are dropped. The by-move body the compiler makes of an `async` closure's body

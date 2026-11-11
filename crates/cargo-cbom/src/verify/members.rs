@@ -927,6 +927,9 @@ impl Files<'_> {
                     // `&*b`: what the box holds
                     '*' => before_blank(s, p).is_some_and(|q| s[q] == '&'),
                     '=' => dyn_here,
+                    // `Box::<Md5>::default()`: the type the box is made of
+                    '<' => re!(r"\b(?:Box|Rc|Arc)\s*::\s*$")
+                        .is_match(src.text(l0.min(p), p).trim_end()),
                     '(' => {
                         let w = word_before_at(s, p);
                         let start = before_blank(s, p).map_or(p, |e| e + 1 - w.len().min(e + 1));

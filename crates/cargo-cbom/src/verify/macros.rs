@@ -508,7 +508,12 @@ pub(super) fn expansion_uncached(src: &Source, at: (usize, usize)) -> Option<Str
         .items
         .iter()
         .find(|i| i.kind == ItemKind::Macro && i.name == name)?;
-    let (r, binds) = rule_for(src, m, &args)?;
+    expansion_of(src, m, &args)
+}
+/// What an invocation with the arguments `args` of the `macro_rules!` item `m` of `src` expands
+/// to (the macro may be another file's than the invocation's).
+pub(super) fn expansion_of(src: &Source, m: &Item, args: &[Tok]) -> Option<String> {
+    let (r, binds) = rule_for(src, m, args)?;
     let mut text = src.orig(r.body.0, r.body.1);
     // longer names first (`$alg` before `$a`)
     let mut binds = binds;

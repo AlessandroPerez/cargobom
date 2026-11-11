@@ -49,10 +49,12 @@ impl Files<'_> {
             return a.clone();
         }
         let mut out: HashMap<String, Vec<String>> = HashMap::new();
-        for f in package_files(dir) {
-            let Ok(t) = std::fs::read_to_string(&f) else {
-                continue;
-            };
+        let mut texts: Vec<String> = package_files(dir)
+            .iter()
+            .filter_map(|f| std::fs::read_to_string(f).ok())
+            .collect();
+        texts.extend(self.macro_made_aliases(dir));
+        for t in texts {
             for m in re!(r"\btype\s+(\w+)\s*(?:<([^=;{}]*)>)?\s*=\s*([^;{}]+);").captures_iter(&t) {
                 out.entry(m[1].to_string())
                     .or_default()
@@ -80,6 +82,83 @@ impl Files<'_> {
         let a = Rc::new(out);
         self.pkg_aliases.insert(dir.to_path_buf(), a.clone());
         a
+    }
+
+    /// What the package's invocations of its own `macro_rules!` that define type aliases expand
+    /// to (sha3's `impl_sha3!(Sha3_256Core, Sha3_256, ..)`, whose rule writes `pub type
+    /// $full_name = CoreWrapper<$name>;`): the alias is written nowhere else. A macro makes
+    /// aliases when its text has `type $name`, or invokes one that does; an invocation's
+    /// expansion is read three macros deep.
+    fn macro_made_aliases(&mut self, dir: &Path) -> Vec<String> {
+        let files: Vec<Rc<Source>> = package_files(dir)
+            .iter()
+            .filter_map(|f| self.source(f))
+            .collect();
+        let macros: Vec<(&Source, &Item)> = files
+            .iter()
+            .flat_map(|s| {
+                s.items
+                    .iter()
+                    .filter(|i| i.kind == ItemKind::Macro)
+                    .map(move |i| (s.as_ref(), i))
+            })
+            .collect();
+        let text_of = |s: &Source, i: &Item| {
+            let (a, b) = s.span(i);
+            s.text(a, b)
+        };
+        let mut making: HashSet<String> = macros
+            .iter()
+            .filter(|(s, i)| re!(r"\btype\s+\$\w+").is_match(&text_of(s, i)))
+            .map(|(_, i)| i.name.clone())
+            .collect();
+        if making.is_empty() {
+            return Vec::new();
+        }
+        loop {
+            let more: Vec<String> = macros
+                .iter()
+                .filter(|(_, i)| !making.contains(&i.name))
+                .filter(|(s, i)| {
+                    let t = text_of(s, i);
+                    making.iter().any(|m| {
+                        Regex::new(&format!(r"\b{}\s*!", regex::escape(m)))
+                            .is_ok_and(|r| r.is_match(&t))
+                    })
+                })
+                .map(|(_, i)| i.name.clone())
+                .collect();
+            if more.is_empty() {
+                break;
+            }
+            making.extend(more);
+        }
+        let mut out = Vec::new();
+        // the invocations to expand: (the source they are in, depth)
+        let mut todo: Vec<(Rc<Source>, usize)> = files.iter().map(|s| (s.clone(), 0)).collect();
+        while let Some((src, depth)) = todo.pop() {
+            for call in src
+                .items
+                .iter()
+                .filter(|i| i.kind == ItemKind::MacroCall && making.contains(&i.name))
+            {
+                let Some((name, args)) =
+                    invocation_start(&src, call.start).and_then(|at| invocation_args(&src, at))
+                else {
+                    continue;
+                };
+                for (msrc, m) in macros.iter().filter(|(_, i)| i.name == name) {
+                    let Some(text) = expansion_of(msrc, m, &args) else {
+                        continue;
+                    };
+                    if depth < 2 {
+                        todo.push((Rc::new(Source::new(&text, true, false)), depth + 1));
+                    }
+                    out.push(text);
+                }
+            }
+        }
+        out
     }
 
     /// Whether a standard-library path (`core::convert::From::from`, generics stripped) names a
