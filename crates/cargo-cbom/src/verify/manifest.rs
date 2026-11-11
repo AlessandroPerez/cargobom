@@ -7,8 +7,7 @@ pub(super) fn pkg_ref(name: &str, version: &str) -> String {
 }
 pub(super) fn load_externs(
     manifest_path: &Path,
-    target: &str,
-    features: &[String],
+    sel: &rcbom_manifest::Selection,
 ) -> Option<(Externs, Libs, Vec<PathBuf>)> {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut cmd = Command::new(cargo);
@@ -18,13 +17,11 @@ pub(super) fn load_externs(
         "1",
         "--locked",
         "--filter-platform",
-        target,
+        sel.target.as_str(),
         "--manifest-path",
     ])
-    .arg(manifest_path);
-    if !features.is_empty() {
-        cmd.arg("--features").arg(features.join(","));
-    }
+    .arg(manifest_path)
+    .args(sel.feature_args());
     let out = cmd.stderr(Stdio::null()).output().ok()?;
     if !out.status.success() {
         return None;

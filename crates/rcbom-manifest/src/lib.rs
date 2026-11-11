@@ -169,43 +169,122 @@ pub fn host_triple() -> Result<String> {
         .context("no host line in rustc -vV")
 }
 
-/// Runs `cargo metadata` and builds the Layer 1 view. `features` are passed as with cargo.
-pub fn load(manifest_path: &Path, target: &str, features: &[String], kb: &Kb) -> Result<Manifest> {
-    load_with(manifest_path, target, features, kb, false)
+/// What of the workspace a run builds, as cargo's own flags select it.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Selection {
+    /// The platform built for.
+    pub target: String,
+    /// `--target` was given: cargo is passed it, and keeps the host's units apart from the
+    /// target's then.
+    pub cross: bool,
+    pub features: Vec<String>,
+    pub all_features: bool,
+    pub no_default_features: bool,
+    /// `-p`: these workspace members and what they depend on. Empty: the whole workspace.
+    pub packages: Vec<String>,
+}
+
+impl Selection {
+    /// The whole workspace, built for the host with `features`.
+    pub fn host(features: &[String]) -> Result<Self> {
+        Ok(Selection {
+            target: host_triple()?,
+            features: features.to_vec(),
+            ..Default::default()
+        })
+    }
+
+    /// cargo's feature flags, for any of its commands.
+    pub fn feature_args(&self) -> Vec<String> {
+        let mut v = Vec::new();
+        if !self.features.is_empty() {
+            v.push("--features".to_string());
+            v.push(self.features.join(","));
+        }
+        if self.all_features {
+            v.push("--all-features".into());
+        }
+        if self.no_default_features {
+            v.push("--no-default-features".into());
+        }
+        v
+    }
+
+    /// cargo's package flags, for the commands that build (`check`, `build`, `tree`).
+    pub fn package_args(&self) -> Vec<String> {
+        if self.packages.is_empty() {
+            return vec!["--workspace".to_string()];
+        }
+        self.packages
+            .iter()
+            .flat_map(|p| ["-p".to_string(), p.clone()])
+            .collect()
+    }
+
+    /// The members a `-p` names (`name` or `name@version`), all of them without one.
+    fn roots<'a>(&self, md: &'a Metadata) -> Result<Vec<&'a PackageId>> {
+        if self.packages.is_empty() {
+            return Ok(md.workspace_members.iter().collect());
+        }
+        let mut out = Vec::new();
+        for spec in &self.packages {
+            let (name, version) = match spec.split_once('@') {
+                Some((n, v)) => (n, Some(v)),
+                None => (spec.as_str(), None),
+            };
+            let found: Vec<&PackageId> = md
+                .packages
+                .iter()
+                .filter(|p| md.workspace_members.contains(&p.id))
+                .filter(|p| {
+                    p.name.as_str() == name && version.is_none_or(|v| p.version.to_string() == v)
+                })
+                .map(|p| &p.id)
+                .collect();
+            if found.is_empty() {
+                anyhow::bail!("`-p {spec}`: the workspace has no member of that name");
+            }
+            out.extend(found);
+        }
+        out.sort();
+        out.dedup();
+        Ok(out)
+    }
+}
+
+/// Runs `cargo metadata` and builds the Layer 1 view of what `sel` builds.
+pub fn load(manifest_path: &Path, sel: &Selection, kb: &Kb) -> Result<Manifest> {
+    load_with(manifest_path, sel, kb, false)
 }
 
 /// As `load`, but `cargo metadata --locked`: fails rather than update `Cargo.lock`, for
 /// checking positions inside it.
-pub fn load_locked(
-    manifest_path: &Path,
-    target: &str,
-    features: &[String],
-    kb: &Kb,
-) -> Result<Manifest> {
-    load_with(manifest_path, target, features, kb, true)
+pub fn load_locked(manifest_path: &Path, sel: &Selection, kb: &Kb) -> Result<Manifest> {
+    load_with(manifest_path, sel, kb, true)
 }
 
-fn load_with(
-    manifest_path: &Path,
-    target: &str,
-    features: &[String],
-    kb: &Kb,
-    locked: bool,
-) -> Result<Manifest> {
+fn load_with(manifest_path: &Path, sel: &Selection, kb: &Kb, locked: bool) -> Result<Manifest> {
     let mut cmd = MetadataCommand::new();
     cmd.manifest_path(manifest_path);
-    let mut opts = vec!["--filter-platform".to_string(), target.to_string()];
+    // (`cargo metadata` has no `-p`: it resolves every member, with these features where a
+    // member has them; what the selected ones are built with is `build_features`'s)
+    let mut opts = vec!["--filter-platform".to_string(), sel.target.clone()];
     if locked {
         opts.push("--locked".into());
     }
-    if !features.is_empty() {
-        opts.push("--features".into());
-        opts.push(features.join(","));
-    }
+    opts.extend(sel.feature_args());
     cmd.other_options(opts);
     let md = cmd.exec().context("cargo metadata")?;
-    let built = build_features(manifest_path, target, features, locked);
-    build(&md, kb, target, &target_cfg(target)?, built.as_ref())
+    let built = build_features(manifest_path, sel, locked);
+    let roots = sel.roots(&md)?;
+    build(
+        &md,
+        kb,
+        &sel.target,
+        &roots,
+        &target_cfg(&sel.target)?,
+        built.as_ref(),
+    )
 }
 
 /// The features each package is built with, by (name, version), as `cargo check` of the
@@ -213,32 +292,29 @@ fn load_with(
 /// `ring` feature a test enables), which the build does not. None if `cargo tree` fails.
 fn build_features(
     manifest_path: &Path,
-    target: &str,
-    features: &[String],
+    sel: &Selection,
     locked: bool,
 ) -> Option<HashMap<(String, String), BTreeSet<String>>> {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut cmd = std::process::Command::new(cargo);
-    cmd.args([
-        "tree",
-        "--workspace",
-        "-e",
-        "normal,build",
-        "--prefix",
-        "none",
-        "--format",
-        "{p}|{f}",
-        "--target",
-        target,
-        "--manifest-path",
-    ])
-    .arg(manifest_path);
+    cmd.arg("tree")
+        .args(sel.package_args())
+        .args([
+            "-e",
+            "normal,build",
+            "--prefix",
+            "none",
+            "--format",
+            "{p}|{f}",
+            "--target",
+            sel.target.as_str(),
+            "--manifest-path",
+        ])
+        .arg(manifest_path);
     if locked {
         cmd.arg("--locked");
     }
-    if !features.is_empty() {
-        cmd.arg("--features").arg(features.join(","));
-    }
+    cmd.args(sel.feature_args());
     let out = cmd.stderr(std::process::Stdio::null()).output().ok()?;
     if !out.status.success() {
         return None;
@@ -288,6 +364,7 @@ fn build(
     md: &Metadata,
     kb: &Kb,
     target: &str,
+    roots: &[&PackageId],
     cfg: &[cargo_metadata::cargo_platform::Cfg],
     built: Option<&HashMap<(String, String), BTreeSet<String>>>,
 ) -> Result<Manifest> {
@@ -354,9 +431,9 @@ fn build(
     let mut scope: HashMap<PackageId, Scope> = HashMap::new();
     let mut parent: HashMap<PackageId, PackageId> = HashMap::new();
     let mut queue: VecDeque<PackageId> = VecDeque::new();
-    for m in &md.workspace_members {
-        scope.insert(m.clone(), Scope::Required);
-        queue.push_back(m.clone());
+    for m in roots {
+        scope.insert((*m).clone(), Scope::Required);
+        queue.push_back((*m).clone());
     }
     while let Some(id) = queue.pop_front() {
         let here = scope[&id];
@@ -451,7 +528,11 @@ fn build(
         let mut evidence = Vec::new();
         if entry.is_some() || unmodelled.is_some() {
             // Direct dependency of a member: the declaring line(s).
-            for m in &md.workspace_members {
+            for m in md
+                .workspace_members
+                .iter()
+                .filter(|m| scope.contains_key(m))
+            {
                 let mp = pkgs[m];
                 // the declarations cargo applies on this platform (not a
                 // `[target.'cfg(target_arch = "wasm32")'.dependencies]` table on another)

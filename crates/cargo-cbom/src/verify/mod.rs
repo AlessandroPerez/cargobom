@@ -368,33 +368,37 @@ type Libs = HashMap<String, Vec<String>>;
 
 pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     let doc: Value = serde_json::from_slice(&std::fs::read(cbom)?)?;
-    let features: Vec<String> = doc["metadata"]["properties"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .find(|p| p["name"] == "rcbom:run:features")
-        .and_then(|p| p["value"].as_str())
-        .map(|s| {
-            s.split(',')
-                .filter(|f| !f.is_empty())
-                .map(str::to_string)
-                .collect()
-        })
-        .unwrap_or_default();
-    let kb = Kb::seed()?;
-    // the platform the CBOM was made for (its dependency tables and features)
-    let target = match doc["metadata"]["properties"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .find(|p| p["name"] == "rcbom:run:target")
-        .and_then(|p| p["value"].as_str())
-    {
-        Some(t) => t.to_string(),
-        None => rcbom_manifest::host_triple()?,
+    // what the CBOM was made of: the platform (its dependency tables), features and members
+    let run_prop = |name: &str| -> Option<&str> {
+        doc["metadata"]["properties"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|p| p["name"] == name)
+            .and_then(|p| p["value"].as_str())
     };
-    let man = rcbom_manifest::load_locked(manifest_path, &target, &features, &kb)?;
-    let (externs, libs, roots) = match load_externs(manifest_path, &target, &features) {
+    let list = |name: &str| -> Vec<String> {
+        run_prop(name)
+            .into_iter()
+            .flat_map(|s| s.split(','))
+            .filter(|f| !f.is_empty())
+            .map(str::to_string)
+            .collect()
+    };
+    let kb = Kb::seed()?;
+    let sel = rcbom_manifest::Selection {
+        target: match run_prop("rcbom:run:target") {
+            Some(t) => t.to_string(),
+            None => rcbom_manifest::host_triple()?,
+        },
+        cross: false,
+        features: list("rcbom:run:features"),
+        all_features: run_prop("rcbom:run:all-features") == Some("true"),
+        no_default_features: run_prop("rcbom:run:no-default-features") == Some("true"),
+        packages: list("rcbom:run:members"),
+    };
+    let man = rcbom_manifest::load_locked(manifest_path, &sel, &kb)?;
+    let (externs, libs, roots) = match load_externs(manifest_path, &sel) {
         Some((e, l, r)) => (Some(e), Some(l), Some(r)),
         None => {
             eprintln!("verify: cargo metadata failed; crate names are resolved by package name");

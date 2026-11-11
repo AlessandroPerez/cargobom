@@ -13,8 +13,8 @@ use crate::{Analysis, Asset, Kind, Occurrence, Usage};
 pub struct RunInfo {
     pub tool_version: String,
     pub toolchain: String,
-    pub target: String,
-    pub features: Vec<String>,
+    /// The platform, features and members built.
+    pub selection: rcbom_manifest::Selection,
     /// The cargo profile analysed (`none` for Layer 1 only).
     pub profile: String,
     /// Packages in the build Layer 1 resolved (normal and build edges, host platform).
@@ -656,14 +656,24 @@ pub fn to_cyclonedx(kb: &Kb, man: &Manifest, an: &Analysis, run: &RunInfo) -> Va
         .or_else(|| included.iter().find(|p| p.member));
     let mut run_props = vec![
         prop("rcbom:run:toolchain", &run.toolchain),
-        prop("rcbom:run:target", &run.target),
-        prop("rcbom:run:features", run.features.join(",")),
+        prop("rcbom:run:target", &run.selection.target),
+        prop("rcbom:run:features", run.selection.features.join(",")),
         prop("rcbom:run:profile", &run.profile),
         prop("rcbom:run:packages", run.packages),
         prop("rcbom:run:sandbox", &run.sandbox),
         prop("rcbom:kb:version", &kb.version),
         prop("rcbom:run:reachable-instances", an.instances),
     ];
+    // cargo's other selection flags, where given
+    if run.selection.all_features {
+        run_props.push(prop("rcbom:run:all-features", "true"));
+    }
+    if run.selection.no_default_features {
+        run_props.push(prop("rcbom:run:no-default-features", "true"));
+    }
+    if !run.selection.packages.is_empty() {
+        run_props.push(prop("rcbom:run:members", run.selection.packages.join(",")));
+    }
     // the artifacts walked (each binary, a workspace library's public API)
     for a in &an.artifacts {
         run_props.push(prop("rcbom:run:artifact", a));

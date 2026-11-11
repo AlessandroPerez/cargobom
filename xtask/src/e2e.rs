@@ -153,12 +153,15 @@ impl Env {
         log.push_str(&format!("== {}\n", rel(dir)));
         let cbom_path = self.path(name, "cbom.json");
         let stderr = std::fs::File::create(self.path(name, "log"))?;
+        // (a fixture's `cbom-args`: what of it is built, as cargo's selection flags)
+        let selection = std::fs::read_to_string(dir.join("cbom-args")).unwrap_or_default();
         let ok = self
             .cli(dir, name)
             .args(["cbom", "--driver"])
             .arg(&self.driver)
             .arg("-o")
             .arg(&cbom_path)
+            .args(selection.split_whitespace())
             .stdout(Stdio::null())
             .stderr(stderr)
             .status()?

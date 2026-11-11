@@ -52,6 +52,21 @@ struct GenArgs {
     /// Features to enable, as with cargo.
     #[arg(long, value_delimiter = ',')]
     features: Vec<String>,
+    /// Enable every feature of the selected packages, as with cargo.
+    #[arg(long)]
+    all_features: bool,
+    /// Do not enable the `default` feature, as with cargo.
+    #[arg(long)]
+    no_default_features: bool,
+    /// Only these workspace members and what they depend on, as with cargo (default: the whole
+    /// workspace).
+    #[arg(short, long, value_name = "MEMBER")]
+    package: Vec<String>,
+    /// The platform the artifact is built for, as with cargo (default: the host). The pinned
+    /// toolchain needs its standard library (`rustup target add`), and `--check-walk` a linker
+    /// for it.
+    #[arg(long, value_name = "TRIPLE")]
+    target: Option<String>,
     /// Output file (default: stdout).
     #[arg(short, long)]
     output: Option<PathBuf>,
@@ -107,25 +122,42 @@ fn main() -> Result<()> {
     }
 }
 
+impl GenArgs {
+    /// What the run builds: cargo's selection flags as given, for the host without `--target`.
+    fn selection(&self) -> Result<rcbom_manifest::Selection> {
+        Ok(rcbom_manifest::Selection {
+            target: match &self.target {
+                Some(t) => t.clone(),
+                None => rcbom_manifest::host_triple()?,
+            },
+            cross: self.target.is_some(),
+            features: self.features.clone(),
+            all_features: self.all_features,
+            no_default_features: self.no_default_features,
+            packages: self.package.clone(),
+        })
+    }
+}
+
 fn generate(a: &GenArgs) -> Result<()> {
     let kb = Kb::seed()?;
-    let target = rcbom_manifest::host_triple()?;
+    let sel = a.selection()?;
     eprintln!("cbom: layer 1 (cargo metadata)");
-    let man = rcbom_manifest::load(&a.manifest_path, &target, &a.features, &kb)?;
+    let man = rcbom_manifest::load(&a.manifest_path, &sel, &kb)?;
 
     let dir = man.target_directory.join("rcbom");
     let facts = if a.manifest_only {
         Vec::new()
     } else {
         let facts_dir = dir.join("facts");
-        let units = run_driver(a, &man, &dir, &facts_dir, &kb.driver_semantics())?;
+        let units = run_driver(a, &sel, &man, &dir, &facts_dir, &kb.driver_semantics())?;
         load_facts(&facts_dir, &units)?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &facts);
     an.layer2 = !a.manifest_only;
     let walk_check = if a.check_walk && !a.manifest_only {
-        walkcheck::run(a, &man, &facts, &dir)?
+        walkcheck::run(a, &sel, &man, &facts, &dir)?
     } else {
         Vec::new()
     };
@@ -136,8 +168,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         } else {
             TOOLCHAIN.into()
         },
-        target,
-        features: a.features.clone(),
+        selection: sel,
         profile: if a.manifest_only {
             "none".into()
         } else {
@@ -224,6 +255,7 @@ fn find_driver(explicit: Option<&Path>) -> Result<PathBuf> {
 /// consists of, fresh or rebuilt, as cargo reports them.
 fn run_driver(
     a: &GenArgs,
+    sel: &rcbom_manifest::Selection,
     man: &rcbom_manifest::Manifest,
     dir: &Path,
     facts_dir: &Path,
@@ -315,7 +347,7 @@ fn run_driver(
         kb_crates,
         stop_crates,
         impl_crates,
-        a.features,
+        sel,
         a.profile,
         local_dirs,
         std::env::var("RCBOM_MAX_INSTANCES").ok(),
@@ -336,9 +368,10 @@ fn run_driver(
     };
     let mut cmd = Command::new("cargo");
     cmd.arg(format!("+{TOOLCHAIN}"))
+        .arg("check")
+        .args(sel.package_args())
+        .args(sel.feature_args())
         .args([
-            "check",
-            "--workspace",
             "--message-format=json-render-diagnostics",
             "--profile",
             a.profile.as_str(),
@@ -356,13 +389,11 @@ fn run_driver(
         .env("RCBOM_LOCAL_DIRS", local_dirs.join("\n"))
         .env("RCBOM_SYSROOT", &sysroot)
         .env("LD_LIBRARY_PATH", ld);
-    if !a.features.is_empty() {
-        cmd.arg("--features").arg(a.features.join(","));
-    }
     if build_std {
-        cmd.arg("-Zbuild-std")
-            .arg("--target")
-            .arg(rcbom_manifest::host_triple()?);
+        cmd.arg("-Zbuild-std");
+    }
+    if sel.cross || build_std {
+        cmd.arg("--target").arg(&sel.target);
     }
     // cargo's JSON messages on stdout, its diagnostics rendered on stderr as usual
     let out = cmd

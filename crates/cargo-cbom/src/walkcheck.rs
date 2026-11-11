@@ -62,6 +62,7 @@ const CLASSES: [&str; 6] = ["entry", "std", "modelled", "constructor", "other", 
 
 pub(crate) fn run(
     a: &crate::GenArgs,
+    sel: &rcbom_manifest::Selection,
     man: &rcbom_manifest::Manifest,
     facts: &[CrateFacts],
     dir: &Path,
@@ -78,8 +79,8 @@ pub(crate) fn run(
         "cbom: walk check (cargo +{} build, opt-level 0)",
         crate::TOOLCHAIN
     );
-    let bins = build(a, &dir.join("link"))?;
-    let crates = Crates::of(man, facts)?;
+    let bins = build(a, sel, &dir.join("link"))?;
+    let crates = Crates::of(man, facts, &sel.target)?;
     let mut out = Vec::new();
     for w in walks {
         let name = &w.artifact["bin ".len()..];
@@ -121,13 +122,18 @@ pub(crate) fn run(
 }
 
 /// Builds the workspace's binaries unoptimised with v0 symbol names; their paths by name.
-fn build(a: &crate::GenArgs, target_dir: &Path) -> Result<HashMap<String, PathBuf>> {
+fn build(
+    a: &crate::GenArgs,
+    sel: &rcbom_manifest::Selection,
+    target_dir: &Path,
+) -> Result<HashMap<String, PathBuf>> {
     let profile = a.profile.to_uppercase().replace('-', "_");
     let mut cmd = Command::new("cargo");
     cmd.arg(format!("+{}", crate::TOOLCHAIN))
+        .arg("build")
+        .args(sel.package_args())
+        .args(sel.feature_args())
         .args([
-            "build",
-            "--workspace",
             "--bins",
             "--message-format=json-render-diagnostics",
             "--profile",
@@ -143,8 +149,8 @@ fn build(a: &crate::GenArgs, target_dir: &Path) -> Result<HashMap<String, PathBu
         .env(format!("CARGO_PROFILE_{profile}_OPT_LEVEL"), "0")
         .env(format!("CARGO_PROFILE_{profile}_LTO"), "false")
         .env(format!("CARGO_PROFILE_{profile}_STRIP"), "none");
-    if !a.features.is_empty() {
-        cmd.arg("--features").arg(a.features.join(","));
+    if sel.cross {
+        cmd.arg("--target").arg(&sel.target);
     }
     let out = cmd
         .stdout(std::process::Stdio::piped())
@@ -295,7 +301,7 @@ struct Crates {
 }
 
 impl Crates {
-    fn of(man: &rcbom_manifest::Manifest, facts: &[CrateFacts]) -> Result<Self> {
+    fn of(man: &rcbom_manifest::Manifest, facts: &[CrateFacts], target: &str) -> Result<Self> {
         let lib = |p: &rcbom_manifest::Pkg| p.lib_name.clone();
         let stop: Vec<&rcbom_manifest::Pkg> = man
             .packages
@@ -342,7 +348,6 @@ impl Crates {
             );
         }
         let sysroot = crate::sysroot()?;
-        let target = rcbom_manifest::host_triple()?;
         // (with the compiler's allocator and panic shims, `__rustc::__rust_alloc`)
         let mut std: HashSet<String> = HashSet::from(["__rustc".to_string()]);
         let libdir = Path::new(&sysroot)
@@ -388,14 +393,44 @@ impl Crates {
     }
 }
 
-/// `age::error::Error::Io`, `core::option::Option::<T>::Some`: the last segment of a plain path
-/// is a type's name.
+/// `age::error::Error::Io`, `core::option::Option::<T>::Some`: the last segment of a path is a
+/// type's name, or a name after a type's generic arguments, whatever its case (`select!`'s
+/// `__PrivResult::<A, B>::_0` is a variant). A method's path starts at its type (`<T>::f`), so
+/// a name right after that qualifier is none; a type declared inside a method has segments in
+/// between (`<S<_>>::run::{closure#3}::__PrivResult::<A, ()>::_0`).
 fn is_constructor(d: &str) -> bool {
-    if d.starts_with('<') {
+    // the path's segments, generic arguments and qualifiers whole
+    let (mut segs, mut depth, mut cur) = (Vec::new(), 0i32, String::new());
+    let chars: Vec<char> = d.chars().collect();
+    let mut k = 0;
+    while k < chars.len() {
+        match chars[k] {
+            '<' => depth += 1,
+            '>' if k == 0 || chars[k - 1] != '-' => depth -= 1,
+            ':' if depth == 0 && chars.get(k + 1) == Some(&':') => {
+                segs.push(std::mem::take(&mut cur));
+                k += 2;
+                continue;
+            }
+            _ => {}
+        }
+        cur.push(chars[k]);
+        k += 1;
+    }
+    segs.push(cur);
+    // the item's name: the last segment that is no list of generic arguments (its own come
+    // after it, `Option::Some::<u8>`)
+    let Some(i) = segs.iter().rposition(|g| !g.starts_with('<')) else {
+        return false;
+    };
+    let last = &segs[i];
+    if i < 1 || last.is_empty() || !last.chars().all(|c| c.is_alphanumeric() || c == '_') {
         return false;
     }
-    let last = d.rsplit("::").find(|s| !s.starts_with('<')).unwrap_or(d);
-    last.chars().next().is_some_and(char::is_uppercase)
+    let qualified = segs[0].starts_with('<');
+    // (after generic arguments of the segment before them, not after the qualifier)
+    let after_args = i >= 2 && segs[i - 1].starts_with('<');
+    after_args || (last.starts_with(char::is_uppercase) && (!qualified || i > 1))
 }
 
 /// The crate defining a v0 symbol's item: the crate root of its path, of the impl for a method
@@ -508,6 +543,18 @@ mod tests {
             Some("core")
         );
         assert!(is_constructor("age::error::Error::Io"));
+        assert!(is_constructor(
+            "net::retry::{closure#0}::__PrivResult::<core::option::Option<u8>, ()>::_0"
+        ));
+        assert!(!is_constructor("net::retry::<u8>::{closure#0}"));
+        assert!(is_constructor(
+            "<s::Server<_, _>>::run::{closure#3}::__PrivResult::<core::result::Result<(), E>, ()>::_2"
+        ));
+        assert!(!is_constructor("<s::Server<_, _>>::run"));
+        assert!(is_constructor("core::option::Option::Some::<u8>"));
+        assert!(!is_constructor("<s::Server<_, _>>::run::<u8>"));
+        assert!(!is_constructor("a::b::run::<u8>"));
+        assert!(!is_constructor("<a::B as c::D<fn(u8) -> u8>>::e"));
         assert!(!is_constructor(
             "<age::error::Error as core::fmt::Display>::fmt"
         ));
