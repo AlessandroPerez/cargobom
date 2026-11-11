@@ -149,7 +149,7 @@ Algorithm and trait crates are **stop crates**: the walk (section 5.5) does not 
 
 An entry's name template has placeholders (`PBKDF2-{hash}-{iterations}-{length}`). The entry says where each one comes from:
 - a type argument, mapped to a name or read as a `typenum` length;
-- an integer constant argument, or an enum constant by its discriminant;
+- an integer constant argument, or an enum constant by its discriminant; read through the standard library's functions that hand back the integer they are given (`[semantics] value_passes`: `NonZeroU32::new(100_000).unwrap()`), and from a constant of a struct that is one integer (`const ROUNDS: NonZeroU32`);
 - an array argument's length;
 - a fixed default of a constructor;
 - the call the value is later passed to.
@@ -327,6 +327,7 @@ The CLI builds each binary once more, without the driver, unoptimised (so little
 | std | the standard library and the compiler's shims, whatever types they are instantiated with |
 | modelled | a stop crate or a crate implementing one: the walk does not enter them |
 | constructor | an enum variant's or tuple struct's constructor used as a function |
+| uncalled object | what only the methods of trait objects nothing uses reach: a `Box<dyn Buf>` the build makes and hands to code that never calls it keeps its type's `Buf` methods in the binary through its vtable, and what only they call. The walk follows them after it ends, for this class alone; their sites stay `present`. Named in the property where there is any |
 | other | a crate that is neither the program's nor a crypto one, and calls no crypto crate |
 | **gap** | anything else: the program's crates, the crypto crates, and crates calling into one |
 
@@ -358,7 +359,7 @@ Each site is matched by kind:
 
 - **Typed calls**, where the type is the algorithm (`Aes256Gcm::encrypt`, `Hmac::<Sha256>::new_from_slice`). The asset comes from the `[[type]]` entry and the call's type tree. The SHA-256 inside `Hmac<Sha256>` becomes a component occurrence.
 - **Functions and constructors.** A method whose parameters were fixed by a constructor takes them from the constructor that built its receiver. For example, `Argon2::default().hash_password(..)` is Argon2id with the default costs. A value a constructor made also names the call it is passed to (`key.sign(Pkcs1v15Sign::new::<Sha384>(), ..)`), in the same function or from another one: read from a field another function stored it in, passed by the function's callers, returned by a function of the program. From elsewhere, only when every value the links find for it is such a constructor's call and they agree; a field two constructors are stored in leaves the call at its family's name. A verification whose parameters are the stored hash's (`verify_password`) is named by the constructor of the receiver that made that hash, when the hash is the result of a hashing call in the same function.
-- **Descriptor calls** (ring, aws-lc-rs), where the algorithm is a value passed to the call. The *value search* finds which descriptors can reach the argument (section 6.3).
+- **Descriptor calls** (ring, aws-lc-rs), where the algorithm is a value passed to the call. The *value search* finds which descriptors can reach the argument (section 6.3). A descriptor's entry may read parameters from the call it is used at (`call_params`): ring's `pbkdf2::derive(PBKDF2_HMAC_SHA256, iterations, salt, secret, out)` is `PBKDF2-SHA-256-100000-32` where the call gives its iteration count and its output's length, and `PBKDF2-SHA-256` where it does not.
 - **Boundary models** (jsonwebtoken). `encode(&header, ..)` signs with `header.alg`. `decode` verifies with `validation.algorithms`, narrowed by the key's family: an RSA key verifies only RS\*/PS\* tokens. The model follows those fields across functions as it follows any value.
 - **Static sites**: a descriptor named directly, or a static leading to descriptors (a table of digests, a rustls cipher suite).
 - **Protocol calls** (`ClientConfig::builder`): a TLS asset with the versions, suites and groups the build offers. The occurrence is marked as configuration, not a connection.

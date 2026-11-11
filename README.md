@@ -177,8 +177,8 @@ correct).
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 70 correct, 2 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (340 outputs, the suite's included): 20,817 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,358 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 100,889 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,541 calls (3,612 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| evidence | every cited position, `verify --self-test` | fixtures (342 outputs, the suite's included): 20,841 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,358 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 100,980 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,548 calls (3,619 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
@@ -240,7 +240,10 @@ run can and cannot show).
   lost a merged occurrence's calls to the boundary check; the walk missed a library's
   `#[global_allocator]` and functions called through `extern` declarations, and stopped at
   200,000 instances on atuin and rustic-rs; the driver panicked on a const-generic projection
-  (heapless); and a pre-release (rsa 0.10.0-rc.18) was outside its knowledge-base entry.
+  (heapless); and a pre-release (rsa 0.10.0-rc.18) was outside its knowledge-base entry. The
+  178 functions rustic-rs then still linked without the walk reaching them are the methods of
+  a `Box<dyn Buf>` that nothing calls: no gap of the walk, and counted apart since
+  (`uncalled object`).
 - *Twenty, 11 November:* mail-auth 0.15.1, rusty_paseto 0.10.1, openidconnect 4.1.0,
   yup-oauth2 12.1.2, instant-acme 0.8.5, x509-parser 0.18.1 (`verify`), libp2p-identity 0.3.1
   (its four key features), quinn-proto 0.11.19, hickory-proto 0.26.3 (`dnssec-ring`),
@@ -347,9 +350,10 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   trait or any escape of such an object, and a future's body counts as run where it is built.
   A vtable method no code calls, an `Arc<dyn Trait>` never called, an `async` body never polled
   are `reachable`; on realapp, whose `main` only builds rustls's ring provider, 419 of 560
-  occurrences are. `present` means compiled and certainly not reached. A named algorithm in such
-  code is counted as wrong by the scorers where its site is labelled dead; none is in the sets
-  above.
+  occurrences are. `present` means compiled and certainly not reached: also the methods of
+  the objects of a trait no code calls through, which their vtables keep in the binary. A
+  named algorithm in such code is counted as wrong by the scorers where its site is labelled
+  dead; none is in the sets above.
 - *Layer 1 from metadata.* An unmodelled package is a crypto package when its `Cargo.toml` says
   so (category or keyword, in any case: rust-crypto's `Crypto`), the knowledge base lists it,
   or it declares no category and its name names an algorithm of the Cryptography Registry
@@ -403,10 +407,9 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   the call: two functions each boxing other hashes share it. A closure called through a
   `dyn Fn` object gets the arguments of the calls made through such objects, beside an
   unknown: where else the object may be called from is not followed.
-- *Names and parameters.* ring's and aws-lc-rs's PBKDF2 is named without its iteration count and
-  output length; BLAKE3 is `BLAKE3-256` for `hash` and `keyed_hash`, `BLAKE3` for key derivation
-  and XOF output. A library's generic API that sibling binaries instantiate gets no "callers
-  choose" unknown for the library itself.
+- *Names and parameters.* BLAKE3 is `BLAKE3-256` for `hash` and `keyed_hash`, `BLAKE3` for key
+  derivation and XOF output. A library's generic API that sibling binaries instantiate gets no
+  "callers choose" unknown for the library itself.
 - *Parameters.* `rcbom:param:*` properties are not scored against the labels' `params`.
 - *The verifier* is text-based. It checks every position, the token and item there, and the
   details it can read in the source (the descriptor a call reads, witnesses in the program and
