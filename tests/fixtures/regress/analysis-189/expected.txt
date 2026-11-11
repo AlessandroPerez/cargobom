@@ -1,0 +1,207 @@
+  occ HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | src/main.rs:33:19 | ring::pbkdf2::PBKDF2_HMAC_SHA1 | [reachable] [component] in analysis_189::by_length; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA1, rounds, b"salt length", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA1`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:11:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in analysis_189::at_the_call; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, rounds, b"salt at call", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:39:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in analysis_189::check; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA256, ROUNDS, b"salt check", password, stored).is_ok()`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | src/main.rs:25:19 | ring::pbkdf2::PBKDF2_HMAC_SHA384 | [reachable] [component] in analysis_189::by_caller; part of PBKDF2-SHA-384 (ring::pbkdf2::PBKDF2_HMAC_SHA384 -> ring::hmac::HMAC_SHA384); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA384, rounds, b"salt caller", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA384`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:18:19 | ring::pbkdf2::PBKDF2_HMAC_SHA512 | [reachable] [component] in analysis_189::by_constant; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::hmac::HMAC_SHA512); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA512, ROUNDS, b"salt constant", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA512`
+  occ PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | src/main.rs:33:19 | ring::pbkdf2::PBKDF2_HMAC_SHA1 | [reachable] [static] in analysis_189::by_length; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA1, rounds, b"salt length", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA1`
+  occ PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | src/main.rs:33:4 | ring::pbkdf2::derive | [reachable] [call] in analysis_189::by_length; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA1 in the arguments; salt: hard-coded (11 bytes, literal at line 33); password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA1, rounds, b"salt length", password, &mut out);`; code: `pbkdf2::derive`
+  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:39:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [static] in analysis_189::check; line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA256, ROUNDS, b"salt check", password, stored).is_ok()`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:39:4 | ring::pbkdf2::verify | [reachable] [call] in analysis_189::check; use: verify; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 39); password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA256, ROUNDS, b"salt check", password, stored).is_ok()`; code: `pbkdf2::verify`
+  occ PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | src/main.rs:11:4 | ring::pbkdf2::derive | [reachable] [call] in analysis_189::at_the_call; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (12 bytes, literal at line 11); password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, rounds, b"salt at call", password, &mut out);`; code: `pbkdf2::derive`
+  occ PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | src/main.rs:25:19 | ring::pbkdf2::PBKDF2_HMAC_SHA384 | [reachable] [static] in analysis_189::by_caller; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA384, rounds, b"salt caller", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA384`
+  occ PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | src/main.rs:25:4 | ring::pbkdf2::derive | [reachable] [call] in analysis_189::by_caller; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA384 in the arguments; salt: hard-coded (11 bytes, literal at line 25); password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA384, rounds, b"salt caller", password, &mut out);`; code: `pbkdf2::derive`
+  occ PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | src/main.rs:18:4 | ring::pbkdf2::derive | [reachable] [call] in analysis_189::by_constant; use: keyderive; algorithm from ring::pbkdf2::PBKDF2_HMAC_SHA512 in the arguments; salt: hard-coded (13 bytes, literal at line 18); password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA512, ROUNDS, b"salt constant", password, &mut out);`; code: `pbkdf2::derive`
+  occ SHA-1 | crypto:algorithm:SHA-1 | src/main.rs:33:19 | ring::pbkdf2::PBKDF2_HMAC_SHA1 | [reachable] [component] in analysis_189::by_length; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA1, rounds, b"salt length", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA1`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in analysis_189::at_the_call; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, rounds, b"salt at call", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:39:19 | ring::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in analysis_189::check; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `pbkdf2::verify(pbkdf2::PBKDF2_HMAC_SHA256, ROUNDS, b"salt check", password, stored).is_ok()`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:25:19 | ring::pbkdf2::PBKDF2_HMAC_SHA384 | [reachable] [component] in analysis_189::by_caller; part of PBKDF2-SHA-384 (ring::pbkdf2::PBKDF2_HMAC_SHA384 -> ring::digest::SHA384); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA384, rounds, b"salt caller", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA384`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:19 | ring::pbkdf2::PBKDF2_HMAC_SHA512 | [reachable] [component] in analysis_189::by_constant; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::digest::SHA512); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA512, ROUNDS, b"salt constant", password, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA512`
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:35:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via analysis-189 -> ring -> getrandom
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via analysis-189 -> ring
+  occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:12:0 | ring | [manifest] declared by analysis-189 (dependencies)
+  occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:confidence=high
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:occurrences=1
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:only-as-component=true
+  prop HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | rcbom:reachability=reachable
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=2
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:only-as-component=true
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:confidence=high
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:occurrences=1
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:only-as-component=true
+  prop HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | rcbom:reachability=reachable
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=knowledge-base
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=1
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:only-as-component=true
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:confidence=high
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:occurrences=2
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:confidence=high
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:occurrences=2
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:confidence=high
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:confidence=high
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:occurrences=2
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:confidence=high
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:occurrences=1
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | rcbom:reachability=reachable
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=knowledge-base
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:kb:version=0.2.0
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:occurrences=1
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:only-as-component=true
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:param:output_bytes=20
+  prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=knowledge-base
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=present
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:crypto-role=algorithm
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:ffi-boundary=true
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
+  prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
+asset HMAC-SHA-1 | crypto:algorithm:HMAC-SHA-1 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-384 | crypto:algorithm:HMAC-SHA-384 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-1 | crypto:algorithm:PBKDF2-SHA-1 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["verify"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-384 | crypto:algorithm:PBKDF2-SHA-384 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-512-600000-64 | crypto:algorithm:PBKDF2-SHA-512-600000-64 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset SHA-1 | crypto:algorithm:SHA-1 | {"algorithmProperties": {"algorithmFamily": "SHA-1", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
+dep crypto:algorithm:HMAC-SHA-1 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep crypto:algorithm:PBKDF2-SHA-1 -> crypto:algorithm:HMAC-SHA-1
+dep crypto:algorithm:PBKDF2-SHA-1 -> crypto:algorithm:SHA-1
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256-100000-32 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256-100000-32 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:PBKDF2-SHA-384 -> crypto:algorithm:HMAC-SHA-384
+dep crypto:algorithm:PBKDF2-SHA-384 -> crypto:algorithm:SHA-384
+dep crypto:algorithm:PBKDF2-SHA-512-600000-64 -> crypto:algorithm:HMAC-SHA-512
+dep crypto:algorithm:PBKDF2-SHA-512-600000-64 -> crypto:algorithm:SHA-512
+dep pkg:cargo/analysis-189@0.1.0 -> pkg:cargo/ring@0.17.14
+dep pkg:cargo/ring@0.17.14 -> pkg:cargo/getrandom@0.2.17
+dependency crypto:algorithm:HMAC-SHA-1
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-384
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:PBKDF2-SHA-1
+dependency crypto:algorithm:PBKDF2-SHA-256
+dependency crypto:algorithm:PBKDF2-SHA-256-100000-32
+dependency crypto:algorithm:PBKDF2-SHA-384
+dependency crypto:algorithm:PBKDF2-SHA-512-600000-64
+dependency crypto:algorithm:SHA-1
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/analysis-189@0.1.0
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ring@0.17.14
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-256-100000-32
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:PBKDF2-SHA-512-600000-64
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-1
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-256
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-384
+provides pkg:cargo/ring@0.17.14 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/analysis-189@0.1.0", "name": "analysis-189", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/analysis-189@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin analysis-189
+run rcbom:run:boundary-check=5 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=121
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

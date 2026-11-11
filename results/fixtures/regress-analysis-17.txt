@@ -24,8 +24,7 @@
   occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:42:46 | aws_lc_rs::kem::ML_KEM_1024 | [reachable] [static] in a17::kem1024; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::ML_KEM_1024`
   occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:44:23 | aws_lc_rs::kem::EncapsulationKey::<Id>::encapsulate | [reachable] [call] in a17::kem1024; use: encapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `let (ct, _ss) = ek.encapsulate().unwrap();`; code: `encapsulate`
   occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:45:7 | aws_lc_rs::kem::DecapsulationKey::<Id>::decapsulate | [reachable] [call] in a17::kem1024; use: decapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `dk.decapsulate(ct).is_ok()`; code: `decapsulate`
-  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:36:19 | aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [static] in a17::mac_kdf; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b"fixed-salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
-  occ PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | src/main.rs:36:4 | aws_lc_rs::pbkdf2::derive | [reachable] [call] in a17::mac_kdf; use: keyderive; algorithm from aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 36); password: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b"fixed-salt", pw, &mut out);`; code: `pbkdf2::derive`
+  occ PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | src/main.rs:36:4 | aws_lc_rs::pbkdf2::derive | [reachable] [call] in a17::mac_kdf; use: keyderive; algorithm from aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 36); password: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b"fixed-salt", pw, &mut out);`; code: `pbkdf2::derive`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:36:19 | aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 | [reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b"fixed-salt", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:65:10 | aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 | [reachable] [component] in a17::P256; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:85:42 | a17::P256 | [reachable] [component] in a17::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `println!("{} {}", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`
@@ -94,15 +93,15 @@
   prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:kb:version=0.2.0
   prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:occurrences=4
   prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:reachability=reachable
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:confidence=high
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:detection:method=type-resolved
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:finding=hard-coded-salt
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:functions:source=observed
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:kb:version=0.2.0
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:occurrences=2
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:password=environment,parameter
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:provenance:salt=hard-coded
-  prop PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | rcbom:reachability=reachable
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:confidence=high
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:detection:method=type-resolved
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:finding=hard-coded-salt
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:functions:source=observed
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:kb:version=0.2.0
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:occurrences=1
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:password=environment,parameter
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:provenance:salt=hard-coded
+  prop PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
@@ -145,7 +144,7 @@ asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFa
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "parameterSetIdentifier": "1024", "primitive": "kem"}, "assetType": "algorithm"}
-asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
+asset PBKDF2-SHA-256-600000-32 | crypto:algorithm:PBKDF2-SHA-256-600000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
@@ -156,8 +155,8 @@ dep crypto:algorithm:ECDSA-P-256-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
 dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
 dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
-dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:HMAC-SHA-256
-dep crypto:algorithm:PBKDF2-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:HMAC-SHA-256
+dep crypto:algorithm:PBKDF2-SHA-256-600000-32 -> crypto:algorithm:SHA-256
 dep pkg:cargo/a17@0.1.0 -> pkg:cargo/aws-lc-rs@1.18.1
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/aws-lc-sys@0.45.0
 dep pkg:cargo/aws-lc-rs@1.18.1 -> pkg:cargo/zeroize@1.9.1
@@ -168,7 +167,7 @@ dependency crypto:algorithm:Ed25519
 dependency crypto:algorithm:HMAC-SHA-256
 dependency crypto:algorithm:HMAC-SHA-512
 dependency crypto:algorithm:ML-KEM-1024
-dependency crypto:algorithm:PBKDF2-SHA-256
+dependency crypto:algorithm:PBKDF2-SHA-256-600000-32
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA-512
 dependency crypto:algorithm:SHA-512/256
@@ -186,7 +185,7 @@ provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:Ed25519
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:HMAC-SHA-256
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:HMAC-SHA-512
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:ML-KEM-1024
-provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:PBKDF2-SHA-256
+provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:PBKDF2-SHA-256-600000-32
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-256
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-512
 provides pkg:cargo/aws-lc-rs@1.18.1 -> crypto:algorithm:SHA-512/256

@@ -1,0 +1,13 @@
+# A trait object that is made and never called (rustic-rs: dav-server boxes a `dyn Buf` and
+# hands it to a file system whose `write_buf` ignores it). Its vtable keeps the type's methods
+# in the binary, and what only they call: linked, not walked, and no gap of the walk. Their
+# hashes are present, not reachable.
+[package]
+name = "driver-39"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+
+[workspace]

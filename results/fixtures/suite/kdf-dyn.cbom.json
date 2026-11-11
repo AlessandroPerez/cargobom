@@ -200,7 +200,7 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:PBKDF2-SHA-256",
+      "bom-ref": "crypto:algorithm:PBKDF2-SHA-256-600000-32",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "PBKDF2",
@@ -214,13 +214,6 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
-            "line": 13,
-            "location": "src/main.rs",
-            "offset": 41,
-            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
-          },
-          {
             "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA256; member: dyn, possible (dyn: `pilot_kdf_dyn::Interactive` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:29); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
             "line": 24,
             "location": "src/main.rs",
@@ -229,7 +222,7 @@
           }
         ]
       },
-      "name": "PBKDF2-SHA-256",
+      "name": "PBKDF2-SHA-256-600000-32",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -269,7 +262,127 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:PBKDF2-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "PBKDF2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 41,
+            "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
+          }
+        ]
+      },
+      "name": "PBKDF2-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:PBKDF2-SHA-512-600000-32",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "PBKDF2",
+          "cryptoFunctions": [
+            "keyderive"
+          ],
+          "primitive": "kdf"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA512; member: dyn, possible (dyn: `pilot_kdf_dyn::Archival` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:30); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::pbkdf2::derive"
+          }
+        ]
+      },
+      "name": "PBKDF2-SHA-512-600000-32",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:password",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-password"
+        },
+        {
+          "name": "rcbom:provenance:salt",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-salt"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -294,13 +407,6 @@
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA512"
-          },
-          {
-            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA512; member: dyn, possible (dyn: `pilot_kdf_dyn::Archival` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:30); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
-            "line": 24,
-            "location": "src/main.rs",
-            "offset": 4,
-            "symbol": "ring::pbkdf2::derive"
           }
         ]
       },
@@ -320,31 +426,15 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "observed"
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:provenance:password",
-          "value": "hard-coded,parameter"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-password"
-        },
-        {
-          "name": "rcbom:provenance:salt",
-          "value": "hard-coded"
-        },
-        {
-          "name": "rcbom:finding",
-          "value": "hard-coded-salt"
-        },
-        {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "1"
         }
       ],
       "type": "cryptographic-asset"
@@ -481,7 +571,9 @@
         "crypto:algorithm:HMAC-SHA-256",
         "crypto:algorithm:HMAC-SHA-512",
         "crypto:algorithm:PBKDF2-SHA-256",
+        "crypto:algorithm:PBKDF2-SHA-256-600000-32",
         "crypto:algorithm:PBKDF2-SHA-512",
+        "crypto:algorithm:PBKDF2-SHA-512-600000-32",
         "crypto:algorithm:SHA-256",
         "crypto:algorithm:SHA-512"
       ],
@@ -512,6 +604,14 @@
         "crypto:algorithm:SHA-512"
       ],
       "ref": "crypto:algorithm:PBKDF2-SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:PBKDF2-SHA-256-600000-32"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:PBKDF2-SHA-512-600000-32"
     },
     {
       "dependsOn": [],
@@ -588,7 +688,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8052e747-2abe-83aa-b59d-8084142c5c58",
+  "serialNumber": "urn:uuid:e89481c5-6499-8d87-86da-5462f17dd744",
   "specVersion": "1.7",
   "version": 1
 }
