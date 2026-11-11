@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 34;
+pub const FACTS_VERSION: u32 = 35;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -129,6 +129,16 @@ pub struct Links {
     /// `dyn Source` (an `Origin::Call` whose `self_ty` is `dyn <trait>`) may run.
     #[serde(default)]
     pub coercions: Vec<Coercion>,
+    /// The types of `coercions` that are structs or enums, by the name a coercion gives them
+    /// (`ty`), as the knowledge base matches types: what a call on a trait object of one of its
+    /// traits may run (`Box<dyn DynDigest>` made of a `Sha256` or a `Sha512`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub coercion_types: Vec<(String, TyTree)>,
+    /// The calls and namings, in the crate's own code, of its generic functions that no other
+    /// crate can name (a private function, a private method): every instance of such a function
+    /// is made by one of them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub closed_calls: Vec<ClosedCall>,
     /// Instances (`origins::body_name`) whose summaries the instance bound left unrecorded: a
     /// call or a write through one of them is cut, not "returns or writes nothing".
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -199,6 +209,16 @@ pub struct Coercion {
     pub in_static: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub methods: Vec<(String, String, String)>,
+}
+
+/// A call (or a naming as a value) of the generic function `callee`, which only its own crate
+/// can name: for each of its type parameters, the type this call gives it, where that is no
+/// parameter of the caller's (`self.apply_with_rng(packs, &mut rng())` in a function generic
+/// over `packs`' type: `impl Rng` is `ThreadRng`, `impl IntoIterator<..>` the caller's).
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ClosedCall {
+    pub callee: String,
+    pub args: Vec<(String, Option<TyTree>)>,
 }
 
 /// Function `func` writes `value` through its parameter `index`; `value` names its parameters.
@@ -446,7 +466,7 @@ pub enum TyTree {
     Tuple(Vec<TyTree>),
     /// A const generic argument, evaluated when possible.
     Const(Option<u64>),
-    /// `dyn Trait`: the principal trait's path.
+    /// `dyn Trait`: the traits' defining paths, the principal one first.
     Dyn(Vec<String>),
     /// A generic parameter: the site is not monomorphic.
     Param(String),

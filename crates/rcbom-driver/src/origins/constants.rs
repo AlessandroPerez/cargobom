@@ -5,11 +5,18 @@ use super::*;
 impl<'a, 'tcx> Origins<'a, 'tcx> {
     pub(super) fn constant(&self, c: &rustc_public::mir::ConstOperand, depth: usize) -> Origin {
         let ty = c.const_.ty();
-        match ty.kind().rigid() {
+        match ty.kind_of().rigid() {
             // a closure without captures passed as a value: followed to what it returns
             Some(RigidTy::Closure(def, _)) => {
                 let did = rustc_internal::internal(self.tcx, def.def_id());
                 return self.follow_closure(did, Some(Vec::new()), depth);
+            }
+            // (or a reference to one, which the compiler promotes: `by_ref(&|alg| ..)`)
+            Some(RigidTy::Ref(_, inner, _)) => {
+                if let Some(RigidTy::Closure(def, _)) = inner.kind_of().rigid() {
+                    let did = rustc_internal::internal(self.tcx, def.def_id());
+                    return self.follow_closure(did, Some(Vec::new()), depth);
+                }
             }
             // a function passed as a value is code, not data: a value without data
             Some(RigidTy::FnDef(def, gargs)) => {
@@ -48,11 +55,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let span = Some(self.loc(c.span));
         // integers, and values of a field-less enum, which are their discriminant
         // (`const ALG: Algorithm = Algorithm::Argon2d`)
-        let int_ty = matches!(ty.kind().rigid(), Some(RigidTy::Uint(_) | RigidTy::Int(_)))
-            || self.fieldless_enum(&ty);
+        let int_ty = matches!(
+            ty.kind_of().rigid(),
+            Some(RigidTy::Uint(_) | RigidTy::Int(_))
+        ) || self.fieldless_enum(&ty);
         match c.const_.kind() {
             ConstantKind::Allocated(a) => {
-                let value = match ty.kind().rigid() {
+                let value = match ty.kind_of().rigid() {
                     Some(RigidTy::Int(_)) => a.read_int().ok(),
                     _ if int_ty => a.read_uint().ok().and_then(|v| i128::try_from(v).ok()),
                     _ => None,
@@ -227,7 +236,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             [_] if int => value.or_else(|| match evaluate()? {
                 rustc_middle::mir::ConstValue::Scalar(
                     rustc_middle::mir::interpret::Scalar::Int(i),
-                ) => Some(match ty.kind().rigid() {
+                ) => Some(match ty.kind_of().rigid() {
                     Some(RigidTy::Int(_)) => i.to_int(i.size()),
                     _ => i128::try_from(i.to_uint(i.size())).ok()?,
                 }),
@@ -378,7 +387,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
     /// An enum whose variants have no fields: its values are their discriminants.
     pub(super) fn fieldless_enum(&self, ty: &Ty) -> bool {
-        let kind = ty.kind();
+        let kind = ty.kind_of();
         let Some(RigidTy::Adt(def, _)) = kind.rigid() else {
             return false;
         };
@@ -396,7 +405,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         ty: &Ty,
     ) -> Option<Origin> {
         let tcx = self.tcx;
-        let (elem, bytes, len) = match ty.kind().rigid() {
+        let (elem, bytes, len) = match ty.kind_of().rigid() {
             Some(RigidTy::Array(e, _)) => (*e, a.bytes.clone(), None),
             Some(RigidTy::Ref(_, t, _)) => {
                 let m =
@@ -417,7 +426,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                             }
                             _ => None,
                         })?;
-                match t.kind().rigid() {
+                match t.kind_of().rigid() {
                     Some(RigidTy::Array(e, _)) => (*e, m.bytes.clone(), None),
                     Some(RigidTy::Slice(e)) if a.bytes.len() == 16 => {
                         let n = a.bytes[8..16]
@@ -434,7 +443,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         if !self.fieldless_enum(&elem) {
             return None;
         }
-        let kind = elem.kind();
+        let kind = elem.kind_of();
         let Some(RigidTy::Adt(def, _)) = kind.rigid() else {
             return None;
         };
@@ -467,7 +476,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
     /// A value of a struct without fields (`OsRng`): it names its type.
     pub(super) fn unit_value(&self, ty: &Ty) -> Option<Origin> {
-        let kind = ty.kind();
+        let kind = ty.kind_of();
         let Some(RigidTy::Adt(def, _)) = kind.rigid() else {
             return None;
         };
@@ -592,7 +601,7 @@ pub(super) fn named_in<'tcx>(
 /// Byte length of `n` elements of type `elem`, when the elements are bytes.
 pub(super) fn byte_len(elem: &Ty, n: Option<u64>) -> Option<u64> {
     matches!(
-        elem.kind().rigid(),
+        elem.kind_of().rigid(),
         Some(RigidTy::Uint(UintTy::U8) | RigidTy::Int(IntTy::I8))
     )
     .then_some(n)
@@ -605,7 +614,7 @@ pub(super) fn index_range(
     a: &rustc_public::ty::Allocation,
     ty: &Ty,
 ) -> Option<(u64, Option<u64>)> {
-    let kind = ty.kind();
+    let kind = ty.kind_of();
     let Some(RigidTy::Adt(def, args)) = kind.rigid() else {
         return None;
     };
@@ -613,7 +622,7 @@ pub(super) fn index_range(
     let name = path.strip_prefix("core::ops::range::")?;
     let over_usize = match args.0.first() {
         Some(rustc_public::ty::GenericArgKind::Type(t)) => {
-            matches!(t.kind().rigid(), Some(RigidTy::Uint(UintTy::Usize)))
+            matches!(t.kind_of().rigid(), Some(RigidTy::Uint(UintTy::Usize)))
         }
         _ => name == "RangeFull",
     };
@@ -656,9 +665,9 @@ pub(super) fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option
                 _ => None,
             })
     };
-    match ty.kind().rigid() {
+    match ty.kind_of().rigid() {
         Some(RigidTy::Array(..)) => (bytes_of_ty(ty), zero(&a.bytes)),
-        Some(RigidTy::Ref(_, t, _)) => match t.kind().rigid() {
+        Some(RigidTy::Ref(_, t, _)) => match t.kind_of().rigid() {
             Some(RigidTy::Array(..)) => {
                 (bytes_of_ty(ty), pointee().is_some_and(|m| zero(&m.bytes)))
             }
@@ -668,7 +677,7 @@ pub(super) fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option
                     .iter()
                     .rev()
                     .try_fold(0u64, |acc, b| b.map(|b| (acc << 8) | b as u64));
-                let bytes_per = match t.kind().rigid() {
+                let bytes_per = match t.kind_of().rigid() {
                     Some(RigidTy::Slice(e)) => byte_len(e, Some(1)),
                     _ => Some(1),
                 };
@@ -689,9 +698,9 @@ pub(super) fn literal_data(a: &rustc_public::ty::Allocation, ty: &Ty) -> (Option
 }
 /// `[u8; N]`, `&[u8; N]`, `&mut [u8; N]`: N bytes.
 pub(super) fn bytes_of_ty(ty: &Ty) -> Option<u64> {
-    match ty.kind().rigid()? {
+    match ty.kind_of().rigid()? {
         RigidTy::Array(t, n) => byte_len(t, n.eval_target_usize().ok()),
-        RigidTy::Ref(_, t, _) | RigidTy::RawPtr(t, _) => match t.kind().rigid()? {
+        RigidTy::Ref(_, t, _) | RigidTy::RawPtr(t, _) => match t.kind_of().rigid()? {
             RigidTy::Array(e, n) => byte_len(e, n.eval_target_usize().ok()),
             _ => None,
         },
@@ -700,9 +709,9 @@ pub(super) fn bytes_of_ty(ty: &Ty) -> Option<u64> {
 }
 /// `[T; N]`, `&[T; N]`, `&mut [T; N]`: N.
 pub(super) fn array_len_of_ty(ty: &Ty) -> Option<u64> {
-    match ty.kind().rigid()? {
+    match ty.kind_of().rigid()? {
         RigidTy::Array(_, n) => n.eval_target_usize().ok(),
-        RigidTy::Ref(_, t, _) | RigidTy::RawPtr(t, _) => match t.kind().rigid()? {
+        RigidTy::Ref(_, t, _) | RigidTy::RawPtr(t, _) => match t.kind_of().rigid()? {
             RigidTy::Array(_, n) => n.eval_target_usize().ok(),
             _ => None,
         },

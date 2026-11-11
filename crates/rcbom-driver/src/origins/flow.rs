@@ -705,7 +705,7 @@ impl Flow {
                 && (1..=nargs).contains(&l)
                 && !reassigned.contains(&l)
                 && matches!(
-                    body.locals()[l].ty.kind().rigid(),
+                    body.locals()[l].ty.kind_of().rigid(),
                     Some(RigidTy::Ref(_, _, Mutability::Mut))
                 )
         };
@@ -848,7 +848,7 @@ pub(super) fn is_init(body: &Body, d: &DefKind) -> bool {
         return false;
     };
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-        func.ty(body.locals()).ok().map(|t| t.kind())
+        func.ty(body.locals()).ok().map(|t| t.kind_of())
     else {
         return false;
     };

@@ -109,7 +109,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     /// a function passed as one (`LazyLock::new(pick)`), a call of it.
     pub(crate) fn closure_value(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
         if let Operand::Constant(c) = op
-            && let Some(RigidTy::FnDef(def, _)) = c.const_.ty().kind().rigid()
+            && let Some(RigidTy::FnDef(def, _)) = c.const_.ty().kind_of().rigid()
         {
             let did = rustc_internal::internal(self.tcx, def.def_id());
             return Origin::Call {
@@ -128,7 +128,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             Origin::Unit { path, krate, .. }
                 if op
                     .ty(self.body.locals())
-                    .is_ok_and(|t| matches!(t.kind().rigid(), Some(RigidTy::FnPtr(_)))) =>
+                    .is_ok_and(|t| matches!(t.kind_of().rigid(), Some(RigidTy::FnPtr(_)))) =>
             {
                 Origin::Call {
                     callee: path,
@@ -502,7 +502,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
     /// Is `func` a function of this crate?
     pub(super) fn local_fn(&self, func: &Operand) -> bool {
-        matches!(func.ty(self.body.locals()).ok().map(|t| t.kind()),
+        matches!(func.ty(self.body.locals()).ok().map(|t| t.kind_of()),
             Some(TyKind::RigidTy(RigidTy::FnDef(def, _)))
                 if rustc_internal::internal(self.tcx, def.def_id()).is_local())
     }
@@ -522,7 +522,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return None;
         };
         let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-            func.ty(self.body.locals()).ok().map(|t| t.kind())
+            func.ty(self.body.locals()).ok().map(|t| t.kind_of())
         else {
             return None;
         };
@@ -548,7 +548,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         {
             *a = self.place(d.local, d.path.clone(), d.at, depth + 1, seen);
         }
-        let gargs = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
+        let gargs = match func.ty(self.body.locals()).ok().map(|t| t.kind_of()) {
             Some(TyKind::RigidTy(RigidTy::FnDef(_, g))) => rustc_internal::internal(self.tcx, g),
             _ => return None,
         };
@@ -738,13 +738,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         // (`Argon2::new(Algorithm::default(), ..)` is Argon2id)
         if args.is_empty()
             && let Some(TyKind::RigidTy(RigidTy::FnDef(def, gargs))) =
-                func.ty(self.body.locals()).ok().map(|t| t.kind())
+                func.ty(self.body.locals()).ok().map(|t| t.kind_of())
             && let Some(o) = self.default_variant(def.def_id(), &gargs)
         {
             return o;
         }
         let mut runs = None;
-        let (callee, krate, self_ty) = match func.ty(self.body.locals()).ok().map(|t| t.kind()) {
+        let (callee, krate, self_ty) = match func.ty(self.body.locals()).ok().map(|t| t.kind_of()) {
             Some(TyKind::RigidTy(RigidTy::FnDef(def, gargs))) => {
                 let did = rustc_internal::internal(self.tcx, def.def_id());
                 let gargs = rustc_internal::internal(self.tcx, gargs);
@@ -785,10 +785,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         if krate == "core"
             && callee.ends_with("::unwrap_or_default")
             && let Some(TyKind::RigidTy(RigidTy::FnDef(_, gargs))) =
-                func.ty(self.body.locals()).ok().map(|t| t.kind())
+                func.ty(self.body.locals()).ok().map(|t| t.kind_of())
             && let Some(rustc_public::ty::GenericArgKind::Type(t)) = gargs.0.first()
             && matches!(
-                t.kind().rigid(),
+                t.kind_of().rigid(),
                 Some(
                     RigidTy::Array(..)
                         | RigidTy::Int(_)
@@ -1235,10 +1235,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             .then(|| returned(true))
             .filter(|f| *f != ret)
             .map(Box::new);
+        // (the closure by its body's path, as the links name it, for a call through a pointer or
+        // a `dyn Fn` to give its parameters the call's arguments; one inside a generic function
+        // is an instance's, not named here)
+        let root = self.tcx.typeck_root_def_id(did);
+        let own = (!self
+            .tcx
+            .generics_of(root)
+            .requires_monomorphization(self.tcx))
+        .then(|| path_of(self.tcx, did));
         Origin::Call {
             callee: "<closure>".into(),
             krate: String::new(),
-            self_ty: None,
+            self_ty: own,
             args: vec![ret],
             span: None,
             runs: None,

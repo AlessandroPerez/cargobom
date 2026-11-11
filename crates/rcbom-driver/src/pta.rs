@@ -20,6 +20,7 @@
 // (fixed-seed hashing: the same input gives the same objects, merges and answers)
 use rustc_data_structures::fx::{FxHashMap as HashMap, FxHashSet as HashSet};
 
+use crate::KindOf;
 use crate::pta_solve::Solver;
 use rustc_middle::ty::TyCtxt;
 use rustc_middle::ty::layout::{LayoutCx, LayoutOf};
@@ -1795,7 +1796,7 @@ impl<'tcx> Tr<'_, 'tcx> {
                 match kind {
                     CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)) => {
                         if let Ok(t) = op.ty(self.body.locals())
-                            && let Some(RigidTy::FnDef(def, args)) = t.kind().rigid()
+                            && let Some(RigidTy::FnDef(def, args)) = t.kind_of().rigid()
                             && let Ok(i) = Instance::resolve_for_fn_ptr(*def, args)
                         {
                             let n = self.p.inst(i);
@@ -1806,7 +1807,7 @@ impl<'tcx> Tr<'_, 'tcx> {
                     }
                     CastKind::PointerCoercion(PointerCoercion::ClosureFnPointer(_)) => {
                         if let Ok(t) = op.ty(self.body.locals())
-                            && let Some(RigidTy::Closure(def, args)) = t.kind().rigid()
+                            && let Some(RigidTy::Closure(def, args)) = t.kind_of().rigid()
                             && let Ok(i) = Instance::resolve_closure(
                                 *def,
                                 args,
@@ -2017,7 +2018,7 @@ impl<'tcx> Tr<'_, 'tcx> {
             self.t.havoc_call(&arg_locs, dest);
             return;
         };
-        match fty.kind().rigid() {
+        match fty.kind_of().rigid() {
             Some(RigidTy::FnDef(def, gargs)) => {
                 let Ok(inst) = Instance::resolve(*def, gargs) else {
                     self.p.havoc_why(format!("unresolved: {}", def.name()));

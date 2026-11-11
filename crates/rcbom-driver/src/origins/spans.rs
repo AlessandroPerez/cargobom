@@ -71,7 +71,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         };
         let operand_span = |o: &Operand, tail: &[Step]| match o {
             Operand::Constant(c) if tail.is_empty() => {
-                matches!(c.const_.ty().kind().rigid(), Some(RigidTy::FnDef(..))).then_some(c.span)
+                matches!(c.const_.ty().kind_of().rigid(), Some(RigidTy::FnDef(..)))
+                    .then_some(c.span)
             }
             Operand::Copy(q) | Operand::Move(q) => place_span(q, tail),
             _ => None,
@@ -182,7 +183,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
                 DefKind::Assign(Rvalue::Cast(_, Operand::Constant(c), _), _) => {
                     let ty = c.const_.ty();
-                    let kind = ty.kind();
+                    let kind = ty.kind_of();
                     let Some(RigidTy::FnDef(def, args)) = kind.rigid() else {
                         return None;
                     };

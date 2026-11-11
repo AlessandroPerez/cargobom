@@ -81,7 +81,7 @@ pub(crate) fn asked_traits() -> &'static [String] {
 }
 /// Is the local a random generator (`ThreadRng`, `OsRng`, `StdRng`, `ChaCha20Rng`)?
 pub(super) fn is_rng(body: &Body, local: Local) -> bool {
-    match body.locals()[local].ty.kind() {
+    match body.locals()[local].ty.kind_of() {
         TyKind::RigidTy(RigidTy::Adt(def, _)) => {
             let name = def.name();
             semantics("generators")
@@ -96,7 +96,7 @@ pub(super) fn is_rng(body: &Body, local: Local) -> bool {
 /// slice's own (`copy_from_slice`, `fill`).
 pub(super) fn fills_whole(body: &Body, func: &Operand) -> bool {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-        func.ty(body.locals()).ok().map(|t| t.kind())
+        func.ty(body.locals()).ok().map(|t| t.kind_of())
     else {
         return false;
     };
@@ -233,7 +233,7 @@ pub(super) fn holder_param(
     f: usize,
 ) -> Option<Vec<usize>> {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-        func.ty(body.locals()).ok().map(|t| t.kind())
+        func.ty(body.locals()).ok().map(|t| t.kind_of())
     else {
         return None;
     };
@@ -336,8 +336,14 @@ pub(super) fn not_plain<'tcx>(
     if depth > 6 {
         return true;
     }
-    // (an atomic's storage is a projection, `<usize as AtomicPrimitive>::Storage`)
+    // (an atomic's storage is a projection, `<usize as AtomicPrimitive>::Storage`; one over a
+    // type or const parameter of a generic body, heapless's `<[T; N] as ..>::..`, is whatever
+    // the instance makes it, and has no normal form to ask for here)
     let t = if matches!(t.kind(), K::Alias(..)) {
+        use rustc_middle::ty::TypeVisitableExt;
+        if t.has_non_region_param() || t.has_escaping_bound_vars() || t.has_placeholders() {
+            return true;
+        }
         match tcx.try_normalize_erasing_regions(
             rustc_middle::ty::TypingEnv::fully_monomorphized(),
             rustc_middle::ty::Unnormalized::new_wip(t),

@@ -2,6 +2,32 @@
 
 use super::*;
 
+/// A type's kind, read without the panic `rustc_public` has for the type of an `async` closure
+/// (`CoroutineClosure`: "FIXME(async_closures): Lower these to SMIR"): that one is built here,
+/// from the compiler's own type. Every reading of a type's kind in this crate goes through it:
+/// a caught panic would lose what was being read with it (a coercion to a trait object of a
+/// type holding such a closure, and the methods the object runs).
+pub(crate) trait KindOf {
+    fn kind_of(&self) -> TyKind;
+}
+impl KindOf for Ty {
+    #[allow(clippy::disallowed_methods)]
+    fn kind_of(&self) -> TyKind {
+        rustc_middle::ty::tls::with(|tcx| match rustc_internal::internal(tcx, *self).kind() {
+            rustc_middle::ty::CoroutineClosure(def, args) => {
+                TyKind::RigidTy(RigidTy::CoroutineClosure(
+                    rustc_public::ty::CoroutineClosureDef(rustc_internal::stable(*def)),
+                    GenericArgs(
+                        args.iter()
+                            .map(|a| rustc_internal::stable(a.kind()))
+                            .collect(),
+                    ),
+                ))
+            }
+            _ => self.kind(),
+        })
+    }
+}
 pub(crate) fn crate_ref(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> CrateRef {
     CrateRef {
         name: tcx.crate_name(did.krate).to_string(),
@@ -296,7 +322,7 @@ pub(crate) fn ty_tree(tcx: TyCtxt<'_>, ty: &Ty, depth: usize) -> TyTree {
     if depth > 16 {
         return TyTree::Other("…".into());
     }
-    match ty.kind() {
+    match ty.kind_of() {
         TyKind::RigidTy(r) => match r {
             RigidTy::Adt(def, args) => {
                 let did = rustc_internal::internal(tcx, def.def_id());
@@ -321,7 +347,11 @@ pub(crate) fn ty_tree(tcx: TyCtxt<'_>, ty: &Ty, depth: usize) -> TyTree {
                 preds
                     .iter()
                     .filter_map(|p| match &p.value {
-                        rustc_public::ty::ExistentialPredicate::Trait(t) => Some(t.def_id.name()),
+                        // (by its defining path, as coercions and call sites name traits:
+                        // `sha2::digest::DynDigest` is `digest::digest::DynDigest`)
+                        rustc_public::ty::ExistentialPredicate::Trait(t) => {
+                            Some(path_of(tcx, rustc_internal::internal(tcx, t.def_id.0)))
+                        }
                         _ => None,
                     })
                     .collect(),
@@ -406,7 +436,7 @@ pub(crate) fn const_int(op: &Operand) -> Option<i128> {
     let ConstantKind::Allocated(a) = c.const_.kind() else {
         return None;
     };
-    match c.const_.ty().kind().rigid()? {
+    match c.const_.ty().kind_of().rigid()? {
         RigidTy::Uint(_) => a.read_uint().ok().and_then(|v| i128::try_from(v).ok()),
         RigidTy::Int(_) => a.read_int().ok(),
         _ => None,

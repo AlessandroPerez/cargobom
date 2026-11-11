@@ -1,0 +1,5 @@
+# `rustc_public` panics converting the kind of an `async` closure's type; `KindOf::kind_of`
+# (src/names.rs) reads every type's kind instead.
+disallowed-methods = [
+    { path = "rustc_public::ty::Ty::kind", reason = "panics on an `async` closure's type: use `KindOf::kind_of`" },
+]

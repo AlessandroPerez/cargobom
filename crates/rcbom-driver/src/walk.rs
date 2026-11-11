@@ -84,6 +84,18 @@ pub(super) fn roots(
             }
         }
     }
+    // a binary also runs what its dependencies define for the standard library to call by
+    // symbol (the allocator functions of a library's `#[global_allocator]`: the shipped
+    // standard library has no MIR for most of the code that calls them)
+    if is_bin {
+        for &did in &cx.linked().std_symbols {
+            if let Ok(i) = Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(did)))
+                && !fns.contains(&i)
+            {
+                fns.push(i);
+            }
+        }
+    }
     let mut statics = Vec::new();
     for did in tcx.hir_body_owners().map(|d| d.to_def_id()) {
         if !matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. })
@@ -99,6 +111,10 @@ pub(super) fn roots(
         {
             statics.push(did);
         }
+    }
+    // (and its dependencies' `#[used]` statics, kept with their crates: constructors)
+    if is_bin {
+        statics.extend(cx.linked().used_statics.iter().copied());
     }
     (fns, statics, generic)
 }
@@ -209,7 +225,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let limit = std::env::var("RCBOM_MAX_INSTANCES")
             .ok()
             .and_then(|v| v.parse().ok())
-            .unwrap_or(200_000);
+            // (a guard against a walk that never ends, not a budget: atuin's binary walks
+            // 400,000 instances)
+            .unwrap_or(2_000_000);
         Walker {
             cx,
             queue: VecDeque::new(),
@@ -228,6 +246,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             paths: Vec::new(),
             shims: Vec::new(),
             coercions: BTreeMap::new(),
+            coercion_types: BTreeMap::new(),
             dyn_used: HashSet::new(),
             pending: HashMap::new(),
             dyn_cache: HashMap::new(),
@@ -598,6 +617,21 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
         let Some(body) = inst.body().map(|b| live_body(self.cx.tcx, &b)) else {
+            // a declaration (`extern` block's): what runs is the function a crate of the build
+            // defines under its symbol name (the allocator functions of a dependency's
+            // `#[global_allocator]`, a `#[no_mangle]` function declared `extern "C"` elsewhere)
+            if self.cx.tcx.is_foreign_item(did)
+                && let Some(def) = self.cx.defined_as(did)
+                && let Ok(i) =
+                    Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(def)))
+            {
+                if usage {
+                    self.enqueue_usage(i);
+                } else {
+                    let from = self.parent.get(&inst).cloned();
+                    self.enqueue(i, from);
+                }
+            }
             return;
         };
         let stop = self.cx.stop_crate(did.krate);
@@ -921,10 +955,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     /// static's item; `in_static`: the static's value).
     pub(super) fn coerced(
         &mut self,
-        (trait_path, ty, methods): Coerced,
+        (trait_path, ty, methods, tree): Coerced,
         at: Option<Loc>,
         in_static: bool,
     ) {
+        if let Some(t) = tree {
+            self.coercion_types.entry(ty.clone()).or_insert(t);
+        }
         self.coercions
             .entry((trait_path, ty))
             .or_insert((at, in_static, methods));
@@ -1078,7 +1115,7 @@ impl Edges<'_, '_> {
                     .collect();
                 let mut callee = None;
                 if let Ok(ty) = func.ty(self.body.locals())
-                    && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
+                    && let Some(RigidTy::FnDef(def, args)) = ty.kind_of().rigid()
                     && let Ok(i) = Instance::resolve(*def, args)
                 {
                     let span = match func {
@@ -1162,14 +1199,14 @@ impl Edges<'_, '_> {
             if let Ok(src) = op.ty(self.body.locals()) {
                 match kind {
                     CastKind::PointerCoercion(PointerCoercion::ReifyFnPointer(_)) => {
-                        if let Some(RigidTy::FnDef(def, args)) = src.kind().rigid()
+                        if let Some(RigidTy::FnDef(def, args)) = src.kind_of().rigid()
                             && let Ok(i) = Instance::resolve_for_fn_ptr(*def, args)
                         {
                             self.found.push((i, span));
                         }
                     }
                     CastKind::PointerCoercion(PointerCoercion::ClosureFnPointer(_)) => {
-                        if let Some(RigidTy::Closure(def, args)) = src.kind().rigid()
+                        if let Some(RigidTy::Closure(def, args)) = src.kind_of().rigid()
                             && let Ok(i) =
                                 Instance::resolve_closure(*def, args, ClosureKind::FnOnce)
                         {
@@ -1268,7 +1305,7 @@ pub(super) fn alloc_callees(
 }
 /// For an unsizing coercion `P<T> -> P<dyn Trait>`, the pair `(T, dyn Trait)`.
 pub(super) fn unsize_tails(src: &Ty, dst: &Ty) -> Option<(Ty, Ty)> {
-    let (s, d) = (src.kind(), dst.kind());
+    let (s, d) = (src.kind_of(), dst.kind_of());
     let (s, d) = (s.rigid()?, d.rigid()?);
     match (s, d) {
         (_, RigidTy::Dynamic(..)) => Some((*src, *dst)),
@@ -1340,7 +1377,11 @@ pub(super) fn coercion<'tcx>(
             })
             .collect()
     };
-    Some((t, ty, methods))
+    // (a struct or enum as the knowledge base matches types: a crypto type made a trait object
+    // is what a call on the object may run)
+    let tree = matches!(concrete.kind(), rustc_middle::ty::Adt(..))
+        .then(|| ty_tree(tcx, &rustc_internal::stable(concrete), 0));
+    Some((t, ty, methods, tree))
 }
 /// The named constant a body's constant operand at `span` is (`KP` in `KP.alg()`), read from
 /// the item's MIR, where it is not evaluated away.
@@ -1491,7 +1532,7 @@ fn only_coerced(tcx: TyCtxt<'_>, body: &Body, local: rustc_public::mir::Local) -
                 && whole(&args[0], local)
                 && destination.projection.is_empty()
                 && let Ok(fty) = func.ty(body.locals())
-                && let Some(RigidTy::FnDef(def, _)) = fty.kind().rigid()
+                && let Some(RigidTy::FnDef(def, _)) = fty.kind_of().rigid()
                 && path_of(tcx, rustc_internal::internal(tcx, def.def_id()))
                     == "alloc::boxed::Box::<T>::new" =>
             {

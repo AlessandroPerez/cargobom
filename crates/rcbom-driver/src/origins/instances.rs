@@ -4,7 +4,7 @@ use super::*;
 
 /// The defining path of the function a call operand names.
 pub(super) fn callee_name(body: &Body, func: &Operand) -> Option<String> {
-    match func.ty(body.locals()).ok()?.kind() {
+    match func.ty(body.locals()).ok()?.kind_of() {
         TyKind::RigidTy(RigidTy::FnDef(def, _)) => Some(def.name()),
         _ => None,
     }

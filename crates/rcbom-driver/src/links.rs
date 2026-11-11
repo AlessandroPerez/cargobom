@@ -19,7 +19,7 @@ use rustc_public::{CrateDef, rustc_internal};
 use rustc_span::def_id::DefId;
 
 use crate::origins::{Origins, Step};
-use crate::{Cx, def_ref_internal, path_of};
+use crate::{Cx, KindOf, def_ref_internal, path_of};
 
 /// Can a value of this type carry an algorithm or a key: does it name a knowledge-base
 /// crate's type (or trait object)?
@@ -235,7 +235,7 @@ pub(crate) fn body_links(
         let all = (0..args.len())
             .filter(|&i| {
                 matches!(
-                    args[i].ty.kind().rigid(),
+                    args[i].ty.kind_of().rigid(),
                     Some(rustc_public::ty::RigidTy::Ref(
                         _,
                         _,

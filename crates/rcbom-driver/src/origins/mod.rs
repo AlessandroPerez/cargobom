@@ -27,7 +27,7 @@ use rustc_public::ty::{ConstantKind, IntTy, RigidTy, Span, Ty, TyKind, UintTy};
 use rustc_public::{CrateDef, rustc_internal};
 use rustc_span::def_id::DefId;
 
-use crate::{def_ref_internal, locate, path_of};
+use crate::{KindOf, def_ref_internal, locate, path_of};
 
 mod constants;
 mod flow;

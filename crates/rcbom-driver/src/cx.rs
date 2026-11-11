@@ -215,6 +215,84 @@ impl Cx<'_> {
         self.is_std(self.tcx.crate_name(c).as_str()) || self.sysroot().contains(&c)
     }
 
+    /// What the crates of the build define for the linker, the local crate's first, then the
+    /// others' but the standard library's (what it declares and defines itself is its own).
+    /// Every definition is asked: a crate that is only checked, as the driver's build is, lists
+    /// no exported symbols.
+    pub(crate) fn linked(&self) -> &Linked {
+        use rustc_hir::def::DefKind;
+        use rustc_middle::middle::codegen_fn_attrs::CodegenFnAttrFlags as F;
+        use rustc_middle::ty::Instance;
+        let tcx = self.tcx;
+        self.linked.get_or_init(|| {
+            let mut out = Linked::default();
+            let mut add = |did: rustc_span::def_id::DefId| match tcx.def_kind(did) {
+                DefKind::Fn | DefKind::AssocFn
+                    if !tcx.is_foreign_item(did)
+                        && tcx.is_mir_available(did)
+                        && !tcx.generics_of(did).requires_monomorphization(tcx) =>
+                {
+                    let attrs = tcx.codegen_fn_attrs(did);
+                    if !attrs.contains_extern_indicator() {
+                        return;
+                    }
+                    let name = tcx.symbol_name(Instance::mono(tcx, did)).name.to_string();
+                    out.named.entry(name).or_insert(did);
+                    if attrs.flags.contains(F::RUSTC_STD_INTERNAL_SYMBOL) && !did.is_local() {
+                        out.std_symbols.push(did);
+                    }
+                }
+                DefKind::Static { .. }
+                    if !did.is_local()
+                        && !tcx.is_foreign_item(did)
+                        && tcx
+                            .codegen_fn_attrs(did)
+                            .flags
+                            .intersects(F::USED_COMPILER | F::USED_LINKER) =>
+                {
+                    out.used_statics.push(did);
+                }
+                _ => {}
+            };
+            for l in tcx.hir_body_owners() {
+                add(l.to_def_id());
+            }
+            for &c in tcx.crates(()) {
+                // (a procedural-macro crate links nothing into the artifact, and its metadata
+                // describes its macros only)
+                if self.sysroot().contains(&c) || tcx.crate_dep_kind(c).macros_only() {
+                    continue;
+                }
+                for i in 0..tcx.num_extern_def_ids(c) {
+                    add(rustc_span::def_id::DefId {
+                        krate: c,
+                        index: rustc_span::def_id::DefIndex::from_usize(i),
+                    });
+                }
+            }
+            out
+        })
+    }
+
+    /// The function a declaration without a body stands for (`extern "C" { fn f(); }`, the
+    /// standard library's `__rust_dealloc`): the one a crate of the build defines under the
+    /// declaration's symbol name, as the linker resolves it. None where no Rust code defines it
+    /// (a C function, the default allocator).
+    pub(crate) fn defined_as(
+        &self,
+        decl: rustc_span::def_id::DefId,
+    ) -> Option<rustc_span::def_id::DefId> {
+        let tcx = self.tcx;
+        let name = tcx
+            .symbol_name(rustc_middle::ty::Instance::mono(tcx, decl))
+            .name;
+        self.linked()
+            .named
+            .get(name)
+            .copied()
+            .filter(|d| *d != decl)
+    }
+
     /// The crates read from the toolchain's sysroot.
     pub(crate) fn sysroot(&self) -> &std::rc::Rc<HashSet<rustc_span::def_id::CrateNum>> {
         let tcx = self.tcx;
@@ -233,4 +311,17 @@ impl Cx<'_> {
             )
         })
     }
+}
+
+/// What the crates of a build define for the linker.
+#[derive(Default)]
+pub(crate) struct Linked {
+    /// The functions defined under a symbol name of their own (`#[no_mangle]`, `#[export_name]`,
+    /// the allocator functions a `#[global_allocator]` makes), by that name.
+    pub(crate) named: HashMap<String, rustc_span::def_id::DefId>,
+    /// Those of other crates the standard library calls by such a name (`__rust_alloc` of a
+    /// dependency's `#[global_allocator]`): they run whatever the program calls.
+    pub(crate) std_symbols: Vec<rustc_span::def_id::DefId>,
+    /// The `#[used]` statics of other crates, which the linker keeps with their crate.
+    pub(crate) used_statics: Vec<rustc_span::def_id::DefId>,
 }

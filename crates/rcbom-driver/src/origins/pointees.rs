@@ -16,7 +16,7 @@ pub(super) fn box_field(body: &Body, q: &Place) -> Option<usize> {
                 projection: q.projection[..n - k].to_vec(),
             }
             .ty(body.locals())
-            .is_ok_and(|t| t.kind().is_box())
+            .is_ok_and(|t| t.kind_of().is_box())
     })
 }
 impl Pointees<'_> {
@@ -48,7 +48,7 @@ impl Pointees<'_> {
             let through_ptr = |j: usize| {
                 j > 0
                     || matches!(
-                        self.body.locals()[t.local].ty.kind().rigid(),
+                        self.body.locals()[t.local].ty.kind_of().rigid(),
                         Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
                     )
             };
@@ -267,7 +267,7 @@ impl Pointees<'_> {
                         (!part && borrows_inside(self.body, func, args, local)).then(|| match func
                             .ty(self.body.locals())
                             .ok()
-                            .map(|t| t.kind())
+                            .map(|t| t.kind_of())
                         {
                             Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) => def.name(),
                             _ => String::new(),
@@ -439,12 +439,12 @@ pub(super) fn holds_mut_arg(t: Ty, depth: usize) -> bool {
     if depth > 4 {
         return false;
     }
-    match t.kind().rigid() {
+    match t.kind_of().rigid() {
         Some(RigidTy::Ref(_, i, Mutability::Not)) => holds_mut_arg(*i, depth + 1),
         Some(RigidTy::Ref(_, i, Mutability::Mut)) => depth > 0 || holds_mut_arg(*i, depth + 1),
         Some(RigidTy::Adt(_, args)) => args.0.iter().any(|a| {
             matches!(a, rustc_public::ty::GenericArgKind::Type(t)
-                if matches!(t.kind().rigid(), Some(RigidTy::Ref(_, _, Mutability::Mut)))
+                if matches!(t.kind_of().rigid(), Some(RigidTy::Ref(_, _, Mutability::Mut)))
                     || holds_mut_arg(*t, depth + 1))
         }),
         Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| holds_mut_arg(*t, depth + 1)),
@@ -456,11 +456,24 @@ pub(super) fn holds_mut_arg(t: Ty, depth: usize) -> bool {
 /// `Box<MaybeUninit<[&mut T; 1]>>` (`vec![..]`'s allocation); none when it holds another
 /// borrow besides.
 pub(super) fn bag_content(t: Ty) -> Option<Ty> {
+    // (a type `rustc_public` cannot convert, an `async` closure's or one holding it, is no
+    // such container: converting it panics, `crate::has_unconvertible`; any other panic is
+    // raised again)
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| bag_content_of(t))).unwrap_or_else(
+        |e| {
+            if !crate::async_closure(&e) {
+                std::panic::resume_unwind(e)
+            }
+            None
+        },
+    )
+}
+fn bag_content_of(t: Ty) -> Option<Ty> {
     fn walk(t: Ty, depth: usize, found: &mut Option<Ty>) -> bool {
         if depth > 6 {
             return false;
         }
-        match t.kind().rigid() {
+        match t.kind_of().rigid() {
             Some(RigidTy::Ref(_, _, Mutability::Mut)) => {
                 if found.is_some_and(|f| f != t) {
                     return false;
@@ -482,7 +495,7 @@ pub(super) fn bag_content(t: Ty) -> Option<Ty> {
         }
     }
     if !matches!(
-        t.kind().rigid(),
+        t.kind_of().rigid(),
         Some(RigidTy::Adt(..) | RigidTy::Array(..) | RigidTy::Slice(_))
     ) {
         return None;
@@ -500,7 +513,7 @@ pub(super) fn risky(t: Ty, p: Ty) -> bool {
         if bag_content(t) == Some(p) {
             return true;
         }
-        match t.kind().rigid() {
+        match t.kind_of().rigid() {
             Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => *i == p || walk(*i, p, depth + 1),
             Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => walk(*e, p, depth + 1),
             Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| walk(*t, p, depth + 1)),
@@ -519,7 +532,7 @@ pub(super) fn risky(t: Ty, p: Ty) -> bool {
 }
 /// Does a value of type `t` hold a trait object (what it holds is not seen in its type)?
 pub(super) fn holds_dyn(t: Ty, depth: usize) -> bool {
-    match t.kind().rigid() {
+    match t.kind_of().rigid() {
         _ if depth > 6 => true,
         Some(RigidTy::Dynamic(..)) => true,
         Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => holds_dyn(*i, depth + 1),
@@ -534,7 +547,7 @@ pub(super) fn holds_dyn(t: Ty, depth: usize) -> bool {
 /// Is the callee one of `MOVES`, or of `MOVES_OF` for a container?
 pub(super) fn moves_only(body: &Body, func: &Operand) -> bool {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, args))) =
-        func.ty(body.locals()).ok().map(|t| t.kind())
+        func.ty(body.locals()).ok().map(|t| t.kind_of())
     else {
         return false;
     };
@@ -549,7 +562,7 @@ pub(super) fn moves_only(body: &Body, func: &Operand) -> bool {
     let plain = |t: &Ty| {
         bag_content(*t).is_some()
             || matches!(
-                t.kind().rigid(),
+                t.kind_of().rigid(),
                 Some(
                     RigidTy::Ref(_, _, Mutability::Mut)
                         | RigidTy::Int(_)
@@ -731,7 +744,7 @@ impl Pointees<'_> {
 
     /// What a call's result holds of the borrows it is given (`returned_pointers`).
     pub(super) fn returns_of(&self, func: &Operand) -> Option<&Returns> {
-        match func.ty(self.body.locals()).ok()?.kind() {
+        match func.ty(self.body.locals()).ok()?.kind_of() {
             TyKind::RigidTy(RigidTy::FnDef(def, _)) => self.returns.get(&def.def_id()),
             _ => None,
         }
@@ -784,14 +797,14 @@ impl Pointees<'_> {
         let t = self.body.locals()[local].ty;
         moves_only(self.body, func)
             && (self.bags.closed.contains(&t)
-                || matches!(t.kind().rigid(),
+                || matches!(t.kind_of().rigid(),
                     Some(RigidTy::Ref(_, i, _)) if self.bags.closed.contains(i)))
     }
 
     /// Is `local` a box of pointers whose contents are followed?
     pub(super) fn boxed(&self, local: Local) -> bool {
         self.bag(local).is_some()
-            && matches!(self.body.locals()[local].ty.kind().rigid(),
+            && matches!(self.body.locals()[local].ty.kind_of().rigid(),
                 Some(RigidTy::Adt(def, _)) if def.name().rsplit("::").next() == Some("Box"))
     }
 
@@ -802,7 +815,7 @@ impl Pointees<'_> {
             return (false, false);
         };
         let closed = |c: Option<Ty>| c.is_some_and(|c| self.bags.closed.contains(&c));
-        match t.kind().rigid() {
+        match t.kind_of().rigid() {
             _ if closed(Some(t)) || closed(bag_content(t)) => (true, false),
             Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) if closed(bag_content(*i)) => {
                 (false, true)
@@ -827,12 +840,12 @@ impl Pointees<'_> {
                 self.lost.set(true);
                 continue;
             };
-            let held = match t.kind().rigid() {
+            let held = match t.kind_of().rigid() {
                 Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => bag_content(*i),
                 _ => None,
             };
             let slot = held.is_some_and(
-                |c| matches!(q.kind().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == c),
+                |c| matches!(q.kind_of().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == c),
             );
             if t == q {
                 out.extend(self.targets(p.local, &path_of_place(p), depth + 1));
@@ -868,9 +881,9 @@ impl Pointees<'_> {
                 }
             } else if mentions(t, q, 0)
                 || (matches!(
-                    t.kind().rigid(),
+                    t.kind_of().rigid(),
                     Some(RigidTy::Ref(_, _, Mutability::Mut) | RigidTy::RawPtr(_, Mutability::Mut))
-                ) && !matches!(q.kind().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == t))
+                ) && !matches!(q.kind_of().rigid(), Some(RigidTy::Ref(_, j, _)) if *j == t))
             {
                 // (another argument of that type in it, or a borrow it may hand out a borrow
                 // into, `Option<&mut T>::from(&mut Option<T>)`; not the pointer stored where a
@@ -937,7 +950,7 @@ impl Pointees<'_> {
         for (_, args) in &self.bags.moves {
             let lends = args.iter().any(|a| match a {
                 Operand::Copy(p) | Operand::Move(p) if is_mut_ptr(self.body, p) => {
-                    matches!(p.ty(self.body.locals()).ok().map(|t| t.kind()),
+                    matches!(p.ty(self.body.locals()).ok().map(|t| t.kind_of()),
                         Some(TyKind::RigidTy(RigidTy::Ref(_, i, _))) if bag_content(i) == Some(q))
                         && self
                             .targets(p.local, &path_of_place(p), depth + 1)
@@ -971,7 +984,7 @@ pub(super) fn mentions(t: Ty, q: Ty, depth: usize) -> bool {
     if t == q {
         return true;
     }
-    match t.kind().rigid() {
+    match t.kind_of().rigid() {
         _ if depth > 6 => true,
         Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => mentions(*i, q, depth + 1),
         Some(RigidTy::Array(e, _) | RigidTy::Slice(e)) => mentions(*e, q, depth + 1),
@@ -1303,8 +1316,8 @@ pub(super) fn borrows_part(body: &Body, func: &Operand, args: &[Operand]) -> boo
         .first()
         .and_then(|a| a.ty(body.locals()).ok())
         .is_some_and(|t| {
-            let inner = match t.kind().rigid() {
-                Some(RigidTy::Ref(_, i, _)) => i.kind(),
+            let inner = match t.kind_of().rigid() {
+                Some(RigidTy::Ref(_, i, _)) => i.kind_of(),
                 _ => return false,
             };
             match inner.rigid() {
@@ -1315,7 +1328,7 @@ pub(super) fn borrows_part(body: &Body, func: &Operand, args: &[Operand]) -> boo
         });
     // `&mut buf[..]` indexes with `RangeFull`: all of it
     let full = args.get(1).and_then(|a| a.ty(body.locals()).ok()).is_some_and(|t| {
-        matches!(t.kind().rigid(), Some(RigidTy::Adt(d, _)) if d.name().ends_with("RangeFull"))
+        matches!(t.kind_of().rigid(), Some(RigidTy::Adt(d, _)) if d.name().ends_with("RangeFull"))
     });
     elementwise && of_sequence && !full
 }
@@ -1323,13 +1336,13 @@ pub(super) fn borrows_part(body: &Body, func: &Operand, args: &[Operand]) -> boo
 /// its argument (`fn slot(&mut self) -> &mut &Digest { &mut self.alg }`): a part of it, not the
 /// whole, when what it points to is of another type than the argument's?
 pub(super) fn borrows_inside(body: &Body, func: &Operand, args: &[Operand], result: Local) -> bool {
-    let std = match func.ty(body.locals()).ok().map(|t| t.kind()) {
+    let std = match func.ty(body.locals()).ok().map(|t| t.kind_of()) {
         Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) => {
             matches!(def.krate().name.as_str(), "core" | "std" | "alloc")
         }
         _ => true,
     };
-    let pointee = |t: Ty| match t.kind().rigid() {
+    let pointee = |t: Ty| match t.kind_of().rigid() {
         Some(RigidTy::Ref(_, i, _) | RigidTy::RawPtr(i, _)) => Some(*i),
         _ => None,
     };
@@ -1425,7 +1438,7 @@ pub(super) fn returned_pointers_in(tcx: TyCtxt<'_>, body: &Body) -> Option<Retur
     let ret = rustc_public::mir::RETURN_LOCAL;
     if !holds_mut_borrow(tcx, rustc_internal::internal(tcx, locals[ret].ty), 0)
         || matches!(
-            locals[ret].ty.kind().rigid(),
+            locals[ret].ty.kind_of().rigid(),
             Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
         )
     {
@@ -1508,7 +1521,7 @@ pub(super) fn returned_pointers_in(tcx: TyCtxt<'_>, body: &Body) -> Option<Retur
                     let t = op.ty(locals).ok()?;
                     let mut at = prefix.clone();
                     at.push(Step::Field(i));
-                    match (op, t.kind().rigid()) {
+                    match (op, t.kind_of().rigid()) {
                         (
                             Operand::Copy(q) | Operand::Move(q),
                             Some(
@@ -1556,7 +1569,7 @@ pub(super) fn callee_returns(
             continue;
         };
         let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-            func.ty(body.locals()).ok().map(|t| t.kind())
+            func.ty(body.locals()).ok().map(|t| t.kind_of())
         else {
             continue;
         };
@@ -1582,7 +1595,7 @@ pub(super) fn callee_returns(
 /// argument 1).
 pub(super) fn returned_part(caller: &Body, func: &Operand) -> Option<(usize, Path)> {
     let Some(TyKind::RigidTy(RigidTy::FnDef(def, _))) =
-        func.ty(caller.locals()).ok().map(|t| t.kind())
+        func.ty(caller.locals()).ok().map(|t| t.kind_of())
     else {
         return None;
     };
@@ -1680,7 +1693,7 @@ pub(super) fn is_ptr(body: &Body, p: &Place) -> bool {
     matches!(
         p.ty(body.locals())
             .ok()
-            .and_then(|t| t.kind().rigid().cloned()),
+            .and_then(|t| t.kind_of().rigid().cloned()),
         Some(RigidTy::Ref(..) | RigidTy::RawPtr(..))
     )
 }
@@ -1691,7 +1704,7 @@ pub(super) fn is_mut_ptr(body: &Body, p: &Place) -> bool {
     let kind = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         p.ty(body.locals())
             .ok()
-            .and_then(|t| t.kind().rigid().cloned())
+            .and_then(|t| t.kind_of().rigid().cloned())
     }))
     .unwrap_or_else(|e| {
         if !crate::async_closure(&e) {
@@ -1786,7 +1799,7 @@ pub(super) fn holds_borrow(body: &Body, dest: &Place) -> bool {
         if depth > 3 {
             return false;
         }
-        match t.kind().rigid() {
+        match t.kind_of().rigid() {
             Some(RigidTy::Ref(..)) => true,
             Some(RigidTy::Tuple(ts)) => ts.iter().any(|t| borrows(t, depth + 1)),
             Some(RigidTy::Adt(_, args)) => args.0.iter().any(|a| match a {
@@ -1797,5 +1810,15 @@ pub(super) fn holds_borrow(body: &Body, dest: &Place) -> bool {
             _ => false,
         }
     }
-    dest.ty(body.locals()).is_ok_and(|t| borrows(&t, 0))
+    // (a type `rustc_public` cannot convert, an `async` closure's or one holding it: not
+    // followed, as `is_mut_ptr`; any other panic is raised again)
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        dest.ty(body.locals()).is_ok_and(|t| borrows(&t, 0))
+    }))
+    .unwrap_or_else(|e| {
+        if !crate::async_closure(&e) {
+            std::panic::resume_unwind(e)
+        }
+        false
+    })
 }

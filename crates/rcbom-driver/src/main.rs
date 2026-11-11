@@ -22,7 +22,7 @@
 //!                      `key=a,b` per line: `fills`, the random fills that write a whole buffer
 //!                      (`fill_bytes`, `getrandom`); `generators`, how random generators' type
 //!                      names end (`Rng`)
-//!   RCBOM_MAX_INSTANCES  reachability walk limit (default 200000)
+//!   RCBOM_MAX_INSTANCES  reachability walk limit (default 2000000)
 //!   RCBOM_SYSROOT      sysroot of the pinned toolchain (else asked from the wrapped rustc)
 //!   RCBOM_DEBUG        if set, print each panic the analysis catches (message and location),
 //!                      and each site dropped for having no source position
@@ -240,6 +240,8 @@ pub(crate) struct Cx<'tcx> {
     /// The crates read from the toolchain's sysroot: the standard library and what it is built
     /// from (`std_crate`).
     sysroot_crates: std::cell::OnceCell<std::rc::Rc<HashSet<rustc_span::def_id::CrateNum>>>,
+    /// What the build's crates define for the linker (`Cx::linked`).
+    linked: std::cell::OnceCell<cx::Linked>,
     /// The program's own crates (workspace members, path dependencies), by crate number and
     /// stable id: never the crates the knowledge base describes, whatever their names (a member
     /// called `signature`).
@@ -267,6 +269,7 @@ fn analyze(tcx: TyCtxt<'_>) {
         crate_roots: Default::default(),
         by_stable_id: Default::default(),
         sysroot_crates: Default::default(),
+        linked: Default::default(),
         local,
         local_ids,
         interesting_statics: HashMap::new(),
@@ -513,6 +516,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 Err(_) => w.cx.errors += 1,
             }
         }
+        w.cx.links.coercion_types = std::mem::take(&mut w.coercion_types).into_iter().collect();
         let coercions = std::mem::take(&mut w.coercions);
         w.cx.links.coercions = coercions
             .into_iter()
@@ -545,6 +549,7 @@ fn analyze(tcx: TyCtxt<'_>) {
 
     let mut crate_links = std::mem::take(&mut cx.links);
     links::instance_links(&cx, &mut crate_links);
+    crate_links.closed_calls = closed_calls(tcx);
     if catch_unwind(AssertUnwindSafe(|| {
         links::mutable_statics(&cx, &mut crate_links)
     }))
@@ -782,6 +787,8 @@ struct Walker<'a, 'tcx> {
     /// Types coerced to trait objects in the walked code: first position seen (in a static's
     /// value or not), and the body each method of the object runs for the type.
     coercions: BTreeMap<(String, String), CoercedAt>,
+    /// The struct and enum types among them, by the name the coercions give them.
+    coercion_types: BTreeMap<String, rcbom_facts::TyTree>,
     /// The trait objects (`dyn_key`) some walked code may call: called through one, handed by
     /// the program's code to code it does not walk, in a root's signature or a result.
     dyn_used: HashSet<String>,
@@ -849,7 +856,12 @@ struct Anchor {
 
 /// A type coerced to a trait object: the trait's path, the type's, and for each trait method
 /// the body the type's vtable holds (`origins::body_name`).
-type Coerced = (String, String, Vec<(String, String, String)>);
+type Coerced = (
+    String,
+    String,
+    Vec<(String, String, String)>,
+    Option<rcbom_facts::TyTree>,
+);
 
 /// Where a type was first seen coerced (in a static's value or not), and the bodies its
 /// methods run.

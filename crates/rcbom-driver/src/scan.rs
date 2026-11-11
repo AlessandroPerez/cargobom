@@ -112,7 +112,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         let Ok(ty) = func.ty(self.body.locals()) else {
             return;
         };
-        let kind = ty.kind();
+        let kind = ty.kind_of();
         let Some(RigidTy::FnDef(def, args)) = kind.rigid() else {
             return;
         };
@@ -438,7 +438,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     /// recorded where it is named (`Call::value`).
     pub(super) fn function_value(&mut self, op: &Operand) {
         if let Operand::Constant(c) = op
-            && let Some(RigidTy::FnDef(def, args)) = c.const_.ty().kind().rigid()
+            && let Some(RigidTy::FnDef(def, args)) = c.const_.ty().kind_of().rigid()
             && self.interesting(def, args)
         {
             self.record_call(def, args, c.span, None);
@@ -518,7 +518,7 @@ pub(super) fn call_id(
     let named = match func
         .ty(body.locals())
         .ok()
-        .and_then(|t| t.kind().rigid().cloned())
+        .and_then(|t| t.kind_of().rigid().cloned())
     {
         Some(RigidTy::FnDef(def, _)) => path_of(tcx, rustc_internal::internal(tcx, def.def_id())),
         _ => String::new(),
@@ -843,7 +843,7 @@ pub(super) fn dyn_fn_call(
     args: &rustc_public::ty::GenericArgs,
 ) -> bool {
     fn dynamic(t: &Ty, depth: usize) -> bool {
-        match t.kind().rigid() {
+        match t.kind_of().rigid() {
             Some(RigidTy::Dynamic(..)) => true,
             Some(RigidTy::Ref(_, t, _)) if depth < 4 => dynamic(t, depth + 1),
             Some(RigidTy::Adt(adt, a)) if depth < 4 && adt.is_box() => match a.0.first() {
@@ -896,7 +896,7 @@ impl Scanner<'_, '_> {
                 self.boundary_edge(func, term);
             }
             if let Ok(ty) = func.ty(self.body.locals())
-                && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
+                && let Some(RigidTy::FnDef(def, args)) = ty.kind_of().rigid()
                 && self.interesting(def, args)
             {
                 match func {
@@ -928,7 +928,7 @@ impl Scanner<'_, '_> {
                 // a call through a pointer to a KB function reified here (`h(&SHA256, d)`)
                 self.record_through(&def, &args, named, call_args, term);
             } else if let Ok(ty) = func.ty(self.body.locals())
-                && matches!(ty.kind().rigid(), Some(RigidTy::FnPtr(..)))
+                && matches!(ty.kind_of().rigid(), Some(RigidTy::FnPtr(..)))
             {
                 // a pointer whose function is named elsewhere (`(h.f)(..)`, a parameter, a
                 // returned pointer): where it comes from, for the analysis to follow to the
@@ -941,7 +941,7 @@ impl Scanner<'_, '_> {
                 let sig = links::pointer_sig(tcx, rustc_internal::internal(tcx, ty)).map(|s| s.1);
                 self.push_pointer(origin, const_args, arg_origins, arg_lens, sig, term);
             } else if let Ok(ty) = func.ty(self.body.locals())
-                && let Some(RigidTy::FnDef(def, args)) = ty.kind().rigid()
+                && let Some(RigidTy::FnDef(def, args)) = ty.kind_of().rigid()
                 && dyn_fn_call(self.cx.tcx, def, args)
                 && let [recv, tuple] = call_args.as_slice()
             {
@@ -955,7 +955,7 @@ impl Scanner<'_, '_> {
                         let n = match tuple
                             .ty(self.body.locals())
                             .ok()
-                            .and_then(|t| t.kind().rigid().cloned())
+                            .and_then(|t| t.kind_of().rigid().cloned())
                         {
                             Some(RigidTy::Tuple(ts)) => ts.len(),
                             _ => 0,
@@ -1044,4 +1044,92 @@ impl Scanner<'_, '_> {
         }
         self.super_const_operand(c, loc);
     }
+}
+
+/// The calls and namings, anywhere in the crate's code (function bodies, closures, the values
+/// of constants and statics, promoted constants), of its generic functions that no other
+/// crate can name, each with the types it gives the function's type parameters
+/// (`Links::closed_calls`). Every instance of such a function is made by one of them, so a
+/// parameter all of them give one type has that type (rustic_core's private
+/// `apply_with_rng(.., rng: &mut impl Rng)`, only ever handed `rand::rng()`). None when a
+/// body of the crate cannot be read: the list would not be all.
+pub(crate) fn closed_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedCall> {
+    use rustc_hir::def::DefKind;
+    use rustc_middle::mir::visit::Visitor;
+    use rustc_middle::ty::TypeVisitableExt;
+    use rustc_middle::{mir, ty};
+    struct V<'tcx> {
+        tcx: TyCtxt<'tcx>,
+        out: Vec<rcbom_facts::ClosedCall>,
+    }
+    impl<'tcx> Visitor<'tcx> for V<'tcx> {
+        fn visit_const_operand(&mut self, c: &mir::ConstOperand<'tcx>, _: mir::Location) {
+            let ty::FnDef(did, gargs) = *c.const_.ty().kind() else {
+                return;
+            };
+            let gargs = gargs.skip_binder();
+            let tcx = self.tcx;
+            let Some(local) = did.as_local() else {
+                return;
+            };
+            let generics = tcx.generics_of(did);
+            if !generics.requires_monomorphization(tcx)
+                || tcx.effective_visibilities(()).is_exported(local)
+            {
+                return;
+            }
+            let mut args = Vec::new();
+            for i in 0..generics.count() {
+                let p = generics.param_at(i, tcx);
+                if !matches!(p.kind, ty::GenericParamDefKind::Type { .. }) {
+                    continue;
+                }
+                let Some(t) = gargs.get(i).and_then(|a| a.as_type()) else {
+                    return;
+                };
+                let tree = (!t.has_non_region_param())
+                    .then(|| ty_tree(tcx, &rustc_internal::stable(t), 0));
+                args.push((p.name.to_string(), tree));
+            }
+            let call = rcbom_facts::ClosedCall {
+                callee: path_of(tcx, did),
+                args,
+            };
+            if !call.args.is_empty() && !self.out.contains(&call) {
+                self.out.push(call);
+            }
+        }
+    }
+    let mut v = V {
+        tcx,
+        out: Vec::new(),
+    };
+    for l in tcx.mir_keys(()) {
+        let did = l.to_def_id();
+        let read = catch_unwind(AssertUnwindSafe(|| {
+            // (a constant's or a static's value is evaluated, by the compiler's own test of
+            // which bodies are; any other is compiled: a function's, a closure's, the by-move
+            // body made for an `async` closure. A constructor has no body written)
+            if matches!(tcx.def_kind(did), DefKind::Ctor(..)) {
+                return;
+            }
+            match tcx.hir_body_const_context(*l) {
+                Some(
+                    rustc_hir::ConstContext::Const { .. } | rustc_hir::ConstContext::Static(_),
+                ) => v.visit_body(tcx.mir_for_ctfe(did)),
+                _ => {
+                    if tcx.is_mir_available(did) {
+                        v.visit_body(tcx.optimized_mir(did))
+                    }
+                }
+            }
+            for p in tcx.promoted_mir(did).iter() {
+                v.visit_body(p);
+            }
+        }));
+        if read.is_err() {
+            return Vec::new();
+        }
+    }
+    v.out
 }
