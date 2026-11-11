@@ -83,6 +83,7 @@ cargo cbom
 
 ```
 rustup toolchain install nightly-2026-09-25 --component rustc-dev,llvm-tools,rust-src,clippy,rustfmt
+rustup target add x86_64-unknown-linux-musl --toolchain nightly-2026-09-25   # for one test fixture
 (cd crates/rcbom-driver && cargo build)      # the compiler driver, pinned nightly
 cargo build                                    # the CLI and libraries, stable
 ```
@@ -94,6 +95,10 @@ cd <cargo project>
 <repo>/target/debug/cargo-cbom cbom -o cbom.json            # Layers 1 and 2
 <repo>/target/debug/cargo-cbom cbom --manifest-only -o ...  # Layer 1 only, nothing compiled
 <repo>/target/debug/cargo-cbom cbom --features f1,f2 ...    # the artifact other features build
+<repo>/target/debug/cargo-cbom cbom --no-default-features ...  # (or --all-features), as with cargo
+<repo>/target/debug/cargo-cbom cbom -p member ...           # one workspace member and what it
+                                                    # depends on, not the whole workspace
+<repo>/target/debug/cargo-cbom cbom --target <triple> ...   # the artifact for another platform
 <repo>/target/debug/cargo-cbom cbom verify cbom.json --self-test
 <repo>/target/debug/cargo-cbom cbom --boundary-list calls.tsv ...  # every call into a crypto
                                                     # package and how the boundary check
@@ -104,8 +109,13 @@ RCBOM_DEBUG=1 <repo>/target/debug/cargo-cbom cbom -o ...    # also print the dri
 In the repository, `cargo xtask summary <path>/cbom.json` prints a CBOM as one sorted line per fact
 (the form of the golden files).
 
-The CBOM describes the built artifact: the host target, the selected features and the
-`release` profile (`--profile` to change it). Tests and build scripts are not in it.
+The CBOM describes one built artifact: a target (the host's unless `--target` names another), a
+feature set, the workspace's members or those `-p` selects, and the `release` profile
+(`--profile` to change it). Tests and build scripts are not in it. Another target, feature set
+or member is another artifact: another run, another CBOM. `--target` needs that platform's
+standard library for the pinned toolchain (`rustup target add <triple> --toolchain
+nightly-2026-09-25`), a C compiler for it where a dependency's build script compiles C, and,
+for `--check-walk`, a linker.
 
 Layer 2 compiles the project, so build scripts and procedural macros run. Run it on code you
 trust, or inside a container.
@@ -154,19 +164,21 @@ independent reviewer of the whole project, then used for the fixes its review fo
 RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows below are after
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
-the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. The same
-day the tool was run on fifteen crates.io packages it had never been run on (Unseen packages,
-below): what that found is fixed in this build, and changed no labelled site's verdict.
+the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
+then the tool was run on sixty-seven crates.io packages it had never been run on, in three
+batches (Unseen packages, below): what those runs found is fixed in this build, and changed
+one labelled site's verdict (rustic_core's private `apply_with_rng`, an honest unknown, is
+correct).
 
 | set | what | result |
 |---|---|---|
 | ground-truth suite | 53 programs, 107 call sites | 107 correct, 0 wrong, 0 miss |
 | corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 28 live sites: 18 correct, 10 honest-unknown, 0 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
-| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 69 correct, 2 less-specific, 14 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
+| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 70 correct, 2 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (328 outputs, the suite's included): 20,527 positions verified, 4 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,868, held-out 1,361 and review 797 verified, with 12 and 6 more within a range in the last two; every one of 99,180 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,425 calls (3,522 cited, 13 cited by the check by name, 16 cited by the check as unknown, 7,874 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| evidence | every cited position, `verify --self-test` | fixtures (340 outputs, the suite's included): 20,817 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,358 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 100,889 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,541 calls (3,612 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
@@ -184,9 +196,8 @@ Where it is not exact, the CBOM says so instead of guessing:
   second review and restored after the third (the label file's header says why); the CBOM keeps
   the HMAC candidates there with a note that validation is disabled on a way to the call.
 - **Honest unknowns.** Each is reported as an operation of unknown algorithm, with the package
-  and the reason. In the held-out set (14): what a library's callers choose (ssh-key's draws
-  from its callers' `rng: &mut impl CryptoRngCore`, five; rustic_core's private generic
-  `apply_with_rng`, which only the library calls), a key made before its scheme is chosen
+  and the reason. In the held-out set (13): what a library's callers choose (ssh-key's draws
+  from its callers' `rng: &mut impl CryptoRngCore`, five), a key made before its scheme is chosen
   (ssh-key's `SecretKey::random` on three curves), and calls into crypto packages the
   knowledge base does not model: ssh-cipher's `encrypt` and `decrypt`, whose cipher is a
   run-time value, aes256ctr_poly1305aes, and sha-crypt's `verify_password`, whose algorithm is
@@ -197,26 +208,61 @@ Where it is not exact, the CBOM says so instead of guessing:
   type parameter of its generic `SshSig::sign` (a signature), and rbw's `parse` of an ssh-key
   public key, which the standard library runs; and four by name, the `Uuid::new_v4` draws.
 
-**Unseen packages.** On 10 November the tool was run on fifteen crates.io packages it had never
-been run on, as published: rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
-nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
-branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
-(a sixteenth, jwt-simple, needs cmake to build here). They have no labels: what a run shows is
-whether it completes, whether the verifier confirms every position and rejects every shifted
-one, whether the walk check finds a gap and the boundary check leaves a call out. The first run
-did not pass. The verifier rejected correct positions in four of them (10 in rsign2, 10 in
-miniserve, 12 in jwt-compact, 86 in pgp: a function type's `->` inside generic arguments, a
-type's default arguments, an associated type, a second chain of instantiations); the walk
-check reported 38 gaps on miniserve that were none (the two builds order a trait object's
-bindings differently); calls made inside the standard library's hash table were missing from
-the boundary check; and on pgp the analysis ran out of 15 GB of memory. Each is fixed in this
-build, where all fifteen complete (pgp's 138 crates in 91 s): 2,512 positions verified and 5
-within a range, none mismatched; 21,558 of 21,565 shifted positions rejected, the seven accepted
-all in pgp (Limitations, the verifier); no walk gap; 1,735 calls into crypto packages, 793
-cited, 7 cited by the check by name, 20 as unknown, 915 excused. What stays unknown in them is
-what the knowledge base does not model (minisign under rsign2, bcrypt, the ciphers and modes
-pgp uses beyond AES-GCM) and miniserve's `Box<dyn DynDigest>`. These packages are development
-material from now on (`in-too-deep.md` 8 says what such a run can and cannot show).
+**Unseen packages.** The tool is also run on crates.io packages it has never been run on, as
+published. They have no labels: what a run shows is whether it completes, whether the verifier
+confirms every position and rejects every shifted one, whether the walk check finds a gap and
+the boundary check leaves a call out. A batch passes when every package does on its first run.
+None of the three batches so far did; each finding is fixed in this build and has a fixture,
+and the packages are development material from then on (`in-too-deep.md` 8 says what such a
+run can and cannot show).
+- *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
+  nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
+  branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
+  (a sixteenth, jwt-simple, needs cmake to build here). The verifier rejected correct
+  positions in four of them (10 in rsign2, 10 in miniserve, 12 in jwt-compact, 86 in pgp: a
+  function type's `->` inside generic arguments, a type's default arguments, an associated
+  type, a second chain of instantiations); the walk check reported 38 gaps on miniserve that
+  were none (the two builds order a trait object's bindings differently); calls made inside
+  the standard library's hash table were missing from the boundary check; and on pgp the
+  analysis ran out of 15 GB of memory.
+- *Thirty-two, 10 November:* vodozemac 0.11.2, snow 0.10.0, hpke 0.15.1, postgres-protocol
+  0.6.12, aws-sigv4 1.6.5, oauth2 5.0.0, tungstenite 0.30.0, zip 9.5.0, keepass 0.17.0,
+  magic-wormhole 0.8.1, bitwarden-crypto 4.0.0, pasetors 0.8.1, age 0.12.1, russh 0.65.1,
+  cosmwasm-crypto 2.2.11, tiny-bip39 2.0.0, opaque-ke 4.0.1, dryoc 2.0.0, crypto_box 0.9.1,
+  pueue 4.0.4, static-web-server 2.44.1, mdbook 0.5.4, oha 1.16.0, tealdeer 1.9.1, cargo-deny
+  0.20.2, shadowsocks-rust 1.25.0, sccache 0.19.0, atuin 18.24.6, sqlx-cli 0.9.0 and rustic-rs
+  0.11.4 (josekit and rathole do not build here: their locked openssl-sys rejects this
+  machine's OpenSSL). Fifteen of the thirty passed. In the others the verifier rejected
+  correct positions (1 to 149 a package: names the source writes through aliases, renamed
+  traits and re-exports, const arguments, attribute macros, chains of same-named calls), and
+  accepted shifted ones where two calls are textually alike; the generator reported a cipher
+  bare beside the mode it was instantiated into, merged two instances at one generic line, and
+  lost a merged occurrence's calls to the boundary check; the walk missed a library's
+  `#[global_allocator]` and functions called through `extern` declarations, and stopped at
+  200,000 instances on atuin and rustic-rs; the driver panicked on a const-generic projection
+  (heapless); and a pre-release (rsa 0.10.0-rc.18) was outside its knowledge-base entry.
+- *Twenty, 11 November:* mail-auth 0.15.1, rusty_paseto 0.10.1, openidconnect 4.1.0,
+  yup-oauth2 12.1.2, instant-acme 0.8.5, x509-parser 0.18.1 (`verify`), libp2p-identity 0.3.1
+  (its four key features), quinn-proto 0.11.19, hickory-proto 0.26.3 (`dnssec-ring`),
+  axum-extra 0.12.6 (`cookie-private`), tower-sessions 0.15.0, schnorrkel 0.11.5, frost-ed25519
+  3.0.0, bip39 3.0.0, kbs2 0.7.3, git-cliff 2.14.2, cargo-audit 0.23.0, websocat 1.14.1,
+  rustypaste 0.18.2 and jj-cli 0.47.1. Fourteen passed. The verifier rejected correct
+  positions in five (7 in mail-auth, 4 in openidconnect, 4 in bip39, 3 in rustypaste, 47 in
+  jj-cli: an impl written in another module than its type, an index operator, an attribute
+  macro's closure, a derive macro's calls cited at its type's fields, a generator type handed
+  to a generic function of another crate); jj-cli had 16 functions linked and not walked, the
+  methods of trait objects of types that hold an `async` closure; websocat builds here only
+  without its default features (OpenSSL), and passes so.
+
+On this build the first fifteen complete with 2,950 positions verified, 5 within a range and
+none mismatched; all 25,774 shifted positions are rejected (three more land on a call of the
+same instance, as true); no walk gap; 1,735 calls into crypto packages: 800 cited, 7 cited by
+the check by name, 19 as unknown, 909 excused. What stays unknown in them is what the
+knowledge base does not model (minisign under rsign2, bcrypt, the ciphers and modes pgp uses
+beyond AES-GCM); pgp's and miniserve's `Box<dyn DynDigest>` hashers are named now, one member
+for each hash the build boxes. The packages of the two later batches were re-run one by one
+as their findings were fixed; their figures on this build as a whole follow the next full
+re-run.
 
 ## Limitations
 
@@ -224,8 +270,9 @@ What the CBOM covers, what it reports differently from a reading of the labellin
 what it does not do yet. A reviewer meeting one of these meets a known limit, not a new finding.
 
 **Scope, by decision**
-- The built artifact only: one target, one feature set, the `release` profile. Tests, build
-  scripts, examples, and code that other features or targets would compile are not covered.
+- One built artifact per run: one target, one feature set, the members selected, the `release`
+  profile (each a flag: Use). Tests, build scripts, examples, and code that other features or
+  targets would compile are not in that artifact's CBOM.
 - Hand-rolled algorithms, unsafe code, certificates loaded at run time, and security
   configuration (which TLS suites a configuration allows) are out of scope. minisign's own
   Ed25519, BLAKE2b and SHA-512 are such code: its labels hold only its random draws and scrypt.
@@ -236,7 +283,8 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   ed25519-dalek 3, x25519-dalek 3, ecdsa 0.17 and the curve crates 0.14), each crate of a
   build matched by its own version; rsa 0.9 to 0.10, ml-kem 0.2 to 0.3; ring 0.17,
   aws-lc-rs 1, rustls 0.23, jsonwebtoken 9 to 11, rand 0.8 to 0.10, md5 0.7 to 0.8,
-  siphasher 0.3 to 1. Other versions and unmodelled crypto packages are reported, with their
+  siphasher 0.3 to 1. A pre-release counts as the release it leads to (rsa 0.10.0-rc.18 is
+  rsa 0.10). Other versions and unmodelled crypto packages are reported, with their
   operations as unknown and the reason.
 - Layers 3 to 5 (purpose, vulnerabilities, policy) are designed, not built: no occurrence says
   whether it protects anything (`rcbom:usage` is a package's usage tier, from the walk).
@@ -251,10 +299,17 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   `io::Write`), what the knowledge base lists as no operation (`[[aside]]`: views, copies,
   wipes, accessors, an error type's constructors and conversions), and calls into relays:
   tokio-rustls, hyper-rustls and actix-tls wrap rustls, whose operations are cited in rustls;
+  tokio-native-tls and hyper-tls wrap native-tls, whose calls are the unknowns (the platform's
+  TLS library runs behind them);
   rustls-pki-types, rustls-pemfile and rustls-native-certs are PKI types, parsers and loaders. Calls between crypto packages are their internals. Where such
   a package's own code calls modelled crates, those calls are cited inside it (rage's call into
   age is an unknown at rage's line, and age's ChaCha20-Poly1305 is cited in age). Inside
   algorithm crates nothing is cited: their internals are folded into the call into them.
+- A block cipher chosen as the type argument of a generic function is cited for the algorithm
+  the instance runs it as: `cbc_encrypt::<aes::Aes128Enc>(..)` over a body that builds a
+  `cbc::Encryptor<C>` is an instantiation of AES-128-CBC, and no AES-128 is reported for it.
+  Where the function uses the cipher as it is, or nothing the knowledge base names, the
+  instantiation stays the cipher's.
 - A call on a type of a crypto package that the knowledge base does not name is an operation
   of unknown algorithm naming that type, also when the type holds one it names: `Cmac<Aes128>`
   is a MAC it cannot name, not an AES-128 block cipher, and the `SigningKey<Sha256>` of an rsa
@@ -318,10 +373,12 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   doubt and was not part of the evaluation.
 - *Generic library code.* In a library, a generic function's type parameters belong to its
   callers: an operation on one is unknown, or named only as far as the library fixes it
-  (`HMAC` of a caller's hash). This holds also where only the library's own code chooses the
-  type: a private generic function reached through the library's generic API (rustic_core's
-  `apply_with_rng(.., rng)`, only ever called with `rand::rng()`), or a type parameter a
-  where-clause closes over the library's own impls (jwt's `Hmac<D>`, signed for three hashes).
+  (`HMAC` of a caller's hash). A function only its own crate can name is the exception: where
+  each call the crate makes gives a parameter a type that is no parameter of the caller's,
+  an operation on it is that type's, a member per type where the calls give several
+  (rustic_core's private `apply_with_rng(.., rng)`, only ever handed `rand::rng()`, is the
+  thread generator's). Still the callers': a type parameter a where-clause closes over the
+  library's own impls (jwt's `Hmac<D>`, signed for three hashes).
 - *Provenance.* Key material is classified for the arguments the knowledge base gives a role;
   a generator handed to an API without an `rng` role is not classified, and gets no
   `predictable-rng` finding. A parameter's provenance includes what the program's callers pass
@@ -339,9 +396,13 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   is `computed (load_key)`).
 - *Positions.* A call is cited where its path starts (`Sha256::digest` at `S`); a path split
   over lines is cited at its first line, where R1 (the callee's line) puts the label one lower.
-- *Needless unknowns.* A set the code closes but the analysis does not follow is an unknown:
-  a `Box<dyn DynDigest>` built from three constructors just above, a closure called through a
-  `Box<dyn Fn>` (one called directly, or handed to `map`, `and_then`, is followed).
+- *Trait objects.* A call on a trait object of a crypto trait (`hasher.update(..)` on a
+  `Box<dyn DynDigest>`) is one of the types the build makes such an object of, anywhere the
+  walk reaches: each the knowledge base names is a member (`member: dyn`, with its coercion),
+  and an unknown stands beside them where one is not named. The set is of the build, not of
+  the call: two functions each boxing other hashes share it. A closure called through a
+  `dyn Fn` object gets the arguments of the calls made through such objects, beside an
+  unknown: where else the object may be called from is not followed.
 - *Names and parameters.* ring's and aws-lc-rs's PBKDF2 is named without its iteration count and
   output length; BLAKE3 is `BLAKE3-256` for `hash` and `keyed_hash`, `BLAKE3` for key derivation
   and XOF output. A library's generic API that sibling binaries instantiate gets no "callers
@@ -358,10 +419,11 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   registry name outside boundary models; and it cannot see an operation the CBOM leaves out
   (`in-too-deep.md` 8). An instantiation detail is held to the call's type arguments where the
   text gives them; of several calls of one generic function by the same text it is verified
-  within that range, a second instance's chain in an occurrence two instances share is not
-  held to the first's arguments, and a method call is not told from another call of that
-  method on the same variable of another crate's type (the seven shifted details it accepts
-  in pgp are of these two kinds). Three fixture positions it cannot confirm are listed in
+  within that range, and so is a method called on a receiver the code gives no type of beside
+  another such call of that method (`k.hash(state)` above `v.hash(state)`). An occurrence
+  several instances of its item reach lists each one's chain, a step naming the item it
+  instantiates where it does not follow the step before; a method call is not told from
+  another call of that method on the same variable of another crate's type. Three fixture positions it cannot confirm are listed in
   `verify-known` files, each checked by hand.
 - *Toolchain.* The driver needs its pinned nightly. Layer 2 compiles the project, so the
   project's build scripts and procedural macros run. A published package whose `Cargo.lock`
