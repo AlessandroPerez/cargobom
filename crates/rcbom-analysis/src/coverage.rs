@@ -241,6 +241,12 @@ pub(super) fn check(
         for c in &o.calls {
             cited.insert((at.0.clone(), at.1, at.2, Some(c.clone())));
         }
+        for (line, offset, calls) in &o.merged {
+            cited.insert((at.0.clone(), *line, *offset, None));
+            for c in calls {
+                cited.insert((at.0.clone(), *line, *offset, Some(c.clone())));
+            }
+        }
     }
     let mut out = Coverage::default();
     // the calls, once each (the same call in two artifacts' walks is one), with the artifacts
@@ -476,6 +482,8 @@ fn floor(
         note: None,
         generic_body: e.owner.kind == OwnerKind::Fn && is_def_hash(&e.owner.id),
         via: Vec::new(),
+        via_all: BTreeSet::new(),
+        merged: Vec::new(),
         artifacts,
         calls: e.call.iter().cloned().collect(),
     };
@@ -523,7 +531,7 @@ fn floor(
 
 /// A type as an occurrence writes it: its path with its arguments
 /// (`digest::core_api::wrapper::CoreWrapper<md5::Md5Core>`).
-fn type_text(t: &rcbom_facts::TyTree) -> String {
+pub(crate) fn type_text(t: &rcbom_facts::TyTree) -> String {
     use rcbom_facts::TyTree;
     let list = |ts: &[TyTree]| ts.iter().map(type_text).collect::<Vec<_>>().join(", ");
     match t {

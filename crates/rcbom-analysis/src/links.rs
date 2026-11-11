@@ -35,6 +35,8 @@ pub struct LinkIndex {
     /// By trait: the types coerced to a trait object of it, with where, and the body each
     /// method runs for them.
     coerced: HashMap<String, Vec<Coerced>>,
+    /// The struct and enum types among them, by the name the coercions give them.
+    coerced_types: HashMap<String, rcbom_facts::TyTree>,
     /// By body: the calls on trait objects that may run it (`Links::dyn_calls`), each caller
     /// with the arguments it passes (the receiver unknown) and the coercion it runs through.
     dyn_calls: HashMap<String, Vec<(String, Vec<Origin>, Via)>>,
@@ -283,7 +285,34 @@ type Coerced = (
 type Read = (Origin, Vec<(String, usize, Option<String>)>, String);
 
 impl LinkIndex {
-    pub fn new(facts: &[CrateFacts]) -> LinkIndex {
+    /// The types the build coerces to a trait object of `trait_path`: the name the coercion
+    /// gives each, where it is written (in a static's value or not), and for a struct or enum
+    /// the type as the knowledge base matches types.
+    pub fn coerced_to(
+        &self,
+        trait_path: &str,
+    ) -> Vec<(
+        &str,
+        Option<&rcbom_facts::Loc>,
+        bool,
+        Option<&rcbom_facts::TyTree>,
+    )> {
+        self.coerced
+            .get(trait_path)
+            .into_iter()
+            .flatten()
+            .map(|(ty, at, in_static, _)| {
+                (
+                    ty.as_str(),
+                    at.as_ref(),
+                    *in_static,
+                    self.coerced_types.get(ty),
+                )
+            })
+            .collect()
+    }
+
+    pub fn new(facts: &[CrateFacts], location: &dyn Fn(&std::path::Path) -> String) -> LinkIndex {
         let mut ix = LinkIndex::default();
         for f in facts {
             for s in &f.links.fields {
@@ -363,10 +392,26 @@ impl LinkIndex {
                     v.push(w.value.clone());
                 }
             }
+            for (ty, tree) in &f.links.coercion_types {
+                ix.coerced_types
+                    .entry(ty.clone())
+                    .or_insert_with(|| tree.clone());
+            }
             for c in &f.links.coercions {
                 let v = ix.coerced.entry(c.trait_path.clone()).or_default();
                 if !v.iter().any(|(t, ..)| *t == c.ty) {
-                    v.push((c.ty.clone(), c.at.clone(), c.in_static, c.methods.clone()));
+                    // (its file as the CBOM names files: relative to the workspace,
+                    // `<package>-<version>/..` in a dependency)
+                    let at = c.at.clone().map(|mut l| {
+                        let p = std::path::Path::new(&l.file);
+                        l.file = if p.is_relative() {
+                            location(&std::path::Path::new(&f.krate.cwd).join(p))
+                        } else {
+                            location(p)
+                        };
+                        l
+                    });
+                    v.push((c.ty.clone(), at, c.in_static, c.methods.clone()));
                 }
             }
             for s in &f.links.statics {

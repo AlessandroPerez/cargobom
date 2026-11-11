@@ -88,15 +88,30 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                             && g.kind == Kind::Component
                             && o.detail == g.detail
                     };
-                    if let Some(o) = s
-                        .occurrences
-                        .iter_mut()
-                        .find(|o| o.location == g.location && o.line == g.line && !parts(o))
-                    {
+                    // (of the same function: at one line of generic code, the `AES-128` an
+                    // instance for a CBC wrapper asks its key size of is not a less specific
+                    // view of the `AES-128-CTR` another instance asks there)
+                    let item = |o: &Occurrence| {
+                        let mut t = o.owner.as_str();
+                        while let Some(i) = t.rfind("::{closure#") {
+                            t = &t[..i];
+                        }
+                        t.to_string()
+                    };
+                    if let Some(o) = s.occurrences.iter_mut().find(|o| {
+                        o.location == g.location
+                            && o.line == g.line
+                            && !parts(o)
+                            && item(o) == item(&g)
+                    }) {
                         if o.function.is_none() {
                             o.function = g.function;
                         }
                         o.artifacts.extend(g.artifacts);
+                        // (the calls it stood for are accounted for by the one it merges into)
+                        o.merged.push((g.line, g.offset, g.calls));
+                        o.merged.extend(g.merged);
+                        o.via_all.extend(g.via_all);
                         for d in g.detail {
                             if !o.detail.contains(&d) {
                                 o.detail.push(d);
@@ -117,6 +132,73 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
             g.occurrences.retain(|o| {
                 !merged.contains(&(o.location.clone(), o.line, o.offset, o.symbol.clone()))
             });
+        }
+    }
+    assets.retain(|_, a| !a.occurrences.is_empty());
+}
+/// A block cipher chosen as a generic function's type argument is an asset of its own where the
+/// function uses it as one. Where every algorithm the instance leads to takes it as the cipher
+/// of a mode or an AEAD (pkcs5's `cbc_encrypt::<aes::Aes128Enc>`, whose body builds a
+/// `cbc::Encryptor<C>`), the choice is that algorithm's: the instantiation is cited for it, and
+/// no bare `AES-128` is reported that the build never runs. "Leads to" is what the occurrences
+/// say: those instantiated through that call. An instance that leads to the cipher itself, to
+/// an asset it is a component of, or to nothing the knowledge base names keeps its occurrence.
+pub(super) fn instantiated_in_a_mode(assets: &mut BTreeMap<String, Asset>) {
+    // (the same cipher, by family and parameter set, with a mode or as another primitive's part)
+    let in_a_mode = |a: &Algo, b: &Algo| {
+        a.material.is_none()
+            && b.material.is_none()
+            && a.mode.is_none()
+            && a.family == b.family
+            && a.parameter_set.is_some()
+            && a.parameter_set == b.parameter_set
+            && (b.mode.is_some() || b.primitive != a.primitive)
+    };
+    let mut moves: Vec<(String, Occurrence, Vec<String>)> = Vec::new();
+    for (key, a) in assets.iter() {
+        for o in a
+            .occurrences
+            .iter()
+            .filter(|o| o.kind == Kind::Instantiation)
+        {
+            let at = (o.location.clone(), o.line, o.offset);
+            let led: Vec<&Asset> = assets
+                .values()
+                .filter(|b| b.occurrences.iter().any(|x| x.via_all.contains(&at)))
+                .collect();
+            if led
+                .iter()
+                .any(|b| b.key == *key || b.components.contains(key))
+            {
+                continue;
+            }
+            let to: Vec<String> = led
+                .iter()
+                .filter(|b| in_a_mode(&a.algo, &b.algo))
+                .map(|b| b.key.clone())
+                .collect();
+            if !to.is_empty() {
+                moves.push((key.clone(), o.clone(), to));
+            }
+        }
+    }
+    for (from, occ, to) in moves {
+        let same = |o: &Occurrence| {
+            o.location == occ.location
+                && o.line == occ.line
+                && o.offset == occ.offset
+                && o.symbol == occ.symbol
+        };
+        if let Some(a) = assets.get_mut(&from) {
+            a.occurrences
+                .retain(|o| !(o.kind == Kind::Instantiation && same(o)));
+        }
+        for k in to {
+            if let Some(b) = assets.get_mut(&k)
+                && !b.occurrences.iter().any(same)
+            {
+                b.occurrences.push(occ.clone());
+            }
         }
     }
     assets.retain(|_, a| !a.occurrences.is_empty());

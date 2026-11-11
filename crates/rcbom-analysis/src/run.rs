@@ -23,7 +23,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     );
     let mut flow = {
         let t = std::time::Instant::now();
-        let ix = links::LinkIndex::new(facts);
+        let ix = links::LinkIndex::new(facts, &|p| man.location(p));
         if std::env::var_os("RCBOM_DEBUG").is_some() {
             eprintln!("analysis: link index in {:.1?}", t.elapsed());
         }
@@ -105,6 +105,33 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .iter()
             .flat_map(|f| f.implementors.iter().map(|(k, v)| (k.clone(), v.clone())))
             .collect(),
+        closed: {
+            let mut given: HashMap<(&str, &str), Vec<Option<&rcbom_facts::TyTree>>> =
+                HashMap::new();
+            for c in facts.iter().flat_map(|f| &f.links.closed_calls) {
+                for (p, t) in &c.args {
+                    given
+                        .entry((c.callee.as_str(), p.as_str()))
+                        .or_default()
+                        .push(t.as_ref());
+                }
+            }
+            given
+                .into_iter()
+                .filter_map(|((f, p), ts)| {
+                    let mut all: Vec<rcbom_facts::TyTree> = Vec::new();
+                    for t in ts {
+                        let t = t?;
+                        if !all.contains(t) {
+                            all.push(t.clone());
+                        }
+                    }
+                    // (in the order of their text: the facts' order is the build's)
+                    all.sort_by_key(coverage::type_text);
+                    (!all.is_empty()).then(|| ((f.to_string(), p.to_string()), all))
+                })
+                .collect()
+        },
         pta: {
             let mut m: HashMap<_, Vec<&rcbom_facts::PtaCall>> = HashMap::new();
             for f in facts {
@@ -356,6 +383,17 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         let mut keys: Vec<_> = ctx.calls.keys().copied().collect();
         keys.sort();
         for k in keys {
+            for b in ctx.bound(ctx.calls[&k]) {
+                let _ = site_matches(
+                    &ctx,
+                    &b.0,
+                    None,
+                    &closure,
+                    &edges,
+                    &reached_data,
+                    &reached_path,
+                );
+            }
             let _ = site_matches(
                 &ctx,
                 ctx.calls[&k],
@@ -638,6 +676,8 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     note: None,
                     generic_body: false,
                     via: Vec::new(),
+                    via_all: BTreeSet::new(),
+                    merged: Vec::new(),
                     artifacts: artifacts.clone(),
                     calls: site.call.iter().cloned().collect(),
                 });
@@ -680,15 +720,38 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                 }
             }
-            let mut matches = site_matches(
-                &ctx,
-                site,
-                Some(&path),
-                &closure,
-                &edges,
-                &reached_data,
-                &reached_path,
-            );
+            // (a type parameter the function's own crate gives one type at every call is that
+            // type: the site is matched as the instance would be, and says so)
+            let bound = ctx.bound(site);
+            let mut matches = if bound.is_empty() {
+                site_matches(
+                    &ctx,
+                    site,
+                    Some(&path),
+                    &closure,
+                    &edges,
+                    &reached_data,
+                    &reached_path,
+                )
+            } else {
+                let mut all = Vec::new();
+                for (b, notes) in &bound {
+                    let mut found = site_matches(
+                        &ctx,
+                        b,
+                        Some(&path),
+                        &closure,
+                        &edges,
+                        &reached_data,
+                        &reached_path,
+                    );
+                    for m in found.iter_mut() {
+                        m.4.extend(notes.iter().cloned());
+                    }
+                    all.extend(found);
+                }
+                all
+            };
             // what an asset computes inside itself (`[[part]]`: Argon2's BLAKE2b), where it is
             // used; its provider is the package under the asset's that implements it
             let mut parts: Vec<SiteMatch> = Vec::new();
@@ -803,10 +866,18 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         t.col.saturating_sub(1)
                     ));
                 }
+                // each step of the chain with the item it instantiates: the occurrence's, then
+                // the caller before (`cbom::context` writes that name only where the step does
+                // not follow the one written before it: an occurrence several instances reach
+                // joins their chains, and a step of the second chain is not a caller of the
+                // first's last)
+                let mut instantiated = short(&site.owner.name);
                 for v in &site.via {
+                    let caller = short(&v.caller);
+                    let callee = std::mem::replace(&mut instantiated, caller.clone());
                     // a call without a position (in the standard library's optimized MIR)
                     if v.span.line == 0 {
-                        detail.push(format!("instantiated by {}", short(&v.caller)));
+                        detail.push(format!("`{callee}` instantiated by {caller}"));
                         continue;
                     }
                     let vp = PathBuf::from(&v.span.file);
@@ -821,13 +892,22 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .map(|t| format!(" as `{t}`"))
                         .unwrap_or_default();
                     detail.push(format!(
-                        "instantiated by {} at {}:{}:{}{text}",
-                        short(&v.caller),
+                        "`{callee}` instantiated by {caller} at {}:{}:{}{text}",
                         man.location(&vp),
                         v.span.line,
                         v.span.col.saturating_sub(1)
                     ));
                 }
+                let via: Vec<(String, usize, usize)> = site
+                    .via
+                    .iter()
+                    .filter(|v| v.span.line != 0)
+                    .map(|v| {
+                        let vp = PathBuf::from(&v.span.file);
+                        let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
+                        (man.location(&vp), v.span.line, v.span.col.saturating_sub(1))
+                    })
+                    .collect();
                 let occ = Occurrence {
                     location,
                     line: site.span.line,
@@ -854,16 +934,9 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .collect(),
                     note: m.algo.note.clone(),
                     generic_body: site.owner.kind == OwnerKind::Fn && is_def_hash(&site.owner.id),
-                    via: site
-                        .via
-                        .iter()
-                        .filter(|v| v.span.line != 0)
-                        .map(|v| {
-                            let vp = PathBuf::from(&v.span.file);
-                            let vp = if vp.is_absolute() { vp } else { cwd.join(vp) };
-                            (man.location(&vp), v.span.line, v.span.col.saturating_sub(1))
-                        })
-                        .collect(),
+                    via: via.clone(),
+                    via_all: via.into_iter().collect(),
+                    merged: Vec::new(),
                     artifacts,
                     calls: site.call.iter().cloned().collect(),
                 };
@@ -923,6 +996,8 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     }
                     o.artifacts.extend(occ.artifacts);
                     o.calls.extend(occ.calls);
+                    o.merged.extend(occ.merged);
+                    o.via_all.extend(occ.via_all);
                     if o.function.is_none() {
                         o.function = occ.function;
                     }
@@ -952,6 +1027,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
     }
     merge_less_specific(&mut assets);
+    instantiated_in_a_mode(&mut assets);
     // the packages implementing an algorithm under the matched one provide it too
     for a in assets.values_mut() {
         let mut more = Vec::new();

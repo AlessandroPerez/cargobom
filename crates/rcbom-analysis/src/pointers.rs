@@ -225,7 +225,19 @@ fn functions(
             all
         }
         Origin::Set { value, .. } => go(value, walk, out),
-        Origin::Call { callee, args, .. } if callee == "<closure>" => {
+        Origin::Call {
+            callee,
+            args,
+            self_ty,
+            ..
+        } if callee == "<closure>" => {
+            // the closure itself is the pointer (`Box<dyn Fn(..)>`, `&dyn Fn(..)`): the call
+            // runs its body, whose parameters get the call's arguments
+            if !walk.returns
+                && let Some(body) = self_ty
+            {
+                out.push((closure_marker(), body.clone()));
+            }
             let mut all = true;
             for a in args {
                 all &= go(
@@ -285,6 +297,18 @@ fn functions(
             }
             _ => false,
         },
+    }
+}
+
+/// The place of a closure among the functions a pointer may be: it is no function named as a
+/// value at a position, but the body its own value runs.
+fn closure_marker() -> Loc {
+    Loc {
+        file: "<closure>".into(),
+        line: 0,
+        col: 0,
+        end_line: 0,
+        end_col: 0,
     }
 }
 

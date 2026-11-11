@@ -84,11 +84,17 @@ pub struct Occurrence {
     /// The calls that created the generic instance it is in, innermost first (location, line,
     /// 0-based column), as the `instantiated by` details cite them.
     pub via: Vec<(String, usize, usize)>,
+    /// Those calls of every instance the occurrence stands for (`via` is the first's).
+    pub via_all: BTreeSet<(String, usize, usize)>,
     /// The artifacts whose walk reaches it (`bin rage-keygen`, `lib rcgen`); none when it is
     /// not reachable.
     pub artifacts: BTreeSet<String>,
     /// The calls it stands for (`Site::call`): the boundary check's edges it accounts for.
     pub calls: BTreeSet<rcbom_facts::CallId>,
+    /// The calls of the less specific occurrences on its line that were merged into it, where
+    /// they are (line, 0-based column): the boundary check's edges it accounts for there
+    /// (`C::key_size()` beside `cbc::Encryptor::<C>::new_from_slices(..)`).
+    pub merged: Vec<(usize, usize, BTreeSet<rcbom_facts::CallId>)>,
 }
 
 #[derive(Clone, Debug)]
@@ -220,6 +226,12 @@ struct Ctx<'a> {
     /// The traits the knowledge base asks about (`[[aside]] implements`) that the crypto
     /// packages' types implement, by the type's path (`CrateFacts::implementors`).
     implementors: HashMap<String, Vec<String>>,
+    /// The type parameters of generic functions only their own crate can name, with the types
+    /// its calls and namings of the function give them, where each gives one that is no
+    /// parameter of its caller's, by (function, parameter) (`Links::closed_calls`):
+    /// rustic_core's private `apply_with_rng(.., rng: &mut impl Rng)`, only ever handed
+    /// `rand::rng()`.
+    closed: HashMap<(String, String), Vec<rcbom_facts::TyTree>>,
     /// The points-to analysis' answers (`RCBOM_PTA`), by the position of the call (absolute
     /// file, line, column): one per copy of the calling body it solved.
     pta: HashMap<(PathBuf, usize, usize), Vec<&'a rcbom_facts::PtaCall>>,
@@ -265,8 +277,32 @@ pub const UNKNOWN: &str = "unknown";
 
 #[cfg(test)]
 mod tests {
-    use super::{short, table_members};
+    use super::{boundary, short, sites, table_members};
     use rcbom_facts::{CrateRef, DefRef};
+
+    #[test]
+    fn a_witness_keeps_the_impl_that_holds_it() {
+        // an impl written in another module than its type: without the segment the function
+        // is none the module has
+        assert_eq!(
+            boundary::short_fn("m::aws::<impl m::HashImpl for m::Sha256>::hasher::<u8>"),
+            "m::aws::<impl m::HashImpl for m::Sha256>::hasher"
+        );
+        assert_eq!(boundary::short_fn("app::pick::<app::Fast>"), "app::pick");
+        assert_eq!(
+            boundary::short_fn("<app::W<app::A> as app::Gen>::alg"),
+            "<app::W<app::A> as app::Gen>::alg"
+        );
+    }
+
+    #[test]
+    fn typenum_integers_are_written_by_name() {
+        let nested = "W<C<S, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<\
+                      typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, \
+                      typenum::bit::B0>, O>>";
+        assert_eq!(sites::typenum_folded(nested), "W<C<S, typenum::U4, O>>");
+        assert_eq!(sites::typenum_folded("a::B<u8>"), "a::B<u8>");
+    }
 
     fn def(krate: &str, path: &str) -> DefRef {
         DefRef {

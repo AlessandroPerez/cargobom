@@ -606,6 +606,81 @@ pub(super) fn site_matches(
                 .flat_map(|t| match_types(kb, std::slice::from_ref(t), &supported))
                 .map(|(m, _)| m.key())
                 .collect();
+            // a call on a trait object of a crypto trait (`hasher.update(..)` on a `Box<dyn
+            // DynDigest>`): the receiver is one of the types the build makes such an object
+            // of, and each one the knowledge base names is a member, cited with its coercion.
+            // Where it names them all, they are all the call may run; else an operation of
+            // unknown algorithm stands beside them.
+            let mut dyn_gap: Option<String> = None;
+            if into_kb
+                && !skip_self
+                && let Some(tr) = self_ty.as_ref().and_then(dyn_trait)
+            {
+                let types = ctx.flow.coerced_to(tr);
+                let mut members: Vec<(Match, links::Via)> = Vec::new();
+                let mut unnamed = 0usize;
+                for (ty, at, in_static, tree) in &types {
+                    let found: Vec<Match> = tree
+                        .map(|t| match_types(kb, std::slice::from_ref(t), &supported))
+                        .unwrap_or_default()
+                        .into_iter()
+                        .filter(|(_, outer)| outer.is_none())
+                        .map(|(m, _)| m)
+                        .collect();
+                    if found.is_empty() {
+                        unnamed += 1;
+                        continue;
+                    }
+                    let via = links::Via::Dyn {
+                        trait_path: tr.to_string(),
+                        ty: typenum_folded(ty),
+                        at: at.cloned(),
+                        in_static: *in_static,
+                        only: types.len() == 1,
+                    };
+                    members.extend(found.into_iter().map(|m| (m, via.clone())));
+                }
+                let name = tr.rsplit("::").next().unwrap_or(tr);
+                if !members.is_empty() && unnamed > 0 {
+                    dyn_gap = Some(format!(
+                        "a trait object (`dyn {name}`): of the {} types the build makes one \
+                         of, {unnamed} {} the knowledge base names",
+                        types.len(),
+                        if unnamed == 1 {
+                            "is not a type"
+                        } else {
+                            "are not types"
+                        }
+                    ));
+                }
+                for (mut m, via) in members {
+                    for k in std::mem::take(&mut m.provider_crates) {
+                        m.providers
+                            .extend(ctx.package_of_crate(&k.name, &k.stable_id));
+                    }
+                    let f = kb.use_of(method, &m.algo.primitive);
+                    let mut d = Vec::new();
+                    if f.is_none() {
+                        d.push(format!("{method}: setup, not a use"));
+                    }
+                    d.push(if types.len() == 1 {
+                        format!("receiver: the type the build makes a `dyn {name}` of")
+                    } else if unnamed == 0 {
+                        format!(
+                            "receiver: one of {} types the build makes a `dyn {name}` of",
+                            types.len()
+                        )
+                    } else {
+                        format!(
+                            "receiver: one of {} types the build makes a `dyn {name}` of, \
+                             beside others not named",
+                            types.len()
+                        )
+                    });
+                    d.push(boundary::member_label(&via));
+                    out.push((m, Kind::Call, f, symbol.clone(), d, false));
+                }
+            }
             for (mut m, outer) in match_types(kb, &trees, &supported) {
                 // ..except by the APIs drawing from the generator they are given (rand's
                 // `Alphanumeric.sample_string(&mut OsRng, 16)`, `v.shuffle(&mut rng)`)
@@ -1089,7 +1164,7 @@ pub(super) fn site_matches(
                 })
             } else if out.is_empty() {
                 unresolved_operation(ctx, site)
-            } else if let Some(reason) = &gap_reason {
+            } else if let Some(reason) = dyn_gap.as_ref().or(gap_reason.as_ref()) {
                 unresolved_operation(ctx, site).map(|(p, f, _, pr)| (p, f, reason.clone(), pr))
             } else {
                 None
@@ -1356,6 +1431,133 @@ pub(super) fn static_witness(
                 .collect::<Vec<_>>()
                 .join(", ")
         )
+    }
+}
+impl Ctx<'_> {
+    /// A call site whose types name type parameters of the function it is in, as each instance
+    /// the function's own crate makes has it: those parameters replaced by the types the
+    /// crate's calls give them (`closed`), with what to say of each. One site where each such
+    /// parameter has one type; one per type where a single parameter has several (the others
+    /// one each); none when it names no such parameter, or two with several types (which pairs
+    /// occur is not recorded).
+    pub(super) fn bound(&self, site: &Site) -> Vec<(Site, Vec<String>)> {
+        use rcbom_facts::TyTree;
+        if self.closed.is_empty() {
+            return Vec::new();
+        }
+        let Target::Call { self_ty, args, .. } = &site.target else {
+            return Vec::new();
+        };
+        // (the function the site is in: a closure's is the one it is written in)
+        let mut owner = site.owner.path.as_str();
+        while let Some(i) = owner.rfind("::{closure#") {
+            owner = &owner[..i];
+        }
+        // the parameters named, each with the types it is given
+        fn named<'t>(
+            t: &'t TyTree,
+            closed: &'t HashMap<(String, String), Vec<TyTree>>,
+            owner: &str,
+            out: &mut Vec<(&'t String, &'t Vec<TyTree>)>,
+        ) {
+            match t {
+                TyTree::Param(p) => {
+                    if let Some(c) = closed.get(&(owner.to_string(), p.clone()))
+                        && !out.iter().any(|(q, _)| *q == p)
+                    {
+                        out.push((p, c));
+                    }
+                }
+                TyTree::Adt { args, .. } | TyTree::Tuple(args) => {
+                    args.iter().for_each(|a| named(a, closed, owner, out))
+                }
+                TyTree::Ref(i) | TyTree::Slice(i) | TyTree::Array(i, _) => {
+                    named(i, closed, owner, out)
+                }
+                _ => {}
+            }
+        }
+        let mut params = Vec::new();
+        for t in self_ty.iter().chain(args) {
+            named(t, &self.closed, owner, &mut params);
+        }
+        if params.is_empty() || params.iter().filter(|(_, c)| c.len() > 1).count() > 1 {
+            return Vec::new();
+        }
+        fn replace(t: &TyTree, with: &HashMap<&String, &TyTree>) -> TyTree {
+            match t {
+                TyTree::Param(p) => with.get(p).map_or_else(|| t.clone(), |c| (*c).clone()),
+                TyTree::Adt { krate, path, args } => TyTree::Adt {
+                    krate: krate.clone(),
+                    path: path.clone(),
+                    args: args.iter().map(|a| replace(a, with)).collect(),
+                },
+                TyTree::Ref(i) => TyTree::Ref(Box::new(replace(i, with))),
+                TyTree::Slice(i) => TyTree::Slice(Box::new(replace(i, with))),
+                TyTree::Array(i, n) => TyTree::Array(Box::new(replace(i, with)), *n),
+                TyTree::Tuple(ts) => TyTree::Tuple(ts.iter().map(|a| replace(a, with)).collect()),
+                _ => t.clone(),
+            }
+        }
+        let text = |c: &TyTree| typenum_folded(&crate::coverage::type_text(c));
+        let choices = params.iter().map(|(_, c)| c.len()).max().unwrap_or(1);
+        (0..choices)
+            .map(|k| {
+                let mut with: HashMap<&String, &TyTree> = HashMap::new();
+                let mut notes = Vec::new();
+                for (p, c) in &params {
+                    let t = if c.len() > 1 { &c[k] } else { &c[0] };
+                    with.insert(*p, t);
+                    notes.push(if c.len() > 1 {
+                        format!(
+                            "`{p}` is one of {} types the calls of `{}` give it, which only its \
+                             crate makes: `{}`",
+                            c.len(),
+                            short(owner),
+                            text(t)
+                        )
+                    } else {
+                        format!(
+                            "`{p}` is `{}` at every call of `{}`, which only its crate makes",
+                            text(t),
+                            short(owner)
+                        )
+                    });
+                }
+                let mut bound = site.clone();
+                if let Target::Call {
+                    self_ty: s,
+                    args: a,
+                    ..
+                } = &mut bound.target
+                {
+                    *s = self_ty.as_ref().map(|t| replace(t, &with));
+                    *a = args.iter().map(|t| replace(t, &with)).collect();
+                }
+                (bound, notes)
+            })
+            .collect()
+    }
+}
+
+/// A type's text with typenum's unsigned integers by their names: rustc prints `U32` as six
+/// nested `typenum::uint::UInt<.., typenum::bit::B0>`, which no reader counts.
+pub(super) fn typenum_folded(t: &str) -> String {
+    static NEST: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+        regex::Regex::new(r"typenum::uint::UInt<typenum::U(\d+), typenum::bit::B([01])>").unwrap()
+    });
+    let mut t = t.replace("typenum::uint::UTerm", "typenum::U0");
+    loop {
+        let n = NEST
+            .replace_all(&t, |c: &regex::Captures| {
+                let v: u128 = c[1].parse().unwrap_or(0);
+                format!("typenum::U{}", v * 2 + u128::from(&c[2] == "1"))
+            })
+            .to_string();
+        if n == t {
+            return t;
+        }
+        t = n;
     }
 }
 /// The principal trait of a trait object type (`dyn digest::DynDigest`), behind references.

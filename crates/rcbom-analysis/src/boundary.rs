@@ -706,6 +706,33 @@ pub(crate) fn short_fn(f: &str) -> String {
 /// `f` without the generic arguments of its path, the qualified self type of an
 /// implementation's item kept whole (`<app::W<app::A> as app::Gen>::alg`).
 fn fn_name(f: &str) -> String {
+    // (an impl written in another module than its type, `m::<impl Tr for other::Ty>::f`: the
+    // segment naming it is kept whole, as a qualified self type is: without it the function
+    // is none the module has)
+    if let Some(i) = f.find("::<impl ") {
+        let start = i + 2;
+        let mut depth = 0usize;
+        for (k, c) in f[start..].char_indices() {
+            match c {
+                '<' => depth += 1,
+                '>' if f[..start + k].ends_with('-') => {}
+                '>' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        let end = start + k;
+                        // (a turbofish with its `::`, as below)
+                        return format!(
+                            "{}::{}{}",
+                            strip_generics(&f[..i].replace("::<", "<")),
+                            &f[start..=end],
+                            strip_generics(&f[end + 1..].replace("::<", "<"))
+                        );
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
     // (an instance's turbofish with its `::`: `app::pick::<app::Fast>` is `app::pick`)
     let f = &f.replace("::<", "<");
     if f.starts_with('<') {

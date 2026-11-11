@@ -61,6 +61,30 @@ fn artifacts_of(occurrences: &[Occurrence]) -> BTreeSet<&str> {
         .collect()
 }
 
+/// Generic arguments of an instance's path that say nothing a reader can use: lifetimes alone,
+/// arguments a long name was shortened to (`::<..>`), and the kind after a closure's body.
+static NO_SOURCE_ARGS: std::sync::LazyLock<(regex::Regex, regex::Regex)> =
+    std::sync::LazyLock::new(|| {
+        (
+            regex::Regex::new(r"::<(?:\.\.|'\w+(?:, '\w+)*)>").unwrap(),
+            regex::Regex::new(r"(\{closure#\d+\})::<i(?:8|16|32)>").unwrap(),
+        )
+    });
+
+/// A detail that is a step of an instantiation chain, as the analysis keeps it (`` `callee`
+/// instantiated by caller at file:line:column as `text` ``): the item instantiated, its caller,
+/// and the step without the item's name.
+fn chain_step(d: &str) -> Option<(&str, &str, &str)> {
+    static STEP: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+        regex::Regex::new(
+            r"^`([^`]*)` (instantiated by (.*?)(?: at [^\s;]+?:\d+(?::\d+)?(?: as `[^`]*`)?)?)$",
+        )
+        .unwrap()
+    });
+    let m = STEP.captures(d)?;
+    Some((m.get(1)?.as_str(), m.get(3)?.as_str(), m.get(2)?.as_str()))
+}
+
 /// The text after an occurrence's position: its tags (tier, kind, the artifacts reaching it
 /// where the run has several, the macro), where it is, its details, and last its source line
 /// and text.
@@ -80,9 +104,25 @@ fn context(o: &Occurrence, several_artifacts: bool) -> String {
     if let Some(f) = &o.function {
         s.push_str(&format!("; use: {f}"));
     }
+    // a step of an instantiation chain names the item it instantiates where that is not the
+    // one before it: the occurrence's item, then the caller of the step written before
+    // (the same item whatever lifetimes the compiler erased in its path, `sign::<'_, '_>`,
+    // whatever arguments its name was shortened of, and whichever kind an `async` closure's
+    // body was made for, `{closure#0}::<i16>`)
+    let plain = |name: &str| {
+        let name = NO_SOURCE_ARGS.0.replace_all(name, "");
+        NO_SOURCE_ARGS.1.replace_all(&name, "$1").into_owned()
+    };
+    let mut before = plain(&o.owner);
     for d in &o.detail {
         s.push_str("; ");
-        s.push_str(d);
+        match chain_step(d) {
+            Some((callee, caller, step)) => {
+                s.push_str(if plain(callee) == before { step } else { d });
+                before = plain(caller);
+            }
+            None => s.push_str(d),
+        }
     }
     // last, so they can be read back: the source line, and the exact text at the position
     // (the line may hold backquotes, in a literal or a comment; the code text never does)

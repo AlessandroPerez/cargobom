@@ -1366,24 +1366,27 @@ mod tests {
     }
 
     fn index(links: Links) -> LinkIndex {
-        LinkIndex::new(&[CrateFacts {
-            facts_version: rcbom_facts::FACTS_VERSION,
-            krate: CrateInfo {
-                name: "app".into(),
-                stable_id: "0".into(),
-                package: "app".into(),
-                version: "0.1.0".into(),
-                cwd: "/".into(),
-                unit: String::new(),
-            },
-            sites: Vec::new(),
-            data_edges: Vec::new(),
-            reach: None,
-            links,
-            fields: Default::default(),
-            variants: Default::default(),
-            implementors: Default::default(),
-        }])
+        LinkIndex::new(
+            &[CrateFacts {
+                facts_version: rcbom_facts::FACTS_VERSION,
+                krate: CrateInfo {
+                    name: "app".into(),
+                    stable_id: "0".into(),
+                    package: "app".into(),
+                    version: "0.1.0".into(),
+                    cwd: "/".into(),
+                    unit: String::new(),
+                },
+                sites: Vec::new(),
+                data_edges: Vec::new(),
+                reach: None,
+                links,
+                fields: Default::default(),
+                variants: Default::default(),
+                implementors: Default::default(),
+            }],
+            &|p| p.display().to_string(),
+        )
     }
 
     fn names(f: &Found) -> Vec<&str> {

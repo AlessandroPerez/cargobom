@@ -277,7 +277,7 @@ pub fn verdict(site: &Site, occ: &[Occ]) -> &'static str {
 /// several calls at one position, each with its own value (`hash_all!(&d; SHA256, SHA384)`), is
 /// no such call.
 fn exact_among_several(occ: &[Occ]) -> Vec<String> {
-    let chain_re = Regex::new(r"; instantiated by [^;]*").unwrap();
+    let chain_re = Regex::new(r"; (?:`[^`]*` )?instantiated by [^;]*").unwrap();
     let inexact = Regex::new(r"; algorithm (one of|possibly|[^;]*selector)").unwrap();
     let sentence_re = Regex::new(r"; (algorithm [^;]*)").unwrap();
     let qualified = Regex::new(r"one of|possibl|selector").unwrap();
