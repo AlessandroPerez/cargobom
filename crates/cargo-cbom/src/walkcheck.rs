@@ -44,8 +44,10 @@ impl Report {
     /// `bin rage-keygen: linked 18121, walked 16405; not walked 2879: constructor 24, ..., gap 0`
     pub fn summary(&self) -> String {
         let n: usize = self.classes.values().sum();
+        // (what a vtable nothing calls through keeps in the binary: named where there is any)
         let classes: Vec<String> = CLASSES
             .iter()
+            .filter(|c| **c != UNCALLED || self.classes.contains_key(*c))
             .map(|c| format!("{c} {}", self.classes.get(c).copied().unwrap_or(0)))
             .collect();
         format!(
@@ -58,7 +60,18 @@ impl Report {
     }
 }
 
-const CLASSES: [&str; 6] = ["entry", "std", "modelled", "constructor", "other", "gap"];
+/// Linked, not walked, and no gap: reached only from the methods of trait objects the walk saw
+/// made and never used (`Reach::uncalled`).
+const UNCALLED: &str = "uncalled object";
+const CLASSES: [&str; 7] = [
+    "entry",
+    "std",
+    "modelled",
+    "constructor",
+    UNCALLED,
+    "other",
+    "gap",
+];
 
 pub(crate) fn run(
     a: &crate::GenArgs,
@@ -94,6 +107,12 @@ pub(crate) fn run(
             .filter(|s| s.starts_with("_R"))
             .map(|s| demangle(s))
             .collect();
+        let uncalled: HashSet<String> = w
+            .uncalled
+            .iter()
+            .filter(|s| s.starts_with("_R"))
+            .map(|s| demangle(s))
+            .collect();
         let data = std::fs::read(exe).with_context(|| exe.display().to_string())?;
         let linked = linked_symbols(&data)?;
         let mut r = Report {
@@ -107,7 +126,10 @@ pub(crate) fn run(
             if walked.contains(d) {
                 continue;
             }
-            let class = crates.class(sym, d);
+            let class = match crates.class(sym, d) {
+                "gap" if uncalled.contains(d) => UNCALLED,
+                c => c,
+            };
             *r.classes.entry(class).or_default() += 1;
             if class == "gap" {
                 r.gaps.push(d.clone());

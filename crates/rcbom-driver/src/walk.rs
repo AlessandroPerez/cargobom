@@ -325,6 +325,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 && a.on_behalf == b.on_behalf
                 && a.call == b.call
         });
+        let uncalled = self.uncalled();
         let tcx = self.cx.tcx;
         let crates = self
             .crates
@@ -340,12 +341,84 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             fns,
             paths,
             shims,
+            uncalled,
             generic: Vec::new(),
             crates,
             crates_complete: !truncated && usage_complete,
             points_to: None,
             boundary,
         }
+    }
+
+    /// What only the methods of trait objects nothing uses reach (those still pending when the
+    /// walk ends): their symbols (`Reach::uncalled`). They are followed as the walk follows
+    /// code that is not the program's, every coercion's methods at once: this says what a
+    /// vtable keeps in the binary, not what runs.
+    fn uncalled(&mut self) -> Vec<String> {
+        let tcx = self.cx.tcx;
+        let mut stack: Vec<Instance> = self
+            .pending
+            .values()
+            .flatten()
+            .map(|(callee, ..)| *callee)
+            .collect();
+        let mut seen: HashSet<Instance> = HashSet::new();
+        let mut out = Vec::new();
+        while let Some(inst) = stack.pop() {
+            if matches!(
+                inst.kind,
+                InstanceKind::Virtual { .. }
+                    | InstanceKind::Intrinsic
+                    | InstanceKind::LlvmIntrinsic
+            ) || self.seen.contains(&inst)
+                || self.usage_seen.contains(&inst)
+                || seen.len() > self.limit
+                || !seen.insert(inst)
+            {
+                continue;
+            }
+            out.push(inst.mangled_name());
+            let sysroot = self.cx.sysroot().clone();
+            let cx = &*self.cx;
+            let found = catch_unwind(AssertUnwindSafe(|| {
+                let did = rustc_internal::internal(tcx, inst.def.def_id());
+                let Some(body) = inst.body().map(|b| live_body(tcx, &b)) else {
+                    // (a declaration: the function the build defines under its symbol)
+                    return cx
+                        .defined_as(did)
+                        .filter(|_| tcx.is_foreign_item(did))
+                        .and_then(|def| {
+                            Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(def)))
+                                .ok()
+                        })
+                        .into_iter()
+                        .collect::<Vec<_>>();
+                };
+                let mut edges = Edges {
+                    tcx,
+                    body: &body,
+                    found: Vec::new(),
+                    coerced: Vec::new(),
+                    cur: None,
+                    unconvertible: has_unconvertible(tcx, &body),
+                    errors: 0,
+                    dest: None,
+                    program: false,
+                    deferred: Vec::new(),
+                    used: Vec::new(),
+                    calls: Vec::new(),
+                    std_calls: Vec::new(),
+                    own: tcx.crate_name(did.krate).to_string(),
+                    sysroot,
+                };
+                edges.visit_body(&body);
+                edges.found.into_iter().map(|(i, _)| i).collect()
+            }))
+            .unwrap_or_default();
+            stack.extend(found);
+        }
+        out.sort();
+        out
     }
 
     pub(super) fn enqueue(

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 35;
+pub const FACTS_VERSION: u32 = 36;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -941,6 +941,12 @@ pub struct Reach {
     /// the linker (`cargo cbom --check-walk`).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub shims: Vec<String>,
+    /// The symbols of the instances that only the methods of trait objects nothing uses reach
+    /// (a `Box<dyn Buf>` made and handed to code that never calls it): compiled into the
+    /// binary, since a vtable holds them, and not run as far as the walk sees. For the check
+    /// against the linker; their sites are not reachable.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub uncalled: Vec<String>,
     /// Of those, a library's generic functions its users may call, which no instance walks
     /// (only a caller has their type arguments): reached, but not walked.
     #[serde(default)]
