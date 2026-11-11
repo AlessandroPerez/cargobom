@@ -741,6 +741,20 @@ pub fn in_family_enum(family: &str) -> bool {
     FAMILY_ENUM.iter().any(|f| f == family)
 }
 
+/// Whether a version range of the knowledge base covers a version of a build. A pre-release is
+/// taken as the release it leads to (`0.10.0-rc.18` is in `>=0.9, <0.11`; `0.11.0-rc.1` is not):
+/// semver's own matching leaves every pre-release out of a range that names none, and crates
+/// are built against release candidates for months (ssh-key's of rsa, argon2 and blake2).
+pub fn covers(req: &semver::VersionReq, version: &semver::Version) -> bool {
+    req.matches(version)
+        || (!version.pre.is_empty()
+            && req.matches(&semver::Version::new(
+                version.major,
+                version.minor,
+                version.patch,
+            )))
+}
+
 fn de_req<'de, D: serde::Deserializer<'de>>(d: D) -> Result<semver::VersionReq, D::Error> {
     let s = String::deserialize(d)?;
     semver::VersionReq::parse(&s).map_err(serde::de::Error::custom)
@@ -1155,7 +1169,7 @@ impl Kb {
     ) -> Option<&CrateEntry> {
         self.crates
             .iter()
-            .find(|c| c.package == package && c.versions.matches(version))
+            .find(|c| c.package == package && covers(&c.versions, version))
     }
 
     /// The `[[crate]]` entry of a crate of the build, any version. Once the build's crates are
@@ -1258,10 +1272,10 @@ impl Kb {
         if !stable_id.is_empty() {
             return bound
                 .get(&(name.to_string(), stable_id.to_string()))
-                .is_some_and(|v| req.matches(v));
+                .is_some_and(|v| covers(req, v));
         }
         let mut named = bound.iter().filter(|((n, _), _)| n == name).peekable();
-        named.peek().is_some() && named.all(|(_, v)| req.matches(v))
+        named.peek().is_some() && named.all(|(_, v)| covers(req, v))
     }
 
     /// Is a package without a `[[crate]]` entry cryptographic, from its `Cargo.toml` metadata:
@@ -1426,6 +1440,16 @@ impl Kb {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_pre_release_is_its_release() {
+        let req = semver::VersionReq::parse(">=0.9, <0.11").unwrap();
+        let v = |s: &str| semver::Version::parse(s).unwrap();
+        assert!(covers(&req, &v("0.10.0")));
+        assert!(covers(&req, &v("0.10.0-rc.18")));
+        assert!(!covers(&req, &v("0.11.0-rc.1")));
+        assert!(!covers(&req, &v("0.8.9")));
+    }
 
     #[test]
     fn seed_parses_and_validates() {

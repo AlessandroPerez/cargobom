@@ -2959,7 +2959,8 @@ not_crypto = ["SmallRng", "StepRng"]
 # may draw a key (orion's `SecretKey::default()`) and a conversion compute one (`to_public`). Not
 # reported: a step of a computation (`steps`: `write`, `update`), whose operation is the call that
 # ends it, and calls into `relays`, crypto packages whose own calls are no operations: wrappers of
-# rustls (whose operations are cited in rustls) and types, parsers and loaders of PKI data.
+# rustls (whose operations are cited in rustls) and of native-tls (whose calls are the unknowns:
+# the platform's TLS library runs behind them), and types, parsers and loaders of PKI data.
 # `generic_methods` say nothing about cryptography without a modelled type to scope them (a
 # `write` is a hash update on a `Sha256` but plain output on age's `ArmoredWriter`): no use there.
 generic_methods = ["write", "write_all", "copy", "update", "chain_update", "finish", "finalize", "hash", "consume", "compute", "fill", "new_with_prefix"]
@@ -2967,7 +2968,7 @@ steps = ["write", "write_all", "copy", "update", "chain_update", "consume", "new
 # (and any method of a trait reading from or writing into a stream: rage reading through age's
 # `InputReader`, `writeln!` into its `ArmoredWriter`)
 step_traits = ["core::io::write::Write", "alloc::io::read::Read", "std::io::Write", "std::io::Read"]
-relays = ["tokio-rustls", "hyper-rustls", "actix-tls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs"]
+relays = ["tokio-rustls", "hyper-rustls", "actix-tls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs", "tokio-native-tls", "hyper-tls"]
 
 # --- Calls that are no operation ---------------------------------------------------------------
 # The boundary check (`rcbom:run:boundary-check`) lists every call of the walked code into a
