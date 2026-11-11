@@ -1,0 +1,125 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | src/lib.rs:25:28 | rand::rng::Rng::gen_range | [reachable] [call] in analysis_188::Subset::apply_with_rng; use: generate; `impl Rng` is `rand::rngs::thread::ThreadRng` at every call of `analysis_188::Subset::apply_with_rng`, which only its crate makes; line: `let i = rng.gen_range(0..packs.len());`; code: `gen_range`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:36:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_188::checksum; use: digest; `D` is one of 2 types the calls of `analysis_188::checksum` give it, which only its crate makes: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`; line: `D::digest(data.as_ref()).to_vec()`; code: `D::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:36:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_188::checksum; use: digest; `D` is one of 2 types the calls of `analysis_188::checksum` give it, which only its crate makes: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>`; line: `D::digest(data.as_ref()).to_vec()`; code: `D::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via analysis-188 -> sha2 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via analysis-188 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:48:0 | digest | [manifest] locked digest 0.10.7; reached via analysis-188 -> sha2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:68:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via analysis-188 -> rand -> rand_core -> getrandom
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:85:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via analysis-188 -> rand -> rand_chacha -> ppv-lite86
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:112:0 | rand | [manifest] locked rand 0.8.8; reached via analysis-188 -> rand
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.toml:14:0 | rand | [manifest] declared by analysis-188 (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:123:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via analysis-188 -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:133:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via analysis-188 -> rand -> rand_core
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:142:0 | sha2 | [manifest] locked sha2 0.10.9; reached via analysis-188 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by analysis-188 (dependencies)
+  occ unknown | crypto:algorithm:unknown:hash:digest | src/lib.rs:49:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_188::open_checksum; use: digest; algorithm unresolved: a type parameter (`D`) of the library's generic API: its callers choose the type; line: `D::digest(data.as_ref()).to_vec()`; code: `D::digest`
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=1
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:reachability=reachable
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:digest | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+dep pkg:cargo/analysis-188@0.1.0 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/analysis-188@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:hash:digest
+dependency pkg:cargo/analysis-188@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/ppv-lite86@0.2.21
+dependency pkg:cargo/rand@0.8.8
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/sha2@0.10.9
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:unknown:hash:digest
+provides pkg:cargo/rand@0.8.8 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/analysis-188@0.1.0", "name": "analysis-188", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/analysis-188@0.1.0", "type": "library", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=lib analysis-188
+run rcbom:run:boundary-check=4 calls into crypto packages: 3 cited, 0 cited by the check as unknown, 1 excused (generator setup 1)
+run rcbom:run:features=
+run rcbom:run:packages=17
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=1
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

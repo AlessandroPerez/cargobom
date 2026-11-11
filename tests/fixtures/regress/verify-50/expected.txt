@@ -1,0 +1,299 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | sharks-0.5.0/src/math.rs:41:32 | rand::distributions::distribution::Distribution::sample | [reachable] [call] in sharks::math::random_polynomial::<..>; use: generate; instantiated by sharks::Sharks::dealer_rng::<rand::rngs::thread::ThreadRng> at sharks-0.5.0/src/lib.rs:98:23 as `math::random_polynomial`; instantiated by sharks::Sharks::dealer at sharks-0.5.0/src/lib.rs:118:13 as `dealer_rng`; line: `poly.push(GF256(between.sample(rng)));`; code: `sample`
+  occ ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | src/rng.rs:22:20 | rand::make_rng | [reachable] [call] in verify_50::rng::Ids::rng_from_seed; use: generate; line: `None => rand::make_rng(),`; code: `rand::make_rng`
+  occ ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | src/rng.rs:28:32 | rand::rng::RngExt::random | [reachable] [call] in verify_50::rng::Ids::id::{closure#0}; use: generate; instantiated by verify_50::rng::Ids::id at src/rng.rs:28:24; line: `(0..length).map(|_| rng.random::<u8>()).collect()`; code: `random`
+  occ SHA-224 | crypto:algorithm:SHA-224 | src/select.rs:9:4 | digest::digest::Digest::digest | [reachable] [call] in verify_50::select::get::{closure#0}; use: digest; instantiated by verify_50::select::get at src/select.rs:8:39; line: `Sha224::digest(&data).to_vec()`; code: `Sha224::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/boxed.rs:16:11 | digest::digest::DynDigest::update | [reachable] [call] in verify_50::boxed::hash; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:9); line: `hasher.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/boxed.rs:17:11 | digest::digest::DynDigest::finalize | [reachable] [call] in verify_50::boxed::hash; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:9); line: `hasher.finalize()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/boxed.rs:9:13 | core::default::Default::default | [reachable] [call] in verify_50::boxed::new_hasher; default: setup, not a use; run for this call by the standard library's `core::default::Default::default`: `<digest::core_api::wrapper::CoreWrapper<T> as core::default::Default>::default` of digest 0.10.7, a function of `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>`; line: `0 => Box::<sha2::Sha256>::default(),`; code: `Box::<sha2::Sha256>::default`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/keyed.rs:14:8 | digest::digest::Digest::digest | [reachable] [call] in <verify_50::keyed::Inner as core::hash::Hash>::hash::<..>; use: digest; instantiated by <verify_50::keyed::Key as core::hash::Hash>::hash::<..> at src/keyed.rs:18:44; instantiated by verify_50::keyed::slot at src/keyed.rs:26:8 as `hash`; line: `Sha256::digest(self.0).as_slice().hash(state);`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:37:30 | core::default::Default::default | [reachable] [call] in verify_50::main; default: setup, not a use; line: `let mut tee = rename::Tee(Default::default(), 0);`; code: `Default::default`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/rename.rs:13:15 | digest::Update::update | [reachable] [call] in <verify_50::rename::Tee as digest::Update>::update; use: digest; line: `self.0.update(data);`; code: `update`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/futures.rs:23:4 | digest::digest::Digest::digest | [reachable] [call] in verify_50::futures::try_request::{closure#0}; use: digest; instantiated by verify_50::futures::handle at src/futures.rs:31:20; line: `Sha384::digest(&data).to_vec()`; code: `Sha384::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/backend.rs:21:9 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] [derive ContentHash] in <verify_50::backend::MillisSinceEpoch as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; expanded from src/backend.rs:21; instantiated by <verify_50::backend::Timestamp as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:27:19 as `MillisSinceEpoch`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:35:14 as `Timestamp`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `#[derive(ContentHash, Clone)]`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/backend.rs:24:9 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] [derive ContentHash] in <verify_50::backend::Timestamp as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; expanded from src/backend.rs:24; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:35:14 as `Timestamp`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `#[derive(ContentHash, Clone)]`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/backend.rs:32:9 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] [derive ContentHash] in <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; expanded from src/backend.rs:32; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `#[derive(ContentHash)]`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/backend.rs:9:0 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] [macro id_type!] in <verify_50::backend::CommitId as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; expanded from src/object_id.rs:13; instantiated by <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:55:14 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `id_type!(`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:16:21 | core::default::Default::default | [reachable] [call] in verify_50::content_hash::sha512_hash::<..>; default: setup, not a use; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `let mut hasher = Sha512::default();`; code: `Sha512::default`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:17:6 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] in verify_50::content_hash::sha512_hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `x.hash(&mut hasher);`; code: `hash`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:18:11 | digest::digest::Digest::finalize | [reachable] [call] in verify_50::content_hash::sha512_hash::<..>; use: digest; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `hasher.finalize().to_vec()`; code: `finalize`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:23:14 | digest::Update::update | [reachable] [call] in <u8 as verify_50::content_hash::ContentHash>::hash::<..>; use: digest; instantiated by <verify_50::backend::Timestamp as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:29:19 as `u8`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:35:14 as `Timestamp`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `state.update(&[*self]);`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:29:14 | digest::Update::update | [reachable] [call] in <i64 as verify_50::content_hash::ContentHash>::hash::<..>; use: digest; instantiated by <verify_50::backend::MillisSinceEpoch as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:22:32 as `i64`; instantiated by <verify_50::backend::Timestamp as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:27:19 as `MillisSinceEpoch`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:35:14 as `Timestamp`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; line: `state.update(&self.to_le_bytes());`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:36:14 | digest::Update::update | [reachable] [call] in <[verify_50::backend::CommitId] as verify_50::content_hash::ContentHash>::hash::<..>; use: digest; instantiated by <alloc::vec::Vec<verify_50::backend::CommitId> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:45:24 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:34:17 as `Vec`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; `<[u8] as verify_50::content_hash::ContentHash>::hash::<..>` instantiated by <alloc::vec::Vec<u8> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:45:24 as `hash`; instantiated by <verify_50::backend::CommitId as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:9:0; instantiated by <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:55:14 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; line: `state.update(&(self.len() as u64).to_le_bytes());`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:38:14 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] in <[verify_50::backend::CommitId] as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; instantiated by <alloc::vec::Vec<verify_50::backend::CommitId> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:45:24 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:34:17 as `Vec`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; `<[u8] as verify_50::content_hash::ContentHash>::hash::<..>` instantiated by <alloc::vec::Vec<u8> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:45:24 as `hash`; instantiated by <verify_50::backend::CommitId as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:9:0; instantiated by <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:55:14 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; line: `x.hash(state);`; code: `hash`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:45:24 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] in <alloc::vec::Vec<verify_50::backend::CommitId> as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:34:17 as `Vec`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; `<alloc::vec::Vec<u8> as verify_50::content_hash::ContentHash>::hash::<..>` instantiated by <verify_50::backend::CommitId as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:9:0; instantiated by <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..> at src/content_hash.rs:55:14 as `hash`; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; line: `self.as_slice().hash(state);`; code: `hash`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:53:14 | digest::Update::update | [reachable] [call] in <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..>; use: digest; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `state.update(&(self.len() as u64).to_le_bytes());`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:55:14 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] in <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `k.hash(state);`; code: `hash`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/content_hash.rs:56:14 | verify_50::content_hash::ContentHash::hash | [reachable] [instantiation] in <alloc::collections::btree::map::BTreeMap<verify_50::backend::CommitId, verify_50::backend::Timestamp> as verify_50::content_hash::ContentHash>::hash::<..>; chosen as generic argument of verify_50::content_hash::ContentHash::hash; instantiated by <verify_50::backend::Commit as verify_50::content_hash::ContentHash>::hash::<..> at src/backend.rs:36:14 as `BTreeMap`; instantiated by verify_50::content_hash::sha512_hash::<..> at src/content_hash.rs:17:6 as `hash`; instantiated by verify_50::main at src/main.rs:31:17 as `content_hash::sha512_hash`; line: `v.hash(state);`; code: `hash`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/boxed.rs:10:13 | core::default::Default::default | [reachable] [call] in verify_50::boxed::new_hasher; default: setup, not a use; run for this call by the standard library's `core::default::Default::default`: `<digest::core_api::wrapper::CoreWrapper<T> as core::default::Default>::default` of digest 0.10.7, a function of `digest::core_api::wrapper::CoreWrapper<sha3::Sha3_256Core>`; line: `_ => Box::<sha3::Sha3_256>::default(),`; code: `Box::<sha3::Sha3_256>::default`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/boxed.rs:16:11 | digest::digest::DynDigest::update | [reachable] [call] in verify_50::boxed::hash; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<sha3::Sha3_256Core>` is coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:10); line: `hasher.update(data);`; code: `update`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/boxed.rs:17:11 | digest::digest::DynDigest::finalize | [reachable] [call] in verify_50::boxed::hash; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<sha3::Sha3_256Core>` is coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:10); line: `hasher.finalize()`; code: `finalize`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:12:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via shim -> sha2 -> digest -> block-buffer
+  occ chacha20 | pkg:cargo/chacha20@0.10.2 | Cargo.lock:27:0 | chacha20 | [manifest] locked chacha20 0.10.2; reached via verify-50 -> rand -> chacha20
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:56:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via shim -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:66:0 | digest | [manifest] locked digest 0.10.7; reached via shim -> sha2 -> digest
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:122:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via verify-50 -> sharks -> rand -> rand_core -> getrandom
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:133:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via verify-50 -> rand -> getrandom
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:154:0 | keccak | [manifest] locked keccak 0.1.6; reached via verify-50 -> sha3 -> keccak
+  occ ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | Cargo.lock:179:0 | ppv-lite86 | [manifest] locked ppv-lite86 0.2.21; reached via verify-50 -> rand_chacha -> ppv-lite86
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.lock:223:0 | rand | [manifest] locked rand 0.10.3; reached via verify-50 -> rand
+  occ rand | pkg:cargo/rand@0.10.3 | Cargo.toml:22:0 | rand | [manifest] declared by verify-50 (dependencies)
+  occ rand | pkg:cargo/rand@0.8.8 | Cargo.lock:212:0 | rand | [manifest] locked rand 0.8.8; reached via verify-50 -> sharks -> rand
+  occ rand_chacha | pkg:cargo/rand_chacha@0.10.0 | Cargo.lock:244:0 | rand_chacha | [manifest] locked rand_chacha 0.10.0; reached via verify-50 -> rand_chacha
+  occ rand_chacha | pkg:cargo/rand_chacha@0.10.0 | Cargo.toml:23:0 | rand_chacha | [manifest] declared by verify-50 (dependencies)
+  occ rand_chacha | pkg:cargo/rand_chacha@0.3.1 | Cargo.lock:234:0 | rand_chacha | [manifest] locked rand_chacha 0.3.1; reached via verify-50 -> sharks -> rand -> rand_chacha
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:263:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via verify-50 -> rand -> rand_core
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:254:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via verify-50 -> sharks -> rand -> rand_core
+  occ sha1_smol | pkg:cargo/sha1_smol@1.0.1 | Cargo.lock:269:0 | sha1_smol | [manifest] locked sha1_smol 1.0.1; reached via verify-50 -> sha1_smol
+  occ sha1_smol | pkg:cargo/sha1_smol@1.0.1 | Cargo.toml:24:0 | sha1_smol | [manifest] declared by verify-50 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:275:0 | sha2 | [manifest] locked sha2 0.10.9; reached via shim -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:26:0 | sha2 | [manifest] declared by verify-50 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | shim/Cargo.toml:7:0 | sha2 | [manifest] declared by shim (dependencies)
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:286:0 | sha3 | [manifest] locked sha3 0.10.9; reached via verify-50 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:27:0 | sha3 | [manifest] declared by verify-50 (dependencies)
+  occ sharks | pkg:cargo/sharks@0.5.0 | Cargo.lock:296:0 | sharks | [manifest] locked sharks 0.5.0; reached via verify-50 -> sharks
+  occ sharks | pkg:cargo/sharks@0.5.0 | Cargo.toml:25:0 | sharks | [manifest] declared by verify-50 (dependencies)
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/chain.rs:22:13 | sha1_smol::Digest::bytes | [reachable] [call] in <sha1_smol::Digest as verify_50::chain::Bytes>::digest; use: unknown; algorithm unresolved: `sha1_smol::Digest::bytes` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `self.bytes()`; code: `bytes`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/chain.rs:29:9 | sha1_smol::Sha1::digest | [reachable] [call] in verify_50::chain::peer; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; line: `.digest()`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/main.rs:32:21 | sha1_smol::Sha1::new | [reachable] [call] in verify_50::main; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut legacy = sha1_smol::Sha1::new();`; code: `sha1_smol::Sha1::new`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/main.rs:43:15 | sha1_smol::Sha1::from | [reachable] [call] in verify_50::main; use: unknown; algorithm unresolved: `sha1_smol::Sha1::from` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `state: sha1_smol::Sha1::from(&digest[..]),`; code: `sha1_smol::Sha1::from`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/shown.rs:7:9 | sha1_smol::Sha1::digest | [reachable] [call] [derive Show] in verify_50::shown::Holder::show; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; expanded from src/shown.rs:7; line: `#[derive(Show)]`
+  occ unknown | crypto:algorithm:unknown:unknown:sharks | src/iter.rs:10:24 | sharks::Sharks::dealer | [reachable] [call] in verify_50::iter::deal; use: unknown; algorithm unresolved: `sharks::Sharks::dealer` of sharks 0.5.0, a crypto package the knowledge base does not model: what the call does is not known; line: `for share in sharks.dealer(secret).take(3) {`; code: `dealer`
+  occ unknown | crypto:algorithm:unknown:unknown:sharks | src/iter.rs:10:4 | core::iter::traits::iterator::Iterator::next | [reachable] [call] in verify_50::iter::deal; use: unknown; algorithm unresolved: the boundary check: the standard library's `core::iter::traits::iterator::Iterator::next` runs `sharks::math::get_evaluator::{closure#0}` of sharks 0.5.0 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `for share in sharks.dealer(secret).take(3) {`
+  occ unknown | crypto:algorithm:unknown:unknown:sharks | src/iter.rs:11:17 | sharks::share::<impl core::convert::From<&sharks::share::Share> for alloc::vec::Vec<u8>>::from | [reachable] [call] in verify_50::iter::deal; use: unknown; algorithm unresolved: the boundary check: `sharks::share::<impl core::convert::From<&sharks::share::Share> for alloc::vec::Vec<u8>>::from` of sharks 0.5.0, a call nothing else in the CBOM accounts for: what it does is not known; line: `total += Vec::from(&share).len();`; code: `Vec::from`
+  occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:401:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via verify-50 -> sharks -> zeroize
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=1
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:confidence=high
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:functions:source=observed
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:occurrences=2
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:reachability=reachable
+  prop ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | rcbom:registry-name=unmatched
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=1
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=15
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=3
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.2 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop pm | pkg:cargo/pm@0.1.0 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:crypto-role=support
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:kb-coverage=unmodelled
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:scope=required
+  prop ppv-lite86 | pkg:cargo/ppv-lite86@0.2.21 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.3 | rcbom:usage=reachable
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.8.8 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.10.0 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.10.0 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.10.0 | rcbom:usage=reachable
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:crypto-role=algorithm
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:scope=required
+  prop rand_chacha | pkg:cargo/rand_chacha@0.3.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:crypto-role=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:kb-coverage=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:scope=required
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop sharks | pkg:cargo/sharks@0.5.0 | rcbom:crypto-role=unmodelled
+  prop sharks | pkg:cargo/sharks@0.5.0 | rcbom:kb-coverage=unmodelled
+  prop sharks | pkg:cargo/sharks@0.5.0 | rcbom:scope=required
+  prop sharks | pkg:cargo/sharks@0.5.0 | rcbom:usage=reachable
+  prop shim | pkg:cargo/shim@0.1.0 | rcbom:scope=required
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:occurrences=5
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:reachability=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:unknown:sharks | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset ChaCha20-RNG | crypto:algorithm:ChaCha20-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:sha1_smol | {"algorithmProperties": {"cryptoFunctions": ["digest", "unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:sharks | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library chacha20 0.10.2 | pkg:cargo/chacha20@0.10.2 | purl pkg:cargo/chacha20@0.10.2
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library pm 0.1.0 | pkg:cargo/pm@0.1.0 | purl pkg:cargo/pm@0.1.0
+component library ppv-lite86 0.2.21 | pkg:cargo/ppv-lite86@0.2.21 | purl pkg:cargo/ppv-lite86@0.2.21
+component library rand 0.10.3 | pkg:cargo/rand@0.10.3 | purl pkg:cargo/rand@0.10.3
+component library rand 0.8.8 | pkg:cargo/rand@0.8.8 | purl pkg:cargo/rand@0.8.8
+component library rand_chacha 0.10.0 | pkg:cargo/rand_chacha@0.10.0 | purl pkg:cargo/rand_chacha@0.10.0
+component library rand_chacha 0.3.1 | pkg:cargo/rand_chacha@0.3.1 | purl pkg:cargo/rand_chacha@0.3.1
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library sha1_smol 1.0.1 | pkg:cargo/sha1_smol@1.0.1 | purl pkg:cargo/sha1_smol@1.0.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library sharks 0.5.0 | pkg:cargo/sharks@0.5.0 | purl pkg:cargo/sharks@0.5.0
+component library shim 0.1.0 | pkg:cargo/shim@0.1.0 | purl pkg:cargo/shim@0.1.0
+component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/chacha20@0.10.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/chacha20@0.10.2
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/rand@0.10.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_chacha@0.3.1
+dep pkg:cargo/rand@0.8.8 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_chacha@0.10.0 -> pkg:cargo/ppv-lite86@0.2.21
+dep pkg:cargo/rand_chacha@0.10.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/ppv-lite86@0.2.21
+dep pkg:cargo/rand_chacha@0.3.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dep pkg:cargo/sharks@0.5.0 -> pkg:cargo/rand@0.8.8
+dep pkg:cargo/sharks@0.5.0 -> pkg:cargo/zeroize@1.9.1
+dep pkg:cargo/shim@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/pm@0.1.0
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/rand@0.10.3
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/rand_chacha@0.10.0
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/sha1_smol@1.0.1
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/sharks@0.5.0
+dep pkg:cargo/verify-50@0.1.0 -> pkg:cargo/shim@0.1.0
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:ChaCha20-RNG
+dependency crypto:algorithm:SHA-224
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:SHA3-256
+dependency crypto:algorithm:unknown:unknown:sha1_smol
+dependency crypto:algorithm:unknown:unknown:sharks
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/chacha20@0.10.2
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/pm@0.1.0
+dependency pkg:cargo/ppv-lite86@0.2.21
+dependency pkg:cargo/rand@0.10.3
+dependency pkg:cargo/rand@0.8.8
+dependency pkg:cargo/rand_chacha@0.10.0
+dependency pkg:cargo/rand_chacha@0.3.1
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/sha1_smol@1.0.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/sharks@0.5.0
+dependency pkg:cargo/shim@0.1.0
+dependency pkg:cargo/verify-50@0.1.0
+dependency pkg:cargo/zeroize@1.9.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:SHA-256
+provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/rand@0.8.8 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/rand_chacha@0.10.0 -> crypto:algorithm:ChaCha20-RNG
+provides pkg:cargo/rand_chacha@0.3.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/sha1_smol@1.0.1 -> crypto:algorithm:unknown:unknown:sha1_smol
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-224
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
+provides pkg:cargo/sharks@0.5.0 -> crypto:algorithm:unknown:unknown:sharks
+root {"bom-ref": "pkg:cargo/verify-50@0.1.0", "name": "verify-50", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-50@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-50
+run rcbom:run:boundary-check=34 calls into crypto packages: 22 cited, 2 cited by the check by name, 2 cited by the check as unknown, 8 excused (format 1, generator setup 3, named 1, step 1, wipe 2)
+run rcbom:run:features=
+run rcbom:run:packages=44
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=773
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

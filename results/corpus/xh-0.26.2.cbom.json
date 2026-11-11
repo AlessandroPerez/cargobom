@@ -185,10 +185,6 @@
         {
           "name": "rcbom:crypto-role",
           "value": "trait"
-        },
-        {
-          "name": "rcbom:usage",
-          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/digest@0.10.7",
@@ -4763,6 +4759,20 @@
             "location": "digest_auth-0.3.1/src/enums.rs",
             "offset": 43,
             "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:38); line: `hash.update(bytes);`; code: `update`",
+            "line": 43,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 13,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:38); line: `hex::encode(hash.finalize())`; code: `finalize`",
+            "line": 44,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 25,
+            "symbol": "digest::digest::DynDigest::finalize"
           }
         ]
       },
@@ -4782,7 +4792,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -4794,7 +4804,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -5871,6 +5881,20 @@
             "symbol": "digest::digest::Digest::new"
           },
           {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:39); line: `hash.update(bytes);`; code: `update`",
+            "line": 43,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 13,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:39); line: `hex::encode(hash.finalize())`; code: `finalize`",
+            "line": 44,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 25,
+            "symbol": "digest::digest::DynDigest::finalize"
+          },
+          {
             "additionalContext": "[present] [component] in rustls::crypto::aws_lc_rs::hpke::ALL_SUPPORTED_SUITES; part of HMAC-SHA-256 (aws_lc_rs::hmac::HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `DH_KEM_P256_HKDF_SHA256_AES_128,`; code: `DH_KEM_P256_HKDF_SHA256_AES_128`",
             "line": 28,
             "location": "rustls-0.23.42/src/crypto/aws_lc_rs/hpke.rs",
@@ -6463,7 +6487,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "82"
+          "value": "84"
         }
       ],
       "type": "cryptographic-asset"
@@ -6946,6 +6970,20 @@
             "location": "digest_auth-0.3.1/src/enums.rs",
             "offset": 52,
             "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U32, sha2::OidSha512_256>>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:40); line: `hash.update(bytes);`; code: `update`",
+            "line": 43,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 13,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U32, sha2::OidSha512_256>>` is coerced to `dyn digest::digest::DynDigest` at digest_auth-0.3.1/src/enums.rs:40); line: `hex::encode(hash.finalize())`; code: `finalize`",
+            "line": 44,
+            "location": "digest_auth-0.3.1/src/enums.rs",
+            "offset": 25,
+            "symbol": "digest::digest::DynDigest::finalize"
           }
         ]
       },
@@ -6965,7 +7003,7 @@
         },
         {
           "name": "rcbom:functions:source",
-          "value": "knowledge-base"
+          "value": "observed"
         },
         {
           "name": "rcbom:kb:version",
@@ -6973,7 +7011,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "1"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -7590,68 +7628,6 @@
         {
           "name": "rcbom:algorithm-family",
           "value": "TLS-PRF"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
-      "bom-ref": "crypto:algorithm:unknown:hash:digest",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "digest"
-          ],
-          "primitive": "hash"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `hash.update(bytes);`; code: `update`",
-            "line": 43,
-            "location": "digest_auth-0.3.1/src/enums.rs",
-            "offset": 13,
-            "symbol": "digest::digest::DynDigest::update"
-          },
-          {
-            "additionalContext": "[reachable] [call] in digest_auth::enums::Algorithm::hash; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `hex::encode(hash.finalize())`; code: `finalize`",
-            "line": 44,
-            "location": "digest_auth-0.3.1/src/enums.rs",
-            "offset": 25,
-            "symbol": "digest::digest::DynDigest::finalize"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "2"
         }
       ],
       "type": "cryptographic-asset"
@@ -8329,9 +8305,6 @@
         "pkg:cargo/block-buffer@0.10.4",
         "pkg:cargo/crypto-common@0.1.6"
       ],
-      "provides": [
-        "crypto:algorithm:unknown:hash:digest"
-      ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
     {
@@ -8698,10 +8671,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:hash:digest"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:signature:aws-lc-rs"
     },
     {
@@ -8799,7 +8768,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8a50427b-048a-8c90-a99e-fd7aa5906d22",
+  "serialNumber": "urn:uuid:80cdccbd-ec99-8072-8ba5-5f2b376f7f54",
   "specVersion": "1.7",
   "version": 1
 }

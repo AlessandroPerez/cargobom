@@ -1,0 +1,14 @@
+# Functions the linker connects by symbol name, not by a path the code writes: the allocator
+# functions a library's `#[global_allocator]` makes for its binary (oha), and a `#[no_mangle]`
+# function called through an `extern` declaration. The walk follows a declaration to the
+# function a crate of the build defines under its symbol: no gap, and what that function calls
+# is reachable.
+[package]
+name = "driver-37"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+
+[workspace]

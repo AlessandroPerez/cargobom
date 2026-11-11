@@ -1,0 +1,237 @@
+  occ AES-128 | crypto:algorithm:AES-128 | src/cipher.rs:15:47 | verify_47::stream::KeyStream::<C>::new | [reachable] [instantiation] in verify_47::cipher::Cipher::from_mode; chosen as generic argument of verify_47::stream::KeyStream::<C>::new; line: `0..=128 => Cipher::Aes128(Box::new(stream::KeyStream::<`
+  occ AES-128 | crypto:algorithm:AES-128 | src/stream.rs:18:20 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in verify_47::stream::KeyStream::<aes::autodetect::Aes128>::new; new_from_slice: setup, not a use; key: hard-coded (literal at src/main.rs:14) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of cipher::Cipher::from_mode); instantiated by verify_47::cipher::Cipher::from_mode at src/cipher.rs:15:47; line: `cipher: C::new_from_slice(&key[..C::key_size()]).unwrap(),`; code: `C::new_from_slice`
+  occ AES-128 | crypto:algorithm:AES-128 | src/stream.rs:18:45 | crypto_common::KeySizeUser::key_size | [reachable] [call] in verify_47::stream::KeyStream::<aes::autodetect::Aes128>::new; key_size: setup, not a use; instantiated by verify_47::cipher::Cipher::from_mode at src/cipher.rs:15:47; line: `cipher: C::new_from_slice(&key[..C::key_size()]).unwrap(),`; code: `C::key_size`
+  occ AES-128 | crypto:algorithm:AES-128 | src/stream.rs:38:24 | cipher::block::BlockEncrypt::encrypt_block | [reachable] [call] in <verify_47::stream::KeyStream<aes::autodetect::Aes128> as verify_47::stream::Crypt>::crypt_in_place; use: encrypt; instantiated by verify_47::cipher::Cipher::crypt_in_place at src/cipher.rs:28:43 as `crypt_in_place`; line: `self.cipher.encrypt_block(&mut block);`; code: `encrypt_block`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/modes.rs:10:4 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in verify_47::modes::cbc_encrypt::<aes::autodetect::Aes128Enc>; new_from_slices: setup, not a use; key: hard-coded (literal at src/main.rs:14) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_47::modes::encrypt); iv: hard-coded (16 bytes, literal at src/main.rs:15) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of verify_47::modes::encrypt); instantiated by verify_47::modes::encrypt at src/modes.rs:19:19 as `cbc_encrypt::<aes::Aes128Enc>`; key_size: setup, not a use; line: `cbc::Encryptor::<C>::new_from_slices(&key[..C::key_size()], iv)`; code: `cbc::Encryptor::<C>::new_from_slices`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/modes.rs:12:9 | cipher::block::BlockEncryptMut::encrypt_padded_mut | [reachable] [call] in verify_47::modes::cbc_encrypt::<aes::autodetect::Aes128Enc>; use: encrypt; instantiated by verify_47::modes::encrypt at src/modes.rs:19:19 as `cbc_encrypt::<aes::Aes128Enc>`; line: `.encrypt_padded_mut::<Pkcs7>(buf, len)`; code: `encrypt_padded_mut`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/modes.rs:19:19 | verify_47::modes::cbc_encrypt | [reachable] [instantiation] in verify_47::modes::encrypt; chosen as generic argument of verify_47::modes::cbc_encrypt; line: `0..=128 => cbc_encrypt::<aes::Aes128Enc>(key, iv, buf, len),`; code: `cbc_encrypt::<aes::Aes128Enc>`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/table.rs:41:8 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in <verify_47::table::CbcOf<aes::autodetect::Aes128> as verify_47::table::Stream>::apply; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CbcOf<aes::autodetect::Aes128>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:69:31 as `&_AES_128_CBC`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; key_size: setup, not a use; line: `cbc::Encryptor::<C>::new_from_slices(&key[..C::key_size()], iv)`; code: `cbc::Encryptor::<C>::new_from_slices`
+  occ AES-128-CBC | crypto:algorithm:AES-128-CBC | src/table.rs:43:13 | cipher::block::BlockEncryptMut::encrypt_padded_mut | [reachable] [call] in <verify_47::table::CbcOf<aes::autodetect::Aes128> as verify_47::table::Stream>::apply; use: encrypt; instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CbcOf<aes::autodetect::Aes128>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:69:31 as `&_AES_128_CBC`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `.encrypt_padded_mut::<NoPadding>(data, len)`; code: `encrypt_padded_mut`
+  occ AES-128-CTR | crypto:algorithm:AES-128-CTR | src/table.rs:30:20 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:67:31 as `&_AES_128_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `let mut c = C::new_from_slices(&key[..C::key_size()], iv).unwrap();`; code: `C::new_from_slices`
+  occ AES-128-CTR | crypto:algorithm:AES-128-CTR | src/table.rs:30:46 | crypto_common::KeySizeUser::key_size | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; key_size: setup, not a use; instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:67:31 as `&_AES_128_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `let mut c = C::new_from_slices(&key[..C::key_size()], iv).unwrap();`; code: `C::key_size`
+  occ AES-128-CTR | crypto:algorithm:AES-128-CTR | src/table.rs:31:10 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; use: encrypt or decrypt; instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes128, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:67:31 as `&_AES_128_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `c.apply_keystream(data);`; code: `apply_keystream`
+  occ AES-256 | crypto:algorithm:AES-256 | src/cipher.rs:18:41 | verify_47::stream::KeyStream::<C>::new | [reachable] [instantiation] in verify_47::cipher::Cipher::from_mode; chosen as generic argument of verify_47::stream::KeyStream::<C>::new; line: `_ => Cipher::Aes256(Box::new(stream::KeyStream::<`
+  occ AES-256 | crypto:algorithm:AES-256 | src/stream.rs:18:20 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in verify_47::stream::KeyStream::<aes::autodetect::Aes256>::new; new_from_slice: setup, not a use; key: hard-coded (literal at src/main.rs:14) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of cipher::Cipher::from_mode); instantiated by verify_47::cipher::Cipher::from_mode at src/cipher.rs:18:41; line: `cipher: C::new_from_slice(&key[..C::key_size()]).unwrap(),`; code: `C::new_from_slice`
+  occ AES-256 | crypto:algorithm:AES-256 | src/stream.rs:18:45 | crypto_common::KeySizeUser::key_size | [reachable] [call] in verify_47::stream::KeyStream::<aes::autodetect::Aes256>::new; key_size: setup, not a use; instantiated by verify_47::cipher::Cipher::from_mode at src/cipher.rs:18:41; line: `cipher: C::new_from_slice(&key[..C::key_size()]).unwrap(),`; code: `C::key_size`
+  occ AES-256 | crypto:algorithm:AES-256 | src/stream.rs:38:24 | cipher::block::BlockEncrypt::encrypt_block | [reachable] [call] in <verify_47::stream::KeyStream<aes::autodetect::Aes256> as verify_47::stream::Crypt>::crypt_in_place; use: encrypt; instantiated by verify_47::cipher::Cipher::crypt_in_place at src/cipher.rs:29:43 as `crypt_in_place`; line: `self.cipher.encrypt_block(&mut block);`; code: `encrypt_block`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/modes.rs:10:4 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in verify_47::modes::cbc_encrypt::<aes::autodetect::Aes256Enc>; new_from_slices: setup, not a use; key: hard-coded (literal at src/main.rs:14) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_47::modes::encrypt); iv: hard-coded (16 bytes, literal at src/main.rs:15) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of verify_47::modes::encrypt); instantiated by verify_47::modes::encrypt at src/modes.rs:20:13 as `cbc_encrypt::<aes::Aes256Enc>`; key_size: setup, not a use; line: `cbc::Encryptor::<C>::new_from_slices(&key[..C::key_size()], iv)`; code: `cbc::Encryptor::<C>::new_from_slices`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/modes.rs:12:9 | cipher::block::BlockEncryptMut::encrypt_padded_mut | [reachable] [call] in verify_47::modes::cbc_encrypt::<aes::autodetect::Aes256Enc>; use: encrypt; instantiated by verify_47::modes::encrypt at src/modes.rs:20:13 as `cbc_encrypt::<aes::Aes256Enc>`; line: `.encrypt_padded_mut::<Pkcs7>(buf, len)`; code: `encrypt_padded_mut`
+  occ AES-256-CBC | crypto:algorithm:AES-256-CBC | src/modes.rs:20:13 | verify_47::modes::cbc_encrypt | [reachable] [instantiation] in verify_47::modes::encrypt; chosen as generic argument of verify_47::modes::cbc_encrypt; line: `_ => cbc_encrypt::<aes::Aes256Enc>(key, iv, buf, len),`; code: `cbc_encrypt::<aes::Aes256Enc>`
+  occ AES-256-CTR | crypto:algorithm:AES-256-CTR | src/table.rs:30:20 | crypto_common::KeyIvInit::new_from_slices | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:68:31 as `&AES_256_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `let mut c = C::new_from_slices(&key[..C::key_size()], iv).unwrap();`; code: `C::new_from_slices`
+  occ AES-256-CTR | crypto:algorithm:AES-256-CTR | src/table.rs:30:46 | crypto_common::KeySizeUser::key_size | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; key_size: setup, not a use; instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:68:31 as `&AES_256_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `let mut c = C::new_from_slices(&key[..C::key_size()], iv).unwrap();`; code: `C::key_size`
+  occ AES-256-CTR | crypto:algorithm:AES-256-CTR | src/table.rs:31:10 | cipher::stream::StreamCipher::apply_keystream | [reachable] [call] in <verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>> as verify_47::table::Stream>::apply; use: encrypt or decrypt; instantiated by verify_47::table::run::<..> at src/table.rs:49:4 as `S::apply`; instantiated by <verify_47::table::Block<verify_47::table::CtrOf<cipher::stream_wrapper::StreamCipherCoreWrapper<ctr::ctr_core::CtrCore<aes::autodetect::Aes256, ctr::flavors::ctr128::Ctr128BE>>>> as verify_47::table::Cipher>::seal at src/table.rs:56:8 as `run::<S>`; instantiated by verify_47::table::CIPHERS::{closure#0} at src/table.rs:68:31 as `&AES_256_CTR`; instantiated by <{closure@verify_47::table::CIPHERS::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `c.apply_keystream(data);`; code: `apply_keystream`
+  occ SHA-224 | crypto:algorithm:SHA-224 | src/wrap.rs:35:20 | digest::digest::Digest::digest | [reachable] [call] in <<verify_47::wrap::NoiseInit as verify_47::wrap::Init>::leader::{closure#0}::Fin as verify_47::wrap::Finalizer>::finalize; use: digest; line: `sha2::Sha224::digest(data).to_vec()`; code: `sha2::Sha224::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/ctx/resp.rs:10:19 | digest::digest::Digest::digest | [reachable] [call] in verify_47::ctx::resp::<impl verify_47::ctx::Respond for verify_47::ctx::Ctx<verify_47::own::Sha256>>::respond; use: digest; line: `out.extend(Sha256::digest(data));`; code: `Sha256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/kdf.rs:18:8 | verify_47::kdf::two_stage::extract | [reachable] [instantiation] in <verify_47::kdf::HkdfSha256 as verify_47::kdf::Kdf>::extract; chosen as generic argument of verify_47::kdf::two_stage::extract; line: `two_stage::extract::<sha2::Sha256>(ikm)`; code: `two_stage::extract::<sha2::Sha256>`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/kdf.rs:32:8 | digest::digest::Digest::digest | [reachable] [call] in verify_47::kdf::two_stage::extract::<..>; use: digest; instantiated by <verify_47::kdf::HkdfSha256 as verify_47::kdf::Kdf>::extract at src/kdf.rs:18:8 as `two_stage::extract::<sha2::Sha256>`; line: `D::digest(ikm).to_vec()`; code: `D::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/wrap.rs:13:8 | digest::digest::Digest::update | [reachable] [call] in verify_47::wrap::digest; use: digest; line: `h.0.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/wrap.rs:14:8 | digest::digest::Digest::finalize | [reachable] [call] in verify_47::wrap::digest; use: digest; line: `h.0.finalize().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/wrap.rs:8:9 | core::default::Default::default | [reachable] [call] [derive Default] in <verify_47::wrap::Sha256 as core::default::Default>::default; default: setup, not a use; expanded from src/wrap.rs:9; line: `#[derive(Default, Clone)]`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/kem.rs:11:8 | digest::digest::Digest::digest | [reachable] [call] in <verify_47::kem::Suite as verify_47::kdf::Kdf>::extract; use: digest; line: `sha2::Sha384::digest(ikm).to_vec()`; code: `sha2::Sha384::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/kdf.rs:24:8 | verify_47::kdf::two_stage::extract | [reachable] [instantiation] in <verify_47::kdf::HkdfSha512 as verify_47::kdf::Kdf>::extract; chosen as generic argument of verify_47::kdf::two_stage::extract; line: `two_stage::extract::<sha2::Sha512>(ikm)`; code: `two_stage::extract::<sha2::Sha512>`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/kdf.rs:32:8 | digest::digest::Digest::digest | [reachable] [call] in verify_47::kdf::two_stage::extract::<..>; use: digest; instantiated by <verify_47::kdf::HkdfSha512 as verify_47::kdf::Kdf>::extract at src/kdf.rs:24:8 as `two_stage::extract::<sha2::Sha512>`; line: `D::digest(ikm).to_vec()`; code: `D::digest`
+  occ SHA-512/256 | crypto:algorithm:SHA-512/256 | src/own.rs:13:8 | digest::digest::Digest::digest | [reachable] [call] in verify_47::own::Sha256::finish; use: digest; line: `sha2::Sha512_256::digest(&data[..self.seen.min(data.len())]).to_vec()`; code: `sha2::Sha512_256::digest`
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:6:0 | aes | [manifest] locked aes 0.8.4; reached via verify-47 -> aes
+  occ aes | pkg:cargo/aes@0.8.4 | Cargo.toml:9:0 | aes | [manifest] declared by verify-47 (dependencies)
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:17:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via verify-47 -> sha2 -> digest -> block-buffer
+  occ block-padding | pkg:cargo/block-padding@0.3.3 | Cargo.lock:26:0 | block-padding | [manifest] locked block-padding 0.3.3; reached via verify-47 -> aes -> cipher -> inout -> block-padding
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.lock:35:0 | cbc | [manifest] locked cbc 0.1.2; reached via verify-47 -> cbc
+  occ cbc | pkg:cargo/cbc@0.1.2 | Cargo.toml:10:0 | cbc | [manifest] declared by verify-47 (dependencies)
+  occ cipher | pkg:cargo/cipher@0.4.4 | Cargo.lock:50:0 | cipher | [manifest] locked cipher 0.4.4; reached via verify-47 -> aes -> cipher
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:69:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via verify-47 -> aes -> cipher -> crypto-common
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.lock:79:0 | ctr | [manifest] locked ctr 0.9.2; reached via verify-47 -> ctr
+  occ ctr | pkg:cargo/ctr@0.9.2 | Cargo.toml:11:0 | ctr | [manifest] declared by verify-47 (dependencies)
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:88:0 | digest | [manifest] locked digest 0.10.7; reached via verify-47 -> sha2 -> digest
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:124:0 | sha2 | [manifest] locked sha2 0.10.9; reached via verify-47 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:12:0 | sha2 | [manifest] declared by verify-47 (dependencies)
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:confidence=high
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:detection:method=type-resolved
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:finding=hard-coded-key
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:functions:source=observed
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:kb:version=0.2.0
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:occurrences=4
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:provenance:key=hard-coded,parameter
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:reachability=reachable
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:confidence=high
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:detection:method=type-resolved
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:finding=hard-coded-iv
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:finding=hard-coded-key
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:functions:source=observed
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:kb:version=0.2.0
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=5
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=hard-coded,parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=hard-coded,parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:confidence=high
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:detection:method=type-resolved
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:functions:source=observed
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:kb:version=0.2.0
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:occurrences=3
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:provenance:iv=parameter
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:provenance:key=parameter
+  prop AES-128-CTR | crypto:algorithm:AES-128-CTR | rcbom:reachability=reachable
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:confidence=high
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:detection:method=type-resolved
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:finding=hard-coded-key
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:functions:source=observed
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:kb:version=0.2.0
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:occurrences=4
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:provenance:key=hard-coded,parameter
+  prop AES-256 | crypto:algorithm:AES-256 | rcbom:reachability=reachable
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:confidence=high
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:detection:method=type-resolved
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:finding=hard-coded-iv
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:finding=hard-coded-key
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:functions:source=observed
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:kb:version=0.2.0
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:occurrences=3
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:iv=hard-coded,parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:provenance:key=hard-coded,parameter
+  prop AES-256-CBC | crypto:algorithm:AES-256-CBC | rcbom:reachability=reachable
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:confidence=high
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:detection:method=type-resolved
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:functions:source=observed
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:kb:version=0.2.0
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:occurrences=3
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:iv=parameter
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:key=parameter
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:reachability=reachable
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=1
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:confidence=high
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:detection:method=type-resolved
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:kb:version=0.2.0
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:occurrences=1
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:reachability=reachable
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:crypto-role=algorithm
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:scope=required
+  prop aes | pkg:cargo/aes@0.8.4 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:crypto-role=support
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:kb-coverage=unmodelled
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:scope=required
+  prop block-padding | pkg:cargo/block-padding@0.3.3 | rcbom:usage=reachable
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:crypto-role=algorithm
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:scope=required
+  prop cbc | pkg:cargo/cbc@0.1.2 | rcbom:usage=reachable
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:crypto-role=trait
+  prop cipher | pkg:cargo/cipher@0.4.4 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:crypto-role=algorithm
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:scope=required
+  prop ctr | pkg:cargo/ctr@0.9.2 | rcbom:usage=reachable
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CTR | crypto:algorithm:AES-128-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256 | crypto:algorithm:AES-256 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-CBC | crypto:algorithm:AES-256-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library block-padding 0.3.3 | pkg:cargo/block-padding@0.3.3 | purl pkg:cargo/block-padding@0.3.3
+component library cbc 0.1.2 | pkg:cargo/cbc@0.1.2 | purl pkg:cargo/cbc@0.1.2
+component library cipher 0.4.4 | pkg:cargo/cipher@0.4.4 | purl pkg:cargo/cipher@0.4.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library ctr 0.9.2 | pkg:cargo/ctr@0.9.2 | purl pkg:cargo/ctr@0.9.2
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+dep pkg:cargo/aes@0.8.4 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cbc@0.1.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/block-padding@0.3.3
+dep pkg:cargo/cipher@0.4.4 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/ctr@0.9.2 -> pkg:cargo/cipher@0.4.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/verify-47@0.1.0 -> pkg:cargo/aes@0.8.4
+dep pkg:cargo/verify-47@0.1.0 -> pkg:cargo/cbc@0.1.2
+dep pkg:cargo/verify-47@0.1.0 -> pkg:cargo/ctr@0.9.2
+dep pkg:cargo/verify-47@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:AES-128
+dependency crypto:algorithm:AES-128-CBC
+dependency crypto:algorithm:AES-128-CTR
+dependency crypto:algorithm:AES-256
+dependency crypto:algorithm:AES-256-CBC
+dependency crypto:algorithm:AES-256-CTR
+dependency crypto:algorithm:SHA-224
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:SHA-512/256
+dependency pkg:cargo/aes@0.8.4
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/block-padding@0.3.3
+dependency pkg:cargo/cbc@0.1.2
+dependency pkg:cargo/cipher@0.4.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/ctr@0.9.2
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/verify-47@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-128-CTR
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/aes@0.8.4 -> crypto:algorithm:AES-256-CTR
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-128-CBC
+provides pkg:cargo/cbc@0.1.2 -> crypto:algorithm:AES-256-CBC
+provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:AES-128-CTR
+provides pkg:cargo/ctr@0.9.2 -> crypto:algorithm:AES-256-CTR
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-224
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512/256
+root {"bom-ref": "pkg:cargo/verify-47@0.1.0", "name": "verify-47", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-47@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-47
+run rcbom:run:boundary-check=26 calls into crypto packages: 20 cited, 0 cited by the check as unknown, 6 excused (format 4, wipe 2)
+run rcbom:run:features=
+run rcbom:run:packages=16
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=478
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

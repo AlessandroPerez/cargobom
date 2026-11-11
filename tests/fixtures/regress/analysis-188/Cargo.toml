@@ -1,0 +1,17 @@
+# A library's generic functions that only its own crate can name: where every call the crate
+# makes gives a type parameter one type, an operation on it is that type's (rustic_core's
+# private `apply_with_rng(.., rng: &mut impl Rng)`, only ever handed `rand::rng()`, was "its
+# callers choose the type").
+[package]
+name = "analysis-188"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+rand = "0.8"
+sha2 = "0.10"
+
+[workspace]

@@ -263,11 +263,18 @@
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in a158::gen; instantiated by a158::main at src/main.rs:83:17 as `gen`; line: `fn gen<F: Fn(&'static Digest)>(f: Rc<F>) { f(&SHA1) }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a158::gen; `a158::gen::<fn(&'static ring::digest::Algorithm) {a158::h5}>` instantiated by a158::main at src/main.rs:83:17 as `gen`; line: `fn gen<F: Fn(&'static Digest)>(f: Rc<F>) { f(&SHA1) }`; code: `SHA1`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:55:12; line: `let c = |a: &'static Digest| { let _ = digest(a, b\"1\"); };`; code: `digest`",
+            "line": 55,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a158::main; line: `r(&SHA1);`; code: `SHA1`",
@@ -275,6 +282,13 @@
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#3}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a158::run`; instantiated by a158::main at src/main.rs:70:12; line: `let m = |a: &'static Digest| { let _ = digest(a, b\"4\"); };`; code: `digest`",
+            "line": 70,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a158::main; line: `h1(&SHA256); let r1: Rc<dyn Fn(&'static Digest)> = Rc::new(h1); r1(&SHA1);`; code: `SHA1`",
@@ -376,7 +390,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "35"
+          "value": "37"
         }
       ],
       "type": "cryptographic-asset"
@@ -508,7 +522,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a158::main::{closure#0}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:55:12; line: `let c = |a: &'static Digest| { let _ = digest(a, b\"1\"); };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a158::main::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:55:12; line: `let c = |a: &'static Digest| { let _ = digest(a, b\"1\"); };`; code: `digest`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 43,
@@ -728,7 +742,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a158::main::{closure#1}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:60:12; line: `let k = |a: &'static Digest| { let _ = digest(a, b\"2\"); };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a158::main::{closure#1}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:60:12; line: `let k = |a: &'static Digest| { let _ = digest(a, b\"2\"); };`; code: `digest`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 43,
@@ -742,7 +756,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a158::main::{closure#2}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:65:12; line: `let q = |a: &'static Digest| { let _ = digest(a, b\"3\"); };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a158::main::{closure#2}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:65:12; line: `let q = |a: &'static Digest| { let _ = digest(a, b\"3\"); };`; code: `digest`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 43,
@@ -756,7 +770,7 @@
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a158::main::{closure#3}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:70:12; line: `let m = |a: &'static Digest| { let _ = digest(a, b\"4\"); };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a158::main::{closure#3}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:70:12; line: `let m = |a: &'static Digest| { let _ = digest(a, b\"4\"); };`; code: `digest`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 43,
@@ -885,11 +899,25 @@
             "symbol": "ring::digest::digest"
           },
           {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#1}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:60:12; line: `let k = |a: &'static Digest| { let _ = digest(a, b\"2\"); };`; code: `digest`",
+            "line": 60,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a158::main; line: `s(&SHA512);`; code: `SHA512`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "ring::digest::SHA512"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a158::main::{closure#2}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `a158::main`; instantiated by a158::main at src/main.rs:65:12; line: `let q = |a: &'static Digest| { let _ = digest(a, b\"3\"); };`; code: `digest`",
+            "line": 65,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "ring::digest::digest"
           },
           {
             "additionalContext": "[reachable] [static] in a158::main; line: `p(&SHA512);`; code: `SHA512`",
@@ -980,7 +1008,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "14"
+          "value": "16"
         }
       ],
       "type": "cryptographic-asset"
@@ -1292,7 +1320,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8e530ae3-b0ab-8a49-ac25-8613b798f2ef",
+  "serialNumber": "urn:uuid:6165f7b5-929c-8936-a05a-c814bde57279",
   "specVersion": "1.7",
   "version": 1
 }

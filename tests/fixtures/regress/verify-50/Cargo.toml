@@ -1,0 +1,27 @@
+# Shapes of source the verifier met on jj-cli and atuin (third batch of unseen crates.io
+# packages): a derive macro's calls cited at the fields of the type it is on, also where a
+# macro another name imports defines that type; generic impls over slices and maps; a generator
+# type a generic function of another crate is instantiated with; one method name three times
+# down a chain; a future held by a variable and boxed later (sccache's redis), or polled in a
+# closure a macro writes; a trait under the name a dependency re-exports it by; a `for` loop
+# over a crypto package's iterator (rustic-rs); hashers boxed by `Box::<T>::default()` and a
+# procedural derive cited at its attribute (pgp); a derive of the language (biscuit-auth). Each
+# case is commented where it is.
+[package]
+name = "verify-50"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["pm", "shim"]
+
+[dependencies]
+pm = { path = "pm" }
+shim = { path = "shim" }
+futures-util = "0.3"
+rand = "0.10"
+rand_chacha = "0.10"
+sha1_smol = "1"
+sharks = "0.5"
+sha2 = "0.10"
+sha3 = "0.10"

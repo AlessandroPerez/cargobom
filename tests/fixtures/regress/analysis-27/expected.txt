@@ -3,8 +3,12 @@
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:23 | elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman | [reachable] [call] in unmodelled::main; use: keyderive; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`
   occ ECDH-P-256 | crypto:algorithm:ECDH-P-256 | src/main.rs:30:43 | elliptic_curve::ecdh::EphemeralSecret::<C>::public_key | [reachable] [call] in unmodelled::main; public_key: setup, not a use; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:16:26 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `"md5" => Box::new(Md5::new()),`; code: `Md5::new`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:19:6 | digest::digest::DynDigest::update | [reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); line: `h.update(data);`; code: `update`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:20:6 | digest::digest::DynDigest::finalize | [reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); line: `h.finalize().to_vec()`; code: `finalize`
   occ MD5 | crypto:algorithm:MD5 | src/main.rs:25:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; line: `let a = Md5::digest(&d);`; code: `Md5::digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:22 | digest::digest::Digest::new | [reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `_ => Box::new(sha2::Sha256::new()),`; code: `sha2::Sha256::new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:19:6 | digest::digest::DynDigest::update | [reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); line: `h.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:20:6 | digest::digest::DynDigest::finalize | [reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); line: `h.finalize().to_vec()`; code: `finalize`
   occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:26:12 | digest::digest::Digest::digest | [reachable] [call] in unmodelled::main; use: digest; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`
   occ base16ct | pkg:cargo/base16ct@0.2.0 | Cargo.lock:6:0 | base16ct | [manifest] locked base16ct 0.2.0; reached via unmodelled -> p256 -> elliptic-curve -> base16ct
   occ base64ct | pkg:cargo/base64ct@1.8.3 | Cargo.lock:12:0 | base64ct | [manifest] locked base64ct 1.8.3; reached via unmodelled -> p256 -> elliptic-curve -> pem-rfc7468 -> base64ct
@@ -40,8 +44,6 @@
   occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:308:0 | signature | [manifest] locked signature 2.2.0; reached via unmodelled -> p256 -> ecdsa -> signature
   occ spki | pkg:cargo/spki@0.7.3 | Cargo.lock:318:0 | spki | [manifest] locked spki 0.7.3; reached via unmodelled -> p256 -> ecdsa -> spki
   occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:328:0 | subtle | [manifest] locked subtle 2.6.1; reached via unmodelled -> md-5 -> digest -> subtle
-  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:19:6 | digest::digest::DynDigest::update | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.update(data);`; code: `update`
-  occ unknown | crypto:algorithm:unknown:hash:digest | src/main.rs:20:6 | digest::digest::DynDigest::finalize | [reachable] [call] in unmodelled::hash_by_name; use: digest; algorithm unresolved: a trait object (`dyn DynDigest`): its type is chosen at run time; line: `h.finalize().to_vec()`; code: `finalize`
   occ zeroize | pkg:cargo/zeroize@1.9.1 | Cargo.lock:363:0 | zeroize | [manifest] locked zeroize 1.9.1; reached via unmodelled -> p256 -> elliptic-curve -> zeroize
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:confidence=high
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:detection:method=type-resolved
@@ -54,14 +56,14 @@
   prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
   prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
   prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
-  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=2
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=4
   prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
   prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
@@ -97,7 +99,6 @@
   prop der | pkg:cargo/der@0.7.10 | rcbom:usage=present
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
   prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
-  prop digest | pkg:cargo/digest@0.10.7 | rcbom:usage=reachable
   prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:crypto-role=algorithm
   prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:scope=required
   prop ecdsa | pkg:cargo/ecdsa@0.16.9 | rcbom:usage=present
@@ -169,13 +170,6 @@
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:algorithm=unresolved
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:confidence=high
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:detection:method=type-resolved
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:functions:source=observed
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:kb:version=0.2.0
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:occurrences=2
-  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:reachability=reachable
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:crypto-role=support
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
@@ -184,7 +178,6 @@ asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algor
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset unknown | crypto:algorithm:unknown:hash:digest | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
@@ -284,7 +277,6 @@ dependency crypto:algorithm:ECDH-P-256
 dependency crypto:algorithm:MD5
 dependency crypto:algorithm:SHA-256
 dependency crypto:algorithm:SHA3-256
-dependency crypto:algorithm:unknown:hash:digest
 dependency pkg:cargo/base16ct@0.2.0
 dependency pkg:cargo/base64ct@1.8.3
 dependency pkg:cargo/block-buffer@0.10.4
@@ -319,7 +311,6 @@ dependency pkg:cargo/zeroize@1.9.1
 doc bomFormat="CycloneDX"
 doc specVersion="1.7"
 doc version=1
-provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:unknown:hash:digest
 provides pkg:cargo/elliptic-curve@0.13.8 -> crypto:algorithm:ECDH-P-256
 provides pkg:cargo/md-5@0.10.6 -> crypto:algorithm:MD5
 provides pkg:cargo/p256@0.13.2 -> crypto:algorithm:ECDH-P-256

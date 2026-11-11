@@ -1,0 +1,13 @@
+# Trait objects made of types that hold an `async` closure (jj's `stream::unfold(self, async
+# |state| ..)` boxed as a `dyn Stream`, its `AsyncCliDispatchFn(async |ui, ..| ..)` boxed as a
+# `dyn AsyncCliDispatch`): the methods such an object runs are reached, the ones only the object
+# calls too (`size_hint`), and so is the closure's body. No walk gap.
+[package]
+name = "driver-38"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+
+[workspace]

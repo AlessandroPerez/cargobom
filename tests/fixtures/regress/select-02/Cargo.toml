@@ -1,0 +1,17 @@
+# `--no-default-features`: the default feature's BLAKE3 is not built; the fallback's SHA-256 is.
+[package]
+name = "select-02"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["fast"]
+fast = ["dep:blake3"]
+mac = ["dep:hmac"]
+
+[dependencies]
+sha2 = "0.10"
+blake3 = { version = "1", optional = true }
+hmac = { version = "0.12", optional = true }
+
+[workspace]

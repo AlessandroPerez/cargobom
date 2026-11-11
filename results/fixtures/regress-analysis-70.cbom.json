@@ -221,6 +221,13 @@
             "symbol": "ring::digest::SHA256"
           },
           {
+            "additionalContext": "[reachable] [call] in a70::main::{closure#1}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a70::main`; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`",
+            "line": 42,
+            "location": "src/main.rs",
+            "offset": 60,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a70::main; line: `g(&SHA256, &d);`; code: `SHA256`",
             "line": 44,
             "location": "src/main.rs",
@@ -253,7 +260,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -460,7 +467,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a70::main::{closure#1}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a70::main::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 60,
@@ -613,7 +620,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0d89d34a-87f9-8f5f-95a7-d8e28475f55c",
+  "serialNumber": "urn:uuid:3c41e0b3-d3e9-82b7-8ef8-415e658cbef0",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,17 @@
+# `--all-features`: the default BLAKE3 and the optional HMAC-SHA-256 are both built; the fallback SHA-256 digest is not.
+[package]
+name = "select-03"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["fast"]
+fast = ["dep:blake3"]
+mac = ["dep:hmac"]
+
+[dependencies]
+sha2 = "0.10"
+blake3 = { version = "1", optional = true }
+hmac = { version = "0.12", optional = true }
+
+[workspace]

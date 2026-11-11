@@ -7,6 +7,7 @@
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:46 | ring::digest::digest | [reachable] [call] in a70::my4; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a70::main`; line: `fn my4(a: &'static Digest, d: &[u8]) -> Out { digest(a, d) }`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:30:10 | ring::digest::SHA256 | [reachable] [static] in a70::main; line: `(*B)(&SHA256, &d);`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:34:13 | ring::digest::SHA256 | [reachable] [static] in a70::main; line: `(OPS.h)(&SHA256, &d);`; code: `SHA256`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:42:60 | ring::digest::digest | [reachable] [call] in a70::main::{closure#1}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a70::main`; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:44:7 | ring::digest::SHA256 | [reachable] [static] in a70::main; line: `g(&SHA256, &d);`; code: `SHA256`
   occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:9:46 | ring::digest::digest | [reachable] [call] in a70::my1; use: digest; algorithm one of 3 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `a70::main`; line: `fn my1(a: &'static Digest, d: &[u8]) -> Out { digest(a, d) }`; code: `digest`
   occ SHA-384 | crypto:algorithm:SHA-384 | src/main.rs:13:46 | ring::digest::digest | [reachable] [call] in a70::my5; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `a70::main`; line: `fn my5(a: &'static Digest, d: &[u8]) -> Out { digest(a, d) }`; code: `digest`
@@ -27,7 +28,7 @@
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.lock:52:0 | ring | [manifest] locked ring 0.17.14; reached via a70 -> ring
   occ ring | pkg:cargo/ring@0.17.14 | Cargo.toml:9:0 | ring | [manifest] declared by a70 (dependencies)
   occ ring | pkg:cargo/ring@0.17.14 | ring-0.17.14/Cargo.toml:18:0 | links | [manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed
-  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:42:60 | ring::digest::digest | [reachable] [call] in a70::main::{closure#1}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`
+  occ unknown | crypto:algorithm:unknown:hash:ring | src/main.rs:42:60 | ring::digest::digest | [reachable] [call] in a70::main::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a70::main at src/main.rs:42:17; line: `let mut fm = |a: &'static Digest, x: &[u8]| { cnt += 1; digest(a, x) };`; code: `digest`
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:confidence=high
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:detection:method=type-resolved
   prop SHA-1 | crypto:algorithm:SHA-1 | rcbom:functions:source=observed
@@ -39,7 +40,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
-  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved

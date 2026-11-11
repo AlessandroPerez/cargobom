@@ -1,0 +1,90 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:15:49 | digest::digest::Digest::digest | [reachable] [call] in select_04::main; use: digest; line: `println!("{} {:x?} {:x?}", env!("BUILD_ID"), Sha256::digest(input.as_bytes()), platform(input.as_bytes()));`; code: `Sha256::digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/main.rs:5:4 | digest::digest::Digest::digest | [reachable] [call] in select_04::platform; use: digest; line: `sha3::Sha3_256::digest(data).to_vec()`; code: `sha3::Sha3_256::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via select-04 -> sha2 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via select-04 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via select-04 -> sha2 -> digest
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:60:0 | keccak | [manifest] locked keccak 0.1.6; reached via select-04 -> sha3 -> keccak
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.lock:95:0 | sha1 | [manifest] locked sha1 0.10.7; reached via select-04 -> sha1
+  occ sha1 | pkg:cargo/sha1@0.10.7 | Cargo.toml:18:0 | sha1 | [manifest] declared by select-04 (build-dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:106:0 | sha2 | [manifest] locked sha2 0.10.9; reached via select-04 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by select-04 (dependencies)
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:117:0 | sha3 | [manifest] locked sha3 0.10.9; reached via select-04 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:9:0 | sha3 | [manifest] declared by select-04 (dependencies)
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:crypto-role=algorithm
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:scope=build-only
+  prop sha1 | pkg:cargo/sha1@0.10.7 | rcbom:usage=unknown
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library sha1 0.10.7 | pkg:cargo/sha1@0.10.7 | purl pkg:cargo/sha1@0.10.7
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/select-04@0.1.0 -> pkg:cargo/sha1@0.10.7
+dep pkg:cargo/select-04@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/select-04@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/sha1@0.10.7 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA3-256
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/select-04@0.1.0
+dependency pkg:cargo/sha1@0.10.7
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha3@0.10.9
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
+root {"bom-ref": "pkg:cargo/select-04@0.1.0", "name": "select-04", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/select-04@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin select-04
+run rcbom:run:boundary-check=2 calls into crypto packages: 2 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=13
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=104
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-musl
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

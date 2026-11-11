@@ -1123,6 +1123,13 @@
             "symbol": "rand::rng::RngExt::random"
           },
           {
+            "additionalContext": "[reachable] [call] in rustic_core::commands::check::ReadSubsetOption::apply_with_rng; use: generate; `impl Rng` is `rand::rngs::thread::ThreadRng` at every call of `rustic_core::commands::check::ReadSubsetOption::apply_with_rng`, which only its crate makes; line: `packs.shuffle(rng);`; code: `shuffle`",
+            "line": 90,
+            "location": "src/commands/check.rs",
+            "offset": 18,
+            "symbol": "rand::seq::slice::SliceRandom::shuffle"
+          },
+          {
             "additionalContext": "[reachable] [call] in rustic_core::crypto::aespoly1305::Key::new; use: generate; line: `rng().fill_bytes(&mut key);`; code: `fill_bytes`",
             "line": 33,
             "location": "src/crypto/aespoly1305.rs",
@@ -1180,7 +1187,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "5"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -1533,61 +1540,6 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:algorithm:unknown:drbg:rand",
-      "cryptoProperties": {
-        "algorithmProperties": {
-          "cryptoFunctions": [
-            "generate"
-          ],
-          "primitive": "drbg"
-        },
-        "assetType": "algorithm"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "additionalContext": "[reachable] [call] in rustic_core::commands::check::ReadSubsetOption::apply_with_rng; use: generate; algorithm unresolved: `rand::seq::slice::SliceRandom::shuffle` of rand 0.10.2 on a type parameter (`impl Rng`) of the library's generic API: its callers choose the type; line: `packs.shuffle(rng);`; code: `shuffle`",
-            "line": 90,
-            "location": "src/commands/check.rs",
-            "offset": 18,
-            "symbol": "rand::seq::slice::SliceRandom::shuffle"
-          }
-        ]
-      },
-      "name": "unknown",
-      "properties": [
-        {
-          "name": "rcbom:detection:method",
-          "value": "type-resolved"
-        },
-        {
-          "name": "rcbom:confidence",
-          "value": "high"
-        },
-        {
-          "name": "rcbom:reachability",
-          "value": "reachable"
-        },
-        {
-          "name": "rcbom:functions:source",
-          "value": "observed"
-        },
-        {
-          "name": "rcbom:kb:version",
-          "value": "0.2.0"
-        },
-        {
-          "name": "rcbom:algorithm",
-          "value": "unresolved"
-        },
-        {
-          "name": "rcbom:occurrences",
-          "value": "1"
-        }
-      ],
-      "type": "cryptographic-asset"
-    },
-    {
       "bom-ref": "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes",
       "cryptoProperties": {
         "algorithmProperties": {
@@ -1792,8 +1744,7 @@
         "pkg:cargo/rand_core@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:ChaCha12-RNG",
-        "crypto:algorithm:unknown:drbg:rand"
+        "crypto:algorithm:ChaCha12-RNG"
       ],
       "ref": "pkg:cargo/rand@0.10.2"
     },
@@ -1896,10 +1847,6 @@
     },
     {
       "dependsOn": [],
-      "ref": "crypto:algorithm:unknown:drbg:rand"
-    },
-    {
-      "dependsOn": [],
       "ref": "crypto:algorithm:unknown:unknown:aes256ctr_poly1305aes"
     }
   ],
@@ -1969,7 +1916,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9cd7d7d5-e4cb-8c02-9d50-dfc4dcbf88a1",
+  "serialNumber": "urn:uuid:38960dc0-ee12-8be1-8b9d-461a096d49bd",
   "specVersion": "1.7",
   "version": 1
 }

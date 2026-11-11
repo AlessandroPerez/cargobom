@@ -102,7 +102,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a157::other; instantiated by a157::main at src/main.rs:28:12 as `other`; line: `fn other<F: Fn(&D) -> usize>(f: F) -> usize { f(&(&SHA1 as D)) }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a157::other; `a157::other::<{closure@a157::main::{closure#2}}>` instantiated by a157::main at src/main.rs:28:12 as `other`; line: `fn other<F: Fn(&D) -> usize>(f: F) -> usize { f(&(&SHA1 as D)) }`; code: `SHA1`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 51,
@@ -120,6 +120,13 @@
             "line": 26,
             "location": "src/main.rs",
             "offset": 20,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a157::main::{closure#3}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:30:12; line: `let g = |a: D| digest(a, &d).as_ref().len(); // SHA-256, SHA-1`; code: `digest`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 19,
             "symbol": "ring::digest::digest"
           },
           {
@@ -229,7 +236,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "14"
+          "value": "15"
         }
       ],
       "type": "cryptographic-asset"
@@ -277,7 +284,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a157::main::{closure#3}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:30:12; line: `let g = |a: D| digest(a, &d).as_ref().len(); // SHA-256, SHA-1`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a157::main::{closure#3}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:30:12; line: `let g = |a: D| digest(a, &d).as_ref().len(); // SHA-256, SHA-1`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 19,
@@ -584,6 +591,13 @@
             "symbol": "ring::digest::SHA512"
           },
           {
+            "additionalContext": "[reachable] [call] in a157::main::{closure#5}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `a157::main`; instantiated by a157::main at src/main.rs:48:47; line: `let cb: Box<dyn Fn(D) -> usize> = Box::new(|a| digest(a, b\"cb\").as_ref().len()); // SHA-512`; code: `digest`",
+            "line": 48,
+            "location": "src/main.rs",
+            "offset": 51,
+            "symbol": "ring::digest::digest"
+          },
+          {
             "additionalContext": "[reachable] [static] in a157::main; line: `let _ = cb(&SHA512);`; code: `SHA512`",
             "line": 49,
             "location": "src/main.rs",
@@ -665,7 +679,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "18"
+          "value": "19"
         }
       ],
       "type": "cryptographic-asset"
@@ -705,7 +719,7 @@
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a157::main::{closure#5}; use: digest; algorithm unresolved: a parameter, whose arguments (where a recorded call passes one) name no algorithm; instantiated by a157::main at src/main.rs:48:47; line: `let cb: Box<dyn Fn(D) -> usize> = Box::new(|a| digest(a, b\"cb\").as_ref().len()); // SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a157::main::{closure#5}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by a157::main at src/main.rs:48:47; line: `let cb: Box<dyn Fn(D) -> usize> = Box::new(|a| digest(a, b\"cb\").as_ref().len()); // SHA-512`; code: `digest`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 51,
@@ -893,7 +907,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:26d98439-e9f4-89dc-a4ac-20f2897a0e44",
+  "serialNumber": "urn:uuid:e2e12cf4-757d-8f98-9e24-4d550c0f52a4",
   "specVersion": "1.7",
   "version": 1
 }
