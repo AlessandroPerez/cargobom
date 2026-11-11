@@ -41,8 +41,9 @@ impl Files<'_> {
 
     /// The type aliases the Rust files of the package in `dir` define (`pub type Sha256 =
     /// CoreWrapper<..>;`, hmac's `pub type Hmac<D> = CoreWrapper<HmacCore<D>>;`): name -> the
-    /// types they stand for, as `norm_path` writes them, a generic one's parameters as written
-    /// (`expand_aliases` leaves a name given arguments as it is).
+    /// types they stand for, as `norm_path` writes them, a generic one's parameters as written.
+    /// A generic one is also listed as `Name<>`, its parameters' names before the type as the
+    /// file writes it (`D|CoreWrapper<HmacCore<D>>`), for `expand_aliases` to apply.
     pub(super) fn package_aliases(&mut self, dir: &Path) -> Rc<HashMap<String, Vec<String>>> {
         if let Some(a) = self.pkg_aliases.get(dir) {
             return a.clone();
@@ -52,10 +53,28 @@ impl Files<'_> {
             let Ok(t) = std::fs::read_to_string(&f) else {
                 continue;
             };
-            for m in re!(r"\btype\s+(\w+)\s*(?:<[^=;{}]*>)?\s*=\s*([^;{}]+);").captures_iter(&t) {
+            for m in re!(r"\btype\s+(\w+)\s*(?:<([^=;{}]*)>)?\s*=\s*([^;{}]+);").captures_iter(&t) {
                 out.entry(m[1].to_string())
                     .or_default()
-                    .push(norm_path(&m[2]));
+                    .push(norm_path(&m[3]));
+                // (type and const parameters by name; a lifetime is none of the arguments
+                // `norm_path` keeps)
+                let params: Vec<String> = m
+                    .get(2)
+                    .map(|g| split_top(g.as_str()))
+                    .unwrap_or_default()
+                    .iter()
+                    .map(|p| p.trim().trim_start_matches("const ").trim())
+                    .filter(|p| !p.starts_with('\'') && !p.is_empty())
+                    .filter_map(|p| re!(r"^\w+").find(p).map(|w| w.as_str().to_string()))
+                    .collect();
+                if !params.is_empty() {
+                    out.entry(format!("{}<>", &m[1])).or_default().push(format!(
+                        "{}|{}",
+                        params.join(","),
+                        m[3].trim()
+                    ));
+                }
             }
         }
         let a = Rc::new(out);
@@ -126,10 +145,19 @@ impl Files<'_> {
                 continue;
             };
             let here = f.parent().unwrap_or(dir);
-            for m in re!(r#"#\[path\s*=\s*"([^"]+)"\s*\]\s*(?:#\[[^\]]*\]\s*)*(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+(\w+)\s*;"#)
+            // (`#[path = "x.rs"] mod m;`, also under a condition this check does not evaluate:
+            // `#[cfg_attr(unix, path = "unix.rs")] #[cfg_attr(windows, path = "windows.rs")]
+            // mod platform;` makes either file the module)
+            for m in re!(r"((?:#\[[^\]]*\]\s*)+)(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+(\w+)\s*;")
                 .captures_iter(&t)
             {
-                out.paths.push((f.clone(), rcbom_manifest::normalize(&here.join(&m[1])), m[2].to_string()));
+                for a in re!(r#"(?:#\[|,)\s*path\s*=\s*"([^"]+)""#).captures_iter(&m[1]) {
+                    out.paths.push((
+                        f.clone(),
+                        rcbom_manifest::normalize(&here.join(&a[1])),
+                        m[2].to_string(),
+                    ));
+                }
             }
             for m in re!(r#"\binclude!\s*\(\s*"([^"]+)"\s*\)"#).captures_iter(&t) {
                 out.included
@@ -194,16 +222,33 @@ impl Files<'_> {
 
     /// The types a name in a file of package `owner` may be an alias of: those its own
     /// package defines under that name, else those of the packages the file imports the name
-    /// from (ssh-encoding's `impl Writer for Sha256` names sha2's alias).
+    /// from (ssh-encoding's `impl Writer for Sha256` names sha2's alias), or of the crate its
+    /// path starts at (`kem::Ciphertext`); and what the package imports under that name from
+    /// another (`use Kem as KemTrait;` in one file, `impl KemTrait for X` in the next). A name
+    /// ending in `<>` asks for a generic alias (`package_aliases`).
     pub(super) fn alias_targets(
         &mut self,
         src: &Source,
         owner: Option<&rcbom_manifest::Pkg>,
         name: &str,
     ) -> Vec<String> {
+        let generic = name.ends_with("<>");
+        let plain = name.trim_end_matches("<>");
+        let (root, bare) = match plain.rsplit_once("::") {
+            Some((q, b)) => (q.split("::").next().map(str::trim), b.trim()),
+            None => (None, plain),
+        };
+        let key = if generic {
+            format!("{bare}<>")
+        } else {
+            bare.to_string()
+        };
         let mut dirs: Vec<PathBuf> = owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
         let owner_id = owner.map(|p| p.id.repr.clone());
-        for r in import_roots(&src.binds, name).into_iter().flatten() {
+        for r in import_roots(&src.binds, root.unwrap_or(bare))
+            .into_iter()
+            .flatten()
+        {
             for p in self.crate_refs(owner_id.as_deref(), &r) {
                 if let Some(pkg) = self
                     .man
@@ -216,12 +261,332 @@ impl Files<'_> {
             }
         }
         let mut out = Vec::new();
-        for d in dirs {
-            if let Some(t) = self.package_aliases(&d).get(name) {
+        for d in &dirs {
+            if let Some(t) = self.package_aliases(d).get(&key) {
                 out.extend(t.iter().cloned());
             }
         }
+        // (a name a `use` gives another item: in the package, or in the package the file
+        // imports the name from, async-std's `pub use futures_io::AsyncRead as Read;` for a
+        // file's `use async_std::io::Read;`)
+        if !generic {
+            for d in &dirs {
+                for b in self.package_binds(d).iter().filter(|b| b.name == bare) {
+                    if let Some(l) = b.path.last()
+                        && l != bare
+                        && l != "self"
+                        && !out.contains(l)
+                    {
+                        out.push(l.clone());
+                    }
+                }
+            }
+        }
         out
+    }
+
+    /// Whether two positions of a file are calls of one method on one variable: the same name
+    /// after a `.`, on receivers written alike whose variable is the same binding (or the same
+    /// function's parameter, `self`, or the same static). The variable has one type, so the two
+    /// calls are of one type's method.
+    pub(super) fn same_receiver(
+        &mut self,
+        location: &str,
+        a: (usize, usize),
+        b: (usize, usize),
+    ) -> bool {
+        let Ok(path) = self.resolve(location) else {
+            return false;
+        };
+        let Some(src) = self.source(&path) else {
+            return false;
+        };
+        let s = &src.code;
+        let call = |at: (usize, usize)| -> Option<(String, String, (usize, usize, usize))> {
+            if at.0 == 0 || at.0 > src.lines.len() || at.1 >= src.lines[at.0 - 1].chars().count() {
+                return None;
+            }
+            let i = src.idx(at);
+            if !word_start(s, i) {
+                return None;
+            }
+            let dot = before_blank(s, i).filter(|&d| s[d] == '.')?;
+            let (r, root, _) = receiver_at(s, dot)?;
+            let text: String = src.text(r, dot).split_whitespace().collect();
+            let item = |k: usize| {
+                src.enclosing(src.pos(k), &[ItemKind::Fn])
+                    .map_or(0, |f| src.idx(f.start))
+            };
+            let bound = match lookup(&src, r, &root)? {
+                Found::Bind(bd) => (0, bd.stmt.0, bd.pat.0),
+                Found::Param(_) => (1, item(r), 0),
+                Found::Item(k) => (2, k, 0),
+            };
+            Some((word_of(s, i), text, bound))
+        };
+        matches!((call(a), call(b)), (Some(x), Some(y)) if x == y)
+    }
+
+    /// Whether two positions of a file are consecutive calls of one method in a chain
+    /// (`H::default()\n.absorb(a)\n.absorb(b)`), the method one that returns its own type: the
+    /// function around `inside` (a location, line and column in its body) is declared `-> Self`
+    /// (or a reference to it). The second call's receiver is then of the first's type.
+    pub(super) fn chained_call(
+        &mut self,
+        location: &str,
+        a: (usize, usize),
+        b: (usize, usize),
+        inside: (&str, usize, usize),
+    ) -> bool {
+        let mut returns_self = || -> Option<bool> {
+            let path = self.resolve(inside.0).ok()?;
+            let src = self.source(&path)?;
+            let f = src.enclosing((inside.1, inside.2), &[ItemKind::Fn])?;
+            let ret = fn_sig(&src, f).ret?;
+            let ret = re!(r"'\w+").replace_all(&ret, "");
+            let ret = ret.trim().trim_start_matches('&').trim();
+            Some(ret.strip_prefix("mut ").unwrap_or(ret).trim() == "Self")
+        };
+        if returns_self() != Some(true) {
+            return false;
+        }
+        let Ok(path) = self.resolve(location) else {
+            return false;
+        };
+        let Some(src) = self.source(&path) else {
+            return false;
+        };
+        let s = &src.code;
+        let at = |p: (usize, usize)| {
+            (p.0 >= 1 && p.0 <= src.lines.len() && p.1 < src.lines[p.0 - 1].chars().count())
+                .then(|| src.idx(p))
+        };
+        let (Some(x), Some(y)) = (at(a), at(b)) else {
+            return false;
+        };
+        let (x, y) = (x.min(y), x.max(y));
+        let name = word_of(s, x);
+        if name.is_empty() || !word_start(s, x) || word_of(s, y) != name {
+            return false;
+        }
+        // the first call's arguments end where the second's `.` follows
+        let open = skip_blank(s, x + name.chars().count());
+        let Some(close) = (s.get(open) == Some(&'('))
+            .then(|| close_of_at(s, open))
+            .flatten()
+        else {
+            return false;
+        };
+        let dot = skip_blank(s, close + 1);
+        s.get(dot) == Some(&'.') && skip_blank(s, dot + 1) == y
+    }
+
+    /// Whether the definition of the constant `name`, which code of package `owner` names by
+    /// the path `quals` before it, leads to a function named `target`, as far as the text
+    /// shows and four steps deep: the constant's value, the macro that declares it or that it
+    /// invokes, the functions those call, each read in its own package (sqlx's
+    /// `sqlx_postgres::any::DRIVER`, declared by sqlx-core's `declare_driver!(DRIVER = ..)` as
+    /// `AnyDriver::with_migrate::<DB>()`, whose body holds `AnyConnection::connect_with_db`).
+    pub(super) fn constant_leads_to(
+        &mut self,
+        src: &Source,
+        owner: Option<&rcbom_manifest::Pkg>,
+        quals: &[String],
+        name: &str,
+        target: &str,
+    ) -> bool {
+        let own = owner.map(|p| p.manifest_dir.clone());
+        let relative = |r: &str| matches!(r, "crate" | "self" | "super" | "$crate" | "Self");
+        // the packages a path's first segment names from a package's code: that package for
+        // a relative path or one of its modules, else the dependency of that name
+        let dirs_of = |me: &Self, d: Option<&PathBuf>, root: Option<&str>| -> Vec<PathBuf> {
+            let here: Vec<PathBuf> = d.into_iter().cloned().collect();
+            let Some(root) = root.filter(|r| !relative(r)) else {
+                return here;
+            };
+            let id = d.and_then(|d| {
+                me.man
+                    .packages
+                    .iter()
+                    .find(|p| p.manifest_dir == *d)
+                    .map(|p| p.id.repr.clone())
+            });
+            let found: Vec<PathBuf> = me
+                .crate_refs(id.as_deref(), root)
+                .iter()
+                .filter_map(|r| {
+                    me.man
+                        .packages
+                        .iter()
+                        .find(|k| pkg_ref(&k.name, &k.version.to_string()) == *r)
+                        .map(|k| k.manifest_dir.clone())
+                })
+                .collect();
+            if found.is_empty() { here } else { found }
+        };
+        let first = quals.first().map(String::as_str).or_else(|| {
+            // (a name the file imports: from the crate its `use` starts at)
+            src.binds
+                .iter()
+                .find(|b| b.name == name)
+                .and_then(|b| b.path.first())
+                .map(String::as_str)
+        });
+        let mut queue: Vec<(PathBuf, String)> = dirs_of(self, own.as_ref(), first)
+            .into_iter()
+            .map(|d| (d, name.to_string()))
+            .collect();
+        let word = |w: &str| Regex::new(&format!(r"\b{}\b", regex::escape(w))).ok();
+        let Some(wanted) = word(target) else {
+            return false;
+        };
+        let mut texts: HashMap<PathBuf, Rc<Vec<String>>> = HashMap::new();
+        let mut seen: HashSet<(PathBuf, String)> = HashSet::new();
+        // where the bracket opened at byte `open` closes
+        let close = |t: &str, open: usize| -> usize {
+            let mut depth = 0i32;
+            for (i, c) in t[open..].char_indices() {
+                match c {
+                    '(' | '[' | '{' => depth += 1,
+                    ')' | ']' | '}' => {
+                        depth -= 1;
+                        if depth <= 0 {
+                            return open + i + 1;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            t.len()
+        };
+        for _ in 0..4 {
+            let mut next: Vec<(PathBuf, String)> = Vec::new();
+            for (d, n) in std::mem::take(&mut queue) {
+                if seen.len() > 200 || !seen.insert((d.clone(), n.clone())) {
+                    continue;
+                }
+                let files = texts
+                    .entry(d.clone())
+                    .or_insert_with(|| {
+                        Rc::new(
+                            package_files(&d)
+                                .iter()
+                                .filter_map(|f| std::fs::read_to_string(f).ok())
+                                .collect(),
+                        )
+                    })
+                    .clone();
+                let Some(named) = word(&n) else { continue };
+                let defs = Regex::new(&format!(
+                    r"\b(?:(?:const|static)\s+(?:mut\s+)?{0}\s*:|fn\s+{0}\b|macro_rules!\s*{0}\b)",
+                    regex::escape(&n)
+                ));
+                let Ok(defs) = defs else { continue };
+                for t in files.iter().filter(|t| named.is_match(t)) {
+                    // the definitions' texts: a constant's to its `;`, a function's or a
+                    // macro's to the end of its block; and the macro invocations that are
+                    // given the name (`declare_driver!(DRIVER = Postgres);`)
+                    let mut regions: Vec<&str> = Vec::new();
+                    for m in defs.find_iter(t) {
+                        let rest = &t[m.start()..];
+                        let end = if m.as_str().starts_with(['c', 's']) {
+                            let mut depth = 0i32;
+                            rest.char_indices()
+                                .find(|&(_, c)| {
+                                    match c {
+                                        '(' | '[' | '{' => depth += 1,
+                                        ')' | ']' | '}' => depth -= 1,
+                                        _ => {}
+                                    }
+                                    c == ';' && depth <= 0
+                                })
+                                .map_or(rest.len(), |(i, _)| i)
+                        } else {
+                            match rest.find(['{', ';']) {
+                                Some(o) if rest[o..].starts_with('{') => close(rest, o),
+                                Some(o) => o,
+                                None => rest.len(),
+                            }
+                        };
+                        regions.push(&rest[..end]);
+                    }
+                    for m in re!(r"((?:[A-Za-z_$]\w*\s*::\s*)*[A-Za-z_]\w*)\s*!\s*[\(\[\{]")
+                        .captures_iter(t)
+                    {
+                        let whole = m.get(0).map_or(0..0, |g| g.range());
+                        let end = close(t, whole.end - 1);
+                        if named.is_match(&t[whole.end..end]) && &m[1] != "macro_rules" {
+                            let path: Vec<&str> = m[1].split("::").map(str::trim).collect();
+                            let root = (path.len() > 1).then(|| path[0]);
+                            let last = path[path.len() - 1].to_string();
+                            for k in dirs_of(self, Some(&d), root) {
+                                next.push((k, last.clone()));
+                            }
+                        }
+                    }
+                    for r in regions {
+                        if wanted.is_match(r) {
+                            return true;
+                        }
+                        // what the definition calls or invokes
+                        for m in re!(
+                            r"((?:[A-Za-z_$]\w*\s*::\s*)*[A-Za-z_]\w*)\s*(?:::\s*<[^;(){}]*>)?\s*[!(]"
+                        )
+                        .captures_iter(r)
+                        {
+                            let path: Vec<&str> = m[1].split("::").map(str::trim).collect();
+                            let last = path[path.len() - 1];
+                            if last == n
+                                || matches!(last, "Some" | "Ok" | "Err" | "if" | "match" | "fn")
+                            {
+                                continue;
+                            }
+                            let root = (path.len() > 1).then(|| path[0]);
+                            for k in dirs_of(self, Some(&d), root) {
+                                next.push((k, last.to_string()));
+                            }
+                        }
+                    }
+                }
+            }
+            if next.is_empty() {
+                return false;
+            }
+            queue = next;
+        }
+        false
+    }
+
+    /// Whether two positions of a file are one awaited call's: the name of the call that
+    /// builds a future and the `await` that polls it (`.with_socket(..)\n.await`). An `async`
+    /// function's body is made by the one and run by the other. Or one borrowed closure's:
+    /// its `&` and its `|` (`by_ref(&|alg| ..)`).
+    pub(super) fn awaited_pair(
+        &mut self,
+        location: &str,
+        a: (usize, usize),
+        b: (usize, usize),
+    ) -> bool {
+        let Ok(path) = self.resolve(location) else {
+            return false;
+        };
+        let Some(src) = self.source(&path) else {
+            return false;
+        };
+        let at = |p: (usize, usize)| {
+            (p.0 >= 1 && p.0 <= src.lines.len() && p.1 < src.lines[p.0 - 1].chars().count())
+                .then(|| src.idx(p))
+        };
+        let (Some(x), Some(y)) = (at(a), at(b)) else {
+            return false;
+        };
+        let (lo, hi) = (x.min(y), x.max(y));
+        awaited_call(&src.code, x) == Some(y)
+            || awaited_call(&src.code, y) == Some(x)
+            // (or a borrowed closure's `&` and the closure it borrows: one expression)
+            || (src.code[lo] == '&'
+                && skip_blank(&src.code, lo + 1) == hi
+                && closure_span(&src.code, hi).is_some())
     }
 
     /// A location's file. The standard library's sources are named as rustc names them
@@ -501,6 +866,60 @@ impl Files<'_> {
         out
     }
 
+    /// Whether the function `sym` names (a path from its crate's root: `rand::rng::RngExt::random`,
+    /// `rand::make_rng`), of one of the packages `refs`, runs for a type its caller gives: a
+    /// method of a trait the package declares (the type it is called on implements the trait,
+    /// in whatever crate), or a function declared with a type parameter (`fn make_rng<R:
+    /// SeedableRng>() -> R`, `fn fill(rng: &mut impl Rng)`). The asset at a call of one may be
+    /// that type's, whatever the function's package provides. Read from the package's source.
+    pub(super) fn runs_for_a_type(&mut self, refs: &[String], sym: &[String]) -> bool {
+        let Some(name) = sym.last() else {
+            return false;
+        };
+        let parent = sym.len().checked_sub(2).and_then(|i| sym.get(i));
+        for r in refs {
+            let key = (r.clone(), sym.join("::"));
+            if let Some(v) = self.open_fns.get(&key) {
+                if *v {
+                    return true;
+                }
+                continue;
+            }
+            let dir = self
+                .man
+                .packages
+                .iter()
+                .find(|k| pkg_ref(&k.name, &k.version.to_string()) == *r)
+                .map(|k| k.manifest_dir.clone());
+            let mut open = false;
+            'files: for f in dir.iter().flat_map(|d| package_files(d)) {
+                let Some(src) = self.source(&f) else { continue };
+                for it in &src.items {
+                    open = match it.kind {
+                        ItemKind::Trait => parent == Some(&it.name),
+                        ItemKind::Fn if it.name == *name => {
+                            let (a, b) = src.span(it);
+                            let head: String = src.code[a..b.min(src.code.len())]
+                                .iter()
+                                .take_while(|c| !matches!(c, '{' | ';'))
+                                .collect();
+                            generic_header(&head)
+                        }
+                        _ => false,
+                    };
+                    if open {
+                        break 'files;
+                    }
+                }
+            }
+            self.open_fns.insert(key, open);
+            if open {
+                return true;
+            }
+        }
+        false
+    }
+
     /// A package that provides no asset by being named: the program's own, or an interface
     /// crate (`digest`, `aead`, `signature`: their traits are implemented by others).
     pub(super) fn neutral(&self, r: &str) -> bool {
@@ -547,4 +966,45 @@ impl Files<'_> {
             None => false,
         }
     }
+}
+
+/// Whether a function's header (`fn name<..>(..) -> ..`, up to its body) declares a type
+/// parameter: one among its generic parameters (not a lifetime, not a constant), or an `impl
+/// Trait` among its arguments.
+pub(super) fn generic_header(head: &str) -> bool {
+    let Some(m) = re!(r"\bfn\s+(?:r#)?\w+\s*").find(head) else {
+        return false;
+    };
+    let mut rest = &head[m.end()..];
+    if rest.starts_with('<') {
+        let Some(close) = angle_close(rest, 0) else {
+            return true;
+        };
+        if split_top(&rest[1..close]).iter().any(|p| {
+            let p = p.trim();
+            !p.is_empty() && !p.starts_with('\'') && !p.starts_with("const ")
+        }) {
+            return true;
+        }
+        rest = &rest[close + 1..];
+    }
+    let Some(open) = rest.find('(') else {
+        return false;
+    };
+    let mut depth = 0i32;
+    let mut end = rest.len();
+    for (i, c) in rest[open..].char_indices() {
+        match c {
+            '(' => depth += 1,
+            ')' => {
+                depth -= 1;
+                if depth == 0 {
+                    end = open + i;
+                    break;
+                }
+            }
+            _ => {}
+        }
+    }
+    re!(r"\bimpl\b").is_match(&rest[open..end])
 }

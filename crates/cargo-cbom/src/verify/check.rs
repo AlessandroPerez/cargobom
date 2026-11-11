@@ -153,24 +153,7 @@ impl Files<'_> {
                 .component_ref
                 .strip_prefix("crypto:algorithm:")
                 .unwrap_or(&o.component_ref);
-            let fits = |template: &str| {
-                let mut re = String::from("^");
-                let mut chars = template.chars();
-                while let Some(ch) = chars.next() {
-                    match ch {
-                        '{' => {
-                            chars.by_ref().take_while(|x| *x != '}').for_each(drop);
-                            re.push_str(".+?");
-                        }
-                        '[' => re.push_str("(?:"),
-                        ']' => re.push_str(")?"),
-                        _ => re.push_str(&regex::escape(&ch.to_string())),
-                    }
-                }
-                re.push('$');
-                Regex::new(&re).is_ok_and(|r| r.is_match(asset))
-            };
-            if !names.iter().any(|n| n == asset || fits(n)) {
+            if !names.iter().any(|n| n == asset || fits_template(n, asset)) {
                 return Err(format!(
                     "the knowledge base does not name `{callee}` as {asset}"
                 ));
@@ -390,7 +373,9 @@ impl Files<'_> {
             // position is the operator
             let op = operator_of(&o.symbol);
             if let Some(op) = op
-                && !(at.starts_with(op) && !at[op.len()..].starts_with('='))
+                && !(at.starts_with(op)
+                    && !at[op.len()..].starts_with('=')
+                    && !(op == "await" && at[op.len()..].starts_with(is_ident)))
             {
                 return Err(format!("expected the operator `{op}` in {text:?}"));
             }
@@ -584,8 +569,35 @@ impl Files<'_> {
                     }
                 }
             }
-            if pointer.is_none() && op.is_none() && !(ok && starts_token) {
+            // (a `for` loop calls its iterator's `next`, and `into_iter` first: at the `for`)
+            let looped = re!(
+                r"core::iter::traits::(?:iterator::Iterator\b.*::next|collect::IntoIterator\b.*::into_iter)$"
+            )
+            .is_match(&o.symbol)
+                && at.starts_with("for")
+                && !at["for".len()..].starts_with(is_ident);
+            if pointer.is_none() && op.is_none() && !looped && !(ok && starts_token) {
                 return Err(format!("expected `{ident}` in {text:?}"));
+            }
+            // a method called on the result of a call of the same name, or whose result one is
+            // called on (`.get_ref()` three times down a chain, each another type's): where the
+            // CBOM does not cite the neighbour as this function too, the text cannot say which
+            // of them is the symbol's, and the position is one of that range
+            if pointer.is_none() && op.is_none() {
+                for (l, c) in chain_neighbours(&src, src.idx((line, offset)), &ident) {
+                    // (another occurrence: not this one's own position, beside the one a
+                    // shift moved it to)
+                    let same = self
+                        .at_pos
+                        .get(&(o.location.clone(), l, c))
+                        .is_some_and(|v| {
+                            v.iter()
+                                .any(|&j| j != oi && self.occs[j].symbol == o.symbol)
+                        });
+                    if !same {
+                        RANGED.with(|r| r.set(true));
+                    }
+                }
             }
         }
         // an instantiation's position that details cite (`instantiated by X at F:L:C`) is cited
@@ -593,9 +605,13 @@ impl Files<'_> {
         // instantiated may use, beside the algorithm its type argument chooses, one of its own
         // (pgp's `StreamDecryptor::<Aes128>::new`: the cipher chosen, and the SHA-1 of its
         // integrity check, whose occurrences cite the instantiation)
+        // (or by one of this asset's name less its parameters, or more: the instance runs
+        // `RSA-PKCS1-1.5` with whatever hash its callers' values name, and this call's is
+        // `Pkcs1v15Sign::new::<Sha256>()`, RSA-PKCS1-1.5-SHA-256)
         if kind == "instantiation"
             && let Some(by) = self.cited.get(&(o.location.clone(), line, offset))
             && !by.contains(&o.component_ref)
+            && !by.iter().any(|b| self.refines(b, &o.component_ref))
             && by
                 .iter()
                 .any(|b| self.graph.primitive.get(b) == self.graph.primitive.get(&o.component_ref))
@@ -718,12 +734,29 @@ impl Files<'_> {
             // a member through a trait object (`member: dyn, possible (dyn: `T` is coerced to
             // `dyn Tr` ..)`): the call calls a method on an object of `Tr` (or of a trait whose
             // supertraits include it), wherever the receivers' types are known
-            if let Some(m) = re!(r"^member: dyn, possible \(dyn: `[^`]+`(?:, the only type)? (?:is )?coerced to `([^`]+)`")
+            if let Some(m) = re!(r"^member: dyn(?:, possible)? \(dyn: `([^`]+)`(?:, the only type)? (?:is )?coerced to `([^`]+)`")
                 .captures(p)
                 && let Some(at) = call_at
             {
+                // (a member no descriptor names is the type made the object: the knowledge
+                // base names that type as this asset, `receiver: one of 2 types the build makes
+                // a `dyn DynDigest` of` with a `Sha256`)
+                if ctx.details.contains("; receiver: ") {
+                    let asset = o
+                        .component_ref
+                        .strip_prefix("crypto:algorithm:")
+                        .unwrap_or(&o.component_ref);
+                    let names = rcbom_analysis::floor_names(self.kb, "", Some(&m[1]));
+                    if !names.iter().any(|n| n == asset || fits_template(n, asset)) {
+                        return Err(format!(
+                            "the knowledge base does not name `{}` as {asset}",
+                            &m[1]
+                        ));
+                    }
+                }
+                let m = [&m[0], &m[2]];
                 let want = type_name(m[1].trim().trim_start_matches("dyn ").trim());
-                let supers = self.supertraits(&path, &m[1]);
+                let supers = self.supertraits(&path, m[1]);
                 if let Some(ts) = call_dyn_receivers(&src, src.idx(at))
                     && !ts.iter().any(|t| {
                         let mut seen = vec![t.clone()];
@@ -899,7 +932,7 @@ impl Files<'_> {
             kind.as_str(),
             "call" | "static" | "via-static" | "instantiation"
         ) && let Some((quals, _, generics)) = &parsed
-            && let Some(provs) = self.graph.providers.get(&o.component_ref)
+            && let Some(provs) = self.graph.providers.get(&o.component_ref).cloned()
         {
             let sym_segs: Vec<String> = sym
                 .split("::")
@@ -913,12 +946,27 @@ impl Files<'_> {
             let owner_id = owner_id.as_deref();
             let mut roots: Vec<String> = Vec::new();
             let mut unknown = false;
-            // the callee's crate
-            roots.extend(
-                self.lib_refs(&sym_crate)
+            // the callee's crate (not of an instantiation: the function instantiated is of any
+            // crate, the asset is its type argument's, written or not: `Scalar::from_hash(
+            // Sha512::default()..)` chooses SHA-512 for curve25519-dalek's function)
+            // (a function that runs for a type its caller gives, a trait's method or one with
+            // a type parameter, may provide the asset, `Oaep::new::<Sha1>()` of rsa; where it
+            // does not, the asset may be that type's and the crate says nothing:
+            // `rand::make_rng()` making a `rand_chacha::ChaCha20Rng`, `rng.random()` on one)
+            let chosen = kind == "instantiation";
+            let mut open: Vec<String> = Vec::new();
+            if !chosen {
+                let refs: Vec<String> = self
+                    .lib_refs(&sym_crate)
                     .into_iter()
-                    .filter(|r| !self.neutral(r)),
-            );
+                    .filter(|r| !self.neutral(r))
+                    .collect();
+                if self.runs_for_a_type(&refs, &sym_segs) {
+                    open = refs;
+                } else {
+                    roots.extend(refs);
+                }
+            }
             // a written qualifier: a self type, unless the path is the trait's own path
             // (`aes_gcm::aead::KeyInit::new_from_slice`: the qualifiers lead to the trait)
             let trait_path = quals.last().is_some_and(|q| sym_segs.contains(q));
@@ -926,6 +974,7 @@ impl Files<'_> {
                 && !matches!(q0.as_str(), "crate" | "self" | "super" | "Self")
                 && !sym_segs.contains(q0)
                 && !trait_path
+                && !chosen
             {
                 match self.origins(&src, owner_id, q0) {
                     Some(r) => roots.extend(r.into_iter().filter(|r| !self.neutral(r))),
@@ -946,8 +995,9 @@ impl Files<'_> {
             if !method_call || by_generics.iter().any(provides) {
                 roots.extend(by_generics);
             }
-            let provided = roots.iter().any(provides);
+            let provided = roots.iter().chain(&open).any(provides);
             if !unknown && !roots.is_empty() && !provided {
+                roots.extend(open);
                 roots.sort();
                 roots.dedup();
                 return Err(format!(
@@ -1028,7 +1078,7 @@ impl Files<'_> {
                     .iter()
                     .any(|e| e.pattern.is_match(w) && Some(&e.algo.primitive) == prim)
             })
-            .chain(call.types.iter().filter(|w| {
+            .chain(call.foreign_types.iter().filter(|w| {
                 self.kb.types.iter().any(|e| {
                     e.name == **w
                         && Some(&e.algo.primitive) == prim
@@ -1096,36 +1146,38 @@ impl Files<'_> {
         line: usize,
         component_ref: &str,
     ) -> bool {
-        let Some(item) = src
-            .items
-            .iter()
-            .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > attr_line)
-            .min_by_key(|i| i.start)
-        else {
+        let Some((s, open, close)) = derive_body(src, attr_line) else {
             return false;
         };
-        let attached = (attr_line + 1..item.start.0).all(|l| {
-            let t = src.lines[l - 1].trim_start();
-            t.is_empty() || t.starts_with("#[") || t.starts_with("//")
-        });
-        // (inside its body: the item records its header)
-        let s = &src.code;
-        let a = src.idx(item.start);
-        let Some(open) = (a..s.len()).find(|&k| matches!(s[k], '{' | '(' | ';')) else {
-            return false;
-        };
-        let Some(close) = close_of_at(s, open) else {
-            return false;
-        };
-        if !attached || line <= src.pos(open).0 || line > src.pos(close).0 {
+        if line < src.pos(open).0 || line > src.pos(close).0 {
             return false;
         }
-        let Some(ty) = re!(r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:r#)?\w+\s*:\s*([^,/]+)")
-            .captures(&src.lines[line - 1])
-            .map(|m| m[1].to_string())
-        else {
+        // the fields the line declares, inside the body: a struct's `name: Type`, a tuple
+        // struct's types (`pub struct Sha256(sha2::Sha256);`, the whole of it on one line)
+        let from = (open + 1).max(src.idx((line, 0)));
+        let to = close.min(if line < src.lines.len() {
+            src.idx((line + 1, 0))
+        } else {
+            s.len()
+        });
+        if from >= to {
             return false;
-        };
+        }
+        let named = re!(r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:r#)?\w+\s*:\s*(.+)$");
+        let tys: Vec<String> = split_top(&src.text(from, to))
+            .into_iter()
+            .filter_map(|f| {
+                if s[open] == '(' {
+                    Some(f)
+                } else {
+                    named.captures(f.trim()).map(|m| m[1].to_string())
+                }
+            })
+            .collect();
+        let ty = tys.join(", ");
+        if ty.trim().is_empty() {
+            return false;
+        }
         let Some(provs) = self.graph.providers.get(component_ref) else {
             return false;
         };
@@ -1140,6 +1192,17 @@ impl Files<'_> {
                     provs.iter().any(|p| cl.contains(p))
                 })
         })
+    }
+
+    /// Whether one of two assets is the other with more of its parameters named
+    /// (`RSA-PKCS1-1.5-SHA-256` and `RSA-PKCS1-1.5`): by their names, as `extends` reads them.
+    fn refines(&self, a: &str, b: &str) -> bool {
+        let name = |r: &str| r.strip_prefix("crypto:algorithm:").map(str::to_string);
+        let family = |r: &str| self.graph.family.get(r).map(String::as_str);
+        match (name(a), name(b)) {
+            (Some(x), Some(y)) => extends(&x, &y, family(a)) || extends(&y, &x, family(b)),
+            _ => false,
+        }
     }
 
     pub(super) fn check_details(
@@ -1181,10 +1244,59 @@ impl Files<'_> {
             {
                 chain.push((c.clone(), inner.clone()));
             }
+            // a step that names the item it instantiates, where that is not the caller of the
+            // step before (an occurrence several instances of its item reach joins their
+            // chains): the occurrence's item or a caller before, with the position its code
+            // holds; or another instance of the occurrence's item
+            let (named_item, part) = match re!(r"^`([^`]*)` (instantiated by .*)$").captures(part) {
+                Some(m) => (
+                    m.get(1).map(|k| k.as_str()),
+                    m.get(2).map_or(part, |p| p.as_str()),
+                ),
+                None => (None, part),
+            };
+            if let Some(k) = named_item {
+                match chain.iter().rev().find(|(n, _)| n == k) {
+                    Some((n, at)) => {
+                        callee = Some(n.clone());
+                        inner = at.clone();
+                    }
+                    None => match chain.first() {
+                        // (a closure's body is one text whichever instance runs it: named as
+                        // the occurrence names it, without the kind an `async` closure's body
+                        // is printed with, `{closure#0}::<i32>`)
+                        Some((first, at)) if same_item(first, k) => {
+                            let closure = strip_generics(k).trim_end_matches("::").ends_with('}');
+                            callee = Some(if closure {
+                                first.clone()
+                            } else {
+                                k.to_string()
+                            });
+                            inner = at.clone();
+                        }
+                        _ => {
+                            return Err(format!(
+                                "`{part}`: `{k}` is neither the occurrence's item nor a caller \
+                                 before this one"
+                            ));
+                        }
+                    },
+                }
+            }
             let Some(m) =
                 re!(r"^(instantiated by (.*) at|expanded from) ([^\s;]+?):(\d+)(?::(\d+))?(?: as `([^`]*)`)?$")
                     .captures(part)
             else {
+                // (a step without a position, a call in the standard library's optimised
+                // code: the next step instantiates its caller)
+                if let Some(c) = part.strip_prefix("instantiated by ") {
+                    if let Some(n) = in_item(c)
+                        && !earlier.contains(&n.name)
+                    {
+                        earlier.push(n.name);
+                    }
+                    callee = Some(c.to_string());
+                }
                 continue;
             };
             let (file, line) = (m[3].to_string(), m[4].parse::<usize>().unwrap_or(0));
@@ -1240,10 +1352,25 @@ impl Files<'_> {
                     .chain(parts.into_iter().flatten().map(String::as_str))
                     .filter_map(|r| self.graph.primitive.get(r))
                     .collect();
+                // (what this caller's instance chooses: the position may be in generic code,
+                // where another instance of the caller chooses otherwise, `new::<C>(..)` in an
+                // `impl<C> Cipher for Block<C>` instantiated for CTR and for CBC ciphers)
+                let chooser = |j: usize| {
+                    let c = &self.occs[j].context;
+                    c.find("] in ")
+                        .and_then(|k| {
+                            super::lex::parts(&c[k + "] in ".len()..])
+                                .into_iter()
+                                .next()
+                        })
+                        .map(str::trim)
+                };
                 let chosen: Vec<&str> = here
                     .iter()
                     .filter(|&&j| {
                         self.occs[j].context.contains("] [instantiation]")
+                            && chooser(j)
+                                .is_none_or(|i| caller.as_deref().map(str::trim) == Some(i))
                             && self
                                 .graph
                                 .primitive
@@ -1256,6 +1383,7 @@ impl Files<'_> {
                     && !here.iter().any(|&j| {
                         self.occs[j].component_ref == component_ref
                             || parts.is_some_and(|p| p.contains(&self.occs[j].component_ref))
+                            || self.refines(&self.occs[j].component_ref, component_ref)
                     })
                 {
                     return Err(format!(
@@ -1291,7 +1419,12 @@ impl Files<'_> {
                     })
                     .collect();
                 by_arguments = !set_up.is_empty();
-                if !set_up.is_empty() && !set_up.iter().any(|o| o.component_ref == component_ref) {
+                if !set_up.is_empty()
+                    && !set_up.iter().any(|o| {
+                        o.component_ref == component_ref
+                            || self.refines(&o.component_ref, component_ref)
+                    })
+                {
                     let mut names: Vec<&str> =
                         set_up.iter().map(|o| o.component.as_str()).collect();
                     names.sort();
@@ -1401,56 +1534,14 @@ impl Files<'_> {
                     };
                     let closure_of =
                         |k: &str| closure_parent(k).is_some_and(|p| bare(p) == bare(c));
-                    // (the second chain of a closure instantiated with two instances of its
-                    // parent: a detail without a call's text that names the parent of a closure
-                    // earlier in the chain, not of the item before it, starts again there)
-                    // (a chain begun again is another instance's as far as the text says: an
-                    // occurrence several instances of a generic item reach is written in one of
-                    // them, `in generic::<Fast>`, with every instance's chain, so its calls are
-                    // not held to that instance's type arguments)
-                    let mut again = false;
-                    if !callee.as_deref().is_some_and(closure_of)
-                        && !part.contains(" as `")
-                        && let Some((k, at)) = chain.iter().rev().find(|(k, _)| closure_of(k))
-                    {
-                        callee = Some(k.clone());
-                        inner = at.clone();
-                        again = true;
-                    }
-                    // (and of a function two callers instantiate: a detail whose call's text
-                    // names an item earlier in the chain, not the one before it, continues from
-                    // that item: `.. as `fill_inner`` after another chain's last caller)
-                    // (of several so named, the one the receiver's type is of, where the code
-                    // says it: `i.read(buf)` on a `StreamDecryptorInner` after a chain through
-                    // another type's `read`)
-                    if let Some(t) = &call_text
-                        && let Some(last) = strip_generics(t).rsplit("::").next()
-                    {
-                        let named = |k: &str| in_item(k).filter(|n| n.name == last);
-                        let on = col.and_then(|c0| receiver_type(&src, src.idx((line, c0))));
-                        let fits = |k: &str| {
-                            named(k).is_some_and(|n| {
-                                on.as_deref().is_none_or(|t| receiver_fits(&src, &n, t))
-                            })
-                        };
-                        if !callee.as_deref().is_some_and(fits)
-                            && let Some((k, at)) =
-                                chain.iter().rev().find(|(k, _)| fits(k)).or_else(|| {
-                                    callee
-                                        .as_deref()
-                                        .is_none_or(|k| named(k).is_none())
-                                        .then(|| {
-                                            chain.iter().rev().find(|(k, _)| named(k).is_some())
-                                        })
-                                        .flatten()
-                                })
-                        {
-                            callee = Some(k.clone());
-                            inner = at.clone();
-                            again = true;
-                        }
-                    }
-                    let own_closure = callee.as_deref().is_some_and(closure_of);
+                    // (a closure the caller writes, or one written inside such a closure,
+                    // where the closures between are no callers of their own: an attribute
+                    // macro's `async move { (|| async { body })().await }`)
+                    let own_closure = callee.as_deref().is_some_and(|k| {
+                        closure_of(k)
+                            || (k.trim_end().ends_with('}')
+                                && bare(k).starts_with(&format!("{}::{{closure", bare(c).trim())))
+                    });
                     // a closure's caller that is its parent but for the closures' indexes
                     // (`main::{closure#7}` for `main::{closure#0}::{closure#0}`) names another
                     // closure than the one holding it
@@ -1489,9 +1580,15 @@ impl Files<'_> {
                     let closure_caller = c.trim_end().ends_with('}');
                     let named: Vec<usize> = if own_closure {
                         // and an `async fn`'s body at its `{`
+                        // (and a borrowed one without captures, which the compiler makes a
+                        // constant, at its `&`: `by_ref(&|alg| ..)`)
+                        let borrowed = re!(r"&\s*(?:(?:async|move|static)\s+)*\|")
+                            .find_iter(text)
+                            .map(|m| text[..m.start()].chars().count());
                         let starts = re!(r"\|\|?|\basync\b|\bmove\b|\bstatic\b|\{")
                             .find_iter(text)
                             .map(|m| text[..m.start()].chars().count())
+                            .chain(borrowed)
                             .filter(|col| cols.contains(col));
                         let body = col.filter(|&c0| {
                             closure_caller
@@ -1527,7 +1624,40 @@ impl Files<'_> {
                         })
                     {
                         let word = Regex::new(&format!(r"\b{}\b", regex::escape(&f))).unwrap();
-                        if word.is_match(text) {
+                        // (or uses, as a value, a variable bound to a call of it: the future
+                        // `let future = self.inner.clone().try_request(cmd);` made, boxed into
+                        // the trait object that polls it at `Box::pin(future)`)
+                        // (in the line, or in the macro invocation that starts at the
+                        // position: `tokio::select! { .. r = fut => .. }` polls `fut`)
+                        let code = &src.code;
+                        let line_span = (
+                            src.idx((line, 0)),
+                            if line < src.lines.len() {
+                                src.idx((line + 1, 0))
+                            } else {
+                                code.len()
+                            },
+                        );
+                        let span = col
+                            .filter(|&c0| macro_call_at(&src, (line, c0)))
+                            .and_then(|c0| {
+                                let open = (src.idx((line, c0))..code.len())
+                                    .find(|&k| matches!(code[k], '(' | '[' | '{'))?;
+                                Some((open, close_of_at(code, open)?))
+                            })
+                            .unwrap_or(line_span);
+                        let held = (span.0..span.1.min(code.len())).any(|j| {
+                            let w = word_of(code, j);
+                            let after = skip_blank(code, j + w.chars().count());
+                            word_start(code, j)
+                                && !(code.get(after) == Some(&':')
+                                    && code.get(after + 1) != Some(&':'))
+                                && matches!(
+                                    binding(&src, j, &w),
+                                    Some(Bound::Let { init, .. }) if word.is_match(&init)
+                                )
+                        });
+                        if word.is_match(text) || held {
                             // (at a token: a name, `?`, a bracket, as below)
                             cols.iter()
                                 .copied()
@@ -1539,7 +1669,16 @@ impl Files<'_> {
                                 })
                                 .collect()
                         } else {
-                            Vec::new()
+                            // (or run where a future another call hands back is awaited:
+                            // `options.connect().await` polls the body of `establish`, which
+                            // `connect` returns)
+                            cols.iter()
+                                .copied()
+                                .filter(|&j| {
+                                    kw(&chars, j, "await")
+                                        && before_blank(&chars, j).is_some_and(|d| chars[d] == '.')
+                                })
+                                .collect()
                         }
                     } else if unnamed {
                         // a token the language calls through: a name (`poll`, a closure's
@@ -1750,6 +1889,152 @@ impl Files<'_> {
                         named.push(c0);
                         awaited = Some(k);
                     }
+                    // a path written over several lines is cited where it starts and names
+                    // its function on a later one (`m::Stream::<\n    m::Aes128,\n>::new(key)`)
+                    if named.is_empty()
+                        && !own_closure
+                        && !item_bound
+                        && let Some(c0) = col
+                        && c0 < chars.len()
+                        && cols.contains(&c0)
+                        && (c0 == 0 || !is_ident(chars[c0 - 1]))
+                        && let Some(n) = callee.as_deref().and_then(in_item)
+                    {
+                        let (p, end) = long_path(&src.code, src.idx((line, c0)));
+                        if src.pos(end).0 > line
+                            && strip_generics(&p).rsplit("::").next() == Some(n.name.as_str())
+                        {
+                            named.push(c0);
+                        }
+                    }
+                    // a call in the code an attribute macro on a type writes for it
+                    // (`#[enum_dispatch(Tr)]` on `enum E`: an `<E as Tr>::f` calling each
+                    // variant's `f`) is cited where the attribute starts: on the type the caller
+                    // is a method of, and naming the caller's trait
+                    let mut generated = false;
+                    if named.is_empty()
+                        && !own_closure
+                        && let Some(c0) = col
+                        && chars.get(c0) == Some(&'#')
+                        && chars[..c0].iter().all(|ch| ch.is_whitespace())
+                        && chars.get(c0 + 1) == Some(&'[')
+                        && let Some(t) = attributed_type(&src, line)
+                        && let Some(n) = in_item(c)
+                        && n.self_ty.as_deref() == Some(t.name.as_str())
+                        && n.trait_name.as_deref().is_none_or(|tr| {
+                            let tr = type_name(tr);
+                            Regex::new(&format!(r"\b{}\b", regex::escape(&tr)))
+                                .is_ok_and(|r| r.is_match(text))
+                        })
+                    {
+                        named.push(c0);
+                        generated = true;
+                    }
+                    // (or in the code a derive macro writes for a type, `#[derive(ContentHash)]`
+                    // on `struct Timestamp`: a `<Timestamp as ContentHash>::hash` calling each
+                    // field's `hash`, cited in the type's body at the field it reads; on the type
+                    // the caller is a method of, whose derive names the caller's trait)
+                    // (the field's type may name the callee's: a token of the type's body
+                    // either way)
+                    if !own_closure
+                        && let Some(c0) = col
+                        && let Some(n) = in_item(c)
+                        && let Some(tr) = n.trait_name.as_deref()
+                        && let Some((ty, derives)) = derived_type_at(&src, (line, c0))
+                        && n.self_ty.as_deref() == Some(ty.as_str())
+                        && derives.contains(&type_name(tr))
+                    {
+                        if !named.contains(&c0) {
+                            named.push(c0);
+                        }
+                        generated = true;
+                    }
+                    // in, `#[protect(..)]` above `async fn upload`: cited where the attribute
+                    // starts, on the function the caller is, or is a closure of)
+                    if named.is_empty()
+                        && let Some(c0) = col
+                        && chars.get(c0) == Some(&'#')
+                        && chars[..c0].iter().all(|ch| ch.is_whitespace())
+                        && chars.get(c0 + 1) == Some(&'[')
+                        && callee
+                            .as_deref()
+                            .is_some_and(|k| k.trim_end().ends_with('}'))
+                        && let Some(f) = attribute_of(&src, line)
+                        && in_item(c).is_some_and(|n| n.name == f.name)
+                    {
+                        named.push(c0);
+                        generated = true;
+                        // (which of several attributes on the function wrote it the text does
+                        // not say: `#[post("/")]` above `#[protect(..)]`)
+                        let first = (1..line)
+                            .rev()
+                            .take_while(|&l| src.lines[l - 1].trim_start().starts_with("#["))
+                            .last()
+                            .unwrap_or(line);
+                        let attrs = (first..f.start.0)
+                            .filter(|&l| src.lines[l - 1].trim_start().starts_with("#["))
+                            .count();
+                        if attrs > 1 {
+                            RANGED.with(|r| r.set(true));
+                        }
+                    }
+                    // a function a constant holds is instantiated where code uses the constant
+                    // (`install_drivers(&[sqlx_postgres::any::DRIVER, ..])`): the expression
+                    // that starts at the position names a constant whose definition leads to
+                    // the function
+                    if named.is_empty()
+                        && !own_closure
+                        && !generated
+                        && let Some(c0) = col
+                        && cols.contains(&c0)
+                        && let Some(n) = callee.as_deref().and_then(in_item)
+                    {
+                        let s = &src.code;
+                        let i = src.idx((line, c0));
+                        // (from its first token: `&`, a bracket, a path)
+                        let starts = matches!(s[i], '&' | '[')
+                            || (word_start(s, i)
+                                && before_blank(s, i).is_none_or(|p| s[p] != ':' && s[p] != '.'));
+                        let amp = before_blank(s, i).is_some_and(|p| s[p] == '&');
+                        let mut k = i;
+                        if s[k] == '&' {
+                            k = skip_blank(s, k + 1);
+                            if kw(s, k, "mut") {
+                                k = skip_blank(s, k + 3);
+                            }
+                        }
+                        let end = match s.get(k) {
+                            Some('[') => close_of_at(s, k).map(|c| c + 1),
+                            Some(c) if is_ident(*c) => Some(long_path(s, k).1),
+                            _ => None,
+                        };
+                        if starts
+                            && !amp
+                            && let Some(end) = end
+                        {
+                            let text = src.text(k, end);
+                            let man = self.man;
+                            let owner = man.owner_of(&path);
+                            let consts: Vec<(Vec<String>, String)> =
+                                re!(r"((?:[A-Za-z_]\w*\s*::\s*)*)([A-Z][A-Z0-9_]+)\b")
+                                    .captures_iter(&text)
+                                    .map(|m| {
+                                        (
+                                            m[1].split("::")
+                                                .map(|g| g.trim().to_string())
+                                                .filter(|g| !g.is_empty())
+                                                .collect(),
+                                            m[2].to_string(),
+                                        )
+                                    })
+                                    .collect();
+                            if consts.iter().any(|(quals, name)| {
+                                self.constant_leads_to(&src, owner, quals, name, &n.name)
+                            }) {
+                                named.push(c0);
+                            }
+                        }
+                    }
                     // a call a macro invoked in the function makes (`calls!(T0 T1)` expanding to
                     // `outer::<T0>()`), or one through a variable bound to the function item
                     // (`let h = Local::alg; h(&d)`)
@@ -1776,6 +2061,29 @@ impl Files<'_> {
                             named.push(c0);
                         }
                     }
+                    // (or a closure a macro invoked in the caller writes around its arguments,
+                    // `tokio::select! { r = fut => .. }`: cited where the invocation starts,
+                    // which holds the code instantiated in the closure)
+                    if named.is_empty()
+                        && own_closure
+                        && let Some(c0) = col
+                        && macro_call_at(&src, (line, c0))
+                    {
+                        let code = &src.code;
+                        let i0 = src.idx((line, c0));
+                        let close = (i0..code.len())
+                            .find(|&k| matches!(code[k], '(' | '[' | '{'))
+                            .and_then(|open| close_of_at(code, open));
+                        let holds = inner.0 != path
+                            || close.is_some_and(|b| {
+                                let ii = src.idx((inner.1, inner.2.unwrap_or(0)));
+                                i0 <= ii && ii <= b
+                            });
+                        if holds {
+                            named.push(c0);
+                            generated = true;
+                        }
+                    }
                     if named.is_empty() && own_closure {
                         return Err(format!(
                             "`{part}`: line {line} writes no closure or `async` body"
@@ -1784,10 +2092,30 @@ impl Files<'_> {
                     // the closure cited holds the code instantiated in it (not the closure
                     // beside it)
                     if own_closure
+                        && !generated
                         && let Some(c0) = col
                         && inner.0 == path
                     {
+                        // (the `async` of an `async fn` makes that function's body: not a
+                        // closure the body itself writes further in)
+                        if let Some(f) = qualified_fn(&src, (line, c0))
+                            && c.trim_end().ends_with("{closure#0}")
+                            && c.matches("{closure#").count() == 1
+                            && in_item(c).is_some_and(|n| n.name == f.name)
+                        {
+                            return Err(format!(
+                                "`{part}`: the `async` at {line}:{c0} makes the body of `{}`, \
+                                 which is the caller",
+                                f.name
+                            ));
+                        }
                         let ci = src.idx((line, c0));
+                        // (a borrowed closure is cited at its `&`)
+                        let ci = if src.code.get(ci) == Some(&'&') {
+                            skip_blank(&src.code, ci + 1)
+                        } else {
+                            ci
+                        };
                         let Some((a, b)) =
                             closure_span(&src.code, ci).or_else(|| async_body_at(&src.code, ci))
                         else {
@@ -1840,28 +2168,114 @@ impl Files<'_> {
                     if let Some(c0) = col
                         && !own_closure
                         && let Some(n) = callee.as_deref().and_then(in_item)
-                        && let Some(t) =
-                            receiver_type(&src, awaited.unwrap_or_else(|| src.idx((line, c0))))
                     {
-                        if !receiver_fits(&src, &n, &t) {
+                        let ci = awaited.unwrap_or_else(|| src.idx((line, c0)));
+                        let local = receiver_type(&src, ci);
+                        if let Some(t) = &local
+                            && !receiver_fits(&src, &n, t)
+                        {
                             return Err(format!(
                                 "`{part}`: the method at {line}:{c0} is called on a `{t}`, not on \
                                  what `{}` is of",
                                 n.path
                             ));
                         }
+                        // the receiver is of the instance's own type: a type of the file, or
+                        // one the code writes by that name with arguments (another file's
+                        // `Box<aes_ctr::Stream<aes_ctr::Aes128>>`, a variant's payload)
+                        let written = receiver_written(&src, ci);
+                        let own = match &local {
+                            Some(t) => n.self_ty.as_deref() == Some(t.as_str()),
+                            None => written.as_deref().is_some_and(|w| {
+                                let d = deref_type(w);
+                                !type_args(&d).is_empty()
+                                    && n.self_ty.as_deref() == Some(type_name(&d).as_str())
+                            }),
+                        };
+                        // the code writes the receiver as a type of another file that is not
+                        // the instance's (another arm's payload, `DkimKey::Rsa(k) => k.sign(..)`
+                        // beside `DkimKey::Ed25519(k) => k.sign(..)`; or a wrapper that
+                        // dereferences to it, which the text does not show): the call is one of
+                        // the candidates for that instance, no more
+                        if local.is_none()
+                            && !own
+                            && let Some(w) = &written
+                            && let Some(st) = n.self_ty.as_deref()
+                        {
+                            let d = type_name(&deref_type(w));
+                            let mut params: Vec<String> = src
+                                .enclosing((line, c0), &[ItemKind::Fn])
+                                .map(|f| fn_sig(&src, f).generics)
+                                .unwrap_or_default();
+                            if let Some(b) = src.enclosing((line, c0), &[ItemKind::Impl])
+                                && let Some((_, own)) = impl_self(&src, b)
+                            {
+                                params.extend(own);
+                            }
+                            let man = self.man;
+                            let owner = man.owner_of(&path);
+                            if !d.is_empty()
+                                && d.chars().all(is_ident)
+                                && d.starts_with(char::is_uppercase)
+                                && d != st
+                                && d != "Self"
+                                && !params.contains(&d)
+                                && self.alias_targets(&src, owner, &d).is_empty()
+                            {
+                                RANGED.with(|r| r.set(true));
+                            }
+                        }
+                        // a receiver the code gives no type of (`k.hash(state)` above
+                        // `v.hash(state)`, both bound by a pattern over a generic map's items):
+                        // where the caller calls a method of that name on another receiver it
+                        // gives no type of either, the call is one of the candidates for the
+                        // instance, which the text cannot tell apart
+                        if local.is_none()
+                            && written.is_none()
+                            && awaited.is_none()
+                            && word_of(&src.code, ci) == n.name
+                            && let Some(dot) =
+                                before_blank(&src.code, ci).filter(|&d| src.code[d] == '.')
+                            && let Some((r, _, _)) = receiver_at(&src.code, dot)
+                            && let Some(f) = src.enclosing((line, c0), &[ItemKind::Fn])
+                        {
+                            let code = &src.code;
+                            let text = |r: usize, dot: usize| {
+                                src.text(r, dot).split_whitespace().collect::<String>()
+                            };
+                            let here = text(r, dot);
+                            let len = n.name.chars().count();
+                            let (a, b) = src.span(f);
+                            let other = (a..b.min(code.len())).any(|i| {
+                                i != ci
+                                    && word_start(code, i)
+                                    && word_of(code, i) == n.name
+                                    && matches!(
+                                        code.get(skip_blank(code, i + len)),
+                                        Some('(' | ':')
+                                    )
+                                    && before_blank(code, i)
+                                        .filter(|&d| code[d] == '.')
+                                        .and_then(|d| {
+                                            receiver_at(code, d).map(|(r, _, _)| text(r, d))
+                                        })
+                                        .is_some_and(|t| t != here)
+                                    && receiver_written(&src, i).is_none()
+                            });
+                            if other {
+                                RANGED.with(|r| r.set(true));
+                            }
+                        }
                         // its type arguments too, where the code gives them and the instance's
                         // type is that type: the payload of the enum variant an arm matched
                         // (`Self::Aes192(i) => i.fill_buf()` is no call on an `Inner<Aes128, R>`).
                         // An argument the code writes as a parameter of the item around the
                         // call, or as an alias, says nothing.
-                        let ci = awaited.unwrap_or_else(|| src.idx((line, c0)));
-                        if !again
-                            && n.self_ty.as_deref() == Some(t.as_str())
+                        if own
                             && let Some(full) = n.self_full.as_deref()
-                            && let Some(w) = receiver_written(&src, ci)
+                            && let Some(w) = &written
                         {
-                            let (want, have) = (type_args(full), type_args(&deref_type(&w)));
+                            let (want, have) = (type_args(full), type_args(&deref_type(w)));
                             let mut params: Vec<String> = src
                                 .enclosing((line, c0), &[ItemKind::Fn])
                                 .map(|f| fn_sig(&src, f).generics)
@@ -1874,18 +2288,34 @@ impl Files<'_> {
                             let man = self.man;
                             let owner = man.owner_of(&path);
                             for (a, b) in want.iter().zip(&have) {
-                                let written = b.chars().all(is_ident)
-                                    && b.starts_with(char::is_uppercase)
-                                    && !params.contains(b)
+                                // (a const argument's value says nothing of the name or
+                                // expression the code writes for it: `168` for `RATE_128`)
+                                if !a.starts_with(|c: char| {
+                                    c.is_alphabetic() || c == '_' || c == '<'
+                                }) || matches!(a.as_str(), "true" | "false")
+                                {
+                                    continue;
+                                }
+                                // (a name, or a path to one: `aes_ctr::Aes128`)
+                                let simple = b.chars().all(is_ident);
+                                let last = b.rsplit("::").next().unwrap_or(b).trim();
+                                let named = b.chars().all(|c| is_ident(c) || c == ':')
+                                    && last.starts_with(char::is_uppercase)
+                                    && !(simple && params.contains(b))
                                     && want.len() == have.len();
-                                if written
-                                    && type_name(a) != type_name(&imported_as(&src, b))
-                                    && self.alias_targets(&src, owner, b).is_empty()
+                                let other = if simple {
+                                    type_name(a) != type_name(&imported_as(&src, b))
+                                } else {
+                                    type_name(a) != last
+                                };
+                                if named
+                                    && other
+                                    && self.alias_targets(&src, owner, last).is_empty()
                                 {
                                     return Err(format!(
                                         "`{part}`: the method at {line}:{c0} is called on a \
                                          `{}`, not on a `{full}`",
-                                        norm_path(&deref_type(&w))
+                                        norm_path(&deref_type(w))
                                     ));
                                 }
                             }
@@ -1893,7 +2323,7 @@ impl Files<'_> {
                         // (the instance's own type, not one implementing its trait: a call of
                         // that instance this caller makes, on whatever line; the self-test reads
                         // it)
-                        if !again && n.self_ty.as_deref() == Some(t.as_str()) {
+                        if own {
                             TYPED.with(|t| t.borrow_mut().push(part.to_string()));
                         }
                     }
@@ -1904,7 +2334,6 @@ impl Files<'_> {
                     let mut compared = false;
                     if let Some(c0) = col
                         && !own_closure
-                        && !again
                         && let Some(want_args) = callee.as_deref().and_then(instance_args)
                         && let Some(n) = callee.as_deref().and_then(in_item)
                         && let Some(found) = call_type_args(
@@ -1964,7 +2393,6 @@ impl Files<'_> {
                     // line (the self-test reads it).
                     if let Some(c0) = col
                         && !own_closure
-                        && !again
                         && !by_arguments
                         && let Some(k) = callee.as_deref()
                         && k.trim_end().ends_with('>')
@@ -2050,6 +2478,20 @@ impl Files<'_> {
                     if !inside && attribute_of(&src, line).is_some_and(|i| i.name == want.name) {
                         inside = true;
                     }
+                    // (or on its type, whose method the attribute writes: checked above)
+                    inside |= generated;
+                    // (in the function's body, not its header: a call is made by code, and a
+                    // bracket of `fn f(data: &[u8])` is none a body's `.await` polls at)
+                    if let Some(c0) = col
+                        && !generated
+                        && let Some(f) = src.enclosing((line, c0), &[ItemKind::Fn])
+                        && src.idx((line, c0)) < src.fn_scope(f).body.0
+                    {
+                        return Err(format!(
+                            "`{part}`: {line}:{c0} is in the header of `{}`, not in its body",
+                            f.name
+                        ));
+                    }
                     // or the impl a `#[derive(..)]` writes (`#[derive(Hash)]` on `PublicKey`
                     // makes `<PublicKey as Hash>::hash`), cited at the trait's name there
                     if !inside
@@ -2077,21 +2519,48 @@ impl Files<'_> {
                     // a procedural macro's code (a derive's, an attribute's, a function-like
                     // one's) is cited at its use: the attribute or invocation the position is
                     // in, from its first line
+                    // (the macro of this file the tag names: by its own name, or by one a `use`
+                    // gives it, `pub use _id_type as id_type;`)
                     let bang = re!(r"\[macro (?:[\w]+::)*(\w+)!\]").captures(tags);
-                    let rules = bang.as_ref().is_some_and(|t| {
-                        src.items
+                    let occ_binds = self.source(at.0);
+                    let rules = bang.as_ref().and_then(|t| {
+                        let is_macro = |n: &str| {
+                            src.items
+                                .iter()
+                                .any(|i| i.kind == ItemKind::Macro && i.name == n)
+                        };
+                        if is_macro(&t[1]) {
+                            return Some(t[1].to_string());
+                        }
+                        src.binds
                             .iter()
-                            .any(|i| i.kind == ItemKind::Macro && i.name == t[1])
+                            .chain(occ_binds.iter().flat_map(|o| o.binds.iter()))
+                            .filter(|b| b.name == t[1])
+                            .filter_map(|b| b.path.last())
+                            .find(|l| is_macro(l))
+                            .cloned()
                     });
-                    let Some(t) = bang.filter(|_| rules) else {
+                    let Some(t) = rules else {
                         let first = attribute_start(self, at.0, at.1);
                         // (or a built-in derive's code for one field, `Sha256::default()` of
                         // `#[derive(Default)]` for `hasher: Sha256`, expanded from that field's
                         // line, which names a package providing the asset)
-                        let field = path == at.0
-                            && tags.contains("[derive ")
-                            && self.derived_field(&src, &path, at.1, line, component_ref);
-                        if path != at.0 || (first != Some(line) && !field) {
+                        // (where the type has such fields the code is one's, not the
+                        // attribute's)
+                        let fields: Vec<usize> = if path == at.0 && tags.contains("[derive ") {
+                            derive_body(&src, at.1)
+                                .map(|(_, open, close)| src.pos(open).0..=src.pos(close).0)
+                                .into_iter()
+                                .flatten()
+                                .filter(|&l| {
+                                    self.derived_field(&src, &path, at.1, l, component_ref)
+                                })
+                                .collect()
+                        } else {
+                            Vec::new()
+                        };
+                        let field = fields.contains(&line);
+                        if path != at.0 || !(field || (fields.is_empty() && first == Some(line))) {
                             return Err(format!(
                                 "`{part}`: not the first line of the attribute or macro call at line {}",
                                 at.1
@@ -2102,7 +2571,7 @@ impl Files<'_> {
                     // the tagged macro's body, or that of a macro of the same file it invokes
                     // (primeorder's `impl_mont_field_element!` writes its arithmetic through
                     // `impl_mont_field_element_arithmetic!`)
-                    let invoked = macros_invoked(&src, &t[1]);
+                    let invoked = macros_invoked(&src, &t);
                     let inside = cols.iter().any(|&col| {
                         src.enclosing((line, col), &[ItemKind::Macro])
                             .is_some_and(|m| invoked.contains(&m.name))
@@ -2110,7 +2579,7 @@ impl Files<'_> {
                     if !inside {
                         return Err(format!(
                             "`{part}`: line {line} is not in the body of `macro_rules! {}`",
-                            &t[1]
+                            t
                         ));
                     }
                     // the macro's line names the symbol, or the call passes it in
@@ -2156,7 +2625,7 @@ impl Files<'_> {
                         .iter()
                         .find(|i| {
                             i.kind == ItemKind::Macro
-                                && i.name == t[1]
+                                && i.name == t
                                 && (i.start.0..=i.end.0).contains(&line)
                         })
                         .and_then(|m| {
@@ -2169,7 +2638,7 @@ impl Files<'_> {
                             return Err(format!(
                                 "`{part}`: line {line} is not in the rule of `macro_rules! {}` the \
                                  invocation matches (lines {l0}-{l1})",
-                                &t[1]
+                                t
                             ));
                         }
                     }
@@ -2201,7 +2670,20 @@ impl Files<'_> {
                     let named = word
                         .find_iter(text)
                         .any(|m| !re!(r"\bfn\s+$").is_match(&text[..m.start()]));
-                    if !named && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l))) {
+                    // (or the line is in a type the macro defines under a derive of the
+                    // symbol's trait, `#[derive($crate::content_hash::ContentHash)]` above
+                    // `$vis struct $name(Vec<u8>);`: the derive's code for the type, cited at
+                    // its fields)
+                    let derived = sym.rsplit("::").nth(1).is_some_and(|tr| {
+                        cols.iter().any(|&col| {
+                            derived_type_at(&src, (line, col))
+                                .is_some_and(|(_, d)| d.iter().any(|x| x == tr))
+                        })
+                    });
+                    if !named
+                        && !derived
+                        && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l)))
+                    {
                         return Err(format!(
                             "`{part}`: line {line} of the macro does not name `{ident}`"
                         ));
@@ -2211,6 +2693,29 @@ impl Files<'_> {
         }
         Ok(())
     }
+}
+/// Whether two instance names are of one item of the source: one path once their generic
+/// arguments are dropped. The by-move body the compiler makes of an `async` closure's body
+/// (`f::{closure#0}::{synthetic#0}`) is that body (`f::{closure#0}::{closure#0}`).
+fn same_item(a: &str, b: &str) -> bool {
+    let bare = |x: &str| {
+        re!(r"\{synthetic#\d+\}")
+            .replace_all(&strip_generics(x).replace("::::", "::"), "{closure#0}")
+            .trim()
+            .trim_end_matches("::")
+            .to_string()
+    };
+    // (a trait's default method run for a type, `<A as Pick>::alg`, is the trait's `Pick::alg`)
+    let default_of = |x: &str, y: &str| {
+        let y = bare(y);
+        let mut segs = y.rsplit("::");
+        let (name, owner) = (segs.next(), segs.next());
+        in_item(x).is_some_and(|n| {
+            Some(n.name.as_str()) == name
+                && n.trait_name.as_deref().map(type_name).as_deref() == owner
+        })
+    };
+    bare(a) == bare(b) || default_of(a, b) || default_of(b, a)
 }
 /// A code position is inside the item its context names (`in <item>; ..`): the innermost
 /// function, static or const around it has the item's name, and, for a method whose path names
@@ -2405,9 +2910,88 @@ pub(super) fn check_item(
     Ok(())
 }
 
+/// The body of the type the attribute at `attr_line` is on (past the attributes and comments
+/// between them): the file's code, where the body opens and where it closes.
+fn derive_body(src: &Source, attr_line: usize) -> Option<(&[char], usize, usize)> {
+    let item = attributed_type(src, attr_line)?;
+    // (inside its body: the item records its header)
+    let s = &src.code;
+    let a = src.idx(item.start);
+    let open = (a..s.len()).find(|&k| matches!(s[k], '{' | '(' | ';'))?;
+    let close = close_of_at(s, open)?;
+    Some((s.as_slice(), open, close))
+}
+
+/// Whether an asset's name is one a knowledge-base entry's name gives: its parameters (`{hash}`)
+/// stand for any text, its optional parts (`[..]`) may be absent (`HMAC-{hash}`: `HMAC-SHA-256`).
+fn fits_template(template: &str, asset: &str) -> bool {
+    let mut re = String::from("^");
+    let mut chars = template.chars();
+    while let Some(ch) = chars.next() {
+        match ch {
+            '{' => {
+                chars.by_ref().take_while(|x| *x != '}').for_each(drop);
+                re.push_str(".+?");
+            }
+            '[' => re.push_str("(?:"),
+            ']' => re.push_str(")?"),
+            _ => re.push_str(&regex::escape(&ch.to_string())),
+        }
+    }
+    re.push('$');
+    Regex::new(&re).is_ok_and(|r| r.is_match(asset))
+}
+
+/// The calls of a method `name` next to the one at `i` in its chain: the one its receiver ends
+/// with, the one made on its result (`a.name()\n.name()\n.name()`), as (line, column) of their
+/// names.
+fn chain_neighbours(src: &Source, i: usize, name: &str) -> Vec<(usize, usize)> {
+    let s = &src.code;
+    let mut out = Vec::new();
+    if word_of(s, i) != name || before_blank(s, i).is_none_or(|d| s[d] != '.') {
+        return out;
+    }
+    // after: `name(..)` then `.name(`
+    let open = skip_blank(s, i + name.chars().count());
+    if s.get(open) == Some(&'(')
+        && let Some(close) = close_of_at(s, open)
+    {
+        let dot = skip_blank(s, close + 1);
+        let k = skip_blank(s, dot + 1);
+        if s.get(dot) == Some(&'.')
+            && word_of(s, k) == name
+            && s.get(skip_blank(s, k + name.chars().count())) == Some(&'(')
+        {
+            out.push(src.pos(k));
+        }
+    }
+    // before: `.name(..)` ending the receiver
+    if let Some(dot) = before_blank(s, i)
+        && let Some(close) = before_blank(s, dot).filter(|&p| s[p] == ')')
+        && let Some(open) = open_of_at(s, close)
+        && let Some((wb, w)) = callee_before(s, open)
+        && w == name
+        && before_blank(s, wb).is_some_and(|d| s[d] == '.')
+    {
+        out.push(src.pos(wb));
+    }
+    out
+}
+
 /// The operator a method of an operator trait is written as (`<P as core::ops::arith::Mul<S>>::
 /// mul`: `*`; `core::ops::try_trait::FromResidual::from_residual`: `?`), for a symbol naming one.
 pub(super) fn operator_of(symbol: &str) -> Option<&'static str> {
+    // (`.await` polls its operand, made a future first: `Future::poll`,
+    // `IntoFuture::into_future`)
+    if re!(r"core::future::(?:future::Future\b.*::poll|into_future::IntoFuture\b.*::into_future)$")
+        .is_match(symbol)
+    {
+        return Some("await");
+    }
+    // (`x[i]` indexes: `Index::index`, `IndexMut::index_mut`, at the bracket)
+    if re!(r"core::ops::index::(?:Index\b.*::index|IndexMut\b.*::index_mut)$").is_match(symbol) {
+        return Some("[");
+    }
     // (`?` branches on its operand and converts the error it returns: `Try::branch`,
     // `FromResidual::from_residual`)
     if re!(r"core::ops::try_trait::(?:Try\b.*::branch|FromResidual\b.*::from_residual)$")

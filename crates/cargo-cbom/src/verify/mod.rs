@@ -573,6 +573,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         roots,
         pkg_mods: HashMap::new(),
         std_items: HashMap::new(),
+        open_fns: HashMap::new(),
         occs: &occs,
         at_pos,
         at_line,
@@ -731,15 +732,94 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     let ok = files
                         .check_with(i, o.line, o.offset, Some(&shifted))
                         .is_ok();
+                    // (the method instantiated: the item before the detail in the chain; one
+                    // with type arguments of its own may be another instance at another call)
+                    let whole = m.get(0).map_or("", |g| g.as_str());
+                    // (the item the detail names, where it does not follow the one before)
+                    let named_item = o.context[..start]
+                        .strip_suffix("` ")
+                        .and_then(|t| t.rfind('`').map(|k| t[k + 1..].to_string()));
+                    let callee = named_item
+                        .clone()
+                        .or_else(|| {
+                            re!(r"instantiated by (.*?) at [^\s;]+:\d+")
+                                .captures_iter(&o.context[..start])
+                                .last()
+                                .map(|c| c[1].trim().to_string())
+                        })
+                        .or_else(|| {
+                            let k = o.context.find("] in ")?;
+                            lex::parts(&o.context[k + "] in ".len()..])
+                                .into_iter()
+                                .next()
+                                .map(|p| p.trim().to_string())
+                        });
+                    // (a position in its body: the detail before this one, or the one whose
+                    // caller the detail names, else the occurrence's own)
+                    let inside = re!(r"instantiated by (.*?) at ([^\s;]+?):(\d+):(\d+)")
+                        .captures_iter(&o.context[..start])
+                        .filter(|c| named_item.as_deref().is_none_or(|k| c[1].trim() == k))
+                        .last()
+                        .map(|c| {
+                            let n = |k: usize| c[k].parse::<usize>().unwrap_or(0);
+                            (c[2].to_string(), n(3), n(4))
+                        })
+                        .unwrap_or_else(|| (o.location.clone(), o.line, o.offset));
+                    let same_variable = ok
+                        && callee.as_deref().is_some_and(|k| !k.ends_with('>'))
+                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
+                            .captures(whole)
+                            .is_some_and(|at| {
+                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
+                                let (l0, c0) = (n(2), n(3));
+                                if l0 + dl < 1 || c0 + dc < 0 {
+                                    return false;
+                                }
+                                let (a, b) = (
+                                    (l0 as usize, c0 as usize),
+                                    ((l0 + dl) as usize, (c0 + dc) as usize),
+                                );
+                                files.same_receiver(&at[1], a, b)
+                                    || files.chained_call(
+                                        &at[1],
+                                        a,
+                                        b,
+                                        (&inside.0, inside.1, inside.2),
+                                    )
+                            });
+                    // (the call that builds an `async` function's future and the `await` that
+                    // polls it: the body is made by the one, run by the other)
+                    let same_future = ok
+                        && callee.as_deref().is_some_and(|k| k.ends_with('}'))
+                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
+                            .captures(whole)
+                            .is_some_and(|at| {
+                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
+                                let (l0, c0) = (n(2), n(3));
+                                l0 + dl >= 1
+                                    && c0 + dc >= 0
+                                    && files.awaited_pair(
+                                        &at[1],
+                                        (l0 as usize, c0 as usize),
+                                        ((l0 + dl) as usize, (c0 + dc) as usize),
+                                    )
+                            });
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
                     } else if m[0].starts_with("coerced to")
                         || TYPED.with(|t| t.borrow().iter().any(|p| p == part))
+                        || same_variable
+                        || same_future
                     {
                         // the shifted line coerces the type to the trait too (a value of the type
                         // becomes an object of that trait there, as `check_coercions` reads it),
                         // or the caller calls the method there too on a value the code says is
-                        // of the instance's type (`E2.ext()` below `a2.ext()`, `a2` an `E2`):
+                        // of the instance's type (`E2.ext()` below `a2.ext()`, `a2` an `E2`), or
+                        // on the same variable (`xof.absorb(a);` above `xof.absorb(b);`, a method
+                        // without type parameters: one variable has one type), or on the result
+                        // of that call, of a method returning its own type (`.absorb(a)` above
+                        // `.absorb(b)` in one chain), or the shift goes from the `await` of a
+                        // future to the call that builds it:
                         // the claim is as true, no wrong position; printed, not hidden
                         total -= 1;
                         also_true += 1;
@@ -871,6 +951,9 @@ struct Files<'a> {
     pkg_mods: HashMap<PathBuf, Rc<PkgMods>>,
     /// standard-library paths checked (`std_item`)
     std_items: HashMap<String, bool>,
+    /// (package, function path) -> whether it runs for a type its caller gives
+    /// (`runs_for_a_type`)
+    open_fns: HashMap<(String, String), bool>,
     occs: &'a [Occ],
     at_pos: HashMap<(String, usize, usize), Vec<usize>>,
     at_line: HashMap<(String, usize), Vec<usize>>,
@@ -1033,6 +1116,9 @@ struct Reads {
     foreign_items: Vec<(Vec<String>, String, Option<String>)>,
     /// the type names written (`Ed25519KeyPair`)
     types: BTreeSet<String>,
+    /// those not written as one of the package's own types (`reads::own_type`): the ones
+    /// another crate may define
+    foreign_types: BTreeSet<String>,
     /// a variable it reads was lent whole as `&mut` to a call whose stores are not read
     /// (`mem::swap`): what its binding names may have been replaced
     replaced: bool,
@@ -1724,6 +1810,19 @@ ring = "0.17"
             Some("*")
         );
         assert_eq!(check::operator_of("m::from_residual"), None);
+        // `x[i]` indexes
+        assert_eq!(
+            check::operator_of(
+                "<h::Hash as core::ops::index::Index<core::ops::range::RangeFull>>::index"
+            ),
+            Some("[")
+        );
+        // `.await` polls
+        assert_eq!(
+            check::operator_of("<h::Connecting<T> as core::future::future::Future>::poll"),
+            Some("await")
+        );
+        assert_eq!(check::operator_of("h::Connecting::<T>::poll"), None);
     }
 
     #[test]
@@ -1743,5 +1842,177 @@ ring = "0.17"
             Some(vec![Some("Bytes".to_string()), Some("4".to_string())])
         );
         assert_eq!(type_defaults(&src, "Missing"), None);
+    }
+
+    #[test]
+    fn a_path_is_read_over_its_lines() {
+        let code: Vec<char> = "x(stream::KeyStream::<
+    stream::Aes128,
+>::new(key)); a < b; c.d()"
+            .chars()
+            .collect();
+        let (p, end) = long_path(&code, 2);
+        assert_eq!(p, "stream::KeyStream::<stream::Aes128,>::new");
+        assert_eq!(code[end], '(');
+        // (a comparison is no generic argument list, a method call no path)
+        let at = code.iter().collect::<String>().find("a <").unwrap();
+        assert_eq!(long_path(&code, at).0, "a");
+        let at = code.iter().collect::<String>().find("c.d").unwrap();
+        assert_eq!(long_path(&code, at).0, "c");
+    }
+
+    #[test]
+    fn aliases_are_replaced_with_their_arguments() {
+        let mut aliases = |n: &str| -> Vec<String> {
+            match n {
+                "Tag" => vec!["Output<Sha256>".into()],
+                "kem::Ciphertext<>" | "Output<>" => {
+                    vec!["K|Array<u8, <K as Kem>::Size>".into()]
+                }
+                "Pair<>" => vec!["A,B|(B, A)".into()],
+                _ => Vec::new(),
+            }
+        };
+        assert_eq!(
+            expand_aliases("From<&kem::Ciphertext<XWing>>", &mut aliases, 3),
+            "From<&Array<u8, <XWing as Kem>::Size>>"
+        );
+        assert_eq!(
+            expand_aliases("Pair<u8, Vec<u16>>", &mut aliases, 3),
+            "(Vec<u16>, u8)"
+        );
+        // one level, then the generic alias it names
+        assert_eq!(
+            expansions("Tag", &mut aliases),
+            vec![
+                "Tag".to_string(),
+                "Output<Sha256>".to_string(),
+                "Array<u8, <Sha256 as Kem>::Size>".to_string()
+            ]
+        );
+        // a name given other arguments than the alias takes is a type
+        assert_eq!(
+            expand_aliases("Output<A, B>", &mut aliases, 3),
+            "Output<A, B>"
+        );
+    }
+
+    #[test]
+    fn a_trait_argument_written_as_an_alias_says_nothing() {
+        let mut aliases = |n: &str| -> Vec<String> {
+            if n == "Ciphertext" {
+                vec!["Ciphertext<XWingKem>".into()]
+            } else {
+                Vec::new()
+            }
+        };
+        let want = "From<&Array<u8,<XWingKemasKem>::CiphertextSize>>";
+        assert!(trait_of("From<&Ciphertext>", want, &mut aliases));
+        assert!(!trait_of("From<&Other>", want, &mut aliases));
+        assert!(!trait_of("Into<&Ciphertext>", want, &mut aliases));
+    }
+
+    #[test]
+    fn items_are_read_from_nested_and_foreign_impl_paths() {
+        // a type declared in a closure of a method, implementing a trait
+        let n =
+            in_item("<<a::Noise as a::Init>::leader::{closure#0}::Fin as a::Finalizer>::finalize")
+                .unwrap();
+        assert_eq!(n.name, "finalize");
+        assert_eq!(n.self_ty.as_deref(), Some("Fin"));
+        assert_eq!(n.trait_name.as_deref(), Some("Finalizer"));
+        // a standard-library trait implemented in another module than the type's
+        assert!(std_impl(
+            "p::kdf::<impl core::convert::TryFrom<&p::kdf::ScryptParams> for scrypt::Params>::try_from"
+        ));
+        assert!(std_impl("<Key as core::convert::From<[u8; 32]>>::from"));
+        assert!(!std_impl(
+            "p::kdf::<impl p::Derive for scrypt::Params>::derive"
+        ));
+    }
+
+    #[test]
+    fn a_statics_block_binds_its_variables() {
+        let src = Source::new(
+            "static A: Block<Ctr<Aes128>> = Block(PhantomData);
+static T: LazyLock<HashMap<&'static str, &(dyn Cipher + Send)>> =
+    LazyLock::new(|| {
+        let mut h: HashMap<&'static str, &(dyn Cipher + Send)> = HashMap::new();
+        h.insert(1, &A);
+        h
+    });
+",
+            true,
+            false,
+        );
+        let at = src.idx((5, 8));
+        assert!(matches!(lookup(&src, at, "h"), Some(Found::Bind(_))));
+        let a = src.idx((5, 20));
+        assert_eq!(
+            expr_type(&src, a, src.idx((6, 0)), 4).as_deref(),
+            Some("Block<Ctr<Aes128>>")
+        );
+    }
+    #[test]
+    fn a_derived_types_body_names_its_derives() {
+        let src = Source::new(
+            "/// doc
+#[derive(ContentHash, Hash, Debug)]
+pub struct Timestamp {
+    /// doc
+    pub timestamp: MillisSinceEpoch,
+    pub tz_offset: i32,
+}
+macro_rules! _id_type {
+    (   $(#[$attr:meta])*
+        $vis:vis $name:ident { $hex_method:ident() }
+    ) => {
+        $(#[$attr])*
+        #[derive($crate::content_hash::ContentHash, PartialEq)]
+        $vis struct $name(Vec<u8>);
+    };
+}
+#[cfg_attr(feature = \"x\", derive(a::B))]
+#[derive(
+    C,
+)]
+pub(crate) enum E<T: Fn(u8) -> u8>
+where
+    T: Clone,
+{
+    V(T),
+}
+fn f() { let x = S { a: 1 }; }
+",
+            true,
+            false,
+        );
+        let names = |at| derived_type_at(&src, at).map(|(n, d)| (n, d.join(",")));
+        assert_eq!(
+            names((5, 19)),
+            Some(("Timestamp".into(), "ContentHash,Hash,Debug".into()))
+        );
+        assert_eq!(names((3, 4)), None);
+        assert_eq!(
+            names((14, 27)),
+            Some(("$name".into(), "ContentHash,PartialEq".into()))
+        );
+        assert_eq!(names((24, 6)), Some(("E".into(), "C,B".into())));
+        assert_eq!(names((26, 20)), None);
+        use super::files::generic_header;
+        assert!(generic_header("fn make_rng<R: SeedableRng>() -> R "));
+        assert!(generic_header("pub fn fill(rng: &mut impl Rng, n: usize) "));
+        assert!(!generic_header(
+            "fn new<'a, const N: usize>(k: &'a [u8; N]) -> impl Sized "
+        ));
+        assert!(same_type("[?]", "[(A,B)]", None, &mut |_| Vec::new()));
+        assert!(same_type(
+            "Vec<?>",
+            "Vec<Option<[u8;4]>>",
+            None,
+            &mut |_| Vec::new()
+        ));
+        assert!(!same_type("(?,?)", "(A,B,C)", None, &mut |_| Vec::new()));
+        assert!(!same_type("[u8;?]", "[u8;4];4", None, &mut |_| Vec::new()));
     }
 }

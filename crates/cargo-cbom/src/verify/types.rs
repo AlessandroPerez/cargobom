@@ -58,26 +58,58 @@ pub(super) fn same_type(
     if written == ty {
         return true;
     }
-    // `[u8;?]` (`impl<const N: usize> X for [u8; N]`) is `[u8;32]`
+    // `[u8;?]` (`impl<const N: usize> X for [u8; N]`) is `[u8;32]`, `[?]` (`impl<T: X> X for
+    // [T]`) is `[(A,B)]`
     if written.contains('?') {
-        let pat = regex::escape(written).replace(r"\?", r"[^,;\[\]()]+");
-        return Regex::new(&format!("^{pat}$")).is_ok_and(|r| r.is_match(ty));
+        let (p, t): (Vec<char>, Vec<char>) = (written.chars().collect(), ty.chars().collect());
+        return fits_blanks(&p, &t);
     }
     // (an alias of a type of that name: `impl Put for &mut A` with `type A = &'static
     // Algorithm`, its block named `A`)
-    if aliases(written)
-        .iter()
-        .any(|t| type_name(&expand_aliases(t, aliases, 3)) == type_name(ty))
-    {
+    let targets = aliases(written);
+    if targets.iter().any(|t| {
+        expansions(t, aliases)
+            .iter()
+            .any(|e| type_name(e) == type_name(ty))
+    }) {
         return true;
     }
     let Some(full) = full else {
         return false;
     };
     let full = fold_typenum(full);
-    aliases(written)
-        .iter()
-        .any(|t| fold_typenum(&expand_aliases(t, aliases, 3)) == full)
+    targets.iter().any(|t| {
+        expansions(t, aliases)
+            .iter()
+            .any(|e| fold_typenum(e) == full)
+    })
+}
+/// Whether the type `t` is the pattern `p`, each `?` of it standing for one type or constant
+/// whole: text whose brackets are balanced and which no `,` or `;` outside them divides.
+fn fits_blanks(p: &[char], t: &[char]) -> bool {
+    match p.first() {
+        None => t.is_empty(),
+        Some('?') => {
+            let mut depth = 0i32;
+            for (i, c) in t.iter().enumerate() {
+                match c {
+                    '<' | '(' | '[' => depth += 1,
+                    '>' if i > 0 && t[i - 1] == '-' => {}
+                    '>' | ')' | ']' => depth -= 1,
+                    ',' | ';' if depth == 0 => return false,
+                    _ => {}
+                }
+                if depth < 0 {
+                    return false;
+                }
+                if depth == 0 && fits_blanks(&p[1..], &t[i + 1..]) {
+                    return true;
+                }
+            }
+            false
+        }
+        Some(c) => t.first() == Some(c) && fits_blanks(&p[1..], &t[1..]),
+    }
 }
 /// A trait as written in an impl header is the trait a context names (`same_trait`), also once
 /// the aliases among its arguments are replaced (`RandomizedSigner<Signature>` with p521's
@@ -98,11 +130,49 @@ pub(super) fn trait_of(
     {
         return true;
     }
-    let expanded = format!("{head}{}", expand_aliases(args, aliases, 3));
-    expanded != written && same_trait(&fold_typenum(&expanded), &fold_typenum(want))
+    if expansions(args, aliases).iter().skip(1).any(|a| {
+        same_trait(
+            &fold_typenum(&norm_path(&format!("{head}{a}"))),
+            &fold_typenum(want),
+        )
+    }) {
+        return true;
+    }
+    // an argument written as an alias that is not seen through says nothing (`From<&Ciphertext>`
+    // with `type Ciphertext = kem::Ciphertext<XWingKem>;`, a generic alias another crate
+    // re-exports): the trait's name and its other arguments are compared
+    let name = |t: &str| t.split('<').next().unwrap_or(t).trim().to_string();
+    let (have, wanted) = (type_args(written), type_args(want));
+    name(written) == name(want)
+        && !have.is_empty()
+        && have.len() == wanted.len()
+        && have.iter().zip(&wanted).all(|(h, w)| {
+            let bare = h.trim().trim_start_matches('&').trim();
+            let bare = bare.strip_prefix("mut ").unwrap_or(bare).trim();
+            fold_typenum(&norm_path(h)) == fold_typenum(&norm_path(w))
+                || (bare.chars().all(|c| is_ident(c) || c == ':')
+                    && !aliases(bare.rsplit("::").next().unwrap_or(bare)).is_empty())
+        })
 }
-/// A type with the aliases it names replaced by what they stand for, `depth` levels deep (the
-/// names followed by arguments are types, not aliases without parameters).
+/// A type as written, then with the aliases it names replaced one, two and three levels deep.
+/// Each is a candidate: an alias's own names are those of the file that defines it, and may be
+/// other things where it is used (`type Aead = ChaCha20Poly1305;` of hpke's struct, used in a
+/// file that imports chacha20poly1305's alias of that name).
+pub(super) fn expansions(t: &str, aliases: &mut dyn FnMut(&str) -> Vec<String>) -> Vec<String> {
+    let mut out = vec![t.to_string()];
+    for depth in 1..=3 {
+        let e = expand_aliases(t, aliases, depth);
+        if !out.contains(&e) {
+            out.push(e);
+        }
+    }
+    out
+}
+/// A type with the aliases it names replaced by what they stand for, `depth` levels deep. A
+/// name given arguments is a type, or a generic alias whose parameters they replace
+/// (`kem::Ciphertext<XWingKem>` with kem's `type Ciphertext<K> = Array<u8, <K as Kem>::
+/// CiphertextSize>;`: `aliases` is asked for `kem::Ciphertext<>` and answers
+/// `K|Array<u8, <K as Kem>::CiphertextSize>`).
 pub(super) fn expand_aliases(
     t: &str,
     aliases: &mut dyn FnMut(&str) -> Vec<String>,
@@ -110,24 +180,78 @@ pub(super) fn expand_aliases(
 ) -> String {
     let mut out = String::new();
     let mut last = 0;
+    let deeper = |e: &str, aliases: &mut dyn FnMut(&str) -> Vec<String>| {
+        if depth > 1 {
+            expand_aliases(e, aliases, depth - 1)
+        } else {
+            e.to_string()
+        }
+    };
     for m in re!(r"\b[A-Za-z_]\w*\b").find_iter(t) {
+        if m.start() < last {
+            continue;
+        }
         if t[m.end()..].starts_with('<') {
+            let Some(close) = angle_close(t, m.end()) else {
+                continue;
+            };
+            // the path whole, for the package the alias is of
+            let head = re!(r"(?:\b\w+\s*::\s*)*$")
+                .find(&t[last..m.start()])
+                .map_or(m.start(), |h| last + h.start());
+            let args = split_top(&t[m.end() + 1..close]);
+            let key = format!("{}<>", t[head..m.end()].replace(' ', ""));
+            let found = aliases(&key).into_iter().find_map(|e| {
+                let (params, target) = e.split_once('|')?;
+                let params: Vec<String> = params.split(',').map(str::to_string).collect();
+                (params.len() == args.len()).then(|| (params, target.to_string()))
+            });
+            if let Some((params, target)) = found {
+                let names: Vec<String> = params.iter().map(|p| regex::escape(p)).collect();
+                let replaced = match Regex::new(&format!(r"\b(?:{})\b", names.join("|"))) {
+                    Ok(re) => re
+                        .replace_all(&target, |c: &regex::Captures| {
+                            params
+                                .iter()
+                                .position(|p| *p == c[0])
+                                .map_or(c[0].to_string(), |k| args[k].trim().to_string())
+                        })
+                        .to_string(),
+                    Err(_) => target,
+                };
+                out.push_str(&t[last..head]);
+                out.push_str(&deeper(&replaced, aliases));
+                last = close + 1;
+            }
             continue;
         }
         if let Some(e) = aliases(m.as_str()).first()
             && e != m.as_str()
         {
             out.push_str(&t[last..m.start()]);
-            if depth > 1 {
-                out.push_str(&expand_aliases(e, aliases, depth - 1));
-            } else {
-                out.push_str(e);
-            }
+            out.push_str(&deeper(e, aliases));
             last = m.end();
         }
     }
     out.push_str(&t[last..]);
     out
+}
+/// Where the `<` at byte `open` of a type's text closes (not at a function type's `->`).
+pub(super) fn angle_close(t: &str, open: usize) -> Option<usize> {
+    let mut depth = 0i32;
+    for (i, c) in t[open..].char_indices() {
+        match c {
+            '<' => depth += 1,
+            '>' if !t[..open + i].ends_with('-') => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(open + i);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }
 /// typenum's unsigned integers as their aliases name them: `UInt<UInt<UTerm,B1>,B0>` is `U2`
 /// (rustc prints the type, the source its alias).
@@ -149,7 +273,9 @@ pub(super) fn fold_typenum(t: &str) -> String {
 pub(super) fn lookup(src: &Source, at: usize, name: &str) -> Option<Found> {
     let p = src.pos(at);
     let f = src.enclosing(p, &[ItemKind::Fn]);
-    if let Some(f) = f {
+    // (or the static whose value's code it is in: `static T: LazyLock<..> = LazyLock::new(|| {
+    // let mut h = ..; h.insert(..); h });`)
+    if let Some(f) = f.or_else(|| src.enclosing(p, &[ItemKind::Static])) {
         let sc = src.fn_scope(f);
         if let Some(b) = sc
             .binds
@@ -358,20 +484,12 @@ pub(super) fn call_type_args(src: &Source, ci: usize, name: &str) -> Option<Vec<
         let mut params: Vec<String> = Vec::new();
         if let Some(f) = src.enclosing(src.pos(ci), &[ItemKind::Fn]) {
             params.extend(fn_sig(src, f).generics);
-            if let Some(b) = impl_of(src, f) {
-                let (ba, bb) = src.span(b);
-                let h = src.text(ba, scan_to(s, ba, bb, |k| s[k] == '{'));
-                if let Some(r) = h
-                    .trim_start()
-                    .strip_prefix("impl")
-                    .filter(|r| r.trim_start().starts_with('<'))
-                {
-                    params.extend(
-                        re!(r"[<,]\s*(\w+)\s*[:,>]")
-                            .captures_iter(r)
-                            .map(|x| x[1].to_string()),
-                    );
-                }
+            // (and of its impl block, const parameters too: `permute::<ROUNDS, N>` in an
+            // `impl<const RATE: usize, const ROUNDS: usize, const N: usize>`)
+            if let Some(b) = impl_of(src, f)
+                && let Some((_, own)) = impl_self(src, b)
+            {
+                params.extend(own);
             }
         }
         return Some(
@@ -657,6 +775,27 @@ pub(super) fn method_ret(src: &Source, ty: &str, name: &str) -> Option<String> {
     let ret = fn_sig(src, f).ret?;
     Some(re!(r"\bSelf\b").replace_all(&ret, ty).to_string())
 }
+/// The type the file's static or const `name`, read at `at`, is declared with.
+fn item_type(src: &Source, at: usize, name: &str) -> Option<String> {
+    let Some(Found::Item(k)) = lookup(src, at, name) else {
+        return None;
+    };
+    let s = &src.code;
+    let (x, y) = src.span(&src.items[k]);
+    let colon = scan_to(s, x, y, |k| s[k] == ':');
+    // (to its `=`, outside the type's brackets: `Box<dyn Iterator<Item = u8>>`)
+    let mut depth = 0i32;
+    let eq = (colon..y).find(|&k| {
+        match s[k] {
+            '<' | '(' | '[' => depth += 1,
+            '>' if s[k - 1] != '-' => depth -= 1,
+            ')' | ']' => depth -= 1,
+            _ => {}
+        }
+        s[k] == '=' && depth == 0
+    })?;
+    Some(src.text(colon + 1, eq).trim().to_string())
+}
 /// The type of the expression at `a..b` of `code` (a variable, a path to a value or a function
 /// of the file called, a struct literal, `vec![..]`, then fields, tuple fields, indexes, `?` and
 /// the file's methods called), as far as the code says: `None` where it does not.
@@ -755,6 +894,9 @@ pub(super) fn expr_type(src: &Source, a: usize, b: usize, depth: usize) -> Optio
                 segs[segs.len() - 2].clone()
             } else if last == "Self" {
                 around(start)?
+            } else if segs.len() == 1 && !matches!(s.get(n), Some('{' | '(')) {
+                // (a static or const, named in capitals as they are)
+                item_type(src, start, &last)?
             } else {
                 return None;
             };
@@ -862,6 +1004,8 @@ pub(super) fn expr_type(src: &Source, a: usize, b: usize, depth: usize) -> Optio
                     }
                     t.1.clone()
                 }
+                // a static or const of the file: the type it is declared with
+                Bound::Item { .. } => item_type(src, start, &last)?,
                 _ => return None,
             };
         } else {
@@ -995,11 +1139,12 @@ pub(super) fn dyn_traits_src(src: &Source, t: &str) -> Vec<String> {
     v.into_iter().map(|t| trait_alias(src, &t)).collect()
 }
 /// The trait a name the file imports under another name stands for (`use m::Pick as Chooser;`:
-/// `Chooser` is `Pick`); the name itself otherwise.
+/// `Chooser` is `Pick`, and so it is after `use Pick as Chooser;` beside the trait); the name
+/// itself otherwise.
 pub(super) fn trait_alias(src: &Source, t: &str) -> String {
     src.binds
         .iter()
-        .find(|b| b.name == t && b.path.len() > 1)
+        .find(|b| b.name == t)
         .and_then(|b| b.path.last().cloned())
         .unwrap_or_else(|| t.to_string())
 }
@@ -1526,7 +1671,8 @@ pub(super) fn written_self(
         return None;
     }
     // (then the package's, by name)
-    let expanded = expand_aliases(&resolved, aliases, 3);
+    let candidates = expansions(&resolved, aliases);
+    let expanded = candidates.last().cloned().unwrap_or_default();
     let (written, named) = (
         fold_typenum(&norm_path(&expanded)),
         fold_typenum(&norm_path(full)),
@@ -1551,7 +1697,11 @@ pub(super) fn written_self(
                 }),
         );
     }
-    Some(written == named)
+    Some(
+        candidates
+            .iter()
+            .any(|e| fold_typenum(&norm_path(e)) == named),
+    )
 }
 
 /// The defaults of the type and const parameters of the file's struct, enum or union `ty`, in

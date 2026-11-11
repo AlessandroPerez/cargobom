@@ -109,6 +109,7 @@ impl Files<'_> {
                 }
                 r.names.extend(sub.names);
                 r.types.extend(sub.types);
+                r.foreign_types.extend(sub.foreign_types);
                 r.replaced |= sub.replaced;
                 // what that initializer names in turn, from its own module
                 let d3 = self
@@ -184,6 +185,7 @@ impl Files<'_> {
                         );
                         r.names.extend(sub.names);
                         r.types.extend(sub.types);
+                        r.foreign_types.extend(sub.foreign_types);
                     }
                 }
                 if found {
@@ -260,7 +262,7 @@ impl Files<'_> {
                     .iter()
                     .any(|e| e.pattern.is_match(w) && Some(&e.algo.primitive) == prim)
             })
-            .chain(r.types.iter().filter(|w| {
+            .chain(r.foreign_types.iter().filter(|w| {
                 self.kb.types.iter().any(|e| {
                     e.name == **w
                         && Some(&e.algo.primitive) == prim
@@ -402,9 +404,16 @@ impl Files<'_> {
         // and the trait is no view, copy or stream step (`[[aside]]`, `step_traits`)
         if matches!(krate, "core" | "std" | "alloc") {
             let trait_path = sym.rsplit_once("::").map(|(t, _)| t);
-            let pkg = component_ref.rsplit(':').next().unwrap_or("");
+            // (the unknown's packages: one, or those providing it together, `ark-bls12-381+
+            // ark-ec`)
+            let pkgs: Vec<&str> = component_ref
+                .rsplit(':')
+                .next()
+                .unwrap_or("")
+                .split('+')
+                .collect();
             return self.man.packages.iter().any(|p| {
-                p.name == pkg
+                pkgs.contains(&p.name.as_str())
                     && !p.local
                     && ((p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto)
                         && !p.lib_name.as_deref().is_some_and(|l| kb.relay(l)))
@@ -488,7 +497,12 @@ impl Files<'_> {
         // (an instance's name printed with an empty turbofish, `m1::gen_set::`: its function;
         // a trait's method of a type printed as `a::Tr::m for a::T`: `<a::T as a::Tr>::m`)
         let w = w.trim_end_matches("::");
-        let w = match re!(r"^(.+)::(\w+) for (.+)$").captures(w) {
+        // (not an impl written in another module than its type, `m::<impl Tr for T>::f`, whose
+        // ` for ` is inside its own segment)
+        let w = match re!(r"^(.+)::(\w+) for (.+)$")
+            .captures(w)
+            .filter(|_| !w.contains("::<impl "))
+        {
             Some(m) => format!("<{} as {}>::{}", &m[3], &m[1], &m[2]),
             None => w.to_string(),
         };
@@ -574,14 +588,14 @@ impl Files<'_> {
             type_name(&expand_aliases(&type_name(t), lookup, 3))
         };
         let mut found = false;
-        // the package's files; then, when none writes the function, what the files' own
-        // `macro_rules!` write at item level (jsonwebtoken 11's `define_ecdsa_signer!(
-        // Es256Signer, ..)` writes `impl Es256Signer { fn new .. }`): each file with the
-        // invocations naming the item expanded in place
+        // the package's files; then what the files' own `macro_rules!` write at item level
+        // (jsonwebtoken 11's `define_ecdsa_signer!(Es256Signer, ..)` writes `impl Es256Signer
+        // { fn new .. }`): each file with the invocations naming the item expanded in place.
+        // Also where a file writes a function of that name itself: under another condition
+        // (shadowsocks-crypto's `cfg_if!` writes `Aes128Gcm::new` by hand for one backend and
+        // by `aead_cipher!(Aes128Gcm, AES_128_GCM)` for another), which this check does not
+        // evaluate; one that gives the descriptor is the witness
         for round in 0..2 {
-            if round == 1 && found {
-                break;
-            }
             let sources: Vec<Rc<Source>> = if round == 0 {
                 files.iter().filter_map(|f| self.source(f)).collect()
             } else {
@@ -853,7 +867,31 @@ impl Files<'_> {
                 .zip(&src.class[line - 1])
                 .map(|(c, k)| if *k == Class::Code { c } else { ' ' })
                 .collect();
-            let base = type_name(ty);
+            // the type by the name the line writes it under: its own, or an alias of the whole
+            // type (`Sha256` for sha2's `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, U32,
+            // OidSha256>>`, which the line never spells)
+            let alias = {
+                let man = self.man;
+                let owner = man.owner_of(&path);
+                let full = fold_typenum(&norm_path(ty));
+                // (with the path written before it: `sha2::Sha256`, an alias of that crate)
+                let names: Vec<String> = re!(r"\b(?:[A-Za-z_]\w*::)*[A-Z]\w*\b")
+                    .find_iter(&code)
+                    .map(|w| w.as_str().to_string())
+                    .collect();
+                names
+                    .into_iter()
+                    .find(|w| {
+                        let mut aliases = |a: &str| self.alias_targets(&src, owner, a);
+                        aliases(w).iter().any(|t| {
+                            expansions(t, &mut aliases)
+                                .iter()
+                                .any(|e| fold_typenum(&norm_path(e)) == full)
+                        })
+                    })
+                    .map(|w| w.rsplit("::").next().unwrap_or(&w).to_string())
+            };
+            let base = alias.clone().unwrap_or_else(|| type_name(ty));
             // the type's arguments (`d3::W<d3::A>`: `A`)
             let args: Vec<String> = ty
                 .find('<')
@@ -866,6 +904,8 @@ impl Files<'_> {
                         .collect()
                 })
                 .unwrap_or_default();
+            // (an alias of the whole type stands for its arguments too)
+            let args = if alias.is_some() { Vec::new() } else { args };
             let word = |w: &str| {
                 Regex::new(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&code))
             };
@@ -921,12 +961,24 @@ impl Files<'_> {
                 })
             };
             let args_written = args.iter().all(|a| word(a));
+            // (where the path the type is written by starts: `sha2::Sha256` at `sha2`)
+            let path_start = |mut i: usize| {
+                while let Some(p) = before_blank(s, i).filter(|&p| p > 0 && s[p] == ':' && s[p - 1] == ':')
+                    && let Some(e) = before_blank(s, p - 1).filter(|&e| is_ident(s[e]))
+                {
+                    i = e;
+                    while i > 0 && is_ident(s[i - 1]) {
+                        i -= 1;
+                    }
+                }
+                i
+            };
             // the type, with its arguments, made a pointer
             let names_type = ((l0..l1).any(|i| {
                 kw(s, i, &base)
                     && (args_written || generic_at(i))
-                    && made_pointer(i)
-                    && coerced(i)
+                    && made_pointer(path_start(i))
+                    && coerced(path_start(i))
             }))
                 || (PRIMS.contains(&base.as_str())
                     && (l0..l1).any(|i| {

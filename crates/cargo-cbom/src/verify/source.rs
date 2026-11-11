@@ -1239,6 +1239,21 @@ pub(super) fn param_passes(src: &Source, fun: &str, var: &str, named: usize) -> 
         "`{var}` is a parameter of `{fun}`, whose calls do not pass it"
     ))
 }
+/// The type definition the attribute at `attr_line` is on, past the attributes and comments
+/// between them.
+pub(super) fn attributed_type(src: &Source, attr_line: usize) -> Option<&Item> {
+    let item = src
+        .items
+        .iter()
+        .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > attr_line)
+        .min_by_key(|i| i.start)?;
+    (attr_line + 1..item.start.0)
+        .all(|l| {
+            let t = src.lines[l - 1].trim_start();
+            t.is_empty() || t.starts_with("#[") || t.starts_with("//")
+        })
+        .then_some(item)
+}
 /// The first line of the attribute (`#[derive(..)]`, `#[hashed]`) or the macro invocation
 /// (`hash_it!(..)`) a line of a file is in: the line itself when it starts one, else the
 /// nearest line above, within a few, that starts one and that no other line in between does.
@@ -1313,6 +1328,16 @@ pub(super) fn by_syntax(item: &InItem) -> bool {
 /// Is the path a method of an impl of a standard-library trait (`<Key as core::convert::From<
 /// [u8; 32]>>::from`)?
 pub(super) fn std_impl(path: &str) -> bool {
+    let std = |tr: &str| {
+        ["core::", "std::", "alloc::"]
+            .iter()
+            .any(|k| tr.starts_with(k))
+    };
+    // (an impl in another module than its type: `m::<impl core::convert::TryFrom<&P> for
+    // scrypt::Params>::try_from`)
+    if let Some(i) = path.find("::<impl ") {
+        return std(&path[i + "::<impl ".len()..]);
+    }
     let Some(q) = path.trim_start().strip_prefix('<') else {
         return false;
     };
@@ -1323,12 +1348,7 @@ pub(super) fn std_impl(path: &str) -> bool {
             '>' if q[..i].ends_with('-') => {}
             '>' if depth == 0 => return false,
             '>' | ')' | ']' => depth -= 1,
-            ' ' if depth == 0 && q[i..].starts_with(" as ") => {
-                let tr = &q[i + 4..];
-                return ["core::", "std::", "alloc::"]
-                    .iter()
-                    .any(|k| tr.starts_with(k));
-            }
+            ' ' if depth == 0 && q[i..].starts_with(" as ") => return std(&q[i + 4..]),
             _ => {}
         }
     }
@@ -1389,6 +1409,81 @@ pub(super) fn derive_at(src: &Source, at: (usize, usize)) -> Option<(String, Str
     });
     between_ok.then(|| (item.name.clone(), word_of(&chars, at.1)))
 }
+/// The type definition whose body (its fields or variants) holds the position, with the traits
+/// its `#[derive(..)]` attributes name, by their last segment: (the type's name, as written,
+/// `$name` in a macro's body; the traits). A derive macro's code for a type is cited there, at
+/// the field it reads.
+pub(super) fn derived_type_at(src: &Source, at: (usize, usize)) -> Option<(String, Vec<String>)> {
+    let s = &src.code;
+    let i = src.idx(at);
+    // (the keyword of a definition, a name after it: not a method called `union`)
+    let named = |j: usize| {
+        let n0 = skip_blank(s, j + word_of(s, j).chars().count());
+        let meta = s.get(n0) == Some(&'$');
+        let word = word_of(s, n0 + usize::from(meta));
+        (!word.is_empty()).then(|| (n0, if meta { format!("${word}") } else { word }))
+    };
+    let (a, (n0, name)) = (0..=i.min(s.len().checked_sub(1)?)).rev().find_map(|j| {
+        ["struct", "enum", "union"]
+            .iter()
+            .any(|w| kw(s, j, w))
+            .then(|| named(j).map(|n| (j, n)))
+            .flatten()
+    })?;
+    // where its body opens: past its generic parameters; past a `where` clause, a brace
+    let (mut depth, mut clause, mut open) = (0i32, false, None);
+    for k in n0 + name.chars().count()..s.len() {
+        match s[k] {
+            '<' => depth += 1,
+            '>' if s[k - 1] != '-' => depth -= 1,
+            '{' if depth <= 0 => open = Some(k),
+            '(' if depth <= 0 && !clause => open = Some(k),
+            ';' if depth <= 0 => return None,
+            _ if depth <= 0 && kw(s, k, "where") => clause = true,
+            _ => {}
+        }
+        if open.is_some() {
+            break;
+        }
+    }
+    let open = open?;
+    let close = close_of_at(s, open)?;
+    if !(open < i && i < close) {
+        return None;
+    }
+    // the attributes above it, past its visibility (the rest of its line) and a macro's
+    // repeated ones (`$(#[$attr])*`)
+    let mut traits = Vec::new();
+    let mut j = src.idx((src.pos(a).0, 0));
+    while let Some(p) = before_blank(s, j) {
+        let (first, last) = match s[p] {
+            ']' => (open_of_at(s, p)?, p),
+            '*' | '+' | '?' if p > 0 && s[p - 1] == ')' => {
+                let q = open_of_at(s, p - 1)?;
+                if q == 0 || s[q - 1] != '$' {
+                    break;
+                }
+                j = q - 1;
+                continue;
+            }
+            _ => break,
+        };
+        let Some(h) = before_blank(s, first).filter(|&h| s[h] == '#') else {
+            break;
+        };
+        let text: String = s[first..=last].iter().collect();
+        for m in re!(r"\bderive\s*\(([^()]*)\)").captures_iter(&text) {
+            for t in split_top(&m[1]) {
+                let t = t.trim();
+                if !t.is_empty() {
+                    traits.push(t.rsplit("::").next().unwrap_or(t).trim().to_string());
+                }
+            }
+        }
+        j = h;
+    }
+    Some((name, traits))
+}
 /// The item a closure or `async` body is written in: `t2::o1` for `t2::o1::{closure#0}`.
 pub(super) fn closure_parent(path: &str) -> Option<&str> {
     let p = path.trim_end();
@@ -1437,6 +1532,15 @@ pub(super) fn fn_item_runs(src: &Source, callee: &str, init: &str) -> bool {
 /// Where ` for ` splits an impl header's text (`Verifier<Signature> for Key`) into its trait and
 /// type: outside the trait's arguments.
 fn top_level_for(t: &str) -> Option<usize> {
+    top_level(t, " for ")
+}
+/// Where ` as ` splits a qualified path's inside (`Key as Verifier<Signature>`) into its type and
+/// trait: outside the type's own brackets (`<A as T>::f::{closure#0}::Local as U`, a type
+/// declared in a method's body).
+fn top_level_as(t: &str) -> Option<usize> {
+    top_level(t, " as ")
+}
+fn top_level(t: &str, word: &str) -> Option<usize> {
     let mut depth = 0i32;
     for (i, c) in t.char_indices() {
         match c {
@@ -1444,7 +1548,7 @@ fn top_level_for(t: &str) -> Option<usize> {
             // (not a function type's `->`)
             '>' if t[..i].ends_with('-') => {}
             '>' | ')' | ']' => depth -= 1,
-            _ if depth == 0 && t[i..].starts_with(" for ") => return Some(i),
+            _ if depth == 0 && t[i..].starts_with(word) => return Some(i),
             _ => {}
         }
     }
@@ -1522,7 +1626,7 @@ pub(super) fn in_item(item: &str) -> Option<InItem> {
         .and_then(|g| g.strip_suffix('>'))
     {
         let t = inner.strip_prefix("impl ").unwrap_or(inner);
-        let t = t.split(" as ").next().unwrap_or(t);
+        let t = top_level_as(t).map_or(t, |i| &t[..i]);
         let t = strip_generics(t);
         let segs: Vec<String> = t.trim().split("::").map(str::to_string).collect();
         if segs.len() >= 2
@@ -1546,7 +1650,9 @@ pub(super) fn in_item(item: &str) -> Option<InItem> {
                 self_ty = Some(last_of(t));
                 self_full = Some(norm_path(t));
                 trait_name = tr.map(norm_path);
-            } else if let Some((t, tr)) = inner.split_once(" as ") {
+            } else if let Some((t, tr)) =
+                top_level_as(inner).map(|i| (&inner[..i], &inner[i + " as ".len()..]))
+            {
                 self_ty = Some(last_of(t));
                 self_full = Some(norm_path(t));
                 trait_name = Some(norm_path(tr));
@@ -1860,7 +1966,15 @@ impl Source {
         if let Some(sc) = self.scopes.borrow().get(&a) {
             return sc.clone();
         }
-        let sc = Rc::new(scan_fn(self, a, b));
+        let sc = Rc::new(if f.kind == ItemKind::Fn {
+            scan_fn(self, a, b)
+        } else {
+            // a static's or const's value: the bindings of the block it runs
+            // (the first block of the value, inside whatever call it is an argument of)
+            let eq = scan_to(&self.code, a, b, |k| self.code[k] == '=');
+            let open = (eq..b).find(|&k| self.code[k] == '{').unwrap_or(b);
+            scan_body(self, FnScope::default(), open, b)
+        });
         self.scopes.borrow_mut().insert(a, sc.clone());
         sc
     }
@@ -1897,6 +2011,12 @@ pub(super) fn scan_fn(src: &Source, a: usize, b: usize) -> FnScope {
         out.params = params_names(s, i + 1, close);
         i = close + 1;
     }
+    scan_body(src, out, i, b)
+}
+/// The bindings of the first block from `i` on, before `b`: a function's body after its
+/// signature, the closure a static's value is (`LazyLock::new(|| { let mut h = ..; .. })`).
+pub(super) fn scan_body(src: &Source, mut out: FnScope, i: usize, b: usize) -> FnScope {
+    let s = &src.code;
     let open = scan_to(s, i, b, |k| s[k] == '{');
     let Some(close) = close_of_at(s, open) else {
         return out;

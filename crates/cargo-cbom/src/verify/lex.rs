@@ -344,6 +344,47 @@ pub(super) fn path_len(chars: &[char], start: usize) -> usize {
     }
     j - start
 }
+/// The path written from `start` in a file's code, over as many lines as it takes
+/// (`m::Stream::<\n    m::Aes128,\n>::new`), without its blanks, and where it ends.
+pub(super) fn long_path(s: &[char], start: usize) -> (String, usize) {
+    let mut out = String::new();
+    let (mut j, mut depth) = (start, 0i32);
+    while j < s.len() {
+        let c = s[j];
+        if depth > 0 {
+            match c {
+                '<' => depth += 1,
+                '>' if s[j - 1] != '-' => depth -= 1,
+                _ => {}
+            }
+            if !c.is_whitespace() {
+                out.push(c);
+            }
+            j += 1;
+            continue;
+        }
+        if is_ident(c) {
+            out.push(c);
+            j += 1;
+            continue;
+        }
+        if c == '<' && (out.is_empty() || out.ends_with("::")) {
+            depth = 1;
+            out.push(c);
+            j += 1;
+            continue;
+        }
+        // `::`, with blanks around it
+        let k = skip_blank(s, j);
+        if s.get(k) == Some(&':') && s.get(k + 1) == Some(&':') {
+            out.push_str("::");
+            j = skip_blank(s, k + 2);
+            continue;
+        }
+        break;
+    }
+    (out, j)
+}
 /// A path names an item: one of its segments is the item's name.
 pub(super) fn path_names(path: &str, name: &str) -> bool {
     re!(r"\w+").find_iter(path).any(|m| m.as_str() == name)

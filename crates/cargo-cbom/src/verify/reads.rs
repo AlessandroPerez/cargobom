@@ -228,6 +228,9 @@ pub(super) fn names_read(
             && w.chars()
                 .all(|c| c.is_uppercase() || c.is_ascii_digit() || c == '_');
         if first.is_uppercase() && !upper {
+            if !own_type(src, start, &w) {
+                r.foreign_types.insert(w.clone());
+            }
             r.types.insert(w);
             // a method named as a value (`o.map(Pick::alg)`): what the file's methods of that
             // name return (the implementation the value's type picks is one of them)
@@ -705,4 +708,26 @@ pub(super) fn names_read(
             None => {}
         }
     }
+}
+
+/// Whether a type name written at `start` is one of the package's own code, as far as the file
+/// says: its path starts in the package (`crate::`, `self::`, `super::`, a module the file
+/// declares, a name the file imports from one of those), or it has no path and the file
+/// defines it or imports it from the package. Such a type is none of another crate's, whatever
+/// its name (mail-auth's own `Sha256`, a unit type whose impl builds ring's SHA-256).
+fn own_type(src: &Source, start: usize, name: &str) -> bool {
+    let path = path_before(&src.code, start);
+    let head = path.first().map_or(name, String::as_str);
+    let relative = |h: &str| matches!(h, "crate" | "self" | "super");
+    relative(head)
+        || (path.is_empty() && src.locals.contains(name))
+        || (!path.is_empty() && {
+            // (`mod hashes;` or `mod hashes { .. }`)
+            let s = &src.code;
+            (0..s.len()).any(|k| kw(s, k, "mod") && word_of(s, skip_blank(s, k + 3)) == head)
+        })
+        || src
+            .binds
+            .iter()
+            .any(|b| b.name == head && b.path.first().is_some_and(|f| relative(f)))
 }
