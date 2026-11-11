@@ -55,14 +55,19 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let span = Some(self.loc(c.span));
         // integers, and values of a field-less enum, which are their discriminant
         // (`const ALG: Algorithm = Algorithm::Argon2d`)
+        // (and of a struct that is one integer, which is that integer:
+        // `const ROUNDS: NonZeroU32 = NonZeroU32::new(600_000).unwrap()`)
+        let one_integer = self.one_integer(&ty);
         let int_ty = matches!(
             ty.kind_of().rigid(),
             Some(RigidTy::Uint(_) | RigidTy::Int(_))
-        ) || self.fieldless_enum(&ty);
+        ) || self.fieldless_enum(&ty)
+            || one_integer.is_some();
         match c.const_.kind() {
             ConstantKind::Allocated(a) => {
                 let value = match ty.kind_of().rigid() {
                     Some(RigidTy::Int(_)) => a.read_int().ok(),
+                    _ if one_integer == Some(true) => a.read_int().ok(),
                     _ if int_ty => a.read_uint().ok().and_then(|v| i128::try_from(v).ok()),
                     _ => None,
                 };
@@ -238,6 +243,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                     rustc_middle::mir::interpret::Scalar::Int(i),
                 ) => Some(match ty.kind_of().rigid() {
                     Some(RigidTy::Int(_)) => i.to_int(i.size()),
+                    _ if self.one_integer(ty) == Some(true) => i.to_int(i.size()),
                     _ => i128::try_from(i.to_uint(i.size())).ok()?,
                 }),
                 _ => None,
@@ -386,6 +392,29 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     }
 
     /// An enum whose variants have no fields: its values are their discriminants.
+    /// Whether a type is a struct that is one integer (`NonZeroU32`, a newtype of an integer:
+    /// laid out as that scalar), and whether the integer is signed. A constant of it is that
+    /// integer's value.
+    pub(super) fn one_integer(&self, ty: &Ty) -> Option<bool> {
+        use rustc_middle::ty::TypeVisitableExt;
+        let t = rustc_internal::internal(self.tcx, *ty);
+        let rustc_middle::ty::Adt(def, _) = t.kind() else {
+            return None;
+        };
+        if !def.is_struct() || t.has_non_region_param() {
+            return None;
+        }
+        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+        let layout = self.tcx.layout_of(env.as_query_input(t)).ok()?;
+        match layout.backend_repr {
+            rustc_abi::BackendRepr::Scalar(s) => match s.primitive() {
+                rustc_abi::Primitive::Int(_, signed) => Some(signed),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
     pub(super) fn fieldless_enum(&self, ty: &Ty) -> bool {
         let kind = ty.kind_of();
         let Some(RigidTy::Adt(def, _)) = kind.rigid() else {

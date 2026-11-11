@@ -132,6 +132,13 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
             g.occurrences.retain(|o| {
                 !merged.contains(&(o.location.clone(), o.line, o.offset, o.symbol.clone()))
             });
+            // (what the less specific name is made of, the more specific one is made of: the
+            // HMAC-SHA-512 of ring's `PBKDF2_HMAC_SHA512` descriptor is that of the
+            // `PBKDF2-SHA-512-100000-32` its call names)
+            if !merged.is_empty() {
+                let parts = g.components.clone();
+                assets.get_mut(specific).unwrap().components.extend(parts);
+            }
         }
     }
     assets.retain(|_, a| !a.occurrences.is_empty());

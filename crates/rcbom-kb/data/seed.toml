@@ -1685,13 +1685,17 @@ family = "HKDF"
 primitive = "kdf"
 functions = ["keyderive"]
 
+# `derive(algorithm, iterations, salt, secret, out)` and `verify(algorithm, iterations, salt,
+# secret, previously_derived)` (ring 0.17.14 pbkdf2.rs, aws-lc-rs 1 pbkdf2.rs): the iteration
+# count and the output's length are the call's, and part of the name where it gives both.
 [[static]]
 crate = ["ring", "aws_lc_rs"]
 name = "^PBKDF2_HMAC_SHA(1|256|384|512)$"
-asset = "PBKDF2-SHA-{1}"
+asset = "PBKDF2-SHA-{1}[-{iterations}-{dk_len}]"
 family = "PBKDF2"
 primitive = "kdf"
 functions = ["keyderive"]
+call_params = { derive = { iterations = { const_arg = 1 }, dk_len = { arg_len = 4 } }, try_derive = { iterations = { const_arg = 1 }, dk_len = { arg_len = 4 } }, verify = { iterations = { const_arg = 1 }, dk_len = { arg_len = 4 } }, try_verify = { iterations = { const_arg = 1 }, dk_len = { arg_len = 4 } } }
 
 [[static]]
 crate = ["ring", "aws_lc_rs"]
@@ -3192,6 +3196,19 @@ fixed_defaults = ["generic-array"]
 # what a key derivation's expansion made (ring's `Okm::fill`), whose output-length descriptor,
 # given at the expansion (`prk.expand(info, HKDF_SHA256)`), names the algorithm.
 algorithm_getters = ["algorithm"]
+# `value_passes`: functions of the standard library that hand back the integer they are given,
+# wrapped or unwrapped: a parameter a call gives by its value (`call_params`, `const_arg`) is
+# read through them (`pbkdf2::derive(alg, NonZeroU32::new(100_000).unwrap(), ..)`).
+value_passes = [
+    "core::num::nonzero::NonZero::<T>::new",
+    "core::num::nonzero::NonZero::<T>::new_unchecked",
+    "core::num::nonzero::NonZero::<T>::get",
+    "core::option::Option::<T>::unwrap",
+    "core::option::Option::<T>::expect",
+    "core::option::Option::<T>::unwrap_unchecked",
+    "core::result::Result::<T, E>::unwrap",
+    "core::result::Result::<T, E>::expect",
+]
 output_steps = ["fill"]
 # For the driver: `buffer_fills`, methods that write every byte of the buffers they are given by
 # `&mut`, or fail (`RngCore::fill_bytes`, `Rng::fill`, ring's `SecureRandom::fill`, getrandom's):

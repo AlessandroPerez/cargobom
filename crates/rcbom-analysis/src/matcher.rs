@@ -184,6 +184,20 @@ pub fn match_static_called(
     method: Option<&str>,
     supported: Supported,
 ) -> Option<Match> {
+    match_static_at(kb, def, method, supported, &[], &[])
+}
+
+/// [`match_static_called`] at a call whose values are known: the parameters the entry reads
+/// from the call the descriptor is used at (`call_params`: ring's `pbkdf2::derive(alg,
+/// iterations, .., out)`) are the asset's, in its name where the entry's template has them.
+pub fn match_static_at(
+    kb: &Kb,
+    def: &DefRef,
+    method: Option<&str>,
+    supported: Supported,
+    const_args: &[Option<i128>],
+    arg_lens: &[Option<u64>],
+) -> Option<Match> {
     if !supported(&def.krate) {
         return None;
     }
@@ -198,18 +212,34 @@ pub fn match_static_called(
             && kb.applies(e.versions.as_ref(), &def.krate.name, &def.krate.stable_id)
     }) {
         if let Some(c) = e.pattern.captures(name) {
-            let vals: BTreeMap<String, String> = (1..c.len())
+            let mut vals: BTreeMap<String, String> = (1..c.len())
                 .filter_map(|i| c.get(i).map(|m| (i.to_string(), m.as_str().to_string())))
                 .collect();
             let mut algo = e.algo.clone();
             if let Some(t) = method.and_then(|m| e.asset_by_method.get(m)) {
                 algo.asset = t.clone();
             }
+            // what the call gives by its values
+            let mut values = BTreeMap::new();
+            for (k, p) in method
+                .and_then(|m| e.algo.call_params.get(m))
+                .into_iter()
+                .flatten()
+            {
+                if let Some(v) = call_value(p, const_args, arg_lens) {
+                    vals.insert(k.clone(), v.clone());
+                    values.insert(k.clone(), v);
+                }
+            }
+            let template = algo.clone();
             let algo = filled_algo(&algo, &vals);
+            let shown = in_name(&template, &values, &algo.asset);
+            let mut params = values.clone();
+            params.retain(|k, _| !shown.contains(k));
             return Some(Match {
                 name: algo.asset.clone(),
-                params: BTreeMap::new(),
-                values: BTreeMap::new(),
+                params,
+                values,
                 algo,
                 components: BTreeSet::new(),
                 providers: BTreeSet::new(),

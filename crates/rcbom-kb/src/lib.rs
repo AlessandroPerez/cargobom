@@ -105,6 +105,8 @@ struct SemanticsRaw {
     generator_suffixes: Vec<String>,
     #[serde(default)]
     wrappers: Vec<String>,
+    #[serde(default)]
+    value_passes: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -659,6 +661,10 @@ pub struct Kb {
     /// Methods of a crypto crate's types that return the descriptor a value was made with
     /// (ring's `key.algorithm()`).
     pub algorithm_getters: Vec<String>,
+    /// Functions of the standard library that hand back the integer they are given, wrapped
+    /// or unwrapped (`NonZeroU32::new(100_000).unwrap()`), by their paths: a parameter a call
+    /// gives by its value is read through them.
+    pub value_passes: Vec<String>,
     /// Methods that output what a key derivation's expansion made (ring's `Okm::fill`), whose
     /// length descriptor, given at the expansion, names the algorithm.
     pub output_steps: Vec<String>,
@@ -970,6 +976,7 @@ impl Kb {
             block_modes: raw.semantics.block_modes,
             fixed_defaults: raw.semantics.fixed_defaults,
             algorithm_getters: raw.semantics.algorithm_getters,
+            value_passes: raw.semantics.value_passes,
             output_steps: raw.semantics.output_steps,
             buffer_fills: raw.semantics.buffer_fills,
             generator_suffixes: raw.semantics.generator_suffixes,

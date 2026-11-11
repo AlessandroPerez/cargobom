@@ -375,6 +375,22 @@ pub(super) fn fn_site_match<'a>(ctx: &Ctx<'a>, site: &Site) -> Option<(Match, Op
 }
 /// Parameters a method fixes itself (`call_params`), over those of the constructor that built
 /// its receiver: one the call does not resolve is unknown, not the constructor's.
+/// The integer a value is, read through the standard library's functions that hand back the
+/// one they are given (`[semantics] value_passes`).
+pub(super) fn passed_int(kb: &Kb, o: &rcbom_facts::Origin, depth: usize) -> Option<i128> {
+    use rcbom_facts::Origin;
+    match o {
+        Origin::Const { value, .. } | Origin::Data { value, .. } | Origin::Unit { value, .. } => {
+            *value
+        }
+        Origin::Call { callee, args, .. }
+            if depth < 8 && kb.value_passes.iter().any(|p| p == callee) =>
+        {
+            passed_int(kb, args.first()?, depth + 1)
+        }
+        _ => None,
+    }
+}
 pub(super) fn fix_call_params(
     m: &mut Match,
     fixes: &BTreeMap<String, rcbom_kb::Param>,
@@ -1020,10 +1036,34 @@ pub(super) fn site_matches(
                             .collect();
                         owners.len() == 1 && !owners.contains(&None)
                     };
+                    // the integers the call is given, also through the standard library's
+                    // wrappers of one (`NonZeroU32::new(100_000).unwrap()`), and its buffers'
+                    // lengths: the parameters a descriptor's entry reads from its call
+                    let (consts, lens): (Vec<Option<i128>>, &[Option<u64>]) = match &site.target {
+                        Target::Call {
+                            const_args,
+                            arg_origins,
+                            arg_lens,
+                            ..
+                        } => (
+                            const_args
+                                .iter()
+                                .zip(arg_origins)
+                                .map(|(c, o)| c.or_else(|| passed_int(kb, o, 0)))
+                                .collect(),
+                            arg_lens,
+                        ),
+                        _ => (Vec::new(), &[]),
+                    };
                     for def in descriptors {
-                        if let Some(mut m) =
-                            matcher::match_static_called(kb, &def, Some(method), &supported)
-                        {
+                        if let Some(mut m) = matcher::match_static_at(
+                            kb,
+                            &def,
+                            Some(method),
+                            &supported,
+                            &consts,
+                            lens,
+                        ) {
                             let f = kb.use_of(method, &m.algo.primitive);
                             if f.is_none() && !has_roles {
                                 continue;
