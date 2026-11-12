@@ -167,18 +167,18 @@ row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 2
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
 then the tool was run on sixty-seven crates.io packages it had never been run on, in three
 batches (Unseen packages, below): what those runs found is fixed in this build, and changed
-one labelled site's verdict (rustic_core's private `apply_with_rng`, an honest unknown, is
-correct).
+three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
+honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HMAC`).
 
 | set | what | result |
 |---|---|---|
 | ground-truth suite | 53 programs, 107 call sites | 107 correct, 0 wrong, 0 miss |
 | corpus | realapp, minisign, rcgen, jwt-cli, rage, xh | Layer 1: 106/106 crypto packages found, none reported that is not; Layer 2: 28 live sites: 18 correct, 10 honest-unknown, 0 miss, 0 wrong; 10 dead sites (features off), nothing reported there |
-| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 70 correct, 2 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
+| held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (342 outputs, the suite's included): 20,841 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,358 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 100,980 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,548 calls (3,619 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| evidence | every cited position, `verify --self-test` | fixtures (343 outputs, the suite's included): 20,857 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,391 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 101,169 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,552 calls (3,623 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
@@ -187,10 +187,11 @@ Where it is not exact, the CBOM says so instead of guessing:
   private-key material, not as the scheme the label names. The corpus and the review set have
   none. (dufs's and rbw's `Uuid::new_v4`, misses until 10 November, are cited at the
   program's call since uuid is a wrapper package: Conventions.)
-- **Less specific.** jwt's `Hmac<D>` signing and verification, named `HMAC`: the library's
-  where-clause closes `D` over three hashes, which the analysis does not read. rbw's
-  `SigningKey::<Sha1>::new_unprefixed`, named `RSA-PKCS1-1.5` with its SHA-1 component: the
-  signature is of the raw digest, without the DigestInfo prefix of RSASSA-PKCS1-v1_5 with SHA-1.
+- **Less specific.** One, in the review set: rbw's `SigningKey::<Sha1>::new_unprefixed`, named
+  `RSA-PKCS1-1.5` with its SHA-1 component: the signature is of the raw digest, without the
+  DigestInfo prefix of RSASSA-PKCS1-v1_5 with SHA-1. (jwt's `Hmac<D>`, named `HMAC` until 11
+  November, is now one of the three hashes the library's own trait bounds `D` to: Limitations,
+  generic library code.)
 - **Labels changed after the runs.** jwt-cli's two `decode` calls with signature validation
   disabled were labelled with the HMACs the file's other sites count, narrowed to HS256 after the
   second review and restored after the third (the label file's header says why); the CBOM keeps
@@ -257,15 +258,18 @@ run can and cannot show).
   methods of trait objects of types that hold an `async` closure; websocat builds here only
   without its default features (OpenSSL), and passes so.
 
-On this build the first fifteen complete with 2,950 positions verified, 5 within a range and
-none mismatched; all 25,774 shifted positions are rejected (three more land on a call of the
-same instance, as true); no walk gap; 1,735 calls into crypto packages: 800 cited, 7 cited by
-the check by name, 19 as unknown, 909 excused. What stays unknown in them is what the
-knowledge base does not model (minisign under rsign2, bcrypt, the ciphers and modes pgp uses
-beyond AES-GCM); pgp's and miniserve's `Box<dyn DynDigest>` hashers are named now, one member
-for each hash the build boxes. The packages of the two later batches were re-run one by one
-as their findings were fixed; their figures on this build as a whole follow the next full
-re-run.
+After the third batch every earlier package that builds here was re-run, versions pinned, on
+the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
+complete; 18,275 positions verified and 93 within a range, none mismatched; all 98,256
+shifted positions rejected (22 more land on a call of the same instance, as true); no walk
+gap in their 26 binaries (rustic-rs's 178 functions linked through a trait object nothing
+calls are counted apart); 14,919 calls into crypto packages, 4,356 cited, 39 cited by the
+check by name, 244 as unknown, 10,280 excused. That re-run caught two regressions the
+fixtures had not (pgp's hashers boxed by `Box::<T>::default()`, a shifted position accepted in
+biscuit-auth), fixed before it ended. What stays unknown in them is what the knowledge base
+does not model (minisign under rsign2, bcrypt, the ciphers and modes pgp uses beyond AES-GCM);
+pgp's and miniserve's `Box<dyn DynDigest>` hashers are named now, one member for each hash the
+build boxes.
 
 ## Limitations
 
@@ -381,8 +385,13 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   each call the crate makes gives a parameter a type that is no parameter of the caller's,
   an operation on it is that type's, a member per type where the calls give several
   (rustic_core's private `apply_with_rng(.., rng)`, only ever handed `rand::rng()`, is the
-  thread generator's). Still the callers': a type parameter a where-clause closes over the
-  library's own impls (jwt's `Hmac<D>`, signed for three hashes).
+  thread generator's). So is a parameter that a trait of the library bounds: it is one of
+  the types the build implements that trait for, each a member (jwt's `Hmac<D>` with `D:
+  TypeLevelAlgorithmType`, signed for SHA-256, SHA-384 and SHA-512), and the occurrence says
+  where another crate can name the trait and implement it for a type of its own. A private
+  helper such a function hands its parameter on to takes what that parameter is (jwt's
+  `get_hmac_with_data<D>`, whose `update` steps are those three HMACs'). Still the callers':
+  a parameter no trait of the library bounds and no call of the library fixes.
 - *Provenance.* Key material is classified for the arguments the knowledge base gives a role;
   a generator handed to an API without an `rng` role is not classified, and gets no
   `predictable-rng` finding. A parameter's provenance includes what the program's callers pass
