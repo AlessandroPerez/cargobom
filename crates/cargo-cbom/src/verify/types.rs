@@ -370,7 +370,11 @@ pub(super) fn receiver_type(src: &Source, i: usize) -> Option<String> {
     let around = src.enclosing(src.pos(i), &[ItemKind::Impl]);
     let code: String = src.code.iter().collect();
     for _ in 0..4 {
-        let Ok(re) = Regex::new(&format!(r"\btype\s+{}\s*=\s*([^;<]+)", regex::escape(&ty))) else {
+        // (also one with parameters: `type RequestSendInner<'a> = request_native::RequestSend<'a>;`)
+        let Ok(re) = Regex::new(&format!(
+            r"\btype\s+{}\s*(?:<[^=;{{}}]*>)?\s*=\s*([^;<]+)",
+            regex::escape(&ty)
+        )) else {
             break;
         };
         let defs: Vec<((usize, usize), String)> = re
@@ -1697,6 +1701,39 @@ pub(super) fn written_self(
                 }),
         );
     }
+    // or one that gives the first of them and leaves out the rest, each equal to its default:
+    // `AcmeConfig::<!>` for `impl AcmeConfig<Infallible, Infallible>`, with `struct
+    // AcmeConfig<EC, EA = EC>`, a default naming another parameter, the written argument for it
+    if !candidates
+        .iter()
+        .any(|e| fold_typenum(&norm_path(e)) == named)
+        && let Some(params) = type_params(src, &type_name(ty))
+    {
+        let (want, have) = (type_args(&named), type_args(&written));
+        if type_name(&named) == type_name(&written)
+            && !want.is_empty()
+            && want.len() < have.len()
+            && have.len() == params.len()
+            && want.iter().zip(&have).all(|(a, b)| a == b)
+        {
+            let by_name: HashMap<&str, &str> = params
+                .iter()
+                .map(|(n, _)| n.as_str())
+                .zip(have.iter().map(String::as_str))
+                .collect();
+            let rest = (want.len()..have.len()).all(|k| {
+                params[k].1.as_deref().is_some_and(|d| {
+                    let d = re!(r"\b[A-Za-z_]\w*\b").replace_all(d, |m: &regex::Captures| {
+                        by_name
+                            .get(&m[0])
+                            .map_or(m[0].to_string(), |a| a.to_string())
+                    });
+                    fold_typenum(&norm_path(&d)) == have[k]
+                })
+            });
+            return Some(rest);
+        }
+    }
     Some(
         candidates
             .iter()
@@ -1707,6 +1744,12 @@ pub(super) fn written_self(
 /// The defaults of the type and const parameters of the file's struct, enum or union `ty`, in
 /// order (`struct NamedTempFile<F = File>`: `[Some("File")]`), lifetimes left out.
 pub(super) fn type_defaults(src: &Source, ty: &str) -> Option<Vec<Option<String>>> {
+    Some(type_params(src, ty)?.into_iter().map(|(_, d)| d).collect())
+}
+/// The type and const parameters of the file's struct, enum or union `ty`, in order, each with
+/// its default (`struct AcmeConfig<EC: Debug, EA: Debug = EC>`: `[("EC", None), ("EA",
+/// Some("EC"))]`), lifetimes left out.
+pub(super) fn type_params(src: &Source, ty: &str) -> Option<Vec<(String, Option<String>)>> {
     let s = &src.code;
     let def = src.items.iter().find(|it| {
         it.kind == ItemKind::TypeDef
@@ -1732,7 +1775,8 @@ pub(super) fn type_defaults(src: &Source, ty: &str) -> Option<Vec<Option<String>
             .map(|p| {
                 // the `=` outside the bounds' brackets (`T: Iterator<Item = u8> = Bytes`)
                 let mut depth = 0i32;
-                p.char_indices()
+                let default = p
+                    .char_indices()
                     .find(|&(k, c)| {
                         match c {
                             '<' | '(' | '[' => depth += 1,
@@ -1742,7 +1786,12 @@ pub(super) fn type_defaults(src: &Source, ty: &str) -> Option<Vec<Option<String>
                         }
                         c == '=' && depth == 0
                     })
-                    .map(|(k, _)| p[k + 1..].trim().to_string())
+                    .map(|(k, _)| p[k + 1..].trim().to_string());
+                let name = word_of(
+                    &p.trim_start_matches("const ").chars().collect::<Vec<_>>(),
+                    0,
+                );
+                (name, default)
             })
             .collect(),
     )

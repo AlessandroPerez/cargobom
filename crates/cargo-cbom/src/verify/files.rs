@@ -213,6 +213,51 @@ impl Files<'_> {
         ok
     }
 
+    /// What a type alias of the standard library stands for, read from the pinned toolchain's
+    /// sources (`std::convert::Infallible`, `pub type Infallible = !;` in core's `convert`
+    /// module): the module the path names, in the crate it names or in core and alloc, which
+    /// std re-exports. None where no such alias is written there.
+    pub(super) fn std_alias(&mut self, path: &[String]) -> Option<String> {
+        let key = path.join("::");
+        if let Some(a) = self.std_aliases.get(&key) {
+            return a.clone();
+        }
+        let found = (|| {
+            let (sysroot, _) = self.toolchain.get_or_insert_with(toolchain).clone()?;
+            let [krate, mods @ .., name] = path else {
+                return None;
+            };
+            let re = Regex::new(&format!(
+                r"\bpub\s+type\s+{}\s*=\s*([^;]+);",
+                regex::escape(name)
+            ))
+            .ok()?;
+            let lib = sysroot.join("lib/rustlib/src/rust/library");
+            let mut crates = vec![krate.as_str()];
+            crates.extend(["core", "alloc"].iter().filter(|c| **c != krate.as_str()));
+            for c in crates {
+                let base = lib.join(c).join("src");
+                let dir = mods.iter().fold(base.clone(), |d, m| d.join(m));
+                let files = if mods.is_empty() {
+                    vec![base.join("lib.rs")]
+                } else {
+                    vec![dir.with_extension("rs"), dir.join("mod.rs")]
+                };
+                for f in files {
+                    let Ok(t) = std::fs::read_to_string(&f) else {
+                        continue;
+                    };
+                    if let Some(m) = re.captures(&t) {
+                        return Some(m[1].trim().to_string());
+                    }
+                }
+            }
+            None
+        })();
+        self.std_aliases.insert(key, found.clone());
+        found
+    }
+
     /// The `#[path]` module declarations and `include!`d files of the package in `dir`.
     pub(super) fn package_mods(&mut self, dir: &Path) -> Rc<PkgMods> {
         if let Some(m) = self.pkg_mods.get(dir) {
@@ -345,6 +390,28 @@ impl Files<'_> {
                 out.extend(t.iter().cloned());
             }
         }
+        // (a type alias of the standard library the file imports, `use std::convert::Infallible;`:
+        // what the toolchain's sources say it stands for, `!`)
+        if !generic && root.is_none() {
+            let std_paths: Vec<Vec<String>> = src
+                .binds
+                .iter()
+                .filter(|b| b.name == bare)
+                .filter(|b| {
+                    b.path
+                        .first()
+                        .is_some_and(|h| matches!(h.as_str(), "std" | "core" | "alloc"))
+                })
+                .map(|b| b.path.clone())
+                .collect();
+            for p in std_paths {
+                if let Some(t) = self.std_alias(&p)
+                    && !out.contains(&t)
+                {
+                    out.push(t);
+                }
+            }
+        }
         // (a name a `use` gives another item: in the package, or in the package the file
         // imports the name from, async-std's `pub use futures_io::AsyncRead as Read;` for a
         // file's `use async_std::io::Read;`)
@@ -404,6 +471,36 @@ impl Files<'_> {
             Some((word_of(s, i), text, bound))
         };
         matches!((call(a), call(b)), (Some(x), Some(y)) if x == y)
+    }
+
+    /// Whether two positions of a file start one closure or `async` body: its own first token
+    /// (`async`, `move`, `|`) and the `&` or `(` before it, where the compiler may cite it.
+    pub(super) fn same_closure(
+        &mut self,
+        location: &str,
+        a: (usize, usize),
+        b: (usize, usize),
+    ) -> bool {
+        let Ok(path) = self.resolve(location) else {
+            return false;
+        };
+        let Some(src) = self.source(&path) else {
+            return false;
+        };
+        let s = &src.code;
+        let body = |at: (usize, usize)| {
+            if at.0 == 0 || at.0 > src.lines.len() || at.1 >= src.lines[at.0 - 1].chars().count() {
+                return None;
+            }
+            let i = src.idx(at);
+            let i = if matches!(s.get(i), Some('&' | '(')) {
+                skip_blank(s, i + 1)
+            } else {
+                i
+            };
+            closure_span(s, i).or_else(|| async_body_at(s, i))
+        };
+        matches!((body(a), body(b)), (Some(x), Some(y)) if x == y)
     }
 
     /// Whether two positions of a file are consecutive calls of one method in a chain

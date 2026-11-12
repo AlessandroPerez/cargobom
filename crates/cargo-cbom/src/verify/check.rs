@@ -370,8 +370,12 @@ impl Files<'_> {
                 return Err("no identifier in symbol".into());
             }
             // an operator trait's method is called by its operator (`point * scalar`): the
-            // position is the operator
-            let op = operator_of(&o.symbol);
+            // position is the operator, unless the code names the method itself
+            // (`Pin::new(&mut fut).poll(cx)`, `a.add(b)`)
+            let by_name = at.starts_with(ident.as_str())
+                && !at[ident.len()..].starts_with(is_ident)
+                && starts_token;
+            let op = operator_of(&o.symbol).filter(|_| !by_name);
             if let Some(op) = op
                 && !(at.starts_with(op)
                     && !at[op.len()..].starts_with('=')
@@ -1441,11 +1445,24 @@ impl Files<'_> {
                 if let Some(n) = caller.as_deref().and_then(in_item) {
                     // in code (not `#[lang = "drop_glue"]` above the function)
                     let text = &src.lines[line - 1];
-                    let in_code = Regex::new(&format!(r"\b{}\b", regex::escape(&n.name)))
-                        .unwrap()
-                        .find_iter(text)
-                        .any(|m| cols.contains(&text[..m.start()].chars().count()));
-                    if !in_code {
+                    let names_in_code = |name: &str| {
+                        Regex::new(&format!(r"\b{}\b", regex::escape(name)))
+                            .unwrap()
+                            .find_iter(text)
+                            .any(|m| cols.contains(&text[..m.start()].chars().count()))
+                    };
+                    let in_code = names_in_code(&n.name);
+                    // (or, as outside the standard library, a line of the caller's body that
+                    // names what it instantiates: `argument_new!(T, x, <T as Display>::fmt)`
+                    // in `Argument::new_display`)
+                    let in_body = col.is_some_and(|c0| {
+                        src.enclosing((line, c0), &[ItemKind::Fn])
+                            .is_some_and(|f| f.name == n.name)
+                    }) && callee
+                        .as_deref()
+                        .and_then(in_item)
+                        .is_some_and(|k| names_in_code(&k.name));
+                    if !in_code && !in_body {
                         return Err(format!("`{part}`: line {line} does not name `{}`", n.name));
                     }
                     // at the start of a token
@@ -1582,9 +1599,22 @@ impl Files<'_> {
                         // and an `async fn`'s body at its `{`
                         // (and a borrowed one without captures, which the compiler makes a
                         // constant, at its `&`: `by_ref(&|alg| ..)`)
-                        let borrowed = re!(r"&\s*(?:(?:async|move|static)\s+)*\|")
-                            .find_iter(text)
-                            .map(|m| text[..m.start()].chars().count());
+                        // (or a parenthesised one, which the compiler gives the span of its
+                        // parentheses: `tokio::spawn((async move { .. }).instrument(..))`; not
+                        // a call's own parenthesis, `and_then(|okm| ..)`)
+                        let chars_of_line: Vec<char> = text.chars().collect();
+                        let line_start = src.idx((line, 0));
+                        let borrowed =
+                            re!(r"(?:&|\()\s*(?:(?:async|move|static)\s+)*(?:\||\{)|\(\s*\|")
+                                .find_iter(text)
+                                .map(|m| text[..m.start()].chars().count())
+                                .filter(|&c| {
+                                    chars_of_line.get(c) != Some(&'(')
+                                        || before_blank(&src.code, line_start + c).is_none_or(|p| {
+                                            let ch = src.code[p];
+                                            !(is_ident(ch) || matches!(ch, '>' | ')' | ']' | '!'))
+                                        })
+                                });
                         let starts = re!(r"\|\|?|\basync\b|\bmove\b|\bstatic\b|\{")
                             .find_iter(text)
                             .map(|m| text[..m.start()].chars().count())
@@ -2061,7 +2091,19 @@ impl Files<'_> {
                                 Some(Bound::Let { init, .. }) if names_it(&init)
                                     && !init.contains('(')
                                     && fn_item_runs(&src, callee.as_deref().unwrap_or(""), init.trim()));
-                        if by_macro || by_variable {
+                        // (or the standard library's formatting arguments, which only
+                        // `format_args!` makes, at a macro invocation with a format string
+                        // that has a placeholder: `write!(&mut s, "{}", p)` making
+                        // `Argument::new_display`)
+                        let by_format = callee.as_deref().is_some_and(|k| {
+                            strip_generics(k)
+                                .replace("::::", "::")
+                                .starts_with("core::fmt::rt::Argument::new_")
+                        }) && macro_call_at(&src, (line, c0))
+                            && invocation_text(&src, (line, c0)).is_some_and(|(_, t)| {
+                                re!(r#""(?:[^"\\]|\\.)*\{[^{}"]*\}(?:[^"\\]|\\.)*""#).is_match(&t)
+                            });
+                        if by_macro || by_variable || by_format {
                             named.push(c0);
                         }
                     }
@@ -2114,8 +2156,9 @@ impl Files<'_> {
                             ));
                         }
                         let ci = src.idx((line, c0));
-                        // (a borrowed closure is cited at its `&`)
-                        let ci = if src.code.get(ci) == Some(&'&') {
+                        // (a borrowed closure is cited at its `&`, a parenthesised one at its
+                        // `(`)
+                        let ci = if matches!(src.code.get(ci), Some('&' | '(')) {
                             skip_blank(&src.code, ci + 1)
                         } else {
                             ci
@@ -2707,6 +2750,39 @@ impl Files<'_> {
         Ok(())
     }
 }
+/// Whether the item starting at `line` carries an attribute macro: an attribute above it (past
+/// comments and other attributes) that the file imports by its name (`use
+/// crate::action::action_impl;` for `#[action_impl]`), or writes by a path into a crate
+/// (`#[async_trait::async_trait]`). A built-in attribute is never imported, and a tool's
+/// (`#[rustfmt::skip]`, `#[clippy::..]`) moves no code.
+fn macro_attributed(src: &Source, line: usize) -> bool {
+    const TOOLS: &[&str] = &["rustfmt", "clippy", "diagnostic", "rust_analyzer", "miri"];
+    let mut l = line;
+    while l > 1 {
+        l -= 1;
+        let t = src.lines[l - 1].trim_start();
+        if t.is_empty() || t.starts_with("//") {
+            continue;
+        }
+        let Some(attr) = t.strip_prefix("#[") else {
+            break;
+        };
+        let path: String = attr
+            .chars()
+            .take_while(|c| is_ident(*c) || *c == ':')
+            .collect();
+        let segs: Vec<&str> = path.split("::").filter(|g| !g.is_empty()).collect();
+        let macro_like = match segs.as_slice() {
+            [name] => src.binds.iter().any(|b| b.name == *name),
+            [head, ..] => !TOOLS.contains(head),
+            [] => false,
+        };
+        if macro_like {
+            return true;
+        }
+    }
+    false
+}
 /// Whether a derive named `name` on a type of `src` is the language's own, not a procedural
 /// macro's: one of its built-in derives, under a name the file does not import (`use
 /// derive_more::Debug;`). The language spans a derived method's calls at the trait's name in
@@ -2736,15 +2812,27 @@ fn same_item(a: &str, b: &str) -> bool {
             .trim_end_matches("::")
             .to_string()
     };
-    // (a trait's default method run for a type, `<A as Pick>::alg`, is the trait's `Pick::alg`)
+    // (a trait's default method run for a type, `<A as Pick>::alg`, is the trait's `Pick::alg`;
+    // and so are the closures and `async` bodies written in it, `..::alg::{closure#0}`, by the
+    // same indexes)
+    let closures = |x: &str| {
+        let x = bare(x);
+        let k = re!(r"(?:::\{closure#\d+\})+$")
+            .find(&x)
+            .map_or(x.len(), |m| m.start());
+        x[k..].to_string()
+    };
     let default_of = |x: &str, y: &str| {
+        let (cx, cy) = (closures(x), closures(y));
         let y = bare(y);
-        let mut segs = y.rsplit("::");
+        let head = &y[..y.len() - cy.len()];
+        let mut segs = head.rsplit("::");
         let (name, owner) = (segs.next(), segs.next());
-        in_item(x).is_some_and(|n| {
-            Some(n.name.as_str()) == name
-                && n.trait_name.as_deref().map(type_name).as_deref() == owner
-        })
+        cx == cy
+            && in_item(x).is_some_and(|n| {
+                Some(n.name.as_str()) == name
+                    && n.trait_name.as_deref().map(type_name).as_deref() == owner
+            })
     };
     bare(a) == bare(b) || default_of(a, b) || default_of(b, a)
 }
@@ -2814,6 +2902,18 @@ pub(super) fn check_item(
     let in_call = src.enclosing(at, &[ItemKind::MacroCall]).is_some() || macro_call_at(src, at);
     if item.name != want.name {
         if in_call && path_names(&want.path, &item.name) {
+            return Ok(());
+        }
+        // or code an attribute macro on the impl block moves into an item it writes for the
+        // same type (mongodb's `#[action_impl]` on `impl Action for X` writes `impl IntoFuture
+        // for X`, whose `into_future` runs the body of `execute`)
+        if let Some(block) = src.enclosing(at, &[ItemKind::Impl])
+            && want
+                .self_ty
+                .as_deref()
+                .is_some_and(|t| type_name(t) == type_name(&block.name))
+            && macro_attributed(src, block.start.0)
+        {
             return Ok(());
         }
         return Err(format!(

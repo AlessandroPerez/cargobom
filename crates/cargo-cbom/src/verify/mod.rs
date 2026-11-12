@@ -573,6 +573,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         roots,
         pkg_mods: HashMap::new(),
         std_items: HashMap::new(),
+        std_aliases: HashMap::new(),
         open_fns: HashMap::new(),
         occs: &occs,
         at_pos,
@@ -804,12 +805,29 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                                         ((l0 + dl) as usize, (c0 + dc) as usize),
                                     )
                             });
+                    // (another token that starts the same closure or `async` body: `async`
+                    // of `(async move { .. })`, cited at its parenthesis)
+                    let same_body = ok
+                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
+                            .captures(whole)
+                            .is_some_and(|at| {
+                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
+                                let (l0, c0) = (n(2), n(3));
+                                l0 + dl >= 1
+                                    && c0 + dc >= 0
+                                    && files.same_closure(
+                                        &at[1],
+                                        (l0 as usize, c0 as usize),
+                                        ((l0 + dl) as usize, (c0 + dc) as usize),
+                                    )
+                            });
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
                     } else if m[0].starts_with("coerced to")
                         || TYPED.with(|t| t.borrow().iter().any(|p| p == part))
                         || same_variable
                         || same_future
+                        || same_body
                     {
                         // the shifted line coerces the type to the trait too (a value of the type
                         // becomes an object of that trait there, as `check_coercions` reads it),
@@ -951,6 +969,8 @@ struct Files<'a> {
     pkg_mods: HashMap<PathBuf, Rc<PkgMods>>,
     /// standard-library paths checked (`std_item`)
     std_items: HashMap<String, bool>,
+    /// the standard library's type aliases read, by path (`std_alias`)
+    std_aliases: HashMap<String, Option<String>>,
     /// (package, function path) -> whether it runs for a type its caller gives
     /// (`runs_for_a_type`)
     open_fns: HashMap<(String, String), bool>,
