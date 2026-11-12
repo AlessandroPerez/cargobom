@@ -178,7 +178,7 @@
         },
         {
           "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "value": "reachable"
         }
       ],
       "purl": "pkg:cargo/sha2@0.10.1",
@@ -222,7 +222,7 @@
       "version": "2.4.1"
     },
     {
-      "bom-ref": "crypto:algorithm:HMAC",
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "HMAC",
@@ -237,49 +237,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; use: tag; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; use: tag; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
             "line": 57,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 30,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; into_bytes: setup, not a use; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; into_bytes: setup, not a use; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
             "line": 58,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 30,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; use: verify; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; use: verify; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
             "line": 81,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 13,
             "symbol": "digest::mac::Mac::verify_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; reset: setup, not a use; line: `hmac.reset();`; code: `reset`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; reset: setup, not a use; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.reset();`; code: `reset`",
             "line": 99,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 9,
             "symbol": "digest::mac::Mac::reset"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
             "line": 100,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 9,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
             "line": 101,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 9,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
             "line": 102,
             "location": "src/algorithm/rust_crypto.rs",
             "offset": 9,
@@ -287,7 +287,7 @@
           }
         ]
       },
-      "name": "HMAC",
+      "name": "HMAC-SHA-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
@@ -317,10 +317,203 @@
       "type": "cryptographic-asset"
     },
     {
-      "bom-ref": "crypto:candidate:sha2@0.10.1:SHA-2",
+      "bom-ref": "crypto:algorithm:HMAC-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag",
+            "verify"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; use: tag; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "line": 57,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; into_bytes: setup, not a use; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "line": 58,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; use: verify; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "line": 81,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 13,
+            "symbol": "digest::mac::Mac::verify_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; reset: setup, not a use; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.reset();`; code: `reset`",
+            "line": 99,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::reset"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "line": 100,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "line": 101,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "line": 102,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag",
+            "verify"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; use: tag; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "line": 57,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; into_bytes: setup, not a use; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "line": 58,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; use: verify; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "line": 81,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 13,
+            "symbol": "digest::mac::Mac::verify_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; reset: setup, not a use; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.reset();`; code: `reset`",
+            "line": 99,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::reset"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "line": 100,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "line": 101,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in jwt::algorithm::rust_crypto::get_hmac_with_data; use: tag; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "line": 102,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
       "cryptoProperties": {
         "algorithmProperties": {
           "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -328,42 +521,281 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] declared by jwt (dependencies)",
-            "line": 51,
-            "location": "Cargo.toml",
-            "offset": 14,
-            "symbol": "sha2"
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-256; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "line": 57,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[manifest] locked sha2 0.10.1; reached via jwt -> sha2",
-            "line": 234,
-            "location": "Cargo.lock",
-            "offset": 0,
-            "symbol": "sha2"
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-256; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "line": 58,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; part of HMAC-SHA-256; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "line": 81,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 13,
+            "symbol": "digest::mac::Mac::verify_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-256; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.reset();`; code: `reset`",
+            "line": 99,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::reset"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-256; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "line": 100,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-256; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "line": 101,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-256; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "line": 102,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
           }
         ]
       },
-      "name": "SHA-2",
+      "name": "SHA-256",
       "properties": [
         {
           "name": "rcbom:detection:method",
-          "value": "manifest"
+          "value": "type-resolved"
         },
         {
           "name": "rcbom:confidence",
-          "value": "low"
+          "value": "high"
         },
         {
-          "name": "rcbom:usage",
-          "value": "declared-not-used"
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
         },
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
         },
         {
-          "name": "rcbom:registry-name",
-          "value": "unmatched"
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-384; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "line": 57,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-384; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "line": 58,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; part of HMAC-SHA-384; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "line": 81,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 13,
+            "symbol": "digest::mac::Mac::verify_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-384; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.reset();`; code: `reset`",
+            "line": 99,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::reset"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-384; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "line": 100,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-384; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "line": 101,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-384; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "line": 102,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-512; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `let mac_result = hmac.finalize();`; code: `finalize`",
+            "line": 57,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::SigningAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::sign; part of HMAC-SHA-512; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `let code = mac_result.into_bytes();`; code: `into_bytes`",
+            "line": 58,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 30,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::<impl jwt::algorithm::VerifyingAlgorithm for digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>>>::verify_bytes; part of HMAC-SHA-512; `D` is one of 3 types the build implements `jwt::algorithm::rust_crypto::TypeLevelAlgorithmType` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.verify_slice(signature)?;`; code: `verify_slice`",
+            "line": 81,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 13,
+            "symbol": "digest::mac::Mac::verify_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-512; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.reset();`; code: `reset`",
+            "line": 99,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::reset"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-512; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(header.as_bytes());`; code: `update`",
+            "line": 100,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-512; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(SEPARATOR.as_bytes());`; code: `update`",
+            "line": 101,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] in jwt::algorithm::rust_crypto::get_hmac_with_data; part of HMAC-SHA-512; `D` is one of 3 types the calls of `jwt::algorithm::rust_crypto::get_hmac_with_data` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64>>`; line: `hmac.update(claims.as_bytes());`; code: `update`",
+            "line": 102,
+            "location": "src/algorithm/rust_crypto.rs",
+            "offset": 9,
+            "symbol": "digest::mac::Mac::update"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "7"
         }
       ],
       "type": "cryptographic-asset"
@@ -391,7 +823,9 @@
         "pkg:cargo/digest@0.10.1"
       ],
       "provides": [
-        "crypto:algorithm:HMAC"
+        "crypto:algorithm:HMAC-SHA-256",
+        "crypto:algorithm:HMAC-SHA-384",
+        "crypto:algorithm:HMAC-SHA-512"
       ],
       "ref": "pkg:cargo/hmac@0.12.0"
     },
@@ -409,7 +843,9 @@
         "pkg:cargo/digest@0.10.1"
       ],
       "provides": [
-        "crypto:candidate:sha2@0.10.1:SHA-2"
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
       ],
       "ref": "pkg:cargo/sha2@0.10.1"
     },
@@ -418,12 +854,34 @@
       "ref": "pkg:cargo/subtle@2.4.1"
     },
     {
-      "dependsOn": [],
-      "ref": "crypto:algorithm:HMAC"
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-512"
     },
     {
       "dependsOn": [],
-      "ref": "crypto:candidate:sha2@0.10.1:SHA-2"
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
     }
   ],
   "metadata": {
@@ -492,7 +950,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:35ad555c-fdbb-877a-8135-d81e9fe4accd",
+  "serialNumber": "urn:uuid:d1499515-c884-8c00-9f84-217025ccaad8",
   "specVersion": "1.7",
   "version": 1
 }

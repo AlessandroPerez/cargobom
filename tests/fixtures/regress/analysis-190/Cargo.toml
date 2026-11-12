@@ -1,0 +1,15 @@
+# A library's generic functions whose type parameter a trait of the library bounds (jwt's
+# `impl<D: TypeLevelAlgorithmType> SigningAlgorithm for Hmac<D>`): the parameter is one of the
+# types the build implements the trait for, beside those another crate may where it can name
+# the trait; a private helper handed that parameter takes what it is. A trait implemented for
+# every type bounds nothing.
+[package]
+name = "analysis-190"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+sha3 = "0.10"
+
+[workspace]

@@ -1,0 +1,116 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:33:19 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::Signer::<D>::sign; use: digest; `D` is one of 3 types the build implements `analysis_190::Tagged` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`; line: `out.extend(D::digest(data));`; code: `D::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/lib.rs:44:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::framed; use: digest; `D` is one of 3 types the calls of `analysis_190::framed` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`; line: `D::digest(data).to_vec()`; code: `D::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/lib.rs:33:19 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::Signer::<D>::sign; use: digest; `D` is one of 3 types the build implements `analysis_190::Tagged` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>`; line: `out.extend(D::digest(data));`; code: `D::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/lib.rs:44:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::framed; use: digest; `D` is one of 3 types the calls of `analysis_190::framed` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>`; line: `D::digest(data).to_vec()`; code: `D::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:33:19 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::Signer::<D>::sign; use: digest; `D` is one of 3 types the build implements `analysis_190::Tagged` for, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>`; line: `out.extend(D::digest(data));`; code: `D::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/lib.rs:44:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::framed; use: digest; `D` is one of 3 types the calls of `analysis_190::framed` give it, which only its crate makes, beside those another crate may: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>`; line: `D::digest(data).to_vec()`; code: `D::digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | src/lib.rs:55:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::fingerprint; use: digest; `D` is the type the build implements `analysis_190::sealed::Only` for: `digest::core_api::wrapper::CoreWrapper<sha3::Sha3_256Core>`; line: `D::digest(data).to_vec()`; code: `D::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via analysis-190 -> sha2 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via analysis-190 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:48:0 | digest | [manifest] locked digest 0.10.7; reached via analysis-190 -> sha2 -> digest
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:68:0 | keccak | [manifest] locked keccak 0.1.6; reached via analysis-190 -> sha3 -> keccak
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:83:0 | sha2 | [manifest] locked sha2 0.10.9; reached via analysis-190 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:12:0 | sha2 | [manifest] declared by analysis-190 (dependencies)
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:94:0 | sha3 | [manifest] locked sha3 0.10.9; reached via analysis-190 -> sha3
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.toml:13:0 | sha3 | [manifest] declared by analysis-190 (dependencies)
+  occ unknown | crypto:algorithm:unknown:hash:digest | src/lib.rs:65:4 | digest::digest::Digest::digest | [reachable] [call] in analysis_190::open; use: digest; algorithm unresolved: a type parameter (`D`) of the library's generic API: its callers choose the type; line: `D::digest(data).to_vec()`; code: `D::digest`
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=present
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:occurrences=1
+  prop unknown | crypto:algorithm:unknown:hash:digest | rcbom:reachability=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:hash:digest | {"algorithmProperties": {"cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+dep pkg:cargo/analysis-190@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/analysis-190@0.1.0 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:SHA3-256
+dependency crypto:algorithm:unknown:hash:digest
+dependency pkg:cargo/analysis-190@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha3@0.10.9
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/digest@0.10.7 -> crypto:algorithm:unknown:hash:digest
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha3@0.10.9 -> crypto:algorithm:SHA3-256
+root {"bom-ref": "pkg:cargo/analysis-190@0.1.0", "name": "analysis-190", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/analysis-190@0.1.0", "type": "library", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=lib analysis-190
+run rcbom:run:boundary-check=4 calls into crypto packages: 4 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=12
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=0
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
