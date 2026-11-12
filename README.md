@@ -165,8 +165,8 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on sixty-seven crates.io packages it had never been run on, in three
-batches (Unseen packages, below): what those runs found is fixed in this build, and changed
+then the tool was run on ninety crates.io packages it had never been run on, in four batches
+(Unseen packages, below): what those runs found is fixed in this build, and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
 honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HMAC`).
 
@@ -177,8 +177,8 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (343 outputs, the suite's included): 20,857 positions verified, 12 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,391 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 101,169 positions shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,552 calls (3,623 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,896 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| evidence | every cited position, `verify --self-test` | fixtures (344 outputs, the suite's included): 20,877 positions verified, 20 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,391 and review 797 verified, with 15 and 6 more within a range in the last two; every one of 101,422 positions shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,569 calls (3,637 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,899 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
 | walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
@@ -213,7 +213,7 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the three batches so far did; each finding is fixed in this build and has a fixture,
+None of the four batches so far did; each finding is fixed in this build and has a fixture,
 and the packages are development material from then on (`in-too-deep.md` 8 says what such a
 run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
@@ -257,6 +257,20 @@ run can and cannot show).
   to a generic function of another crate); jj-cli had 16 functions linked and not walked, the
   methods of trait objects of types that hold an `async` closure; websocat builds here only
   without its default features (OpenSSL), and passes so.
+- *Twenty-three, 12 November:* just 1.59.0, ntpd 1.9.0, routinator 0.16.1, mongodb 3.10.0,
+  rust-s3 0.38.0 (rustls), reqsign 0.20.7, fernet 0.2.2 (`rustcrypto`), fastwebsockets 0.8.1
+  (`upgrade`), oo7 0.7.1, b3sum 1.8.7, uu_hashsum 0.5.0, rustls-acme 0.15.4,
+  hpke-rs-rust-crypto 0.8.0, zipsign 0.2.2, p12 0.6.3, bip32 0.6.0, ureq 3.5.1, scram 0.6.0,
+  tuf 0.2.0, libp2p-noise 0.47.0, srp 0.6.0, x509-certificate 0.25.0 and lettre 0.11.23
+  (rustls), with the build pushed that day; tuf 0.2.0 does not build as published (its
+  dependencies' versions are yanked). Seventeen of the twenty-two passed, and in all of them
+  no shifted position was accepted, the walk check found no gap and the driver caught no
+  panic. The verifier rejected correct positions in five (23 in rust-s3, 5 in rustls-acme, 3
+  in ntpd, 1 in mongodb, 1 in libp2p-noise): a trait's default `async` method run for a type,
+  `Future::poll` called by its name, an impl for the standard library's `Infallible` (`!`)
+  with a defaulted argument the compiler leaves out, a receiver typed by a generic alias, a
+  parenthesised `async` block, an attribute macro on an impl moving a method's body into
+  another item, a formatting macro reaching a `Display` impl through the standard library.
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
@@ -266,7 +280,9 @@ gap in their 26 binaries (rustic-rs's 178 functions linked through a trait objec
 calls are counted apart); 14,919 calls into crypto packages, 4,356 cited, 39 cited by the
 check by name, 244 as unknown, 10,280 excused. That re-run caught two regressions the
 fixtures had not (pgp's hashers boxed by `Box::<T>::default()`, a shifted position accepted in
-biscuit-auth), fixed before it ended. What stays unknown in them is what the knowledge base
+biscuit-auth), fixed before it ended. After the fourth batch's fixes, which are the verifier's,
+the CBOMs of all 86 packages were verified again: 24,402 positions verified and 105 within a
+range, none mismatched; all 124,318 shifted positions rejected (25 more as true). What stays unknown in them is what the knowledge base
 does not model (minisign under rsign2, bcrypt, the ciphers and modes pgp uses beyond AES-GCM);
 pgp's and miniserve's `Box<dyn DynDigest>` hashers are named now, one member for each hash the
 build boxes.
