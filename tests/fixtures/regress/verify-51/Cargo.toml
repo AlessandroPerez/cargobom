@@ -1,0 +1,19 @@
+# Shapes of source the verifier met on the fourth batch of unseen crates.io packages (rust-s3,
+# rustls-acme, ntpd, mongodb, libp2p-noise): a trait's default `async` method run for a type; an
+# impl header the compiler prints with the standard library's alias replaced and a defaulted
+# argument left out; a receiver typed by a generic alias; a parenthesised `async` block; an
+# attribute macro on an impl moving a method's body into another item; a formatting macro
+# reaching a `Display` impl through the standard library. Each case is commented where it is.
+[package]
+name = "verify-51"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["pm"]
+
+[dependencies]
+pm = { path = "pm" }
+hmac = "0.12"
+sha1_smol = "1"
+sha2 = "0.10"

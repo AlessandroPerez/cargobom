@@ -1,0 +1,149 @@
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/defaults.rs:12:22 | digest::mac::Mac::new_from_slice | [reachable] [call] in verify_51::defaults::Request::authorization::{closure#0}; new_from_slice: setup, not a use; key: computed (defaults::Request::key); `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `let mut mac = Hmac::<Sha256>::new_from_slice(&self.key()).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/defaults.rs:13:12 | digest::mac::Mac::update | [reachable] [call] in verify_51::defaults::Request::authorization::{closure#0}; use: tag; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/defaults.rs:14:12 | digest::mac::Mac::finalize | [reachable] [call] in verify_51::defaults::Request::authorization::{closure#0}; use: tag; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/defaults.rs:14:23 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in verify_51::defaults::Request::authorization::{closure#0}; into_bytes: setup, not a use; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-224 | crypto:algorithm:SHA-224 | src/blocks.rs:18:20 | digest::digest::Digest::digest | [reachable] [call] in verify_51::blocks::spawned::{closure#0}; use: digest; instantiated by verify_51::blocks::spawned at src/blocks.rs:17:8; line: `let h = Sha224::digest(&data);`; code: `Sha224::digest`
+  occ SHA-224 | crypto:algorithm:SHA-224 | src/blocks.rs:23:13 | digest::digest::Digest::digest | [reachable] [call] in verify_51::blocks::spawned::{closure#1}; use: digest; instantiated by verify_51::blocks::spawned at src/blocks.rs:23:9 as `|b| Sha224::digest([b])[0]`; line: `.map(|b| Sha224::digest([b])[0])`; code: `Sha224::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/defaults.rs:12:22 | digest::mac::Mac::new_from_slice | [reachable] [component] in verify_51::defaults::Request::authorization::{closure#0}; part of HMAC-SHA-256; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `let mut mac = Hmac::<Sha256>::new_from_slice(&self.key()).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/defaults.rs:13:12 | digest::mac::Mac::update | [reachable] [component] in verify_51::defaults::Request::authorization::{closure#0}; part of HMAC-SHA-256; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/defaults.rs:14:12 | digest::mac::Mac::finalize | [reachable] [component] in verify_51::defaults::Request::authorization::{closure#0}; part of HMAC-SHA-256; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/defaults.rs:14:23 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in verify_51::defaults::Request::authorization::{closure#0}; part of HMAC-SHA-256; `<verify_51::defaults::Bucket as verify_51::defaults::Request>::authorization::{closure#0}` instantiated by <verify_51::defaults::Bucket as verify_51::defaults::Request>::presigned::{closure#0} at src/defaults.rs:18:41; instantiated by verify_51::defaults::sign::{closure#0} at src/defaults.rs:31:18; instantiated by verify_51::defaults::sign at src/defaults.rs:30:41; line: `mac.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/moved.rs:16:16 | digest::digest::Digest::digest | [reachable] [call] in verify_51::moved::Parse::run; use: digest; line: `let h = Sha256::digest(&self.0);`; code: `Sha256::digest`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/alias.rs:21:24 | digest::digest::Digest::new | [reachable] [call] in verify_51::alias::inner::Hasher::<'_>::digest; new: setup, not a use; instantiated by verify_51::alias::Config::<!>::fingerprint at src/alias.rs:39:15 as `digest`; instantiated by verify_51::main at src/main.rs:26:33 as `fingerprint`; line: `let mut h = sha2::Sha384::new();`; code: `sha2::Sha384::new`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/alias.rs:22:14 | digest::digest::Digest::update | [reachable] [call] in verify_51::alias::inner::Hasher::<'_>::digest; use: digest; instantiated by verify_51::alias::Config::<!>::fingerprint at src/alias.rs:39:15 as `digest`; instantiated by verify_51::main at src/main.rs:26:33 as `fingerprint`; line: `h.update(self.0);`; code: `update`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/alias.rs:23:14 | digest::digest::Digest::update | [reachable] [call] in verify_51::alias::inner::Hasher::<'_>::digest; use: digest; instantiated by verify_51::alias::Config::<!>::fingerprint at src/alias.rs:39:15 as `digest`; instantiated by verify_51::main at src/main.rs:26:33 as `fingerprint`; line: `h.update(data);`; code: `update`
+  occ SHA-384 | crypto:algorithm:SHA-384 | src/alias.rs:24:14 | digest::digest::Digest::finalize | [reachable] [call] in verify_51::alias::inner::Hasher::<'_>::digest; use: digest; instantiated by verify_51::alias::Config::<!>::fingerprint at src/alias.rs:39:15 as `digest`; instantiated by verify_51::main at src/main.rs:26:33 as `fingerprint`; line: `h.finalize().to_vec()`; code: `finalize`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/alias.rs:31:19 | digest::digest::Digest::digest | [reachable] [call] in verify_51::alias::Config::<!>::new; use: digest; line: `let salt = Sha512::digest(b"config");`; code: `Sha512::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via verify-51 -> hmac -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via verify-51 -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via verify-51 -> hmac -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via verify-51 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:17:0 | hmac | [manifest] declared by verify-51 (dependencies)
+  occ sha1_smol | pkg:cargo/sha1_smol@1.0.1 | Cargo.lock:80:0 | sha1_smol | [manifest] locked sha1_smol 1.0.1; reached via verify-51 -> sha1_smol
+  occ sha1_smol | pkg:cargo/sha1_smol@1.0.1 | Cargo.toml:18:0 | sha1_smol | [manifest] declared by verify-51 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:86:0 | sha2 | [manifest] locked sha2 0.10.9; reached via verify-51 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:19:0 | sha2 | [manifest] declared by verify-51 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:97:0 | subtle | [manifest] locked subtle 2.6.1; reached via verify-51 -> hmac -> digest -> subtle
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/shown.rs:11:20 | sha1_smol::Sha1::new | [reachable] [call] in <verify_51::shown::Tag<'_> as core::fmt::Display>::fmt; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by core::fmt::rt::Argument::<..>::new_display::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/fmt/rt.rs:90:28 as `<T as Display>::fmt`; instantiated by verify_51::shown::render at src/shown.rs:19:4; line: `let mut h = sha1_smol::Sha1::new();`; code: `sha1_smol::Sha1::new`
+  occ unknown | crypto:algorithm:unknown:unknown:sha1_smol | src/shown.rs:13:26 | sha1_smol::Sha1::digest | [reachable] [call] in <verify_51::shown::Tag<'_> as core::fmt::Display>::fmt; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; instantiated by core::fmt::rt::Argument::<..>::new_display::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/fmt/rt.rs:90:28 as `<T as Display>::fmt`; instantiated by verify_51::shown::render at src/shown.rs:19:4; line: `write!(f, "{}", h.digest())`; code: `digest`
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=computed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=2
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=5
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=4
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop pm | pkg:cargo/pm@0.1.0 | rcbom:scope=required
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:crypto-role=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:kb-coverage=unmodelled
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:scope=required
+  prop sha1_smol | pkg:cargo/sha1_smol@1.0.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:reachability=reachable
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:sha1_smol | {"algorithmProperties": {"cryptoFunctions": ["digest", "unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library pm 0.1.0 | pkg:cargo/pm@0.1.0 | purl pkg:cargo/pm@0.1.0
+component library sha1_smol 1.0.1 | pkg:cargo/sha1_smol@1.0.1 | purl pkg:cargo/sha1_smol@1.0.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/verify-51@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/verify-51@0.1.0 -> pkg:cargo/pm@0.1.0
+dep pkg:cargo/verify-51@0.1.0 -> pkg:cargo/sha1_smol@1.0.1
+dep pkg:cargo/verify-51@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:SHA-224
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-384
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:unknown:sha1_smol
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/pm@0.1.0
+dependency pkg:cargo/sha1_smol@1.0.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/verify-51@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/sha1_smol@1.0.1 -> crypto:algorithm:unknown:unknown:sha1_smol
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-224
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-384
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/verify-51@0.1.0", "name": "verify-51", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-51@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-51
+run rcbom:run:boundary-check=17 calls into crypto packages: 14 cited, 0 cited by the check as unknown, 3 excused (format 2, step 1)
+run rcbom:run:features=
+run rcbom:run:packages=14
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=306
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
