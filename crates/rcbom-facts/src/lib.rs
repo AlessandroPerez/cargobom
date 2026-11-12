@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 36;
+pub const FACTS_VERSION: u32 = 37;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -139,6 +139,10 @@ pub struct Links {
     /// is made by one of them.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub closed_calls: Vec<ClosedCall>,
+    /// The type parameters of this crate's generic functions that a where-clause bounds by a
+    /// trait of the crate, with the types the build implements that trait for.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub closed_bounds: Vec<ClosedBound>,
     /// Instances (`origins::body_name`) whose summaries the instance bound left unrecorded: a
     /// call or a write through one of them is cut, not "returns or writes nothing".
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -218,7 +222,25 @@ pub struct Coercion {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ClosedCall {
     pub callee: String,
+    /// The function the call is in (a closure's: the one it is written in). A type given that
+    /// is one of its parameters whole (`TyTree::Param`) is whatever that parameter is.
+    #[serde(default)]
+    pub caller: String,
     pub args: Vec<(String, Option<TyTree>)>,
+}
+
+/// Type parameter `param` of the generic function `item` is bounded by `trait_path`, a trait of
+/// the function's crate, which the build implements for `types` and no others (jwt's `impl<D:
+/// TypeLevelAlgorithmType> SigningAlgorithm for Hmac<D>`: `D` is `Sha256`, `Sha384` or
+/// `Sha512`). `open`: another crate can name the trait, and so implement it for a type of its
+/// own.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ClosedBound {
+    pub item: String,
+    pub param: String,
+    pub trait_path: String,
+    pub open: bool,
+    pub types: Vec<TyTree>,
 }
 
 /// Function `func` writes `value` through its parameter `index`; `value` names its parameters.

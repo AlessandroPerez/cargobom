@@ -231,7 +231,14 @@ struct Ctx<'a> {
     /// parameter of its caller's, by (function, parameter) (`Links::closed_calls`):
     /// rustic_core's private `apply_with_rng(.., rng: &mut impl Rng)`, only ever handed
     /// `rand::rng()`.
-    closed: HashMap<(String, String), Vec<rcbom_facts::TyTree>>,
+    /// A call that hands its caller's parameter on gives what that parameter is, by its own
+    /// calls or by a trait that bounds it; the flag says another crate may add to those.
+    closed: HashMap<(String, String), (Vec<rcbom_facts::TyTree>, bool)>,
+    /// The type parameters of generic functions that a trait of their own crate bounds, by
+    /// (function, parameter), with the trait, whether another crate can implement it, and the
+    /// types the build implements it for (`Links::closed_bounds`): jwt's `Hmac<D>` with `D:
+    /// TypeLevelAlgorithmType`, a trait of three hashes.
+    bounds: HashMap<(String, String), (String, bool, Vec<rcbom_facts::TyTree>)>,
     /// The points-to analysis' answers (`RCBOM_PTA`), by the position of the call (absolute
     /// file, line, column): one per copy of the calling body it solved.
     pta: HashMap<(PathBuf, usize, usize), Vec<&'a rcbom_facts::PtaCall>>,

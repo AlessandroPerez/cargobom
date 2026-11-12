@@ -1053,6 +1053,74 @@ impl Scanner<'_, '_> {
 /// parameter all of them give one type has that type (rustic_core's private
 /// `apply_with_rng(.., rng: &mut impl Rng)`, only ever handed `rand::rng()`). None when a
 /// body of the crate cannot be read: the list would not be all.
+/// The type parameters of this crate's generic functions that a where-clause bounds by a trait
+/// of the crate, each with the types the build implements that trait for
+/// (`rcbom_facts::ClosedBound`). A trait with an impl for a type that is not whole (`impl<T>
+/// Tr for T`, `for Vec<T>`) bounds nothing to a set. Of several such traits on one parameter,
+/// the one with the fewest types.
+pub(crate) fn closed_bounds(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedBound> {
+    use rustc_hir::def::DefKind;
+    use rustc_middle::ty::{self, TypeVisitableExt};
+    let read = catch_unwind(AssertUnwindSafe(|| {
+        let visible = tcx.effective_visibilities(());
+        let mut out: Vec<rcbom_facts::ClosedBound> = Vec::new();
+        // a trait's types, read once
+        let mut sets: HashMap<rustc_span::def_id::DefId, Option<Vec<TyTree>>> = HashMap::new();
+        for l in tcx.mir_keys(()) {
+            let did = l.to_def_id();
+            if !matches!(tcx.def_kind(did), DefKind::Fn | DefKind::AssocFn)
+                || !tcx.generics_of(did).requires_monomorphization(tcx)
+            {
+                continue;
+            }
+            let item = path_of(tcx, did);
+            for clause in tcx.clauses_of(did).instantiate_identity(tcx).clauses {
+                let Some(pred) = clause.skip_norm_wip().as_trait_clause() else {
+                    continue;
+                };
+                let pred = pred.skip_binder();
+                let ty::Param(param) = pred.self_ty().kind() else {
+                    continue;
+                };
+                let tr = pred.def_id();
+                let Some(local) = tr.as_local() else { continue };
+                let types = sets.entry(tr).or_insert_with(|| {
+                    let mut types = Vec::new();
+                    for i in tcx.all_impls(tr) {
+                        let t = tcx.type_of(i).instantiate_identity().skip_norm_wip();
+                        if t.has_non_region_param() {
+                            return None;
+                        }
+                        let tree = ty_tree(tcx, &rustc_internal::stable(t), 0);
+                        if !types.contains(&tree) {
+                            types.push(tree);
+                        }
+                    }
+                    (!types.is_empty()).then_some(types)
+                });
+                let Some(types) = types.clone() else { continue };
+                let bound = rcbom_facts::ClosedBound {
+                    item: item.clone(),
+                    param: param.name.to_string(),
+                    trait_path: path_of(tcx, tr),
+                    open: visible.is_exported(local),
+                    types,
+                };
+                match out
+                    .iter_mut()
+                    .find(|b| b.item == bound.item && b.param == bound.param)
+                {
+                    Some(b) if b.types.len() > bound.types.len() => *b = bound,
+                    Some(_) => {}
+                    None => out.push(bound),
+                }
+            }
+        }
+        out
+    }));
+    read.unwrap_or_default()
+}
+
 pub(crate) fn closed_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedCall> {
     use rustc_hir::def::DefKind;
     use rustc_middle::mir::visit::Visitor;
@@ -1060,6 +1128,8 @@ pub(crate) fn closed_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedCall> {
     use rustc_middle::{mir, ty};
     struct V<'tcx> {
         tcx: TyCtxt<'tcx>,
+        /// the function whose body is read
+        caller: String,
         out: Vec<rcbom_facts::ClosedCall>,
     }
     impl<'tcx> Visitor<'tcx> for V<'tcx> {
@@ -1087,12 +1157,14 @@ pub(crate) fn closed_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedCall> {
                 let Some(t) = gargs.get(i).and_then(|a| a.as_type()) else {
                     return;
                 };
-                let tree = (!t.has_non_region_param())
+                // (whole, or a parameter of the caller's whole: what that one is)
+                let tree = (!t.has_non_region_param() || matches!(t.kind(), ty::Param(_)))
                     .then(|| ty_tree(tcx, &rustc_internal::stable(t), 0));
                 args.push((p.name.to_string(), tree));
             }
             let call = rcbom_facts::ClosedCall {
                 callee: path_of(tcx, did),
+                caller: self.caller.clone(),
                 args,
             };
             if !call.args.is_empty() && !self.out.contains(&call) {
@@ -1102,11 +1174,13 @@ pub(crate) fn closed_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedCall> {
     }
     let mut v = V {
         tcx,
+        caller: String::new(),
         out: Vec::new(),
     };
     for l in tcx.mir_keys(()) {
         let did = l.to_def_id();
         let read = catch_unwind(AssertUnwindSafe(|| {
+            v.caller = path_of(tcx, tcx.typeck_root_def_id(did));
             // (a constant's or a static's value is evaluated, by the compiler's own test of
             // which bodies are; any other is compiled: a function's, a closure's, the by-move
             // body made for an `async` closure. A constructor has no body written)

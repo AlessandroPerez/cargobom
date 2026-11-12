@@ -105,33 +105,19 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
             .iter()
             .flat_map(|f| f.implementors.iter().map(|(k, v)| (k.clone(), v.clone())))
             .collect(),
-        closed: {
-            let mut given: HashMap<(&str, &str), Vec<Option<&rcbom_facts::TyTree>>> =
-                HashMap::new();
-            for c in facts.iter().flat_map(|f| &f.links.closed_calls) {
-                for (p, t) in &c.args {
-                    given
-                        .entry((c.callee.as_str(), p.as_str()))
-                        .or_default()
-                        .push(t.as_ref());
-                }
-            }
-            given
-                .into_iter()
-                .filter_map(|((f, p), ts)| {
-                    let mut all: Vec<rcbom_facts::TyTree> = Vec::new();
-                    for t in ts {
-                        let t = t?;
-                        if !all.contains(t) {
-                            all.push(t.clone());
-                        }
-                    }
-                    // (in the order of their text: the facts' order is the build's)
-                    all.sort_by_key(coverage::type_text);
-                    (!all.is_empty()).then(|| ((f.to_string(), p.to_string()), all))
-                })
-                .collect()
-        },
+        closed: closed_params(facts),
+        bounds: facts
+            .iter()
+            .flat_map(|f| &f.links.closed_bounds)
+            .map(|b| {
+                let mut types = b.types.clone();
+                types.sort_by_key(coverage::type_text);
+                (
+                    (b.item.clone(), b.param.clone()),
+                    (b.trait_path.clone(), b.open, types),
+                )
+            })
+            .collect(),
         pta: {
             let mut m: HashMap<_, Vec<&rcbom_facts::PtaCall>> = HashMap::new();
             for f in facts {
@@ -1256,4 +1242,103 @@ struct ArtifactWalk<'f> {
     /// A library's generic functions its users can call, which its walk makes no instance of.
     generic: HashSet<&'f str>,
     statics: HashSet<String>,
+}
+
+/// The type parameters of generic functions only their own crate can name, each with the types
+/// its calls give it (`Ctx::closed`). A call that hands on a parameter of its caller's whole
+/// gives what that parameter is: by the caller's own calls, or by a trait of the crate that
+/// bounds it (`closed_bounds`), which another crate may implement for more where it can name
+/// the trait (the flag). A call giving anything else leaves the parameter to the callers.
+fn closed_params(
+    facts: &[CrateFacts],
+) -> HashMap<(String, String), (Vec<rcbom_facts::TyTree>, bool)> {
+    use rcbom_facts::TyTree;
+    type Key<'a> = (&'a str, &'a str);
+    let mut given: HashMap<Key<'_>, Vec<Option<(&str, &TyTree)>>> = HashMap::new();
+    for c in facts.iter().flat_map(|f| &f.links.closed_calls) {
+        for (p, t) in &c.args {
+            given
+                .entry((c.callee.as_str(), p.as_str()))
+                .or_default()
+                .push(t.as_ref().map(|t| (c.caller.as_str(), t)));
+        }
+    }
+    let bounds: HashMap<Key<'_>, (&Vec<TyTree>, bool)> = facts
+        .iter()
+        .flat_map(|f| &f.links.closed_bounds)
+        .map(|b| ((b.item.as_str(), b.param.as_str()), (&b.types, b.open)))
+        .collect();
+    fn whole(t: &TyTree) -> bool {
+        match t {
+            TyTree::Param(_) => false,
+            TyTree::Adt { args, .. } | TyTree::Tuple(args) => args.iter().all(whole),
+            TyTree::Ref(i) | TyTree::Slice(i) | TyTree::Array(i, _) => whole(i),
+            _ => true,
+        }
+    }
+    #[allow(clippy::type_complexity)]
+    fn resolve<'a>(
+        key: Key<'a>,
+        given: &HashMap<Key<'a>, Vec<Option<(&'a str, &'a TyTree)>>>,
+        bounds: &HashMap<Key<'a>, (&'a Vec<TyTree>, bool)>,
+        memo: &mut HashMap<Key<'a>, Option<(Vec<TyTree>, bool)>>,
+        stack: &mut Vec<Key<'a>>,
+    ) -> Option<(Vec<TyTree>, bool)> {
+        if let Some(r) = memo.get(&key) {
+            return r.clone();
+        }
+        // (a function calling itself gives its parameter nothing new)
+        if stack.contains(&key) {
+            return Some((Vec::new(), false));
+        }
+        let Some(calls) = given.get(&key) else {
+            return bounds.get(&key).map(|(t, open)| ((*t).clone(), *open));
+        };
+        stack.push(key);
+        let mut all: Vec<TyTree> = Vec::new();
+        let mut open = false;
+        let mut known = true;
+        for call in calls {
+            let types = match call {
+                Some((caller, TyTree::Param(q))) => {
+                    match resolve((*caller, q.as_str()), given, bounds, memo, stack) {
+                        Some((ts, o)) => {
+                            open |= o;
+                            ts
+                        }
+                        None => {
+                            known = false;
+                            break;
+                        }
+                    }
+                }
+                Some((_, t)) if whole(t) => vec![(*t).clone()],
+                _ => {
+                    known = false;
+                    break;
+                }
+            };
+            for t in types {
+                if !all.contains(&t) {
+                    all.push(t);
+                }
+            }
+        }
+        stack.pop();
+        // (in the order of their text: the facts' order is the build's)
+        all.sort_by_key(coverage::type_text);
+        let r = (known && !all.is_empty()).then_some((all, open));
+        if stack.is_empty() {
+            memo.insert(key, r.clone());
+        }
+        r
+    }
+    let mut memo = HashMap::new();
+    let keys: Vec<Key<'_>> = given.keys().copied().collect();
+    keys.into_iter()
+        .filter_map(|k| {
+            let r = resolve(k, &given, &bounds, &mut memo, &mut Vec::new())?;
+            Some(((k.0.to_string(), k.1.to_string()), r))
+        })
+        .collect()
 }

@@ -1482,7 +1482,7 @@ impl Ctx<'_> {
     /// occur is not recorded).
     pub(super) fn bound(&self, site: &Site) -> Vec<(Site, Vec<String>)> {
         use rcbom_facts::TyTree;
-        if self.closed.is_empty() {
+        if self.closed.is_empty() && self.bounds.is_empty() {
             return Vec::new();
         }
         let Target::Call { self_ty, args, .. } = &site.target else {
@@ -1493,35 +1493,37 @@ impl Ctx<'_> {
         while let Some(i) = owner.rfind("::{closure#") {
             owner = &owner[..i];
         }
-        // the parameters named, each with the types it is given
-        fn named<'t>(
-            t: &'t TyTree,
-            closed: &'t HashMap<(String, String), Vec<TyTree>>,
-            owner: &str,
-            out: &mut Vec<(&'t String, &'t Vec<TyTree>)>,
-        ) {
+        // the parameters named, each with the types it is given: by the calls of a function
+        // only its crate can name, else by a trait of the crate that bounds it (with the trait,
+        // and whether another crate can implement it)
+        type Given<'t> = (&'t String, &'t Vec<TyTree>, (Option<&'t str>, bool));
+        fn named<'t>(t: &'t TyTree, ctx: &'t Ctx<'_>, owner: &str, out: &mut Vec<Given<'t>>) {
             match t {
                 TyTree::Param(p) => {
-                    if let Some(c) = closed.get(&(owner.to_string(), p.clone()))
-                        && !out.iter().any(|(q, _)| *q == p)
-                    {
-                        out.push((p, c));
+                    if out.iter().any(|(q, ..)| *q == p) {
+                        return;
+                    }
+                    let key = (owner.to_string(), p.clone());
+                    if let Some((c, open)) = ctx.closed.get(&key) {
+                        out.push((p, c, (None, *open)));
+                    } else if let Some((tr, open, c)) = ctx.bounds.get(&key) {
+                        out.push((p, c, (Some(tr.as_str()), *open)));
                     }
                 }
                 TyTree::Adt { args, .. } | TyTree::Tuple(args) => {
-                    args.iter().for_each(|a| named(a, closed, owner, out))
+                    args.iter().for_each(|a| named(a, ctx, owner, out))
                 }
                 TyTree::Ref(i) | TyTree::Slice(i) | TyTree::Array(i, _) => {
-                    named(i, closed, owner, out)
+                    named(i, ctx, owner, out)
                 }
                 _ => {}
             }
         }
-        let mut params = Vec::new();
+        let mut params: Vec<Given<'_>> = Vec::new();
         for t in self_ty.iter().chain(args) {
-            named(t, &self.closed, owner, &mut params);
+            named(t, self, owner, &mut params);
         }
-        if params.is_empty() || params.iter().filter(|(_, c)| c.len() > 1).count() > 1 {
+        if params.is_empty() || params.iter().filter(|(_, c, _)| c.len() > 1).count() > 1 {
             return Vec::new();
         }
         fn replace(t: &TyTree, with: &HashMap<&String, &TyTree>) -> TyTree {
@@ -1540,28 +1542,44 @@ impl Ctx<'_> {
             }
         }
         let text = |c: &TyTree| typenum_folded(&crate::coverage::type_text(c));
-        let choices = params.iter().map(|(_, c)| c.len()).max().unwrap_or(1);
+        let choices = params.iter().map(|(_, c, _)| c.len()).max().unwrap_or(1);
         (0..choices)
             .map(|k| {
                 let mut with: HashMap<&String, &TyTree> = HashMap::new();
                 let mut notes = Vec::new();
-                for (p, c) in &params {
+                for (p, c, by_trait) in &params {
                     let t = if c.len() > 1 { &c[k] } else { &c[0] };
                     with.insert(*p, t);
-                    notes.push(if c.len() > 1 {
-                        format!(
+                    // (a trait another crate can name may be implemented there for a type
+                    // of its own: the build's are those of this crate)
+                    let beside = if by_trait.1 {
+                        ", beside those another crate may"
+                    } else {
+                        ""
+                    };
+                    notes.push(match by_trait.0 {
+                        Some(tr) => format!(
+                            "`{p}` is {} the build implements `{}` for{beside}: `{}`",
+                            match c.len() {
+                                1 => "the type".to_string(),
+                                n => format!("one of {n} types"),
+                            },
+                            short(tr),
+                            text(t)
+                        ),
+                        None if c.len() > 1 => format!(
                             "`{p}` is one of {} types the calls of `{}` give it, which only its \
-                             crate makes: `{}`",
+                             crate makes{beside}: `{}`",
                             c.len(),
                             short(owner),
                             text(t)
-                        )
-                    } else {
-                        format!(
-                            "`{p}` is `{}` at every call of `{}`, which only its crate makes",
+                        ),
+                        None => format!(
+                            "`{p}` is `{}` at every call of `{}`, which only its crate \
+                             makes{beside}",
                             text(t),
                             short(owner)
-                        )
+                        ),
                     });
                 }
                 let mut bound = site.clone();

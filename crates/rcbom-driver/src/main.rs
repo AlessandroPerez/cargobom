@@ -550,6 +550,7 @@ fn analyze(tcx: TyCtxt<'_>) {
     let mut crate_links = std::mem::take(&mut cx.links);
     links::instance_links(&cx, &mut crate_links);
     crate_links.closed_calls = closed_calls(tcx);
+    crate_links.closed_bounds = closed_bounds(tcx);
     if catch_unwind(AssertUnwindSafe(|| {
         links::mutable_statics(&cx, &mut crate_links)
     }))
