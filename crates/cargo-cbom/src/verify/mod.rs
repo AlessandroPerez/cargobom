@@ -109,7 +109,9 @@
 //!   tails, the file's type aliases and traits imported under another name), also a field of
 //!   `self` declared of `T` (`&self.t`), a box's contents (`&*b`), and a closure's parameter
 //!   where `T` is named on the line before the closure; in a static's item exactly when the
-//!   detail says "in a static";
+//!   detail says "in a static", on any line of an item cited at its first; `T` may be written
+//!   as a type parameter of the function or its impl (`Box::new(T::new())`), which the
+//!   instance gives the type;
 //! - a pointer's `named at` is where the variable called is bound, the binding in scope (blocks,
 //!   closures, nested functions, shadowing, `let f = f;`, a macro's `let`), or the statement
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
@@ -259,6 +261,12 @@ use anyhow::Result;
 use rcbom_kb::Kb;
 use regex::Regex;
 use serde_json::Value;
+
+/// What `Files::find_item` is asked: the package's directory, the module, the item's name, how
+/// many re-exports deep.
+type FoundKey = (PathBuf, Vec<String>, String, usize);
+/// An item `Files::find_item` found: its file, its extent in the file's code, its module.
+type FoundItem = (PathBuf, (usize, usize), Vec<String>);
 
 #[derive(Clone)]
 struct Occ {
@@ -574,6 +582,8 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         pkg_mods: HashMap::new(),
         std_items: HashMap::new(),
         std_aliases: HashMap::new(),
+        chains: HashMap::new(),
+        found_items: HashMap::new(),
         open_fns: HashMap::new(),
         occs: &occs,
         at_pos,
@@ -971,6 +981,11 @@ struct Files<'a> {
     std_items: HashMap<String, bool>,
     /// the standard library's type aliases read, by path (`std_alias`)
     std_aliases: HashMap<String, Option<String>>,
+    /// `module_chains` of a file, as asked for the file itself (depth 0).
+    chains: HashMap<PathBuf, Option<Vec<Vec<String>>>>,
+    /// `find_item`'s answers: a name looked up through a package's re-exports is asked for
+    /// again along every path of globs that leads to its module.
+    found_items: HashMap<FoundKey, Option<Vec<FoundItem>>>,
     /// (package, function path) -> whether it runs for a type its caller gives
     /// (`runs_for_a_type`)
     open_fns: HashMap<(String, String), bool>,

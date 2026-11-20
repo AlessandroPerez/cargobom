@@ -307,6 +307,7 @@ impl Files<'_> {
         // a macro's invocation is in the item the context names, as any position
         if macro_tagged {
             let chains = self.module_chains(&path, 0);
+            let made = self.made_modules(&src, owner, (line, offset));
             let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
             // (a static's own descriptor tells invocations apart too: `#[cfg(unix)] g!(run,
             // SHA384)` beside `#[cfg(not(unix))] g!(run, SHA512)`)
@@ -322,6 +323,7 @@ impl Files<'_> {
                 (line, offset),
                 &mut aliases,
                 chains.as_deref(),
+                &made,
                 own,
             )?;
         }
@@ -330,6 +332,7 @@ impl Files<'_> {
             // function, or in another type's method of that name, is another occurrence), and
             // no macro's body (a macro's code is cited where it is called)
             let chains = self.module_chains(&path, 0);
+            let made = self.made_modules(&src, owner, (line, offset));
             let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
             check_item(
                 &src,
@@ -337,6 +340,7 @@ impl Files<'_> {
                 (line, offset),
                 &mut aliases,
                 chains.as_deref(),
+                &made,
                 None,
             )?;
             // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
@@ -738,9 +742,14 @@ impl Files<'_> {
             // a member through a trait object (`member: dyn, possible (dyn: `T` is coerced to
             // `dyn Tr` ..)`): the call calls a method on an object of `Tr` (or of a trait whose
             // supertraits include it), wherever the receivers' types are known
+            // (a member that reaches the call from other functions comes through a method
+            // such an object runs there, not at the call: rustls 0.21's `self.dec_key
+            // .open_within(..)`, the key made by `<AesGcm as Tls12AeadAlgorithm>::decrypter`;
+            // the coercion is checked as any, `check_coercions`)
             if let Some(m) = re!(r"^member: dyn(?:, possible)? \(dyn: `([^`]+)`(?:, the only type)? (?:is )?coerced to `([^`]+)`")
                 .captures(p)
                 && let Some(at) = call_at
+                && !ctx.details.contains("that may reach the call from other functions")
             {
                 // (a member no descriptor names is the type made the object: the knowledge
                 // base names that type as this asset, `receiver: one of 2 types the build makes
@@ -1278,6 +1287,45 @@ impl Files<'_> {
                             });
                             inner = at.clone();
                         }
+                        // (or another item the macro invocation at the occurrence makes of
+                        // the same code: picky's `define_oid! { A => a => "..", B => b => "..",
+                        // }` writes `a::{closure#0}` and `b::{closure#0}`, one line of the macro
+                        // each time. The items differ in one segment, which the invocation
+                        // names)
+                        Some((first, held))
+                            if re!(r"\[macro [\w:]+!\]").is_match(tags)
+                                && self.source(at.0).is_some_and(|occ| {
+                                    let segs = |x: &str| -> Vec<String> {
+                                        strip_generics(x)
+                                            .split("::")
+                                            .map(|g| g.trim().to_string())
+                                            .filter(|g| !g.is_empty())
+                                            .collect()
+                                    };
+                                    let (a, b) = (segs(first), segs(k));
+                                    let differing: Vec<&String> = a
+                                        .iter()
+                                        .zip(&b)
+                                        .filter(|(x, y)| x != y)
+                                        .map(|(_, y)| y)
+                                        .collect();
+                                    a.len() == b.len()
+                                        && differing.len() == 1
+                                        && differing[0].chars().all(is_ident)
+                                        && invocation_text(&occ, (at.1, at.2)).is_some_and(
+                                            |(_, text)| {
+                                                Regex::new(&format!(
+                                                    r"\b{}\b",
+                                                    regex::escape(differing[0])
+                                                ))
+                                                .is_ok_and(|r| r.is_match(&text))
+                                            },
+                                        )
+                                }) =>
+                        {
+                            callee = Some(k.to_string());
+                            inner = held.clone();
+                        }
                         _ => {
                             return Err(format!(
                                 "`{part}`: `{k}` is neither the occurrence's item nor a caller \
@@ -1343,6 +1391,8 @@ impl Files<'_> {
             // the one its type argument chooses (the SHA-1 of pgp's integrity check, in a
             // decryptor instantiated with its cipher); nor of an operation of unknown algorithm
             // (cfb-mode's, run over the cipher chosen there)
+            // (whether it does, with this asset among it)
+            let mut by_instantiation = false;
             if let (Some(_), Some(c0)) = (&caller, col)
                 && !component_ref.starts_with("crypto:algorithm:unknown")
             {
@@ -1395,6 +1445,7 @@ impl Files<'_> {
                         chosen.join(", ")
                     ));
                 }
+                by_instantiation = !chosen.is_empty();
             }
             // an instance its arguments choose, its `<..>` not written (`Algorithm::hash(
             // HmacSha256::new_from_slice(k).unwrap(), d)`): where they set up assets of this
@@ -1462,7 +1513,23 @@ impl Files<'_> {
                         .as_deref()
                         .and_then(in_item)
                         .is_some_and(|k| names_in_code(&k.name));
-                    if !in_code && !in_body {
+                    // (or where a closure is written, in the function that writes it: the
+                    // library's code is compiled with that function put into its caller,
+                    // `map_try_fold`'s `move |acc, elt| g(acc, f(elt))` in `<Map<..> as
+                    // Iterator>::try_fold`)
+                    let built_there = col.is_some_and(|c0| {
+                        callee
+                            .as_deref()
+                            .and_then(closure_parent)
+                            .and_then(in_item)
+                            .is_some_and(|p| {
+                                src.enclosing((line, c0), &[ItemKind::Fn])
+                                    .is_some_and(|f| f.name == p.name)
+                            })
+                            && re!(r"^(?:\|\|?|move\b|async\b|static\b)")
+                                .is_match(&text.chars().skip(c0).collect::<String>())
+                    });
+                    if !in_code && !in_body && !built_there {
                         return Err(format!("`{part}`: line {line} does not name `{}`", n.name));
                     }
                     // at the start of a token
@@ -1586,8 +1653,7 @@ impl Files<'_> {
                                 by_syntax(&n)
                                     || (std_impl(p)
                                         && call_text.as_ref().is_some_and(|t| {
-                                            strip_generics(t).rsplit("::").next()
-                                                != Some(n.name.as_str())
+                                            bare(t).rsplit("::").next() != Some(n.name.as_str())
                                         }))
                             })
                     });
@@ -1632,7 +1698,9 @@ impl Files<'_> {
                             // an `async fn`'s body (`m::hash_with::{closure#0}`): made where the
                             // line calls that function
                             let base = p.trim().strip_suffix("::{closure#0}")?;
-                            let name = strip_generics(base).rsplit("::").next()?.to_string();
+                            // (its name, whatever arguments the path ends with:
+                            // `S::<..>::connect::<..>`)
+                            let name = bare(base).rsplit("::").next()?.to_string();
                             // (written in this file or in the instantiated function's own)
                             let is_async = |s: &Source| {
                                 s.items.iter().any(|it| {
@@ -1676,6 +1744,72 @@ impl Files<'_> {
                                 Some((open, close_of_at(code, open)?))
                             })
                             .unwrap_or(line_span);
+                        // (the future itself: a call the initializer makes as its own value
+                        // and does not await, of that function where the call names a type.
+                        // `let signed = SignedRole::new(..).await?;` binds what the future
+                        // gave; `let roles = if .. { .. Vec::new() .. } else { .. };` makes none)
+                        let owners: Vec<String> = callee
+                            .as_deref()
+                            .and_then(|p| in_item(p.trim().strip_suffix("::{closure#0}")?))
+                            .map(|n| {
+                                n.self_ty
+                                    .iter()
+                                    .chain(&n.trait_name)
+                                    .map(|t| type_name(t))
+                                    .collect()
+                            })
+                            .unwrap_or_default();
+                        let unawaited = |init: &str| {
+                            let t: Vec<char> = init.chars().collect();
+                            word.find_iter(init).any(|m| {
+                                let at = init[..m.start()].chars().count();
+                                let depth = t[..at].iter().fold(0i32, |d, c| match c {
+                                    '{' => d + 1,
+                                    '}' => d - 1,
+                                    _ => d,
+                                });
+                                let qualifier = before_blank(&t, at)
+                                    .filter(|&q| q > 0 && t[q] == ':' && t[q - 1] == ':')
+                                    .and_then(|q| before_blank(&t, q - 1))
+                                    .map(|e| {
+                                        let b = (0..=e)
+                                            .rev()
+                                            .take_while(|&x| is_ident(t[x]))
+                                            .last()
+                                            .unwrap_or(e + 1);
+                                        t[b..=e].iter().collect::<String>()
+                                    });
+                                let other = qualifier.is_some_and(|q| {
+                                    q.starts_with(char::is_uppercase)
+                                        && q != "Self"
+                                        && !owners.is_empty()
+                                        && !owners.contains(&q)
+                                });
+                                if depth != 0 || other {
+                                    return false;
+                                }
+                                let mut k = skip_blank(&t, init[..m.end()].chars().count());
+                                if t.get(k) == Some(&':') && t.get(k + 1) == Some(&':') {
+                                    let lt = skip_blank(&t, k + 2);
+                                    let mut depth = 0i32;
+                                    k = (lt..t.len())
+                                        .find(|&x| {
+                                            depth += i32::from(t[x] == '<');
+                                            depth -= i32::from(t[x] == '>');
+                                            depth == 0
+                                        })
+                                        .map_or(t.len(), |x| skip_blank(&t, x + 1));
+                                }
+                                let close = (t.get(k) == Some(&'('))
+                                    .then(|| close_of_at(&t, k))
+                                    .flatten();
+                                close.is_none_or(|c| {
+                                    let dot = skip_blank(&t, c + 1);
+                                    !(t.get(dot) == Some(&'.')
+                                        && kw(&t, skip_blank(&t, dot + 1), "await"))
+                                })
+                            })
+                        };
                         let held = (span.0..span.1.min(code.len())).any(|j| {
                             let w = word_of(code, j);
                             let after = skip_blank(code, j + w.chars().count());
@@ -1684,7 +1818,7 @@ impl Files<'_> {
                                     && code.get(after + 1) != Some(&':'))
                                 && matches!(
                                     binding(&src, j, &w),
-                                    Some(Bound::Let { init, .. }) if word.is_match(&init)
+                                    Some(Bound::Let { init, .. }) if unawaited(&init)
                                 )
                         });
                         if word.is_match(text) || held {
@@ -1908,15 +2042,19 @@ impl Files<'_> {
                     };
                     // an `async fn`'s body is made where the call is awaited: at the `await` of
                     // `f(..).await`, on the call's line or a later one
+                    // (the call is then the one whose receiver and arguments are read below, not
+                    // the `await`, whose "receiver" is what the call returns: `c.connect().await`
+                    // with `async fn connect(&self) -> Session` is called on `c`)
                     let mut awaited = None;
-                    if named.is_empty()
-                        && !own_closure
+                    if !own_closure
                         && let Some(c0) = col
                         && let Some(n) = callee.as_deref().and_then(in_item)
                         && let Some(k) = awaited_call(&src.code, src.idx((line, c0)))
                         && word_of(&src.code, k) == n.name
                     {
-                        named.push(c0);
+                        if named.is_empty() {
+                            named.push(c0);
+                        }
                         awaited = Some(k);
                     }
                     // a path written over several lines is cited where it starts and names
@@ -1932,7 +2070,7 @@ impl Files<'_> {
                     {
                         let (p, end) = long_path(&src.code, src.idx((line, c0)));
                         if src.pos(end).0 > line
-                            && strip_generics(&p).rsplit("::").next() == Some(n.name.as_str())
+                            && bare(&p).rsplit("::").next() == Some(n.name.as_str())
                         {
                             named.push(c0);
                         }
@@ -1981,6 +2119,22 @@ impl Files<'_> {
                         if !named.contains(&c0) {
                             named.push(c0);
                         }
+                        generated = true;
+                    }
+                    // (or at the derive's own name in the attribute, where a procedural
+                    // derive gives its code the span of its invocation: multihash-derive's
+                    // `MultihashDigest` on `enum Code`, whose `<Code as MultihashDigest>::digest`
+                    // runs each variant's hasher; on the type the caller is a method of, the
+                    // name being the caller's trait)
+                    if named.is_empty()
+                        && !own_closure
+                        && let Some(c0) = col
+                        && let Some(n) = in_item(c)
+                        && let Some((ty, tr)) = derive_at(&src, (line, c0))
+                        && n.self_ty.as_deref().map(type_name) == Some(ty)
+                        && n.trait_name.as_deref().map(type_name) == Some(tr)
+                    {
+                        named.push(c0);
                         generated = true;
                     }
                     // in, `#[protect(..)]` above `async fn upload`: cited where the attribute
@@ -2080,8 +2234,39 @@ impl Files<'_> {
                         let word = Regex::new(&format!(r"\b{}\b", regex::escape(&want_name))).ok();
                         let names_it = |t: &str| word.as_ref().is_some_and(|r| r.is_match(t));
                         let ci = src.idx((line, c0));
-                        let by_macro = macro_call_at(&src, (line, c0))
+                        // (the macro's rule with the arguments put in, for one of the file;
+                        // else what the macro's definition, in another file of the package,
+                        // and the macros it invokes in turn write: near-crypto's `prs!(x)`,
+                        // whose `hash.rs` writes `_hash_new` and, through `hash_chain!`,
+                        // `_hash_chain`)
+                        let man = self.man;
+                        let owner = man.owner_of(&path);
+                        let elsewhere = |v: &mut Self, p: (usize, usize)| {
+                            macro_call_at(&src, p)
+                                && v.macro_bodies(&src, owner, p).iter().any(|t| names_it(t))
+                        };
+                        let in_file = macro_call_at(&src, (line, c0))
                             && expansion(&src, (line, c0)).is_some_and(|e| names_it(&e));
+                        let by_macro = in_file || elsewhere(self, (line, c0));
+                        // (such a definition is not expanded here: where the function invokes
+                        // another macro that writes the name too, `hash_s!(..)` on the next
+                        // line making `_hash_new` for another digest, the position is one of
+                        // the candidates the text cannot tell apart, unless the CBOM records
+                        // that the invocation here chooses this asset)
+                        if by_macro
+                            && !in_file
+                            && !by_instantiation
+                            && let Some(f) = src.enclosing((line, c0), &[ItemKind::Fn])
+                        {
+                            let (a, b) = src.span(f);
+                            for i in a..b.min(src.code.len()) {
+                                let p = src.pos(i);
+                                if p != (line, c0) && elsewhere(self, p) {
+                                    RANGED.with(|r| r.set(true));
+                                    break;
+                                }
+                            }
+                        }
                         let w = word_of(&src.code, ci);
                         let by_variable = !w.is_empty()
                             && w.starts_with(|c: char| c.is_lowercase() || c == '_')
@@ -2501,16 +2686,21 @@ impl Files<'_> {
                     let chains = self.module_chains(&path, 0);
                     let man = self.man;
                     let owner = man.owner_of(&path);
+                    let made: Vec<Vec<String>> = named
+                        .iter()
+                        .map(|&col| self.made_modules(&src, owner, (line, col)))
+                        .collect();
                     let mut aliases = |n: &str| self.alias_targets(&src, owner, n);
                     let mut first_err = None;
                     let mut inside = false;
-                    for &col in &named {
+                    for (&col, made) in named.iter().zip(&made) {
                         match check_item(
                             &src,
                             &format!("in {c}"),
                             (line, col),
                             &mut aliases,
                             chains.as_deref(),
+                            made,
                             None,
                         ) {
                             Ok(()) => {
@@ -2614,8 +2804,36 @@ impl Files<'_> {
                         let builtin = re!(r"\[derive ([\w:]+)\]")
                             .captures(tags)
                             .is_some_and(|m| language_derive(&src, &m[1]));
+                        // (a derive is expanded from where its attribute names it: of one
+                        // written over several lines, the line of the name, `#[derive(\n
+                        // Clone, .., Serialize,\n)]`)
+                        let names_derive: Vec<usize> = re!(r"\[derive ([\w:]+)\]")
+                            .captures(tags)
+                            .zip(first)
+                            .and_then(|(m, first)| {
+                                let name = m[1].rsplit("::").next()?.to_string();
+                                let word =
+                                    Regex::new(&format!(r"\b{}\b", regex::escape(&name))).ok()?;
+                                let code = &src.code;
+                                let open =
+                                    (src.idx((first, 0))..code.len()).find(|&k| code[k] == '[')?;
+                                let last = src.pos(close_of_at(code, open)?).0;
+                                Some(
+                                    (first..=last)
+                                        .filter(|&l| {
+                                            src.lines.get(l - 1).is_some_and(|t| word.is_match(t))
+                                        })
+                                        .collect(),
+                                )
+                            })
+                            .unwrap_or_default();
+                        let at_attribute = if names_derive.is_empty() {
+                            first == Some(line)
+                        } else {
+                            names_derive.contains(&line)
+                        };
                         if path != at.0
-                            || !(field || ((fields.is_empty() || !builtin) && first == Some(line)))
+                            || !(field || ((fields.is_empty() || !builtin) && at_attribute))
                         {
                             return Err(format!(
                                 "`{part}`: not the first line of the attribute or macro call at line {}",
@@ -2686,18 +2904,28 @@ impl Files<'_> {
                         })
                         .and_then(|m| {
                             let (_, args) = invocation_args(occ.as_deref()?, (at.1, at.2))?;
-                            rule_for(&src, m, &args)
+                            rules_reached(&src, m, &args, 3)
                         });
-                    if let Some((r, _)) = &rule {
-                        let (l0, l1) = (src.pos(r.body.0).0, src.pos(r.body.1).0);
-                        if !(l0..=l1).contains(&line) {
-                            return Err(format!(
-                                "`{part}`: line {line} is not in the rule of `macro_rules! {}` the \
-                                 invocation matches (lines {l0}-{l1})",
-                                t
-                            ));
+                    // (or of a rule that one hands its arguments on to, in this macro or
+                    // another of the file: the rule the line is in, with what it binds)
+                    let rule = match rule {
+                        Some(reached) => {
+                            let lines = |r: &Rule| (src.pos(r.body.0).0, src.pos(r.body.1).0);
+                            let (l0, l1) = lines(&reached[0].0);
+                            let Some(holding) = reached.into_iter().find(|(r, _)| {
+                                let (a, b) = lines(r);
+                                (a..=b).contains(&line)
+                            }) else {
+                                return Err(format!(
+                                    "`{part}`: line {line} is not in the rule of `macro_rules! \
+                                     {}` the invocation matches (lines {l0}-{l1})",
+                                    t
+                                ));
+                            };
+                            Some(holding)
                         }
-                    }
+                        None => None,
+                    };
                     let binding = match &rule {
                         Some((_, binds)) => Some(
                             binds
@@ -2736,8 +2964,58 @@ impl Files<'_> {
                                 .is_some_and(|(_, d)| d.iter().any(|x| x == tr))
                         })
                     });
+                    // (or the line names a procedural derive, in a `#[derive(..)]` of the
+                    // macro's body above the type the occurrence's item is a method of: the
+                    // derive's code for that type, which no text of the macro holds.
+                    // `#[derive(Tagged)]` above `pub struct $name(..);`, the invocation
+                    // giving `$name`)
+                    let own_type = chain.first().and_then(|(k, _)| in_item(k)).and_then(|n| {
+                        n.self_ty
+                            .as_deref()
+                            .map(type_name)
+                            .or(n.owner.map(|(t, _)| t))
+                    });
+                    let by_derive = own_type.is_some_and(|own| {
+                        let listed = re!(r"\bderive\s*\(([^)]*)")
+                            .captures(text)
+                            .map(|m| m[1].to_string())
+                            .or_else(|| {
+                                attribute_before(&src, line, text.chars().count())
+                                    .filter(|a| {
+                                        re!(r"^(?:derive|cfg_attr)\s*\(").is_match(a)
+                                            && open_in(a, "derive")
+                                    })
+                                    .map(|_| text.to_string())
+                            });
+                        let procedural = listed.is_some_and(|l| {
+                            re!(r"[A-Za-z_][\w:]*").find_iter(&l).any(|d| {
+                                let name = d.as_str().rsplit("::").next().unwrap_or_default();
+                                !name.is_empty() && !language_derive(&src, name)
+                            })
+                        });
+                        // (the type the attribute is on: the next the body defines)
+                        let defined = (line..src.lines.len().min(line + 12)).find_map(|l| {
+                            re!(r"\b(?:struct|enum|union)\s+(\$?\w+)")
+                                .captures(&src.lines[l])
+                                .map(|m| m[1].to_string())
+                        });
+                        procedural
+                            && defined.is_some_and(|d| match d.strip_prefix('$') {
+                                Some(var) => match &rule {
+                                    Some((_, binds)) => binds
+                                        .iter()
+                                        .any(|(n, toks)| n == var && toks_text(toks) == own),
+                                    None => call_line.is_some_and(|l| {
+                                        Regex::new(&format!(r"\b{}\b", regex::escape(&own)))
+                                            .is_ok_and(|r| r.is_match(l))
+                                    }),
+                                },
+                                None => d == own,
+                            })
+                    });
                     if !named
                         && !derived
+                        && !by_derive
                         && !(uses_metavar && call_line.is_some_and(|l| word.is_match(l)))
                     {
                         return Err(format!(
@@ -2847,6 +3125,7 @@ pub(super) fn check_item(
     at: (usize, usize),
     aliases: &mut dyn FnMut(&str) -> Vec<String>,
     chains: Option<&[Vec<String>]>,
+    made: &[String],
     descriptor: Option<&str>,
 ) -> Result<(), String> {
     if let Some(m) = src.enclosing(at, &[ItemKind::Macro]) {
@@ -2926,14 +3205,31 @@ pub(super) fn check_item(
     // definition when the file has it. An identical statement in another module or file is
     // another item (rustls's `crypto::ring::tls12` repeats `crypto::aws_lc_rs::tls12`).
     if let Some(chains) = chains {
-        let around = |p: (usize, usize)| -> Vec<String> {
+        // (first as the file writes them; then, for an item inside a macro invocation that is
+        // outside any function, with each module the macro writes around the code it is
+        // handed, `made`: tendermint's `tendermint_pb_modules! { impl .. }`, whose rule writes
+        // `mod v0_34 { .. $($contents)* }`, makes `account::v0_34::<impl ..>` in `account.rs`)
+        let call = src
+            .enclosing(item.start, &[ItemKind::MacroCall])
+            .filter(|c| src.enclosing(c.start, &[ItemKind::Fn]).is_none());
+        let around = |p: (usize, usize)| -> Vec<Vec<String>> {
             let mut v: Vec<&Item> = src
                 .items
                 .iter()
                 .filter(|i| matches!(i.kind, ItemKind::Mod | ItemKind::Fn) && i.contains(p))
                 .collect();
             v.sort_by_key(|i| i.start);
-            v.iter().map(|i| i.name.clone()).collect()
+            let plain: Vec<String> = v.iter().map(|i| i.name.clone()).collect();
+            let mut out = vec![plain.clone()];
+            if let Some(c) = call.filter(|c| c.contains(p)) {
+                let k = v.iter().take_while(|i| i.start < c.start).count();
+                for m in made {
+                    let mut w = plain.clone();
+                    w.insert(k, m.clone());
+                    out.push(w);
+                }
+            }
+            out
         };
         let in_chain = |inner: &[String], want: &[String]| {
             chains.iter().any(|c| {
@@ -2944,16 +3240,18 @@ pub(super) fn check_item(
         if let Some(mods) = &want.mods {
             let mut inner = around(at);
             if item.kind == ItemKind::Fn {
-                inner.pop();
+                for c in &mut inner {
+                    c.pop();
+                }
             }
-            if !in_chain(&inner, mods) {
+            if !inner.iter().any(|c| in_chain(c, mods)) {
                 return Err(format!(
                     "position in module `{}`, not in `{}`",
                     chains
                         .first()
                         .map(|c| c
                             .iter()
-                            .chain(&inner)
+                            .chain(&inner[0])
                             .cloned()
                             .collect::<Vec<_>>()
                             .join("::"))
@@ -2976,7 +3274,11 @@ pub(super) fn check_item(
                     })
                 })
                 .collect();
-            if !defs.is_empty() && !defs.iter().any(|d| in_chain(&around(d.start), mods)) {
+            if !defs.is_empty()
+                && !defs
+                    .iter()
+                    .any(|d| around(d.start).iter().any(|c| in_chain(c, mods)))
+            {
                 return Err(format!(
                     "`{ty}` of this file is not the one in `{}`",
                     mods.join("::")

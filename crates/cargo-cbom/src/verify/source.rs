@@ -1394,16 +1394,32 @@ pub(super) fn qualified_fn(src: &Source, at: (usize, usize)) -> Option<&Item> {
 /// trait (`Hash` in `#[derive(Debug, Hash)]`), the type is the item the attribute is on.
 pub(super) fn derive_at(src: &Source, at: (usize, usize)) -> Option<(String, String)> {
     let chars: Vec<char> = src.lines.get(at.0.wrapping_sub(1))?.chars().collect();
-    let before: String = chars.get(..at.1)?.iter().collect();
-    if !re!(r"#\[\s*derive\s*\([^)]*$").is_match(&before) || !word_start(&chars, at.1) {
+    // (in a `derive(..)` open there, the attribute's own or a `cfg_attr`'s, on that line or
+    // one above: `#[derive(\n    Clone, Hash,\n)]`)
+    let attr = attribute_before(src, at.0, at.1)?;
+    if !(re!(r"^(?:derive|cfg_attr)\s*\(").is_match(&attr) && open_in(&attr, "derive"))
+        || !word_start(&chars, at.1)
+    {
         return None;
     }
+    // (the line the attribute ends on)
+    let s = &src.code;
+    let mut depth = 0i32;
+    let end = (src.idx(at)..s.len()).find(|&k| {
+        match s[k] {
+            '[' => depth += 1,
+            ']' => depth -= 1,
+            _ => {}
+        }
+        depth < 0
+    })?;
+    let last = src.pos(end).0;
     let item = src
         .items
         .iter()
-        .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > at.0)
+        .filter(|i| i.kind == ItemKind::TypeDef && i.start.0 > last)
         .min_by_key(|i| i.start)?;
-    let between_ok = (at.0 + 1..item.start.0).all(|l| {
+    let between_ok = (last + 1..item.start.0).all(|l| {
         let t = src.lines[l - 1].trim_start();
         t.is_empty() || t.starts_with("#[") || t.starts_with("//")
     });

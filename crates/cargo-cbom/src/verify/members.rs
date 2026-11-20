@@ -862,6 +862,20 @@ impl Files<'_> {
                     if in_static { "" } else { "not " }
                 ));
             }
+            // (a coercion in the value of a static or const is cited at the item, which may
+            // write it on a later line: rustls 0.21's `pub static TLS_..: SupportedCipherSuite
+            // =\n    SupportedCipherSuite::Tls12(&Tls12CipherSuite { .. aead_alg: &AesGcm, .. });`)
+            let lines: Vec<usize> = src
+                .items
+                .iter()
+                .find(|i| i.kind == ItemKind::Static && i.start.0 == line && i.end.0 > line)
+                .map_or(vec![line], |i| (i.start.0..=i.end.0).collect());
+            let mut made = false;
+            for line in lines {
+                let Some(text) = src.lines.get(line.wrapping_sub(1)) else {
+                    continue;
+                };
+                let ok = 'line: {
             let code: String = text
                 .chars()
                 .zip(&src.class[line - 1])
@@ -990,13 +1004,39 @@ impl Files<'_> {
                             && word_of(s, i).ends_with(base.as_str())
                             && made_pointer(i)
                             && coerced(i)
-                    }));
+                    }))
+                // (or a type parameter of the function, or of its impl, which the instance
+                // gives the type: `Box::new(T::new())` in rsa's `fn new<T: Digest + DynDigest>()`)
+                || (l0..l1).any(|i| {
+                    word_start(s, i)
+                        && before_blank(s, i).is_none_or(|p| s[p] != '.' && s[p] != ':')
+                        && src.enclosing(src.pos(i), &[ItemKind::Fn]).is_some_and(|f| {
+                            let w = word_of(s, i);
+                            let impl_params = impl_of(&src, f)
+                                .map(|b| {
+                                    let (ba, bb) = src.span(b);
+                                    src.text(ba, scan_to(s, ba, bb, |k| s[k] == '{'))
+                                })
+                                .filter(|h| {
+                                    h.trim_start()
+                                        .strip_prefix("impl")
+                                        .is_some_and(|r| r.trim_start().starts_with('<'))
+                                })
+                                .unwrap_or_default();
+                            fn_sig(&src, f).generics.contains(&w)
+                                || re!(r"[<,]\s*(\w+)\s*[:,>]")
+                                    .captures_iter(&impl_params)
+                                    .any(|x| x[1] == w)
+                        })
+                        && made_pointer(i)
+                        && coerced(i)
+                });
             if names_type {
-                continue;
+                break 'line true;
             }
             // a variable or parameter of the type, made a pointer there
             let ty_word = Regex::new(&format!(r"\b{}\b", regex::escape(&base))).ok();
-            let via_var = (l0..l1).any(|i| {
+            (l0..l1).any(|i| {
                     if !word_start(s, i)
                         || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
                         || !made_pointer(i)
@@ -1087,8 +1127,14 @@ impl Files<'_> {
                         }
                         _ => false,
                     }
-                });
-            if !via_var {
+                })
+                };
+                if ok {
+                    made = true;
+                    break;
+                }
+            }
+            if !made {
                 return Err(format!(
                     "`{what}`: line {line} of {file} makes no `{ty}` a pointer to a trait object"
                 ));

@@ -86,7 +86,10 @@ pub(super) fn invocation_names(
                 .is_some_and(|k| *k == Class::Code);
             // (an identical invocation in another module is another candidate: `mod a { h!(run); }`
             // and `mod b { h!(run); }`; the modules around each tell them apart)
+            // (one a `macro_rules!` writes in its own rules makes no item where it stands:
+            // `$( define_oid! { $u => $l => $v } )+`)
             if code
+                && src.enclosing((l + 1, c), &[ItemKind::Macro]).is_none()
                 && (l + 1, c) != start
                 && let Some((_, t)) = invocation_text(src, (l + 1, c))
             {
@@ -106,7 +109,17 @@ pub(super) fn invocation_names(
             .collect()
     };
     // the path's segments, after its crate, as `mod` declarations in order
-    let segs: Vec<String> = strip_generics(path)
+    // (a qualified path's are its type's: `<m::sha2::Sha2_256 as Default>::default`)
+    let plain = match path.trim_start().strip_prefix('<') {
+        Some(q) => q
+            .trim_start_matches('&')
+            .trim_start_matches("mut ")
+            .split(" as ")
+            .next()
+            .unwrap_or(path),
+        None => path,
+    };
+    let segs: Vec<String> = strip_generics(plain)
         .split("::")
         .skip(1)
         .map(|g| g.trim().to_string())
@@ -137,7 +150,8 @@ pub(super) fn invocation_names(
             .filter(|w| matches!((w[0], w[1]), (Some(a), Some(b)) if a < b))
             .count()
     };
-    let score = |p: (usize, usize), inv: &str| {
+    // what an invocation writes, as far as it is read
+    let written = |p: (usize, usize), inv: &str| {
         // in the modules around the invocation (`mod alpha { h!(run); }` makes `alpha::run`)
         let mut mods: Vec<&Item> = src
             .items
@@ -149,10 +163,56 @@ pub(super) fn invocation_names(
             .iter()
             .map(|m| format!("mod {} {{ ", m.name))
             .collect::<String>();
-        t.push_str(&expansion(src, p).unwrap_or_else(|| inv.to_string()));
+        // (its rule with the arguments put in, and the arguments themselves: of those a
+        // rule repeats, the expansion read here holds the first)
+        if let Some(e) = expansion(src, p) {
+            t.push_str(&e);
+            t.push(' ');
+        }
+        t.push_str(inv);
+        t
+    };
+    let score = |p: (usize, usize), inv: &str| {
+        let t = written(p, inv);
         let w = words(&t);
         (wanted.iter().filter(|x| w.contains(*x)).count(), order(&t))
     };
+    // the types of the item's own crate its path names, which no item of the file outside a
+    // macro defines: an invocation makes the item only if it names them. Where this one does,
+    // another that does not is no candidate, whatever else of the path its rule writes
+    // (picky-asn1's `asn1_wrapper! { auto struct ObjectIdentifierAsn1(..), .. }` for `<impl
+    // Deserialize for wrapper::ObjectIdentifierAsn1>::..::visit_newtype_struct`, not the
+    // `auto collection` invocations whose rule writes that impl out)
+    let krate = re!(r"[A-Za-z_]\w*")
+        .find(path)
+        .map(|m| m.as_str().to_string())
+        .unwrap_or_default();
+    let own_types: Vec<String> = Regex::new(&format!(
+        r"\b{}::(?:[a-z_]\w*::)*([A-Z]\w*)",
+        regex::escape(&krate)
+    ))
+    .ok()
+    .into_iter()
+    .flat_map(|r| {
+        r.captures_iter(path)
+            .map(|m| m[1].to_string())
+            .collect::<Vec<_>>()
+    })
+    .filter(|t| {
+        !src.items.iter().any(|i| {
+            matches!(i.kind, ItemKind::TypeDef | ItemKind::Trait)
+                && i.name == *t
+                && src
+                    .enclosing(i.start, &[ItemKind::MacroCall, ItemKind::Macro])
+                    .is_none()
+        })
+    })
+    .collect();
+    let names_types = |p: (usize, usize), inv: &str| {
+        let w = words(&written(p, inv));
+        own_types.iter().all(|t| w.contains(t))
+    };
+    let mine_names = !own_types.is_empty() && names_types(start, &mine);
     // an invocation inside `mod` items makes items in those modules: the path names them all
     let in_modules = |p: (usize, usize)| {
         src.items
@@ -169,7 +229,11 @@ pub(super) fn invocation_names(
         return Pick::No;
     }
     let mut tie = false;
-    for (p, t) in others.iter().filter(|(p, _)| in_modules(*p)) {
+    for (p, t) in others
+        .iter()
+        .filter(|(p, _)| in_modules(*p))
+        .filter(|(p, t)| !mine_names || names_types(*p, t))
+    {
         let o = score(*p, t);
         if o > mine {
             return Pick::No;
@@ -439,6 +503,93 @@ pub(super) fn rule_for(src: &Source, m: &Item, args: &[Tok]) -> Option<(Rule, Me
         }
     }
     None
+}
+/// The rules an invocation of `m` with `args` expands through: the one it matches, then those the
+/// invocations of the file's macros in that rule's transcriber match in turn, a rule that hands
+/// its arguments on (picky's `( $( $u:ident => $l:ident => $v:literal, )+ ) => { $( define_oid! {
+/// $u => $l => $v } )+ }` reaching the rule that writes the function), each with the
+/// metavariables it binds. An invocation there is read with its metavariables replaced by what
+/// the rule binds them to first; where that matches no rule that can be read, all of that
+/// macro's rules are reached. None when the invocation itself matches none.
+pub(super) fn rules_reached(
+    src: &Source,
+    m: &Item,
+    args: &[Tok],
+    depth: usize,
+) -> Option<Vec<(Rule, Metavars)>> {
+    // `$name` replaced by its first binding; a repetition `$( .. )` by its tokens once
+    fn put(toks: &[Tok], binds: &Metavars) -> Vec<Tok> {
+        let mut out = Vec::new();
+        let mut i = 0;
+        while i < toks.len() {
+            match (&toks[i], toks.get(i + 1)) {
+                (Tok::Punct('$'), Some(Tok::Word(v))) => {
+                    match binds.iter().find(|(n, _)| n == v) {
+                        Some((_, t)) => out.extend(t.iter().cloned()),
+                        None => out.extend([toks[i].clone(), toks[i + 1].clone()]),
+                    }
+                    i += 2;
+                }
+                (Tok::Punct('$'), Some(Tok::Group('(', inner))) => {
+                    out.extend(put(inner, binds));
+                    i += 2;
+                    // (its separator and operator)
+                    let end = toks[i..]
+                        .iter()
+                        .take(2)
+                        .position(|t| matches!(t, Tok::Punct('*' | '+' | '?')));
+                    i += end.map_or(0, |k| k + 1);
+                }
+                (Tok::Group(d, inner), _) => {
+                    out.push(Tok::Group(*d, put(inner, binds)));
+                    i += 1;
+                }
+                (t, _) => {
+                    out.push(t.clone());
+                    i += 1;
+                }
+            }
+        }
+        out
+    }
+    // the invocations a transcriber writes: `name ! ( .. )`, at any depth
+    fn invoked(toks: &[Tok], out: &mut Vec<(String, Vec<Tok>)>) {
+        for (i, t) in toks.iter().enumerate() {
+            if let Tok::Group(_, inner) = t {
+                match (
+                    i.checked_sub(2).map(|k| &toks[k]),
+                    i.checked_sub(1).map(|k| &toks[k]),
+                ) {
+                    (Some(Tok::Word(n)), Some(Tok::Punct('!'))) => {
+                        out.push((n.clone(), inner.clone()));
+                    }
+                    _ => invoked(inner, out),
+                }
+            }
+        }
+    }
+    let (r, binds) = rule_for(src, m, args)?;
+    let mut calls = Vec::new();
+    if depth > 0 {
+        invoked(&tokens(&src.orig(r.body.0, r.body.1)), &mut calls);
+    }
+    let mut more = Vec::new();
+    for (name, inner) in calls {
+        let Some(m2) = src
+            .items
+            .iter()
+            .find(|i| i.kind == ItemKind::Macro && i.name == name)
+        else {
+            continue;
+        };
+        match rules_reached(src, m2, &put(&inner, &binds), depth - 1) {
+            Some(reached) => more.extend(reached),
+            None => more.extend(rules_of(src, m2).into_iter().map(|r| (r, Vec::new()))),
+        }
+    }
+    let mut out = vec![(r, binds)];
+    out.extend(more);
+    Some(out)
 }
 /// The file with its item-level invocations of its own `macro_rules!` that name one of `words`
 /// (the item's type, its function) expanded in place: what the macros write there, among the

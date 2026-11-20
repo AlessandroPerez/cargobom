@@ -84,6 +84,113 @@ impl Files<'_> {
         a
     }
 
+    /// The modules a macro invocation outside any function writes around the code it is handed,
+    /// for a position inside that invocation: the `mod` blocks of the macro's definition that
+    /// hold a metavariable (tendermint's `tendermint_pb_modules! { .. }`, whose rule writes
+    /// `mod v0_34 { use .. as pb; $($contents)* }` and two more). The definition is the file's,
+    /// else one of its package's files'.
+    pub(super) fn made_modules(
+        &mut self,
+        src: &Source,
+        owner: Option<&rcbom_manifest::Pkg>,
+        at: (usize, usize),
+    ) -> Vec<String> {
+        // (the invocation around the item the position is in, itself outside any function)
+        let Some(item) = src.enclosing(at, &[ItemKind::Fn, ItemKind::Static]) else {
+            return Vec::new();
+        };
+        if src
+            .enclosing(item.start, &[ItemKind::MacroCall])
+            .is_none_or(|c| src.enclosing(c.start, &[ItemKind::Fn]).is_some())
+        {
+            return Vec::new();
+        }
+        let Some((name, _)) =
+            invocation_start(src, item.start).and_then(|s| invocation_text(src, s))
+        else {
+            return Vec::new();
+        };
+        let mods_of = |s: &Source| -> Vec<String> {
+            let code = &s.code;
+            let mut out = Vec::new();
+            for m in s
+                .items
+                .iter()
+                .filter(|i| i.kind == ItemKind::Macro && i.name == name)
+            {
+                let (a, b) = s.span(m);
+                for i in a..b.min(code.len()) {
+                    if !(kw(code, i, "mod") && word_start(code, i)) {
+                        continue;
+                    }
+                    let j = skip_blank(code, i + 3);
+                    let w = word_of(code, j);
+                    let open = skip_blank(code, j + w.chars().count());
+                    if !w.is_empty()
+                        && code.get(open) == Some(&'{')
+                        && let Some(close) = close_of_at(code, open)
+                        && code[open..close].contains(&'$')
+                    {
+                        out.push(w);
+                    }
+                }
+            }
+            out
+        };
+        let mut out = mods_of(src);
+        if out.is_empty()
+            && let Some(p) = owner
+        {
+            for f in package_files(&p.manifest_dir) {
+                if let Some(s) = self.source(&f) {
+                    out.extend(mods_of(&s));
+                }
+            }
+        }
+        out.sort();
+        out.dedup();
+        out
+    }
+
+    /// What the `macro_rules!` invoked at `at` writes, where its definition is in another file
+    /// of the package than the invocation's: the definition's text and that of the macros of
+    /// its file it invokes in turn (near-crypto's `prs!` in `vrf.rs`, defined in `hash.rs`
+    /// beside the `hash_chain!` it invokes). None for a macro the file itself defines.
+    pub(super) fn macro_bodies(
+        &mut self,
+        src: &Source,
+        owner: Option<&rcbom_manifest::Pkg>,
+        at: (usize, usize),
+    ) -> Vec<String> {
+        let Some((name, _)) = invocation_text(src, at) else {
+            return Vec::new();
+        };
+        let defines = |s: &Source| {
+            s.items
+                .iter()
+                .any(|i| i.kind == ItemKind::Macro && i.name == name)
+        };
+        let Some(p) = owner.filter(|_| !defines(src)) else {
+            return Vec::new();
+        };
+        let mut out = Vec::new();
+        for f in package_files(&p.manifest_dir) {
+            let Some(s) = self.source(&f).filter(|s| defines(s)) else {
+                continue;
+            };
+            let invoked = macros_invoked(&s, &name);
+            for m in s
+                .items
+                .iter()
+                .filter(|i| i.kind == ItemKind::Macro && invoked.contains(&i.name))
+            {
+                let (a, b) = s.span(m);
+                out.push(s.text(a, b));
+            }
+        }
+        out
+    }
+
     /// What the package's invocations of its own `macro_rules!` that define type aliases expand
     /// to (sha3's `impl_sha3!(Sha3_256Core, Sha3_256, ..)`, whose rule writes `pub type
     /// $full_name = CoreWrapper<$name>;`): the alias is written nowhere else. A macro makes
@@ -299,6 +406,18 @@ impl Files<'_> {
     /// None when unknown: no `cargo metadata`, a file outside every target's directory, one an
     /// `include!` reads, or a build script's output.
     pub(super) fn module_chains(&mut self, path: &Path, depth: usize) -> Option<Vec<Vec<String>>> {
+        if depth > 0 {
+            return self.module_chains_of(path, depth);
+        }
+        if let Some(c) = self.chains.get(path) {
+            return c.clone();
+        }
+        let c = self.module_chains_of(path, 0);
+        self.chains.insert(path.to_path_buf(), c.clone());
+        c
+    }
+
+    fn module_chains_of(&mut self, path: &Path, depth: usize) -> Option<Vec<Vec<String>>> {
         let roots = self.roots.as_ref()?;
         // code a build script wrote (`<target>/build/<pkg>-<hash>/out/gen.rs`), included where
         // the crate says
@@ -863,14 +982,29 @@ impl Files<'_> {
     /// (`pub use inner::DEEP as SHALLOW;`, a glob `pub use inner::*;`), followed in turn: (file,
     /// the item's extent in its `code`, the item's module). None when the modules of the
     /// package's files are not known (no `cargo metadata`).
-    #[allow(clippy::type_complexity)]
     pub(super) fn find_item(
         &mut self,
         dir: &Path,
         module: &[String],
         item: &str,
         depth: usize,
-    ) -> Option<Vec<(PathBuf, (usize, usize), Vec<String>)>> {
+    ) -> Option<Vec<FoundItem>> {
+        let key = (dir.to_path_buf(), module.to_vec(), item.to_string(), depth);
+        if let Some(found) = self.found_items.get(&key) {
+            return found.clone();
+        }
+        let found = self.find_item_in(dir, module, item, depth);
+        self.found_items.insert(key, found.clone());
+        found
+    }
+
+    fn find_item_in(
+        &mut self,
+        dir: &Path,
+        module: &[String],
+        item: &str,
+        depth: usize,
+    ) -> Option<Vec<FoundItem>> {
         let files = package_files(dir);
         let mut out = Vec::new();
         let mut known = false;
