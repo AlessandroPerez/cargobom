@@ -264,6 +264,11 @@ const MAX_STEPS: usize = 4096;
 /// megabytes for one value, and a set of 256 of them per lookup). One larger than this is cut
 /// (`Truncated`): what lies further is not known, and the set says it is not all.
 const MAX_NODES: usize = 1024;
+/// Bounds on the values `LinkIndex::field_parts` looks into for one field, and on how many deep
+/// (a value written by a method called on a value written by a method, and so on: a builder's
+/// chain, two levels a call).
+const MAX_FIELD_STEPS: usize = 512;
+const MAX_FIELD_DEPTH: usize = 64;
 /// The answers kept (`memo`), in origins over their keys and values: past this they are
 /// dropped and found again when asked for.
 const MEMO_NODES: usize = 4_000_000;
@@ -645,6 +650,27 @@ impl LinkIndex {
     /// where it may not write it; none for a write to another field (`self.n += 7` is no part of
     /// `self.key`). `None` for any other value.
     pub fn field_parts(&self, w: &Origin, adt: &str, field: usize) -> Option<Vec<Origin>> {
+        let mut steps = MAX_FIELD_STEPS;
+        self.field_parts_in(w, adt, field, 0, &mut steps)
+    }
+
+    /// `field_parts`, bounded: a field of a value that a long chain of calls wrote, each
+    /// through the one before (apple-codesign's builders: hundreds of methods chained, the
+    /// walk two levels deeper for each, until the stack ended), or of a value too large, has no
+    /// parts known. It is then that field of the value as it stands (`None`), which keeps what
+    /// is in it and narrows nothing.
+    fn field_parts_in(
+        &self,
+        w: &Origin,
+        adt: &str,
+        field: usize,
+        depth: usize,
+        steps: &mut usize,
+    ) -> Option<Vec<Origin>> {
+        if depth > MAX_FIELD_DEPTH || *steps == 0 || w.nodes(MAX_NODES) > MAX_NODES {
+            return None;
+        }
+        *steps -= 1;
         // a value with fields written into it (`k.n = 7` after `k = K { .. }`): those writes
         // projected the same way
         if let Origin::All(alts) = w
@@ -670,11 +696,11 @@ impl LinkIndex {
                 base,
                 ..
             } = w
-                && let Some(inner) = self.field_parts(peel(base), a, *f)
+                && let Some(inner) = self.field_parts_in(peel(base), a, *f, depth + 1, steps)
             {
                 let mut out = Vec::new();
                 for p in inner {
-                    match self.field_parts(peel(&p), adt, field) {
+                    match self.field_parts_in(peel(&p), adt, field, depth + 1, steps) {
                         Some(parts) => out.extend(parts),
                         None => project(&p, adt, field, &mut out),
                     }
