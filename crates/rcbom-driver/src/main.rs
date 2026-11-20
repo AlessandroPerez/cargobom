@@ -812,6 +812,10 @@ struct Edges<'a, 'tcx> {
     tcx: TyCtxt<'tcx>,
     body: &'a Body,
     found: Vec<(Instance, Span)>,
+    /// The closures and `async` blocks this body builds, with where. One it also calls or
+    /// polls is reached from where it builds it, whichever of the two its blocks have first
+    /// (the blocks of an `async fn`'s state machine are not in the order of the source).
+    built: HashMap<Instance, Span>,
     /// Types coerced to a trait object, where, and whether in a constant's value.
     coerced: Vec<(Coerced, Span, bool)>,
     /// Span of the statement being visited, for casts.

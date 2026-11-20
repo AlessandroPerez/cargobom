@@ -398,6 +398,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                     tcx,
                     body: &body,
                     found: Vec::new(),
+                    built: HashMap::new(),
                     coerced: Vec::new(),
                     cur: None,
                     unconvertible: has_unconvertible(tcx, &body),
@@ -718,6 +719,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             tcx: self.cx.tcx,
             body: &body,
             found: Vec::new(),
+            built: HashMap::new(),
             coerced: Vec::new(),
             cur: None,
             unconvertible: has_unconvertible(self.cx.tcx, &body),
@@ -933,6 +935,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // (a coercion or a closure made a trait object here: an edge now if such an object is
         // used, else when one is)
         let mut found = std::mem::take(&mut edges.found);
+        // (a closure or `async` block the body builds and also calls or awaits: from where it
+        // builds it)
+        let built = std::mem::take(&mut edges.built);
+        for (callee, span) in &mut found {
+            if let Some(b) = built.get(callee) {
+                *span = *b;
+            }
+        }
         for (key, methods, span) in std::mem::take(&mut edges.deferred) {
             if self.dyn_used.contains(&key) {
                 found.extend(methods.into_iter().map(|m| (m, span)));
@@ -1262,7 +1272,9 @@ impl Edges<'_, '_> {
                         self.deferred
                             .push((key, vec![rustc_internal::stable(i)], span));
                     } else {
-                        self.found.push((rustc_internal::stable(i), span));
+                        let i = rustc_internal::stable(i);
+                        self.built.entry(i).or_insert(span);
+                        self.found.push((i, span));
                     }
                 }
             }
