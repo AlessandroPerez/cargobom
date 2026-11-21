@@ -530,8 +530,8 @@ pub(crate) fn evaluable_const<'tcx>(
 }
 
 /// The MIR evaluation runs for a const or `const fn`: `Err` when a dependency's constant
-/// needed none (see `ctfe_mir`), `None` when there is none (a trait's const without default,
-/// a function that is not `const`).
+/// needed none (see `ctfe_mir`), `None` when there is none (a trait's const or method without
+/// default, a function that is not `const`).
 fn ctfe_body<'tcx>(tcx: TyCtxt<'tcx>, def: DefId) -> Option<Result<&'tcx mir::Body<'tcx>, ()>> {
     match tcx.def_kind(def) {
         // a trait's constant without a default (`ff::Field::ZERO`): each impl gives its own, the
@@ -550,6 +550,14 @@ fn ctfe_body<'tcx>(tcx: TyCtxt<'tcx>, def: DefId) -> Option<Result<&'tcx mir::Bo
             {
                 return None;
             }
+        }
+        // a trait's method without a default, of a `const` trait
+        // (`core::intrinsics::fallback::FunnelShift::unchecked_funnel_shl`, which a rotation
+        // reaches): a declaration, with no body to evaluate; each impl gives its own
+        DefKind::AssocFn
+            if tcx.trait_of_assoc(def).is_some() && !tcx.defaultness(def).has_value() =>
+        {
+            return None;
         }
         DefKind::Fn | DefKind::AssocFn if tcx.is_const_fn(def) => {}
         _ => return None,

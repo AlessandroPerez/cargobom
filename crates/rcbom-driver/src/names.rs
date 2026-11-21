@@ -265,6 +265,17 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
         (raw_loc(tcx, span), None)
     }
 }
+/// Where a piece of code is, for a place no name in the text holds (a coercion): the code
+/// itself, or for a macro's code the invocation in the source that writes it (`locate`'s
+/// position), with how it starts there and the fingerprint of its line at its column.
+pub(crate) fn place(tcx: TyCtxt<'_>, span: rustc_span::Span) -> crate::Place {
+    let s = if span.from_expansion() {
+        span.source_callsite()
+    } else {
+        span
+    };
+    (raw_loc(tcx, s), span_head(tcx, s, 120), span_mark(tcx, s))
+}
 /// The start of a span's source text where it is written (inside a macro's definition, for a
 /// macro's code): its first line, to `max` characters.
 pub(crate) fn span_head(tcx: TyCtxt<'_>, span: rustc_span::Span, max: usize) -> Option<String> {
@@ -345,7 +356,10 @@ fn steps_from(
 }
 /// The expansion that defines an item, as the compiler records it; the root's for one the
 /// source writes. Of another crate's items, the metadata keeps it for modules, types, traits
-/// and impls only: an item in one of those a macro defines is that macro's.
+/// and impls only: an item in one of those a macro defines is that macro's. One in none of
+/// those (a free function a macro writes, `implement_aead!(aes128_seal, ..)`: its name is the
+/// invocation's, and reads as the source's) is the macro's whose expansion its header is
+/// written in.
 fn defining_expansion(
     tcx: TyCtxt<'_>,
     did: rustc_span::def_id::DefId,
@@ -371,7 +385,17 @@ fn defining_expansion(
             None => break,
         }
     }
-    root
+    // (past what the compiler rewrites, an `async fn`'s body: the macro such code is in)
+    let mut own = tcx.def_span(did).ctxt().outer_expn();
+    while own != root
+        && !matches!(
+            own.expn_data().kind,
+            rustc_span::hygiene::ExpnKind::Macro(..)
+        )
+    {
+        own = own.expn_data().call_site.ctxt().outer_expn();
+    }
+    own
 }
 /// Where the source names an item: its identifier; for a closure or an `async` block, where it
 /// is written. An item a macro defines is so whatever spans its tokens have (a procedural macro

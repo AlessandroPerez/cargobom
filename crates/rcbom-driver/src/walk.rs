@@ -760,10 +760,10 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 .then(|| const_item_at(tcx, did, rustc_internal::internal(tcx, span)))
                 .flatten();
             let at = match item {
-                Some(k) => locate(tcx, tcx.def_span(k)).0,
-                None => locate_stable(tcx, span).0,
+                Some(k) => crate::names::place(tcx, tcx.def_span(k)),
+                None => crate::names::place(tcx, rustc_internal::internal(tcx, span)),
             };
-            self.coerced(c, (at.line > 0).then_some(at), false);
+            self.coerced(c, (at.0.line > 0).then_some(at), false);
         }
         // RCBOM_DEBUG_WALK=<substring>: print the edges out of matching instances
         let debug = std::env::var("RCBOM_DEBUG_WALK")
@@ -1079,7 +1079,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     pub(super) fn coerced(
         &mut self,
         (trait_path, ty, methods, tree): Coerced,
-        at: Option<Loc>,
+        at: Option<crate::Place>,
         in_static: bool,
     ) {
         if let Some(t) = tree {
@@ -1121,9 +1121,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut nested = Vec::new();
         let mut coerced = Vec::new();
         alloc_callees(tcx, &a, &mut found, &mut nested, &mut coerced, 0);
-        let at = locate(tcx, tcx.def_span(did)).0;
+        let at = crate::names::place(tcx, tcx.def_span(did));
         for c in coerced {
-            self.coerced(c, (at.line > 0).then(|| at.clone()), true);
+            self.coerced(c, (at.0.line > 0).then(|| at.clone()), true);
         }
         for i in found {
             self.enqueue(i, None);

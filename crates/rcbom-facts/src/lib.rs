@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 39;
+pub const FACTS_VERSION: u32 = 40;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -213,6 +213,13 @@ pub struct Coercion {
     pub in_static: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub methods: Vec<(String, String, String)>,
+    /// How the code at `at` starts, and the fingerprint of its line at its column
+    /// (`line_mark`): what the place is held to, since no name in the text says which type an
+    /// expression has.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mark: Option<String>,
 }
 
 /// A call (or a naming as a value) of the generic function `callee`, which only its own crate

@@ -532,15 +532,21 @@ fn analyze(tcx: TyCtxt<'_>) {
         let coercions = std::mem::take(&mut w.coercions);
         w.cx.links.coercions = coercions
             .into_iter()
-            .map(
-                |((trait_path, ty), (at, in_static, methods))| rcbom_facts::Coercion {
+            .map(|((trait_path, ty), (at, in_static, methods))| {
+                let (at, text, mark) = match at {
+                    Some((l, t, m)) => (Some(l), t, m),
+                    None => (None, None, None),
+                };
+                rcbom_facts::Coercion {
                     trait_path,
                     ty,
                     at,
                     in_static,
                     methods,
-                },
-            )
+                    text,
+                    mark,
+                }
+            })
             .collect();
         sites.extend(w.sites);
         r.fns.extend(generic);
@@ -899,7 +905,11 @@ type Coerced = (
 
 /// Where a type was first seen coerced (in a static's value or not), and the bodies its
 /// methods run.
-type CoercedAt = (Option<Loc>, bool, Vec<(String, String, String)>);
+type CoercedAt = (Option<Place>, bool, Vec<(String, String, String)>);
+
+/// A place no name in the text holds: its span, how its code starts, and the fingerprint of its
+/// line at its column (`names::place`).
+pub(crate) type Place = (Loc, Option<String>, Option<String>);
 
 #[cfg(test)]
 mod tests {
