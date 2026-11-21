@@ -15,6 +15,7 @@ mod run;
 mod search;
 mod sites;
 mod unknowns;
+mod witness;
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};

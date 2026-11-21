@@ -77,7 +77,7 @@ static NO_SOURCE_ARGS: std::sync::LazyLock<(regex::Regex, regex::Regex)> =
 fn chain_step(d: &str) -> Option<(&str, &str, &str)> {
     static STEP: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
         regex::Regex::new(
-            r"^`([^`]*)` (instantiated by (.*?)(?: at [^\s;]+?:\d+(?::\d+)?(?: as `[^`]*`)?)?)$",
+            r"^`([^`]*)` (instantiated by (.*?)(?: at [^\s;]+?:\d+(?::\d+)?(?: as `[^`]*`)?(?: \(.*\))?)?)$",
         )
         .unwrap()
     });
@@ -116,6 +116,16 @@ fn context(o: &Occurrence, several_artifacts: bool) -> String {
     let mut before = plain(&o.owner);
     for d in &o.detail {
         s.push_str("; ");
+        // where an item is named: the occurrence's own without its name, another's (a macro's
+        // invocation writing several, each with the operation) with it
+        if let Some((item, at)) = crate::witness::owner_parts(d) {
+            if plain(item) == plain(&o.owner) {
+                s.push_str(&format!("owner at {at}"));
+            } else {
+                s.push_str(d);
+            }
+            continue;
+        }
         match chain_step(d) {
             Some((callee, caller, step)) => {
                 s.push_str(if plain(callee) == before { step } else { d });

@@ -251,7 +251,7 @@ pub(super) fn check(
     let mut out = Coverage::default();
     // the calls, once each (the same call in two artifacts' walks is one), with the artifacts
     // reaching it
-    let mut calls: Vec<(String, &rcbom_facts::BoundaryEdge, BTreeSet<String>)> = Vec::new();
+    let mut calls: Vec<(String, &rcbom_facts::BoundaryEdge, BTreeSet<String>, &Path)> = Vec::new();
     let mut index: HashMap<(String, usize, usize, String, Option<rcbom_facts::CallId>), usize> =
         HashMap::new();
     for f in facts {
@@ -276,12 +276,17 @@ pub(super) fn check(
                 }
                 None => {
                     index.insert(key, calls.len());
-                    calls.push((location, e, BTreeSet::from([reach.artifact.clone()])));
+                    calls.push((location, e, BTreeSet::from([reach.artifact.clone()]), cwd));
                 }
             }
         }
     }
-    for (location, e, artifacts) in calls {
+    for (location, e, artifacts, cwd) in calls {
+        // (a file of the facts, as the CBOM names it)
+        let named = |f: &str| {
+            let p = PathBuf::from(f);
+            man.location(&if p.is_absolute() { p } else { cwd.join(p) })
+        };
         let offset = e.span.col.saturating_sub(1);
         out.edges += 1;
         let own = cited.contains(&(location.clone(), e.span.line, offset, e.call.clone()))
@@ -292,7 +297,7 @@ pub(super) fn check(
         } else if let Some(why) = excuse(ctx, e) {
             *out.excused.entry(why.to_string()).or_default() += 1;
             why.to_string()
-        } else if floor(ctx, e, &location, artifacts, assets, usage) {
+        } else if floor(ctx, e, &location, &named, artifacts, assets, usage) {
             out.named += 1;
             "named".to_string()
         } else {
@@ -325,6 +330,7 @@ fn floor(
     ctx: &Ctx<'_>,
     e: &rcbom_facts::BoundaryEdge,
     location: &str,
+    files: crate::witness::Named,
     artifacts: BTreeSet<String>,
     assets: &mut BTreeMap<String, Asset>,
     usage: &mut HashMap<(String, String), Usage>,
@@ -476,7 +482,19 @@ fn floor(
             .map(|x| (x.kind, x.macro_name.clone())),
         line_text: e.line_text.clone(),
         code: e.text.clone(),
-        detail: vec![detail],
+        // (with where the compiler records the call's item, and a macro's code)
+        detail: std::iter::once(detail)
+            .chain(
+                e.owner_at
+                    .iter()
+                    .map(|at| crate::witness::owner(at, &short(&e.owner.name), files)),
+            )
+            .chain(
+                e.expansion
+                    .iter()
+                    .map(|x| crate::witness::expanded(x, files)),
+            )
+            .collect(),
         package,
         provenance: Vec::new(),
         note: None,

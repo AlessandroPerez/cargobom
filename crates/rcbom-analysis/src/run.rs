@@ -649,14 +649,31 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     tier,
                     function: None,
                     owner: short(&site.owner.name),
-                    macro_tag: None,
+                    macro_tag: site
+                        .expansion
+                        .as_ref()
+                        .filter(|e| e.kind != rcbom_facts::MacroKind::Desugaring)
+                        .map(|e| (e.kind, e.macro_name.clone())),
                     line_text: site.line_text.clone(),
                     code: site.text.clone(),
                     // a `[[protocol]]` call configures the stack; it makes no connection
-                    detail: vec![format!(
-                        "{}: configuration, not a connection",
-                        callee.path.rsplit("::").next().unwrap_or(&callee.path)
-                    )],
+                    detail: {
+                        let named = |f: &str| {
+                            let p = PathBuf::from(f);
+                            man.location(&if p.is_absolute() { p } else { cwd.join(p) })
+                        };
+                        let mut d = vec![format!(
+                            "{}: configuration, not a connection",
+                            callee.path.rsplit("::").next().unwrap_or(&callee.path)
+                        )];
+                        if let Some(at) = &site.owner_at {
+                            d.push(crate::witness::owner(at, &short(&site.owner.name), &named));
+                        }
+                        if let Some(e) = &site.expansion {
+                            d.push(crate::witness::expanded(e, &named));
+                        }
+                        d
+                    },
                     package: pkg.clone(),
                     provenance: Vec::new(),
                     note: None,
@@ -827,12 +844,17 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         detail.push(format!("{role}: {}", text.join(" or ")));
                     }
                 }
+                // where the compiler records the code: the file of a position of the facts, as
+                // the CBOM names it
+                let named = |f: &str| {
+                    let p = PathBuf::from(f);
+                    man.location(&if p.is_absolute() { p } else { cwd.join(p) })
+                };
+                if let Some(at) = &site.owner_at {
+                    detail.push(crate::witness::owner(at, &short(&site.owner.name), &named));
+                }
                 if let Some(e) = &site.expansion {
-                    detail.push(format!(
-                        "expanded from {}:{}",
-                        man.location(&cwd.join(&e.def_site.file)),
-                        e.def_site.line
-                    ));
+                    detail.push(crate::witness::expanded(e, &named));
                 }
                 // a call through a function pointer: the operation is at the call, the function
                 // was named elsewhere (`let h = digest;`)
@@ -878,10 +900,11 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         .map(|t| format!(" as `{t}`"))
                         .unwrap_or_default();
                     detail.push(format!(
-                        "`{callee}` instantiated by {caller} at {}:{}:{}{text}",
+                        "`{callee}` instantiated by {caller} at {}:{}:{}{text}{}",
                         man.location(&vp),
                         v.span.line,
-                        v.span.col.saturating_sub(1)
+                        v.span.col.saturating_sub(1),
+                        crate::witness::via(v, &callee, &short, &named)
                     ));
                 }
                 let via: Vec<(String, usize, usize)> = site
