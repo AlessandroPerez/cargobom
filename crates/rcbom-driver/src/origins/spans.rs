@@ -120,8 +120,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         // a closure of a generic function's instance: the parent's constants with that
         // instance's arguments (`let alg = T::ALG;` captured in `each::<P512>`)
         if let Some(a) = self.inst_args() {
-            let n = self.tcx.generics_of(parent).count().min(a.len());
-            outer = outer.with_item(parent, self.tcx.mk_args(&a[..n]));
+            outer = outer.with_item(parent, enclosing_args(self.tcx, parent, a));
         }
         for (bb, block) in body.blocks.iter().enumerate() {
             for (idx, s) in block.statements.iter().enumerate() {

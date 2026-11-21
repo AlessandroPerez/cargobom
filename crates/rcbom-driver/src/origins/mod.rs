@@ -252,6 +252,26 @@ struct Flow {
     open_cells: HashSet<Local>,
 }
 
+/// The arguments of the body a closure is written in (`parent`), from the closure's own (`a`):
+/// those of the function both are nested in, which every body in it shares and has first. The
+/// rest are each body's own (a closure's kind, signature and captures; a coroutine's types),
+/// and the closure's say nothing of its parent's: they stay parameters, and a constant of the
+/// parent that names one is not evaluated. Taken as a prefix of the closure's, a closure in an
+/// `async fn` gave the coroutine around it its own kind and signature for the coroutine's
+/// types, and too few of them.
+pub(super) fn enclosing_args<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    parent: DefId,
+    a: GenericArgsRef<'tcx>,
+) -> GenericArgsRef<'tcx> {
+    let shared = tcx
+        .generics_of(tcx.typeck_root_def_id(parent))
+        .count()
+        .min(a.len());
+    let own = rustc_middle::ty::GenericArgs::identity_for_item(tcx, parent);
+    tcx.mk_args_from_iter(a[..shared].iter().copied().chain(own.iter().skip(shared)))
+}
+
 impl<'a, 'tcx> Origins<'a, 'tcx> {
     pub(crate) fn new(tcx: TyCtxt<'tcx>, body: &'a Body, def: Option<DefId>) -> Self {
         let kind = match def {

@@ -1,0 +1,15 @@
+# A closure in an `async fn` whose argument comes from what the coroutine around it holds: the
+# search follows the capture into the enclosing body and reads that body's constants with the
+# closure's own generic arguments. Those were taken as a prefix of the closure's, which holds
+# for a function around a closure and not for a coroutine or another closure: its own
+# parameters (its types, or its kind and signature) are not the closure's, and are more. A
+# constant of the coroutine's own (`&[&SHA256, &SHA384]`) then named a parameter the closure has
+# none for, the compiler panicked, and the call's algorithm was not read (s3s's
+# `v4_check_header_auth`).
+[package]
+name = "driver-44"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ring = "=0.17.14"
