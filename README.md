@@ -75,13 +75,15 @@ cargo cbom
   6.10).
 - **The verifier** reopens every cited file and checks each position. With each one the CBOM
   gives what the compiler records of where the code is: the item it is in, the macros that
-  write it (each invocation and definition, innermost first), and for every step of an
-  instantiation chain what the code there is. Each span of the record that no name in the
-  text holds (a macro's code, an invocation, a chain step, a closure) comes with a fingerprint
-  of its column in its line. The verifier does not look for any of that in the text: it reads
-  each recorded span and holds it to what the record says. What a path at a position names,
-  and the values a call reads (the descriptor, bindings in scope, coercions, witnesses), it
-  reads from the text itself. `--self-test` shifts every position, and every span of the
+  write it (each invocation and definition, innermost first), for every step of an
+  instantiation chain what the code there is, and where a value is made a trait object. Each
+  span of the record that no name in the text holds (a macro's code, an invocation, a chain
+  step, a closure, a coercion) comes with a fingerprint of its column in its line. The
+  verifier does not look for any of that in the text: it reads each recorded span and holds
+  it to what the record says. What a path at a position names, and the values a call reads
+  (the descriptor, bindings in scope, witnesses), it reads from the text itself. A value the
+  text does not lead to (a pointer a constructor stored in a field) is counted as not shown, no
+  mismatch. `--self-test` shifts every position, and every span of the
   record, by a line and by a column, and counts how many shifts it rejects. What comes from
   the walk or the value search (tiers, provenance classes, set labels) it does not check
   (Limitations).
@@ -172,7 +174,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 124 crates.io packages it had never been run on, in five batches
+then the tool was run on 238 crates.io packages it had never been run on, in eight batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -185,9 +187,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (347 outputs, the suite's included): 20,996 positions verified, 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range; every one of 194,922 positions and spans of the compiler's record shifted by a line or a column rejected (5 more land on another coercion of the same type, as true) |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,638 calls (3,691 cited, 15 cited by the check by name, 18 cited by the check as unknown, 7,914 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent |
+| evidence | every cited position, `verify --self-test` | fixtures (363 outputs, the suite's included): 21,580 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 201,337 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,976 calls (3,970 cited, 19 cited by the check by name, 26 cited by the check as unknown, 7,961 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 355 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -221,10 +223,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the five batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32). Each
-finding is fixed in this build and has a fixture, but for one (two versions of one crate in a
-build: Limitations), and the packages are development material from then on (`in-too-deep.md`
-8 says what such a run can and cannot show).
+None of the eight batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33); a ninth was started and stopped for lack of memory, and is not counted
+(below). Each finding is fixed in this build and has a fixture, but for one (two
+versions of one crate in a build: Limitations), and the packages are development material
+from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -299,6 +302,78 @@ build: Limitations), and the packages are development material from then on (`in
   0.21's connection state, whose methods write it through one another: the walk of a written
   value's fields had no bound), and once bounded showed the limit of two versions of one
   crate.
+- *Thirty-six, 21 November:* clatter 2.3.0, mla 2.1.0, age-plugin-xwing 0.2.1,
+  cosmian_cover_crypt 16.0.1, sunset 0.6.0, quantum-box 0.2.0, saorsa-pqc 0.5.2,
+  sequoia-openpgp 2.4.2 (`crypto-rust`, not its default backend), openmls_rust_crypto 0.6.0,
+  emissary-core 0.4.0, rustls-post-quantum 0.2.4 (these eleven, and rosenpass, depend on a
+  post-quantum package), librespot-core 0.8.0 (`rustls-tls-webpki-roots`), nostr 0.45.7
+  (`all-nips`), ruma-signatures 0.23.0, matrix-sdk-store-encryption 0.19.1,
+  mls-rs-crypto-rustcrypto 0.24.0, tor-llcrypto 0.48.0 (`full`), webrtc-dtls 0.12.0,
+  webrtc-srtp 0.17.3, makiko 0.2.5, kdbx-rs 0.5.2, cotp 1.9.10, dexios 8.8.1, kestrel-cli
+  1.0.3, fclones 0.35.0, cargo-deb 3.8.0, rpm 0.30.2, pdf 0.10.0, rusty-s3 0.12.0, svix
+  2.11.0, voprf 0.4.1, poem 3.1.12 (`cookie`, `csrf`, `session`), secret-service 5.2.0
+  (`rt-tokio-crypto-rust`) and blind-rsa-signatures 0.19.0, with the build pushed that day,
+  the first whose verifier checks the compiler's record (rosenpass 0.2.3 needs the system's
+  libsodium, which this machine has not; onetun 0.3.10's locked curve25519-dalek 4.0.0-rc.3
+  does not build on the pinned nightly). Twenty-seven of the thirty-four passed. The verifier
+  rejected correct positions in five (46 in sequoia-openpgp, 36 in openmls_rust_crypto, 3 in
+  cotp, 2 in cosmian_cover_crypt, 2 in kdbx-rs: a macro's path with metavariables before its
+  last name, a dependency's free function a macro writes, which the unit walking it recorded
+  without its macro, a hash of its own in a function generic over another, a chain of
+  instantiations starting at the second of two functions one macro call writes, a value
+  boxed as a trait object over several lines); the driver caught a compiler panic on nostr
+  (bitcoin_hashes' constants, computed by rotations, reach a method of a `const` trait of
+  core that has no body); and the walk check reported a gap on cargo-deb that is none (its
+  manifest optimises serde_json on its own, and in an optimised unit two functions of the
+  same code are one, under both names).
+- *Forty, 21 November:* superboring 0.1.18, bergshamra-keys 0.12.0, kryptering 0.7.1
+  (`post-quantum`), affinidi-crypto 0.4.0 (`post-quantum`), bc-components 0.31.1, xml-sec 0.6.0
+  (`experimental-pq`), tronic 0.8.1, katwalk 0.1.4, cas-lib 0.2.95, darkbio-crypto 0.20.1
+  (`mldsa`, `eddsa`, `rsa`, `xdsa`, `xhpke`, `argon2`, `hkdf`), jose-rs 0.12.1
+  (`post-quantum`), passkey-crypto 0.1.1, libsumatracrypt-rs 0.6.1, hpke-ng 0.2.0 (`pq`) (these
+  fourteen, and four of the five below that do not build, depend on a post-quantum package),
+  pkcs5 0.8.1 (`pbes2`), shadowsocks-crypto 0.8.0, noise-rust-crypto 0.6.2, web-push-native
+  0.5.0, signatory 0.27.1 (`ed25519`, `nistp256`), enr 0.14.0, zipsign-api 0.2.2, askar-crypto
+  0.3.7, libpna 0.41.1, jwt-authorizer 0.15.0, livekit-token 0.5.0, cloudfront_sign 0.4.1,
+  oauth1-request 0.6.1, jose-jwk 0.1.2, discv5 0.12.0, ohttp 0.8.0, xeddsa 1.1.0, cms 0.2.3
+  (`builder`), csrf 0.5.0, bc-crypto 0.14.0 and sphinx-packet 0.8.0, with the first build whose
+  knowledge base has the post-quantum crates (wasi-crypto 0.1.16 needs cmake for boring-sys and
+  tiny-encrypt 1.9.20 the system's PC/SC library, which this machine has not; cargo rejects
+  citadel_pqcrypto 0.14.0's manifest; selenite 0.6.0's rustc-serialize and rusty_paserk 0.5.0's
+  locked curve25519-dalek do not compile on the pinned nightly). Twenty-seven of the
+  thirty-five passed. The verifier rejected correct positions in seven (230 in bergshamra-keys,
+  209 in kryptering and 209 in jose-rs, both built on it, 42 in katwalk, 10 in xml-sec, 3 in
+  web-push-native, 3 in cms) and accepted one shifted position in superboring: a macro handed
+  to another by name and invoked through its metavariable (`$callback!(..)`); two calls one
+  macro invocation writes, cited together, the second's code checked against the first's
+  function; a function of two type parameters given one by each of two callers, where every
+  instantiation was held to choose the occurrence's hash; a binary whose crate is named after
+  its target, not its package; a trait imported under another name and its objects written with
+  that name; a crate's trait implemented for `Vec<u8>`, taken for a function of the standard
+  library; and a function pointer held by a variable of the function's own name, bound one line
+  above where the function is named, at the same column.
+- *Thirty-eight, 21 November:* commucat-crypto 1.0.103 (`pq`), affidavit 26.10.17, qudag-crypto
+  0.6.0, chacha_box_ietf 0.2.0, structured-webauthn 0.1.0, zf-zebrachain 0.0.17, sh-secgen
+  0.2.2, quantum-sign 0.1.7, breakmancer 0.9.0, pqsign 0.6.0, latticearc 0.19.0, QuantCrypt
+  0.2.0, pqfile 4.3.4, crypt_guard_core 3.1.0 (these fourteen, and two of the five below that
+  do not build, depend on a post-quantum package), totp-lite 2.0.1, s3s 0.17.0, bip0039 0.14.2,
+  hkd32 0.7.0 (`bip39`), scratchstack-aws-signature 0.11.4, hawk 5.0.1, hdwallet 0.4.1,
+  jsonwebtokens 1.2.0, boringauth 0.9.0, a2 0.10.0 (`ring`), min_jwt 0.10.0, office-crypto
+  0.4.0, luks2 0.5.0, ms-offcrypto-writer 1.0.7, minreq 3.0.0 (`https-rustls`), suppaftp 13.0.0
+  (`rustls-ring`), async-tls 0.13.0, machineid-rs 1.2.4 and sshcerts 0.15.4 (`encrypted-keys`,
+  `rsa-signing`), with the build that has the seventh batch's fixes (hubro-sdk 1.0.2's polars-
+  ops and osshkeys 0.7.0's locked proc-macro2 do not compile on the pinned nightly; libslug
+  0.13.0 needs the system's OpenSSL and rsasl 2.3.1 its GSSAPI library, which this machine has
+  not; cargo finds no `hmac ^0.4` for tiny-hderive 0.3.0). Thirty of the thirty-three passed,
+  and for the first time no finding is the verifier's reading of a correct position. QuantCrypt
+  did not run and hdwallet had two positions rejected for one cause: each pins a toolchain of
+  its own (`rust-toolchain`: 1.81, 1.63), the manifest layer ran the cargo the directory
+  selects and the build the pinned nightly, and the older cargo cannot read a dependency's
+  manifest, or keeps the registry's sources in another directory, so that a file the build
+  compiled was no file of a package the manifest layer knew. And the driver caught a compiler
+  panic on s3s: a closure in an `async fn` handing a crypto call a slice the coroutine around
+  it holds as a constant, read with the closure's generic arguments where the coroutine has its
+  own.
 
 The fifth batch's findings were first fixed as the others had been, by more rules in the
 verifier (and by the driver citing a closure a function builds and also awaits where it
@@ -321,6 +396,122 @@ two functions written by one macro call share (hpke). The self-test, which now s
 as every position, found two spans the verifier held to nothing (a closure's, a macro's
 outermost invocation's): every span no name in the text holds now carries a fingerprint of
 its line. All of them are in a fixture (`regress/verify-54`).
+
+The sixth batch was the first run on the record, and did not pass either. Its findings are
+of three kinds: what the text was still asked (which type a coerced expression has, how a
+macro's path ends, which hash a generic function's own code runs), what the record left out
+(another crate's free function a macro writes, a chain starting at a second owner), and two
+outside the verifier (a constant the driver could not read, a build setting the walk check
+did not override). Two things changed with them. A coercion to a trait object is now on the
+record too, its span with a fingerprint, and the rules that read from a line which type an
+expression has are deleted: the verifier, 16,900 lines before the record, is 13,800.
+And the cases are no longer left to the packages to find: one fixture (`regress/verify-55`)
+is built by construction, the same file of cases compiled in the program, in a crate it
+depends on and a second time in the program, crossing who writes the code (a `macro_rules!`
+of another crate, an attribute, a derive, a function-like procedural macro, one of these
+writing another's invocation), what it writes (a free function, a method, an impl, a
+closure, an `async fn`, a static, a boxed trait object), where the item's name comes from
+and how the call is written. On the build the sixth batch ran on, the verifier rejected 61 of
+its 125 positions: five of that build's nine findings (the batch's and the re-run's), and one
+that no package had shown, a static a macro's invocation names. A kind of code not yet in it
+is added there as a case first.
+
+The seventh batch was the first run with the post-quantum crates in the knowledge base, on
+forty packages chosen for the most part among their dependents. On that code, none of it seen
+before, the CBOMs named ML-DSA in ten packages, ML-KEM in nine, SLH-DSA in six and X-Wing in
+three; one package called a crate not modelled yet (pqcrypto-mldsa, added since), and one the
+round-three Kyber, Dilithium and Falcon, which the registry has no names for (unknown
+operations of their packages). The batch did not pass: its seven findings are all in what the
+verifier still reads from the text and not from the record (how a macro's invocation is
+written, which instantiation of a chain chooses a hash, what a trait object's trait is called,
+where a pointer's variable is bound, which crate a path's first name is), and in one case in
+how the analysis cites two calls together. Each is a case of the fixture built by construction
+now, in the program, a dependency and a second binary: the build the batch ran on rejects 20 of
+its 183 positions and accepts 2 shifted ones.
+
+Both batches were run again on the build with these fixes. The thirty-five packages of the
+seventh and the thirty-four of the sixth complete: 9,616 and 9,473 positions verified (3 within
+a range), none mismatched, all 123,226 and 113,149 shifted positions and spans rejected (2 more
+as true). On the sixth batch's packages the post-quantum entries name 57 assets in thirteen
+packages where the build before named 24 in twelve (ML-KEM, and ML-DSA in one): ML-DSA in six
+now, SLH-DSA in three, X-Wing in three, and eighteen in saorsa-pqc, which had 238 operations of
+unknown algorithm (one is left). The re-run found one thing more, in the walk check and on
+cargo-deb again. The flag that had forced every unit unoptimised also turned debug assertions
+on in the units the manifest optimises on its own (the compiler takes them from the level where
+cargo says nothing), so rayon-core was linked with a function only a `debug_assert!` calls; and
+the check's build set its own compiler flags in place of the project's. That build now runs the
+compiler through the tool, which keeps each unit's arguments as the analysed build gives them
+and adds only what leaves the code as it is (`regress/driver-42`). The check had been run on
+the fixtures by hand: its probes run it in every e2e now, and `cargo xtask e2e --walk` runs it
+on every binary of the fixtures (no gap).
+
+The eighth batch ran on that build: thirty of thirty-three, its three failures of two causes,
+neither in the verifier (a project's own toolchain file, a closure in an `async fn`; both
+fixed, `regress/driver-45` and `driver-44`). Its CBOMs name ML-DSA in nine packages, ML-KEM in
+six and SLH-DSA in three.
+
+What the batches could not show was looked for apart from them. The verifier was read for every
+check that still derives a fact from the text, and each legal way of writing Rust such a check
+might misread was written as a case, thirty in all. One of them found a miss that no package,
+fixture or check had: a function of a modelled crate named in a table behind a reference in a
+static or a constant (`static TABLE: &[(&str, HashFn)] = &[("sha256", <Sha256 as
+Digest>::digest)]`) and called through a pointer taken out of the table was in no CBOM. The
+driver recorded the functions named in a function's nested constants and not in a static's or a
+constant's; the walk does not enter a modelled crate; and a pointer in memory was no call for
+the boundary check. Five of the seven hashes of `regress/driver-43` were left out, silently.
+The record is fixed, and the boundary check now reads what a reached static and the constants
+of walked code hold in memory: a function of a crypto package there that code outside its own
+crate names is cited by that naming or by a call through a pointer to it, or else by the check
+itself, by name (with the record's fix taken out again, the check names all five). A second
+case was built from that one: a crypto package that exports its own functions as values (a
+table of function pointers, a constant, a public field of a static). The program names none of
+them and calls no function of the package. A constant's function was followed to the package's
+own naming and reported; a table's element, and any function the knowledge base does not name,
+were in no CBOM, and there was no call for the boundary check to miss: MD5 run, the CBOM empty
+(`regress/driver-46`, a copy of md5 with such items added; none of the 6,300 crate versions
+downloaded to this machine exports one). The check now reads the value of every other crate's static or
+constant that walked code names, as its type says, and each crypto function there that the code
+can read is a call it accounts for, cited where the item is named. One behind a private field
+of a crypto package's type is not: only that package's code reads it (the functions inside
+aws-lc-rs's algorithm descriptors).
+
+The other cases were false rejections of correct positions by the verifier, 45 on the build of
+the eighth batch. Half were what the text says, read too narrowly, and those are read now: the
+callee of a call through a pointer (a constant called by a path, nested indexes, a call's
+result, a field's value, two lines), a macro's, a derive's or an attribute's path as the
+grammar lets it be written (from the root, over two lines, a blank before the `!`, a raw
+identifier, far below its `#[derive(`), a dependency renamed in a manifest table or by the
+workspace, a table found by its module and not by its name alone, an alias in a macro's body
+resolved where the macro is invoked. The other half were facts the text does not say where they
+are used: which function a pointer holds when a constructor set the field or a function between
+handed it on, what type a receiver has behind an alias of another file, which algorithm a
+macro's invocation names. The verifier derived such a fact from the text as far as its rules
+followed, and called what they did not follow a mismatch: that is where every batch had found
+source its rules did not read. It now tells the two apart. What a position, and each position
+its context cites, must read is checked as before, and a text that reads otherwise is a
+mismatch. A value the text leads to and finds to be another is a mismatch too. A value the text
+does not lead to is the compiler's word: the position is verified, and the fact is printed and
+counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and the self-test
+counts a shift that passes only so apart as well. The cases are in the fixture built by
+construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
+does not show, every shifted position and span rejected (2 of 3,125 shifted details only where
+the text does not show the fact). No position of the other 362 fixture outputs or of the
+labelled sets has such a fact.
+
+A ninth batch was started on the build with all of this: forty-two packages, the twenty-two
+most downloaded dependents of the post-quantum crates not yet seen and every ninety-fifth of
+the unseen dependents of fifteen classical ones, by a rule fixed before any was looked at. It
+was stopped for lack of memory at its sixth package and is not counted: the walk check's
+unoptimised build of x0x 0.48.1, a library of 40,000 lines, had the compiler killed at 9 GB of
+this machine's 16. Of the five before it, bitwarden 2.1.0 and ap-proxy-protocol 0.11.0 passed
+and three do not build here (thrussh on libsodium, card-cli and verifiable-credential-toolkit
+on OpenSSL). It showed one defect all the same: the run ended at the failed build with no CBOM,
+the analysis done. The CBOM is now written without the walk check, saying so, and the run fails
+after it (`regress/driver-47`). For the same want of memory the earlier batches were not run
+again whole on this build. What was: the three packages the eighth batch failed on, which pass
+(QuantCrypt, hdwallet, s3s); and the final verifier over the CBOMs of the sixty-seven packages
+of the seventh and eighth batches, which rejects no position but hdwallet's two in the CBOM
+made before its fix, accepts no shift and finds no fact the text does not show.
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
@@ -354,11 +545,14 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   0.12, blake2 0.10 to 0.11, hmac 0.13, hkdf 0.13, pbkdf2 0.13, scrypt 0.12, argon2 0.6,
   aead 0.6, aes 0.9, aes-gcm 0.11, chacha20poly1305 0.11, cbc 0.2, ctr 0.10, signature 3,
   ed25519-dalek 3, x25519-dalek 3, ecdsa 0.17 and the curve crates 0.14), each crate of a
-  build matched by its own version; rsa 0.9 to 0.10, ml-kem 0.2 to 0.3; ring 0.17,
-  aws-lc-rs 1, rustls 0.23, jsonwebtoken 9 to 11, rand 0.8 to 0.10, md5 0.7 to 0.8,
-  siphasher 0.3 to 1. A pre-release counts as the release it leads to (rsa 0.10.0-rc.18 is
-  rsa 0.10). Other versions and unmodelled crypto packages are reported, with their
-  operations as unknown and the reason.
+  build matched by its own version; rsa 0.9 to 0.10; ring 0.17, aws-lc-rs 1, rustls 0.23,
+  jsonwebtoken 9 to 11, rand 0.8 to 0.10, md5 0.7 to 0.8, siphasher 0.3 to 1. Post-quantum:
+  ml-kem 0.2 to 0.3, ml-dsa 0.0.4 to 0.1, slh-dsa 0.0.3 to 0.2, x-wing 0.1 (a hybrid: its
+  ML-KEM-768, X25519 and SHA3-256 are listed as its components), fips203, fips204 and fips205
+  0.4 to 0.5 (HashML-DSA and HashSLH-DSA named apart), pqcrypto-mlkem 0.1 and pqcrypto-mldsa
+  0.1, and the ML-KEM and ML-DSA descriptors of aws-lc-rs. A pre-release counts as the
+  release it leads to (rsa 0.10.0-rc.18 is rsa 0.10). Other versions and unmodelled crypto
+  packages are reported, with their operations as unknown and the reason.
 - Layers 3 to 5 (purpose, vulnerabilities, policy) are designed, not built: no occurrence says
   whether it protects anything (`rcbom:usage` is a package's usage tier, from the walk).
 
@@ -487,15 +681,21 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   "callers choose" unknown for the library itself.
 - *Parameters.* `rcbom:param:*` properties are not scored against the labels' `params`.
 - *The verifier* is independent of the analysis, not of the compiler. Where code is (the item
-  around a position, the macros that write it, what a step of an instantiation chain is) it
-  takes from the compiler's record in the CBOM and checks against the bytes; it does not ask
-  the text again which function the code at a chain step calls, nor with which type
-  arguments. Until 20 November it derived all of that from the text by rules, and each batch
-  of unseen packages found source shapes the rules misread (Unseen packages). From the text
-  it still reads what a path at a position names (through imports and aliases), the
-  descriptor a call reads, witnesses in the program and its dependencies, bindings,
-  coercions, manifest entries and a library component's name, version and purl. The
-  standard library's witnesses are not read, and a position in the standard library, which
+  around a position, the macros that write it, what a step of an instantiation chain is,
+  where a value becomes a trait object) it takes from the compiler's record in the CBOM and
+  checks against the bytes; it does not ask the text again which function the code at a
+  chain step calls, with which type arguments, nor which type a coerced expression has.
+  Until 20 November it derived all of that from the text by rules, and each batch of unseen
+  packages found source shapes the rules misread (Unseen packages). From the text it still
+  reads what a path at a position names (through imports and aliases), the descriptor a call
+  reads, witnesses in the program and its dependencies, bindings, manifest entries and a
+  library component's name, version and purl. What a position must read (a name, an alias, a
+  key) it holds the text to. What a value is where it is used (the function a pointer holds, a
+  receiver's type, the descriptor an argument carries) it checks where the text leads to the
+  value; where the text does not, it counts the fact as not shown (`NOT SHOWN`) and its word is
+  only that the positions cited read as claimed: a wrong function claimed for a pointer whose
+  way from its naming the text does not show would pass, counted so. The standard library's
+  witnesses are not read, and a position in the standard library, which
   is compiled with functions put into their callers, is not held to the item that runs it.
   It shares the knowledge base with the analysis, and its naming of a descriptor
   (`static_names`). It does not check the reachability tier, artifact tags, provenance
