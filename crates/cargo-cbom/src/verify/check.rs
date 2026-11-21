@@ -323,6 +323,22 @@ impl Files<'_> {
                 o.symbol
             ));
         }
+        // a function held as a value by an item of another crate (``held as a value in
+        // `md5::TABLE` named here``): the position names that item, in whose value the compiler
+        // finds the function; the text is checked for the item as it is for a static
+        let held_in = re!(r"held as a value in `([^`]+)` named here")
+            .captures(ctx.details)
+            .map(|m| strip_generics(&m[1]));
+        let (sym, sym_crate) = match &held_in {
+            Some(h) => {
+                let krate = h.split("::").next().unwrap_or("").to_string();
+                if !self.crate_known(&krate) {
+                    return Err(format!("`{h}`: no crate `{krate}` in the build"));
+                }
+                (h.clone(), krate)
+            }
+            None => (sym, sym_crate),
+        };
         let mut parsed = None;
         // a method call (`cipher.encrypt_padded_vec_mut::<Pkcs7>(..)`): its receiver, whose type
         // the text does not give, may carry the asset, not the method's own type arguments
@@ -369,7 +385,7 @@ impl Files<'_> {
             let by_name = at.starts_with(ident.as_str())
                 && !at[ident.len()..].starts_with(is_ident)
                 && starts_token;
-            let op = operator_of(&o.symbol).filter(|_| !by_name);
+            let op = operator_of(&o.symbol).filter(|_| !by_name && held_in.is_none());
             if let Some(op) = op
                 && !(at.starts_with(op)
                     && !at[op.len()..].starts_with('=')
@@ -572,6 +588,7 @@ impl Files<'_> {
                 r"core::iter::traits::(?:iterator::Iterator\b.*::next|collect::IntoIterator\b.*::into_iter)$"
             )
             .is_match(&o.symbol)
+                && held_in.is_none()
                 && at.starts_with("for")
                 && !at["for".len()..].starts_with(is_ident);
             if pointer.is_none() && op.is_none() && !looped && !(ok && starts_token) {

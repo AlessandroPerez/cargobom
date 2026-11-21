@@ -1,0 +1,19 @@
+# A modelled crate exporting its own functions as values: a table of function pointers, a
+# constant, a public field of a static, a static behind a static, an `Option`. The program calls
+# through them and names none of the functions; the crate's code names them, and no call of
+# the program's enters the crate. Nothing was reported: MD5 was run and the CBOM was empty,
+# with no call for the boundary check to miss. The check now has an edge where walked code
+# names an item of another crate whose value holds a crypto function at a place that code can
+# read (`md5::TABLE`), not behind a private field of a crypto crate's type (`Suite::inner`,
+# which only `Suite::run` calls).
+[package]
+name = "driver-46"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["picks"]
+
+[dependencies]
+md5 = "=0.7.0"
+picks = { path = "picks" }

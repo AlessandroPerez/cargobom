@@ -112,6 +112,7 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                         o.merged.push((g.line, g.offset, g.calls));
                         o.merged.extend(g.merged);
                         o.named.extend(g.named);
+                        o.held.extend(g.held);
                         o.via_all.extend(g.via_all);
                         for d in g.detail {
                             // (where a macro writes the merged call says whose code it is: the

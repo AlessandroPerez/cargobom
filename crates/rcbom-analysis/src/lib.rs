@@ -99,6 +99,11 @@ pub struct Occurrence {
     /// Where the function a call through a pointer runs is named (location, line, 0-based
     /// column): the boundary check's value edges it accounts for (`BoundaryEdge::value`).
     pub named: BTreeSet<(String, usize, usize)>,
+    /// The functions it accounts for as the code of a static or a constant names them (the
+    /// item's id, the function's): its own naming in such an item, or the one a call through
+    /// a pointer runs. The boundary check's edges of functions held in that item, where
+    /// other code names the item (`BoundaryEdge::holder`).
+    pub held: BTreeSet<(String, String)>,
 }
 
 #[derive(Clone, Debug)]

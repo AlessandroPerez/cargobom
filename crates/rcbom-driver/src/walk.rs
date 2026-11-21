@@ -243,6 +243,8 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             sites: Vec::new(),
             boundary: Vec::new(),
             value_edges: Vec::new(),
+            held: HashMap::new(),
+            holders_seen: HashSet::new(),
             callers: HashMap::new(),
             fns: Vec::new(),
             paths: Vec::new(),
@@ -554,6 +556,8 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                         types: adt_paths(tcx, rustc_internal::internal(tcx, c).args),
                         through_value: a.values.contains(&did),
                         value: false,
+                        holder: None,
+                        held_in: None,
                         on_behalf: self.behalf(a.caller, memo, 0),
                         call: a.call.clone(),
                         text: a.text.clone(),
@@ -855,14 +859,17 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             }
             if item {
                 let args = rustc_internal::internal(self.cx.tcx, inst).args;
-                sites.extend(statics::fn_data_sites(
+                let named = statics::fn_named(self.cx, did, Some(args));
+                sites.extend(statics::data_sites(
                     self.cx,
                     did,
-                    Some(args),
+                    &named,
                     &owner,
                     Tier::Reachable,
                     &via,
                 ));
+                // (the functions another crate's static or constant named here holds)
+                self.holder_edges(did, &named, 0);
             }
             self.sites.extend(sites);
             for s in statics {
@@ -1130,51 +1137,133 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         named.sort_by_key(|(item, _, span)| (*span, tcx.def_path_hash(*item)));
         named.dedup();
         for (item, inst, span) in named {
-            let did = inst.def_id();
-            if item.krate == did.krate || !held.contains(&inst) {
+            if item.krate == inst.def_id().krate || !held.contains(&inst) {
                 continue;
             }
-            // (as a site of the naming is placed: `Scanner::site_span`)
-            let span = match derive_site(tcx, item) {
-                Some(d) if !span.from_expansion() => d,
-                _ => span,
+            if let Some(e) = self.value_edge(item, inst, span, None) {
+                self.value_edges.push(e);
+            }
+        }
+    }
+
+    /// The edge of a function held as a value (`inst`), at `span` in the code of `item`:
+    /// where that code names the function, or, with `holder`, the item of another crate whose
+    /// value holds it (the item named, and the one whose own memory the function is in).
+    fn value_edge(
+        &self,
+        item: rustc_span::def_id::DefId,
+        inst: rustc_middle::ty::Instance<'tcx>,
+        span: rustc_span::Span,
+        holder: Option<(rustc_span::def_id::DefId, rustc_span::def_id::DefId)>,
+    ) -> Option<rcbom_facts::BoundaryEdge> {
+        let tcx = self.cx.tcx;
+        let did = inst.def_id();
+        // (as a site of the naming is placed: `Scanner::site_span`)
+        let span = match derive_site(tcx, item) {
+            Some(d) if !span.from_expansion() => d,
+            _ => span,
+        };
+        let (loc, expansion) = locate(tcx, span);
+        if loc.line == 0 {
+            return None;
+        }
+        let trait_path = tcx
+            .trait_of_assoc(did)
+            .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
+            .map(|t| path_of(tcx, t));
+        let kind = match tcx.def_kind(item) {
+            k if k.is_fn_like() => OwnerKind::Fn,
+            _ => OwnerKind::Static,
+        };
+        Some(rcbom_facts::BoundaryEdge {
+            owner: Owner {
+                kind,
+                name: path_of(tcx, item),
+                id: def_hash(tcx, item),
+                krate: crate_ref(tcx, item),
+                path: path_of(tcx, item),
+            },
+            span: loc,
+            callee: def_ref_internal(tcx, did),
+            trait_path,
+            coroutine: false,
+            types: adt_paths(tcx, inst.args),
+            through_value: false,
+            value: true,
+            holder: holder.map(|(named, _)| def_ref_internal(tcx, named)),
+            held_in: holder.map(|(_, in_item)| {
+                let mut ids = vec![def_hash(tcx, did)];
+                ids.extend(tcx.trait_item_of(did).map(|t| def_hash(tcx, t)));
+                (def_hash(tcx, in_item), ids)
+            }),
+            on_behalf: None,
+            call: None,
+            text: span_text(tcx, span),
+            line_text: line_text(tcx, span),
+            expansion,
+            std_entry: None,
+            self_ty: self_tree(tcx, did, inst.args),
+            owner_at: crate::names::item_at(tcx, item, None),
+        })
+    }
+
+    /// The statics and constants of other crates that the code of `item` names (`named`, with
+    /// where), and the local constants it names name: each function of the crypto set such an
+    /// item's value holds where this code can read it (`held::readable`) is an edge at the
+    /// naming, as a function named there would be. The item's own crate records where it
+    /// names the function (a site in its facts); here only the memory says it is there.
+    ///
+    /// A static of this crate is read where it is reached (`reach_static`), a function's
+    /// local constants where its code is (`named_values`).
+    pub(super) fn holder_edges(
+        &mut self,
+        item: rustc_span::def_id::DefId,
+        named: &[(statics::Named, rustc_span::Span)],
+        depth: usize,
+    ) {
+        for &(n, span) in named {
+            let (holder, constant) = match n {
+                statics::Named::Static(d) => (d, false),
+                statics::Named::Const(d) => (d, true),
             };
-            let (loc, expansion) = locate(tcx, span);
-            if loc.line == 0 {
+            if holder.is_local() {
+                // (a constant of this crate: what its own code names, there)
+                if constant && depth < 4 && self.holders_seen.insert((holder, holder, span)) {
+                    let inner = statics::item_named(self.cx, holder);
+                    self.holder_edges(holder, &inner, depth + 1);
+                }
                 continue;
             }
-            let trait_path = tcx
-                .trait_of_assoc(did)
-                .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
-                .map(|t| path_of(tcx, t));
-            let kind = match tcx.def_kind(item) {
-                k if k.is_fn_like() => OwnerKind::Fn,
-                _ => OwnerKind::Static,
+            if self.cx.std_crate(holder.krate) || !self.holders_seen.insert((item, holder, span)) {
+                continue;
+            }
+            let held = match self.held.get(&holder) {
+                Some(h) => h.clone(),
+                None => {
+                    let cx = &*self.cx;
+                    let h = catch_unwind(AssertUnwindSafe(|| crate::held::readable(cx, holder)));
+                    let h = std::rc::Rc::new(match h {
+                        Ok(h) => h
+                            .into_iter()
+                            .filter(|(i, _)| self.cx.kb_crate(i.def_id().krate))
+                            .collect(),
+                        Err(_) => {
+                            self.cx.errors += 1;
+                            Vec::new()
+                        }
+                    });
+                    self.held.insert(holder, h.clone());
+                    h
+                }
             };
-            self.value_edges.push(rcbom_facts::BoundaryEdge {
-                owner: Owner {
-                    kind,
-                    name: path_of(tcx, item),
-                    id: def_hash(tcx, item),
-                    krate: crate_ref(tcx, item),
-                    path: path_of(tcx, item),
-                },
-                span: loc,
-                callee: def_ref_internal(tcx, did),
-                trait_path,
-                coroutine: false,
-                types: adt_paths(tcx, inst.args),
-                through_value: false,
-                value: true,
-                on_behalf: None,
-                call: None,
-                text: span_text(tcx, span),
-                line_text: line_text(tcx, span),
-                expansion,
-                std_entry: None,
-                self_ty: self_tree(tcx, did, inst.args),
-                owner_at: crate::names::item_at(tcx, item, None),
-            });
+            for &(inst, in_item) in held.iter() {
+                if item.krate == inst.def_id().krate {
+                    continue;
+                }
+                if let Some(e) = self.value_edge(item, inst, span, Some((holder, in_item))) {
+                    self.value_edges.push(e);
+                }
+            }
         }
     }
 
@@ -1216,6 +1305,10 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         let mut held = Vec::new();
         alloc_fns(&a, &mut held, 0);
         self.value_edges(did, &held);
+        if did.is_local() {
+            let named = statics::item_named(self.cx, did);
+            self.holder_edges(did, &named, 0);
+        }
         for i in found {
             self.enqueue(i, None);
         }

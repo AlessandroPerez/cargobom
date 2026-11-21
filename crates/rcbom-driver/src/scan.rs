@@ -191,6 +191,8 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             types: adt_paths(tcx, iargs),
             through_value: !matches!(func, Operand::Constant(_)),
             value: false,
+            holder: None,
+            held_in: None,
             on_behalf: None,
             call: self.cur_call.clone(),
             text: span_text(tcx, span),

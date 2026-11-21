@@ -231,6 +231,9 @@ pub(super) fn check(
 ) -> Coverage {
     // (an occurrence cites the calls it stands for; one without, a position)
     let mut cited: HashSet<(String, usize, usize, Option<rcbom_facts::CallId>)> = HashSet::new();
+    // (and the functions named in a static's or a constant's own code, by item: an edge of a
+    // function held in that item, where other code names the item)
+    let mut held: HashSet<(String, String)> = HashSet::new();
     for o in assets
         .values()
         .flat_map(|a| &a.occurrences)
@@ -251,6 +254,7 @@ pub(super) fn check(
         for (location, line, offset) in &o.named {
             cited.insert((location.clone(), *line, *offset, None));
         }
+        held.extend(o.held.iter().cloned());
     }
     let mut out = Coverage::default();
     // the calls, once each (the same call in two artifacts' walks is one), with the artifacts
@@ -294,7 +298,11 @@ pub(super) fn check(
         let offset = e.span.col.saturating_sub(1);
         out.edges += 1;
         let own = cited.contains(&(location.clone(), e.span.line, offset, e.call.clone()))
-            || (e.call.is_none() && cited.contains(&(location.clone(), e.span.line, offset, None)));
+            || (e.call.is_none() && cited.contains(&(location.clone(), e.span.line, offset, None)))
+            || e.held_in.as_ref().is_some_and(|(item, ids)| {
+                ids.iter()
+                    .any(|f| held.contains(&(item.clone(), f.clone())))
+            });
         let verdict = if own {
             out.cited += 1;
             "cited".to_string()
@@ -376,11 +384,18 @@ fn floor(
             ""
         }
     };
+    // (a function the code here does not name: the item of another crate it names, whose value
+    // holds the function)
+    let in_holder = match &e.holder {
+        Some(h) => format!("in `{}` named ", short(&h.path)),
+        None => String::new(),
+    };
     let reason = match &e.std_entry {
         None if e.value => format!(
-            "the boundary check: `{}`{of} is held as a value here, which nothing else in the \
+            "the boundary check: `{}`{of} is held as a value {}here, which nothing else in the \
              CBOM accounts for{does}",
-            short(&e.callee.path)
+            short(&e.callee.path),
+            in_holder
         ),
         Some(f) => format!(
             "the boundary check: {}`{}` runs `{}`{of} here, a call nothing else in the CBOM \
@@ -466,7 +481,7 @@ fn floor(
                 None => String::new(),
             };
             let d = format!(
-                "{setup}held as a value here: `{}`{of}{on}",
+                "{setup}held as a value {in_holder}here: `{}`{of}{on}",
                 short(&e.callee.path)
             );
             (m, f, d)
@@ -531,6 +546,7 @@ fn floor(
         via_all: BTreeSet::new(),
         merged: Vec::new(),
         named: BTreeSet::new(),
+        held: BTreeSet::new(),
         artifacts,
         calls: e.call.iter().cloned().collect(),
     };

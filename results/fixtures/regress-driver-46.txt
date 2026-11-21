@@ -1,0 +1,62 @@
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:11:12 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; held as a value in `md5::OPEN` named here: `md5::compute` of md5 0.7.0; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `let h = md5::OPEN.hash;`; code: `md5::OPEN`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:13:21 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; held as a value in `md5::OPEN` named here: `md5::compute` of md5 0.7.0; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `println!("{:x}", md5::OPEN.run(data.clone()));`; code: `md5::OPEN`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:15:13 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; held as a value in `md5::OUTER` named here: `md5::compute` of md5 0.7.0; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `let o = *md5::OUTER;`; code: `md5::OUTER`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:18:25 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; owner at src/main.rs:1:3-1:7 within 1:0-23:1; called through a function pointer to `md5::compute` named at md5-0.7.0/src/lib.rs:480:55; line: `println!("{:x}", m(data.clone()));`; code: `m`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:22:21 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; owner at src/main.rs:1:3-1:7 within 1:0-23:1; called through a function pointer to `md5::compute` named at picks/src/lib.rs:3:48; line: `println!("{:x}", p(data));`; code: `p`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:5:20 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; held as a value in `md5::TABLE` named here: `md5::compute` of md5 0.7.0; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `let (name, f) = md5::TABLE[0];`; code: `md5::TABLE`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:9:21 | md5::compute | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: digest; owner at src/main.rs:1:3-1:7 within 1:0-23:1; called through a function pointer to `md5::compute` named at md5-0.7.0/src/lib.rs:449:41; line: `println!("{:x}", g(data.clone()));`; code: `g`
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.lock:14:0 | md5 | [manifest] locked md5 0.7.0; reached via picks -> md5
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.toml:18:0 | md5 | [manifest] declared by driver-46 (dependencies)
+  occ md5 | pkg:cargo/md5@0.7.0 | picks/Cargo.toml:7:0 | md5 | [manifest] declared by picks (dependencies)
+  occ unknown | crypto:algorithm:unknown:unknown:md5 | src/main.rs:13:31 | md5::Suite::run | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: unknown; algorithm unresolved: the boundary check: `md5::Suite::run` of md5 0.7.0, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `println!("{:x}", md5::OPEN.run(data.clone()));`; code: `run`
+  occ unknown | crypto:algorithm:unknown:unknown:md5 | src/main.rs:5:20 | md5::compute_bytes | [reachable] [call] [artifacts: bin driver-46] in driver_46::main; use: unknown; algorithm unresolved: the boundary check: `md5::compute_bytes` of md5 0.7.0 is held as a value in `md5::TABLE` named here, which nothing else in the CBOM accounts for: what it does is not known; owner at src/main.rs:1:3-1:7 within 1:0-23:1; line: `let (name, f) = md5::TABLE[0];`; code: `md5::TABLE`
+  prop MD5 | crypto:algorithm:MD5 | rcbom:artifact=bin driver-46
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=7
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:crypto-role=algorithm
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:scope=required
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:usage=reachable
+  prop picks | pkg:cargo/picks@0.1.0 | rcbom:scope=required
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:artifact=bin driver-46
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:occurrences=2
+  prop unknown | crypto:algorithm:unknown:unknown:md5 | rcbom:reachability=reachable
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:md5 | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
+component library picks 0.1.0 | pkg:cargo/picks@0.1.0 | purl pkg:cargo/picks@0.1.0
+dep pkg:cargo/driver-46@0.1.0 -> pkg:cargo/md5@0.7.0
+dep pkg:cargo/driver-46@0.1.0 -> pkg:cargo/picks@0.1.0
+dep pkg:cargo/picks@0.1.0 -> pkg:cargo/md5@0.7.0
+dependency crypto:algorithm:MD5
+dependency crypto:algorithm:unknown:unknown:md5
+dependency pkg:cargo/driver-46@0.1.0
+dependency pkg:cargo/md5@0.7.0
+dependency pkg:cargo/picks@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:MD5
+provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:unknown:unknown:md5
+root {"bom-ref": "pkg:cargo/driver-46@0.1.0", "name": "driver-46", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/driver-46@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin driver-46
+run rcbom:run:artifact=lib picks
+run rcbom:run:boundary-check=17 calls into crypto packages: 4 cited, 4 cited by the check by name, 2 cited by the check as unknown, 7 excused (format 7)
+run rcbom:run:features=
+run rcbom:run:packages=3
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=91
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

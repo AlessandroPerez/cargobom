@@ -34,6 +34,23 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
     // one get the call's arguments for their parameters
     let (pointer_calls, named_for_pointers, through_pointers) = pointers::resolve(facts, &flow);
     flow.add_calls(through_pointers);
+    // the functions the code of statics and constants names as values, by where and by path:
+    // the item and the function (`Occurrence::held`)
+    let holders: HashMap<(&rcbom_facts::Loc, &str), (&str, &str)> = facts
+        .iter()
+        .flat_map(|f| &f.sites)
+        .filter_map(|s| match &s.target {
+            Target::Call {
+                callee,
+                value: true,
+                ..
+            } if s.owner.kind == OwnerKind::Static => Some((
+                (&s.span, callee.path.as_str()),
+                (s.owner.id.as_str(), callee.id.as_str()),
+            )),
+            _ => None,
+        })
+        .collect();
     let sites_of = |i: usize| {
         facts[i]
             .sites
@@ -682,6 +699,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     via_all: BTreeSet::new(),
                     merged: Vec::new(),
                     named: BTreeSet::new(),
+                    held: BTreeSet::new(),
                     artifacts: artifacts.clone(),
                     calls: site.call.iter().cloned().collect(),
                 });
@@ -957,6 +975,25 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                         }
                         _ => BTreeSet::new(),
                     },
+                    held: match &site.target {
+                        Target::Call {
+                            callee,
+                            value: true,
+                            ..
+                        } if site.owner.kind == OwnerKind::Static => {
+                            BTreeSet::from([(site.owner.id.clone(), callee.id.clone())])
+                        }
+                        Target::Call {
+                            callee,
+                            through: Some(t),
+                            ..
+                        } => holders
+                            .get(&(t, callee.path.as_str()))
+                            .map(|(item, f)| (item.to_string(), f.to_string()))
+                            .into_iter()
+                            .collect(),
+                        _ => BTreeSet::new(),
+                    },
                     artifacts,
                     calls: site.call.iter().cloned().collect(),
                 };
@@ -1018,6 +1055,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     o.calls.extend(occ.calls);
                     o.merged.extend(occ.merged);
                     o.named.extend(occ.named);
+                    o.held.extend(occ.held);
                     o.via_all.extend(occ.via_all);
                     if o.function.is_none() {
                         o.function = occ.function;

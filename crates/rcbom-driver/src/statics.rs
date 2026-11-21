@@ -28,7 +28,7 @@ use crate::{Cx, crate_ref, def_ref_internal, locate, path_of};
 
 /// A named data item a body refers to, with the span that names it.
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum Named {
+pub(crate) enum Named {
     Static(DefId),
     Const(DefId),
 }
@@ -139,6 +139,17 @@ pub(crate) fn fn_data_sites<'tcx>(
     tier: Tier,
     via: &[ViaStep],
 ) -> Vec<Site> {
+    let found = fn_named(cx, did, args);
+    data_sites(cx, did, &found, owner, tier, via)
+}
+
+/// The statics and consts the live code of function `did` names, with where (`fn_data_sites`
+/// keeps those that lead to the knowledge base's).
+pub(crate) fn fn_named<'tcx>(
+    cx: &mut Cx<'tcx>,
+    did: DefId,
+    args: Option<GenericArgsRef<'tcx>>,
+) -> Vec<(Named, rustc_span::Span)> {
     let tcx = cx.tcx;
     if !tcx.is_mir_available(did) {
         return Vec::new();
@@ -159,13 +170,61 @@ pub(crate) fn fn_data_sites<'tcx>(
         }
         v.found
     }));
-    let Ok(found) = found else {
-        cx.errors += 1;
+    match found {
+        Ok(found) => found,
+        Err(_) => {
+            cx.errors += 1;
+            Vec::new()
+        }
+    }
+}
+
+/// The statics and consts the code of the local static or constant `did` names, with where.
+pub(crate) fn item_named(cx: &mut Cx<'_>, did: DefId) -> Vec<(Named, rustc_span::Span)> {
+    let tcx = cx.tcx;
+    if !did.is_local()
+        || !matches!(
+            tcx.def_kind(did),
+            DefKind::Static { .. } | DefKind::Const | DefKind::AssocConst
+        )
+        || tcx.is_foreign_item(did)
+        || !tcx.is_mir_available(did)
+    {
         return Vec::new();
-    };
+    }
+    let found = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let mut v = Refs::new(tcx, None);
+        v.visit_body(tcx.mir_for_ctfe(did));
+        for p in tcx.promoted_mir(did).iter() {
+            v.visit_body(p);
+        }
+        v.found
+    }));
+    match found {
+        Ok(found) => found,
+        Err(_) => {
+            cx.errors += 1;
+            Vec::new()
+        }
+    }
+}
+
+/// The sites of the statics and consts `found` in function `did` (`fn_named`).
+pub(crate) fn data_sites(
+    cx: &mut Cx<'_>,
+    did: DefId,
+    found: &[(Named, rustc_span::Span)],
+    owner: &Owner,
+    tier: Tier,
+    via: &[ViaStep],
+) -> Vec<Site> {
+    let tcx = cx.tcx;
+    if found.is_empty() {
+        return Vec::new();
+    }
     let owner_at = crate::names::item_at(tcx, did, Some(tcx.optimized_mir(did).span));
     let mut out = Vec::new();
-    for (named, span) in found {
+    for &(named, span) in found {
         // local data, data of knowledge-base crates, and statics leading to them
         let keep = match named {
             Named::Static(d) => d.is_local() || cx.kb_crate(d.krate) || cx.static_interesting(d),

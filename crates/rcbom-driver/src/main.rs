@@ -44,6 +44,7 @@ extern crate rustc_public;
 extern crate rustc_span;
 
 mod cx;
+mod held;
 mod links;
 mod names;
 mod origins;
@@ -804,6 +805,15 @@ struct Walker<'a, 'tcx> {
     boundary: Vec<(Instance, rcbom_facts::BoundaryEdge)>,
     /// The functions of the crypto set found held as values (`value_edges`).
     value_edges: Vec<rcbom_facts::BoundaryEdge>,
+    /// The functions of the crypto set another crate's static or constant holds where code
+    /// naming it can read them (`held::readable`), by item.
+    held: HashMap<rustc_span::def_id::DefId, std::rc::Rc<Vec<held::Held<'tcx>>>>,
+    /// The namings of such items seen: (the code's item, the item named, where).
+    holders_seen: HashSet<(
+        rustc_span::def_id::DefId,
+        rustc_span::def_id::DefId,
+        rustc_span::Span,
+    )>,
     /// Every instance an instance is reached from (`parent` keeps the first).
     callers: HashMap<Instance, Vec<Instance>>,
     /// Owner ids of the instances whose bodies were walked.
