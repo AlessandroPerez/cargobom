@@ -1,0 +1,93 @@
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:13:21 | pqcrypto_mldsa::mldsa44::keypair | [reachable] [call] in a197::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let (pk2, sk2) = mldsa44::keypair();`; code: `mldsa44::keypair`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:14:17 | pqcrypto_mldsa::mldsa44::sign_ctx | [reachable] [call] in a197::main; use: sign; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let signed = mldsa44::sign_ctx(msg, b"ctx", &sk2);`; code: `mldsa44::sign_ctx`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:15:17 | pqcrypto_traits::sign::PublicKey::from_bytes | [reachable] [call] in a197::main; from_bytes: setup, not a use; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let stored = mldsa44::PublicKey::from_bytes(pk2.as_bytes()).unwrap();`; code: `mldsa44::PublicKey::from_bytes`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:15:52 | pqcrypto_traits::sign::PublicKey::as_bytes | [reachable] [call] in a197::main; as_bytes: setup, not a use; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let stored = mldsa44::PublicKey::from_bytes(pk2.as_bytes()).unwrap();`; code: `as_bytes`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:16:17 | pqcrypto_mldsa::mldsa44::open_ctx | [reachable] [call] in a197::main; use: verify; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let opened = mldsa44::open_ctx(&signed, b"ctx", &stored).is_ok();`; code: `mldsa44::open_ctx`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:10:14 | pqcrypto_mldsa::mldsa87::detached_sign | [reachable] [call] in a197::main; use: sign; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let sig = mldsa87::detached_sign(msg, &sk);`; code: `mldsa87::detached_sign`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:11:13 | pqcrypto_mldsa::mldsa87::verify_detached_signature | [reachable] [call] in a197::main; use: verify; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let ok = mldsa87::verify_detached_signature(&sig, msg, &pk).is_ok();`; code: `mldsa87::verify_detached_signature`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:9:19 | pqcrypto_mldsa::mldsa87::keypair | [reachable] [call] in a197::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let (pk, sk) = mldsa87::keypair();`; code: `mldsa87::keypair`
+  occ OS-RNG | crypto:algorithm:OS-RNG | pqcrypto-internals-0.2.11/src/lib.rs:21:4 | getrandom::fill | [present] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect("RNG Failed");`; code: `getrandom::fill`
+  occ getrandom | pkg:cargo/getrandom@0.3.4 | Cargo.lock:45:0 | getrandom | [manifest] locked getrandom 0.3.4; reached via a197 -> pqcrypto-mldsa -> pqcrypto-internals -> getrandom
+  occ pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | pqcrypto-internals-0.2.11/Cargo.toml:17:0 | links | [manifest] native library `pqcrypto_internals`; code behind the FFI boundary is not analysed
+  occ pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | Cargo.lock:108:0 | pqcrypto-mldsa | [manifest] locked pqcrypto-mldsa 0.1.2; reached via a197 -> pqcrypto-mldsa
+  occ pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | Cargo.toml:9:0 | pqcrypto-mldsa | [manifest] declared by a197 (dependencies)
+  occ pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | Cargo.lock:122:0 | pqcrypto-mlkem | [manifest] locked pqcrypto-mlkem 0.1.1; reached via a197 -> pqcrypto-mlkem
+  occ pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | Cargo.toml:10:0 | pqcrypto-mlkem | [manifest] declared by a197 (dependencies)
+  occ pqcrypto-traits | pkg:cargo/pqcrypto-traits@0.3.5 | Cargo.lock:135:0 | pqcrypto-traits | [manifest] locked pqcrypto-traits 0.3.5; reached via a197 -> pqcrypto-traits
+  occ pqcrypto-traits | pkg:cargo/pqcrypto-traits@0.3.5 | Cargo.toml:11:0 | pqcrypto-traits | [manifest] declared by a197 (dependencies)
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:confidence=high
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:detection:method=type-resolved
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:functions:source=observed
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:kb:version=0.2.0
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:occurrences=5
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:reachability=reachable
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:confidence=high
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:detection:method=type-resolved
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:functions:source=observed
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:kb:version=0.2.0
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:occurrences=3
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:reachability=reachable
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:confidence=high
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:detection:method=type-resolved
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=1
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
+  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:usage=present
+  prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:ffi-boundary=true
+  prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:native-links=pqcrypto_internals
+  prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:scope=required
+  prop pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | rcbom:crypto-role=algorithm
+  prop pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | rcbom:scope=required
+  prop pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | rcbom:usage=reachable
+  prop pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | rcbom:crypto-role=algorithm
+  prop pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | rcbom:scope=required
+  prop pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | rcbom:usage=reachable
+  prop pqcrypto-traits | pkg:cargo/pqcrypto-traits@0.3.5 | rcbom:crypto-role=trait
+  prop pqcrypto-traits | pkg:cargo/pqcrypto-traits@0.3.5 | rcbom:scope=required
+asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-87 | crypto:algorithm:ML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+component library getrandom 0.3.4 | pkg:cargo/getrandom@0.3.4 | purl pkg:cargo/getrandom@0.3.4
+component library pqcrypto-internals 0.2.11 | pkg:cargo/pqcrypto-internals@0.2.11 | purl pkg:cargo/pqcrypto-internals@0.2.11
+component library pqcrypto-mldsa 0.1.2 | pkg:cargo/pqcrypto-mldsa@0.1.2 | purl pkg:cargo/pqcrypto-mldsa@0.1.2
+component library pqcrypto-mlkem 0.1.1 | pkg:cargo/pqcrypto-mlkem@0.1.1 | purl pkg:cargo/pqcrypto-mlkem@0.1.1
+component library pqcrypto-traits 0.3.5 | pkg:cargo/pqcrypto-traits@0.3.5 | purl pkg:cargo/pqcrypto-traits@0.3.5
+dep pkg:cargo/a197@0.1.0 -> pkg:cargo/pqcrypto-mldsa@0.1.2
+dep pkg:cargo/a197@0.1.0 -> pkg:cargo/pqcrypto-mlkem@0.1.1
+dep pkg:cargo/a197@0.1.0 -> pkg:cargo/pqcrypto-traits@0.3.5
+dep pkg:cargo/pqcrypto-internals@0.2.11 -> pkg:cargo/getrandom@0.3.4
+dep pkg:cargo/pqcrypto-mldsa@0.1.2 -> pkg:cargo/pqcrypto-internals@0.2.11
+dep pkg:cargo/pqcrypto-mldsa@0.1.2 -> pkg:cargo/pqcrypto-traits@0.3.5
+dep pkg:cargo/pqcrypto-mlkem@0.1.1 -> pkg:cargo/pqcrypto-internals@0.2.11
+dep pkg:cargo/pqcrypto-mlkem@0.1.1 -> pkg:cargo/pqcrypto-traits@0.3.5
+dependency crypto:algorithm:ML-DSA-44
+dependency crypto:algorithm:ML-DSA-87
+dependency crypto:algorithm:OS-RNG
+dependency pkg:cargo/a197@0.1.0
+dependency pkg:cargo/getrandom@0.3.4
+dependency pkg:cargo/pqcrypto-internals@0.2.11
+dependency pkg:cargo/pqcrypto-mldsa@0.1.2
+dependency pkg:cargo/pqcrypto-mlkem@0.1.1
+dependency pkg:cargo/pqcrypto-traits@0.3.5
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/getrandom@0.3.4 -> crypto:algorithm:OS-RNG
+provides pkg:cargo/pqcrypto-mldsa@0.1.2 -> crypto:algorithm:ML-DSA-44
+provides pkg:cargo/pqcrypto-mldsa@0.1.2 -> crypto:algorithm:ML-DSA-87
+root {"bom-ref": "pkg:cargo/a197@0.1.0", "name": "a197", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a197@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a197
+run rcbom:run:boundary-check=12 calls into crypto packages: 8 cited, 0 cited by the check as unknown, 4 excused (accessor 2, encoding 1, format 1)
+run rcbom:run:features=
+run rcbom:run:packages=15
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=41
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

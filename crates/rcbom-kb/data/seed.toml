@@ -318,6 +318,12 @@ role = "algorithm"
 candidates = ["ML-KEM"]
 
 [[crate]]
+package = "pqcrypto-mldsa"
+versions = ">=0.1, <0.2"
+role = "algorithm"
+candidates = ["ML-DSA"]
+
+[[crate]]
 package = "pqcrypto-traits"
 versions = ">=0.3, <0.4"
 role = "trait"
@@ -1666,6 +1672,27 @@ primitive = "kem"
 functions = ["decapsulate"]
 params = { level = { group = 1, required = true } }
 
+# pqcrypto-mldsa: as pqcrypto-mlkem, ML-DSA's keys by the module of the parameter set
+[[type]]
+crate = "pqcrypto_mldsa"
+name = "PublicKey"
+module = "^mldsa(44|65|87)::"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["verify"]
+params = { level = { group = 1, required = true } }
+
+[[type]]
+crate = "pqcrypto_mldsa"
+name = "SecretKey"
+module = "^mldsa(44|65|87)::"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { level = { group = 1, required = true } }
+
 # Elliptic curves of the RustCrypto elliptic-curve crates: the curve is the type argument
 # (`EphemeralSecret<NistP256>`, `SigningKey<NistP256>`); ECDSA's hash is the curve's
 # (`DigestPrimitive`: SHA-256 for P-256, SHA-384 for P-384, SHA-512 for P-521)
@@ -2850,6 +2877,39 @@ primitive = "kem"
 functions = ["encapsulate", "decapsulate"]
 params = { level = { group = 1 } }
 
+# pqcrypto-mldsa's: `mldsa65::keypair()`; a signature attached to its message (`sign`, checked
+# and removed by `open`) or detached (`detached_sign`, `verify_detached_signature`), each with
+# a context string too (`_ctx`)
+[[fn]]
+crate = "pqcrypto_mldsa"
+path = "^mldsa(44|65|87)::keypair$"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen"]
+use = "keygen"
+params = { level = { group = 1 } }
+
+[[fn]]
+crate = "pqcrypto_mldsa"
+path = "^mldsa(44|65|87)::(sign|detached_sign)(_ctx)?$"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+use = "sign"
+params = { level = { group = 1 } }
+
+[[fn]]
+crate = "pqcrypto_mldsa"
+path = "^mldsa(44|65|87)::(open|verify_detached_signature)(_ctx)?$"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["verify"]
+use = "verify"
+params = { level = { group = 1 } }
+
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
 crate = "rsa"
@@ -3501,8 +3561,8 @@ why = "an X-Wing ciphertext's bytes written (the ciphertext is cited where it is
 
 [[aside]]
 name = "encoding"
-traits = ["fips203::traits::SerDes", "fips204::traits::SerDes", "fips205::traits::SerDes", "pqcrypto_traits::kem::Ciphertext", "pqcrypto_traits::kem::SharedSecret"]
-why = "a ciphertext's or a shared secret's bytes written or read (a key's are setup of its algorithm, cited): what is made with them is cited where it is used"
+traits = ["fips203::traits::SerDes", "fips204::traits::SerDes", "fips205::traits::SerDes", "pqcrypto_traits::kem::Ciphertext", "pqcrypto_traits::kem::SharedSecret", "pqcrypto_traits::sign::DetachedSignature", "pqcrypto_traits::sign::SignedMessage"]
+why = "a ciphertext's, a shared secret's or a signature's bytes written or read (a key's are setup of its algorithm, cited): what is made with them is cited where it is used"
 
 [[aside]]
 name = "encoding"
@@ -3594,6 +3654,12 @@ name = "accessor"
 crate = ["x25519-dalek", "elliptic-curve", "blake3", "digest", "scrypt", "rsa", "ring"]
 path = "^(x25519::SharedSecret::(as_bytes|to_bytes)|ecdh::SharedSecret::raw_secret_bytes|Hash::as_bytes|mac::CtOutput::into_bytes|params::Params::(log_n|r|p|len)|(key::RsaPrivateKey|private_key::PrivateKey)::crt_coefficient|rand::Random::expose)$"
 why = "an operation's output or a key's or parameters' value, read after it is made (cited where it is computed)"
+
+[[aside]]
+name = "accessor"
+crate = ["pqcrypto-mlkem", "pqcrypto-mldsa"]
+path = "^ml(kem|dsa)\\d+::(public_key|secret_key|ciphertext|shared_secret|signature)_bytes$"
+why = "the size of a parameter set's keys, ciphertexts, shared secrets or signatures: a constant"
 
 [[aside]]
 name = "accessor"
