@@ -106,6 +106,10 @@ enum Cmd {
 }
 
 fn main() -> Result<()> {
+    // the walk check's own build runs us in the compiler's place
+    if std::env::var_os(walkcheck::AS_RUSTC).is_some() {
+        walkcheck::rustc(std::env::args().skip(1).collect());
+    }
     // `cargo cbom ...` runs us as `cargo-cbom cbom ...`
     let mut args: Vec<String> = std::env::args().collect();
     if args.get(1).is_some_and(|a| a == "cbom") {

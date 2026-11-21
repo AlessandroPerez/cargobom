@@ -1,0 +1,32 @@
+# The walk check links each binary once more, unoptimised, and what it links has to be the code
+# the analysed build compiled. Three ways the two builds differed:
+# - `quiet` is optimised by the manifest on its own (cargo-deb does so for rayon-core): cargo then
+#   says nothing of debug assertions, the compiler turns them on where a unit is unoptimised, and
+#   the check's build linked what only a `debug_assert!` calls (rayon-core's
+#   `WorkerThread::local_deque_is_empty`), which the release build analysed does not hold;
+# - `checked` has its debug assertions on by the manifest: what its `debug_assert!` calls is in
+#   the program, walked and linked;
+# - `.cargo/config.toml` gives every unit `--cfg extra`: the check's build set its own compiler
+#   flags in place of the project's and compiled the other branch of `#[cfg(extra)]`.
+[package]
+name = "driver-42"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["quiet", "checked"]
+
+[dependencies]
+quiet = { path = "quiet" }
+checked = { path = "checked" }
+sha2 = "0.10"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(extra)'] }
+
+[profile.release.package.quiet]
+opt-level = 2
+
+[profile.release.package.checked]
+opt-level = 2
+debug-assertions = true

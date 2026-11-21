@@ -2,7 +2,9 @@
 //! keeps exactly the code the binary contains.
 //!
 //! Each binary is linked once more, unoptimised (little is inlined) and with v0 symbol names
-//! (full paths and generic arguments), into its own target directory, without the driver. Its
+//! (full paths and generic arguments), into its own target directory, without the driver: every
+//! unit with the arguments the build analysed gives it, the project's own compiler flags and
+//! what its profile says of debug assertions included, or the two builds are not of one code. Its
 //! defined function symbols, less those of the instances and shims the binary's walk reached
 //! (`Reach::fns`, `Reach::shims`), are the code linked but not walked. Both sides are compared
 //! demangled without crate hashes: the two builds hash a crate's dependencies differently, and
@@ -143,6 +145,96 @@ pub(crate) fn run(
     Ok(out)
 }
 
+/// Set in the check's build, where cargo runs this program as its `RUSTC_WRAPPER`.
+pub(crate) const AS_RUSTC: &str = "RCBOM_WALK_RUSTC";
+
+/// As cargo's `RUSTC_WRAPPER` in the check's build (`<this> <rustc> <arguments>`): the compiler
+/// with the arguments cargo gives it, which are those of the build analysed, and `unoptimised`.
+pub(crate) fn rustc(mut args: Vec<String>) -> ! {
+    if args.is_empty() {
+        eprintln!("cbom: {AS_RUSTC} is set: expected a compiler and its arguments");
+        std::process::exit(2);
+    }
+    let rustc = args.remove(0);
+    let extra = unoptimised(&args);
+    match Command::new(&rustc).args(&args).args(extra).status() {
+        Ok(s) => std::process::exit(s.code().unwrap_or(1)),
+        Err(e) => {
+            eprintln!("cbom: running {rustc}: {e}");
+            std::process::exit(1);
+        }
+    }
+}
+
+/// What the check's build adds to a unit's arguments: its code as the build analysed compiles
+/// it, unoptimised and with v0 symbol names. Nothing for a call that compiles nothing (`-vV`,
+/// `--print`).
+///
+/// The flags come last, and of a flag given twice the last one counts: every unit is
+/// unoptimised whatever the manifest sets for it (cargo-deb's `[profile.release.package.
+/// serde_json] opt-level = 2`; an optimised unit's functions are inlined and merged where their
+/// code is the same). Debug assertions and overflow checks are code, and the compiler takes
+/// them from the optimisation level where nothing sets them, as cargo knows and relies on: what
+/// the unit's own level implied is said in full, or the unit optimised by the manifest would be
+/// linked with what only its `debug_assert!`s call (cargo-deb's rayon-core).
+fn unoptimised(args: &[String]) -> Vec<String> {
+    let args = with_files(args);
+    let compiles = args.iter().any(|a| a == "--crate-name")
+        && !args
+            .iter()
+            .any(|a| a == "--print" || a.starts_with("--print="));
+    if !compiles {
+        return Vec::new();
+    }
+    let mut level = "0";
+    let (mut assertions, mut overflow) = (None, None);
+    let mut it = args.iter().map(String::as_str);
+    while let Some(a) = it.next() {
+        let option = match a {
+            "-C" | "--codegen" => it.next(),
+            "-O" => Some("opt-level=3"),
+            _ => a
+                .strip_prefix("--codegen=")
+                .or_else(|| a.strip_prefix("-C"))
+                .filter(|o| !o.is_empty()),
+        };
+        let Some(option) = option else { continue };
+        let (key, value) = option.split_once('=').unwrap_or((option, "yes"));
+        let on = matches!(value, "y" | "yes" | "on" | "true");
+        match key.replace('_', "-").as_str() {
+            "opt-level" => level = value,
+            "debug-assertions" => assertions = Some(on),
+            "overflow-checks" => overflow = Some(on),
+            _ => {}
+        }
+    }
+    let assertions = assertions.unwrap_or(level == "0");
+    let overflow = overflow.unwrap_or(assertions);
+    let said = |on| if on { "on" } else { "off" };
+    [
+        "symbol-mangling-version=v0".to_string(),
+        "opt-level=0".to_string(),
+        format!("debug-assertions={}", said(assertions)),
+        format!("overflow-checks={}", said(overflow)),
+    ]
+    .into_iter()
+    .flat_map(|o| ["-C".to_string(), o])
+    .collect()
+}
+
+/// The arguments with those of each `@file` in its place (one a line), as the compiler reads
+/// them.
+fn with_files(args: &[String]) -> Vec<String> {
+    let mut out = Vec::new();
+    for a in args {
+        match a.strip_prefix('@').map(std::fs::read_to_string) {
+            Some(Ok(text)) => out.extend(text.lines().map(str::to_string)),
+            _ => out.push(a.clone()),
+        }
+    }
+    out
+}
+
 /// Builds the workspace's binaries unoptimised with v0 symbol names; their paths by name.
 fn build(
     a: &crate::GenArgs,
@@ -165,15 +257,11 @@ fn build(
         .arg(&a.manifest_path)
         .arg("--target-dir")
         .arg(target_dir)
-        .env_remove("RUSTC_WRAPPER")
+        // (each unit as the build analysed compiles it, the project's own flags included, and
+        // unoptimised: `rustc` below)
+        .env("RUSTC_WRAPPER", std::env::current_exe()?)
+        .env(AS_RUSTC, "1")
         .env_remove("RUSTC_WORKSPACE_WRAPPER")
-        // (every unit unoptimised, whatever the manifest sets for a package: cargo-deb's
-        // `[profile.release.package.serde_json] opt-level = 2` outlives the profile's own
-        // level, and an optimised unit's functions are inlined and merged where their code
-        // is the same, `error::<_, Reference<str>>` into `error::<_, Reference<[u8]>>`: the
-        // flag comes after cargo's own, and the last one counts)
-        .env("RUSTFLAGS", "-C symbol-mangling-version=v0 -C opt-level=0")
-        .env(format!("CARGO_PROFILE_{profile}_OPT_LEVEL"), "0")
         .env(format!("CARGO_PROFILE_{profile}_LTO"), "false")
         .env(format!("CARGO_PROFILE_{profile}_STRIP"), "none");
     if sel.cross {
@@ -548,6 +636,62 @@ pub(crate) fn print(reports: &[Report]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_unit_keeps_the_assertions_its_own_level_implied() {
+        let of = |line: &str| {
+            let args: Vec<String> = format!("--crate-name x {line}")
+                .split_whitespace()
+                .map(str::to_string)
+                .collect();
+            let extra = unoptimised(&args);
+            assert_eq!(
+                extra[..4],
+                ["-C", "symbol-mangling-version=v0", "-C", "opt-level=0"]
+            );
+            format!("{} {}", extra[5], extra[7])
+        };
+        // cargo says nothing of assertions where they are what the level it gives implies
+        assert_eq!(
+            of("-C opt-level=2"),
+            "debug-assertions=off overflow-checks=off"
+        );
+        assert_eq!(of(""), "debug-assertions=on overflow-checks=on");
+        // and says where they are not
+        assert_eq!(
+            of("-C opt-level=2 -C debug-assertions=on"),
+            "debug-assertions=on overflow-checks=on"
+        );
+        assert_eq!(
+            of("-C debug-assertions=off"),
+            "debug-assertions=off overflow-checks=off"
+        );
+        assert_eq!(
+            of("-C opt-level=3 -C overflow-checks=on"),
+            "debug-assertions=off overflow-checks=on"
+        );
+        // the project's own flags come after cargo's, in any spelling; the last one counts
+        assert_eq!(
+            of("-C opt-level=3 -Copt-level=0"),
+            "debug-assertions=on overflow-checks=on"
+        );
+        assert_eq!(
+            of("--codegen=opt-level=s --codegen debug_assertions"),
+            "debug-assertions=on overflow-checks=on"
+        );
+        assert_eq!(of("-O"), "debug-assertions=off overflow-checks=off");
+        assert_eq!(
+            of("-C debug-assertions=on -C overflow-checks=no"),
+            "debug-assertions=on overflow-checks=off"
+        );
+        // a call that compiles nothing is left as it is
+        let probe = |line: &str| {
+            let args: Vec<String> = line.split_whitespace().map(str::to_string).collect();
+            unoptimised(&args)
+        };
+        assert!(probe("-vV").is_empty());
+        assert!(probe("- --crate-name ___ --print=file-names").is_empty());
+    }
 
     #[test]
     fn the_defining_crate_of_paths_impls_and_shims() {
