@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 40;
+pub const FACTS_VERSION: u32 = 41;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -1182,6 +1182,13 @@ pub struct BoundaryEdge {
     /// hash)`): it is cited where it is named.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub through_value: bool,
+    /// No call: the function is held as a value where the walk finds it, in a reached static's
+    /// memory or in that of a constant a walked body uses (`static T: &[F] = &[digest]`). The
+    /// position is where the holder's code names it, or the holder's own when its code does
+    /// not (a table a `const fn` computes). Cited by the function's naming there, or by a call
+    /// through a pointer that names it there.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub value: bool,
     /// The code making the call runs on behalf of the crypto layer, on every way the walk
     /// reaches it: it is an algorithm crate's or a crate implementing one (`Algorithm`), or a
     /// crypto package's (`Package`), or a generic instance every chain of instantiations of

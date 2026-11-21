@@ -247,6 +247,10 @@ pub(super) fn check(
                 cited.insert((at.0.clone(), *line, *offset, Some(c.clone())));
             }
         }
+        // (a call through a pointer: the function it runs, where that is named)
+        for (location, line, offset) in &o.named {
+            cited.insert((location.clone(), *line, *offset, None));
+        }
     }
     let mut out = Coverage::default();
     // the calls, once each (the same call in two artifacts' walks is one), with the artifacts
@@ -373,6 +377,11 @@ fn floor(
         }
     };
     let reason = match &e.std_entry {
+        None if e.value => format!(
+            "the boundary check: `{}`{of} is held as a value here, which nothing else in the \
+             CBOM accounts for{does}",
+            short(&e.callee.path)
+        ),
         Some(f) => format!(
             "the boundary check: {}`{}` runs `{}`{of} here, a call nothing else in the CBOM \
              accounts for{does}",
@@ -393,10 +402,9 @@ fn floor(
     // (the type a call named by its type is a function of, as the occurrence says it: the
     // callee's path may name the impl's parameters, `<CoreWrapper<T> as Default>::default`)
     let mut by_type = None;
-    let named = e
-        .std_entry
-        .as_ref()
-        .and_then(|_| match_fn(ctx.kb, &e.callee, None, &[], &[], &[], &supported))
+    let named = (e.std_entry.is_some() || e.value)
+        .then(|| match_fn(ctx.kb, &e.callee, None, &[], &[], &[], &supported))
+        .flatten()
         .filter(|m| m.algo.material.is_none() && m.algo.open.is_empty())
         .and_then(|m| {
             let f = m
@@ -410,7 +418,9 @@ fn floor(
         // write` under `map.insert(k, v)`: SipHash-1-3): the use its name is, or the type's
         // setup, as a call of it the code writes would be
         .or_else(|| {
-            e.std_entry.as_ref()?;
+            if e.std_entry.is_none() && !e.value {
+                return None;
+            }
             let t = e.self_ty.as_ref()?;
             let m = matcher::match_types(ctx.kb, std::slice::from_ref(t), &supported)
                 .into_iter()
@@ -439,6 +449,24 @@ fn floor(
                 "{setup}run for this call by {}`{}`: `{}`{of}{on}",
                 entry_of(entry),
                 short(entry),
+                short(&e.callee.path)
+            );
+            (m, f, d)
+        }
+        // a function held as a value that no naming in the CBOM accounts for
+        (Some((mut m, f)), None) => {
+            m.provider_crates.clear();
+            let setup = if f.is_none() {
+                format!("{method}: setup, not a use; ")
+            } else {
+                String::new()
+            };
+            let on = match &by_type {
+                Some(t) => format!(", a function of `{t}`"),
+                None => String::new(),
+            };
+            let d = format!(
+                "{setup}held as a value here: `{}`{of}{on}",
                 short(&e.callee.path)
             );
             (m, f, d)
@@ -502,6 +530,7 @@ fn floor(
         via: Vec::new(),
         via_all: BTreeSet::new(),
         merged: Vec::new(),
+        named: BTreeSet::new(),
         artifacts,
         calls: e.call.iter().cloned().collect(),
     };

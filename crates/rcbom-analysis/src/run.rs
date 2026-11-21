@@ -681,6 +681,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     via: Vec::new(),
                     via_all: BTreeSet::new(),
                     merged: Vec::new(),
+                    named: BTreeSet::new(),
                     artifacts: artifacts.clone(),
                     calls: site.call.iter().cloned().collect(),
                 });
@@ -946,6 +947,16 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     via: via.clone(),
                     via_all: via.into_iter().collect(),
                     merged: Vec::new(),
+                    named: match &site.target {
+                        Target::Call {
+                            through: Some(t), ..
+                        } => {
+                            let tp = PathBuf::from(&t.file);
+                            let tp = if tp.is_absolute() { tp } else { cwd.join(tp) };
+                            BTreeSet::from([(man.location(&tp), t.line, t.col.saturating_sub(1))])
+                        }
+                        _ => BTreeSet::new(),
+                    },
                     artifacts,
                     calls: site.call.iter().cloned().collect(),
                 };
@@ -1006,6 +1017,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                     o.artifacts.extend(occ.artifacts);
                     o.calls.extend(occ.calls);
                     o.merged.extend(occ.merged);
+                    o.named.extend(occ.named);
                     o.via_all.extend(occ.via_all);
                     if o.function.is_none() {
                         o.function = occ.function;

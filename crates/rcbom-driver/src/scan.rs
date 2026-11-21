@@ -190,6 +190,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             coroutine: tcx.is_coroutine(did),
             types: adt_paths(tcx, iargs),
             through_value: !matches!(func, Operand::Constant(_)),
+            value: false,
             on_behalf: None,
             call: self.cur_call.clone(),
             text: span_text(tcx, span),

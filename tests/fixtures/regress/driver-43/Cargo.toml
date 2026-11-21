@@ -1,0 +1,14 @@
+# Functions of a modelled crate named in tables, each hash in a table of another shape, and
+# called through a pointer taken out of the table. A table behind a reference (`static T: &[F] =
+# &[f]`, a slice of tuples or of structs, a constant's, an associated constant's) is a constant
+# of the item's own, compiled beside its initializer: the functions named in it were recorded
+# for a function's constants and not for a static's or a constant's, and a hash called only so
+# was not in the CBOM.
+[package]
+name = "driver-43"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+md5 = "0.7"

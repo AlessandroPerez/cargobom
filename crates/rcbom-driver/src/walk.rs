@@ -242,6 +242,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             static_seen: HashSet::new(),
             sites: Vec::new(),
             boundary: Vec::new(),
+            value_edges: Vec::new(),
             callers: HashMap::new(),
             fns: Vec::new(),
             paths: Vec::new(),
@@ -317,6 +318,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             })
             .collect();
         boundary.extend(self.std_edges(&mut memo));
+        boundary.extend(std::mem::take(&mut self.value_edges));
         boundary.sort_by(|a, b| {
             (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
         });
@@ -399,6 +401,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                     tcx,
                     body: &body,
                     found: Vec::new(),
+                    values: Vec::new(),
                     built: HashMap::new(),
                     coerced: Vec::new(),
                     cur: None,
@@ -550,6 +553,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                         coroutine: tcx.is_coroutine(did),
                         types: adt_paths(tcx, rustc_internal::internal(tcx, c).args),
                         through_value: a.values.contains(&did),
+                        value: false,
                         on_behalf: self.behalf(a.caller, memo, 0),
                         call: a.call.clone(),
                         text: a.text.clone(),
@@ -736,6 +740,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             tcx: self.cx.tcx,
             body: &body,
             found: Vec::new(),
+            values: Vec::new(),
             built: HashMap::new(),
             coerced: Vec::new(),
             cur: None,
@@ -951,6 +956,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
         // (a coercion or a closure made a trait object here: an edge now if such an object is
         // used, else when one is)
+        // (the functions the body's constants hold, where code outside their crate names them)
+        let held: Vec<Instance> = std::mem::take(&mut edges.values)
+            .into_iter()
+            .map(|(i, _)| i)
+            .collect();
+        if !usage && !stop && !shim && !held.is_empty() {
+            self.value_edges(did, &held);
+        }
         let mut found = std::mem::take(&mut edges.found);
         // (a closure or `async` block the body builds and also calls or awaits: from where it
         // builds it)
@@ -1090,6 +1103,81 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             .or_insert((at, in_static, methods));
     }
 
+    /// Functions held as values: `held` are those the memory of a reached static points at,
+    /// or that of the constants a walked body uses (`holder`: the static, the body's
+    /// function). Each of the crypto set that code outside its own crate names, in the
+    /// holder's code or in what that code computes its constants from (`named_values`), is an
+    /// edge the boundary check accounts for at each such naming (`BoundaryEdge::value`).
+    ///
+    /// The memory is what the program holds; where a function is named is read from the code
+    /// apart from it, as the sites are. A naming the sites miss is then an edge no occurrence
+    /// cites, which the check cites itself. One named only in its own crate came with a value
+    /// of that crate (the functions inside aws-lc-rs's `aead::CHACHA20_POLY1305`): the
+    /// crate's own, as a call between its functions is.
+    pub(super) fn value_edges(&mut self, holder: rustc_span::def_id::DefId, held: &[Instance]) {
+        let tcx = self.cx.tcx;
+        let held: Vec<rustc_middle::ty::Instance<'tcx>> = held
+            .iter()
+            .filter(|i| matches!(i.kind, InstanceKind::Item))
+            .map(|i| rustc_internal::internal(tcx, *i))
+            .filter(|i| self.cx.kb_crate(i.def_id().krate))
+            .collect();
+        if held.is_empty() {
+            return;
+        }
+        let mut named = Vec::new();
+        named_values(tcx, holder, false, 0, &mut HashSet::new(), &mut named);
+        named.sort_by_key(|(item, _, span)| (*span, tcx.def_path_hash(*item)));
+        named.dedup();
+        for (item, inst, span) in named {
+            let did = inst.def_id();
+            if item.krate == did.krate || !held.contains(&inst) {
+                continue;
+            }
+            // (as a site of the naming is placed: `Scanner::site_span`)
+            let span = match derive_site(tcx, item) {
+                Some(d) if !span.from_expansion() => d,
+                _ => span,
+            };
+            let (loc, expansion) = locate(tcx, span);
+            if loc.line == 0 {
+                continue;
+            }
+            let trait_path = tcx
+                .trait_of_assoc(did)
+                .or_else(|| tcx.trait_impl_of_assoc(did).map(|i| tcx.impl_trait_id(i)))
+                .map(|t| path_of(tcx, t));
+            let kind = match tcx.def_kind(item) {
+                k if k.is_fn_like() => OwnerKind::Fn,
+                _ => OwnerKind::Static,
+            };
+            self.value_edges.push(rcbom_facts::BoundaryEdge {
+                owner: Owner {
+                    kind,
+                    name: path_of(tcx, item),
+                    id: def_hash(tcx, item),
+                    krate: crate_ref(tcx, item),
+                    path: path_of(tcx, item),
+                },
+                span: loc,
+                callee: def_ref_internal(tcx, did),
+                trait_path,
+                coroutine: false,
+                types: adt_paths(tcx, inst.args),
+                through_value: false,
+                value: true,
+                on_behalf: None,
+                call: None,
+                text: span_text(tcx, span),
+                line_text: line_text(tcx, span),
+                expansion,
+                std_entry: None,
+                self_ty: self_tree(tcx, did, inst.args),
+                owner_at: crate::names::item_at(tcx, item, None),
+            });
+        }
+    }
+
     /// A static is reached: remember it, and walk the function pointers and vtables in its
     /// value (rustls keeps its providers as `&dyn` objects inside statics).
     pub(super) fn reach_static(&mut self, did: rustc_span::def_id::DefId) {
@@ -1125,6 +1213,9 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         for c in coerced {
             self.coerced(c, (at.0.line > 0).then(|| at.clone()), true);
         }
+        let mut held = Vec::new();
+        alloc_fns(&a, &mut held, 0);
+        self.value_edges(did, &held);
         for i in found {
             self.enqueue(i, None);
         }
@@ -1397,6 +1488,9 @@ impl Edges<'_, '_> {
             let mut found = Vec::new();
             let mut coerced = Vec::new();
             alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), &mut coerced, 0);
+            let mut held = Vec::new();
+            alloc_fns(a, &mut held, 0);
+            self.values.extend(held.into_iter().map(|i| (i, c.span)));
             self.found
                 .extend(found.into_iter().map(|i| (i, c.span, Edge::Constant)));
             self.coerced
@@ -1405,6 +1499,123 @@ impl Edges<'_, '_> {
         self.super_const_operand(c, loc);
     }
 }
+/// The functions a constant's memory points at, through the memory it points at: no static's
+/// (each is reached itself) and no vtable's (a trait object's methods are its coercion's).
+pub(super) fn alloc_fns(a: &Allocation, out: &mut Vec<Instance>, depth: usize) {
+    if depth > 8 {
+        return;
+    }
+    for (_, prov) in &a.provenance.ptrs {
+        match GlobalAlloc::from(prov.0) {
+            GlobalAlloc::Function(i) => out.push(i),
+            GlobalAlloc::Memory(m) => alloc_fns(&m, out, depth + 1),
+            _ => {}
+        }
+    }
+}
+
+/// Where code names functions as values, for the value a static or a constant holds: every
+/// constant of a function's type in the code of item `did` and in its own constants, with
+/// the item and the function it resolves to; and the same of what that code is computed
+/// from at compile time: the constant items it names, and, in a static's or a constant's
+/// code (`ctfe`), the `const fn`s it calls. Of this crate only: another crate's metadata keeps
+/// the code of some of its constants and not of others, and does not say which.
+pub(super) fn named_values<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    did: rustc_span::def_id::DefId,
+    ctfe: bool,
+    depth: usize,
+    seen: &mut HashSet<rustc_span::def_id::DefId>,
+    out: &mut Vec<(
+        rustc_span::def_id::DefId,
+        rustc_middle::ty::Instance<'tcx>,
+        rustc_span::Span,
+    )>,
+) {
+    use rustc_hir::def::DefKind;
+    use rustc_middle::mir::visit::Visitor;
+    use rustc_middle::ty::TypeVisitableExt;
+    struct Named<'a, 'tcx> {
+        tcx: TyCtxt<'tcx>,
+        item: rustc_span::def_id::DefId,
+        out: &'a mut Vec<(
+            rustc_span::def_id::DefId,
+            rustc_middle::ty::Instance<'tcx>,
+            rustc_span::Span,
+        )>,
+        /// The items the code is computed from: (item, whether its code is run at compile
+        /// time).
+        next: Vec<(rustc_span::def_id::DefId, bool)>,
+        ctfe: bool,
+    }
+    impl<'tcx> Visitor<'tcx> for Named<'_, 'tcx> {
+        fn visit_const_operand(
+            &mut self,
+            c: &rustc_middle::mir::ConstOperand<'tcx>,
+            _: rustc_middle::mir::Location,
+        ) {
+            let tcx = self.tcx;
+            if let rustc_middle::ty::FnDef(d, args) = *c.const_.ty().kind()
+                && !args.skip_binder().has_non_region_param()
+                && let Ok(Some(i)) = rustc_middle::ty::Instance::try_resolve(
+                    tcx,
+                    rustc_middle::ty::TypingEnv::fully_monomorphized(),
+                    d,
+                    args.skip_binder(),
+                )
+            {
+                self.out.push((self.item, i, c.span));
+                if self.ctfe && i.def_id().is_local() && tcx.is_const_fn(i.def_id()) {
+                    self.next.push((i.def_id(), true));
+                }
+            }
+            if let rustc_middle::mir::Const::Unevaluated(uv, _) = c.const_
+                && uv.promoted.is_none()
+                && !uv.args.has_non_region_param()
+                && let Some(def) = crate::statics::resolve_const(tcx, uv.def, uv.args, None)
+                && def.is_local()
+            {
+                self.next.push((def, true));
+            }
+        }
+    }
+    if depth > 6 || seen.len() > 256 || !seen.insert(did) {
+        return;
+    }
+    let kind = tcx.def_kind(did);
+    let constant = matches!(
+        kind,
+        DefKind::Static { .. } | DefKind::Const | DefKind::AssocConst | DefKind::AnonConst
+    );
+    let ctfe = ctfe || constant;
+    let function = kind.is_fn_like() && !tcx.is_constructor(did);
+    let body = if constant || (ctfe && function && tcx.is_const_fn(did)) {
+        did.is_local().then(|| tcx.mir_for_ctfe(did))
+    } else if function {
+        tcx.is_mir_available(did).then(|| tcx.optimized_mir(did))
+    } else {
+        None
+    };
+    let Some(body) = body else {
+        return;
+    };
+    let mut v = Named {
+        tcx,
+        item: did,
+        out,
+        next: Vec::new(),
+        ctfe,
+    };
+    v.visit_body(body);
+    for p in tcx.promoted_mir(did).iter() {
+        v.visit_body(p);
+    }
+    let next = std::mem::take(&mut v.next);
+    for (d, c) in next {
+        named_values(tcx, d, c, depth + 1, seen, out);
+    }
+}
+
 /// Function pointers and vtables inside a constant's memory; statics are reported separately.
 pub(super) fn alloc_callees(
     tcx: TyCtxt<'_>,

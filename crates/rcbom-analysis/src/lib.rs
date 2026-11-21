@@ -96,6 +96,9 @@ pub struct Occurrence {
     /// they are (line, 0-based column): the boundary check's edges it accounts for there
     /// (`C::key_size()` beside `cbc::Encryptor::<C>::new_from_slices(..)`).
     pub merged: Vec<(usize, usize, BTreeSet<rcbom_facts::CallId>)>,
+    /// Where the function a call through a pointer runs is named (location, line, 0-based
+    /// column): the boundary check's value edges it accounts for (`BoundaryEdge::value`).
+    pub named: BTreeSet<(String, usize, usize)>,
 }
 
 #[derive(Clone, Debug)]

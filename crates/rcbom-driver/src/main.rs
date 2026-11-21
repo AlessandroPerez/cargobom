@@ -389,6 +389,9 @@ fn analyze(tcx: TyCtxt<'_>) {
                     None,
                 );
                 sc.visit_body(&body);
+                // (a table behind a reference, `static T: &[F] = &[f]`, is a constant of the
+                // item's own: the functions it names are named there)
+                sc.promoted_values(did);
                 let mut l = rcbom_facts::Links::default();
                 links::body_links(&cx, &body, did, false, None, &mut l);
                 links::promoted_links(&cx, did, &mut l);
@@ -799,6 +802,8 @@ struct Walker<'a, 'tcx> {
     /// The walked code's calls into a crate of the crypto set (`Reach::boundary`), with the
     /// instance making each.
     boundary: Vec<(Instance, rcbom_facts::BoundaryEdge)>,
+    /// The functions of the crypto set found held as values (`value_edges`).
+    value_edges: Vec<rcbom_facts::BoundaryEdge>,
     /// Every instance an instance is reached from (`parent` keeps the first).
     callers: HashMap<Instance, Vec<Instance>>,
     /// Owner ids of the instances whose bodies were walked.
@@ -847,6 +852,9 @@ struct Edges<'a, 'tcx> {
     tcx: TyCtxt<'tcx>,
     body: &'a Body,
     found: Vec<(Instance, Span, Edge)>,
+    /// The functions the memory of the body's constants points at (no vtable's), with where
+    /// the constant is: held as values (`Walker::value_edges`).
+    values: Vec<(Instance, Span)>,
     /// The closures and `async` blocks this body builds, with where. One it also calls or
     /// polls is reached from where it builds it, whichever of the two its blocks have first
     /// (the blocks of an `async fn`'s state machine are not in the order of the source).
