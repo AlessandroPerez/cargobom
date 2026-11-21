@@ -383,6 +383,8 @@ pub fn match_fn_with(
     // an entry for the methods of a type: its parameters may be the type's own arguments
     // (`parent_arg`: the curve of `SigningKey<NistP256>`)
     let mut parent = None;
+    // where the regex that places the entry's item matched (`group` parameters)
+    let mut placed = String::new();
     let e = kb.fns.iter().find(|e| match &e.self_type {
         Some(st) => match self_ty {
             Some(TyTree::Adt {
@@ -394,16 +396,27 @@ pub fn match_fn_with(
                 && supported(krate)
                 && kb.applies(e.versions.as_ref(), &krate.name, &krate.stable_id) =>
             {
-                let ok = e.pattern.is_match(&callee.path) || e.pattern.is_match(&full_bare);
+                let within = tp.strip_prefix(&format!("{}::", krate.name)).unwrap_or(tp);
+                let by_path = [callee.path.as_str(), full_bare.as_str()]
+                    .into_iter()
+                    .find(|t| e.pattern.is_match(t));
+                let ok = by_path.is_some() && e.module.as_ref().is_none_or(|m| m.is_match(within));
                 if ok {
                     provider = Some(krate.clone());
                     parent = Some(targs.as_slice());
+                    placed = match &e.module {
+                        Some(_) => within.to_string(),
+                        None => by_path.unwrap_or_default().to_string(),
+                    };
                 }
                 ok
             }
             _ => false,
         },
         None => {
+            let by_path = [path, bare.as_str()]
+                .into_iter()
+                .find(|t| e.pattern.is_match(t));
             let ok = e.krates.contains(&callee.krate.name)
                 && supported(&callee.krate)
                 && kb.applies(
@@ -411,15 +424,16 @@ pub fn match_fn_with(
                     &callee.krate.name,
                     &callee.krate.stable_id,
                 )
-                && (e.pattern.is_match(path) || e.pattern.is_match(&bare));
+                && by_path.is_some();
             if ok {
                 provider = Some(callee.krate.clone());
+                placed = by_path.unwrap_or_default().to_string();
             }
             ok
         }
     })?;
     Some(fn_entry_match_in(
-        kb, e, args, parent, const_args, arg_lens, provider, supported, overrides,
+        kb, e, args, parent, const_args, arg_lens, provider, supported, overrides, &placed,
     ))
 }
 
@@ -430,9 +444,19 @@ fn sourceless(p: &Param) -> bool {
         && p.const_arg.is_none()
         && p.arg_len.is_none()
         && p.value.is_none()
+        && p.group.is_none()
+}
+
+/// A `group` parameter of a `[[fn]]` entry: that capture group of the regex that places its
+/// item (`module`, the Self type's, when it has one; `path` otherwise) in `placed`, the text it
+/// matched.
+fn placed_group(e: &rcbom_kb::PatternEntry, p: &Param, placed: &str) -> Option<String> {
+    let re = e.module.as_ref().unwrap_or(&e.pattern);
+    rcbom_kb::group(re, placed, p.group?).and_then(|v| mapped(p, v))
 }
 
 /// The asset of a `[[fn]]` entry, with its parameters from the call and `overrides`.
+#[cfg(test)]
 #[allow(clippy::too_many_arguments)]
 fn fn_entry_match(
     kb: &Kb,
@@ -445,7 +469,7 @@ fn fn_entry_match(
     overrides: &BTreeMap<String, String>,
 ) -> Match {
     fn_entry_match_in(
-        kb, e, args, None, const_args, arg_lens, provider, supported, overrides,
+        kb, e, args, None, const_args, arg_lens, provider, supported, overrides, "",
     )
 }
 
@@ -461,10 +485,12 @@ fn fn_entry_match_in(
     provider: Option<CrateRef>,
     supported: Supported,
     overrides: &BTreeMap<String, String>,
+    placed: &str,
 ) -> Match {
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
         let v = match (p.const_arg, p.arg_len) {
+            _ if p.group.is_some() => placed_group(e, p, placed),
             (None, None) => p
                 .value
                 .clone()
@@ -524,6 +550,7 @@ fn constructed_by(
     e: &rcbom_kb::PatternEntry,
     args: &[Origin],
     overrides: &BTreeMap<String, String>,
+    placed: &str,
 ) -> Match {
     let consts: Vec<Option<i128>> = args
         .iter()
@@ -534,7 +561,52 @@ fn constructed_by(
             _ => None,
         })
         .collect();
-    fn_entry_match(kb, e, &[], &consts, &[], None, &|_| true, overrides)
+    fn_entry_match_in(
+        kb,
+        e,
+        &[],
+        None,
+        &consts,
+        &[],
+        None,
+        &|_| true,
+        overrides,
+        placed,
+    )
+}
+
+/// Is `e` the entry of a call in an origin tree: of `path` (generic arguments removed) in
+/// `krate`, on `self_ty`? The text the regex that places its item matched (`group` parameters).
+fn places(
+    kb: &Kb,
+    e: &rcbom_kb::PatternEntry,
+    krate: &str,
+    path: &str,
+    self_ty: Option<&str>,
+) -> Option<String> {
+    match &e.self_type {
+        Some(st) => {
+            let t = strip_generics(self_ty?);
+            let k = e.krates.iter().find(|k| {
+                t.starts_with(&format!("{k}::")) && kb.applies(e.versions.as_ref(), k, "")
+            })?;
+            let within = &t[k.len() + 2..];
+            (last(&t) == st
+                && e.pattern.is_match(path)
+                && e.module.as_ref().is_none_or(|m| m.is_match(within)))
+            .then(|| match &e.module {
+                Some(_) => within.to_string(),
+                None => path.to_string(),
+            })
+        }
+        None => {
+            let within = path.strip_prefix(&format!("{krate}::")).unwrap_or(path);
+            (e.krates.iter().any(|k| k == krate)
+                && kb.applies(e.versions.as_ref(), krate, "")
+                && e.pattern.is_match(within))
+            .then(|| within.to_string())
+        }
+    }
 }
 
 /// The `[[fn]]` entry of `family` an argument's origin is a call of, through standard-library
@@ -543,7 +615,7 @@ fn argument_entry<'k, 'o>(
     kb: &'k Kb,
     family: &str,
     mut o: &'o Origin,
-) -> Option<(&'k rcbom_kb::PatternEntry, &'o [Origin])> {
+) -> Option<(&'k rcbom_kb::PatternEntry, &'o [Origin], String)> {
     for _ in 0..8 {
         let Origin::Call {
             callee,
@@ -556,35 +628,29 @@ fn argument_entry<'k, 'o>(
             return None;
         };
         let path = strip_generics(callee);
-        let within = path.strip_prefix(&format!("{krate}::")).unwrap_or(&path);
         // a constructor of a parameter value of that crate (`argon2::Params`), not data computed
         // with the family (`blake3::derive_key(..)` as the key of `Hasher::new_keyed`)
         let builds = self_ty
             .as_deref()
             .is_some_and(|t| t.starts_with(&format!("{krate}::")));
         if builds
-            && let Some(e) = kb.fns.iter().find(|e| {
-                e.algo.family == family
-                    && e.self_type.is_none()
-                    && e.krates.contains(krate)
-                    && kb.applies(e.versions.as_ref(), krate, "")
-                    && e.pattern.is_match(within)
-            })
+            && let Some(found) = kb
+                .fns
+                .iter()
+                .filter(|e| e.algo.family == family && e.self_type.is_none())
+                .find_map(|e| Some((e, args.as_slice(), places(kb, e, krate, &path, None)?)))
         {
-            return Some((e, args));
+            return Some(found);
         }
         // a std constructor of such a value (`Params::default()`): an entry with that self type
         if let Some(t) = self_ty.as_deref()
-            && let Some(e) = kb.fns.iter().find(|e| {
-                e.algo.family == family
-                    && e.self_type.as_deref() == Some(last(t))
-                    && e.krates.iter().any(|k| {
-                        t.starts_with(&format!("{k}::")) && kb.applies(e.versions.as_ref(), k, "")
-                    })
-                    && e.pattern.is_match(&path)
-            })
+            && let Some(found) = kb
+                .fns
+                .iter()
+                .filter(|e| e.algo.family == family && e.self_type.is_some())
+                .find_map(|e| Some((e, args.as_slice(), places(kb, e, krate, &path, Some(t))?)))
         {
-            return Some((e, args));
+            return Some(found);
         }
         if !matches!(krate.as_str(), "core" | "std" | "alloc") {
             return None;
@@ -617,34 +683,23 @@ pub fn match_constructor<'o>(
             return None;
         };
         let path = strip_generics(callee);
-        let entry = kb.fns.iter().find(|e| {
-            e.algo.family == family
-                && match &e.self_type {
-                    Some(st) => self_ty.as_deref().is_some_and(|t| {
-                        last(t) == st
-                            && e.krates.iter().any(|k| {
-                                t.starts_with(&format!("{k}::"))
-                                    && kb.applies(e.versions.as_ref(), k, "")
-                            })
-                            && e.pattern.is_match(&path)
-                    }),
-                    None => {
-                        e.krates.contains(krate)
-                            && kb.applies(e.versions.as_ref(), krate, "")
-                            && e.pattern
-                                .is_match(path.strip_prefix(&format!("{krate}::")).unwrap_or(&path))
-                    }
-                }
-        });
-        if let Some(e) = entry {
+        let entry = kb
+            .fns
+            .iter()
+            .filter(|e| e.algo.family == family)
+            .find_map(|e| Some((e, places(kb, e, krate, &path, self_ty.as_deref())?)));
+        if let Some((e, placed)) = entry {
             let none = BTreeMap::new();
-            let m = constructed_by(kb, e, args, &none);
+            let m = constructed_by(kb, e, args, &none, &placed);
             // a value of the family built in its arguments says more (`Argon2::new(alg, ver,
             // Params::new(m, t, p, None)?)`): that one, with what this constructor fixes
             for a in args {
                 if let Some(inner) = argument_entry(kb, family, a) {
-                    let (f, inner_args) = inner;
-                    return Some((constructed_by(kb, f, inner_args, &m.values), span.as_ref()));
+                    let (f, inner_args, at) = inner;
+                    return Some((
+                        constructed_by(kb, f, inner_args, &m.values, &at),
+                        span.as_ref(),
+                    ));
                 }
             }
             return Some((m, span.as_ref()));
@@ -732,7 +787,7 @@ fn walk(
                         && supported(krate)
                         && kb.applies(e.versions.as_ref(), &krate.name, &krate.stable_id)
                 })
-                .find_map(|e| Some((e, type_match(kb, e, args, parent, supported)?)));
+                .find_map(|e| Some((e, type_match(kb, e, args, parent, supported, within)?)));
             if let Some((e, mut m)) = entry {
                 m.provider_crates = vec![krate.clone()];
                 // an argument read as a parameter (the `Aes256` of `AesGcm<Aes256, ..>`, a
@@ -802,16 +857,27 @@ fn walk(
     }
 }
 
+/// The asset of a `[[type]]` entry for a type at `within` its crate, with these arguments.
 fn type_match(
     kb: &Kb,
     e: &TypeEntry,
     args: &[TyTree],
     parent: Option<&[TyTree]>,
     supported: Supported,
+    within: &str,
 ) -> Option<Match> {
     let mut params = BTreeMap::new();
     for (k, p) in &e.params {
-        match eval_param(kb, p, args, parent, supported) {
+        // a parameter the type's module says (`group`), or its arguments
+        let v = match (p.group, &e.module) {
+            (Some(n), Some(m)) => regex::Regex::new(m)
+                .ok()
+                .and_then(|r| rcbom_kb::group(&r, within, n))
+                .and_then(|v| mapped(p, v)),
+            (Some(_), None) => None,
+            (None, _) => eval_param(kb, p, args, parent, supported),
+        };
+        match v {
             Some(v) => {
                 params.insert(k.clone(), v);
             }
@@ -1034,6 +1100,56 @@ mod tests {
     fn typenum_decodes() {
         assert_eq!(typenum(&num(12)), Some(12));
         assert_eq!(typenum(&num(32)), Some(32));
+    }
+
+    #[test]
+    fn a_parameter_set_named_by_module_is_read_from_the_path() {
+        let kb = Kb::seed().unwrap();
+        let name = |t: TyTree| {
+            let m = match_types(&kb, &[t], &all);
+            m.first().map(|(m, _)| m.name.clone())
+        };
+        // a type by its module (`group` over `module`), with a map and without
+        let kg = adt("fips204", "fips204::ml_dsa_65::KG", vec![]);
+        assert_eq!(name(kg).as_deref(), Some("ML-DSA-65"));
+        let sk = adt("fips205", "fips205::slh_dsa_sha2_128s::PrivateKey", vec![]);
+        assert_eq!(name(sk).as_deref(), Some("SLH-DSA-SHA2-128s"));
+        // ... and not one of another module: the parameter is required
+        let other = adt("fips205", "fips205::types::PrivateKey", vec![]);
+        assert_eq!(name(other), None);
+        // the same key types by a const argument, and SLH-DSA's by type numbers
+        let pk = adt(
+            "fips204",
+            "fips204::types::PublicKey",
+            vec![TyTree::Const(Some(8)), TyTree::Const(Some(7))],
+        );
+        assert_eq!(name(pk).as_deref(), Some("ML-DSA-87"));
+        let set = adt(
+            "slh_dsa",
+            "slh_dsa::hashes::shake::Shake",
+            vec![num(24), num(42)],
+        );
+        let vk = adt("slh_dsa", "slh_dsa::verifying_key::VerifyingKey", vec![set]);
+        assert_eq!(name(vk).as_deref(), Some("SLH-DSA-SHAKE-192f"));
+        // a function by its path (`group` over `path`), and a trait's method by the module of
+        // the type it is called on (`self_type` with `module`): the pre-hash variant
+        let callee = |path: &str| DefRef {
+            krate: CrateRef {
+                name: "fips205".into(),
+                stable_id: "0".into(),
+            },
+            path: path.into(),
+            id: String::new(),
+        };
+        let free = callee("fips205::slh_dsa_shake_256s::try_keygen_with_rng");
+        let m = match_fn(&kb, &free, None, &[], &[], &[], &all).unwrap();
+        assert_eq!(m.name, "SLH-DSA-SHAKE-256s");
+        let sk = adt("fips205", "fips205::slh_dsa_sha2_192f::PrivateKey", vec![]);
+        let method = callee("fips205::traits::Signer::try_hash_sign");
+        let m = match_fn(&kb, &method, Some(&sk), &[], &[], &[], &all).unwrap();
+        assert_eq!(m.name, "HashSLH-DSA-SHA2-192f");
+        let plain = callee("fips205::traits::Signer::try_sign");
+        assert!(match_fn(&kb, &plain, Some(&sk), &[], &[], &[], &all).is_none());
     }
 
     #[test]

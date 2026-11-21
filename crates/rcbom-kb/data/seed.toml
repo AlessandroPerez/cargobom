@@ -265,9 +265,61 @@ package = "ml-kem"
 versions = ">=0.2, <0.4"
 role = "algorithm"
 
+# (kem's yanked 0.4.0 pre-releases are what was published as 0.3.0: x-wing 0.1.0-pre.2 is
+# built over 0.4.0-pre.1)
 [[crate]]
 package = "kem"
-versions = ">=0.3.0-pre.0, <0.4"
+versions = ">=0.3.0-pre.0, <=0.4.0-rc.5"
+role = "trait"
+
+# ML-DSA (FIPS 204), SLH-DSA (FIPS 205) and the X-Wing hybrid KEM of the RustCrypto project; the
+# fips203, fips204 and fips205 crates (pure Rust, one module per parameter set); PQClean's
+# ML-KEM behind pqcrypto-mlkem, whose keys and values implement the traits of pqcrypto-traits
+[[crate]]
+package = "ml-dsa"
+versions = ">=0.0.4, <0.2"
+role = "algorithm"
+candidates = ["ML-DSA"]
+
+[[crate]]
+package = "slh-dsa"
+versions = ">=0.0.3, <0.3"
+role = "algorithm"
+candidates = ["SLH-DSA"]
+
+[[crate]]
+package = "x-wing"
+versions = ">=0.1, <0.2"
+role = "algorithm"
+candidates = ["X-Wing"]
+
+[[crate]]
+package = "fips203"
+versions = ">=0.4, <0.6"
+role = "algorithm"
+candidates = ["ML-KEM"]
+
+[[crate]]
+package = "fips204"
+versions = ">=0.4, <0.6"
+role = "algorithm"
+candidates = ["ML-DSA"]
+
+[[crate]]
+package = "fips205"
+versions = ">=0.4, <0.6"
+role = "algorithm"
+candidates = ["SLH-DSA"]
+
+[[crate]]
+package = "pqcrypto-mlkem"
+versions = ">=0.1, <0.2"
+role = "algorithm"
+candidates = ["ML-KEM"]
+
+[[crate]]
+package = "pqcrypto-traits"
+versions = ">=0.3, <0.4"
 role = "trait"
 
 [[crate]]
@@ -321,6 +373,8 @@ role = "algorithm"
 #   { arg = N, asset = true }   arg N contains another KB type; its asset name (composition)
 #   { parent_arg = N, .. }      the same, but on the type that contains the matched one
 #   { .., path = [i, j] }       the argument's own argument i, then that one's argument j
+#   { group = N, map = {..} }   capture group N of the entry's `module` regex: a parameter set
+#                               the crate names by module (`fips204::ml_dsa_65::KG`)
 #   { .., required = true }     the entry matches only when the parameter resolves
 # An argument read as a parameter (map, typenum) is part of the name, not a component.
 # `functions` are the asset's defaults when no call reveals the use. `[..]` in a name is written
@@ -1373,6 +1427,245 @@ primitive = "kem"
 functions = ["keygen", "encapsulate", "decapsulate"]
 versions = ">=0.3"
 
+# ML-DSA (FIPS 204), RustCrypto's ml-dsa: the parameter set is the type argument
+# (`SigningKey<MlDsa65>`, `VerifyingKey<MlDsa65>`; 0.0.4's `KeyPair<MlDsa65>`, 0.1's
+# `ExpandedSigningKey<MlDsa65>`), a struct of its own on which 0.0.4 makes keys
+# (`MlDsa65::key_gen(&mut rng)`, its `KeyGen` trait). 0.1's `SigningKey::from_seed` reads a
+# stored key as well as it makes one from fresh bytes: setup, the method does not say which.
+[[type]]
+crate = "ml_dsa"
+name = "SigningKey"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+
+[[type]]
+crate = "ml_dsa"
+name = "ExpandedSigningKey"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+
+[[type]]
+crate = "ml_dsa"
+name = "KeyPair"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+
+[[type]]
+crate = "ml_dsa"
+name = "VerifyingKey"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["verify"]
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+
+[[type]]
+crate = "ml_dsa"
+name = "MlDsa44"
+asset = "ML-DSA-44"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen", "sign", "verify"]
+
+[[type]]
+crate = "ml_dsa"
+name = "MlDsa65"
+asset = "ML-DSA-65"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen", "sign", "verify"]
+
+[[type]]
+crate = "ml_dsa"
+name = "MlDsa87"
+asset = "ML-DSA-87"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen", "sign", "verify"]
+
+# SLH-DSA (FIPS 205), RustCrypto's slh-dsa: the parameter set is the type argument, a hash
+# family with its sizes as type numbers. `Sha2L1<U16, U30>` is SHA2-128s (n = 16 bytes; m = 30
+# for 128s, 34 for 128f), `Sha2L35<U24, U39>` SHA2-192s (42: 192f), `Sha2L35<U32, U47>`
+# SHA2-256s (49: 256f), `Shake<N, M>` the same with SHAKE (hashes/sha2.rs, hashes/shake.rs).
+[[type]]
+crate = "slh_dsa"
+name = "SigningKey"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" }, required = true }, bits = { arg = 0, path = [0], typenum = true, scale = 8, required = true }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" }, required = true } }
+
+[[type]]
+crate = "slh_dsa"
+name = "VerifyingKey"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["verify"]
+params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" }, required = true }, bits = { arg = 0, path = [0], typenum = true, scale = 8, required = true }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" }, required = true } }
+
+# X-Wing (draft-connolly-cfrg-xwing-kem): a hybrid KEM, ML-KEM-768 with X25519, their two
+# shared secrets combined by SHA3-256 (the `[[part]]` entries below). The registry has no name
+# for it: it is its own family. 0.1's `XWingKem` is the scheme, on which kem 0.3 makes keys.
+[[type]]
+crate = "x_wing"
+name = "EncapsulationKey"
+asset = "X-Wing"
+family = "X-Wing"
+primitive = "kem"
+functions = ["encapsulate"]
+
+[[type]]
+crate = "x_wing"
+name = "DecapsulationKey"
+asset = "X-Wing"
+family = "X-Wing"
+primitive = "kem"
+functions = ["decapsulate"]
+
+[[type]]
+crate = "x_wing"
+name = "DecapsulationKeyRejectNonContrib"
+asset = "X-Wing"
+family = "X-Wing"
+primitive = "kem"
+functions = ["decapsulate"]
+
+[[type]]
+crate = "x_wing"
+name = "XWingKem"
+asset = "X-Wing"
+family = "X-Wing"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+
+# fips203 (pure Rust): one module per parameter set, with a `KG` on which keys are made
+# (`ml_kem_768::KG::try_keygen()`); the keys are `types::EncapsKey<EK_LEN>` and
+# `types::DecapsKey<DK_LEN>`, the set being their length in bytes (lib.rs: 800 and 1632 for
+# ML-KEM-512, 1184 and 2400 for ML-KEM-768, 1568 and 3168 for ML-KEM-1024)
+[[type]]
+crate = "fips203"
+name = "KG"
+module = "^ml_kem_(512|768|1024)::"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen"]
+params = { level = { group = 1, required = true } }
+
+[[type]]
+crate = "fips203"
+name = "EncapsKey"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["encapsulate"]
+params = { level = { arg = 0, typenum = true, map = { "800" = "512", "1184" = "768", "1568" = "1024" }, required = true } }
+
+[[type]]
+crate = "fips203"
+name = "DecapsKey"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["decapsulate"]
+params = { level = { arg = 0, typenum = true, map = { "1632" = "512", "2400" = "768", "3168" = "1024" }, required = true } }
+
+# fips204: as fips203, the keys being `types::PrivateKey<K, L>` and `types::PublicKey<K, L>`
+# with the matrix dimensions of the set (lib.rs: 4 x 4 for ML-DSA-44, 6 x 5 for ML-DSA-65,
+# 8 x 7 for ML-DSA-87)
+[[type]]
+crate = "fips204"
+name = "KG"
+module = "^ml_dsa_(44|65|87)::"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen"]
+params = { level = { group = 1, required = true } }
+
+[[type]]
+crate = "fips204"
+name = "PrivateKey"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" }, required = true } }
+
+[[type]]
+crate = "fips204"
+name = "PublicKey"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["verify"]
+params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" }, required = true } }
+
+# fips205: every module has its own `KG`, `PrivateKey` and `PublicKey`
+# (`slh_dsa_sha2_128s::PrivateKey`): the set is the module
+[[type]]
+crate = "fips205"
+name = "KG"
+module = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["keygen"]
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+
+[[type]]
+crate = "fips205"
+name = "PrivateKey"
+module = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["sign"]
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+
+[[type]]
+crate = "fips205"
+name = "PublicKey"
+module = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["verify"]
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+
+# pqcrypto-mlkem (PQClean's C behind it): one module per parameter set, with its keys' types
+# (`mlkem768::PublicKey`, `mlkem768::SecretKey`) and free functions (the `[[fn]]` entries)
+[[type]]
+crate = "pqcrypto_mlkem"
+name = "PublicKey"
+module = "^mlkem(512|768|1024)::"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["encapsulate"]
+params = { level = { group = 1, required = true } }
+
+[[type]]
+crate = "pqcrypto_mlkem"
+name = "SecretKey"
+module = "^mlkem(512|768|1024)::"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["decapsulate"]
+params = { level = { group = 1, required = true } }
+
 # Elliptic curves of the RustCrypto elliptic-curve crates: the curve is the type argument
 # (`EphemeralSecret<NistP256>`, `SigningKey<NistP256>`); ECDSA's hash is the curve's
 # (`DigestPrimitive`: SHA-256 for P-256, SHA-384 for P-384, SHA-512 for P-521)
@@ -1979,7 +2272,9 @@ curve = "other/Curve25519"
 # `self_type` (a std trait the crypto type implements), over the full callee path.
 # `{ const_arg = N }`: value argument N when it is an integer constant (through `map`, `scale`).
 # `{ arg_len = N }`: the length of the array behind value argument N (`&mut [0u8; 32]`).
-# `{ arg = N, .. }`: generic argument N, as for types. `use`: what the call does when its method
+# `{ arg = N, .. }`: generic argument N, as for types. `{ group = N }`: capture group N of
+# `path`, or, with `self_type` and a `module` (a regex over that type's path inside its crate),
+# of the `module`. `use`: what the call does when its method
 # is not a listed use (`keygen` for a key generator); without it the call sets the asset up.
 # A parameter the name cannot show (a positional part before it is unknown) is reported as a
 # property; `unresolved` is a note on what is not known, `{missing}` the name's placeholders
@@ -2408,6 +2703,152 @@ family = "SHA-2"
 primitive = "hash"
 functions = ["digest"]
 implemented_by = ["sha2"]
+
+# X-Wing computes ML-KEM-768 and X25519 inside itself, and SHA3-256 over their shared secrets
+# (draft-connolly-cfrg-xwing-kem section 5; x-wing's lib.rs `combiner`): components where it is
+# used. ml-kem, x25519-dalek and sha3 under x-wing implement them.
+[[part]]
+of = "X-Wing"
+asset = "ML-KEM-768"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen", "encapsulate", "decapsulate"]
+implemented_by = ["ml-kem"]
+
+[[part]]
+of = "X-Wing"
+asset = "x25519"
+family = "ECDH"
+primitive = "key-agree"
+functions = ["keygen", "keyderive"]
+curve = "other/Curve25519"
+implemented_by = ["x25519-dalek"]
+
+[[part]]
+of = "X-Wing"
+asset = "SHA3-256"
+family = "SHA-3"
+primitive = "hash"
+functions = ["digest"]
+implemented_by = ["sha3"]
+
+# x-wing 0.1.0-pre's key generation: free functions, and `DecapsulationKey::generate_from_os_rng`
+# (`generate`, with a generator, is a listed use)
+[[fn]]
+crate = "x_wing"
+path = "^generate_key_pair(_from_os_rng)?$|(^|::)DecapsulationKey::generate_from_os_rng$"
+asset = "X-Wing"
+family = "X-Wing"
+primitive = "kem"
+functions = ["keygen"]
+use = "keygen"
+
+# slh-dsa's `SigningKey::<P>::new(&mut rng)` makes a key (a `new` sets other assets up)
+[[fn]]
+crate = "slh_dsa"
+path = "(^|::)SigningKey::new$"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["keygen"]
+use = "keygen"
+params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" } }, bits = { arg = 0, path = [0], typenum = true, scale = 8 }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" } } }
+
+# fips204's and fips205's key generation as a function of the parameter set's module
+# (`ml_dsa_65::try_keygen()`, which calls `KG::try_keygen()`)
+[[fn]]
+crate = "fips204"
+path = "^ml_dsa_(44|65|87)::try_keygen(_with_rng)?$"
+asset = "ML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["keygen"]
+use = "keygen"
+params = { level = { group = 1 } }
+
+[[fn]]
+crate = "fips205"
+path = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::try_keygen(_with_rng)?$"
+asset = "SLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["keygen"]
+use = "keygen"
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
+
+# The pre-hash variants (FIPS 204 5.4, FIPS 205 10.2: the message's digest is signed, with the
+# hash's identifier, under another domain separator): HashML-DSA and HashSLH-DSA, not ML-DSA
+# and SLH-DSA. The hash is an argument (fips204 0.4's `Ph`, an OID in 0.5), which is not read.
+[[fn]]
+crate = "fips204"
+self_type = "PrivateKey"
+path = "Signer::try_hash_sign(_with_rng|_with_seed)?$"
+asset = "HashML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["sign"]
+use = "sign"
+unresolved = "pre-hash function: an argument of the call"
+params = { level = { parent_arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" } } }
+
+[[fn]]
+crate = "fips204"
+self_type = "PublicKey"
+path = "Verifier::hash_verify$"
+asset = "HashML-DSA-{level}"
+family = "ML-DSA"
+primitive = "signature"
+functions = ["verify"]
+use = "verify"
+unresolved = "pre-hash function: an argument of the call"
+params = { level = { parent_arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" } } }
+
+[[fn]]
+crate = "fips205"
+self_type = "PrivateKey"
+module = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::"
+path = "Signer::try_hash_sign(_with_rng)?$"
+asset = "HashSLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["sign"]
+use = "sign"
+unresolved = "pre-hash function: an argument of the call"
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
+
+[[fn]]
+crate = "fips205"
+self_type = "PublicKey"
+module = "^slh_dsa_(sha2|shake)_(128|192|256)(s|f)::"
+path = "Verifier::hash_verify$"
+asset = "HashSLH-DSA-{hash}-{bits}{speed}"
+family = "SLH-DSA"
+primitive = "signature"
+functions = ["verify"]
+use = "verify"
+unresolved = "pre-hash function: an argument of the call"
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
+
+# pqcrypto-mlkem's free functions, by the module of the parameter set: `mlkem768::keypair()`
+# makes a key pair; `encapsulate(&pk)` and `decapsulate(&ct, &sk)` are listed uses
+[[fn]]
+crate = "pqcrypto_mlkem"
+path = "^mlkem(512|768|1024)::keypair$"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["keygen"]
+use = "keygen"
+params = { level = { group = 1 } }
+
+[[fn]]
+crate = "pqcrypto_mlkem"
+path = "^mlkem(512|768|1024)::(encapsulate|decapsulate)$"
+asset = "ML-KEM-{level}"
+family = "ML-KEM"
+primitive = "kem"
+functions = ["encapsulate", "decapsulate"]
+params = { level = { group = 1 } }
 
 # Key generation without a scheme: key material, not an algorithm.
 [[fn]]
@@ -2898,7 +3339,7 @@ methods = ["update", "update_reader", "update_mmap", "update_mmap_rayon", "updat
 [[use]]
 function = "verify"
 primitives = ["signature", "mac", "kdf"]
-methods = ["verify", "verify_slice", "verify_reset", "verify_slice_reset", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed", "multipart_verify"]
+methods = ["verify", "verify_slice", "verify_reset", "verify_slice_reset", "verify_truncated_left", "verify_truncated_right", "verify_password", "verify_strict", "verify_digest", "verify_prehash", "verify_prehashed", "verify_prehashed_strict", "verify_sig", "raw_verify", "raw_verify_prehashed", "multipart_verify", "verify_internal", "verify_with_context", "verify_mu", "try_verify_with_context", "slh_verify_internal"]
 
 [[use]]
 function = "keyderive"
@@ -2906,15 +3347,18 @@ primitives = ["kdf", "key-agree"]
 methods = ["expand", "extract", "expand_multi_info", "diffie_hellman", "scrypt", "agree_ephemeral", "agree", "hash_password", "hash_password_customized", "hash_password_with_salt", "hash_password_with_rng", "hash_password_with_params", "hash_password_into", "hash_password_into_with_memory", "pbkdf2", "pbkdf2_array", "pbkdf2_hmac", "pbkdf2_hmac_array", "pbkdf2_hmac_with_params", "derive", "derive_key", "finalize", "finalize_xof", "fill"]
 
 # the `signature` crate's traits: Signer, RandomizedSigner, DigestSigner,
-# RandomizedDigestSigner, hazmat::PrehashSigner, RandomizedPrehashSigner
+# RandomizedDigestSigner, hazmat::PrehashSigner, RandomizedPrehashSigner; the methods the
+# post-quantum crates name after FIPS 204 and 205 (`sign_internal`, `sign_mu_deterministic`,
+# `slh_sign_internal`, `try_sign_with_context`), as for verification and key generation
+# (`key_gen_internal`, `keygen_from_seed`: KeyGen from a seed)
 [[use]]
 function = "sign"
 primitives = ["signature"]
-methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "sign_prehashed", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate", "multipart_sign", "try_multipart_sign", "multipart_sign_with_rng", "try_multipart_sign_with_rng"]
+methods = ["sign", "try_sign", "sign_with_rng", "try_sign_with_rng", "sign_digest", "try_sign_digest", "sign_digest_with_rng", "try_sign_digest_with_rng", "sign_prehash", "sign_prehash_with_rng", "sign_prehashed", "raw_sign", "raw_sign_prehashed", "raw_sign_byupdate", "multipart_sign", "try_multipart_sign", "multipart_sign_with_rng", "try_multipart_sign_with_rng", "sign_internal", "sign_randomized", "sign_deterministic", "sign_mu", "sign_mu_randomized", "sign_mu_deterministic", "try_sign_with_context", "try_sign_with_seed", "slh_sign_internal"]
 
 [[use]]
 function = "keygen"
-methods = ["generate", "try_generate", "generate_from_rng", "try_generate_from_rng", "generate_key", "generate_keypair", "generate_keypair_from_rng", "random_from_rng", "generate_pkcs8", "generate_deterministic"]
+methods = ["generate", "try_generate", "generate_from_rng", "try_generate_from_rng", "generate_key", "generate_keypair", "generate_keypair_from_rng", "random_from_rng", "generate_pkcs8", "generate_deterministic", "keygen", "try_keygen", "try_keygen_with_rng", "keygen_from_seed", "key_gen", "key_gen_internal", "slh_keygen_internal"]
 
 # a draw from a random generator; rand's `seq` traits draw from the one they are given
 # (`v.shuffle(&mut rng)`, `v.choose(&mut rng)`)
@@ -2930,16 +3374,17 @@ function = "keygen"
 primitives = ["key-agree", "signature"]
 methods = ["random"]
 
-# aws-lc-rs `kem`: `EncapsulationKey::encapsulate()`, `DecapsulationKey::decapsulate(ct)`
+# aws-lc-rs `kem`: `EncapsulationKey::encapsulate()`, `DecapsulationKey::decapsulate(ct)`;
+# fips203's `Encaps::try_encaps`, `Decaps::try_decaps`
 [[use]]
 function = "encapsulate"
 primitives = ["kem"]
-methods = ["encapsulate", "encapsulate_with_rng", "encapsulate_deterministic"]
+methods = ["encapsulate", "encapsulate_with_rng", "encapsulate_deterministic", "try_encaps", "try_encaps_with_rng", "encaps_from_seed"]
 
 [[use]]
 function = "decapsulate"
 primitives = ["kem"]
-methods = ["decapsulate", "decapsulate_slice", "try_decapsulate", "try_decapsulate_slice"]
+methods = ["decapsulate", "decapsulate_slice", "try_decapsulate", "try_decapsulate_slice", "try_decaps"]
 
 # --- Layer 1: packages without [[crate]] entries -------------------------------------------
 # A package the knowledge base does not model is still reported as cryptographic when its
@@ -2950,11 +3395,12 @@ methods = ["decapsulate", "decapsulate_slice", "try_decapsulate", "try_decapsula
 # zkcrypto field and group traits, one-time passwords, QUIC) or reads like an encoding's
 # (OpenSSH keys, which sign, and the agent protocol serving them: the same categories as der's);
 # `support` lists helpers whose metadata or name says cryptography but which compute none
-# (opaque-debug's name is the OPAQUE protocol's); it never makes a package cryptographic by
-# itself.
+# (opaque-debug's name is the OPAQUE protocol's) or only the arithmetic an algorithm crate above
+# them is made of (crypto-bigint's integers, module-lattice's polynomials under ml-kem and
+# ml-dsa); it never makes a package cryptographic by itself.
 [unmodelled]
 crypto = ["age-core", "hyper-rustls", "aws-lc-sys", "aws-lc-fips-sys", "openssl-sys", "boring-sys", "ff", "group", "ssh-key", "ssh-agent-lib", "totp-rs", "quinn-proto", "native-tls", "tokio-native-tls", "hyper-tls", "async-native-tls"]
-support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint", "opaque-debug"]
+support = ["block-buffer", "block-padding", "subtle", "constant_time_eq", "cmov", "ctutils", "ppv-lite86", "pem", "crypto-bigint", "opaque-debug", "module-lattice"]
 # Types of modelled crates that compute no cryptography: a draw from rand's `SmallRng`
 # (Xoshiro) or `StepRng` (a counter) is no operation, not an unknown one
 not_crypto = ["SmallRng", "StepRng"]
@@ -3040,6 +3486,23 @@ name = "encoding"
 crate = ["ed25519"]
 path = "^Signature::(to_bytes|from_bytes|from_slice|from_components|to_vec|r_bytes|s_bytes)$"
 why = "an Ed25519 signature's bytes written or read (the signature is cited where it is made or verified)"
+
+[[aside]]
+name = "encoding"
+crate = ["ml-dsa", "slh-dsa"]
+path = "^(signature_encoding::)?Signature::(encode|decode|c_tilde|to_bytes|to_vec)$"
+why = "an ML-DSA or SLH-DSA signature's bytes written or read (the signature is cited where it is made or verified)"
+
+[[aside]]
+name = "encoding"
+crate = ["x-wing"]
+path = "^(Ciphertext|CiphertextMessage)::to_bytes$"
+why = "an X-Wing ciphertext's bytes written (the ciphertext is cited where it is made or opened)"
+
+[[aside]]
+name = "encoding"
+traits = ["fips203::traits::SerDes", "fips204::traits::SerDes", "fips205::traits::SerDes", "pqcrypto_traits::kem::Ciphertext", "pqcrypto_traits::kem::SharedSecret"]
+why = "a ciphertext's or a shared secret's bytes written or read (a key's are setup of its algorithm, cited): what is made with them is cited where it is used"
 
 [[aside]]
 name = "encoding"
@@ -3782,7 +4245,6 @@ args = { "1" = "nonce" }
 path = "^(ring|aws_lc_rs)::aead::(BoundKey|SealingKey|OpeningKey)::new$"
 role = "nonce"
 method = "NonceSequence::advance"
-
 
 # aws-lc-rs TLS record keys: `seal_in_place_append_tag(nonce, aad, in_out)`
 [[role]]

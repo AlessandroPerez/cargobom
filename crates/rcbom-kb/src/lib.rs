@@ -502,6 +502,17 @@ pub struct Param {
     /// `from = "output_bytes"` for the BLAKE2b that makes an Argon2 tag.
     #[serde(default)]
     pub from: Option<String>,
+    /// Capture group N of the regex that places the entry's item (through `map` if given): a
+    /// `[[type]]`'s `module`; a `[[fn]]`'s `module` when it has one, its `path` otherwise. The
+    /// parameter set a crate names by module: fips204's `ml_dsa_65::KG` and
+    /// `ml_dsa_65::try_keygen`.
+    #[serde(default)]
+    pub group: Option<usize>,
+}
+
+/// Capture group `n` of `re` in `text`, when it matched there.
+pub fn group(re: &Regex, text: &str, n: usize) -> Option<String> {
+    Some(re.captures(text)?.get(n)?.as_str().to_string())
 }
 
 #[derive(Debug, Deserialize)]
@@ -548,6 +559,10 @@ struct FnRaw {
     path: String,
     #[serde(default)]
     self_type: Option<String>,
+    /// With `self_type`: regex over that type's path inside its crate, when the name alone is
+    /// ambiguous or the path says a parameter (fips205's `slh_dsa_sha2_128s::PrivateKey`).
+    #[serde(default)]
+    module: Option<String>,
     #[serde(default)]
     params: BTreeMap<String, Param>,
     #[serde(default, deserialize_with = "de_opt_req")]
@@ -562,7 +577,8 @@ struct FnRaw {
 pub struct PatternEntry {
     pub krates: Vec<String>,
     pub pattern: Regex,
-    /// For statics: regex the path inside the crate must match.
+    /// Regex the path inside the crate must match: a static's own, the Self type's of a
+    /// function entry with `self_type`.
     pub module: Option<Regex>,
     pub self_type: Option<String>,
     pub params: BTreeMap<String, Param>,
@@ -810,7 +826,7 @@ impl Kb {
                     Ok(PatternEntry {
                         krates: s.krate.into_vec(),
                         pattern: pat(&s.path)?,
-                        module: None,
+                        module: s.module.as_deref().map(pat).transpose()?,
                         self_type: s.self_type,
                         params: s.params,
                         asset_by_method: BTreeMap::new(),
@@ -991,10 +1007,43 @@ impl Kb {
     }
 
     fn validate(&self) -> Result<()> {
-        // a `[[type]]` module restriction is matched later, by path; it must compile now
+        // a `[[type]]` module restriction is matched later, by path; it must compile now, and
+        // have the groups the entry's parameters read
         for t in &self.types {
-            if let Some(m) = &t.module {
-                Regex::new(m).with_context(|| format!("[[type]] {}: module {m:?}", t.name))?;
+            let groups = match &t.module {
+                Some(m) => Regex::new(m)
+                    .with_context(|| format!("[[type]] {}: module {m:?}", t.name))?
+                    .captures_len(),
+                None => 0,
+            };
+            if let Some(n) = t
+                .params
+                .values()
+                .filter_map(|p| p.group)
+                .find(|n| *n >= groups)
+            {
+                bail!("[[type]] {}: no capture group {n} in its `module`", t.name);
+            }
+        }
+        for f in &self.fns {
+            if f.module.is_some() && f.self_type.is_none() {
+                bail!(
+                    "{}: a [[fn]] `module` is its `self_type`'s; without one, `path` says where the function is",
+                    f.algo.asset
+                );
+            }
+            let groups = f.module.as_ref().unwrap_or(&f.pattern).captures_len();
+            if let Some(n) = f
+                .params
+                .values()
+                .filter_map(|p| p.group)
+                .find(|n| *n >= groups)
+            {
+                bail!(
+                    "{}: no capture group {n} in the regex that places {:?}",
+                    f.algo.asset,
+                    f.pattern.as_str()
+                );
             }
         }
         for b in &self.boundaries {
@@ -1026,14 +1075,18 @@ impl Kb {
             // property); key material has no algorithmProperties, its family is a property
             // a random generator the registry has no family for (`OS-RNG`) names none
             let unnamed_drbg = a.primitive == "drbg" && a.family.is_empty();
+            // an algorithm the registry has no name for at all is its own family (`X-Wing`)
+            let own = a.family == a.asset && !registry::valid(&a.asset);
             if a.material.is_none()
                 && !unnamed_drbg
+                && !own
                 && !in_family_enum(&a.family)
                 && !registry::family(&a.family)
             {
                 bail!(
                     "{}: algorithm family {:?} is neither a CycloneDX 1.7 algorithmFamily nor \
-                     a Cryptography Registry family",
+                     a Cryptography Registry family, nor the name of an algorithm the registry \
+                     has none for",
                     a.asset,
                     a.family
                 );
@@ -1600,6 +1653,37 @@ mod tests {
         let ok = SEED.replacen("family = \"HKDF\"", "family = \"TLS-PRF\"", 1);
         assert!(Kb::parse(&ok).is_ok());
         assert!(!in_family_enum("TLS-PRF") && in_family_enum("HKDF"));
+        // an algorithm the registry has no name for is its own family, and no other's
+        let kb = Kb::seed().unwrap();
+        assert!(
+            kb.types
+                .iter()
+                .any(|t| t.algo.asset == "X-Wing" && t.algo.family == "X-Wing")
+        );
+        assert!(!registry::valid("X-Wing") && !registry::family("X-Wing"));
+        let bad = SEED.replacen("family = \"X-Wing\"", "family = \"X-Wings\"", 1);
+        assert!(Kb::parse(&bad).is_err());
+    }
+
+    #[test]
+    fn a_group_parameter_needs_the_group_it_reads() {
+        // a `[[type]]` whose parameter reads its module's group, without the module
+        let module = "name = \"KG\"\nmodule = \"^ml_dsa_(44|65|87)::\"\n";
+        assert!(SEED.contains(module));
+        let bad = SEED.replacen(module, "name = \"KG\"\n", 1);
+        let err = Kb::parse(&bad).unwrap_err().to_string();
+        assert!(err.contains("no capture group 1"), "{err}");
+        // a `[[fn]]` whose `path` has no such group
+        let path = "path = \"^ml_dsa_(44|65|87)::try_keygen(_with_rng)?$\"";
+        assert!(SEED.contains(path));
+        let bad = SEED.replacen(path, "path = \"^ml_dsa_65::try_keygen$\"", 1);
+        let err = Kb::parse(&bad).unwrap_err().to_string();
+        assert!(err.contains("no capture group 1"), "{err}");
+        // a `module` on a `[[fn]]` is its `self_type`'s
+        let own = "self_type = \"PrivateKey\"\nmodule = \"^slh_dsa_";
+        assert!(SEED.contains(own));
+        let bad = SEED.replacen(own, "module = \"^slh_dsa_", 1);
+        assert!(Kb::parse(&bad).is_err());
     }
 
     #[test]
