@@ -3,6 +3,79 @@
 use super::*;
 
 impl Files<'_> {
+    /// Does a path written in the file `file` (its qualifiers, its last segment) name the item
+    /// `sym` of crate `sym_crate`, whose own name is `ident`: by that name, by an import alias
+    /// of the file, or by an alias another file defines, of this package or of the crate the
+    /// path goes through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in
+    /// mylib; a name a glob import brings from a module that re-exports the item under it)?
+    #[allow(clippy::too_many_arguments)]
+    fn names_item(
+        &mut self,
+        src: &Source,
+        file: &Path,
+        quals: &[String],
+        last: &str,
+        ident: &str,
+        sym: &str,
+        sym_crate: &str,
+    ) -> bool {
+        let man = self.man;
+        let owner = man.owner_of(file);
+        let owner_id = owner.map(|p| p.id.repr.clone());
+        if last == ident
+            || src.binds.iter().any(|b| {
+                b.name == last
+                    && self.alias_of(b, ident, sym_crate, owner_id.as_deref(), &src.binds)
+            })
+        {
+            return true;
+        }
+        let mut dirs: Vec<PathBuf> = owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
+        let first = quals.first().map_or(last, String::as_str);
+        for root in import_roots(&src.binds, first).into_iter().flatten() {
+            for r in self.crate_refs(owner_id.as_deref(), &root) {
+                let pkg = r
+                    .strip_prefix("pkg:cargo/")
+                    .and_then(|nv| nv.split_once('@'))
+                    .and_then(|(n, v)| man.by_name_version(n, v));
+                if let Some(p) = pkg
+                    && !dirs.contains(&p.manifest_dir)
+                {
+                    dirs.push(p.manifest_dir.clone());
+                }
+            }
+        }
+        for d in dirs {
+            let binds = self.package_binds(&d);
+            // (a re-export inside the symbol's own crate, relative to it: `pub use
+            // inner::DEEP as SHALLOW;` in picklib for `picklib::inner::DEEP`)
+            let own_crate = man
+                .packages
+                .iter()
+                .find(|p| p.manifest_dir == d)
+                .is_some_and(|p| {
+                    p.lib_name.as_deref() == Some(sym_crate)
+                        || p.name.replace('-', "_") == sym_crate
+                });
+            if binds.iter().any(|b| {
+                b.name == last
+                    && (self.alias_of(b, ident, sym_crate, owner_id.as_deref(), &binds)
+                        || (own_crate && b.path.last().map(String::as_str) == Some(ident) && {
+                            let rel: Vec<&str> = b
+                                .path
+                                .iter()
+                                .map(String::as_str)
+                                .skip_while(|g| matches!(*g, "crate" | "self"))
+                                .collect();
+                            sym.ends_with(&format!("::{}", rel.join("::")))
+                        }))
+            }) {
+                return true;
+            }
+        }
+        false
+    }
+
     pub(super) fn check(&mut self, oi: usize, line: usize, offset: usize) -> Result<(), String> {
         self.check_with(oi, line, offset, None)
     }
@@ -76,8 +149,21 @@ impl Files<'_> {
                     &o.context,
                     &o.component_ref,
                 ),
-                "Cargo.toml" => check_toml(
+                "Cargo.toml" => check_toml_in(
                     &src.toml,
+                    // (the manifest of the workspace the package is a member of: the nearest
+                    // above it with a `[workspace]`)
+                    &path
+                        .ancestors()
+                        .skip(2)
+                        .find_map(|d| {
+                            let keys =
+                                toml_keys(&std::fs::read_to_string(d.join("Cargo.toml")).ok()?);
+                            keys.iter()
+                                .any(|k| k.path.first().is_some_and(|f| f == "workspace"))
+                                .then_some(keys)
+                        })
+                        .unwrap_or_default(),
                     &text,
                     line,
                     offset,
@@ -242,9 +328,10 @@ impl Files<'_> {
         let mut tagged = false;
         if let Some(m) = re!(r"\[macro ([\w:]+!)\]").captures(ctx.tags) {
             let name = &m[1];
-            let ok = Regex::new(&format!(r"^(?:\w+::)*{}", regex::escape(name)))
-                .unwrap()
-                .is_match(&at);
+            // (as the grammar lets a path be written: blanks and line ends around `::` and
+            // before the `!`, a raw identifier, a path from the root)
+            let ok = written_path(name.trim_end_matches('!'), r"\s*!")
+                .is_match(&code_from(&src, line, offset));
             if !(ok && starts_token) {
                 return Err(format!("expected `{name}` in {text:?}"));
             }
@@ -254,9 +341,7 @@ impl Files<'_> {
         // `derive(..)`)
         if !tagged && let Some(m) = re!(r"\[derive ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
-            let ok = Regex::new(&format!(r"^(?:\w+::)*{}\b", regex::escape(&name)))
-                .unwrap()
-                .is_match(&at);
+            let ok = written_path(&name, r"\b").is_match(&code_from(&src, line, offset));
             let in_derive = attribute_before(&src, line, offset).is_some_and(|a| {
                 re!(r"^(?:derive|cfg_attr)\s*\(").is_match(&a) && open_in(&a, "derive")
             });
@@ -270,13 +355,11 @@ impl Files<'_> {
         // attribute macro: the position is the attribute, or its name inside a `cfg_attr`
         if !tagged && let Some(m) = re!(r"\[attribute ([\w:]+)\]").captures(ctx.tags) {
             let name = m[1].rsplit("::").next().unwrap_or(&m[1]).to_string();
-            let direct = Regex::new(&format!(r"^#!?\[\s*(?:\w+::)*{}\b", regex::escape(&name)))
-                .unwrap()
-                .is_match(&at)
-                && at.starts_with('#');
-            let in_cfg_attr = Regex::new(&format!(r"^(?:\w+::)*{}\b", regex::escape(&name)))
-                .unwrap()
-                .is_match(&at)
+            let here = code_from(&src, line, offset);
+            let direct = re!(r"^#\s*!?\s*\[\s*")
+                .find(&here)
+                .is_some_and(|open| written_path(&name, r"\b").is_match(&here[open.end()..]));
+            let in_cfg_attr = written_path(&name, r"\b").is_match(&here)
                 && attribute_before(&src, line, offset)
                     .is_some_and(|a| re!(r"^cfg_attr\s*\(").is_match(&a));
             if !((direct || in_cfg_attr) && starts_token) {
@@ -413,43 +496,52 @@ impl Files<'_> {
             let pointer = pointers.first().cloned();
             for (file, l2, c2) in &pointers {
                 let (l2, c2) = (*l2, *c2);
-                // the callee expression: a parenthesised expression (`(h.f)`), or a name with
-                // fields, indexes and calls after it (`h`, `fs[0]`, `get()`), then the
-                // arguments
-                let callee = re!(
-                    r"^(?:\(([^()]*(?:\([^()]*\)[^()]*)*)\)|([A-Za-z_]\w*)(?:\s*\.\s*\w+|\s*\[[^\[\]]*\]|\s*\([^()]*\))*)\s*\("
-                )
-                .captures(&at);
-                // not a method (`.next(`) or a path (`ring::digest::digest(`): those name a
-                // function, not a pointer
-                let before = chars[..offset].iter().rev().find(|c| !c.is_whitespace());
-                let method = matches!(before, Some('.' | ':'));
-                let Some(callee) = callee.filter(|_| starts_token && !method) else {
+                // the callee expression: a parenthesised expression (`(h.f)`), or a path with
+                // fields, indexes and calls after it (`h`, `Self::F`, `fs[ix[0]]`, `get()`),
+                // then the arguments, on the lines after too
+                let (rs, rc) = rest(&src, line, offset);
+                let callee = pointer_callee(&rs, &rc);
+                // not a method (`.next(`) or the rest of a path (`digest::digest(`): those
+                // name a function, not a pointer (the value of a field, `tag: h(..)`, is one)
+                let before: Vec<char> = chars[..offset]
+                    .iter()
+                    .rev()
+                    .filter(|c| !c.is_whitespace())
+                    .take(2)
+                    .copied()
+                    .collect();
+                let inside = before.first() == Some(&'.') || before == [':', ':'];
+                let Some(callee) = callee.filter(|_| starts_token && !inside) else {
                     return Err(format!(
                         "expected a call through a function pointer in {text:?}"
                     ));
                 };
-                // the root of the callee: a variable, not a function of the file (`run(`)
-                let root = callee
-                    .get(2)
-                    .map(|m| m.as_str().to_string())
-                    .or_else(|| {
-                        callee.get(1).and_then(|m| {
-                            re!(r"^\s*([A-Za-z_]\w*)")
-                                .captures(m.as_str())
-                                .map(|r| r[1].to_string())
-                        })
-                    })
-                    .unwrap_or_default();
-                let plain = callee.get(2).is_some_and(|m| {
-                    callee[0][m.end()..].trim_start().starts_with('(')
-                        && callee[0][m.end()..].trim() == "("
-                });
-                if plain
+                // (which bracketed group after the path is the call's own arguments, the
+                // text recorded at the position says: `get()` of `get()(..)`; else the last)
+                let end = ctx
+                    .code
+                    .map(|c| c.chars().count())
+                    .filter(|n| callee.ends.contains(n))
+                    .or(callee.ends.last().copied())
+                    .unwrap_or(0);
+                let root = callee.root.clone();
+                // (where the root is read: `self` in `(self.f)(..)`, on its own line)
+                let root_pos = {
+                    let lines = rs[..callee.root_at].iter().filter(|&&c| c == '\n').count();
+                    let col = match rs[..callee.root_at].iter().rposition(|&c| c == '\n') {
+                        Some(n) => callee.root_at - n - 1,
+                        None => offset + callee.root_at,
+                    };
+                    (line + lines, col)
+                };
+                // a name alone before the arguments is a variable, a constant or a static,
+                // not a function of the file (`run(`)
+                if Some(end) == callee.path_end
                     && src
                         .items
                         .iter()
                         .any(|i| i.kind == ItemKind::Fn && i.name == root)
+                    && binding(&src, src.idx(root_pos), &root).is_none()
                 {
                     return Err(format!(
                         "`{root}` is a function of the file, not a pointer, in {text:?}"
@@ -460,13 +552,7 @@ impl Files<'_> {
                 // binding of the variable it copies (`if let Some(f) = o`: `o`'s), in the body
                 // of the file's function it calls (`let g = get();`: `get`'s)
                 if !root.is_empty() && self.resolve(file).ok().as_deref() == Some(path.as_path()) {
-                    // (the root as read at the call: `self` in `(self.f)(..)`)
-                    let rest: String = chars[offset..].iter().collect();
-                    let k = Regex::new(&format!(r"\b{}\b", regex::escape(&root)))
-                        .ok()
-                        .and_then(|r| r.find(&rest))
-                        .map_or(0, |m| rest[..m.start()].chars().count());
-                    let root_at = src.idx((line, offset + k));
+                    let root_at = src.idx(root_pos);
                     pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))).map_err(|e| {
                         format!("{e}, not where the function is named ({file}:{l2}:{c2})")
                     })?;
@@ -482,32 +568,31 @@ impl Files<'_> {
                         .then(|| path_and_generics(&rs, &rc))
                         .flatten()
                 });
-                let names = named.is_some_and(|(_, last, _)| {
-                    last == ident
-                        || src2.binds.iter().any(|b| {
-                            b.name == last
-                                && self.alias_of(
-                                    b,
-                                    &ident,
-                                    &sym_crate,
-                                    owner_id.as_deref(),
-                                    &src2.binds,
-                                )
-                        })
+                let names = named.is_some_and(|(quals, last, _)| {
+                    self.names_item(&src2, &p2, &quals, &last, &ident, &sym, &sym_crate)
                 });
-                // or a macro of the file whose expansion binds it is invoked there (`bind!(m)`
-                // with `let $n: HashFn = digest::digest;`): its body names it
+                // or a macro whose expansion binds it is invoked there (`bind!(m)` with `let
+                // $n: HashFn = digest::digest;`): its body names it, in the file or in
+                // another of the package
                 let by_macro = !names
                     && macro_call_at(&src2, (l2, c2))
                     && invocation_text(&src2, (l2, c2)).is_some_and(|(m, _)| {
-                        src2.items
-                            .iter()
-                            .filter(|i| i.kind == ItemKind::Macro && i.name == m)
-                            .any(|i| {
-                                let (a, b) = src2.span(i);
-                                Regex::new(&format!(r"\b{}\b", regex::escape(&ident)))
-                                    .is_ok_and(|r| r.is_match(&src2.text(a, b)))
+                        let mut files = vec![p2.clone()];
+                        if let Some(p) = self.man.owner_of(&p2) {
+                            files.extend(manifest::package_files(&p.manifest_dir));
+                        }
+                        files.iter().any(|f| {
+                            self.source(f).is_some_and(|s| {
+                                s.items
+                                    .iter()
+                                    .filter(|i| i.kind == ItemKind::Macro && i.name == m)
+                                    .any(|i| {
+                                        let (a, b) = s.span(i);
+                                        Regex::new(&format!(r"\b{}\b", regex::escape(&ident)))
+                                            .is_ok_and(|r| r.is_match(&s.text(a, b)))
+                                    })
                             })
+                        })
                     });
                 if !names && !by_macro {
                     return Err(format!(
@@ -521,68 +606,10 @@ impl Files<'_> {
             parsed = path_and_generics(&rs, &rc);
             method_call = before_blank(&src.code, src.idx((line, offset)))
                 .is_some_and(|k| src.code[k] == '.');
-            let mut ok = parsed.as_ref().is_some_and(|(_, last, _)| {
-                *last == ident
-                    || src.binds.iter().any(|b| {
-                        b.name == *last
-                            && self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &src.binds)
-                    })
-            });
-            // an alias another file defines: of this package, or of the crate the path goes
-            // through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in mylib)
-            if !ok
-                && starts_token
-                && let Some((quals, last, _)) = &parsed
-            {
-                let mut dirs: Vec<PathBuf> =
-                    owner.map(|p| p.manifest_dir.clone()).into_iter().collect();
-                for root in import_roots(&src.binds, quals.first().unwrap_or(last))
-                    .into_iter()
-                    .flatten()
-                {
-                    for r in self.crate_refs(owner_id.as_deref(), &root) {
-                        let pkg = r
-                            .strip_prefix("pkg:cargo/")
-                            .and_then(|nv| nv.split_once('@'))
-                            .and_then(|(n, v)| man.by_name_version(n, v));
-                        if let Some(p) = pkg
-                            && !dirs.contains(&p.manifest_dir)
-                        {
-                            dirs.push(p.manifest_dir.clone());
-                        }
-                    }
-                }
-                for d in dirs {
-                    let binds = self.package_binds(&d);
-                    // (a re-export inside the symbol's own crate, relative to it: `pub use
-                    // inner::DEEP as SHALLOW;` in picklib for `picklib::inner::DEEP`)
-                    let own_crate = self
-                        .man
-                        .packages
-                        .iter()
-                        .find(|p| p.manifest_dir == d)
-                        .is_some_and(|p| {
-                            p.lib_name.as_deref() == Some(sym_crate.as_str())
-                                || p.name.replace('-', "_") == sym_crate
-                        });
-                    if binds.iter().any(|b| {
-                        b.name == *last
-                            && (self.alias_of(b, &ident, &sym_crate, owner_id.as_deref(), &binds)
-                                || (own_crate && b.path.last() == Some(&ident) && {
-                                    let rel: Vec<&str> = b
-                                        .path
-                                        .iter()
-                                        .map(String::as_str)
-                                        .skip_while(|g| matches!(*g, "crate" | "self"))
-                                        .collect();
-                                    sym.ends_with(&format!("::{}", rel.join("::")))
-                                }))
-                    }) {
-                        ok = true;
-                        break;
-                    }
-                }
-            }
+            let ok = starts_token
+                && parsed.as_ref().is_some_and(|(quals, last, _)| {
+                    self.names_item(&src, &path, quals, last, &ident, &sym, &sym_crate)
+                });
             // (a `for` loop calls its iterator's `next`, and `into_iter` first: at the `for`)
             let looped = re!(
                 r"core::iter::traits::(?:iterator::Iterator\b.*::next|collect::IntoIterator\b.*::into_iter)$"
@@ -591,7 +618,7 @@ impl Files<'_> {
                 && held_in.is_none()
                 && at.starts_with("for")
                 && !at["for".len()..].starts_with(is_ident);
-            if pointer.is_none() && op.is_none() && !looped && !(ok && starts_token) {
+            if pointer.is_none() && op.is_none() && !looped && !ok {
                 return Err(format!("expected `{ident}` in {text:?}"));
             }
             // a method called on the result of a call of the same name, or whose result one is

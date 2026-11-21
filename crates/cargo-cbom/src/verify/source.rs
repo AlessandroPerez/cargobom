@@ -1343,7 +1343,7 @@ pub(super) fn in_item(item: &str) -> Option<InItem> {
 /// open. None when the position is in no attribute.
 pub(super) fn attribute_before(src: &Source, line: usize, offset: usize) -> Option<String> {
     let mut code = String::new();
-    for l in (line.saturating_sub(12).max(1)..=line).rev() {
+    for l in (line.saturating_sub(400).max(1)..=line).rev() {
         let chars: Vec<char> = src.lines[l - 1].chars().collect();
         let end = if l == line {
             offset.min(chars.len())
@@ -1356,7 +1356,12 @@ pub(super) fn attribute_before(src: &Source, line: usize, offset: usize) -> Opti
             .map(|(&c, k)| if *k == Class::Code { c } else { ' ' })
             .collect();
         code = format!("{part}\n{code}");
-        if let Some(i) = code.rfind("#[").or_else(|| code.rfind("#![")) {
+        // (`#[`, `#![`, with blanks between as the grammar allows: `# [`)
+        if let Some(i) = re!(r"#\s*!?\s*\[")
+            .find_iter(&code)
+            .last()
+            .map(|m| m.start())
+        {
             let open = code[i..].find('[').unwrap() + i + 1;
             let inner = &code[open..];
             let depth: i32 = inner

@@ -505,8 +505,27 @@ impl Toml {
 ///   version requirement its version meets;
 /// - `native library `L``: the `links` key of `[package]`, with value L, in the manifest of the
 ///   package the occurrence is evidence of.
+#[cfg(test)]
 pub(super) fn check_toml(
     keys: &[TomlKey],
+    text: &str,
+    line: usize,
+    offset: usize,
+    symbol: &str,
+    context: &str,
+    component: &str,
+) -> Result<(), String> {
+    check_toml_in(keys, &[], text, line, offset, symbol, context, component)
+}
+
+/// `check_toml`, with the keys of the workspace's manifest (`workspace`: none when the
+/// manifest is its own workspace's, or outside one): a dependency a member inherits (`sym = {
+/// workspace = true }`, `sym.workspace = true`) is the one `[workspace.dependencies]` declares
+/// under that key, there renamed and given its version.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn check_toml_in(
+    keys: &[TomlKey],
+    workspace: &[TomlKey],
     text: &str,
     line: usize,
     offset: usize,
@@ -554,8 +573,28 @@ pub(super) fn check_toml(
                     && x.path.last().is_some_and(|l| l == f)
             })
         };
+        // (inherited from the workspace: what its `[workspace.dependencies]` says of the key,
+        // in the workspace's manifest or in this one when it is the workspace's)
+        let shared = field("workspace").and_then(|_| {
+            [workspace, keys].into_iter().find_map(|ks| {
+                let at = ks
+                    .iter()
+                    .find(|x| x.path == ["workspace", "dependencies", symbol])?;
+                let of = |f: &str| {
+                    ks.iter()
+                        .find(|x| {
+                            x.path.len() == at.path.len() + 1
+                                && x.path.starts_with(&at.path)
+                                && x.path.last().is_some_and(|l| l == f)
+                        })
+                        .and_then(|x| x.value.as_deref())
+                };
+                Some((of("package"), at.value.as_deref().or(of("version"))))
+            })
+        });
         let package = field("package")
             .and_then(|x| x.value.as_deref())
+            .or(shared.and_then(|(p, _)| p))
             .unwrap_or(symbol);
         if package != cname {
             return Err(format!(
@@ -565,7 +604,8 @@ pub(super) fn check_toml(
         let req = k
             .value
             .as_deref()
-            .or_else(|| field("version").and_then(|x| x.value.as_deref()));
+            .or_else(|| field("version").and_then(|x| x.value.as_deref()))
+            .or(shared.and_then(|(_, v)| v));
         if let Some(req) = req
             && let (Ok(req), Ok(v)) = (
                 semver::VersionReq::parse(req),
@@ -647,13 +687,44 @@ pub(super) fn in_proc_macro_package(file: &Path) -> bool {
 /// The package a dependency key of the manifest in `dir` renames (`algs = { package =
 /// "picklib", .. }`: `picklib`, as a crate name), for the name the code writes.
 pub(super) fn renamed_dep(dir: &Path, name: &str) -> Option<String> {
-    let text = std::fs::read_to_string(dir.join("Cargo.toml")).ok()?;
-    let key = regex::escape(name).replace('_', "[-_]");
-    let re = Regex::new(&format!(
-        r#"(?m)^\s*{key}\s*=\s*\{{[^}}\n]*\bpackage\s*=\s*"([^"]+)""#
-    ))
-    .ok()?;
-    re.captures(&text).map(|c| c[1].replace('-', "_"))
+    let same = |k: &str| k.replace('-', "_") == name.replace('-', "_");
+    let read = |d: &Path| {
+        Some(toml_keys(
+            &std::fs::read_to_string(d.join("Cargo.toml")).ok()?,
+        ))
+    };
+    // the `package` of a key `name` in a table of dependencies, however the key is written
+    // (`name = { package = ".." }`, `[dependencies.name]`, `name.package = ".."`)
+    let package = |keys: &[TomlKey], inherited: bool| {
+        keys.iter().find_map(|k| {
+            let n = k.path.len();
+            (n >= 3
+                && k.path[n - 1] == "package"
+                && same(&k.path[n - 2])
+                && k.path[n - 3].ends_with("dependencies")
+                && (k.path[0] == "workspace") == inherited)
+                .then(|| k.value.as_ref().map(|v| v.replace('-', "_")))
+                .flatten()
+        })
+    };
+    let keys = read(dir)?;
+    if let Some(p) = package(&keys, false) {
+        return Some(p);
+    }
+    // (a dependency the workspace declares and the member inherits: renamed there)
+    let inherits = keys.iter().any(|k| {
+        let n = k.path.len();
+        n >= 3 && k.path[n - 1] == "workspace" && same(&k.path[n - 2])
+    });
+    if !inherits {
+        return None;
+    }
+    package(&keys, true).or_else(|| {
+        dir.ancestors()
+            .skip(1)
+            .find_map(|d| read(d).filter(|ks| ks.iter().any(|k| k.path[0] == "workspace")))
+            .and_then(|ks| package(&ks, true))
+    })
 }
 /// Every Rust file under a package's directory, not in `target/`, a hidden directory or
 /// another package's directory.

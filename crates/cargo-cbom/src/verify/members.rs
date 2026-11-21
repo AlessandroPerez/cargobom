@@ -839,6 +839,25 @@ impl Files<'_> {
                 None => return Ok(()),
             }
         }
+        // (the table by its path: whether the files of its module declare an item of that
+        // name; a method's constant or another module's static of the name is another item)
+        let segs: Vec<String> = table.split("::").map(str::to_string).collect();
+        let declared = (segs.len() >= 2)
+            .then(|| {
+                let dir = self
+                    .man
+                    .packages
+                    .iter()
+                    .find(|p| {
+                        p.lib_name.as_deref() == Some(segs[0].as_str())
+                            || p.name.replace('-', "_") == segs[0]
+                    })?
+                    .manifest_dir
+                    .clone();
+                self.find_item(&dir, &segs[1..segs.len() - 1], name, 4)
+            })
+            .flatten()
+            .map(|items| !items.is_empty());
         let mut found = false;
         files.dedup();
         for f in files {
@@ -872,7 +891,7 @@ impl Files<'_> {
         // it: `table!(TABLE, read, SHA256, SHA384)`): what it holds is what the CBOM cites in
         // it, each such occurrence read at its own position with the compiler's record of the
         // item
-        if !found
+        if (!found || declared == Some(false))
             && self
                 .graph
                 .cited_in
@@ -881,7 +900,7 @@ impl Files<'_> {
         {
             return tie(self);
         }
-        Err(if found {
+        Err(if found && declared != Some(false) {
             format!("`{table}` holds no `{last}`")
         } else {
             format!("no static or const `{name}` in the package")

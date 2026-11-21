@@ -1241,6 +1241,69 @@ mod tests {
     }
 
     #[test]
+    fn a_pointer_calls_callee() {
+        let c = |t: &str| {
+            let s: Vec<char> = t.chars().collect();
+            pointer_callee(&s, &classify(t)).map(|c| (c.root, c.path_end, c.ends))
+        };
+        assert_eq!(c("f(a)"), Some(("f".into(), Some(1), vec![1])));
+        assert_eq!(
+            c("Self::TABLE[0](a, b)"),
+            Some(("TABLE".into(), Some(11), vec![14]))
+        );
+        // (each group of arguments after the path may be the call's own)
+        assert_eq!(
+            c("get::<u8>()(a)"),
+            Some(("get".into(), Some(9), vec![9, 11]))
+        );
+        assert_eq!(
+            c("(self.f)(a)").map(|c| (c.0, c.1)),
+            Some(("self".into(), None))
+        );
+        assert_eq!(c("FNS[IX[0]](a)").map(|c| c.2), Some(vec![10]));
+        assert_eq!(c("f\n    (a)").map(|c| c.2), Some(vec![1]));
+        assert_eq!(c("f /* the pointer */ (a)").map(|c| c.2), Some(vec![1]));
+        assert_eq!(c("x + 1").map(|c| c.2), None);
+        assert_eq!(c("1(a)").map(|c| c.2), None);
+    }
+
+    #[test]
+    fn a_path_as_it_may_be_written() {
+        let m = written_path("mac::free_fn", r"\s*!");
+        assert!(m.is_match("mac::free_fn!(a)"));
+        assert!(m.is_match("mac::\n    free_fn!(a)"));
+        assert!(m.is_match("mac::r#free_fn ! (a)"));
+        assert!(m.is_match("::mac::free_fn!(a)"));
+        assert!(!m.is_match("mac::free_fn2!(a)"));
+        let d = written_path("Sum", r"\b");
+        assert!(d.is_match("::pm::Sum)]"));
+        assert!(d.is_match("Sum, Clone)]"));
+        assert!(!d.is_match("Summary)]"));
+    }
+
+    #[test]
+    fn a_dependency_renamed_in_any_form() {
+        let dir = std::env::temp_dir().join(format!("rcbom-renamed-{}", std::process::id()));
+        let member = dir.join("member");
+        std::fs::create_dir_all(&member).unwrap();
+        std::fs::write(
+            dir.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"member\"]\n[workspace.dependencies]\nshax = { package = \"sha2\", version = \"0.10\" }\n",
+        )
+        .unwrap();
+        std::fs::write(
+            member.join("Cargo.toml"),
+            "[package]\nname = \"m\"\n[dependencies]\ninline = { package = \"md-5\", version = \"0.10\" }\nshax = { workspace = true }\nplain = \"1\"\n[dependencies.algs]\npackage = \"picklib\"\npath = \"../picklib\"\n",
+        )
+        .unwrap();
+        assert_eq!(renamed_dep(&member, "inline").as_deref(), Some("md_5"));
+        assert_eq!(renamed_dep(&member, "algs").as_deref(), Some("picklib"));
+        assert_eq!(renamed_dep(&member, "shax").as_deref(), Some("sha2"));
+        assert_eq!(renamed_dep(&member, "plain"), None);
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn paths() {
         assert_eq!(
             path_at("Hmac::<Sha256>::new_from_slice(k)").unwrap().1,

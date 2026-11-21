@@ -695,11 +695,10 @@ impl Files<'_> {
             let head: String = rs.iter().take(400).collect();
             let name = st.name.rsplit("::").next().unwrap_or_default();
             let named = |prefix: &str, suffix: &str| {
-                Regex::new(&format!(
-                    r"^{prefix}(?:\$crate\s*::\s*|::\s*)?(?:\w+\s*::\s*)*{}{suffix}",
-                    regex::escape(name)
-                ))
-                .is_ok_and(|r| r.is_match(&head))
+                Regex::new(&format!("^{prefix}"))
+                    .ok()
+                    .and_then(|r| r.find(&head))
+                    .is_some_and(|open| written_path(name, suffix).is_match(&head[open.end()..]))
             };
             match &st.kind {
                 StepKind::Macro => {
@@ -735,7 +734,7 @@ impl Files<'_> {
                     }
                 }
                 StepKind::Attribute => {
-                    let direct = named(r"#!?\[\s*", r"\b");
+                    let direct = named(r"#\s*!?\s*\[\s*", r"\b");
                     let inside =
                         named("", r"\b") && attribute_before(&csrc, start.0, start.1).is_some();
                     if !(direct || inside) {
@@ -884,6 +883,29 @@ impl Files<'_> {
                 .any(|b| b.name == *l && b.path.last() == Some(&ident))
         {
             return Ok(true);
+        }
+        // (a `macro_rules!` body's path is resolved where the macro is invoked: a name the
+        // invoking file imports the symbol as; and `$crate::name`, one the macro's package
+        // re-exports it as)
+        if let Some(l) = &last {
+            let mut binds: Vec<Rc<Vec<Binding>>> = Vec::new();
+            for st in &w.steps {
+                let Some(call) = &st.call else { continue };
+                let cpath = self.resolve(&call.file)?;
+                if let Some(csrc) = self.source(&cpath) {
+                    binds.push(Rc::new(csrc.binds.clone()));
+                }
+            }
+            if dollar && let Some(dir) = self.man.owner_of(&path).map(|p| p.manifest_dir.clone()) {
+                binds.push(self.package_binds(&dir));
+            }
+            if binds
+                .iter()
+                .flat_map(|b| b.iter())
+                .any(|b| b.name == *l && b.path.last() == Some(&ident))
+            {
+                return Ok(true);
+            }
         }
         // (an operator is somewhere in its expression's span)
         let text = text_of(&src, w.at.start, w.at.end);

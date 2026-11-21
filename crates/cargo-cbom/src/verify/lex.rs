@@ -783,3 +783,200 @@ pub(super) fn tokens(text: &str) -> Vec<Tok> {
     let mut i = 0;
     go(&chars, &cls, &mut i, None)
 }
+
+/// The callee of a call through a pointer, as `pointer_callee` reads it.
+pub(super) struct Callee {
+    /// The name the pointer is read by: the first name of a parenthesised expression, the
+    /// last segment of a path.
+    pub(super) root: String,
+    /// Where it is, in the text read.
+    pub(super) root_at: usize,
+    /// Where the path alone ends (none for a parenthesised expression).
+    pub(super) path_end: Option<usize>,
+    /// Where the callee may end: before each bracketed group of arguments that follows (`f` of
+    /// `f(a)`; `get` and `get()` of `get()(a)`).
+    pub(super) ends: Vec<usize>,
+}
+
+/// The callee of a call through a pointer at the start of `s` (the code from the position on,
+/// over the lines after, with its classes): a parenthesised expression (`(h.f)`), or a path
+/// (`h`, `Self::F`, `algs::HASH`, `pick::<u8>`) with fields, indexes, calls and `?` after it
+/// (`fs[ix[0]]`, `get()`), before the arguments. None when the text is no such expression
+/// followed by arguments.
+pub(super) fn pointer_callee(s: &[char], cls: &[Class]) -> Option<Callee> {
+    let code = |i: usize| cls.get(i) == Some(&Class::Code);
+    // past blanks and comments
+    let skip = |mut i: usize| {
+        while i < s.len()
+            && (!code(i) && cls.get(i) != Some(&Class::Literal) || s[i].is_whitespace())
+        {
+            i += 1;
+        }
+        i
+    };
+    // past the bracket at `i` and what it holds
+    let group = |i: usize| -> Option<usize> {
+        let mut depth = 0usize;
+        for (k, &c) in s.iter().enumerate().skip(i) {
+            if !code(k) {
+                continue;
+            }
+            match c {
+                '(' | '[' | '{' => depth += 1,
+                ')' | ']' | '}' => {
+                    depth = depth.checked_sub(1)?;
+                    if depth == 0 {
+                        return Some(k + 1);
+                    }
+                }
+                _ => {}
+            }
+        }
+        None
+    };
+    let ident = |i: usize| -> usize {
+        let mut k = i;
+        if s.get(k) == Some(&'r') && s.get(k + 1) == Some(&'#') {
+            k += 2;
+        }
+        let st = k;
+        while k < s.len() && code(k) && is_ident(s[k]) {
+            k += 1;
+        }
+        if k == st || s[st].is_ascii_digit() {
+            i
+        } else {
+            k
+        }
+    };
+    let (mut i, mut root, mut root_at, mut path_end) = (0, String::new(), 0, None);
+    if s.first() == Some(&'(') {
+        i = group(0)?;
+        let inner = skip(1);
+        let mut k = inner;
+        while k < i && (matches!(s[k], '*' | '&') || s[k].is_whitespace()) {
+            k += 1;
+        }
+        let e = ident(k);
+        if e > k {
+            root = s[k..e]
+                .iter()
+                .collect::<String>()
+                .trim_start_matches("r#")
+                .to_string();
+            root_at = k;
+        }
+    } else {
+        loop {
+            let e = ident(i);
+            if e == i {
+                return None;
+            }
+            root = s[i..e]
+                .iter()
+                .collect::<String>()
+                .trim_start_matches("r#")
+                .to_string();
+            root_at = i;
+            i = e;
+            // `::segment`, `::<arguments>`
+            let mut j = skip(i);
+            let mut more = false;
+            while s.get(j) == Some(&':') && s.get(j + 1) == Some(&':') {
+                j = skip(j + 2);
+                if s.get(j) == Some(&'<') {
+                    let mut depth = 0usize;
+                    let mut k = j;
+                    while k < s.len() {
+                        if code(k) {
+                            match s[k] {
+                                '<' => depth += 1,
+                                '>' if k > 0 && s[k - 1] == '-' => {}
+                                '>' => {
+                                    depth -= 1;
+                                    if depth == 0 {
+                                        break;
+                                    }
+                                }
+                                ';' | '{' | '}' => return None,
+                                _ => {}
+                            }
+                        }
+                        k += 1;
+                    }
+                    if k >= s.len() {
+                        return None;
+                    }
+                    i = k + 1;
+                    j = skip(i);
+                } else {
+                    i = j;
+                    more = true;
+                    break;
+                }
+            }
+            if !more {
+                break;
+            }
+        }
+        path_end = Some(i);
+    }
+    let mut ends = Vec::new();
+    loop {
+        let j = skip(i);
+        match s.get(j) {
+            Some('.') => {
+                let k = skip(j + 1);
+                let mut e = ident(k);
+                if e == k {
+                    // (a tuple's element)
+                    while e < s.len() && s[e].is_ascii_digit() {
+                        e += 1;
+                    }
+                }
+                if e == k {
+                    break;
+                }
+                i = e;
+            }
+            Some('[') => i = group(j)?,
+            Some('(') => {
+                ends.push(i);
+                i = group(j)?;
+            }
+            Some('?') => i = j + 1,
+            _ => break,
+        }
+    }
+    (!ends.is_empty()).then_some(Callee {
+        root,
+        root_at,
+        path_end,
+        ends,
+    })
+}
+
+/// The code from a position on, over the lines after: comments and literals blanked.
+pub(super) fn code_from(src: &Source, line: usize, offset: usize) -> String {
+    let (s, k) = rest(src, line, offset);
+    s.iter()
+        .zip(&k)
+        .map(|(&c, k)| if *k == Class::Code { c } else { ' ' })
+        .collect()
+}
+
+/// A pattern for the path `name` as the grammar lets it be written where the text starts:
+/// from the root (`::pm::Sum`) or `$crate`, under any qualifiers, with blanks and line ends
+/// around its `::`, each segment a raw identifier or not (`mac::r#free_fn`); then `suffix`.
+pub(super) fn written_path(name: &str, suffix: &str) -> Regex {
+    let segments: Vec<String> = name
+        .split("::")
+        .filter(|g| !g.is_empty())
+        .map(|g| format!("(?:r#)?{}", regex::escape(g.trim_start_matches("r#"))))
+        .collect();
+    Regex::new(&format!(
+        r"^(?:\$crate\s*::\s*|::\s*)?(?:(?:r#)?\w+\s*::\s*)*{}{suffix}",
+        segments.join(r"\s*::\s*")
+    ))
+    .unwrap()
+}
