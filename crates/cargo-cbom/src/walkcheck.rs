@@ -167,7 +167,12 @@ fn build(
         .arg(target_dir)
         .env_remove("RUSTC_WRAPPER")
         .env_remove("RUSTC_WORKSPACE_WRAPPER")
-        .env("RUSTFLAGS", "-C symbol-mangling-version=v0")
+        // (every unit unoptimised, whatever the manifest sets for a package: cargo-deb's
+        // `[profile.release.package.serde_json] opt-level = 2` outlives the profile's own
+        // level, and an optimised unit's functions are inlined and merged where their code
+        // is the same, `error::<_, Reference<str>>` into `error::<_, Reference<[u8]>>`: the
+        // flag comes after cargo's own, and the last one counts)
+        .env("RUSTFLAGS", "-C symbol-mangling-version=v0 -C opt-level=0")
         .env(format!("CARGO_PROFILE_{profile}_OPT_LEVEL"), "0")
         .env(format!("CARGO_PROFILE_{profile}_LTO"), "false")
         .env(format!("CARGO_PROFILE_{profile}_STRIP"), "none");
