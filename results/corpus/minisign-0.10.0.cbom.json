@@ -424,35 +424,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; line: `getrandom(&mut seed)?;`; code: `getrandom`",
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; owner at src/keypair.rs:29:11-29:39 within 29:4-57:5; line: `getrandom(&mut seed)?;`; code: `getrandom`",
             "line": 31,
             "location": "src/keypair.rs",
             "offset": 8,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; line: `getrandom(&mut keynum)?;`; code: `getrandom`",
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_unencrypted_keypair; use: generate; owner at src/keypair.rs:29:11-29:39 within 29:4-57:5; line: `getrandom(&mut keynum)?;`; code: `getrandom`",
             "line": 34,
             "location": "src/keypair.rs",
             "offset": 8,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_encrypted_keypair; use: generate; line: `getrandom(&mut kdf_salt)?;`; code: `getrandom`",
+            "additionalContext": "[reachable] [call] in minisign::keypair::KeyPair::generate_encrypted_keypair; use: generate; owner at src/keypair.rs:65:11-65:37 within 65:4-106:5; line: `getrandom(&mut kdf_salt)?;`; code: `getrandom`",
             "line": 71,
             "location": "src/keypair.rs",
             "offset": 8,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; line: `getrandom(&mut z)?;`; code: `getrandom`",
+            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; owner at src/lib.rs:69:7-69:11 within 69:0-128:1; line: `getrandom(&mut z)?;`; code: `getrandom`",
             "line": 99,
             "location": "src/lib.rs",
             "offset": 4,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; line: `getrandom(&mut z)?;`; code: `getrandom`",
+            "additionalContext": "[reachable] [call] in minisign::sign; use: generate; owner at src/lib.rs:69:7-69:11 within 69:0-128:1; line: `getrandom(&mut z)?;`; code: `getrandom`",
             "line": 107,
             "location": "src/lib.rs",
             "offset": 4,
@@ -508,14 +508,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in minisign::helpers::raw_scrypt_params; new: setup, not a use; line: `scrypt::Params::new(n_log2, r, p, scrypt::Params::RECOMMENDED_LEN).map_err(Into::into)`; code: `scrypt::Params::new`",
+            "additionalContext": "[reachable] [call] in minisign::helpers::raw_scrypt_params; new: setup, not a use; owner at src/helpers.rs:45:7-45:24 within 45:0-74:1; line: `scrypt::Params::new(n_log2, r, p, scrypt::Params::RECOMMENDED_LEN).map_err(Into::into)`; code: `scrypt::Params::new`",
             "line": 73,
             "location": "src/helpers.rs",
             "offset": 4,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: computed (minisign::helpers::get_password) or parameter (argument 0 of keypair::KeyPair::generate_encrypted_keypair) or parameter (argument 1 of secret_key::SecretKey::from_box) or parameter (argument 1 of secret_key::SecretKey::from_box_) or parameter (argument 1 of secret_key::SecretKey::from_file) or parameter (argument 1 of secret_key::SecretKeyBox::into_secret_key) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of keypair::KeyPair::generate_and_write_encrypted_keypair); salt: computed (secret_key::SecretKey::from_base64) or parameter (argument 0 of the enclosing function) or rng (getrandom::fill); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in minisign::secret_key::SecretKey::encrypt; use: keyderive; password: computed (minisign::helpers::get_password) or parameter (argument 0 of keypair::KeyPair::generate_encrypted_keypair) or parameter (argument 1 of secret_key::SecretKey::from_box) or parameter (argument 1 of secret_key::SecretKey::from_box_) or parameter (argument 1 of secret_key::SecretKey::from_file) or parameter (argument 1 of secret_key::SecretKeyBox::into_secret_key) or parameter (argument 1 of the enclosing function) or parameter (argument 3 of keypair::KeyPair::generate_and_write_encrypted_keypair); salt: computed (secret_key::SecretKey::from_base64) or parameter (argument 0 of the enclosing function) or rng (getrandom::fill); owner at src/secret_key.rs:130:18-130:25 within 130:4-141:5; line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut stream)?;`; code: `scrypt::scrypt`",
             "line": 138,
             "location": "src/secret_key.rs",
             "offset": 8,
@@ -730,7 +730,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8a32ede8-66f0-8abf-a877-542b31b2c7db",
+  "serialNumber": "urn:uuid:8ba09f8f-15a1-8d4c-9f42-be0fffb918a3",
   "specVersion": "1.7",
   "version": 1
 }

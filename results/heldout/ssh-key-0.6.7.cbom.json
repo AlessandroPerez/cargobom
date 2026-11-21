@@ -1932,28 +1932,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>` (call, to 311:37 as `cbc_encrypt::<Aes128>` line #6bdfdfa6, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
             "line": 423,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes128>; use: encrypt; owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:311:16 as `cbc_encrypt::<Aes128>` (call, to 311:37 as `cbc_encrypt::<Aes128>` line #6bdfdfa6, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
             "line": 427,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>` (call, to 238:37 as `cbc_decrypt::<Aes128>` line #9140d664, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
             "line": 438,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes128>; use: decrypt; owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:238:16 as `cbc_decrypt::<Aes128>` (call, to 238:37 as `cbc_decrypt::<Aes128>` line #9140d664, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
             "line": 442,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2016,14 +2016,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>` (call, to 326:47 as `ctr_encrypt::<Ctr128BE<Aes128>>` line #88c25b5e, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
             "line": 453,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:326:16 as `ctr_encrypt::<Ctr128BE<Aes128>>` (call, to 326:47 as `ctr_encrypt::<Ctr128BE<Aes128>>` line #88c25b5e, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
             "line": 456,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2086,28 +2086,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5; line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 266,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5; line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 270,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5; line: `let cipher = Aes128Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes128Gcm::new_from_slice`",
             "line": 341,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5; line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 344,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -2178,28 +2178,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>` (call, to 316:37 as `cbc_encrypt::<Aes192>` line #7de5458b, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
             "line": 423,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes192>; use: encrypt; owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:316:16 as `cbc_encrypt::<Aes192>` (call, to 316:37 as `cbc_encrypt::<Aes192>` line #7de5458b, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
             "line": 427,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>` (call, to 245:37 as `cbc_decrypt::<Aes192>` line #b1753e21, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
             "line": 438,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes192>; use: decrypt; owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:245:16 as `cbc_decrypt::<Aes192>` (call, to 245:37 as `cbc_decrypt::<Aes192>` line #b1753e21, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
             "line": 442,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2262,14 +2262,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>` (call, to 331:47 as `ctr_encrypt::<Ctr128BE<Aes192>>` line #f548b03d, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
             "line": 453,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:331:16 as `ctr_encrypt::<Ctr128BE<Aes192>>` (call, to 331:47 as `ctr_encrypt::<Ctr128BE<Aes192>>` line #f548b03d, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
             "line": 456,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2332,28 +2332,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>`; line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>` (call, to 321:37 as `cbc_encrypt::<Aes256>` line #20bd3196, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = Encryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Encryptor::<C>::new_from_slices`",
             "line": 423,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; use: encrypt; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>`; line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_encrypt::<aes::autodetect::Aes256>; use: encrypt; owner at ssh-cipher-0.2.0/src/lib.rs:419:3-419:14 within 419:0-431:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:321:16 as `cbc_encrypt::<Aes256>` (call, to 321:37 as `cbc_encrypt::<Aes256>` line #20bd3196, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.encrypt_padded_mut::<NoPadding>(buffer, buffer.len())`; code: `encrypt_padded_mut`",
             "line": 427,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>`; line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>` (call, to 252:37 as `cbc_decrypt::<Aes256>` line #f099d7c4, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `let cipher = Decryptor::<C>::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `Decryptor::<C>::new_from_slices`",
             "line": 438,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; use: decrypt; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>`; line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::cbc_decrypt::<aes::autodetect::Aes256>; use: decrypt; owner at ssh-cipher-0.2.0/src/lib.rs:434:3-434:14 within 434:0-446:1; instantiated by ssh_cipher::Cipher::decrypt at ssh-cipher-0.2.0/src/lib.rs:252:16 as `cbc_decrypt::<Aes256>` (call, to 252:37 as `cbc_decrypt::<Aes256>` line #f099d7c4, caller at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5); line: `.decrypt_padded_mut::<NoPadding>(buffer)`; code: `decrypt_padded_mut`",
             "line": 442,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2416,14 +2416,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>`; line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; new_from_slices: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>` (call, to 336:47 as `ctr_encrypt::<Ctr128BE<Aes256>>` line #6d57a4de, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `let cipher = C::new_from_slices(key, iv).map_err(|_| Error::KeySize)?;`; code: `C::new_from_slices`",
             "line": 453,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>`; line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::ctr_encrypt::<..>; try_apply_keystream_partial: setup, not a use; owner at ssh-cipher-0.2.0/src/lib.rs:449:3-449:14 within 449:0-460:1; instantiated by ssh_cipher::Cipher::encrypt at ssh-cipher-0.2.0/src/lib.rs:336:16 as `ctr_encrypt::<Ctr128BE<Aes256>>` (call, to 336:47 as `ctr_encrypt::<Ctr128BE<Aes256>>` line #6d57a4de, caller at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5); line: `.try_apply_keystream_partial(buffer.into())`; code: `try_apply_keystream_partial`",
             "line": 456,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 9,
@@ -2486,28 +2486,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5; line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 277,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::decrypt; use: decrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:231:11-231:18 within 231:4-304:5; line: `.decrypt_in_place_detached(&nonce.into(), &[], buffer, &tag.into())`; code: `decrypt_in_place_detached`",
             "line": 281,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
             "symbol": "aead::AeadInPlace::decrypt_in_place_detached"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; new_from_slice: setup, not a use; key: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 1 of ssh_cipher::Cipher::decrypt) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5; line: `let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Error::KeySize)?;`; code: `Aes256Gcm::new_from_slice`",
             "line": 351,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 29,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::Cipher::encrypt; use: encrypt; nonce: computed (kdf::Kdf::derive_key_and_iv) or parameter (argument 2 of ssh_cipher::Cipher::decrypt) or parameter (argument 2 of the enclosing function); owner at ssh-cipher-0.2.0/src/lib.rs:307:11-307:18 within 307:4-375:5; line: `.encrypt_in_place_detached(&nonce.into(), &[], buffer)`; code: `encrypt_in_place_detached`",
             "line": 354,
             "location": "ssh-cipher-0.2.0/src/lib.rs",
             "offset": 21,
@@ -2576,35 +2576,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (default value) or parameter (argument 1 of the enclosing function); line: `let mut cipher = ChaCha20::new(key, &nonce.into());`; code: `ChaCha20::new`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function); iv: hard-coded (default value) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:41:11-41:14 within 41:4-68:5; line: `let mut cipher = ChaCha20::new(key, &nonce.into());`; code: `ChaCha20::new`",
             "line": 58,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 25,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; use: encrypt or decrypt; line: `cipher.apply_keystream(&mut poly1305_key);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; use: encrypt or decrypt; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:41:11-41:14 within 41:4-68:5; line: `cipher.apply_keystream(&mut poly1305_key);`; code: `apply_keystream`",
             "line": 60,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 15,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; seek: setup, not a use; line: `cipher.seek(64);`; code: `seek`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; seek: setup, not a use; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:41:11-41:14 within 41:4-68:5; line: `cipher.seek(64);`; code: `seek`",
             "line": 65,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 15,
             "symbol": "cipher::stream::StreamCipherSeek::seek"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: encrypt or decrypt; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:71:11-71:18 within 71:4-74:5; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 72,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 20,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: encrypt or decrypt; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: encrypt or decrypt; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:77:11-77:18 within 77:4-86:5; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 81,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 24,
@@ -2669,63 +2669,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p256::NistP256>>::try_from; try_from: setup, not a use; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p256::NistP256>>::try_from; try_from: setup, not a use; owner at src/public/ecdsa.rs:164:15-164:23 as `try_from` line #b740f885 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:165:16-165:53 as `$krate::ecdsa::VerifyingKey::try_from` line #a7a17e04 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
             "line": 200,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p256::NistP256>>::try_from; from_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p256::NistP256>>::try_from; from_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:173:15-173:23 as `try_from` line #e2512047 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:176:24-176:71 as `$krate::ecdsa::VerifyingKey::from_encoded_point` line #40f3e5e8 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
             "line": 200,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&ecdsa::verifying::VerifyingKey<p256::NistP256>>>::from; to_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&ecdsa::verifying::VerifyingKey<p256::NistP256>>>::from; to_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:193:15-193:19 as `from` line #aa3c4708 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:194:43-194:59 as `to_encoded_point` line #71209937 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:200:0-200:45 line #79e0c712 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p256, \"p256\", NistP256);`",
             "line": 200,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "ecdsa::verifying::VerifyingKey::<C>::to_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEcdsaSha2NistP256>::verify; from_encoded_point: setup, not a use; line: `p256::ecdsa::VerifyingKey::from_encoded_point(self.ec_point())?.verify(`; code: `p256::ecdsa::VerifyingKey::from_encoded_point`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEcdsaSha2NistP256>::verify; from_encoded_point: setup, not a use; owner at src/signature.rs:432:7-432:13 within 432:4-439:5; line: `p256::ecdsa::VerifyingKey::from_encoded_point(self.ec_point())?.verify(`; code: `p256::ecdsa::VerifyingKey::from_encoded_point`",
             "line": 435,
             "location": "src/signature.rs",
             "offset": 8,
             "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEcdsaSha2NistP256>::verify; use: verify; line: `p256::ecdsa::VerifyingKey::from_encoded_point(self.ec_point())?.verify(`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEcdsaSha2NistP256>::verify; use: verify; owner at src/signature.rs:432:7-432:13 within 432:4-439:5; line: `p256::ecdsa::VerifyingKey::from_encoded_point(self.ec_point())?.verify(`; code: `verify`",
             "line": 435,
             "location": "src/signature.rs",
             "offset": 72,
             "symbol": "signature::verifier::Verifier::verify"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<32>>::try_sign; from_slice: setup, not a use; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p256, \"p256\", NistP256, 32);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<32>>::try_sign; from_slice: setup, not a use; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:520:0-520:53 line #78ca0c5d defined src/signature.rs:467-518); expanded from src/signature.rs:512:34-512:71 as `$krate::ecdsa::SigningKey::from_slice` line #d3268076 (by macro impl_signature_for_curve! at src/signature.rs:520:0-520:53 line #78ca0c5d defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p256, \"p256\", NistP256, 32);`",
             "line": 520,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "ecdsa::signing::SigningKey::<C>::from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<32>>::try_sign; use: sign; expanded from src/signature.rs:513; line: `impl_signature_for_curve!(p256, \"p256\", NistP256, 32);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<32>>::try_sign; use: sign; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:520:0-520:53 line #78ca0c5d defined src/signature.rs:467-518); expanded from src/signature.rs:513:70-513:78 as `try_sign` line #82e70932 (by macro impl_signature_for_curve! at src/signature.rs:520:0-520:53 line #78ca0c5d defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p256, \"p256\", NistP256, 32);`",
             "line": 520,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; line: `let verifying_key = p256::ecdsa::VerifyingKey::try_from(self)?;`; code: `p256::ecdsa::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `let verifying_key = p256::ecdsa::VerifyingKey::try_from(self)?;`; code: `p256::ecdsa::VerifyingKey::try_from`",
             "line": 638,
             "location": "src/signature.rs",
             "offset": 40,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; line: `verifying_key.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `verifying_key.verify(message, &signature)`; code: `verify`",
             "line": 640,
             "location": "src/signature.rs",
             "offset": 34,
@@ -2778,49 +2778,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p384::NistP384>>::try_from; try_from: setup, not a use; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p384::NistP384>>::try_from; try_from: setup, not a use; owner at src/public/ecdsa.rs:164:15-164:23 as `try_from` line #b740f885 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:165:16-165:53 as `$krate::ecdsa::VerifyingKey::try_from` line #a7a17e04 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
             "line": 201,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p384::NistP384>>::try_from; from_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for ecdsa::verifying::VerifyingKey<p384::NistP384>>::try_from; from_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:173:15-173:23 as `try_from` line #e2512047 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:176:24-176:71 as `$krate::ecdsa::VerifyingKey::from_encoded_point` line #40f3e5e8 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
             "line": 201,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "ecdsa::verifying::VerifyingKey::<C>::from_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&ecdsa::verifying::VerifyingKey<p384::NistP384>>>::from; to_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&ecdsa::verifying::VerifyingKey<p384::NistP384>>>::from; to_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:193:15-193:19 as `from` line #aa3c4708 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:194:43-194:59 as `to_encoded_point` line #71209937 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:201:0-201:45 line #788d8562 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p384, \"p384\", NistP384);`",
             "line": 201,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "ecdsa::verifying::VerifyingKey::<C>::to_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<48>>::try_sign; from_slice: setup, not a use; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p384, \"p384\", NistP384, 48);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<48>>::try_sign; from_slice: setup, not a use; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:521:0-521:53 line #b0050f9c defined src/signature.rs:467-518); expanded from src/signature.rs:512:34-512:71 as `$krate::ecdsa::SigningKey::from_slice` line #d3268076 (by macro impl_signature_for_curve! at src/signature.rs:521:0-521:53 line #b0050f9c defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p384, \"p384\", NistP384, 48);`",
             "line": 521,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "ecdsa::signing::SigningKey::<C>::from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<48>>::try_sign; use: sign; expanded from src/signature.rs:513; line: `impl_signature_for_curve!(p384, \"p384\", NistP384, 48);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<48>>::try_sign; use: sign; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:521:0-521:53 line #b0050f9c defined src/signature.rs:467-518); expanded from src/signature.rs:513:70-513:78 as `try_sign` line #82e70932 (by macro impl_signature_for_curve! at src/signature.rs:521:0-521:53 line #b0050f9c defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p384, \"p384\", NistP384, 48);`",
             "line": 521,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; line: `let verifying_key = p384::ecdsa::VerifyingKey::try_from(self)?;`; code: `p384::ecdsa::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `let verifying_key = p384::ecdsa::VerifyingKey::try_from(self)?;`; code: `p384::ecdsa::VerifyingKey::try_from`",
             "line": 645,
             "location": "src/signature.rs",
             "offset": 40,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; line: `verifying_key.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `verifying_key.verify(message, &signature)`; code: `verify`",
             "line": 647,
             "location": "src/signature.rs",
             "offset": 34,
@@ -2873,49 +2873,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; try_from: setup, not a use; expanded from src/public/ecdsa.rs:165; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; try_from: setup, not a use; owner at src/public/ecdsa.rs:164:15-164:23 as `try_from` line #b740f885 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:165:16-165:53 as `$krate::ecdsa::VerifyingKey::try_from` line #a7a17e04 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
             "line": 202,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; from_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:176; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in ssh_key::public::ecdsa::<impl core::convert::TryFrom<&ssh_key::public::ecdsa::EcdsaPublicKey> for p521::ecdsa::VerifyingKey>::try_from; from_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:173:15-173:23 as `try_from` line #e2512047 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:176:24-176:71 as `$krate::ecdsa::VerifyingKey::from_encoded_point` line #40f3e5e8 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
             "line": 202,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "p521::ecdsa::VerifyingKey::from_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; to_encoded_point: setup, not a use; expanded from src/public/ecdsa.rs:194; line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
+            "additionalContext": "[reachable] [call] [macro impl_ecdsa_for_curve!] in <ssh_key::public::ecdsa::EcdsaPublicKey as core::convert::From<&p521::ecdsa::VerifyingKey>>::from; to_encoded_point: setup, not a use; owner at src/public/ecdsa.rs:193:15-193:19 as `from` line #aa3c4708 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); expanded from src/public/ecdsa.rs:194:43-194:59 as `to_encoded_point` line #71209937 (by macro impl_ecdsa_for_curve! at src/public/ecdsa.rs:202:0-202:45 line #30af88b3 defined src/public/ecdsa.rs:158-198); line: `impl_ecdsa_for_curve!(p521, \"p521\", NistP521);`",
             "line": 202,
             "location": "src/public/ecdsa.rs",
             "offset": 0,
             "symbol": "p521::ecdsa::VerifyingKey::to_encoded_point"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; from_slice: setup, not a use; expanded from src/signature.rs:512; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; from_slice: setup, not a use; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:522:0-522:53 line #1e9c1391 defined src/signature.rs:467-518); expanded from src/signature.rs:512:34-512:71 as `$krate::ecdsa::SigningKey::from_slice` line #d3268076 (by macro impl_signature_for_curve! at src/signature.rs:522:0-522:53 line #1e9c1391 defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
             "line": 522,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "p521::ecdsa::SigningKey::from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; expanded from src/signature.rs:513; line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
+            "additionalContext": "[reachable] [call] [macro impl_signature_for_curve!] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ecdsa::EcdsaPrivateKey<66>>::try_sign; use: sign; owner at src/signature.rs:511:15-511:23 as `try_sign` line #a4b498ca (by macro impl_signature_for_curve! at src/signature.rs:522:0-522:53 line #1e9c1391 defined src/signature.rs:467-518); expanded from src/signature.rs:513:70-513:78 as `try_sign` line #82e70932 (by macro impl_signature_for_curve! at src/signature.rs:522:0-522:53 line #1e9c1391 defined src/signature.rs:467-518); line: `impl_signature_for_curve!(p521, \"p521\", NistP521, 66);`",
             "line": 522,
             "location": "src/signature.rs",
             "offset": 0,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `let verifying_key = p521::ecdsa::VerifyingKey::try_from(self)?;`; code: `p521::ecdsa::VerifyingKey::try_from`",
             "line": 652,
             "location": "src/signature.rs",
             "offset": 40,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; line: `verifying_key.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ecdsa::EcdsaPublicKey>::verify; use: verify; owner at src/signature.rs:633:7-633:13 within 633:4-662:5; line: `verifying_key.verify(message, &signature)`; code: `verify`",
             "line": 654,
             "location": "src/signature.rs",
             "offset": 34,
@@ -2969,147 +2969,147 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey> for ed25519_dalek::signing::SigningKey>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::from(&key)`; code: `ed25519_dalek::SigningKey::from`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey> for ed25519_dalek::signing::SigningKey>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:102:7-102:11 within 102:4-104:5; line: `ed25519_dalek::SigningKey::from(&key)`; code: `ed25519_dalek::SigningKey::from`",
             "line": 103,
             "location": "src/private/ed25519.rs",
             "offset": 8,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ed25519_dalek::signing::SigningKey>::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::from_bytes(key.as_ref())`; code: `ed25519_dalek::SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ed25519_dalek::signing::SigningKey>::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:109:7-109:11 within 109:4-111:5; line: `ed25519_dalek::SigningKey::from_bytes(key.as_ref())`; code: `ed25519_dalek::SigningKey::from_bytes`",
             "line": 110,
             "location": "src/private/ed25519.rs",
             "offset": 8,
             "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519PrivateKey as core::convert::From<&ed25519_dalek::signing::SigningKey>>::from; to_bytes: setup, not a use; line: `Ed25519PrivateKey(key.to_bytes())`; code: `to_bytes`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519PrivateKey as core::convert::From<&ed25519_dalek::signing::SigningKey>>::from; to_bytes: setup, not a use; owner at src/private/ed25519.rs:123:7-123:11 within 123:4-125:5; line: `Ed25519PrivateKey(key.to_bytes())`; code: `to_bytes`",
             "line": 124,
             "location": "src/private/ed25519.rs",
             "offset": 30,
             "symbol": "ed25519_dalek::signing::SigningKey::to_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ssh_key::public::ed25519::Ed25519PublicKey>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::from(private)`; code: `ed25519_dalek::SigningKey::from`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ssh_key::public::ed25519::Ed25519PublicKey>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:137:7-137:11 within 137:4-141:5; line: `ed25519_dalek::SigningKey::from(private)`; code: `ed25519_dalek::SigningKey::from`",
             "line": 138,
             "location": "src/private/ed25519.rs",
             "offset": 8,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ssh_key::public::ed25519::Ed25519PublicKey>::from; verifying_key: setup, not a use; line: `.verifying_key()`; code: `verifying_key`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::From<&ssh_key::private::ed25519::Ed25519PrivateKey> for ssh_key::public::ed25519::Ed25519PublicKey>::from; verifying_key: setup, not a use; owner at src/private/ed25519.rs:137:7-137:11 within 137:4-141:5; line: `.verifying_key()`; code: `verifying_key`",
             "line": 139,
             "location": "src/private/ed25519.rs",
             "offset": 13,
             "symbol": "ed25519_dalek::signing::SigningKey::verifying_key"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey>>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let secret = ed25519_dalek::SigningKey::from(&private);`; code: `ed25519_dalek::SigningKey::from`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey>>::from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:275:7-275:11 within 275:4-279:5; line: `let secret = ed25519_dalek::SigningKey::from(&private);`; code: `ed25519_dalek::SigningKey::from`",
             "line": 276,
             "location": "src/private/ed25519.rs",
             "offset": 21,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey>>::from; verifying_key: setup, not a use; line: `let public = secret.verifying_key().into();`; code: `verifying_key`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<ssh_key::private::ed25519::Ed25519PrivateKey>>::from; verifying_key: setup, not a use; owner at src/private/ed25519.rs:275:7-275:11 within 275:4-279:5; line: `let public = secret.verifying_key().into();`; code: `verifying_key`",
             "line": 277,
             "location": "src/private/ed25519.rs",
             "offset": 28,
             "symbol": "ed25519_dalek::signing::SigningKey::verifying_key"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::try_from(&key)`; code: `ed25519_dalek::SigningKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:286:7-286:15 within 286:4-288:5; line: `ed25519_dalek::SigningKey::try_from(&key)`; code: `ed25519_dalek::SigningKey::try_from`",
             "line": 287,
             "location": "src/private/ed25519.rs",
             "offset": 8,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let signing_key = ed25519_dalek::SigningKey::from(&key.private);`; code: `ed25519_dalek::SigningKey::from`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/private/ed25519.rs:295:7-295:15 within 295:4-304:5; line: `let signing_key = ed25519_dalek::SigningKey::from(&key.private);`; code: `ed25519_dalek::SigningKey::from`",
             "line": 296,
             "location": "src/private/ed25519.rs",
             "offset": 26,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; try_from: setup, not a use; line: `let verifying_key = ed25519_dalek::VerifyingKey::try_from(&key.public)?;`; code: `ed25519_dalek::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; try_from: setup, not a use; owner at src/private/ed25519.rs:295:7-295:15 within 295:4-304:5; line: `let verifying_key = ed25519_dalek::VerifyingKey::try_from(&key.public)?;`; code: `ed25519_dalek::VerifyingKey::try_from`",
             "line": 297,
             "location": "src/private/ed25519.rs",
             "offset": 28,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; verifying_key: setup, not a use; line: `if signing_key.verifying_key() == verifying_key {`; code: `verifying_key`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::<impl core::convert::TryFrom<&ssh_key::private::ed25519::Ed25519Keypair> for ed25519_dalek::signing::SigningKey>::try_from; verifying_key: setup, not a use; owner at src/private/ed25519.rs:295:7-295:15 within 295:4-304:5; line: `if signing_key.verifying_key() == verifying_key {`; code: `verifying_key`",
             "line": 299,
             "location": "src/private/ed25519.rs",
             "offset": 23,
             "symbol": "ed25519_dalek::signing::SigningKey::verifying_key"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<&ed25519_dalek::signing::SigningKey>>::from; verifying_key: setup, not a use; line: `public: key.verifying_key().into(),`; code: `verifying_key`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::ed25519::Ed25519Keypair as core::convert::From<&ed25519_dalek::signing::SigningKey>>::from; verifying_key: setup, not a use; owner at src/private/ed25519.rs:316:7-316:11 within 316:4-321:5; line: `public: key.verifying_key().into(),`; code: `verifying_key`",
             "line": 319,
             "location": "src/private/ed25519.rs",
             "offset": 24,
             "symbol": "ed25519_dalek::signing::SigningKey::verifying_key"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::public::ed25519::<impl core::convert::TryFrom<ssh_key::public::ed25519::Ed25519PublicKey> for ed25519_dalek::verifying::VerifyingKey>::try_from; try_from: setup, not a use; line: `ed25519_dalek::VerifyingKey::try_from(&key)`; code: `ed25519_dalek::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::public::ed25519::<impl core::convert::TryFrom<ssh_key::public::ed25519::Ed25519PublicKey> for ed25519_dalek::verifying::VerifyingKey>::try_from; try_from: setup, not a use; owner at src/public/ed25519.rs:82:7-82:15 within 82:4-84:5; line: `ed25519_dalek::VerifyingKey::try_from(&key)`; code: `ed25519_dalek::VerifyingKey::try_from`",
             "line": 83,
             "location": "src/public/ed25519.rs",
             "offset": 8,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::public::ed25519::<impl core::convert::TryFrom<&ssh_key::public::ed25519::Ed25519PublicKey> for ed25519_dalek::verifying::VerifyingKey>::try_from; from_bytes: setup, not a use; line: `ed25519_dalek::VerifyingKey::from_bytes(key.as_ref()).map_err(|_| Error::Crypto)`; code: `ed25519_dalek::VerifyingKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in ssh_key::public::ed25519::<impl core::convert::TryFrom<&ssh_key::public::ed25519::Ed25519PublicKey> for ed25519_dalek::verifying::VerifyingKey>::try_from; from_bytes: setup, not a use; owner at src/public/ed25519.rs:91:7-91:15 within 91:4-93:5; line: `ed25519_dalek::VerifyingKey::from_bytes(key.as_ref()).map_err(|_| Error::Crypto)`; code: `ed25519_dalek::VerifyingKey::from_bytes`",
             "line": 92,
             "location": "src/public/ed25519.rs",
             "offset": 8,
             "symbol": "ed25519_dalek::verifying::VerifyingKey::from_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::public::ed25519::Ed25519PublicKey as core::convert::From<&ed25519_dalek::verifying::VerifyingKey>>::from; to_bytes: setup, not a use; line: `Ed25519PublicKey(key.to_bytes())`; code: `to_bytes`",
+            "additionalContext": "[reachable] [call] in <ssh_key::public::ed25519::Ed25519PublicKey as core::convert::From<&ed25519_dalek::verifying::VerifyingKey>>::from; to_bytes: setup, not a use; owner at src/public/ed25519.rs:105:7-105:11 within 105:4-107:5; line: `Ed25519PublicKey(key.to_bytes())`; code: `to_bytes`",
             "line": 106,
             "location": "src/public/ed25519.rs",
             "offset": 29,
             "symbol": "ed25519_dalek::verifying::VerifyingKey::to_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `ed25519_dalek::SigningKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/signature.rs:400:7-400:15 within 400:4-407:5; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `ed25519_dalek::SigningKey::try_from`",
             "line": 401,
             "location": "src/signature.rs",
             "offset": 24,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; use: sign; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `sign`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; use: sign; owner at src/signature.rs:400:7-400:15 within 400:4-407:5; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `sign`",
             "line": 401,
             "location": "src/signature.rs",
             "offset": 67,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; try_from: setup, not a use; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `ed25519_dalek::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:412:7-412:13 within 412:4-415:5; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `ed25519_dalek::VerifyingKey::try_from`",
             "line": 414,
             "location": "src/signature.rs",
             "offset": 8,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; use: verify; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; use: verify; owner at src/signature.rs:412:7-412:13 within 412:4-415:5; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `verify`",
             "line": 414,
             "location": "src/signature.rs",
             "offset": 53,
             "symbol": "signature::verifier::Verifier::verify"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; try_from: setup, not a use; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `ed25519_dalek::VerifyingKey::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; try_from: setup, not a use; owner at src/signature.rs:420:7-420:13 within 420:4-427:5; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `ed25519_dalek::VerifyingKey::try_from`",
             "line": 423,
             "location": "src/signature.rs",
             "offset": 8,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; use: verify; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; use: verify; owner at src/signature.rs:420:7-420:13 within 420:4-427:5; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `verify`",
             "line": 423,
             "location": "src/signature.rs",
             "offset": 66,
@@ -3165,21 +3165,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); line: `let mac = Poly1305::new(&poly1305_key);`; code: `Poly1305::new`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::new; new: setup, not a use; key: parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function); owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:41:11-41:14 within 41:4-68:5; line: `let mac = Poly1305::new(&poly1305_key);`; code: `Poly1305::new`",
             "line": 62,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 18,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: tag; line: `self.mac.compute_unpadded(buffer).into()`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::encrypt; use: tag; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:71:11-71:18 within 71:4-74:5; line: `self.mac.compute_unpadded(buffer).into()`; code: `compute_unpadded`",
             "line": 73,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 17,
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: tag; line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in ssh_cipher::chacha20poly1305::ChaCha20Poly1305::decrypt; use: tag; owner at ssh-cipher-0.2.0/src/chacha20poly1305.rs:77:11-77:18 within 77:4-86:5; line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
             "line": 78,
             "location": "ssh-cipher-0.2.0/src/chacha20poly1305.rs",
             "offset": 36,
@@ -3235,21 +3235,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>>>::try_from; new: setup, not a use; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:689:39 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`; line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>>>::try_from; new: setup, not a use; owner at src/public/rsa.rs:117:7-117:15 within 117:4-119:5; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:689:39 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from` (call, to 689:86 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from` line #245ff2da, caller at src/signature.rs:683:7-683:13 within 683:4-699:5); line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
             "line": 118,
             "location": "src/public/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; try_from: setup, not a use; line: `HashAlg::Sha256 => rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `HashAlg::Sha256 => rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`",
             "line": 689,
             "location": "src/signature.rs",
             "offset": 39,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; use: verify; line: `.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; use: verify; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `.verify(message, &signature)`; code: `verify`",
             "line": 690,
             "location": "src/signature.rs",
             "offset": 25,
@@ -3302,42 +3302,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::pkcs1v15::signing_key::SigningKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; new: setup, not a use; instantiated by ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign at src/signature.rs:668:19 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`; line: `Ok(pkcs1v15::SigningKey::new(keypair.try_into()?))`; code: `pkcs1v15::SigningKey::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::pkcs1v15::signing_key::SigningKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; new: setup, not a use; owner at src/private/rsa.rs:257:7-257:15 within 257:4-259:5; instantiated by ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign at src/signature.rs:668:19 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from` (call, to 668:64 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from` line #2e0544b7, caller at src/signature.rs:667:7-667:15 within 667:4-678:5); line: `Ok(pkcs1v15::SigningKey::new(keypair.try_into()?))`; code: `pkcs1v15::SigningKey::new`",
             "line": 258,
             "location": "src/private/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; new: setup, not a use; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:692:39 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`; line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; new: setup, not a use; owner at src/public/rsa.rs:117:7-117:15 within 117:4-119:5; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:692:39 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from` (call, to 692:86 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from` line #24ca4644, caller at src/signature.rs:683:7-683:13 within 683:4-699:5); line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
             "line": 118,
             "location": "src/public/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let data = rsa::pkcs1v15::SigningKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; try_from: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/signature.rs:667:7-667:15 within 667:4-678:5; line: `let data = rsa::pkcs1v15::SigningKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`",
             "line": 668,
             "location": "src/signature.rs",
             "offset": 19,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; use: sign; line: `.try_sign(message)`; code: `try_sign`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; use: sign; owner at src/signature.rs:667:7-667:15 within 667:4-678:5; line: `.try_sign(message)`; code: `try_sign`",
             "line": 669,
             "location": "src/signature.rs",
             "offset": 13,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; try_from: setup, not a use; line: `HashAlg::Sha512 => rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; try_from: setup, not a use; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `HashAlg::Sha512 => rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`",
             "line": 692,
             "location": "src/signature.rs",
             "offset": 39,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; use: verify; line: `.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; use: verify; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `.verify(message, &signature)`; code: `verify`",
             "line": 693,
             "location": "src/signature.rs",
             "offset": 25,
@@ -3389,14 +3389,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::RsaKeypair::random; use: keygen; rng: parameter (argument 0 of the enclosing function); line: `rsa::RsaPrivateKey::new(rng, bit_size)?.try_into()`; code: `rsa::RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::RsaKeypair::random; use: keygen; rng: parameter (argument 0 of the enclosing function); owner at src/private/rsa.rs:110:11-110:17 within 110:4-116:5; line: `rsa::RsaPrivateKey::new(rng, bit_size)?.try_into()`; code: `rsa::RsaPrivateKey::new`",
             "line": 112,
             "location": "src/private/rsa.rs",
             "offset": 12,
             "symbol": "rsa::key::RsaPrivateKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::key::RsaPrivateKey>::try_from; from_components: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); line: `let ret = rsa::RsaPrivateKey::from_components(`; code: `rsa::RsaPrivateKey::from_components`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::key::RsaPrivateKey>::try_from; from_components: setup, not a use; key: computed (boxed::Box::new_uninit) or parameter (argument 0 of the enclosing function); owner at src/private/rsa.rs:195:7-195:15 within 195:4-211:5; line: `let ret = rsa::RsaPrivateKey::from_components(`; code: `rsa::RsaPrivateKey::from_components`",
             "line": 196,
             "location": "src/private/rsa.rs",
             "offset": 18,
@@ -3460,63 +3460,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>> as ssh_encoding::writer::Writer>::write; use: digest; line: `self.update(bytes);`; code: `update`",
+            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>> as ssh_encoding::writer::Writer>::write; use: digest; owner at ssh-encoding-0.2.0/src/writer.rs:46:7-46:12 within 46:4-49:5; line: `self.update(bytes);`; code: `update`",
             "line": 47,
             "location": "ssh-encoding-0.2.0/src/writer.rs",
             "offset": 13,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::algorithm::HashAlg::digest; use: digest; line: `HashAlg::Sha256 => Sha256::digest(msg).to_vec(),`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in ssh_key::algorithm::HashAlg::digest; use: digest; owner at src/algorithm.rs:422:11-422:17 within 422:4-427:5; line: `HashAlg::Sha256 => Sha256::digest(msg).to_vec(),`; code: `Sha256::digest`",
             "line": 424,
             "location": "src/algorithm.rs",
             "offset": 31,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; new: setup, not a use; line: `let mut digest = Sha256::new();`; code: `Sha256::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; new: setup, not a use; owner at src/fingerprint.rs:62:11-62:14 within 62:4-75:5; line: `let mut digest = Sha256::new();`; code: `Sha256::new`",
             "line": 65,
             "location": "src/fingerprint.rs",
             "offset": 33,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; use: digest; line: `Self::Sha256(digest.finalize().into())`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; use: digest; owner at src/fingerprint.rs:62:11-62:14 within 62:4-75:5; line: `Self::Sha256(digest.finalize().into())`; code: `finalize`",
             "line": 67,
             "location": "src/fingerprint.rs",
             "offset": 36,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>>>::try_from; part of RSA-PKCS1-1.5-SHA-256; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:689:39 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`; line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
+            "additionalContext": "[reachable] [component] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>>>::try_from; part of RSA-PKCS1-1.5-SHA-256; owner at src/public/rsa.rs:117:7-117:15 within 117:4-119:5; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:689:39 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from` (call, to 689:86 as `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from` line #245ff2da, caller at src/signature.rs:683:7-683:13 within 683:4-699:5); line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
             "line": 118,
             "location": "src/public/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::make_sk_signed_data; use: digest; line: `signed_data.extend(Sha256::digest(application));`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::make_sk_signed_data; use: digest; owner at src/signature.rs:443:3-443:22 within 443:0-452:1; line: `signed_data.extend(Sha256::digest(application));`; code: `Sha256::digest`",
             "line": 448,
             "location": "src/signature.rs",
             "offset": 23,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::make_sk_signed_data; use: digest; line: `signed_data.extend(Sha256::digest(message));`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::make_sk_signed_data; use: digest; owner at src/signature.rs:443:3-443:22 within 443:0-452:1; line: `signed_data.extend(Sha256::digest(message));`; code: `Sha256::digest`",
             "line": 450,
             "location": "src/signature.rs",
             "offset": 23,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-256; line: `HashAlg::Sha256 => rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-256; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `HashAlg::Sha256 => rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha256>::try_from`",
             "line": 689,
             "location": "src/signature.rs",
             "offset": 39,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-256; line: `.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-256; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `.verify(message, &signature)`; code: `verify`",
             "line": 690,
             "location": "src/signature.rs",
             "offset": 25,
@@ -3568,91 +3568,91 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>> as ssh_encoding::writer::Writer>::write; use: digest; line: `self.update(bytes);`; code: `update`",
+            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>> as ssh_encoding::writer::Writer>::write; use: digest; owner at ssh-encoding-0.2.0/src/writer.rs:54:7-54:12 within 54:4-57:5; line: `self.update(bytes);`; code: `update`",
             "line": 55,
             "location": "ssh-encoding-0.2.0/src/writer.rs",
             "offset": 13,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::algorithm::HashAlg::digest; use: digest; line: `HashAlg::Sha512 => Sha512::digest(msg).to_vec(),`; code: `Sha512::digest`",
+            "additionalContext": "[reachable] [call] in ssh_key::algorithm::HashAlg::digest; use: digest; owner at src/algorithm.rs:422:11-422:17 within 422:4-427:5; line: `HashAlg::Sha512 => Sha512::digest(msg).to_vec(),`; code: `Sha512::digest`",
             "line": 425,
             "location": "src/algorithm.rs",
             "offset": 31,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; new: setup, not a use; line: `let mut digest = Sha512::new();`; code: `Sha512::new`",
+            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; new: setup, not a use; owner at src/fingerprint.rs:62:11-62:14 within 62:4-75:5; line: `let mut digest = Sha512::new();`; code: `Sha512::new`",
             "line": 70,
             "location": "src/fingerprint.rs",
             "offset": 33,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; use: digest; line: `Self::Sha512(digest.finalize().into())`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in ssh_key::fingerprint::Fingerprint::new; use: digest; owner at src/fingerprint.rs:62:11-62:14 within 62:4-75:5; line: `Self::Sha512(digest.finalize().into())`; code: `finalize`",
             "line": 72,
             "location": "src/fingerprint.rs",
             "offset": 36,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::pkcs1v15::signing_key::SigningKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; part of RSA-PKCS1-1.5-SHA-512; instantiated by ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign at src/signature.rs:668:19 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`; line: `Ok(pkcs1v15::SigningKey::new(keypair.try_into()?))`; code: `pkcs1v15::SigningKey::new`",
+            "additionalContext": "[reachable] [component] in ssh_key::private::rsa::<impl core::convert::TryFrom<&ssh_key::private::rsa::RsaKeypair> for rsa::pkcs1v15::signing_key::SigningKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; part of RSA-PKCS1-1.5-SHA-512; owner at src/private/rsa.rs:257:7-257:15 within 257:4-259:5; instantiated by ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign at src/signature.rs:668:19 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from` (call, to 668:64 as `rsa::pkcs1v15::SigningKey::<Sha512>::try_from` line #2e0544b7, caller at src/signature.rs:667:7-667:15 within 667:4-678:5); line: `Ok(pkcs1v15::SigningKey::new(keypair.try_into()?))`; code: `pkcs1v15::SigningKey::new`",
             "line": 258,
             "location": "src/private/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; part of RSA-PKCS1-1.5-SHA-512; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:692:39 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`; line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
+            "additionalContext": "[reachable] [component] in ssh_key::public::rsa::<impl core::convert::TryFrom<&ssh_key::public::rsa::RsaPublicKey> for rsa::pkcs1v15::verifying_key::VerifyingKey<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>>>::try_from; part of RSA-PKCS1-1.5-SHA-512; owner at src/public/rsa.rs:117:7-117:15 within 117:4-119:5; instantiated by ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify at src/signature.rs:692:39 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from` (call, to 692:86 as `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from` line #24ca4644, caller at src/signature.rs:683:7-683:13 within 683:4-699:5); line: `Ok(pkcs1v15::VerifyingKey::new(key.try_into()?))`; code: `pkcs1v15::VerifyingKey::new`",
             "line": 118,
             "location": "src/public/rsa.rs",
             "offset": 11,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; part of Ed25519; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `sign`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::ed25519::Ed25519Keypair>::try_sign; part of Ed25519; owner at src/signature.rs:400:7-400:15 within 400:4-407:5; line: `let signature = ed25519_dalek::SigningKey::try_from(self)?.sign(message);`; code: `sign`",
             "line": 401,
             "location": "src/signature.rs",
             "offset": 67,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; part of Ed25519; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; part of Ed25519; owner at src/signature.rs:412:7-412:13 within 412:4-415:5; line: `ed25519_dalek::VerifyingKey::try_from(self)?.verify(message, &signature)`; code: `verify`",
             "line": 414,
             "location": "src/signature.rs",
             "offset": 53,
             "symbol": "signature::verifier::Verifier::verify"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; part of Ed25519; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `verify`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; part of Ed25519; owner at src/signature.rs:420:7-420:13 within 420:4-427:5; line: `ed25519_dalek::VerifyingKey::try_from(self.public_key())?.verify(`; code: `verify`",
             "line": 423,
             "location": "src/signature.rs",
             "offset": 66,
             "symbol": "signature::verifier::Verifier::verify"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; part of RSA-PKCS1-1.5-SHA-512; line: `let data = rsa::pkcs1v15::SigningKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; part of RSA-PKCS1-1.5-SHA-512; owner at src/signature.rs:667:7-667:15 within 667:4-678:5; line: `let data = rsa::pkcs1v15::SigningKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::SigningKey::<Sha512>::try_from`",
             "line": 668,
             "location": "src/signature.rs",
             "offset": 19,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; part of RSA-PKCS1-1.5-SHA-512; line: `.try_sign(message)`; code: `try_sign`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::signer::Signer<ssh_key::signature::Signature> for ssh_key::private::rsa::RsaKeypair>::try_sign; part of RSA-PKCS1-1.5-SHA-512; owner at src/signature.rs:667:7-667:15 within 667:4-678:5; line: `.try_sign(message)`; code: `try_sign`",
             "line": 669,
             "location": "src/signature.rs",
             "offset": 13,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-512; line: `HashAlg::Sha512 => rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-512; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `HashAlg::Sha512 => rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from(self)?`; code: `rsa::pkcs1v15::VerifyingKey::<Sha512>::try_from`",
             "line": 692,
             "location": "src/signature.rs",
             "offset": 39,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-512; line: `.verify(message, &signature)`; code: `verify`",
+            "additionalContext": "[reachable] [component] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::rsa::RsaPublicKey>::verify; part of RSA-PKCS1-1.5-SHA-512; owner at src/signature.rs:683:7-683:13 within 683:4-699:5; line: `.verify(message, &signature)`; code: `verify`",
             "line": 693,
             "location": "src/signature.rs",
             "offset": 25,
@@ -3704,7 +3704,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive; use: keyderive; line: `bcrypt_pbkdf(password, salt, *rounds, output).map_err(|_| Error::Crypto)?;`; code: `bcrypt_pbkdf`",
+            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive; use: keyderive; owner at src/kdf.rs:70:11-70:17 within 70:4-78:5; line: `bcrypt_pbkdf(password, salt, *rounds, output).map_err(|_| Error::Crypto)?;`; code: `bcrypt_pbkdf`",
             "line": 74,
             "location": "src/kdf.rs",
             "offset": 16,
@@ -3759,35 +3759,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::certificate::builder::Builder::new_with_random_nonce; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; line: `rng.fill_bytes(&mut nonce);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in ssh_key::certificate::builder::Builder::new_with_random_nonce; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; owner at src/certificate/builder.rs:154:11-154:32 within 154:4-163:5; line: `rng.fill_bytes(&mut nonce);`; code: `fill_bytes`",
             "line": 161,
             "location": "src/certificate/builder.rs",
             "offset": 12,
             "symbol": "rand_core::RngCore::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::new; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::new; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; owner at src/kdf.rs:43:11-43:14 within 43:4-57:5; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
             "line": 45,
             "location": "src/kdf.rs",
             "offset": 12,
             "symbol": "rand_core::RngCore::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encrypt_with_cipher; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; line: `let checkint = rng.next_u32();`; code: `next_u32`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encrypt_with_cipher; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; owner at src/private.rs:386:11-386:30 within 386:4-400:5; line: `let checkint = rng.next_u32();`; code: `next_u32`",
             "line": 392,
             "location": "src/private.rs",
             "offset": 27,
             "symbol": "rand_core::RngCore::next_u32"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::random; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; line: `let checkint = rng.next_u32();`; code: `next_u32`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::random; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; owner at src/private.rs:488:11-488:17 within 488:4-513:5; line: `let checkint = rng.next_u32();`; code: `next_u32`",
             "line": 489,
             "location": "src/private.rs",
             "offset": 27,
             "symbol": "rand_core::RngCore::next_u32"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::Ed25519PrivateKey::random; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; line: `rng.fill_bytes(&mut key_bytes);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ed25519::Ed25519PrivateKey::random; use: generate; algorithm unresolved: a type parameter (`impl CryptoRngCore`) of the library's generic API: its callers choose the type; owner at src/private/ed25519.rs:25:11-25:17 within 25:4-29:5; line: `rng.fill_bytes(&mut key_bytes);`; code: `fill_bytes`",
             "line": 27,
             "location": "src/private/ed25519.rs",
             "offset": 12,
@@ -3842,14 +3842,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::certificate::builder::Builder::sign; use: sign; algorithm unresolved: a type parameter (`S`) of the library's generic API: its callers choose the type; line: `cert.signature = signing_key.try_sign(&tbs_cert)?;`; code: `try_sign`",
+            "additionalContext": "[reachable] [call] in ssh_key::certificate::builder::Builder::sign; use: sign; algorithm unresolved: a type parameter (`S`) of the library's generic API: its callers choose the type; owner at src/certificate/builder.rs:276:11-276:15 within 276:4-312:5; line: `cert.signature = signing_key.try_sign(&tbs_cert)?;`; code: `try_sign`",
             "line": 303,
             "location": "src/certificate/builder.rs",
             "offset": 37,
             "symbol": "signature::signer::Signer::try_sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::sshsig::SshSig::sign; use: sign; algorithm unresolved: the boundary check: `signature::signer::Signer::try_sign` of signature 2.2.0, a call nothing else in the CBOM accounts for; line: `let signature = signing_key.try_sign(&signed_data)?;`; code: `try_sign`",
+            "additionalContext": "[reachable] [call] in ssh_key::sshsig::SshSig::sign; use: sign; algorithm unresolved: the boundary check: `signature::signer::Signer::try_sign` of signature 2.2.0, a call nothing else in the CBOM accounts for; owner at src/sshsig.rs:101:11-101:15 within 101:4-123:5; line: `let signature = signing_key.try_sign(&signed_data)?;`; code: `try_sign`",
             "line": 121,
             "location": "src/sshsig.rs",
             "offset": 36,
@@ -3904,28 +3904,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `ed25519_dalek::Signature::try_from(&signature)`; code: `ed25519_dalek::Signature::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; owner at src/signature.rs:379:7-379:15 within 379:4-381:5; line: `ed25519_dalek::Signature::try_from(&signature)`; code: `ed25519_dalek::Signature::try_from`",
             "line": 380,
             "location": "src/signature.rs",
             "offset": 8,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<&ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `Ok(ed25519_dalek::Signature::try_from(signature.as_bytes())?)`; code: `ed25519_dalek::Signature::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl core::convert::TryFrom<&ssh_key::signature::Signature> for ed25519::Signature>::try_from; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; owner at src/signature.rs:388:7-388:15 within 388:4-395:5; line: `Ok(ed25519_dalek::Signature::try_from(signature.as_bytes())?)`; code: `ed25519_dalek::Signature::try_from`",
             "line": 391,
             "location": "src/signature.rs",
             "offset": 19,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::ed25519::Ed25519PublicKey>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; owner at src/signature.rs:412:7-412:13 within 412:4-415:5; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
             "line": 413,
             "location": "src/signature.rs",
             "offset": 24,
             "symbol": "core::convert::TryFrom::try_from"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
+            "additionalContext": "[reachable] [call] in ssh_key::signature::<impl signature::verifier::Verifier<ssh_key::signature::Signature> for ssh_key::public::sk::SkEd25519>::verify; use: unknown; algorithm unresolved: `core::convert::TryFrom::try_from` of ed25519 2.2.3, a crypto package the knowledge base does not model: what the call does is not known; owner at src/signature.rs:420:7-420:13 within 420:4-427:5; line: `let signature = ed25519_dalek::Signature::try_from(signature)?;`; code: `ed25519_dalek::Signature::try_from`",
             "line": 422,
             "location": "src/signature.rs",
             "offset": 24,
@@ -3980,7 +3980,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p256::SecretKey::random(rng);`; code: `p256::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); owner at src/private/ecdsa.rs:189:11-189:17 within 189:4-221:5; line: `let private = p256::SecretKey::random(rng);`; code: `p256::SecretKey::random`",
             "line": 193,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -4039,7 +4039,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); owner at src/private/ecdsa.rs:189:11-189:17 within 189:4-221:5; line: `let private = p384::SecretKey::random(rng);`; code: `p384::SecretKey::random`",
             "line": 202,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -4098,7 +4098,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::ecdsa::EcdsaKeypair::random; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.13.8, which the knowledge base does not name; rng: parameter (argument 0 of the enclosing function); owner at src/private/ecdsa.rs:189:11-189:17 within 189:4-221:5; line: `let private = p521::SecretKey::random(rng);`; code: `p521::SecretKey::random`",
             "line": 211,
             "location": "src/private/ecdsa.rs",
             "offset": 30,
@@ -4159,70 +4159,70 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive_key_and_iv; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::key_and_iv_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `let (key_size, iv_size) = cipher.key_and_iv_size().ok_or(Error::Decrypted)?;`; code: `key_and_iv_size`",
+            "additionalContext": "[reachable] [call] in ssh_key::kdf::Kdf::derive_key_and_iv; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::key_and_iv_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/kdf.rs:84:11-84:28 within 84:4-98:5; line: `let (key_size, iv_size) = cipher.key_and_iv_size().ok_or(Error::Decrypted)?;`; code: `key_and_iv_size`",
             "line": 89,
             "location": "src/kdf.rs",
             "offset": 41,
             "symbol": "ssh_cipher::Cipher::key_and_iv_size"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: decrypt; algorithm unresolved: `ssh_cipher::Cipher::decrypt` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; line: `self.cipher.decrypt(&key, &iv, &mut buffer, self.auth_tag)?;`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: decrypt; algorithm unresolved: `ssh_cipher::Cipher::decrypt` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; owner at src/private.rs:350:11-350:18 within 350:4-362:5; line: `self.cipher.decrypt(&key, &iv, &mut buffer, self.auth_tag)?;`; code: `decrypt`",
             "line": 355,
             "location": "src/private.rs",
             "offset": 20,
             "symbol": "ssh_cipher::Cipher::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `self.cipher.block_size(),`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::decrypt; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:350:11-350:18 within 350:4-362:5; line: `self.cipher.block_size(),`; code: `block_size`",
             "line": 360,
             "location": "src/private.rs",
             "offset": 24,
             "symbol": "ssh_cipher::Cipher::block_size"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encrypt_with; use: encrypt; algorithm unresolved: `ssh_cipher::Cipher::encrypt` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; line: `let auth_tag = cipher.encrypt(&key_bytes, &iv_bytes, out.as_mut_slice())?;`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encrypt_with; use: encrypt; algorithm unresolved: `ssh_cipher::Cipher::encrypt` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model; owner at src/private.rs:407:11-407:23 within 407:4-434:5; line: `let auth_tag = cipher.encrypt(&key_bytes, &iv_bytes, out.as_mut_slice())?;`; code: `encrypt`",
             "line": 424,
             "location": "src/private.rs",
             "offset": 30,
             "symbol": "ssh_cipher::Cipher::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encode_privatekey_comment_pair::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::Encode>::encode::<..> at src/private.rs:784:17 as `encode_privatekey_comment_pair`; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::EncodePem>::encode_pem at ssh-encoding-0.2.0/src/encode.rs:68:13 as `encode`; instantiated by ssh_key::private::PrivateKey::encode_openssh at src/private.rs:249:16 as `encode_pem`; line: `let padding_len = cipher.padding_len(unpadded_len);`; code: `padding_len`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encode_privatekey_comment_pair::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:609:7-609:37 within 609:4-624:5; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::Encode>::encode::<..> at src/private.rs:784:17 as `encode_privatekey_comment_pair` (call, to 784:47 as `encode_privatekey_comment_pair` line #588b9121, caller at src/private.rs:761:7-761:13 within 761:4-788:5); instantiated by <ssh_key::private::PrivateKey as ssh_encoding::encode::EncodePem>::encode_pem at ssh-encoding-0.2.0/src/encode.rs:68:13 as `encode` (call, to 68:19 as `encode` line #35b8e0c1, caller at ssh-encoding-0.2.0/src/encode.rs:63:7-63:17 within 63:4-71:5); instantiated by ssh_key::private::PrivateKey::encode_openssh at src/private.rs:249:16 as `encode_pem` (call, to 249:26 as `encode_pem` line #ad988bb9, caller at src/private.rs:244:11-244:25 within 244:4-250:5); line: `let padding_len = cipher.padding_len(unpadded_len);`; code: `padding_len`",
             "line": 616,
             "location": "src/private.rs",
             "offset": 33,
             "symbol": "ssh_cipher::Cipher::padding_len"
           },
           {
-            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encoded_privatekey_comment_pair_len; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; line: `[len, cipher.padding_len(len)].checked_sum()`; code: `padding_len`",
+            "additionalContext": "[reachable] [call] in ssh_key::private::PrivateKey::encoded_privatekey_comment_pair_len; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::padding_len` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:628:7-628:42 within 628:4-631:5; line: `[len, cipher.padding_len(len)].checked_sum()`; code: `padding_len`",
             "line": 630,
             "location": "src/private.rs",
             "offset": 21,
             "symbol": "ssh_cipher::Cipher::padding_len"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::is_some` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `if cipher.is_some() {`; code: `is_some`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::is_some` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:673:7-673:13 within 673:4-738:5; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode` (call, to 239:38 as `Self::decode` line #249c3eb6, caller at src/private.rs:237:11-237:21 within 237:4-241:5); `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode` (call, to 49:30 as `Self::decode` line #8d60073a, caller at ssh-encoding-0.2.0/src/decode.rs:44:7-44:17 within 44:4-51:5); instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem` (call, to 233:24 as `Self::decode_pem` line #6716824b, caller at src/private.rs:232:11-232:23 within 232:4-234:5); instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh` (call, to 323:26 as `Self::from_openssh` line #43cabc7d, caller at src/private.rs:320:11-320:28 within 320:4-324:5); line: `if cipher.is_some() {`; code: `is_some`",
             "line": 698,
             "location": "src/private.rs",
             "offset": 18,
             "symbol": "ssh_cipher::Cipher::is_some"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `if ciphertext.len().checked_rem(cipher.block_size()) != Some(0) {`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:673:7-673:13 within 673:4-738:5; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode` (call, to 239:38 as `Self::decode` line #249c3eb6, caller at src/private.rs:237:11-237:21 within 237:4-241:5); `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode` (call, to 49:30 as `Self::decode` line #8d60073a, caller at ssh-encoding-0.2.0/src/decode.rs:44:7-44:17 within 44:4-51:5); instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem` (call, to 233:24 as `Self::decode_pem` line #6716824b, caller at src/private.rs:232:11-232:23 within 232:4-234:5); instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh` (call, to 323:26 as `Self::from_openssh` line #43cabc7d, caller at src/private.rs:320:11-320:28 within 320:4-324:5); line: `if ciphertext.len().checked_rem(cipher.block_size()) != Some(0) {`; code: `block_size`",
             "line": 702,
             "location": "src/private.rs",
             "offset": 51,
             "symbol": "ssh_cipher::Cipher::block_size"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::has_tag` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `let auth_tag = if cipher.has_tag() {`; code: `has_tag`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::has_tag` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:673:7-673:13 within 673:4-738:5; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode` (call, to 239:38 as `Self::decode` line #249c3eb6, caller at src/private.rs:237:11-237:21 within 237:4-241:5); `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode` (call, to 49:30 as `Self::decode` line #8d60073a, caller at ssh-encoding-0.2.0/src/decode.rs:44:7-44:17 within 44:4-51:5); instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem` (call, to 233:24 as `Self::decode_pem` line #6716824b, caller at src/private.rs:232:11-232:23 within 232:4-234:5); instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh` (call, to 323:26 as `Self::from_openssh` line #43cabc7d, caller at src/private.rs:320:11-320:28 within 320:4-324:5); line: `let auth_tag = if cipher.has_tag() {`; code: `has_tag`",
             "line": 706,
             "location": "src/private.rs",
             "offset": 37,
             "symbol": "ssh_cipher::Cipher::has_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::{closure#0}; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..> at src/private.rs:735:29; instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode`; `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode`; instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem`; instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh`; line: `Self::decode_privatekey_comment_pair(reader, public_key, cipher.block_size())`; code: `block_size`",
+            "additionalContext": "[reachable] [call] in <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::{closure#0}; use: unknown; algorithm unresolved: `ssh_cipher::Cipher::block_size` of ssh-cipher 0.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/private.rs:735:29-735:37 as `|reader|` line #b0d25c84 within 735:29-737:9; owner at src/private.rs:735:29-735:37 as `|reader|` line #b0d25c84 within 735:29-737:9; instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..> at src/private.rs:735:29 (built, to 737:9 as `|reader| {` line #b0d25c84, caller at src/private.rs:673:7-673:13 within 673:4-738:5); instantiated by ssh_key::private::PrivateKey::from_bytes at src/private.rs:239:26 as `Self::decode` (call, to 239:38 as `Self::decode` line #249c3eb6, caller at src/private.rs:237:11-237:21 within 237:4-241:5); `<ssh_key::private::PrivateKey as ssh_encoding::decode::Decode>::decode::<..>` instantiated by <ssh_key::private::PrivateKey as ssh_encoding::decode::DecodePem>::decode_pem::<..> at ssh-encoding-0.2.0/src/decode.rs:49:18 as `Self::decode` (call, to 49:30 as `Self::decode` line #8d60073a, caller at ssh-encoding-0.2.0/src/decode.rs:44:7-44:17 within 44:4-51:5); instantiated by ssh_key::private::PrivateKey::from_openssh::<..> at src/private.rs:233:8 as `Self::decode_pem` (call, to 233:24 as `Self::decode_pem` line #6716824b, caller at src/private.rs:232:11-232:23 within 232:4-234:5); instantiated by ssh_key::private::PrivateKey::read_openssh_file at src/private.rs:323:8 as `Self::from_openssh` (call, to 323:26 as `Self::from_openssh` line #43cabc7d, caller at src/private.rs:320:11-320:28 within 320:4-324:5); line: `Self::decode_privatekey_comment_pair(reader, public_key, cipher.block_size())`; code: `block_size`",
             "line": 736,
             "location": "src/private.rs",
             "offset": 76,
@@ -4933,7 +4933,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e10d04fa-ae11-846a-9ab4-6255e5e80d48",
+  "serialNumber": "urn:uuid:a0e4ebe2-5e54-8722-8d3f-0bec3bb385bc",
   "specVersion": "1.7",
   "version": 1
 }

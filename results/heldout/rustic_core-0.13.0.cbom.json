@@ -977,14 +977,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `Aes128::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); owner at aes256ctr_poly1305aes-0.2.1/src/lib.rs:153:7-153:24 within 153:4-169:5; line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `Aes128::new`",
             "line": 159,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 8,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; use: encrypt; line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `encrypt_block`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; use: encrypt; owner at aes256ctr_poly1305aes-0.2.1/src/lib.rs:153:7-153:24 within 153:4-169:5; line: `Aes128::new(&self.aes128_key).encrypt_block(&mut block);`; code: `encrypt_block`",
             "line": 159,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 38,
@@ -1043,21 +1043,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::encrypt_in_place_detached; use: encrypt or decrypt; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::encrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:198:13 as `encrypt_in_place_detached`; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::encrypt_in_place_detached; use: encrypt or decrypt; owner at aes256ctr_poly1305aes-0.2.1/src/cipher.rs:30:18-30:43 within 30:4-43:5; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::encrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:198:13 as `encrypt_in_place_detached` (call, to 198:38 as `encrypt_in_place_detached` line #97c0fec3, caller at aes256ctr_poly1305aes-0.2.1/src/lib.rs:191:7-191:32 within 191:4-199:5); line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 41,
             "location": "aes256ctr_poly1305aes-0.2.1/src/cipher.rs",
             "offset": 20,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::decrypt_in_place_detached; use: encrypt or decrypt; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::decrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:209:13 as `decrypt_in_place_detached`; line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::decrypt_in_place_detached; use: encrypt or decrypt; owner at aes256ctr_poly1305aes-0.2.1/src/cipher.rs:47:18-47:43 within 47:4-69:5; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::decrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:209:13 as `decrypt_in_place_detached` (call, to 209:38 as `decrypt_in_place_detached` line #380cc2db, caller at aes256ctr_poly1305aes-0.2.1/src/lib.rs:201:7-201:32 within 201:4-210:5); line: `self.cipher.apply_keystream(buffer);`; code: `apply_keystream`",
             "line": 64,
             "location": "aes256ctr_poly1305aes-0.2.1/src/cipher.rs",
             "offset": 24,
             "symbol": "cipher::stream::StreamCipher::apply_keystream"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); line: `<Aes256Ctr as KeyIvInit>::new(&self.aes256ctr_key, nonce),`; code: `<Aes256Ctr as KeyIvInit>::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function); iv: parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); owner at aes256ctr_poly1305aes-0.2.1/src/lib.rs:153:7-153:24 within 153:4-169:5; line: `<Aes256Ctr as KeyIvInit>::new(&self.aes256ctr_key, nonce),`; code: `<Aes256Ctr as KeyIvInit>::new`",
             "line": 164,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 12,
@@ -1116,42 +1116,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::chunker::rabin::random_poly; use: generate; line: `let mut poly: u64 = rng().random();`; code: `random`",
+            "additionalContext": "[reachable] [call] in rustic_core::chunker::rabin::random_poly; use: generate; owner at src/chunker/rabin.rs:203:7-203:18 within 203:0-224:1; line: `let mut poly: u64 = rng().random();`; code: `random`",
             "line": 205,
             "location": "src/chunker/rabin.rs",
             "offset": 34,
             "symbol": "rand::rng::RngExt::random"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::commands::check::ReadSubsetOption::apply_with_rng; use: generate; `impl Rng` is `rand::rngs::thread::ThreadRng` at every call of `rustic_core::commands::check::ReadSubsetOption::apply_with_rng`, which only its crate makes; line: `packs.shuffle(rng);`; code: `shuffle`",
+            "additionalContext": "[reachable] [call] in rustic_core::commands::check::ReadSubsetOption::apply_with_rng; use: generate; `impl Rng` is `rand::rngs::thread::ThreadRng` at every call of `rustic_core::commands::check::ReadSubsetOption::apply_with_rng`, which only its crate makes; owner at src/commands/check.rs:60:7-60:21 within 60:4-102:5; line: `packs.shuffle(rng);`; code: `shuffle`",
             "line": 90,
             "location": "src/commands/check.rs",
             "offset": 18,
             "symbol": "rand::seq::slice::SliceRandom::shuffle"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::aespoly1305::Key::new; use: generate; line: `rng().fill_bytes(&mut key);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::aespoly1305::Key::new; use: generate; owner at src/crypto/aespoly1305.rs:31:11-31:14 within 31:4-35:5; line: `rng().fill_bytes(&mut key);`; code: `fill_bytes`",
             "line": 33,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 14,
             "symbol": "rand_core::Rng::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: generate; line: `rng().fill_bytes(&mut nonce);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: generate; owner at src/crypto/aespoly1305.rs:119:7-119:19 within 119:4-134:5; line: `rng().fill_bytes(&mut nonce);`; code: `fill_bytes`",
             "line": 121,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 14,
             "symbol": "rand_core::Rng::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::id::Id::random_from_rng::<..>; use: generate; instantiated by rustic_core::id::Id::random at src/id.rs:147:8 as `Self::random_from_rng`; line: `rng.fill_bytes(&mut id.0);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in rustic_core::id::Id::random_from_rng::<..>; use: generate; owner at src/id.rs:138:11-138:26 within 138:4-142:5; instantiated by rustic_core::id::Id::random at src/id.rs:147:8 as `Self::random_from_rng` (call, to 147:29 as `Self::random_from_rng` line #953f8be8, caller at src/id.rs:146:11-146:17 within 146:4-148:5); line: `rng.fill_bytes(&mut id.0);`; code: `fill_bytes`",
             "line": 140,
             "location": "src/id.rs",
             "offset": 12,
             "symbol": "rand_core::Rng::fill_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: generate; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: generate; owner at src/repofile/keyfile.rs:199:11-199:19 within 199:4-244:5; line: `rng().fill_bytes(&mut salt);`; code: `fill_bytes`",
             "line": 209,
             "location": "src/repofile/keyfile.rs",
             "offset": 14,
@@ -1206,7 +1206,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in tempfile::util::create_helper; use: generate; line: `if let Ok(seed) = getrandom::u64() {`; code: `getrandom::u64`",
+            "additionalContext": "[present] [call] in tempfile::util::create_helper; use: generate; owner at tempfile-3.27.0/src/util.rs:22:7-22:20 within 22:0-82:1; line: `if let Ok(seed) = getrandom::u64() {`; code: `getrandom::u64`",
             "line": 61,
             "location": "tempfile-3.27.0/src/util.rs",
             "offset": 30,
@@ -1262,21 +1262,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::encrypt_in_place_detached; use: tag; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::encrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:198:13 as `encrypt_in_place_detached`; line: `Ok(self.mac.compute_unpadded(buffer))`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::encrypt_in_place_detached; use: tag; owner at aes256ctr_poly1305aes-0.2.1/src/cipher.rs:30:18-30:43 within 30:4-43:5; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::encrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:198:13 as `encrypt_in_place_detached` (call, to 198:38 as `encrypt_in_place_detached` line #97c0fec3, caller at aes256ctr_poly1305aes-0.2.1/src/lib.rs:191:7-191:32 within 191:4-199:5); line: `Ok(self.mac.compute_unpadded(buffer))`; code: `compute_unpadded`",
             "line": 42,
             "location": "aes256ctr_poly1305aes-0.2.1/src/cipher.rs",
             "offset": 20,
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::decrypt_in_place_detached; use: tag; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::decrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:209:13 as `decrypt_in_place_detached`; line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::cipher::Cipher::<..>::decrypt_in_place_detached; use: tag; owner at aes256ctr_poly1305aes-0.2.1/src/cipher.rs:47:18-47:43 within 47:4-69:5; instantiated by <aes256ctr_poly1305aes::Aes256CtrPoly1305Aes as aead::AeadInPlace>::decrypt_in_place_detached at aes256ctr_poly1305aes-0.2.1/src/lib.rs:209:13 as `decrypt_in_place_detached` (call, to 209:38 as `decrypt_in_place_detached` line #380cc2db, caller at aes256ctr_poly1305aes-0.2.1/src/lib.rs:201:7-201:32 within 201:4-210:5); line: `let expected_tag = self.mac.compute_unpadded(buffer);`; code: `compute_unpadded`",
             "line": 58,
             "location": "aes256ctr_poly1305aes-0.2.1/src/cipher.rs",
             "offset": 36,
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: computed (written into an element by aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce) or parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); line: `Poly1305::new(&mac_key),`; code: `Poly1305::new`",
+            "additionalContext": "[reachable] [call] in aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce; new: setup, not a use; key: computed (written into an element by aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::cipher_from_nonce) or parameter (argument 0 of ::decrypt_in_place_detached) or parameter (argument 0 of ::encrypt_in_place_detached) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of ::decrypt_in_place_detached) or parameter (argument 1 of ::encrypt_in_place_detached) or parameter (argument 1 of the enclosing function); owner at aes256ctr_poly1305aes-0.2.1/src/lib.rs:153:7-153:24 within 153:4-169:5; line: `Poly1305::new(&mac_key),`; code: `Poly1305::new`",
             "line": 165,
             "location": "aes256ctr_poly1305aes-0.2.1/src/lib.rs",
             "offset": 12,
@@ -1332,28 +1332,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::hash; use: digest; line: `Id::new(Sha256::digest(data).into())`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::hash; use: digest; owner at src/crypto/hasher.rs:17:7-17:11 within 17:0-19:1; line: `Id::new(Sha256::digest(data).into())`; code: `Sha256::digest`",
             "line": 18,
             "location": "src/crypto/hasher.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::new; default: setup, not a use; line: `Self(Sha256::default())`; code: `Sha256::default`",
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::new; default: setup, not a use; owner at src/crypto/hasher.rs:24:11-24:14 within 24:4-26:5; line: `Self(Sha256::default())`; code: `Sha256::default`",
             "line": 25,
             "location": "src/crypto/hasher.rs",
             "offset": 13,
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::update; use: digest; line: `self.0.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::update; use: digest; owner at src/crypto/hasher.rs:28:11-28:17 within 28:4-30:5; line: `self.0.update(data);`; code: `update`",
             "line": 29,
             "location": "src/crypto/hasher.rs",
             "offset": 15,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::finalize; use: digest; line: `Id::new(self.0.finalize().into())`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in rustic_core::crypto::hasher::Hasher::finalize; use: digest; owner at src/crypto/hasher.rs:32:11-32:19 within 32:4-34:5; line: `Id::new(self.0.finalize().into())`; code: `finalize`",
             "line": 33,
             "location": "src/crypto/hasher.rs",
             "offset": 23,
@@ -1405,21 +1405,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; new: setup, not a use; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `let params = Params::new(`; code: `Params::new`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; new: setup, not a use; owner at src/repofile/keyfile.rs:101:11-101:18 within 101:4-131:5; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key` (call, to 178:40 as `kdf_key` line #76f19f0c, caller at src/repofile/keyfile.rs:177:11-177:28 within 177:4-179:5); instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password` (call, to 384:52 as `key_from_password` line #a4741192, caller at src/repofile/keyfile.rs:379:14-379:30 within 379:0-385:1); instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend` (call, to 410:28 as `key_from_backend` line #547adff5, caller at src/repofile/keyfile.rs:404:14-404:33 within 404:0-425:1); line: `let params = Params::new(`; code: `Params::new`",
             "line": 102,
             "location": "src/repofile/keyfile.rs",
             "offset": 21,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; password: parameter (argument 1 of KeyFile::key_from_password::) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of KeyFile::key_from_password::) or parameter (argument 0 of the enclosing function); instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key`; instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password`; instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend`; line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::kdf_key::<..>; use: keyderive; password: parameter (argument 1 of KeyFile::key_from_password::) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of KeyFile::key_from_password::) or parameter (argument 0 of the enclosing function); owner at src/repofile/keyfile.rs:101:11-101:18 within 101:4-131:5; instantiated by rustic_core::repofile::keyfile::KeyFile::key_from_password::<..> at src/repofile/keyfile.rs:178:33 as `kdf_key` (call, to 178:40 as `kdf_key` line #76f19f0c, caller at src/repofile/keyfile.rs:177:11-177:28 within 177:4-179:5); instantiated by rustic_core::repofile::keyfile::key_from_backend::<..> at src/repofile/keyfile.rs:384:35 as `key_from_password` (call, to 384:52 as `key_from_password` line #a4741192, caller at src/repofile/keyfile.rs:379:14-379:30 within 379:0-385:1); instantiated by rustic_core::repofile::keyfile::find_key_in_backend::<..> at src/repofile/keyfile.rs:410:12 as `key_from_backend` (call, to 410:28 as `key_from_backend` line #547adff5, caller at src/repofile/keyfile.rs:404:14-404:33 within 404:0-425:1); line: `scrypt::scrypt(passwd.as_ref(), &self.salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 122,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
             "symbol": "scrypt::scrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of commands::key::add_key_to_repo); salt: rng (rand_core::Rng::fill_bytes); line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in rustic_core::repofile::keyfile::KeyFile::generate::<&str>; use: keyderive; password: parameter (argument 1 of the enclosing function) or parameter (argument 2 of commands::key::add_key_to_repo); salt: rng (rand_core::Rng::fill_bytes); owner at src/repofile/keyfile.rs:199:11-199:19 within 199:4-244:5; line: `scrypt::scrypt(passwd.as_ref(), &salt, &params, &mut key).map_err(|err| {`; code: `scrypt::scrypt`",
             "line": 212,
             "location": "src/repofile/keyfile.rs",
             "offset": 8,
@@ -1487,14 +1487,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::decrypt_data; use: decrypt; algorithm unresolved: the type `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model; nonce: parameter (argument 1 of the enclosing function); line: `.decrypt(nonce, &data[16..])`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::decrypt_data; use: decrypt; algorithm unresolved: the type `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model; nonce: parameter (argument 1 of the enclosing function); owner at src/crypto/aespoly1305.rs:88:7-88:19 within 88:4-108:5; line: `.decrypt(nonce, &data[16..])`; code: `decrypt`",
             "line": 98,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 13,
             "symbol": "aead::Aead::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: encrypt; algorithm unresolved: the type `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model; nonce: rng (rand_core::Rng::fill_bytes); line: `.encrypt_in_place_detached(&nonce, &[], &mut res[16..])`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: encrypt; algorithm unresolved: the type `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model; nonce: rng (rand_core::Rng::fill_bytes); owner at src/crypto/aespoly1305.rs:119:7-119:19 within 119:4-134:5; line: `.encrypt_in_place_detached(&nonce, &[], &mut res[16..])`; code: `encrypt_in_place_detached`",
             "line": 127,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 13,
@@ -1553,14 +1553,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::decrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; line: `Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::decrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/crypto/aespoly1305.rs:88:7-88:19 within 88:4-108:5; line: `Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
             "line": 97,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 8,
             "symbol": "aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new"
           },
           {
-            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let tag = Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
+            "additionalContext": "[reachable] [call] in <rustic_core::crypto::aespoly1305::Key as rustic_core::crypto::CryptoKey>::encrypt_data; use: unknown; algorithm unresolved: `aes256ctr_poly1305aes::Aes256CtrPoly1305Aes::new` of aes256ctr_poly1305aes 0.2.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/crypto/aespoly1305.rs:119:7-119:19 within 119:4-134:5; line: `let tag = Aes256CtrPoly1305Aes::new(&self.0)`; code: `Aes256CtrPoly1305Aes::new`",
             "line": 126,
             "location": "src/crypto/aespoly1305.rs",
             "offset": 18,
@@ -1916,7 +1916,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:38960dc0-ee12-8be1-8b9d-461a096d49bd",
+  "serialNumber": "urn:uuid:3b7fd415-2a76-8e82-b776-aeaa02c6f4e7",
   "specVersion": "1.7",
   "version": 1
 }

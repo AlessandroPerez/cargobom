@@ -226,84 +226,84 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::generate; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `Self::generate_for(&PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::generate; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/key_pair.rs:85:8-85:16 within 85:1-87:2; line: `Self::generate_for(&PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 86,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: type-join, possible (a value `static rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256` stores in the field); line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: type-join, possible (a value `static rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256` stores in the field); owner at src/key_pair.rs:96:8-96:20 within 96:1-141:2; line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 101,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `} else if alg == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 241,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; line: `&signature::ECDSA_P256_SHA256_ASN1_SIGNING,`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `&signature::ECDSA_P256_SHA256_ASN1_SIGNING,`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 243,
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
             "line": 457,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `ecdsa_from_pkcs8(&signature::ECDSA_P256_SHA256_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `ecdsa_from_pkcs8(&signature::ECDSA_P256_SHA256_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 541,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 543,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); owner at src/ring_like.rs:12:14-12:30 within 12:0-26:1; line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 19,
             "location": "src/ring_like.rs",
             "offset": 2,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `} else if self == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 52,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `&PKCS_ECDSA_P256_SHA256,`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_ECDSA_P256_SHA256,`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 99,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P256_SHA256_ASN1_SIGNING),`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256; owner at src/sign_algo.rs:159:12-159:34 within 159:1-166:3; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P256_SHA256_ASN1_SIGNING),`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 162,
             "location": "src/sign_algo.rs",
             "offset": 29,
@@ -361,77 +361,77 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: type-join, possible (a value `static rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384` stores in the field); line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: type-join, possible (a value `static rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384` stores in the field); owner at src/key_pair.rs:96:8-96:20 within 96:1-141:2; line: `let key_pair_doc = EcdsaKeyPair::generate_pkcs8(sign_alg, rng)._err()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 101,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `} else if alg == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 247,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING,`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING,`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 249,
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `let signature = kp.sign(&system_random, msg)._err()?;`; code: `sign`",
             "line": 457,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `ecdsa_from_pkcs8(&signature::ECDSA_P384_SHA384_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `ecdsa_from_pkcs8(&signature::ECDSA_P384_SHA384_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 545,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P384_SHA384)`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P384_SHA384)`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 547,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::ring_like::ecdsa_from_pkcs8; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; member: caller, passed by `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from`; key: computed (error::ExternalError::_err) or computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der) or parameter (argument 1 of the enclosing function); owner at src/ring_like.rs:12:14-12:30 within 12:0-26:1; line: `signature::EcdsaKeyPair::from_pkcs8(alg, pkcs8, _rng)._err()`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 19,
             "location": "src/ring_like.rs",
             "offset": 2,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `} else if self == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 54,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `&PKCS_ECDSA_P384_SHA384,`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384 -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_ECDSA_P384_SHA384,`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 100,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P384_SHA384_ASN1_SIGNING),`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384; owner at src/sign_algo.rs:169:12-169:34 within 169:1-176:3; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P384_SHA384_ASN1_SIGNING),`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 172,
             "location": "src/sign_algo.rs",
             "offset": 29,
@@ -489,84 +489,84 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; line: `let key_pair_doc = Ed25519KeyPair::generate_pkcs8(rng)._err()?;`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; use: keygen; owner at src/key_pair.rs:96:8-96:20 within 96:1-141:2; line: `let key_pair_doc = Ed25519KeyPair::generate_pkcs8(rng)._err()?;`; code: `Ed25519KeyPair::generate_pkcs8`",
             "line": 112,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; from_pkcs8: setup, not a use; key: computed (error::ExternalError::_err); line: `let key_pair = Ed25519KeyPair::from_pkcs8(key_pair_doc.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::generate_for; from_pkcs8: setup, not a use; key: computed (error::ExternalError::_err); owner at src/key_pair.rs:96:8-96:20 within 96:1-141:2; line: `let key_pair = Ed25519KeyPair::from_pkcs8(key_pair_doc.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
             "line": 115,
             "location": "src/key_pair.rs",
             "offset": 19,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; line: `let kind = if alg == &PKCS_ED25519 {`; code: `PKCS_ED25519`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `let kind = if alg == &PKCS_ED25519 {`; code: `PKCS_ED25519`",
             "line": 239,
             "location": "src/key_pair.rs",
             "offset": 24,
             "symbol": "rcgen::sign_algo::algo::PKCS_ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8_maybe_unchecked: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `KeyPairKind::Ed(Ed25519KeyPair::from_pkcs8_maybe_unchecked(&serialized_der)._err()?)`; code: `Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8_maybe_unchecked: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Ed(Ed25519KeyPair::from_pkcs8_maybe_unchecked(&serialized_der)._err()?)`; code: `Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
             "line": 240,
             "location": "src/key_pair.rs",
             "offset": 19,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; line: `KeyPairKind::Ed(kp) => kp.sign(msg).as_ref().to_owned(),`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `KeyPairKind::Ed(kp) => kp.sign(msg).as_ref().to_owned(),`; code: `sign`",
             "line": 460,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::PublicKeyData>::der_bytes; public_key: setup, not a use; line: `KeyPairKind::Ed(kp) => kp.public_key().as_ref(),`; code: `public_key`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::PublicKeyData>::der_bytes; public_key: setup, not a use; owner at src/key_pair.rs:480:4-480:13 within 480:1-488:2; line: `KeyPairKind::Ed(kp) => kp.public_key().as_ref(),`; code: `public_key`",
             "line": 483,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "ring::signature::KeyPair::public_key"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; from_pkcs8_maybe_unchecked: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let (kind, alg) = if let Ok(edkp) = Ed25519KeyPair::from_pkcs8_maybe_unchecked(pkcs8) {`; code: `Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; from_pkcs8_maybe_unchecked: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `let (kind, alg) = if let Ok(edkp) = Ed25519KeyPair::from_pkcs8_maybe_unchecked(pkcs8) {`; code: `Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
             "line": 538,
             "location": "src/key_pair.rs",
             "offset": 39,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; line: `(KeyPairKind::Ed(edkp), &PKCS_ED25519)`; code: `PKCS_ED25519`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `(KeyPairKind::Ed(edkp), &PKCS_ED25519)`; code: `PKCS_ED25519`",
             "line": 539,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "rcgen::sign_algo::algo::PKCS_ED25519"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; line: `} else if self == &PKCS_ED25519 {`; code: `PKCS_ED25519`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_ED25519 {`; code: `PKCS_ED25519`",
             "line": 56,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_ED25519"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; line: `&PKCS_ED25519,`; code: `PKCS_ED25519`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_ED25519 -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_ED25519,`; code: `PKCS_ED25519`",
             "line": 107,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_ED25519"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::curve25519::ed25519::verification::ED25519; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ED25519; line: `sign_alg: SignAlgo::EdDsa(&signature::ED25519),`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_ED25519; owner at src/sign_algo.rs:222:12-222:24 within 222:1-230:3; line: `sign_alg: SignAlgo::EdDsa(&signature::ED25519),`; code: `signature::ED25519`",
             "line": 226,
             "location": "src/sign_algo.rs",
             "offset": 29,
@@ -622,63 +622,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `} else if alg == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
             "line": 253,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 255,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; member: type-join, possible (a value `<rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from` stores in the field); owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
             "line": 470,
             "location": "src/key_pair.rs",
             "offset": 7,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 550,
             "location": "src/key_pair.rs",
             "offset": 30,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
             "line": 551,
             "location": "src/key_pair.rs",
             "offset": 6,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `if self == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `if self == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
             "line": 46,
             "location": "src/sign_algo.rs",
             "offset": 14,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA256 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
             "line": 96,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA256; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA256; owner at src/sign_algo.rs:129:12-129:27 within 129:1-136:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 132,
             "location": "src/sign_algo.rs",
             "offset": 27,
@@ -730,49 +730,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `} else if alg == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
             "line": 256,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA384)`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA384)`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 258,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; member: type-join, possible (a value `rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo` stores in the field); line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; member: type-join, possible (a value `rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo` stores in the field); owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
             "line": 470,
             "location": "src/key_pair.rs",
             "offset": 7,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `} else if self == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
             "line": 48,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `&PKCS_RSA_SHA384,`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA384 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA384,`; code: `PKCS_RSA_SHA384`",
             "line": 97,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA384; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA384),`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA384; owner at src/sign_algo.rs:139:12-139:27 within 139:1-146:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA384),`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 142,
             "location": "src/sign_algo.rs",
             "offset": 27,
@@ -824,49 +824,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `} else if alg == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [via-static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
             "line": 259,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA512)`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [static] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA512)`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 261,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; member: type-join, possible (a value `rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo` stores in the field); line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; use: sign; algorithm one of 3 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; member: type-join, possible (a value `rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo` stores in the field); owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `kp.sign(*padding_alg, &system_random, msg, &mut signature)`; code: `sign`",
             "line": 470,
             "location": "src/key_pair.rs",
             "offset": 7,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `} else if self == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [via-static] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
             "line": 50,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `&PKCS_RSA_SHA512,`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; rcgen::sign_algo::algo::PKCS_RSA_SHA512 -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA512,`; code: `PKCS_RSA_SHA512`",
             "line": 98,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [via-static] in rcgen::sign_algo::SignatureAlgorithm::iter; rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS -> ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA512; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA512),`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [static] in rcgen::sign_algo::algo::PKCS_RSA_SHA512; owner at src/sign_algo.rs:149:12-149:27 within 149:1-156:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA512),`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 152,
             "location": "src/sign_algo.rs",
             "offset": 27,
@@ -914,28 +914,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
             "line": 254,
             "location": "src/key_pair.rs",
             "offset": 15,
             "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
             "line": 257,
             "location": "src/key_pair.rs",
             "offset": 15,
             "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `let rsakp = RsaKeyPair::from_pkcs8(&serialized_der)._err()?;`; code: `RsaKeyPair::from_pkcs8`",
             "line": 260,
             "location": "src/key_pair.rs",
             "offset": 15,
             "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); line: `} else if let Ok(rsakp) = RsaKeyPair::from_pkcs8(pkcs8) {`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; from_pkcs8: setup, not a use; key: computed (rustls_pki_types::PrivatePkcs8KeyDer::secret_pkcs8_der); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `} else if let Ok(rsakp) = RsaKeyPair::from_pkcs8(pkcs8) {`; code: `RsaKeyPair::from_pkcs8`",
             "line": 548,
             "location": "src/key_pair.rs",
             "offset": 29,
@@ -995,140 +995,140 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; use: digest; algorithm from ring::digest::SHA256 in the arguments; instantiated by rcgen::certificate::CertificateParams::serialize_der_with_signer::<..> at src/certificate.rs:451:42; instantiated by rcgen::certificate::CertificateParams::self_signed::<..> at src/certificate.rs:157:13 as `serialize_der_with_signer`; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/certificate.rs:451:42-451:50 as `|writer|` line #c25f5cd7 within 451:42-512:3; owner at src/certificate.rs:451:42-451:50 as `|writer|` line #c25f5cd7 within 451:42-512:3; instantiated by rcgen::certificate::CertificateParams::serialize_der_with_signer::<..> at src/certificate.rs:451:42 (built, to 512:3 as `|writer| {` line #c25f5cd7, caller at src/certificate.rs:435:15-435:40 within 435:1-515:2); instantiated by rcgen::certificate::CertificateParams::self_signed::<..> at src/certificate.rs:157:13 as `serialize_der_with_signer` (call, to 157:38 as `serialize_der_with_signer` line #5d44262b, caller at src/certificate.rs:154:8-154:19 within 154:1-159:2); line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::digest`",
             "line": 463,
             "location": "src/certificate.rs",
             "offset": 16,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; instantiated by rcgen::certificate::CertificateParams::serialize_der_with_signer::<..> at src/certificate.rs:451:42; instantiated by rcgen::certificate::CertificateParams::self_signed::<..> at src/certificate.rs:157:13 as `serialize_der_with_signer`; line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in rcgen::certificate::CertificateParams::serialize_der_with_signer::{closure#1}; owner at src/certificate.rs:451:42-451:50 as `|writer|` line #c25f5cd7 within 451:42-512:3; owner at src/certificate.rs:451:42-451:50 as `|writer|` line #c25f5cd7 within 451:42-512:3; instantiated by rcgen::certificate::CertificateParams::serialize_der_with_signer::<..> at src/certificate.rs:451:42 (built, to 512:3 as `|writer| {` line #c25f5cd7, caller at src/certificate.rs:435:15-435:40 within 435:1-515:2); instantiated by rcgen::certificate::CertificateParams::self_signed::<..> at src/certificate.rs:157:13 as `serialize_der_with_signer` (call, to 157:38 as `serialize_der_with_signer` line #5d44262b, caller at src/certificate.rs:154:8-154:19 within 154:1-159:2); line: `let hash = digest::digest(&digest::SHA256, pub_key.der_bytes());`; code: `digest::SHA256`",
             "line": 463,
             "location": "src/certificate.rs",
             "offset": 32,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::generate; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `Self::generate_for(&PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::generate; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/key_pair.rs:85:8-85:16 within 85:1-87:2; line: `Self::generate_for(&PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 86,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `} else if alg == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 241,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `&signature::ECDSA_P256_SHA256_ASN1_SIGNING,`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `&signature::ECDSA_P256_SHA256_ASN1_SIGNING,`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 243,
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `} else if alg == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
             "line": 253,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256)`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 255,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `ecdsa_from_pkcs8(&signature::ECDSA_P256_SHA256_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `ecdsa_from_pkcs8(&signature::ECDSA_P256_SHA256_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 541,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P256_SHA256)`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 543,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 550,
             "location": "src/key_pair.rs",
             "offset": 30,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
             "line": 551,
             "location": "src/key_pair.rs",
             "offset": 6,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `Self::Sha256 => &digest::SHA256,`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>` at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `Self::Sha256 => &digest::SHA256,`; code: `digest::SHA256`",
             "line": 725,
             "location": "src/lib.rs",
             "offset": 20,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
             "line": 736,
             "location": "src/lib.rs",
             "offset": 16,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `if self == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `if self == &PKCS_RSA_SHA256 {`; code: `PKCS_RSA_SHA256`",
             "line": 46,
             "location": "src/sign_algo.rs",
             "offset": 14,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `} else if self == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_ECDSA_P256_SHA256 {`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 52,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA256,`; code: `PKCS_RSA_SHA256`",
             "line": 96,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `&PKCS_ECDSA_P256_SHA256,`; code: `PKCS_ECDSA_P256_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_ECDSA_P256_SHA256,`; code: `PKCS_ECDSA_P256_SHA256`",
             "line": 99,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA256; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA256; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/sign_algo.rs:129:12-129:27 within 129:1-136:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA256),`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 132,
             "location": "src/sign_algo.rs",
             "offset": 27,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P256_SHA256_ASN1_SIGNING),`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_ECDSA_P256_SHA256; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/sign_algo.rs:159:12-159:34 within 159:1-166:3; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P256_SHA256_ASN1_SIGNING),`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 162,
             "location": "src/sign_algo.rs",
             "offset": 29,
@@ -1180,105 +1180,105 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `} else if alg == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 247,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING,`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING,`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 249,
             "location": "src/key_pair.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `} else if alg == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
             "line": 256,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA384)`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA384)`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 258,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `ecdsa_from_pkcs8(&signature::ECDSA_P384_SHA384_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `ecdsa_from_pkcs8(&signature::ECDSA_P384_SHA384_ASN1_SIGNING, pkcs8, &rng)`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 545,
             "location": "src/key_pair.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P384_SHA384)`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as core::convert::TryFrom<&rustls_pki_types::PrivateKeyDer<'_>>>::try_from; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/key_pair.rs:530:4-530:12 within 530:1-601:2; line: `(KeyPairKind::Ec(eckp), &PKCS_ECDSA_P384_SHA384)`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 547,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `Self::Sha384 => &digest::SHA384,`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>` at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `Self::Sha384 => &digest::SHA384,`; code: `digest::SHA384`",
             "line": 727,
             "location": "src/lib.rs",
             "offset": 20,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
             "line": 736,
             "location": "src/lib.rs",
             "offset": 16,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `} else if self == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_RSA_SHA384 {`; code: `PKCS_RSA_SHA384`",
             "line": 48,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `} else if self == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_ECDSA_P384_SHA384 {`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 54,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `&PKCS_RSA_SHA384,`; code: `PKCS_RSA_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA384,`; code: `PKCS_RSA_SHA384`",
             "line": 97,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `&PKCS_ECDSA_P384_SHA384,`; code: `PKCS_ECDSA_P384_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_ECDSA_P384_SHA384,`; code: `PKCS_ECDSA_P384_SHA384`",
             "line": 100,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA384; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA384),`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA384; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at src/sign_algo.rs:139:12-139:27 within 139:1-146:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA384),`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 142,
             "location": "src/sign_algo.rs",
             "offset": 27,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P384_SHA384_ASN1_SIGNING),`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_ECDSA_P384_SHA384; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/sign_algo.rs:169:12-169:34 within 169:1-176:3; line: `sign_alg: SignAlgo::EcDsa(&signature::ECDSA_P384_SHA384_ASN1_SIGNING),`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 172,
             "location": "src/sign_algo.rs",
             "offset": 29,
@@ -1330,70 +1330,70 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::generate_for; part of Ed25519; line: `let key_pair_doc = Ed25519KeyPair::generate_pkcs8(rng)._err()?;`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::generate_for; part of Ed25519; owner at src/key_pair.rs:96:8-96:20 within 96:1-141:2; line: `let key_pair_doc = Ed25519KeyPair::generate_pkcs8(rng)._err()?;`; code: `Ed25519KeyPair::generate_pkcs8`",
             "line": 112,
             "location": "src/key_pair.rs",
             "offset": 23,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `} else if alg == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `} else if alg == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
             "line": 259,
             "location": "src/key_pair.rs",
             "offset": 20,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA512)`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [component] in rcgen::key_pair::KeyPair::from_pkcs8_der_and_sign_algo; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/key_pair.rs:232:8-232:36 within 232:1-295:2; line: `KeyPairKind::Rsa(rsakp, &signature::RSA_PKCS1_SHA512)`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 261,
             "location": "src/key_pair.rs",
             "offset": 28,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; part of Ed25519; line: `KeyPairKind::Ed(kp) => kp.sign(msg).as_ref().to_owned(),`; code: `sign`",
+            "additionalContext": "[reachable] [component] in <rcgen::key_pair::KeyPair as rcgen::key_pair::SigningKey>::sign; part of Ed25519; owner at src/key_pair.rs:453:4-453:8 within 453:1-475:2; line: `KeyPairKind::Ed(kp) => kp.sign(msg).as_ref().to_owned(),`; code: `sign`",
             "line": 460,
             "location": "src/key_pair.rs",
             "offset": 29,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `Self::Sha512 => &digest::SHA512,`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in rcgen::KeyIdMethod::derive; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>` at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `Self::Sha512 => &digest::SHA512,`; code: `digest::SHA512`",
             "line": 729,
             "location": "src/lib.rs",
             "offset": 20,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive`; instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4; line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in rcgen::KeyIdMethod::derive::<alloc::vec::Vec<u8>>; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; owner at src/lib.rs:721:15-721:21 within 721:1-739:2; owner `rcgen::KeyIdMethod::derive::<&[u8]>` at src/lib.rs:721:15-721:21 within 721:1-739:2; `rcgen::KeyIdMethod::derive::<&[u8]>` instantiated by rcgen::certificate::CertificateParams::write_ca_extensions::{closure#0} at src/certificate.rs:265:52 as `derive` (call, to 265:58 as `derive` line #62f849fe, caller at src/certificate.rs:264:4-264:12 as `|writer|` line #1fc6f337 within 264:4-266:5); instantiated by rcgen::certificate::CertificateParams::write_ca_extensions at src/certificate.rs:264:4 (built, to 266:5 as `|writer| {` line #1fc6f337, caller at src/certificate.rs:252:4-252:23 within 252:1-286:2); line: `let digest = digest::digest(digest_method, subject_public_key_info.as_ref());`; code: `digest::digest`",
             "line": 736,
             "location": "src/lib.rs",
             "offset": 16,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `} else if self == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [component] in <rcgen::sign_algo::SignatureAlgorithm as core::fmt::Debug>::fmt; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/sign_algo.rs:44:4-44:7 within 44:1-74:2; line: `} else if self == &PKCS_RSA_SHA512 {`; code: `PKCS_RSA_SHA512`",
             "line": 50,
             "location": "src/sign_algo.rs",
             "offset": 21,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `&PKCS_RSA_SHA512,`; code: `PKCS_RSA_SHA512`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/sign_algo.rs:95:9-95:19 within 95:2-108:4; line: `&PKCS_RSA_SHA512,`; code: `PKCS_RSA_SHA512`",
             "line": 98,
             "location": "src/sign_algo.rs",
             "offset": 4,
             "symbol": "rcgen::sign_algo::algo::PKCS_RSA_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::SignatureAlgorithm::iter; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/sign_algo.rs:93:15-93:19 within 93:1-110:2; line: `ALGORITHMS.iter()`; code: `ALGORITHMS`",
             "line": 109,
             "location": "src/sign_algo.rs",
             "offset": 2,
             "symbol": "rcgen::sign_algo::SignatureAlgorithm::iter::ALGORITHMS"
           },
           {
-            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA512; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA512),`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [component] in rcgen::sign_algo::algo::PKCS_RSA_SHA512; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at src/sign_algo.rs:149:12-149:27 within 149:1-156:3; line: `sign_alg: SignAlgo::Rsa(&signature::RSA_PKCS1_SHA512),`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 152,
             "location": "src/sign_algo.rs",
             "offset": 27,
@@ -1595,7 +1595,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:19dbeaa9-5ea1-8719-acd9-df46573425ad",
+  "serialNumber": "urn:uuid:5afd9cf1-acd0-86e3-812f-0e091a358562",
   "specVersion": "1.7",
   "version": 1
 }
